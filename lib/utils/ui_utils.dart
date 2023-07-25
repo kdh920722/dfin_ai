@@ -8,7 +8,7 @@ import 'app_config.dart';
 import 'common_utils.dart';
 
 class UiUtils {
-  static ScreenUtilInit getMainView(BuildContext context, Widget mainView, Future<bool> Function(BuildContext? context) callbackBackButtonForView){
+  static ScreenUtilInit getMainView2(BuildContext context, Widget mainView, Future<bool> Function(BuildContext? context) callbackBackButtonForView){
     return ScreenUtilInit( // 스크린 사이즈 비율 고정
         designSize: const Size(Config.appWidth, Config.appHeight),
         builder: (context, child) {
@@ -27,11 +27,11 @@ class UiUtils {
                           FocusManager.instance.primaryFocus?.unfocus();
                           scrollController.jumpTo(0);
                           },
-                        child: Scaffold(
-                          backgroundColor: Colors.black,
-                          body: SafeArea(
-                              child: WillPopScope(
-                                  onWillPop: () => callbackBackButtonForView(context),
+                        child: WillPopScope(
+                          onWillPop: () => callbackBackButtonForView(context),
+                          child: Scaffold(
+                              backgroundColor: Colors.black,
+                              body: SafeArea(
                                   child: Container(
                                       color: Colors.black,
                                       alignment: AlignmentDirectional.center,
@@ -40,12 +40,12 @@ class UiUtils {
                                           shrinkWrap: true,
                                           physics: const BouncingScrollPhysics(),
                                           children: [
-                                            SizedBox(width: Config.appRealSize[0].w, height: Config.appRealSize[1].h, child: child!)
+                                            SizedBox(width: Config.appRealSize[0], height: Config.appRealSize[1], child: child!)
                                           ]
                                       )
                                   )
                               )
-                          )
+                          ),
                         )
                     )
                 );
@@ -53,6 +53,54 @@ class UiUtils {
           );
         },
       child: mainView
+    );
+  }
+
+  static ScreenUtilInit getMainView(BuildContext context, Widget mainView){
+    return ScreenUtilInit( // 스크린 사이즈 비율 고정
+        designSize: const Size(Config.appWidth, Config.appHeight),
+        builder: (context, child) {
+          return MaterialApp(
+              home: child,
+              builder: (context, child) {
+                if(!Config.isAppMainInit){
+                  Config.appFullSize = CommonUtils.fullSize(context);
+                  Config.appRealSize = CommonUtils.safeSize(context);
+                  Config.isAppMainInit = true;
+                }
+                return MediaQuery(
+                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
+                    child: GestureDetector(
+                        onTap: () {
+                          FocusManager.instance.primaryFocus?.unfocus();
+                          scrollController.jumpTo(0);
+                        },
+                        child: SafeArea(
+                            child: child!
+                        )
+                    )
+                );
+              }
+          );
+        },
+        child: mainView
+    );
+  }
+
+  static Widget getView(BuildContext context, Widget view, Future<bool> Function(BuildContext? context) callbackBackButtonForView){
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: WillPopScope(
+        onWillPop: () => callbackBackButtonForView(context),
+        child: ListView(
+            controller: scrollController,
+            shrinkWrap: true,
+            physics: const BouncingScrollPhysics(),
+            children: [
+              SizedBox(width: Config.appRealSize[0], height: Config.appRealSize[1], child: view)
+            ]
+        )
+      ),
     );
   }
 
@@ -229,10 +277,8 @@ class UiUtils {
   }
 
   static void closeLoadingPop(BuildContext targetContext){
-    if(isLoadingPopOn) {
-      isLoadingPopOn = false;
-      Navigator.pop(targetContext);
-    }
+    isLoadingPopOn = false;
+    Navigator.pop(targetContext);
   }
 
   static void showPop(BuildContext parentViewContext, Widget Function(BuildContext context, StateSetter setState) createWidgetMethod){

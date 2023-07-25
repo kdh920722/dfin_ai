@@ -3,18 +3,17 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutterwebchat/controllers/api_controller.dart';
 import 'package:flutterwebchat/styles/ColorStyles.dart';
-import 'package:flutterwebchat/views/test_view.dart';
 import '../styles/TextStyles.dart';
 import '../utils/app_config.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
 
-class ChatView extends StatefulWidget{
+class TestView extends StatefulWidget{
   @override
-  ChatViewState createState() => ChatViewState();
+  TestViewState createState() => TestViewState();
 }
 
-class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
+class TestViewState extends State<TestView> with WidgetsBindingObserver{
   List<Map<String, String>> messages = [];
   final messageListViewController = ScrollController();
   final inputTextController = TextEditingController();

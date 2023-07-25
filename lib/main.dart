@@ -40,7 +40,7 @@ class MyApp extends StatelessWidget {
       _keyboardVisibilityController ??= CommonUtils.getKeyboardViewController(null, _functionForKeyboardHide);
     }
 
-    return UiUtils.getMainView(context, ChatView(), CommonUtils.onWillPopForPreventBackButton);
+    return UiUtils.getMainView(context, ChatView());
   }
 }
 
