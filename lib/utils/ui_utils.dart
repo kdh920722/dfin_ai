@@ -8,54 +8,6 @@ import '../configs/app_config.dart';
 import 'common_utils.dart';
 
 class UiUtils {
-  static ScreenUtilInit getMainView2(BuildContext context, Widget mainView, Future<bool> Function(BuildContext? context) callbackBackButtonForView){
-    return ScreenUtilInit( // 스크린 사이즈 비율 고정
-        designSize: const Size(Config.appWidth, Config.appHeight),
-        builder: (context, child) {
-          return MaterialApp(
-              home: child,
-              builder: (context, child) {
-                if(!Config.isAppMainInit){
-                  Config.appFullSize = CommonUtils.fullSize(context);
-                  Config.appRealSize = CommonUtils.safeSize(context);
-                  Config.isAppMainInit = true;
-                }
-                return MediaQuery(
-                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
-                    child: GestureDetector(
-                        onTap: () {
-                          FocusManager.instance.primaryFocus?.unfocus();
-                          scrollController.jumpTo(0);
-                          },
-                        child: WillPopScope(
-                          onWillPop: () => callbackBackButtonForView(context),
-                          child: Scaffold(
-                              backgroundColor: Colors.black,
-                              body: SafeArea(
-                                  child: Container(
-                                      color: Colors.black,
-                                      alignment: AlignmentDirectional.center,
-                                      child: ListView(
-                                          controller: scrollController,
-                                          shrinkWrap: true,
-                                          physics: const BouncingScrollPhysics(),
-                                          children: [
-                                            SizedBox(width: Config.appRealSize[0], height: Config.appRealSize[1], child: child!)
-                                          ]
-                                      )
-                                  )
-                              )
-                          ),
-                        )
-                    )
-                );
-              }
-          );
-        },
-      child: mainView
-    );
-  }
-
   static ScreenUtilInit getMainView(BuildContext context, Widget mainView){
     return ScreenUtilInit( // 스크린 사이즈 비율 고정
         designSize: const Size(Config.appWidth, Config.appHeight),
@@ -70,14 +22,8 @@ class UiUtils {
                 }
                 return MediaQuery(
                     data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
-                    child: GestureDetector(
-                        onTap: () {
-                          FocusManager.instance.primaryFocus?.unfocus();
-                          scrollController.jumpTo(0);
-                        },
-                        child: SafeArea(
-                            child: child!
-                        )
+                    child: SafeArea(
+                        child: child!
                     )
                 );
               }
@@ -88,19 +34,40 @@ class UiUtils {
   }
 
   static Widget getView(BuildContext context, Widget view, Future<bool> Function(BuildContext? context) callbackBackButtonForView){
-    return Scaffold(
-      backgroundColor: Colors.black,
-      body: WillPopScope(
-        onWillPop: () => callbackBackButtonForView(context),
-        child: ListView(
-            controller: scrollController,
-            shrinkWrap: true,
-            physics: const BouncingScrollPhysics(),
-            children: [
-              SizedBox(width: Config.appRealSize[0], height: Config.appRealSize[1], child: view)
-            ]
+    return GestureDetector(
+        onTap: () {
+          FocusManager.instance.primaryFocus?.unfocus();
+        },
+        child: Scaffold(
+          backgroundColor: Colors.black,
+          body: WillPopScope(
+              onWillPop: () => callbackBackButtonForView(context),
+              child: SizedBox(width: Config.appRealSize[0], height: Config.appRealSize[1], child: view)
+          ),
         )
-      ),
+    );
+  }
+
+  static Widget getViewWithScroll(BuildContext context, Widget view, ScrollController scrollController, Future<bool> Function(BuildContext? context) callbackBackButtonForView){
+    return GestureDetector(
+      onTap: () {
+        FocusManager.instance.primaryFocus?.unfocus();
+        scrollController.jumpTo(0);
+      },
+      child: Scaffold(
+        backgroundColor: Colors.black,
+        body: WillPopScope(
+            onWillPop: () => callbackBackButtonForView(context),
+            child: ListView(
+                controller: scrollController,
+                shrinkWrap: true,
+                physics: const BouncingScrollPhysics(),
+                children: [
+                  SizedBox(width: Config.appRealSize[0], height: Config.appRealSize[1], child: view)
+                ]
+            )
+        ),
+      )
     );
   }
 

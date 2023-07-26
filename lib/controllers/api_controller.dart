@@ -26,17 +26,17 @@ class ApiController{
   static String prompt = "Hi, my name is 'KDH'";
   /// ------------------------------------------------------------------------------------------------------------------------ ///
 
-  static final openAI = OpenAI.instance.build(token: IgnoreConfig.apiKey, baseOption: HttpSetup(receiveTimeout: const Duration(seconds: 5)),enableLog: true);
+  static final openAI = OpenAI.instance.build(token: IgnoreConfig.apiKey, baseOption: HttpSetup(receiveTimeout: const Duration(seconds: 60)),enableLog: true);
   /// work only with gpt-turbo-0613,gpt-4-0613
-  static Future<String> sendAndReceiveTextToGPTUsingLib(String message) async {
+  static Future<String> sendAndReceiveTextToGPTUsingLib(List<Messages> messageList) async {
     try{
-      final request = ChatCompleteText(messages: [Messages(role: Role.user, content: message)], maxToken: 200, model: Gpt4ChatModel());
+      final request = ChatCompleteText(messages: messageList, maxToken: 1024, model: Gpt4ChatModel());
       final response = await openAI.onChatCompletion(request: request);
       String resultMessage = "";
       for (var element in response!.choices) {
         resultMessage += "${element.message!.content}\n";
       }
-      return resultMessage.replaceAll('\n\n', '');
+      return resultMessage.replaceAll('\n', '');
     }catch(ex){
       return "exception : ${ex.toString()}";
     }
