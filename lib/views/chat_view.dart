@@ -105,7 +105,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
     setState(() {});
 
     UiUtils.showLoadingPop(context);
-    String receivedMessage = await ApiController.sendAndReceiveTextToGPT(message);
+    String receivedMessage = await ApiController.sendAndReceiveTextToGPT3(message);
     if(context.mounted){
       _receiveMessage(receivedMessage);
       UiUtils.closeLoadingPop(context);
@@ -123,7 +123,6 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
 
   @override
   Widget build(BuildContext context) {
-
     if(messageListViewController.positions.isNotEmpty){
       SchedulerBinding.instance.addPostFrameCallback((_) {
         messageListViewController.jumpTo(messageListViewController.position.maxScrollExtent);
@@ -133,15 +132,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
     Widget view = Container(width: Config.appRealSize[0], color: ColorStyles.finAppWhite, child:Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        Container(height: Config.appRealSize[1]*0.9, color: ColorStyles.finAppGreen, padding : const EdgeInsets.all(10),
-                  child: messages.isEmpty? Container() : ListView.builder(
-                    controller: messageListViewController,
-                    scrollDirection: Axis.vertical,
-                    itemCount: messages.length,
-                    itemBuilder: (context, index) {
-                      return _getChatBox(messages[index]);
-                    },
-                  )),
+
         UiUtils.getMarginBox(Config.appRealSize[1]*0.005, 0),
         Container(width: Config.appRealSize[0]*0.95, height: Config.appRealSize[1]*0.095, color: ColorStyles.finAppWhite,
             child: Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center, children: [
@@ -161,7 +152,16 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
                 }
               })
             ])
-        )
+        ),
+        Container(height: Config.appRealSize[1]*0.9, color: ColorStyles.finAppGreen, padding : const EdgeInsets.all(10),
+            child: messages.isEmpty? Container() : ListView.builder(
+              controller: messageListViewController,
+              scrollDirection: Axis.vertical,
+              itemCount: messages.length,
+              itemBuilder: (context, index) {
+                return _getChatBox(messages[index]);
+              },
+            )),
       ],
     ));
 

@@ -45,6 +45,8 @@ dependencies:
   intl: ^0.17.0
   get: ^4.6.5
   openai_client: ^0.0.7
+  chat_gpt_sdk: 2.2.3
+  velocity_x: ^3.6.0
 
 dev_dependencies:
   flutter_test:
