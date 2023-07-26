@@ -247,7 +247,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
                   decoration: UiUtils.getInputDecorationWithNoErrorMessage("INPUT"),
                 ),
               ),
-              UiUtils.getMarginBox(0, Config.appRealSize[0] * 0.95 * 0.02),
+              UiUtils.getMarginBox(0, Config.appRealSize[0] * 0.95 * 0.03),
               UiUtils.getIconButtonBox(
                 Config.appRealSize[0] * 0.95 * 0.2,
                 Icons.send,
