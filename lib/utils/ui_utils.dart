@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import '../main.dart';
 import '../styles/ColorStyles.dart';
 import '../styles/TextStyles.dart';
-import 'app_config.dart';
+import '../configs/app_config.dart';
 import 'common_utils.dart';
 
 class UiUtils {

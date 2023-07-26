@@ -3,9 +3,8 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutterwebchat/controllers/api_controller.dart';
 import 'package:flutterwebchat/styles/ColorStyles.dart';
-import 'package:flutterwebchat/views/test_view.dart';
 import '../styles/TextStyles.dart';
-import '../utils/app_config.dart';
+import '../configs/app_config.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
 
@@ -105,7 +104,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
     setState(() {});
 
     UiUtils.showLoadingPop(context);
-    String receivedMessage = await ApiController.sendAndReceiveTextToGPT3(message);
+    String receivedMessage = await ApiController.sendAndReceiveTextToGPTUsingLib(message);
     if(context.mounted){
       _receiveMessage(receivedMessage);
       UiUtils.closeLoadingPop(context);
@@ -132,8 +131,21 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
     Widget view = Container(width: Config.appRealSize[0], color: ColorStyles.finAppWhite, child:Column(
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
+        /// 채팅 메인 화면
+        Container(height: Config.appRealSize[1]*0.9, color: ColorStyles.finAppGreen, padding : const EdgeInsets.all(10),
+            child: messages.isEmpty? Container() : ListView.builder(
+              controller: messageListViewController,
+              scrollDirection: Axis.vertical,
+              itemCount: messages.length,
+              itemBuilder: (context, index) {
+                return _getChatBox(messages[index]);
+              },
+            )),
 
+        /// 채팅 상하 여백
         UiUtils.getMarginBox(Config.appRealSize[1]*0.005, 0),
+
+        /// 채팅 글 입력 칸
         Container(width: Config.appRealSize[0]*0.95, height: Config.appRealSize[1]*0.095, color: ColorStyles.finAppWhite,
             child: Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center, children: [
               SizedBox(width: Config.appRealSize[0]*0.95*0.75, child: TextField(
@@ -153,15 +165,6 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
               })
             ])
         ),
-        Container(height: Config.appRealSize[1]*0.9, color: ColorStyles.finAppGreen, padding : const EdgeInsets.all(10),
-            child: messages.isEmpty? Container() : ListView.builder(
-              controller: messageListViewController,
-              scrollDirection: Axis.vertical,
-              itemCount: messages.length,
-              itemBuilder: (context, index) {
-                return _getChatBox(messages[index]);
-              },
-            )),
       ],
     ));
 

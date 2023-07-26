@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:flutterwebchat/utils/app_config.dart';
+import 'package:flutterwebchat/configs/app_config.dart';
 import 'package:flutterwebchat/utils/common_utils.dart';
 import 'package:flutterwebchat/utils/ui_utils.dart';
 import 'package:flutterwebchat/views/chat_view.dart';

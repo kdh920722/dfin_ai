@@ -32,6 +32,9 @@ migrate_working_dir/
 .pub/
 /build/
 
+# git ignores files for app config (api keys..)
+/lib/configs/gitignores/
+
 # Symbolication related
 app.*.symbols
 
