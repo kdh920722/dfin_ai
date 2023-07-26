@@ -155,10 +155,8 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
     UiUtils.showLoadingPop(context);
     if(!isInit){
       await FireBaseController.initializeFirebase();
-      print("FB INIT : 222");
       String gptAPiKey = await FireBaseController.getGPTApiKey();
       ApiController.gptApiKey = gptAPiKey;
-      print(gptAPiKey);
       isInit = true;
     }
 
