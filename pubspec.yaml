@@ -47,6 +47,8 @@ dependencies:
   openai_client: ^0.0.7
   chat_gpt_sdk: 2.2.3
   velocity_x: ^3.6.0
+  firebase_database: ^10.2.4
+  firebase_core: ^2.15.0
 
 dev_dependencies:
   flutter_test:

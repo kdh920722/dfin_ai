@@ -3,6 +3,7 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutterwebchat/controllers/api_controller.dart';
+import 'package:flutterwebchat/controllers/firebase_controller.dart';
 import 'package:flutterwebchat/styles/ColorStyles.dart';
 import '../styles/TextStyles.dart';
 import '../configs/app_config.dart';
@@ -23,6 +24,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
   final String firstId = "FIRST";
   final String thisId = "ME";
   final String aiId = "GPT";
+  bool isInit = false;
 
   KeyboardVisibilityController? _keyboardVisibilityController;
   void _functionForKeyboardHide(){
@@ -52,6 +54,14 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
       'id': firstId,
       'text': "AI 상담사",
     });
+  }
+
+  Future<void> _initGptApiKEy() async {
+    await FireBaseController.initializeFirebase();
+    String gptAPiKey = await FireBaseController.getGPTApiKey();
+    ApiController.gptApiKey = gptAPiKey;
+    print(gptAPiKey);
+    isInit = true;
   }
 
   @override
@@ -142,15 +152,24 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
 
   Future<void> _sendMessage(String message) async {
     CommonUtils.hideKeyBoard(context);
+    UiUtils.showLoadingPop(context);
+    if(!isInit){
+      await FireBaseController.initializeFirebase();
+      print("FB INIT : 222");
+      String gptAPiKey = await FireBaseController.getGPTApiKey();
+      ApiController.gptApiKey = gptAPiKey;
+      print(gptAPiKey);
+      isInit = true;
+    }
+
     messages.add({
       'id': thisId,
       'text': message,
     });
+
     setState(() {});
 
     messagesHistory.add(Messages(role: Role.user, content: message));
-
-    UiUtils.showLoadingPop(context);
     String receivedMessage = await ApiController.sendAndReceiveTextToGPTUsingLib(messagesHistory);
     if(context.mounted){
       _receiveMessage(receivedMessage);

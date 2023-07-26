@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
-import 'package:flutterwebchat/configs/gitignores/ignore_config.dart';
-import 'package:openai_client/openai_client.dart';
 import 'package:http/http.dart' as http;
 
 class ApiController{
@@ -12,26 +10,13 @@ class ApiController{
   ApiController._internal();
 
   /// ------------------------------------------------------------------------------------------------------------------------ ///
-  // Create the configuration
-  static const conf = OpenAIConfiguration(
-    apiKey: IgnoreConfig.apiKey,
-  );
-  // Create a new client
-  static final client = OpenAIClient(
-    configuration: conf,
-    enableLogging: true,
-  );
-
-  static bool isFirstConversation = true;
-  static String prompt = "Hi, my name is 'KDH'";
-  /// ------------------------------------------------------------------------------------------------------------------------ ///
-
-  static final openAI = OpenAI.instance.build(token: IgnoreConfig.apiKey, baseOption: HttpSetup(receiveTimeout: const Duration(seconds: 60)),enableLog: true);
-  /// work only with gpt-turbo-0613,gpt-4-0613
+  static String gptApiKey = "";
+  static OpenAI? openAI;
   static Future<String> sendAndReceiveTextToGPTUsingLib(List<Messages> messageList) async {
     try{
+      openAI = OpenAI.instance.build(token: gptApiKey, baseOption: HttpSetup(receiveTimeout: const Duration(seconds: 60)),enableLog: true);
       final request = ChatCompleteText(messages: messageList, maxToken: 1024, model: Gpt4ChatModel());
-      final response = await openAI.onChatCompletion(request: request);
+      final response = await openAI!.onChatCompletion(request: request);
       String resultMessage = "";
       for (var element in response!.choices) {
         resultMessage += "${element.message!.content}\n";
@@ -50,7 +35,7 @@ class ApiController{
         Uri.parse('https://api.openai.com/v1/engines/$model/completions'),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ${IgnoreConfig.apiKey}',
+          'Authorization': 'Bearer $gptApiKey',
         },
         body: jsonEncode({
           'prompt': message,
