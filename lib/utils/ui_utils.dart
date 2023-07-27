@@ -34,6 +34,7 @@ class UiUtils {
     );
   }
 
+
   static Widget getView(BuildContext context, Widget view, Future<bool> Function(BuildContext? context) callbackBackButtonForView){
     return GestureDetector(
         onTap: () {
