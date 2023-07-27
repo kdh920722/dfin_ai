@@ -21,7 +21,7 @@ class ApiController{
       for (var element in response!.choices) {
         resultMessage += "${element.message!.content}\n";
       }
-      return resultMessage.replaceAll('\n', '');
+      return resultMessage;
     }catch(ex){
       return "exception : ${ex.toString()}";
     }

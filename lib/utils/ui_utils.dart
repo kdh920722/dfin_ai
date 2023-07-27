@@ -1,7 +1,6 @@
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
-import '../main.dart';
 import '../styles/ColorStyles.dart';
 import '../styles/TextStyles.dart';
 import '../configs/app_config.dart';
@@ -11,6 +10,8 @@ class UiUtils {
   static ScreenUtilInit getMainView(BuildContext context, Widget mainView){
     return ScreenUtilInit( // 스크린 사이즈 비율 고정
         designSize: const Size(Config.appWidth, Config.appHeight),
+        useInheritedMediaQuery: false,
+        rebuildFactor: (old, data) => false,
         builder: (context, child) {
           return MaterialApp(
               home: child,
@@ -36,14 +37,14 @@ class UiUtils {
   static Widget getView(BuildContext context, Widget view, Future<bool> Function(BuildContext? context) callbackBackButtonForView){
     return GestureDetector(
         onTap: () {
-          FocusManager.instance.primaryFocus?.unfocus();
+          CommonUtils.hideKeyBoard(context);
         },
-        child: Scaffold(
-          backgroundColor: Colors.black,
-          body: WillPopScope(
-              onWillPop: () => callbackBackButtonForView(context),
-              child: SizedBox(width: Config.appRealSize[0], height: Config.appRealSize[1], child: view)
-          ),
+        child: WillPopScope(
+            onWillPop: () => callbackBackButtonForView(context),
+            child: Scaffold(
+              backgroundColor: Colors.black,
+              body: SafeArea(child: view)
+            )
         )
     );
   }
@@ -51,7 +52,7 @@ class UiUtils {
   static Widget getViewWithScroll(BuildContext context, Widget view, ScrollController scrollController, Future<bool> Function(BuildContext? context) callbackBackButtonForView){
     return GestureDetector(
       onTap: () {
-        FocusManager.instance.primaryFocus?.unfocus();
+        CommonUtils.hideKeyBoard(context);
         scrollController.jumpTo(0);
       },
       child: Scaffold(
@@ -109,7 +110,7 @@ class UiUtils {
             backgroundColor: buttonColor,
             padding: const EdgeInsets.all(15),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
-            elevation: 3,
+            elevation: 5,
             shadowColor: Colors.grey,
           ),
           onPressed: onPressedCallback,
@@ -195,13 +196,13 @@ class UiUtils {
   }
 
   static InputDecoration getInputDecorationWithNoErrorMessage(String labelText){
-    return InputDecoration(labelText: labelText, hintText: "", counterText: "",
+    return InputDecoration(
+        labelText: labelText,
+        hintText: "",
+        counterText: "",
         labelStyle: TextStyles.labelTextStyle,
         border : OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.r),
-          borderSide: BorderSide(
-            color: ColorStyles.darkGray,
-          ),
+          borderRadius: BorderRadius.circular(10.r)
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.r),
@@ -232,8 +233,8 @@ class UiUtils {
               builder: (BuildContext context, StateSetter setState) {
                 isLoadingPopOn = true;
                 return Container(
-                    height: MediaQuery.of(context).size.height,
-                    width: MediaQuery.of(context).size.width,
+                    width: Config.appRealSize[0],
+                    height: Config.appRealSize[1],
                     color: ColorStyles.darkGrayWithAlpha,
                     child: SpinKitCubeGrid(color: ColorStyles.finAppGreen, size: 50.w)
                 );

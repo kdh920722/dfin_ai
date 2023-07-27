@@ -6,7 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:transition/transition.dart';
-
+import '../configs/app_config.dart';
 import '../styles/ColorStyles.dart';
 import '../styles/TextStyles.dart';
 
@@ -46,7 +46,9 @@ class CommonUtils {
   }
 
   static void hideKeyBoard(BuildContext context){
-    FocusScope.of(context).unfocus();
+    if(isKeyboardUp){
+      FocusManager.instance.primaryFocus?.unfocus();
+    }
   }
 
   static String getPriceCommaFormattedString(double price){
@@ -132,14 +134,14 @@ class CommonUtils {
     return Transition(child: toView, transitionEffect: TransitionEffect.RIGHT_TO_LEFT);
   }
 
+  static bool isKeyboardUp = false;
   static KeyboardVisibilityController getKeyboardViewController(void Function()? callbackOnKeyboardShow, void Function()? callbackOnKeyboardHide){
     var keyboardVisibilityController = KeyboardVisibilityController();
     keyboardVisibilityController.onChange.listen((bool visible) {
+      isKeyboardUp = visible;
       if(visible){
-        print("show");
         if(callbackOnKeyboardShow != null) callbackOnKeyboardShow();
       }else{
-        print("hide");
         if(callbackOnKeyboardHide != null) callbackOnKeyboardHide();
       }
     });

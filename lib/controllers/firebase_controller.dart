@@ -26,10 +26,8 @@ class FireBaseController{
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case "operation-not-allowed":
-          print("Anonymous auth hasn't been enabled for this project.");
           break;
         default:
-          print("Unknown error : ${e.code} + ${e.toString()}");
       }
     }
   }
@@ -40,14 +38,11 @@ class FireBaseController{
       final ref = FirebaseDatabase.instance.ref();
       final snapshot = await ref.child('ROAMIFY/API_KEYS/gpt').get();
       if (snapshot.exists) {
-        print(snapshot.value);
         return resultKey = snapshot.value.toString();
       } else {
-        print('No data available.');
         return resultKey = "error";
       }
     }catch(ex){
-      print("FB Ref ex : ${ex.toString()}");
       return resultKey = ex.toString();
     }
   }
