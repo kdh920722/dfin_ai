@@ -4,10 +4,6 @@ class Config{
   static bool isAppMainInit = false;
   static const double appWidth = 393;
   static const double appHeight = 852;
-  static List<double> appFullSize = [0,0];
-  static List<double> appRealSize = [0,0];
-  static final isWebMobile = kIsWeb && (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.android);
-  static final isAndroidWebMobile = (defaultTargetPlatform == TargetPlatform.android);
 }
 
 enum SlideType {

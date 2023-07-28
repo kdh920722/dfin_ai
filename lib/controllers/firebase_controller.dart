@@ -6,10 +6,12 @@ class FireBaseController{
   static final FireBaseController _instance = FireBaseController._internal();
   factory FireBaseController() => _instance;
   FireBaseController._internal();
+  static FirebaseApp? firebaseApp;
+  static UserCredential? userCredential;
 
   static Future<void> initializeFirebase() async {
     try {
-      var app = await Firebase.initializeApp(
+      firebaseApp = await Firebase.initializeApp(
           options: const FirebaseOptions(
               apiKey: "AIzaSyAP0g-SSeuXgSa4crBmrCLWavwrksQSOQk",
               authDomain: "soarkidz-8ac85.firebaseapp.com",
@@ -22,7 +24,7 @@ class FireBaseController{
           )
       );
 
-      final userCredential = await FirebaseAuth.instance.signInAnonymously();
+      userCredential = await FirebaseAuth.instance.signInAnonymously();
     } on FirebaseAuthException catch (e) {
       switch (e.code) {
         case "operation-not-allowed":
@@ -33,17 +35,16 @@ class FireBaseController{
   }
 
   static Future<String> getGPTApiKey() async{
-    String resultKey = "";
     try{
       final ref = FirebaseDatabase.instance.ref();
       final snapshot = await ref.child('ROAMIFY/API_KEYS/gpt').get();
       if (snapshot.exists) {
-        return resultKey = snapshot.value.toString();
+        return snapshot.value.toString();
       } else {
-        return resultKey = "error";
+        return "error";
       }
     }catch(ex){
-      return resultKey = ex.toString();
+      return ex.toString();
     }
   }
 }

@@ -1,36 +1,20 @@
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 import '../styles/ColorStyles.dart';
 import '../styles/TextStyles.dart';
 import '../configs/app_config.dart';
 import 'common_utils.dart';
 
 class UiUtils {
-  static ScreenUtilInit getMainView(BuildContext context, Widget mainView){
-    return ScreenUtilInit( // 스크린 사이즈 비율 고정
-        designSize: const Size(Config.appWidth, Config.appHeight),
-        useInheritedMediaQuery: false,
-        rebuildFactor: (old, data) => false,
-        builder: (context, child) {
-          return MaterialApp(
-              home: child,
-              builder: (context, child) {
-                if(!Config.isAppMainInit){
-                  Config.appFullSize = CommonUtils.fullSize(context);
-                  Config.appRealSize = CommonUtils.safeSize(context);
-                  Config.isAppMainInit = true;
-                }
-                return MediaQuery(
-                    data: MediaQuery.of(context).copyWith(textScaleFactor: 1.0),
-                    child: SafeArea(
-                        child: child!
-                    )
-                );
-              }
-          );
-        },
-        child: mainView
+  static Widget getMainView(BuildContext context, Widget mainView){
+    return Sizer(
+      builder: (BuildContext context, Orientation orientation, DeviceType deviceType) {
+        print("rebuild");
+        return MaterialApp(
+            home: mainView
+        );
+      },
     );
   }
 
@@ -40,11 +24,13 @@ class UiUtils {
         onTap: () {
           CommonUtils.hideKeyBoard(context);
         },
-        child: WillPopScope(
-            onWillPop: () => callbackBackButtonForView(context),
-            child: Scaffold(
-              backgroundColor: Colors.black,
-              body: SafeArea(child: view)
+        child: SafeArea(
+            child: WillPopScope(
+                onWillPop: () => callbackBackButtonForView(context),
+                child: Scaffold(
+                  backgroundColor: Colors.black,
+                  body: view,
+                )
             )
         )
     );
@@ -56,21 +42,29 @@ class UiUtils {
         CommonUtils.hideKeyBoard(context);
         scrollController.jumpTo(0);
       },
-      child: Scaffold(
-        backgroundColor: Colors.black,
-        body: WillPopScope(
-            onWillPop: () => callbackBackButtonForView(context),
-            child: ListView(
-                controller: scrollController,
-                shrinkWrap: true,
-                physics: const BouncingScrollPhysics(),
-                children: [
-                  SizedBox(width: Config.appRealSize[0], height: Config.appRealSize[1], child: view)
-                ]
-            )
-        ),
+      child: SafeArea(
+          child: WillPopScope(
+              onWillPop: () => callbackBackButtonForView(context),
+              child: Scaffold(
+                  backgroundColor: Colors.black,
+                  body: ListView(
+                      controller: scrollController,
+                      shrinkWrap: true,
+                      physics: const BouncingScrollPhysics(),
+                      children: [view]
+                  )
+              )
+          )
       )
     );
+  }
+
+  static Text getTextWithFixedScale(String text, TextStyle textStyle, TextAlign? textAlign, int? textMaxLine){
+    return Text(text, style: textStyle,  textScaleFactor: 1.0, textAlign: textAlign, maxLines: textMaxLine);
+  }
+
+  static SelectableText getSelectableTextWithFixedScale(String text, TextStyle textStyle, TextAlign? textAlign, int? textMaxLine){
+    return SelectableText(text, style: textStyle,  textScaleFactor: 1.0, textAlign: textAlign, maxLines: textMaxLine);
   }
 
   static Widget getTextWithUnderline(String text, TextStyle textStyle, Color underlineColor, VoidCallback? onPressedCallback){
@@ -78,11 +72,11 @@ class UiUtils {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[Container(padding: const EdgeInsets.only(bottom: 3),
           decoration: BoxDecoration(border: Border(bottom: BorderSide(color: underlineColor, width: 0.5.w))),
-          child: GestureDetector(onTap: onPressedCallback, child: Text(text, style: textStyle)))]);
+          child: GestureDetector(onTap: onPressedCallback, child: getTextWithFixedScale(text,textStyle,null,null)))]);
   }
 
-  static SizedBox getMarginBox(double marginHeight, double marginWidth){
-    return SizedBox(height: marginHeight, width: marginWidth);
+  static SizedBox getMarginBox(double marginWidth, double marginHeight){
+    return SizedBox(width: marginWidth, height: marginHeight,);
   }
 
   static SizedBox getIconTextButtonBox(double buttonWidth, IconData icon, String buttonText, Color buttonColor, VoidCallback onPressedCallback) {
@@ -92,12 +86,12 @@ class UiUtils {
           style: ElevatedButton.styleFrom(
             backgroundColor: buttonColor,
             padding: const EdgeInsets.all(15),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
-            elevation: 3,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            elevation: 5,
             shadowColor: Colors.grey,
           ),
-          icon: Icon(icon, color: ColorStyles.finAppWhite, size: 25.sp,),
-          label: Text(buttonText, style: TextStyle(color: ColorStyles.finAppWhite, fontSize: 18.sp, fontWeight: FontWeight.bold)),
+          icon: Icon(icon, color: ColorStyles.finAppWhite, size: 25.sp),
+          label: getTextWithFixedScale(buttonText,TextStyle(color: ColorStyles.finAppWhite, fontSize: 18.sp, fontWeight: FontWeight.bold),null,null),
           onPressed: onPressedCallback,
         )
     );
@@ -109,8 +103,8 @@ class UiUtils {
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: buttonColor,
-            padding: const EdgeInsets.all(15),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
+            padding: const EdgeInsets.all(10),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             elevation: 5,
             shadowColor: Colors.grey,
           ),
@@ -126,14 +120,14 @@ class UiUtils {
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: buttonColor,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
-            elevation: 3,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            elevation: 5,
             shadowColor: Colors.grey,
           ),
           onPressed: onPressedCallback,
           child: Padding(
             padding: const EdgeInsets.all(15.0),
-            child: Text(buttonText, style: TextStyles.buttonTextStyle, textAlign: TextAlign.center),
+            child: getTextWithFixedScale(buttonText,TextStyles.buttonTextStyle,TextAlign.center,null)
           ),
         )
     );
@@ -150,7 +144,7 @@ class UiUtils {
           onPressed: onPressedCallback,
           child: Padding(
             padding: const EdgeInsets.all(12.0),
-            child: Text(buttonText, style: TextStyles.countDownButtonStyle, textAlign: TextAlign.center),
+            child: getTextWithFixedScale(buttonText,TextStyles.countDownButtonStyle,TextAlign.center,null)
           ),
         )
     );
@@ -167,7 +161,7 @@ class UiUtils {
             onPressed: onPressedCallback,
             child: Padding(
               padding: const EdgeInsets.all(15.0),
-              child: Text(buttonText, style: TextStyles.buttonTextStyle, textAlign: TextAlign.center),
+              child: getTextWithFixedScale(buttonText, TextStyles.buttonTextStyle, TextAlign.center, null)
             ),
           )
       );
@@ -181,7 +175,7 @@ class UiUtils {
             onPressed: () { },
             child: Padding(
               padding: const EdgeInsets.all(15.0),
-              child: Text(buttonText, style: TextStyles.buttonTextStyle, textAlign: TextAlign.center),
+              child: getTextWithFixedScale(buttonText, TextStyles.buttonTextStyle, TextAlign.center, null)
             ),
           )
       );
@@ -189,11 +183,11 @@ class UiUtils {
   }
 
   static Text getTitle(String titleText){
-    return Text(titleText, style: TextStyles.titleTextStyle, textAlign: TextAlign.start);
+    return getTextWithFixedScale(titleText, TextStyles.titleTextStyle, TextAlign.start, null);
   }
 
   static Text getSubTitle(String titleText){
-    return Text(titleText, style: TextStyles.subTitleTextStyle, textAlign: TextAlign.start);
+    return getTextWithFixedScale(titleText, TextStyles.subTitleTextStyle, TextAlign.start, null);
   }
 
   static InputDecoration getInputDecorationWithNoErrorMessage(String labelText){
@@ -203,20 +197,16 @@ class UiUtils {
         counterText: "",
         labelStyle: TextStyles.labelTextStyle,
         border : OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.r)
+          borderRadius: BorderRadius.circular(10)
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.r),
-          borderSide: BorderSide(
-            color: ColorStyles.finAppGreen,
-          ),
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: ColorStyles.finAppGreen),
         ),
         errorStyle: const TextStyle(height: 0),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10.r),
-          borderSide: BorderSide(
-            color: Colors.redAccent,
-          ),
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: Colors.redAccent),
         ),
         filled: true,
         fillColor: ColorStyles.finAppWhite
@@ -234,10 +224,10 @@ class UiUtils {
               builder: (BuildContext context, StateSetter setState) {
                 isLoadingPopOn = true;
                 return Container(
-                    width: Config.appRealSize[0],
-                    height: Config.appRealSize[1],
+                    width: 100.w,
+                    height: 100.h,
                     color: ColorStyles.darkGrayWithAlpha,
-                    child: SpinKitCubeGrid(color: ColorStyles.finAppGreen, size: 50.w)
+                    child: SpinKitCubeGrid(color: ColorStyles.finAppGreen, size: 25.w)
                 );
               });
         },
@@ -251,14 +241,13 @@ class UiUtils {
   }
 
   static void showPop(BuildContext parentViewContext, Widget Function(BuildContext context, StateSetter setState) createWidgetMethod){
-    double popWidth = Config.appFullSize[0]*(2/3);
-
+    double popWidth = 66.w;
     showDialog(
       barrierDismissible: false,
       context: parentViewContext,
       builder: (_) {
         return Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.r)),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           backgroundColor: ColorStyles.finAppWhite,
           insetPadding: const EdgeInsets.all(10),
           child: StatefulBuilder(
@@ -275,44 +264,43 @@ class UiUtils {
   }
 
   static void showSlideMenu(BuildContext parentViewContext, SlideType slideType, Widget Function(BuildContext context, StateSetter setState) createWidgetMethod){
-    double popWidth = Config.appFullSize[0]*(2/3);
-    double popHeight = Config.appFullSize[1]*(1/3);
-    BorderRadius borderRadius = BorderRadius.circular(30.r);
+    double popWidth = 66.w;
+    double popHeight = 33.h;
+    BorderRadius borderRadius = BorderRadius.circular(30);
     Alignment alignment = Alignment.bottomCenter;
 
     showGeneralDialog(
       barrierLabel: "Slide Menu",
       barrierDismissible: true,
       barrierColor: Colors.black.withOpacity(0.5),
-      transitionDuration: Duration(milliseconds: 500),
+      transitionDuration: const Duration(milliseconds: 500),
       context: parentViewContext,
       pageBuilder: (context, anim1, anim2) {
         switch (slideType) {
           case SlideType.toRight:
-            popHeight = double.infinity;
+            popHeight = 100.h;
             alignment = Alignment.centerLeft;
-            borderRadius = BorderRadius.only(topRight: Radius.circular(30.r), bottomRight: Radius.circular(30.r));
+            borderRadius = const BorderRadius.only(topRight: Radius.circular(30), bottomRight: Radius.circular(30));
             break;
           case SlideType.toLeft:
-            popHeight = double.infinity;
+            popHeight = 100.h;
             alignment = Alignment.centerRight;
-            borderRadius = BorderRadius.only(topLeft: Radius.circular(30.r), bottomLeft: Radius.circular(30.r));
+            borderRadius = const BorderRadius.only(topLeft: Radius.circular(30), bottomLeft: Radius.circular(30));
             break;
           case SlideType.toTop:
-            popWidth = double.infinity;
+            popWidth = 100.w;
             alignment = Alignment.bottomCenter;
-            borderRadius = BorderRadius.only(topLeft: Radius.circular(30.r), topRight: Radius.circular(30.r));
+            borderRadius = const BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30));
             break;
           case SlideType.toBottom:
-            popWidth = double.infinity;
-            popHeight = 300.h;
+            popWidth = 100.w;
             alignment = Alignment.topCenter;
-            borderRadius = BorderRadius.only(bottomLeft: Radius.circular(30.r), bottomRight: Radius.circular(30.r));
+            borderRadius = const BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30));
             break;
           default:
-            popWidth = double.infinity;
+            popWidth = 100.w;
             alignment = Alignment.bottomCenter;
-            borderRadius = BorderRadius.only(topLeft: Radius.circular(30.r), bottomLeft: Radius.circular(30.r));
+            borderRadius = const BorderRadius.only(topLeft: Radius.circular(30), bottomLeft: Radius.circular(30));
         }
 
         return Align(
@@ -320,6 +308,10 @@ class UiUtils {
           child: Container(
             width: popWidth,
             height: popHeight,
+            decoration: BoxDecoration(
+              color: ColorStyles.finAppWhite,
+              borderRadius: borderRadius,
+            ),
             child: SizedBox.expand(
                 child: StatefulBuilder(
                     builder: (_, StateSetter popViewSetState){
@@ -328,10 +320,6 @@ class UiUtils {
                     }
                 )
             ),
-            decoration: BoxDecoration(
-              color: ColorStyles.finAppWhite,
-              borderRadius: borderRadius,
-            ),
           ),
         );
       },
@@ -339,27 +327,27 @@ class UiUtils {
         switch (slideType) {
           case SlideType.toLeft:
             return SlideTransition(
-              position: Tween(begin: Offset(1, 0), end: Offset(0,0)).animate(anim1),
+              position: Tween(begin: const Offset(1, 0), end: const Offset(0,0)).animate(anim1),
               child: child,
             );
           case SlideType.toRight:
             return SlideTransition(
-              position: Tween(begin: Offset(-1, 0), end: Offset(0,0)).animate(anim1),
+              position: Tween(begin: const Offset(-1, 0), end: const Offset(0,0)).animate(anim1),
               child: child,
             );
           case SlideType.toTop:
             return SlideTransition(
-              position: Tween(begin: Offset(0, 1), end: Offset(0,0)).animate(anim1),
+              position: Tween(begin: const Offset(0, 1), end: const Offset(0,0)).animate(anim1),
               child: child,
             );
           case SlideType.toBottom:
             return SlideTransition(
-              position: Tween(begin: Offset(0, -1), end: Offset(0,0)).animate(anim1),
+              position: Tween(begin: const Offset(0, -1), end: const Offset(0,0)).animate(anim1),
               child: child,
             );
           default:
             return SlideTransition(
-              position: Tween(begin: Offset(1, 0), end: Offset(0,0)).animate(anim1),
+              position: Tween(begin: const Offset(1, 0), end: const Offset(0,0)).animate(anim1),
               child: child,
             );
         }
@@ -383,7 +371,7 @@ class UiUtils {
     return Align(
       alignment: alignment,
       child: Padding(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: FloatingActionButton.extended(
             label: Text(text!),
             icon: Icon(icon),

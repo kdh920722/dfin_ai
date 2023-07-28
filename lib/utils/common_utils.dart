@@ -46,9 +46,7 @@ class CommonUtils {
   }
 
   static void hideKeyBoard(BuildContext context){
-    if(isKeyboardUp){
-      FocusManager.instance.primaryFocus?.unfocus();
-    }
+    FocusManager.instance.primaryFocus?.unfocus();
   }
 
   static String getPriceCommaFormattedString(double price){
