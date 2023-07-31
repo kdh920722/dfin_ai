@@ -1,6 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import '../utils/common_utils.dart';
 
 class FireBaseController{
   static final FireBaseController _instance = FireBaseController._internal();
@@ -9,7 +9,7 @@ class FireBaseController{
   static FirebaseApp? firebaseApp;
   static UserCredential? userCredential;
 
-  static Future<void> initializeFirebase() async {
+  static Future<void> initFirebase(Function(bool) callback) async {
     try {
       firebaseApp = await Firebase.initializeApp(
           options: const FirebaseOptions(
@@ -25,26 +25,10 @@ class FireBaseController{
       );
 
       userCredential = await FirebaseAuth.instance.signInAnonymously();
+      callback(true);
     } on FirebaseAuthException catch (e) {
-      switch (e.code) {
-        case "operation-not-allowed":
-          break;
-        default:
-      }
-    }
-  }
-
-  static Future<String> getGPTApiKey() async{
-    try{
-      final ref = FirebaseDatabase.instance.ref();
-      final snapshot = await ref.child('ROAMIFY/API_KEYS/gpt').get();
-      if (snapshot.exists) {
-        return snapshot.value.toString();
-      } else {
-        return "error";
-      }
-    }catch(ex){
-      return ex.toString();
+      CommonUtils.log("e", "firebase init error : ${e.code} : ${e.toString()}");
+      callback(false);
     }
   }
 }

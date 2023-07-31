@@ -1,16 +1,16 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:flutter/cupertino.dart';
 import 'package:flutterwebchat/controllers/get_controller.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
-import 'package:visibility_detector/visibility_detector.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:sizer/sizer.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:flutterwebchat/controllers/api_controller.dart';
+import 'package:flutterwebchat/controllers/gpt_controller.dart';
 import 'package:flutterwebchat/controllers/firebase_controller.dart';
 import 'package:flutterwebchat/styles/ColorStyles.dart';
+import '../controllers/codef_controller.dart';
 import '../observers/keyboard_observer.dart';
 import '../styles/TextStyles.dart';
 import '../configs/app_config.dart';
@@ -31,7 +31,6 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
   final String firstId = "FIRST";
   final String thisId = "ME";
   final String aiId = "GPT";
-  bool isInit = false;
 
   /// keyboard check for Web Platform
   final FocusNode _focusNode = FocusNode();
@@ -53,6 +52,57 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
   void _functionForKeyboardHide2(){
     FocusManager.instance.primaryFocus?.unfocus();
     viewScrollController.jumpTo(0);
+  }
+
+  Future<void> _initFirebase() async {
+    // init
+    await FireBaseController.initFirebase((bool isSuccess){
+      if(isSuccess){
+        CommonUtils.log("i", "firebase credential : ${FireBaseController.userCredential.toString()}");
+      }else{
+        CommonUtils.flutterToast("firebase init 에러가 발생했습니다.");
+      }
+    });
+  }
+
+  Future<void> _initGPT() async {
+    // init
+    await GptController.getGPTApiKey((bool isSuccess){
+      if(isSuccess){
+        CommonUtils.log("i", "gpt key : ${GptController.gptApiKey}");
+      }else{
+        CommonUtils.flutterToast("gpt init 에러가 발생했습니다.");
+      }
+    });
+  }
+
+  Future<void> _initCodeF() async {
+    // set host : prod or dev
+    CodeFController.setHostStatus(HostStatus.prod);
+
+    // init
+    await CodeFController.initAccessToken((bool isSuccess){
+      if(isSuccess){
+        CommonUtils.log("i", "codef token : ${CodeFController.token}");
+      }else{
+        CommonUtils.flutterToast("codef init 에러가 발생했습니다.");
+      }
+    });
+  }
+
+  void _initUiValue(){
+    currentScreenHeight = screenHeight;
+    switchBarHeight = currentScreenHeight*0.05;
+  }
+
+  Future<void> _init(BuildContext context) async {
+    Config.isAppMainInit = true;
+    Get.put(GetController());
+    await _initFirebase();
+    await _initGPT();
+    await _initCodeF();
+    _initUiValue();
+    setState(() {});
   }
 
   @override
@@ -167,16 +217,8 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
 
     CommonUtils.hideKeyBoard(context);
     UiUtils.showLoadingPop(context);
-
-    if(!isInit){
-      await FireBaseController.initializeFirebase();
-      String gptAPiKey = await FireBaseController.getGPTApiKey();
-      ApiController.gptApiKey = gptAPiKey;
-      isInit = true;
-    }
-
     messagesHistory.add(Messages(role: Role.user, content: message));
-    String receivedMessage = await ApiController.sendAndReceiveTextToGPTUsingLib(messagesHistory);
+    String receivedMessage = await GptController.sendAndReceiveTextToGPTUsingLib(messagesHistory);
     if(context.mounted){
       _receiveMessage(receivedMessage);
       UiUtils.closeLoadingPop(context);
@@ -214,10 +256,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
 
   final KeyboardObserver _keyboardObserver = KeyboardObserver();
   void _onKeyboardHeightChanged() {
-    keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
-    screenHeightWhenKeyboardUp = screenHeight - keyboardHeight;
-    print("keyboard height : $keyboardHeight");
-    GetController.to.updateCounter(keyboardHeight);
+    //keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
   }
 
   void _onFocusChange() {
@@ -237,12 +276,9 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
   @override
   Widget build(BuildContext context) {
     if(!Config.isAppMainInit){
-      keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
-      GetController.to.updateCounter(keyboardHeight);
-      currentScreenHeight = screenHeight;
-      switchBarHeight = currentScreenHeight*0.05;
-      Config.isAppMainInit = true;
+      _init(context);
     }
+
     scrollToBottom();
 
     Widget view =
@@ -257,8 +293,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
                   activeColor: ColorStyles.finAppGreen,
                   value: isWebMobile,
                   onChanged: (value) {
-                    isWebMobile = value;
-                    setState(() {});
+                    setState(() {isWebMobile = value;});
                   },
                 ),
                 UiUtils.getMarginBox(2.w, 0),
