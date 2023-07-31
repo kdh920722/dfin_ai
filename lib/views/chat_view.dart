@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutterwebchat/controllers/get_controller.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:visibility_detector/visibility_detector.dart';
@@ -40,24 +41,13 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
   KeyboardVisibilityController? _keyboardVisibilityController;
   void _functionForKeyboardHide(){
     currentScreenHeight = screenHeight;
-    inputMaxHeight = currentScreenHeight*0.3;
     inputHeight = inputMinHeight;
   }
   void _functionForKeyboardShow(){
     currentScreenHeight = screenHeight*0.55;
-    inputMaxHeight = currentScreenHeight*0.3;
     scrollToBottom();
   }
-  void _functionForKeyboardHideForNative(){
-    currentScreenHeight = screenHeight;
-    inputMaxHeight = currentScreenHeight*0.3;
-    inputHeight = inputMinHeight;
-  }
-  void _functionForKeyboardShowForNative(){
-    currentScreenHeight = screenHeight-keyboardHeight;
-    inputMaxHeight = currentScreenHeight*0.3;
-    scrollToBottom();
-  }
+
   final ScrollController viewScrollController = ScrollController();
   KeyboardVisibilityController? _keyboardVisibilityController2;
   void _functionForKeyboardHide2(){
@@ -219,7 +209,8 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
   double screenHeightWhenKeyboardUp = 0;
   double currentScreenHeight = 0;
   double keyboardHeight = 0;
-  bool isPC = false;
+  double switchBarHeight = 0;
+  bool isWebMobile = false;
 
   final KeyboardObserver _keyboardObserver = KeyboardObserver();
   void _onKeyboardHeightChanged() {
@@ -230,53 +221,17 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
   }
 
   void _onFocusChange() {
-    Future.delayed(const Duration(milliseconds: 1000), () {
-      if(_focusNode.hasFocus){
-        //textfield 눌렀을 때
-        if(keyboardHeight == 0){
-          //web
-          if(isPC){
-            // web pc
-            // do nothing..
-          }else{
-            // web mobile
-            _functionForKeyboardShow();
-          }
-        }else{
-          // native
-          _functionForKeyboardShowForNative();
-        }
-      }else{
-        //textfield 밖으로 나갔을 때
-        if(keyboardHeight > 100){
-          // web
-          if(isPC){
-            // web pc
-            // do nothing..
-          }else{
-            // web mobile
-            _functionForKeyboardHide();
-          }
-        }else{
-          // native
-          _functionForKeyboardHideForNative();
-        }
+    if(_focusNode.hasFocus){
+      switchBarHeight = 0;
+      if(isWebMobile){
+        _functionForKeyboardShow();
       }
-      inputTextController.text = keyboardHeight.toString();
-      GetController.to.updateCounter(keyboardHeight);
-    });
-    /*
-    isKeyboardVisible = _focusNode.hasFocus;
-    if (isKeyboardVisible) {
-      /// keyboard show point
-      _functionForKeyboardShow();
     }else{
-      /// keyboard hide point
+      switchBarHeight = screenHeight*0.05;
       _functionForKeyboardHide();
     }
+    inputMaxHeight = currentScreenHeight*0.3;
     setState(() {});
-
-     */
   }
 
   @override
@@ -285,17 +240,31 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
       keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
       GetController.to.updateCounter(keyboardHeight);
       currentScreenHeight = screenHeight;
+      switchBarHeight = currentScreenHeight*0.05;
       Config.isAppMainInit = true;
     }
     scrollToBottom();
 
     Widget view =
-    AnimatedContainer(duration: const Duration(milliseconds: 400), width: 100.w, height: currentScreenHeight, color: ColorStyles.finAppWhite, child:Column(
+    AnimatedContainer(duration: const Duration(milliseconds: 100), width: 100.w, height: currentScreenHeight, color: ColorStyles.finAppWhite, child:Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
-          Obx((){
-            return  Text("KEY : ${GetController.to.counter.value} / O_SCREEN : $screenHeight / SCREEN : $currentScreenHeight");
-          }),
+          AnimatedContainer(height: switchBarHeight, duration: const Duration(milliseconds: 100),
+              child: Row(mainAxisAlignment : MainAxisAlignment.center, children: [
+                UiUtils.getTextWithFixedScale("WEB", TextStyles.basicTextStyle, null, null),
+                UiUtils.getMarginBox(2.w, 0),
+                CupertinoSwitch(
+                  activeColor: ColorStyles.finAppGreen,
+                  value: isWebMobile,
+                  onChanged: (value) {
+                    isWebMobile = value;
+                    setState(() {});
+                  },
+                ),
+                UiUtils.getMarginBox(2.w, 0),
+                UiUtils.getTextWithFixedScale("MOBILE WEB", TextStyles.basicTextStyle, null, null)
+              ])
+          ),
           /// 채팅 메인 화면
           Expanded(
               child: Container(

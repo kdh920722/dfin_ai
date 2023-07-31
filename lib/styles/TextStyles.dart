@@ -9,7 +9,7 @@ class TextStyles {
   static TextStyle subTitleTextStyle = TextStyle(fontSize: 16.sp, color: ColorStyles.finAppGray4, fontWeight: FontWeight.bold, decoration: TextDecoration.none, decorationThickness: 0.0);
   static TextStyle buttonTextStyle = TextStyle(fontSize: 20.sp, color: Colors.white, fontWeight: FontWeight.bold, decoration: TextDecoration.none, decorationThickness: 0.0);
   static TextStyle basicTextStyleBold = TextStyle(fontSize: 22.sp, color: Colors.black, fontWeight: FontWeight.bold, decoration: TextDecoration.none, decorationThickness: 0.0);
-  static TextStyle basicTextStyle = TextStyle(fontSize: 14.sp, color: Colors.black, fontWeight: FontWeight.normal, decoration: TextDecoration.none, decorationThickness: 0.0);
+  static TextStyle basicTextStyle = TextStyle(fontSize: 10.sp, color: Colors.black, fontWeight: FontWeight.normal, decoration: TextDecoration.none, decorationThickness: 0.0);
   static TextStyle dropDownTextStyle = TextStyle(fontSize: 16.sp, color: Colors.black, fontWeight: FontWeight.normal, decoration: TextDecoration.none, decorationThickness: 0.0);
   static TextStyle labelTextStyle = TextStyle(fontSize: 20.sp, color: Colors.black45, fontWeight: FontWeight.normal, decoration: TextDecoration.none, decorationThickness: 0.0);
   static TextStyle closeTextStyle = TextStyle(fontSize: 20.sp, color: Colors.black26, fontWeight: FontWeight.bold, decoration: TextDecoration.none, decorationThickness: 0.0);

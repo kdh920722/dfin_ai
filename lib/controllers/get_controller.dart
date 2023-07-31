@@ -37,6 +37,5 @@ class GetController extends GetxController {
 
   void updateCounter(double newValue) {
     counter.value = newValue;
-    print("update counter : ${counter.value}");
   }
 }
