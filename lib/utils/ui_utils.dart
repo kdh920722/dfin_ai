@@ -103,13 +103,13 @@ class UiUtils {
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: buttonColor,
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(20),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             elevation: 5,
             shadowColor: Colors.grey,
           ),
           onPressed: onPressedCallback,
-          child: Icon(icon, color: ColorStyles.finAppWhite, size: 25.sp)
+          child: Icon(icon, color: ColorStyles.finAppWhite, size: 16.sp)
         )
     );
   }
@@ -192,10 +192,9 @@ class UiUtils {
 
   static InputDecoration getInputDecorationWithNoErrorMessage(String labelText){
     return InputDecoration(
-        labelText: labelText,
-        hintText: "",
+        hintText: labelText,
         counterText: "",
-        labelStyle: TextStyles.labelTextStyle,
+        hintStyle: TextStyles.labelTextStyle,
         border : OutlineInputBorder(
           borderRadius: BorderRadius.circular(10)
         ),

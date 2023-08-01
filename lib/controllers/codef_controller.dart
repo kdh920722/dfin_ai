@@ -87,23 +87,30 @@ class CodeFController{
         final decodedResponseBody = Uri.decodeFull(response.body);
         final json = jsonDecode(decodedResponseBody);
         if(json.containsKey('result') && json.containsKey('data')){
+          CommonUtils.log('i', 'out full : ${json.toString()}');
           final result = json['result'];
           final resultCode = result['code'];
-          if(resultCode == 'CF-00000'){
+
+          // CF-00000 : 성공, CF-03002 : 추가 인증 필요
+          if(resultCode == 'CF-00000' || resultCode == 'CF-03002'){
             final resultData = json['data'];
+            CommonUtils.log('i', 'out resultCode : $resultCode\nresultData : ${resultData.toString()}');
             if (resultData is Map<String, dynamic>) {
               callback(true, resultData, null);
             } else if (resultData is List<dynamic>) {
               callback(true, null, resultData);
             }
           } else {
+            CommonUtils.log('e', 'out resultCode error : $resultCode');
             callback(false, null, null);
           }
         }
       } else {
+        CommonUtils.log('e', 'http error code : ${response.statusCode}');
         callback(false, null, null);
       }
     } catch (e) {
+      CommonUtils.log('e', e.toString());
       callback(false, null, null);
     }
   }
@@ -167,7 +174,7 @@ extension HostDevExtension on HostDev {
 }
 
 enum Apis {
-  addressApi1, addressApi2
+  addressApi1, addressApi2, carRegistration1Api, carRegistration2Api
 }
 
 extension ApisExtension on Apis {
@@ -177,6 +184,10 @@ extension ApisExtension on Apis {
         return '/v1/kr/etc/ld/kb/serial-number';
       case Apis.addressApi2:
         return '/v1/kr/etc/ld/kb/market-price-information';
+      case Apis.carRegistration1Api:
+        return '/v1/kr/public/mw/car-registration-a/issuance';
+      case Apis.carRegistration2Api:
+        return '/v1/kr/public/mw/car-registration-b/issuance';
       default:
         throw Exception('Unknown host value');
     }

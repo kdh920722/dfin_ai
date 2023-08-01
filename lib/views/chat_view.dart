@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/services.dart';
 import 'package:flutterwebchat/controllers/get_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -28,6 +29,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
   List<Messages> messagesHistory = [];
   final messageListViewController = ScrollController();
   final inputTextController = TextEditingController();
+  String currentText = '';
   final String firstId = "FIRST";
   final String thisId = "ME";
   final String aiId = "GPT";
@@ -172,7 +174,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
       chatTextColor = ColorStyles.darkGray;
       boxColor = Colors.transparent;
       borderType = const BorderRadiusDirectional.all(Radius.circular(30));
-      fontSize = 26.sp;
+      fontSize = 20.sp;
 
       return Container(padding: const EdgeInsets.only(bottom: 20),
           child : Column(children: [
@@ -224,6 +226,84 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
       UiUtils.closeLoadingPop(context);
     }
 
+    /*
+    CommonUtils.hideKeyBoard(context);
+    UiUtils.showLoadingPop(context);
+    await _callCarRegistration1();
+    if(context.mounted){
+      UiUtils.closeLoadingPop(context);
+    }
+    */
+  }
+
+  bool isAuthTest = false;
+  Map<String, dynamic> authMap = {};
+  Future<void> _callCarRegistration1() async {
+    Map<String, dynamic> inputJson = {
+      "organization": "0001",
+      "loginType": "5",
+      "userName": "김동환",
+      "identity": "9207221199215",
+      "birthDate": "",
+      "carNo": "66가7997",
+      "ownerName": "김영일",
+      "displyed": "1",
+      "isIdentityViewYn": "1",
+      "address": "",
+      "identity2": "5810221144516",
+      "loginTypeLevel": "1",
+      "phoneNo": "01054041099" ,
+      "telecom": "1"
+    };
+
+    if(!isAuthTest){
+      await CodeFController.getDataFromApi(Apis.carRegistration1Api, inputJson, (bool isSuccess, map, _){
+        if(isSuccess){
+          if(map != null){
+            bool is2way = map["continue2Way"] as bool;
+            if(is2way){
+              isAuthTest = true;
+              authMap = map;
+            }
+          }
+        }else{
+          CommonUtils.flutterToast("에러가 발생했습니다.");
+        }
+      });
+    }else{
+
+      var jobIndex = authMap["jobIndex"];
+      var threadIndex = authMap["threadIndex"];
+      var jti = authMap["jti"];
+      var twoWayTimestamp = authMap["twoWayTimestamp"];
+
+      Map<String, dynamic> input2WayJson = {
+        "simpleAuth": "1",
+        "is2Way": true,
+        "twoWayInfo": {
+          "jobIndex": jobIndex,
+          "threadIndex": threadIndex,
+          "jti": jti,
+          "twoWayTimestamp": twoWayTimestamp
+        }
+      };
+
+      Map<String, dynamic> resultInput = {};
+      resultInput.addAll(inputJson);
+      resultInput.addAll(input2WayJson);
+      CommonUtils.log('i', 'result input : ${resultInput.toString()}');
+      isAuthTest = false;
+      await CodeFController.getDataFromApi(Apis.carRegistration1Api, resultInput, (bool isSuccess, map, _){
+        if(isSuccess){
+          if(map != null){
+
+          }
+        }else{
+          CommonUtils.flutterToast("추가인증 에러가 발생했습니다.");
+        }
+      });
+    }
+
   }
 
   void _receiveMessage(String message){
@@ -244,8 +324,8 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
     }
   }
 
-  double inputMinHeight = 10.h;
-  double inputHeight = 10.h;
+  double inputMinHeight = 5.h;
+  double inputHeight = 5.h;
   double inputMaxHeight = 30.h;
   double screenHeight = 100.h;
   double screenHeightWhenKeyboardUp = 0;
@@ -316,7 +396,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
           ),
 
           /// 채팅 상하 여백
-          UiUtils.getMarginBox(0, currentScreenHeight*0.01),
+          UiUtils.getMarginBox(0, screenHeight*0.01),
 
           /// 채팅 글 입력 칸
           AnimatedContainer(
@@ -342,19 +422,22 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
                     textAlign: TextAlign.start,
                     cursorColor: Colors.grey,
                     onChanged: (text) {
+                      currentText = CommonUtils.getLastWord(text);
                       // Calculate the desired height based on the text content
-                      final textHeight = TextPainter(
-                        text: TextSpan(text: text, style: TextStyles.subTitleTextStyle),
-                        maxLines: null,
-                        textDirection: TextDirection.ltr,
-                      )..layout(minWidth: 0, maxWidth: 85.w);
-                      final desiredHeight = inputMinHeight + textHeight.height;
-                      // Limit the height to the maxHeight constraint
-                      final height = desiredHeight.clamp(inputMinHeight, inputMaxHeight);
-                      // Update the container height
-                      setState(() {
-                        inputHeight = height;
-                      });
+                      if(!CommonUtils.isKoreanText(currentText)){
+                        final textHeight = TextPainter(
+                          text: TextSpan(text: text, style: TextStyles.subTitleTextStyle),
+                          maxLines: null,
+                          textDirection: TextDirection.ltr,
+                        )..layout(minWidth: 0, maxWidth: 85.w);
+                        final desiredHeight = inputMinHeight*0.3 + textHeight.height;
+                        // Limit the height to the maxHeight constraint
+                        final height = desiredHeight.clamp(inputMinHeight, inputMaxHeight);
+                        // Update the container height
+                        setState(() {
+                          inputHeight = height;
+                        });
+                      }
                     },
                     decoration: UiUtils.getInputDecorationWithNoErrorMessage("입력"),
                   ),
@@ -369,9 +452,9 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
                     if (inputTextController.text.trim() != "") {
                       String message = inputTextController.text;
                       inputTextController.text = "";
+                      currentText = "";
                       inputHeight = inputMinHeight;
                       _sendMessage(message);
-
                     }
                   },
                 ),
@@ -380,7 +463,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
           ),
 
           /// 채팅 상하 여백
-          UiUtils.getMarginBox(0, currentScreenHeight*0.01),
+          UiUtils.getMarginBox(0, screenHeight*0.01),
         ])
     );
 

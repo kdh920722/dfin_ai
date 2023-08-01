@@ -49,6 +49,32 @@ class CommonUtils {
     FocusManager.instance.primaryFocus?.unfocus();
   }
 
+  static bool isKoreanText(String text) {
+    if (text.isEmpty) {
+      return false; // Handle empty input
+    }
+
+    const koreanUnicodeStart = 0xAC00;
+    const koreanUnicodeEnd = 0xD7AF;
+
+    for (int i = 0; i < text.length; i++) {
+      int charCode = text.codeUnitAt(i);
+      if (charCode >= koreanUnicodeStart && charCode <= koreanUnicodeEnd) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  static String getLastWord(String text) {
+    List<String> words = text.split('');
+    if (words.isNotEmpty) {
+      return words.last;
+    } else {
+      return '';
+    }
+  }
+
   static String getPriceCommaFormattedString(double price){
     var format = NumberFormat('###,###,###,###');
     return format.format(price);
