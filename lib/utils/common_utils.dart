@@ -75,6 +75,46 @@ class CommonUtils {
     }
   }
 
+  static String getFirstWord(String text) {
+    List<String> words = text.split('');
+    if (words.isNotEmpty) {
+      return words.first;
+    } else {
+      return '';
+    }
+  }
+
+  static String replaceLastWord(String originalString, String newWord) {
+    List<String> words = originalString.split('');
+    if (words.isNotEmpty) {
+      // Replace the last word with the new word
+      words[words.length - 1] = newWord;
+    }
+    // Join the words back into a string
+    String result = words.join('');
+    return result;
+  }
+
+  static String extractStringAfterTarget(String originalString, String targetString){
+    int index = originalString.indexOf(targetString);
+
+    if (index != -1) {
+      return originalString.substring(index + targetString.length);
+    } else {
+      return originalString;
+    }
+  }
+
+  static String extractStringBeforeTarget(String originalString, String targetString){
+    int index = originalString.indexOf(targetString);
+
+    if (index != -1) {
+      return originalString.substring(0, index);
+    } else {
+      return originalString;
+    }
+  }
+
   static String getPriceCommaFormattedString(double price){
     var format = NumberFormat('###,###,###,###');
     return format.format(price);
