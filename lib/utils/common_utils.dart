@@ -84,7 +84,16 @@ class CommonUtils {
     }
   }
 
-  static String replaceLastWord(String originalString, String newWord) {
+  static String deleteLastEnter(String text){
+    String result = text;
+    while(CommonUtils.getLastWord(result) == "\n"){
+      result = _replaceLastWord(result, "");
+    }
+
+    return result;
+  }
+
+  static String _replaceLastWord(String originalString, String newWord) {
     List<String> words = originalString.split('');
     if (words.isNotEmpty) {
       // Replace the last word with the new word

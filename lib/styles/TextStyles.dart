@@ -6,7 +6,7 @@ class TextStyles {
   static TextStyle titleTextStyle = TextStyle(fontSize: 22.sp, color: Colors.black54, fontWeight: FontWeight.bold, decoration: TextDecoration.none, decorationThickness: 0.0);
   static TextStyle popTitleTextStyle = TextStyle(fontSize: 22.sp, color: Colors.black87, fontWeight: FontWeight.bold, decoration: TextDecoration.none, decorationThickness: 0.0);
   static TextStyle popSubUnderTextStyle = TextStyle(fontSize: 14.sp, color: Colors.black26, fontWeight: FontWeight.normal, decoration: TextDecoration.none, decorationThickness: 0.0);
-  static TextStyle subTitleTextStyle = TextStyle(fontSize: 14.sp, color: ColorStyles.finAppGray4, fontWeight: FontWeight.normal, decoration: TextDecoration.none, decorationThickness: 0.0);
+  static TextStyle subTitleTextStyle = TextStyle(fontSize: 10.sp, color: ColorStyles.finAppGray4, fontWeight: FontWeight.normal, decoration: TextDecoration.none, decorationThickness: 0.0);
   static TextStyle buttonTextStyle = TextStyle(fontSize: 20.sp, color: Colors.white, fontWeight: FontWeight.bold, decoration: TextDecoration.none, decorationThickness: 0.0);
   static TextStyle basicTextStyleBold = TextStyle(fontSize: 22.sp, color: Colors.black, fontWeight: FontWeight.bold, decoration: TextDecoration.none, decorationThickness: 0.0);
   static TextStyle basicTextStyle = TextStyle(fontSize: 10.sp, color: Colors.black, fontWeight: FontWeight.normal, decoration: TextDecoration.none, decorationThickness: 0.0);

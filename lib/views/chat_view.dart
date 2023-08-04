@@ -34,6 +34,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
   final String firstId = "FIRST";
   final String thisId = "ME";
   final String aiId = "GPT";
+  final String aiResultId = "GPT_RESULT";
 
   /// keyboard check for Web Platform
   final FocusNode _focusNode = FocusNode();
@@ -202,9 +203,13 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
         boxAlignType = MainAxisAlignment.end;
         chatTextColor = ColorStyles.darkGray;
         borderType = const BorderRadiusDirectional.only(topStart: Radius.circular(15), bottomEnd: Radius.circular(15), bottomStart: Radius.circular(15));
-      }else{
+      }else if(messageId == aiId){
         boxColor = Colors.amberAccent;
         chatTextColor = Colors.black;
+      }else{
+        // aiResultId
+        boxColor = Colors.green;
+        chatTextColor = ColorStyles.finAppWhite;
       }
 
       return Container(padding: const EdgeInsets.only(bottom: 10),
@@ -226,6 +231,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
   }
 
   Future<void> _sendMessage(String message) async {
+    message = CommonUtils.deleteLastEnter(message);
     messages.add({
       'id': thisId,
       'text': message,
@@ -239,11 +245,13 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
     CommonUtils.hideKeyBoard(context);
     UiUtils.showLoadingPop(context);
     messagesHistory.add(Messages(role: Role.user, content: message));
-    Future.delayed(const Duration(milliseconds: 1100), () async {
+    await Future.delayed(const Duration(milliseconds: 1100), () async {
       String receivedMessage = await GptController.sendAndReceiveTextToGPTUsingLib(messagesHistory);
+      await _receiveMessage(receivedMessage);
+
       if(context.mounted){
-        _receiveMessage(receivedMessage);
         UiUtils.closeLoadingPop(context);
+        setState(() {});
       }
     });
 
@@ -256,6 +264,67 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
     }
     */
 
+  }
+
+  Future<void> _receiveMessage(String message) async{
+
+    String messageForHistory = GptController.deleteUnnecessaryGptAnswer(message);
+    if(messageForHistory.contains(GptController.deletedResultSplitPattern)){
+      List<String> messageForHistoryList = messageForHistory.split(GptController.deletedResultSplitPattern);
+      messagesHistory.add(
+          Messages(
+              role: Role.assistant,
+              content: messageForHistoryList[1])
+      );
+    }
+
+    String convertedMessage = GptController.convertGptAnswerToSystemAnswer(message);
+    if(convertedMessage.contains(GptController.carNumResultSplitPattern)){
+      List<String> result = convertedMessage.split(GptController.carNumResultSplitPattern);
+      print(result[0]);
+
+      // get price from api
+      String price = "6,000 만원";
+      messagesHistory.add(
+          Messages(
+              role: Role.user,
+              content: "차량 시세 금액은 $price 입니다.")
+      );
+
+      await Future.delayed(const Duration(milliseconds: 1100), () async {
+        String receivedMessage = await GptController.sendAndReceiveTextToGPTUsingLib(messagesHistory);
+        await _receiveMessage(receivedMessage);
+      });
+    }else if(convertedMessage.contains(GptController.houseAddressResultSplitPattern)){
+      List<String> result = convertedMessage.split(GptController.houseAddressResultSplitPattern);
+      print(result[0]);
+
+      // get price from api
+      String price = "2억 3,500 만원";
+      messagesHistory.add(
+          Messages(
+              role: Role.user,
+              content: "주탹의 시세 금액은 $price 입니다.")
+      );
+
+      await Future.delayed(const Duration(milliseconds: 1100), () async {
+        String receivedMessage = await GptController.sendAndReceiveTextToGPTUsingLib(messagesHistory);
+        await _receiveMessage(receivedMessage);
+      });
+    }else if(convertedMessage.contains(GptController.resultSplitPattern)){
+      List<String> resultMessages = convertedMessage.split(GptController.resultSplitPattern);
+      messages.last['text'] = resultMessages[0];
+      messages.add({
+        'id': aiResultId,
+        'text': resultMessages[1],
+      });
+      messages.add({
+        'id': aiId,
+        'text': resultMessages[2],
+      });
+    }else{
+      messages.last['text'] = convertedMessage;
+    }
   }
 
   bool isAuthTest = false;
@@ -325,28 +394,6 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
         }
       });
     }
-
-  }
-
-  void _receiveMessage(String message){
-    messagesHistory.add(
-        Messages(
-            role: Role.assistant,
-            content: message)
-    );
-    String convertedMessage = GptController.convertGptAnswerToSystemAnswer(message);
-    if(convertedMessage.contains("@@@")){
-      List<String> resultMessages = convertedMessage.split("@@@");
-      messages.last['text'] = resultMessages[0];
-      messages.add({
-        'id': aiId,
-        'text': resultMessages[1],
-      });
-    }else{
-      messages.last['text'] = convertedMessage;
-    }
-
-    setState(() {});
   }
 
   void scrollToBottom(){
@@ -357,7 +404,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
     }
   }
 
-  double inputMinHeight = 5.h;
+  double inputMinHeight = 10.h;
   double inputHeight = 5.h;
   double inputMaxHeight = 30.h;
   double screenHeight = 100.h;
