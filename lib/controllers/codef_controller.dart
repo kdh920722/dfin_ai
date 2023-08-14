@@ -87,14 +87,14 @@ class CodeFController{
         final decodedResponseBody = Uri.decodeFull(response.body);
         final json = jsonDecode(decodedResponseBody);
         if(json.containsKey('result') && json.containsKey('data')){
-          CommonUtils.log('i', 'out full : ${json.toString()}');
           final result = json['result'];
           final resultCode = result['code'];
+          CommonUtils.log('i', 'out full : \n$json');
 
           // CF-00000 : 성공, CF-03002 : 추가 인증 필요
           if(resultCode == 'CF-00000' || resultCode == 'CF-03002'){
             final resultData = json['data'];
-            CommonUtils.log('i', 'out resultCode : $resultCode\nresultData : ${resultData.toString()}');
+            CommonUtils.log('i', 'out resultCode : $resultCode\nresultData : \n${resultData.toString()}');
             if (resultData is Map<String, dynamic>) {
               callback(true, resultData, null);
             } else if (resultData is List<dynamic>) {
@@ -174,7 +174,7 @@ extension HostDevExtension on HostDev {
 }
 
 enum Apis {
-  addressApi1, addressApi2, carRegistration1Api, carRegistration2Api
+  addressApi1, addressApi2, carRegistration1Api, carRegistration2Api, bankruptApi1, bankruptApi2
 }
 
 extension ApisExtension on Apis {
@@ -188,6 +188,10 @@ extension ApisExtension on Apis {
         return '/v1/kr/public/mw/car-registration-a/issuance';
       case Apis.carRegistration2Api:
         return '/v1/kr/public/mw/car-registration-b/issuance';
+      case Apis.bankruptApi1:
+        return '/v1/kr/public/ck/rehab-bankruptcy/list';
+      case Apis.bankruptApi2:
+        return '/v1/kr/public/ck/scourt-events/search';
       default:
         throw Exception('Unknown host value');
     }

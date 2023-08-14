@@ -1,10 +1,8 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/services.dart';
 import 'package:flutterwebchat/controllers/get_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:sizer/sizer.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -231,6 +229,46 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
   }
 
   Future<void> _sendMessage(String message) async {
+
+    await _call2WayCert();
+
+    /*
+    Map<String, dynamic> inputJson = {
+      "organization": "0001",
+      "court_name": "부산회생법원",
+      "caseNumberYear": "2021",
+      "caseNumberType": "개회",
+      "caseNumberNumber": "105645",
+      "userName": "양미정",
+      "timeout": "",
+      "bankCode": "",
+      "account": "",
+      "userName1": ""
+    };
+
+    await CodeFController.getDataFromApi(Apis.bankruptApi2, inputJson, (bool isSuccess, map, listMap){
+      if(isSuccess){
+        if(map != null){
+          CommonUtils.log('i', 'out : is map');
+        }else if(listMap != null){
+          CommonUtils.log('i', 'out : is list map (size):${listMap.length}');
+          for(Map<String, dynamic> each in listMap){
+            String name = each['resDebtor'];
+            String num = each['resCaseNumber'];
+            if(name == "양미정"){
+              CommonUtils.log('i', 'out $name ### $num');
+            }
+          }
+        }
+      }else{
+        CommonUtils.flutterToast("에러가 발생했습니다.");
+      }
+    });
+
+     */
+
+
+    /*
     message = CommonUtils.deleteLastEnter(message);
     messages.add({
       'id': thisId,
@@ -254,6 +292,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
         setState(() {});
       }
     });
+    */
 
     /*
     CommonUtils.hideKeyBoard(context);
@@ -329,26 +368,22 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
 
   bool isAuthTest = false;
   Map<String, dynamic> authMap = {};
-  Future<void> _callCarRegistration1() async {
+  Future<void> _call2WayCert() async {
     Map<String, dynamic> inputJson = {
       "organization": "0001",
-      "loginType": "5",
-      "userName": "김동환",
-      "identity": "9207221199215",
-      "birthDate": "",
-      "carNo": "66가7997",
-      "ownerName": "김영일",
-      "displyed": "1",
-      "isIdentityViewYn": "1",
-      "address": "",
-      "identity2": "5810221144516",
-      "loginTypeLevel": "1",
-      "phoneNo": "01054041099" ,
-      "telecom": "1"
+      "court_name": "부산회생법원",
+      "caseNumberYear": "2022",
+      "caseNumberType": "개회",
+      "caseNumberNumber": "109637",
+      "userName": "김대성",
+      "timeout": "",
+      "bankCode": "048",
+      "account": "13211616",
+      "userName1": "김대성"
     };
 
     if(!isAuthTest){
-      await CodeFController.getDataFromApi(Apis.carRegistration1Api, inputJson, (bool isSuccess, map, _){
+      await CodeFController.getDataFromApi(Apis.bankruptApi2, inputJson, (bool isSuccess, map, _){
         if(isSuccess){
           if(map != null){
             bool is2way = map["continue2Way"] as bool;
@@ -367,9 +402,13 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
       var threadIndex = authMap["threadIndex"];
       var jti = authMap["jti"];
       var twoWayTimestamp = authMap["twoWayTimestamp"];
+      var extraInfo = authMap["extraInfo"];
+      var secNo = extraInfo["reqSecureNo"];
+      var secNoRefresh = extraInfo["reqSecureNoRefresh"];
 
       Map<String, dynamic> input2WayJson = {
-        "simpleAuth": "1",
+        "secureNo": secNo,
+        "secureNoRefresh" : secNoRefresh,
         "is2Way": true,
         "twoWayInfo": {
           "jobIndex": jobIndex,
@@ -384,7 +423,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
       resultInput.addAll(input2WayJson);
       CommonUtils.log('i', 'result input : ${resultInput.toString()}');
       isAuthTest = false;
-      await CodeFController.getDataFromApi(Apis.carRegistration1Api, resultInput, (bool isSuccess, map, _){
+      await CodeFController.getDataFromApi(Apis.bankruptApi2, resultInput, (bool isSuccess, map, _){
         if(isSuccess){
           if(map != null){
 
@@ -546,6 +585,10 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
                       currentText = "";
                       inputHeight = inputMinHeight;
                       _sendMessage(message);
+                    }else if(inputTextController.text.trim() == ""){
+                      _sendMessage("");
+                      inputTextController.text = "";
+                      currentText = "";
                     }
                   },
                 ),
