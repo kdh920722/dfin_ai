@@ -230,8 +230,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
 
   Future<void> _sendMessage(String message) async {
 
-    await _call2WayCert();
-
+    await _findInfoByCaseNumber();
     /*
     Map<String, dynamic> inputJson = {
       "organization": "0001",
@@ -302,7 +301,31 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
       UiUtils.closeLoadingPop(context);
     }
     */
+  }
 
+  Future<void> _findInfoByCaseNumber() async {
+    Map<String, dynamic> inputJson = {
+      "organization": "0001",
+      "court_name": "부산회생법원",
+      "caseNumberYear": "2022",
+      "caseNumberType": "개회",
+      "caseNumberNumber": "109637",
+      "userName": "김대성",
+      "timeout": "",
+      "bankCode": "048",
+      "account": "13211616",
+      "userName1": "김대성"
+    };
+
+    await CodeFController.getDataFromApi(Apis.bankruptApi2, inputJson, (bool isSuccess, map, _){
+      if(isSuccess){
+        if(map != null){
+
+        }
+      }else{
+        CommonUtils.flutterToast("에러가 발생했습니다.");
+      }
+    });
   }
 
   Future<void> _receiveMessage(String message) async{
