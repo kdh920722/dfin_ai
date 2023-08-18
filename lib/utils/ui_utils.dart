@@ -262,7 +262,7 @@ class UiUtils {
     );
   }
 
-  static void showSlideMenu(BuildContext parentViewContext, SlideType slideType, Widget Function(BuildContext context, StateSetter setState) createWidgetMethod){
+  static void showSlideMenu(BuildContext parentViewContext, SlideType slideType, bool isDismissible, Widget Function(BuildContext context, StateSetter setState) createWidgetMethod){
     double popWidth = 66.w;
     double popHeight = 33.h;
     BorderRadius borderRadius = BorderRadius.circular(30);
@@ -270,7 +270,7 @@ class UiUtils {
 
     showGeneralDialog(
       barrierLabel: "Slide Menu",
-      barrierDismissible: true,
+      barrierDismissible: isDismissible,
       barrierColor: Colors.black.withOpacity(0.5),
       transitionDuration: const Duration(milliseconds: 500),
       context: parentViewContext,

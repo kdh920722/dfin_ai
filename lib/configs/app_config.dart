@@ -1,9 +1,12 @@
 import 'package:flutter/foundation.dart';
+import 'dart:io';
 
 class Config{
   static bool isAppMainInit = false;
   static const double appWidth = 393;
   static const double appHeight = 852;
+  static bool isWeb = kIsWeb;
+  static bool isAndroid = Platform.isAndroid;
 }
 
 enum SlideType {

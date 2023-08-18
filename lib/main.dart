@@ -1,14 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutterwebchat/configs/app_config.dart';
-import 'package:flutterwebchat/controllers/gpt_controller.dart';
-import 'package:flutterwebchat/controllers/get_controller.dart';
-import 'package:flutterwebchat/utils/common_utils.dart';
 import 'package:flutterwebchat/utils/ui_utils.dart';
 import 'package:flutterwebchat/views/chat_view.dart';
-import 'package:get/get.dart';
-import 'controllers/codef_controller.dart';
-import 'controllers/firebase_controller.dart';
 
 void main() async{
   // 화면 회전 제어

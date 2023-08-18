@@ -1,8 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
 import 'package:http/http.dart' as http;
-
+import '../configs/app_config.dart';
 import '../utils/common_utils.dart';
 
 class CodeFController{
@@ -20,11 +19,14 @@ class CodeFController{
   }
 
   static Future<void> initAccessToken(Function(bool) callback) async {
-    //const proxy = "http://cors-anywhere.herokuapp.com/";
     const oauthDomain = "https://oauth.codef.io"; // Replace with the actual OAuth domain.
     const getTokenPath = "/oauth/token"; // Replace with the actual path to get the token.
-
-    var targetUrl = 'https://corsproxy.io/?${Uri.encodeComponent(oauthDomain + getTokenPath)}';
+    var targetUrl = "";
+    if(Config.isWeb){
+      targetUrl = 'https://corsproxy.io/?${Uri.encodeComponent(oauthDomain + getTokenPath)}';
+    }else{
+      targetUrl = oauthDomain + getTokenPath;
+    }
 
     try {
       final url = Uri.parse(targetUrl);
@@ -66,12 +68,79 @@ class CodeFController{
     }
   }
 
-  static Future<void> getDataFromApi(Apis apiInfo, Map<String, dynamic> inputJson,
-      void Function(bool isSuccess, Map<String, dynamic>? outputJson, List<dynamic>? outputJsonArray) callback) async {
+  static Future<void> getDataFromApiOnApp(Apis apiInfo, Map<String, dynamic> inputJson,
+      void Function(bool isSuccess, bool is2WayProcess, Map<String, dynamic>? outputJson, List<dynamic>? outputJsonArray) callback) async {
     final baseUrl = hostStatus.value == HostStatus.prod.value ? Host.baseUrl.value : HostDev.baseUrl.value;
     final endPoint = apiInfo.value;
     final url = baseUrl + endPoint;
-    var targetUrl = 'https://corsproxy.io/?${Uri.encodeComponent(url)}';
+    final tokenHeader = 'Bearer $token';
+
+    try {
+      CommonUtils.log('i', 'call start');
+      final response = await http.post(Uri.parse(url),
+          headers: {
+            'Authorization': tokenHeader,
+            'Content-Type': 'application/json'
+          },
+          body: jsonEncode(inputJson)
+      );
+
+      if(response.statusCode == 200) {
+        CommonUtils.log('i', 'call response here');
+        final decodedResponseBody = Uri.decodeFull(response.body);
+        final json = jsonDecode(decodedResponseBody);
+        if(json.containsKey('result') && json.containsKey('data')){
+          final result = json['result'];
+          final resultCode = result['code'];
+          CommonUtils.log('i', 'out full : \n$json');
+
+          // CF-00000 : 성공, CF-03002 : 추가 인증 필요
+          if(resultCode == 'CF-00000' || resultCode == 'CF-03002'){
+            final resultData = json['data'];
+            CommonUtils.log('i', 'out resultCode : $resultCode\nresultData : \n${resultData.toString()}');
+            if (resultData is Map<String, dynamic>) {
+              if(resultCode == 'CF-03002') {
+                callback(true, true, resultData, null);
+              } else {
+                callback(true, false, resultData, null);
+              }
+            } else if (resultData is List<dynamic>) {
+              if(resultCode == 'CF-03002') {
+                callback(true, true, null, resultData);
+              } else {
+                callback(true, false, null, resultData);
+              }
+            } else{
+              CommonUtils.log('i', '???');
+            }
+
+          } else {
+            CommonUtils.log('e', 'out resultCode error : $resultCode');
+            callback(false, false, null, null);
+          }
+        }
+      } else {
+        CommonUtils.log('e', response.statusCode.toString());
+        callback(false, false, null, null);
+      }
+    } catch (e) {
+      CommonUtils.log('e', e.toString());
+      callback(false, false, null, null);
+    }
+  }
+
+  static Future<void> getDataFromApi(Apis apiInfo, Map<String, dynamic> inputJson,
+      void Function(bool isSuccess, bool is2WayProcess, Map<String, dynamic>? outputJson, List<dynamic>? outputJsonArray) callback) async {
+    final baseUrl = hostStatus.value == HostStatus.prod.value ? Host.baseUrl.value : HostDev.baseUrl.value;
+    final endPoint = apiInfo.value;
+    final url = baseUrl + endPoint;
+    var targetUrl = "";
+    if(Config.isWeb){
+      targetUrl = 'https://corsproxy.io/?${Uri.encodeComponent(url)}';
+    }else{
+      targetUrl = url;
+    }
+
     final tokenHeader = 'Bearer $token';
 
     try {
@@ -96,22 +165,31 @@ class CodeFController{
             final resultData = json['data'];
             CommonUtils.log('i', 'out resultCode : $resultCode\nresultData : \n${resultData.toString()}');
             if (resultData is Map<String, dynamic>) {
-              callback(true, resultData, null);
+              if(resultCode == 'CF-03002') {
+                callback(true, true, resultData, null);
+              } else {
+                callback(true, false, resultData, null);
+              }
             } else if (resultData is List<dynamic>) {
-              callback(true, null, resultData);
+              if(resultCode == 'CF-03002') {
+                callback(true, true, null, resultData);
+              } else {
+                callback(true, false, null, resultData);
+              }
+
             }
           } else {
             CommonUtils.log('e', 'out resultCode error : $resultCode');
-            callback(false, null, null);
+            callback(false, false, null, null);
           }
         }
       } else {
         CommonUtils.log('e', 'http error code : ${response.statusCode}');
-        callback(false, null, null);
+        callback(false, false, null, null);
       }
     } catch (e) {
       CommonUtils.log('e', e.toString());
-      callback(false, null, null);
+      callback(false, false, null, null);
     }
   }
   /// ------------------------------------------------------------------------------------------------------------------------ ///
@@ -174,7 +252,8 @@ extension HostDevExtension on HostDev {
 }
 
 enum Apis {
-  addressApi1, addressApi2, carRegistration1Api, carRegistration2Api, bankruptApi1, bankruptApi2
+  addressApi1, addressApi2, carRegistration1Api, carRegistration2Api, bankruptApi1, bankruptApi2,
+  residentRegistrationAbstract, residentRegistrationCopy
 }
 
 extension ApisExtension on Apis {
@@ -192,6 +271,10 @@ extension ApisExtension on Apis {
         return '/v1/kr/public/ck/rehab-bankruptcy/list';
       case Apis.bankruptApi2:
         return '/v1/kr/public/ck/scourt-events/search';
+      case Apis.residentRegistrationAbstract:
+        return '/v1/kr/public/mw/resident-registration-abstract/issuance';
+      case Apis.residentRegistrationCopy:
+        return '/v1/kr/public/mw/resident-registration-copy/issuance';
       default:
         throw Exception('Unknown host value');
     }
