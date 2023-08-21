@@ -94,6 +94,7 @@ class CLOVAController{
 
   static Future<void> uploadImageToCLOVA(String imagePath, Function(bool) callback) async {
     var targetUrl = "";
+
     if(Config.isWeb){
       targetUrl = 'https://corsproxy.io/?${Uri.encodeComponent(apiURL)}';
     }else{
