@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
+import '../configs/app_config.dart';
 import '../utils/common_utils.dart';
 
 class CLOVAController{
@@ -92,7 +93,12 @@ class CLOVAController{
   }
 
   static Future<void> uploadImageToCLOVA(String imagePath, Function(bool) callback) async {
-    var targetUrl = apiURL;
+    var targetUrl = "";
+    if(Config.isWeb){
+      targetUrl = 'https://corsproxy.io/?${Uri.encodeComponent(apiURL)}';
+    }else{
+      targetUrl = apiURL;
+    }
 
     try {
       String fileName = imagePath.split('/').last;
