@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
+import 'package:flutterwebchat/controllers/clova_controller.dart';
 import 'package:flutterwebchat/controllers/get_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:sizer/sizer.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -92,6 +94,17 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
     });
   }
 
+  Future<void> _initCLOVA() async {
+    // init
+    await CLOVAController.initCLOVA((bool isSuccess){
+      if(isSuccess){
+        CommonUtils.log("i", "clova url : ${CLOVAController.apiURL}\nclova secretKey : ${CLOVAController.secretKey}");
+      }else{
+        CommonUtils.flutterToast("clova init 에러가 발생했습니다.");
+      }
+    });
+  }
+
   void _initUiValue(){
     currentScreenHeight = screenHeight;
     switchBarHeight = currentScreenHeight*0.05;
@@ -103,6 +116,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
     await _initFirebase();
     await _initGPT();
     await _initCodeF();
+    await _initCLOVA();
     _initUiValue();
     setState(() {});
   }
@@ -668,7 +682,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
                   Icons.send,
                   "",
                   ColorStyles.finAppGreen,
-                      () {
+                      () async {
                     if (inputTextController.text.trim() != "") {
                       String message = inputTextController.text;
                       inputTextController.text = "";
@@ -676,9 +690,19 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
                       inputHeight = inputMinHeight;
                       _sendMessage(message);
                     }else if(inputTextController.text.trim() == ""){
-                      _sendMessage("");
-                      inputTextController.text = "";
-                      currentText = "";
+                      XFile? image = await CommonUtils.getCameraImage();
+                      if(image != null){
+                        CLOVAController.uploadImageToCLOVA(image, (bool isSuccess){
+                          if(isSuccess){
+
+                          }else{
+
+                          }
+                        });
+                      }
+                      //_sendMessage("");
+                      //inputTextController.text = "";
+                      //currentText = "";
                     }
                   },
                 ),

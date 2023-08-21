@@ -1,14 +1,17 @@
 import 'dart:io';
+import 'dart:math';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:transition/transition.dart';
-import '../configs/app_config.dart';
 import '../styles/ColorStyles.dart';
 import '../styles/TextStyles.dart';
+import 'package:image/image.dart' as imglib;
 
 class CommonUtils {
   static void log(String logType, String logMessage){
@@ -43,6 +46,11 @@ class CommonUtils {
     }
 
     return result;
+  }
+
+  static String getRandomKey(){
+    int randomNumber = Random().nextInt(10000); // 0 ~ 10000 랜덤
+    return randomNumber.toString();
   }
 
   static void hideKeyBoard(BuildContext context){
@@ -279,8 +287,7 @@ class CommonUtils {
 
   static DateTime getCurrentLocalTime() {
     DateTime now = DateTime.now();
-    String formattedDateTime = DateFormat('yyyyMMddHHmmss').format(now);
-    return DateTime.parse(formattedDateTime);
+    return now;
   }
 
   static DateTime convertToUtcTime(DateTime dateTime) {
@@ -300,7 +307,110 @@ class CommonUtils {
     return systemDateTime;
   }
 
+  static final ImagePicker _picker = ImagePicker();
 
+  static Future<XFile?> getGalleryImage() async {
+    try{
+      XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+      if(image != null){
+        image = await renameFile(image, makeImageName(image));
+        image = await convertImageFileToJpg(image);
+        CommonUtils.log('i', "path : ${image.path}\nname : ${image.name}");
+      }
 
+      return image;
+    }catch(e){
+      CommonUtils.log('e', e.toString());
+      return null;
+    }
+  }
+
+  static Future<XFile?> getCameraImage() async {
+    try{
+      XFile? image = await _picker.pickImage(source: ImageSource.camera);
+      if(image != null){
+        image = await renameFile(image, makeImageName(image));
+        image = await convertImageFileToJpg(image);
+        CommonUtils.log('i', "path : ${image.path}\nname : ${image.name}");
+      }
+      return image;
+    }catch(e){
+      CommonUtils.log('e', e.toString());
+      return null;
+    }
+  }
+
+  static Future<List<XFile?>> getGalleryImageList() async {
+    List<XFile?> imageList = [];
+    try{
+      List<XFile?> imageListInMultiImage = await _picker.pickMultiImage();
+      for(var eachImage in imageListInMultiImage){
+        if(eachImage != null) {
+          eachImage = await renameFile(eachImage, makeImageName(eachImage));
+          eachImage = await convertImageFileToJpg(eachImage);
+          imageList.add(eachImage);
+        }
+      }
+      return imageList;
+    }catch(e){
+      CommonUtils.log('e', e.toString());
+      return imageList;
+    }
+  }
+
+  static Future<XFile> convertImageFileToJpg(XFile targetImage) async {
+    String imagePath = targetImage.path;
+    String extension = imagePath.split('.').last.toLowerCase();
+
+    if (extension != 'jpg') {
+      List<int> imageBytes = await File(imagePath).readAsBytes();
+      imglib.Image? originalImage = imglib.decodeImage(Uint8List.fromList(imageBytes));
+      if (originalImage != null) {
+        String newImagePath = imagePath.replaceFirst(extension, 'jpg');
+        File(newImagePath).writeAsBytesSync(imglib.encodeJpg(originalImage));
+        targetImage = XFile(newImagePath);
+      }
+    }
+    return targetImage;
+  }
+
+  static Future<XFile> renameFile(XFile targetImage, String newFileName) async {
+    String originalPath = targetImage.path ?? '';
+    File originalFile = File(originalPath);
+    String originalFileName = originalFile.path.split('/').last;
+    String newPath = originalPath.replaceFirst(originalFileName, newFileName);
+    File renamedFile = await originalFile.rename(newPath);
+    return XFile(renamedFile.path);
+  }
+
+  static String makeImageName(XFile targetImage){
+    String currentTimeString = CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime());
+    List filename = targetImage.name.split(".");
+    return '$currentTimeString.${filename[1]}';
+  }
+
+  static Future<bool> uploadImage(XFile targetImage) async {
+    try {
+      //final MultipartFile multipartFile =  MultipartFile.fromFileSync(targetImage.path, contentType: MediaType("image", "jpg"));
+      var formData = FormData.fromMap({'image': await MultipartFile.fromFile(targetImage.path)});
+      //var formData = FormData.fromMap({'imageKey': multipartFile});
+
+      var dio = Dio();
+      dio.options.contentType = 'multipart/form-data';
+      dio.options.maxRedirects.isFinite;
+      dio.options.headers = {'token': 'HEADER_TOKEN'};
+      final res = await dio.post('BASE_URL', data: formData);
+
+      CommonUtils.log('i', res.statusCode.toString());
+      if (res.statusCode == 200) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      CommonUtils.log('e', e.toString());
+      return false;
+    }
+  }
 
 }
