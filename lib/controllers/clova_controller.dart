@@ -4,7 +4,6 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import 'dart:io';
 import 'package:dio/dio.dart';
-import '../configs/app_config.dart';
 import '../utils/common_utils.dart';
 
 class CLOVAController{
@@ -129,10 +128,10 @@ class CLOVAController{
           "Content-Type": "application/json"
         },
         body: reqBody,
-      ).timeout(Duration(seconds: 120));
+      ).timeout(const Duration(seconds: 120));
 
-      final decodedResponseBody = Uri.decodeFull(response.body);
-      final json = jsonDecode(decodedResponseBody);
+      //final decodedResponseBody = Uri.decodeFull(response.body);
+      final json = jsonDecode(response.body);
       CommonUtils.log('i', 'out full : \n$json');
 
       if (response.statusCode == 200) { // HTTP_OK
