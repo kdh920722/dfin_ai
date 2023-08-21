@@ -463,4 +463,44 @@ class CommonUtils {
     }
   }
 
+  static Future<String> drawBlackSquareAndSave(String imagePath, List<int>xPoints, List<int>yPoints) async {
+    try {
+      final imglib.Image image = imglib.decodeImage(File(imagePath).readAsBytesSync())!;
+
+      int squareX = 0;   // X-coordinate of the top-left corner
+      int squareY = 0;   // Y-coordinate of the top-left corner
+      int squareXSize = 0; // Size of the square (width and height)
+      int squareYSize = 0;
+
+      if(xPoints[0] > xPoints[2]){
+        squareX = xPoints[2];
+        squareXSize = xPoints[0] - xPoints[2];
+      }else{
+        squareX = xPoints[0];
+        squareXSize = xPoints[2] - xPoints[0];
+      }
+
+      if(yPoints[0] > yPoints[2]){
+        squareY = yPoints[2];
+        squareYSize = yPoints[0] - yPoints[2];
+      }else{
+        squareY = yPoints[0];
+        squareYSize = yPoints[2] - yPoints[0];
+      }
+
+      imglib.fillRect(image, x1: squareX, y1: squareY, x2 : squareX + squareXSize, y2 : squareY + squareYSize, color: imglib.ColorRgba8(0, 0, 0, 255));
+
+      final modifiedImagePath = imagePath.replaceAll('.jpg', '_modified.jpg');
+      File(modifiedImagePath).writeAsBytesSync(imglib.encodeJpg(image));
+
+      print('Image with black square saved: $modifiedImagePath');
+
+      return modifiedImagePath;
+    } catch (e) {
+      CommonUtils.log('e', e.toString());
+      return imagePath;
+    }
+  }
+
+
 }

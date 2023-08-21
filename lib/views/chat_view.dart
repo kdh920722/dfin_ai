@@ -712,16 +712,30 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
                       if(image != null){
                         CroppedFile? croppedFile = await CommonUtils.cropImage(image);
                         if(croppedFile != null){
-                          await CLOVAController.uploadImageToCLOVA(croppedFile.path, (bool isSuccess){
+                          await CLOVAController.uploadImageToCLOVA(croppedFile.path, (bool isSuccess, map) async {
                             if(isSuccess){
-
+                              CommonUtils.log('i', map.toString());
+                              CommonUtils.log('i', map!['personalNum'][0]['maskingPolys'][0]['vertices'].toString());
+                              List<dynamic> listMap = map!['personalNum'][0]['maskingPolys'][0]['vertices'];
+                              List<int> xPointList = [];
+                              List<int> yPointList = [];
+                              for(Map<String,dynamic> each in listMap){
+                                var xPoint = each['x'].toString().split(".")[0];
+                                var yPoint = each['y'].toString().split(".")[0];
+                                xPointList.add(int.parse(xPoint));
+                                yPointList.add(int.parse(yPoint));
+                              }
+                              CommonUtils.log('i', xPointList.toString());
+                              CommonUtils.log('i', yPointList.toString());
+                              String path = await CommonUtils.drawBlackSquareAndSave(croppedFile.path, xPointList, yPointList);
+                              setState(() {
+                                pickedFilePath = path;
+                              });
                             }else{
 
                             }
                           });
-                          setState(() {
-                            pickedFilePath = croppedFile.path;
-                          });
+
                         }
 
                       }

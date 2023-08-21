@@ -53,7 +53,7 @@ class CLOVAController{
     }
   }
 
-  static Future<void> uploadImageToCLOVA(String imagePath, Function(bool) callback) async {
+  static Future<void> uploadImageToCLOVA(String imagePath, Function(bool, Map<String, dynamic>? outputJson) callback) async {
     var targetUrl = "";
 
     if(Config.isWeb){
@@ -104,17 +104,18 @@ class CLOVAController{
       if (response.statusCode == 200) { // HTTP_OK
         final resultData = json['images'][0];
         if(resultData['inferResult'] == "SUCCESS"){
-          callback(true);
+          final resultmap = resultData['idCard']['result']['ic'];
+          callback(true, resultmap);
         }else{
-          callback(false);
+          callback(false, null);
         }
       } else {
         CommonUtils.log('e', 'http error code : ${response.statusCode}');
-        callback(false);
+        callback(false, null);
       }
     } catch (e) {
       CommonUtils.log('e', e.toString());
-      callback(false);
+      callback(false, null);
     }
   }
 
