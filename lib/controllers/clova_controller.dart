@@ -53,45 +53,6 @@ class CLOVAController{
     }
   }
 
-  static Future<void> uploadImage(XFile targetImage, Function(bool) callback) async {
-    try {
-      //final MultipartFile multipartFile =  MultipartFile.fromFileSync(targetImage.path, contentType: MediaType("image", "jpg"));
-      //var formData = FormData.fromMap({'imageKey': multipartFile});
-      var formData = FormData.fromMap({
-        "version": "V2",
-        "requestId": CommonUtils.getRandomKey(),
-        "timestamp": 0,
-        "images": [
-          {
-            "format": "jpg",
-            "name": "CLOVA_CHECK_${targetImage.name}",
-            'data': await MultipartFile.fromFile(targetImage.path)
-          }
-        ]
-
-      });
-
-      var dio = Dio();
-      dio.options.contentType = 'multipart/form-data';
-      dio.options.maxRedirects.isFinite;
-      dio.options.baseUrl = apiURL;
-      dio.options.headers = {
-        "Content-Type": "multipart/form-data",
-        "X-OCR-SECRET": secretKey
-      };
-      final res = await dio.post(apiURL, data: formData);
-      CommonUtils.log('i', 'out full : \n${res.toString()}');
-      if (res.statusCode == 200) {
-        callback(true);
-      } else {
-        callback(false);
-      }
-    } catch (e) {
-      CommonUtils.log('e', e.toString());
-      callback(false);
-    }
-  }
-
   static Future<void> uploadImageToCLOVA(String imagePath, Function(bool) callback) async {
     var targetUrl = "";
 
@@ -137,7 +98,6 @@ class CLOVAController{
         body: reqBody,
       ).timeout(const Duration(seconds: 120));
 
-      //final decodedResponseBody = Uri.decodeFull(response.body);
       final json = jsonDecode(response.body);
       CommonUtils.log('i', 'out full : \n$json');
 
@@ -153,46 +113,6 @@ class CLOVAController{
         callback(false);
       }
     } catch (e) {
-      CommonUtils.log('e', e.toString());
-      callback(false);
-    }
-  }
-
-  static Future<void> uploadImageToCLOVA2(String imagePath, Function(bool) callback) async {
-    try{
-      final requestJson = {
-        'images': [
-          {
-            'format': 'jpg',
-            'name': 'demo',
-          }
-        ],
-        'requestId': CommonUtils.getRandomKey(),
-        'version': 'V2',
-        'timestamp': 0,
-      };
-      final String fileName = imagePath.split('/').last;
-      final payload = {'message': jsonEncode(requestJson)};
-      final multipartFile = http.MultipartFile(
-        'file',
-        File(imagePath).readAsBytes().asStream(),
-        File(imagePath).lengthSync(),
-        filename: fileName,
-      );
-
-      final request = http.MultipartRequest('POST', Uri.parse(apiURL))
-        ..headers.addAll({'X-OCR-SECRET': secretKey, "Content-Type" : "multipart/form-data"})
-        ..fields.addAll(payload)
-        ..files.add(multipartFile);
-
-      final response = await request.send();
-      final responseBody = await response.stream.bytesToString();
-
-      final decodedResponseBody = Uri.decodeFull(responseBody);
-      final json = jsonDecode(decodedResponseBody);
-      CommonUtils.log('i', 'out full : \n$json');
-      callback(true);
-    }catch(e){
       CommonUtils.log('e', e.toString());
       callback(false);
     }

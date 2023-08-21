@@ -49,8 +49,7 @@ class CodeFController{
       );
 
       if (response.statusCode == 200) { // HTTP_OK
-        final decodedResponse = utf8.decode(response.bodyBytes);
-        final decodedJson = json.decode(Uri.decodeComponent(decodedResponse));
+        final decodedJson = jsonDecode(response.body);
         if (decodedJson.containsKey('access_token')) {
           token = decodedJson['access_token'];
           callback(true);
