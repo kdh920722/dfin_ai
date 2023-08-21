@@ -4,6 +4,7 @@ import 'package:flutterwebchat/controllers/clova_controller.dart';
 import 'package:flutterwebchat/controllers/get_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sizer/sizer.dart';
 import 'package:flutter/scheduler.dart';
@@ -18,6 +19,7 @@ import '../configs/app_config.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
 import 'package:chat_gpt_sdk/chat_gpt_sdk.dart';
+import 'dart:io';
 
 class ChatView extends StatefulWidget{
   @override
@@ -557,6 +559,8 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
   double switchBarHeight = 0;
   bool isWebMobile = false;
 
+  String pickedFilePath = "";
+
   final KeyboardObserver _keyboardObserver = KeyboardObserver();
   void _onKeyboardHeightChanged() {
     //keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
@@ -588,6 +592,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
     AnimatedContainer(duration: const Duration(milliseconds: 100), width: 100.w, height: currentScreenHeight, color: ColorStyles.finAppWhite, child:Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
+          /*
           AnimatedContainer(height: switchBarHeight, duration: const Duration(milliseconds: 100),
               child: Row(mainAxisAlignment : MainAxisAlignment.center, children: [
                 UiUtils.getTextWithFixedScale("WEB", TextStyles.basicTextStyle, null, null),
@@ -603,6 +608,19 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
                 UiUtils.getTextWithFixedScale("MOBILE WEB", TextStyles.basicTextStyle, null, null)
               ])
           ),
+
+           */
+
+          SizedBox(height: 30.h,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: 100.w,
+                  maxHeight: 30.h,
+                ),
+                child: pickedFilePath != "" ? Image.file(File(pickedFilePath)) : Container(),
+              )
+          ),
+
           /// 채팅 메인 화면
           Expanded(
               child: Container(
@@ -692,13 +710,20 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
                     }else if(inputTextController.text.trim() == ""){
                       XFile? image = await CommonUtils.getCameraImage();
                       if(image != null){
-                        CLOVAController.uploadImageToCLOVA(image, (bool isSuccess){
-                          if(isSuccess){
+                        CroppedFile? croppedFile = await CommonUtils.cropImage(image);
+                        if(croppedFile != null){
+                          await CLOVAController.uploadImageToCLOVA(croppedFile.path, (bool isSuccess){
+                            if(isSuccess){
 
-                          }else{
+                            }else{
 
-                          }
-                        });
+                            }
+                          });
+                          setState(() {
+                            pickedFilePath = croppedFile.path;
+                          });
+                        }
+
                       }
                       //_sendMessage("");
                       //inputTextController.text = "";

@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import 'dart:io';
-
+import 'package:dio/dio.dart';
 import '../configs/app_config.dart';
 import '../utils/common_utils.dart';
 
@@ -53,20 +53,11 @@ class CLOVAController{
     }
   }
 
-  static Future<void> uploadImageToCLOVA(XFile targetImage, Function(bool) callback) async {
-    var targetUrl = "";
-    if(Config.isWeb){
-      targetUrl = 'https://corsproxy.io/?${Uri.encodeComponent(apiURL)}';
-    }else{
-      targetUrl = apiURL;
-    }
-
+  static Future<void> uploadImage(XFile targetImage, Function(bool) callback) async {
     try {
-      File fileImage = File(targetImage.path);
-      final bytes = File(fileImage.path).readAsBytesSync();
-      String base64Image = base64Encode(bytes);
-
-      Map<String, dynamic> inputJson = {
+      //final MultipartFile multipartFile =  MultipartFile.fromFileSync(targetImage.path, contentType: MediaType("image", "jpg"));
+      //var formData = FormData.fromMap({'imageKey': multipartFile});
+      var formData = FormData.fromMap({
         "version": "V2",
         "requestId": CommonUtils.getRandomKey(),
         "timestamp": 0,
@@ -74,20 +65,72 @@ class CLOVAController{
           {
             "format": "jpg",
             "name": "CLOVA_CHECK_${targetImage.name}",
-            "data": base64Image
+            'data': await MultipartFile.fromFile(targetImage.path)
+          }
+        ]
+
+      });
+
+      var dio = Dio();
+      dio.options.contentType = 'multipart/form-data';
+      dio.options.maxRedirects.isFinite;
+      dio.options.baseUrl = apiURL;
+      dio.options.headers = {
+        "Content-Type": "multipart/form-data",
+        "X-OCR-SECRET": secretKey
+      };
+      final res = await dio.post(apiURL, data: formData);
+      CommonUtils.log('i', 'out full : \n${res.toString()}');
+      if (res.statusCode == 200) {
+        callback(true);
+      } else {
+        callback(false);
+      }
+    } catch (e) {
+      CommonUtils.log('e', e.toString());
+      callback(false);
+    }
+  }
+
+  static Future<void> uploadImageToCLOVA(String imagePath, Function(bool) callback) async {
+    var targetUrl = apiURL;
+
+    try {
+      String fileName = imagePath.split('/').last;
+      final bytes = await File(imagePath).readAsBytes();
+      final base64Image = base64Encode(bytes);
+      Map<String, dynamic> inputJson = {
+        "version": "V2",
+        "requestId": CommonUtils.getRandomKey(),
+        "timestamp": 0,
+        "images": [
+          {
+            "format": "jpg",
+            "data":  base64Image,
+            "name": "CLOVA_CHECK_$fileName",
           }
         ]
       };
 
+      CommonUtils.log('i', 'input file info start ===========================>');
+      CommonUtils.log('i', 'input file path : $imagePath');
+      CommonUtils.log('i', 'input file base62image : $base64Image\n\n');
+      CommonUtils.log('i', 'input file inputJson : $inputJson\n\n');
+      await CommonUtils.printFileSize(File(imagePath));
+      CommonUtils.log('i', 'input file info end ===========================>');
+
       final url = Uri.parse(targetUrl);
+      final reqBody = jsonEncode(inputJson);
+      CommonUtils.isValidEncoded(reqBody);
       final response = await http.post(
         url,
         headers: {
-          "Content-Type": "application/json",
           "X-OCR-SECRET": secretKey,
+          "Content-Type": "application/json"
         },
-        body: jsonEncode(inputJson),
-      );
+        body: reqBody,
+      ).timeout(Duration(seconds: 120));
+
       final decodedResponseBody = Uri.decodeFull(response.body);
       final json = jsonDecode(decodedResponseBody);
       CommonUtils.log('i', 'out full : \n$json');
@@ -108,4 +151,46 @@ class CLOVAController{
       callback(false);
     }
   }
+
+  static Future<void> uploadImageToCLOVA2(String imagePath, Function(bool) callback) async {
+    try{
+      final requestJson = {
+        'images': [
+          {
+            'format': 'jpg',
+            'name': 'demo',
+          }
+        ],
+        'requestId': CommonUtils.getRandomKey(),
+        'version': 'V2',
+        'timestamp': 0,
+      };
+      final String fileName = imagePath.split('/').last;
+      final payload = {'message': jsonEncode(requestJson)};
+      final multipartFile = http.MultipartFile(
+        'file',
+        File(imagePath).readAsBytes().asStream(),
+        File(imagePath).lengthSync(),
+        filename: fileName,
+      );
+
+      final request = http.MultipartRequest('POST', Uri.parse(apiURL))
+        ..headers.addAll({'X-OCR-SECRET': secretKey, "Content-Type" : "multipart/form-data"})
+        ..fields.addAll(payload)
+        ..files.add(multipartFile);
+
+      final response = await request.send();
+      final responseBody = await response.stream.bytesToString();
+
+      final decodedResponseBody = Uri.decodeFull(responseBody);
+      final json = jsonDecode(decodedResponseBody);
+      CommonUtils.log('i', 'out full : \n$json');
+      callback(true);
+    }catch(e){
+      CommonUtils.log('e', e.toString());
+      callback(false);
+    }
+  }
+
+
 }

@@ -1,11 +1,12 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:dio/dio.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:transition/transition.dart';
@@ -313,8 +314,6 @@ class CommonUtils {
     try{
       XFile? image = await _picker.pickImage(source: ImageSource.gallery);
       if(image != null){
-        image = await renameFile(image, makeImageName(image));
-        image = await convertImageFileToJpg(image);
         CommonUtils.log('i', "path : ${image.path}\nname : ${image.name}");
       }
 
@@ -329,8 +328,6 @@ class CommonUtils {
     try{
       XFile? image = await _picker.pickImage(source: ImageSource.camera);
       if(image != null){
-        image = await renameFile(image, makeImageName(image));
-        image = await convertImageFileToJpg(image);
         CommonUtils.log('i', "path : ${image.path}\nname : ${image.name}");
       }
       return image;
@@ -346,8 +343,6 @@ class CommonUtils {
       List<XFile?> imageListInMultiImage = await _picker.pickMultiImage();
       for(var eachImage in imageListInMultiImage){
         if(eachImage != null) {
-          eachImage = await renameFile(eachImage, makeImageName(eachImage));
-          eachImage = await convertImageFileToJpg(eachImage);
           imageList.add(eachImage);
         }
       }
@@ -358,55 +353,110 @@ class CommonUtils {
     }
   }
 
-  static Future<XFile> convertImageFileToJpg(XFile targetImage) async {
-    String imagePath = targetImage.path;
-    String extension = imagePath.split('.').last.toLowerCase();
+  static Future<void> convertImageFileToJpg(String targetImagePath) async {
+    File originalFile = File(targetImagePath);
+    String originalFileName = originalFile.path.split('/').last;
+    List imageNameSplit = originalFileName.split(".");
+    String extension = imageNameSplit[1].toLowerCase();
 
-    if (extension != 'jpg') {
-      List<int> imageBytes = await File(imagePath).readAsBytes();
+    if (extension != 'jpg' && extension != 'jpeg') {
+      List<int> imageBytes = await File(targetImagePath).readAsBytes();
       imglib.Image? originalImage = imglib.decodeImage(Uint8List.fromList(imageBytes));
       if (originalImage != null) {
-        String newImagePath = imagePath.replaceFirst(extension, 'jpg');
-        File(newImagePath).writeAsBytesSync(imglib.encodeJpg(originalImage));
-        targetImage = XFile(newImagePath);
+        String newImagePath = targetImagePath.replaceFirst(extension, 'jpg');
+        await File(newImagePath).writeAsBytes(imglib.encodeJpg(originalImage));
+        CommonUtils.log('i', 'after convert to JPG');
+        await printFileSize(File(newImagePath));
       }
+    }else{
+      CommonUtils.log('i', 'don\'t need convert to JPG');
     }
-    return targetImage;
   }
 
-  static Future<XFile> renameFile(XFile targetImage, String newFileName) async {
-    String originalPath = targetImage.path ?? '';
-    File originalFile = File(originalPath);
+  static Future<void> resizeAndEncodeImage(String targetImagePath) async {
+    List<int> originalBytes = await File(targetImagePath).readAsBytes();
+    imglib.Image originalImage = imglib.decodeImage(Uint8List.fromList(originalBytes))!;
+    List<int> resizedBytes = imglib.encodeJpg(originalImage, quality: 50);
+    await File(targetImagePath).writeAsBytes(resizedBytes);
+    await printFileSize(File(targetImagePath));
+  }
+
+  static Future<void> renameFile(String targetImagePath, String newImagePath) async {
+    File originalFile = File(targetImagePath);
+    await originalFile.rename(newImagePath);
+    CommonUtils.log('i', 'after rename image file');
+    await printFileSize(File(newImagePath));
+  }
+
+  static String getNewImagePath(String targetImagePath){
+    File originalFile = File(targetImagePath);
     String originalFileName = originalFile.path.split('/').last;
-    String newPath = originalPath.replaceFirst(originalFileName, newFileName);
-    File renamedFile = await originalFile.rename(newPath);
-    return XFile(renamedFile.path);
-  }
-
-  static String makeImageName(XFile targetImage){
     String currentTimeString = CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime());
-    List filename = targetImage.name.split(".");
-    return '$currentTimeString.${filename[1]}';
+    List filename = originalFileName.split(".");
+    String newFileName = '$currentTimeString.${filename[1]}';
+    String newPath = targetImagePath.replaceFirst(originalFileName, newFileName);
+    CommonUtils.log('i', 'original path : $targetImagePath\nnew path : $newPath');
+    return newPath;
   }
 
-  static Future<bool> uploadImage(XFile targetImage) async {
+  static Future<void> printFileSize(File file) async {
+    int sizeInBytes = await file.length();
+    double sizeInKB = sizeInBytes / 1024; // Convert bytes to kilobytes
+    double sizeInMB = sizeInKB / 1024;    // Convert kilobytes to megabytes
+    CommonUtils.log('i','File Size \nKB : $sizeInKB kb');
+  }
+
+  static Future<void> printXFileSize(XFile xFile) async {
+    int sizeInBytes = await xFile.length();
+    double sizeInKB = sizeInBytes / 1024; // Convert bytes to kilobytes
+    double sizeInMB = sizeInKB / 1024;    // Convert kilobytes to megabytes
+    CommonUtils.log('i','XFile Size \nKB : $sizeInKB kb \nMB :  $sizeInMB mb');
+  }
+
+  static Future<String> _remakeFile(String filePath) async {
+    CommonUtils.log('i', 'before convert to JPG');
+    await printFileSize(File(filePath));
+    await convertImageFileToJpg(filePath);
+    //await resizeAndEncodeImage(filePath);
+    String newPath = getNewImagePath(filePath);
+    CommonUtils.log('i', 'before rename image file');
+    await renameFile(filePath, newPath);
+    await printXFileSize(XFile(newPath));
+
+    return newPath;
+  }
+
+  static Future<CroppedFile?> cropImage(XFile targetImage) async {
+    final croppedFile = await ImageCropper().cropImage(
+      sourcePath: targetImage.path,
+      compressFormat: ImageCompressFormat.jpg,
+      compressQuality: 70,
+      uiSettings: [
+        AndroidUiSettings(
+            toolbarTitle: 'Cropper',
+            toolbarColor: Colors.deepOrange,
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.original,
+            lockAspectRatio: false),
+        IOSUiSettings(
+          title: 'Cropper',
+        ),
+      ],
+    );
+    if (croppedFile != null) {
+      CommonUtils.log('i', 'croppedFile path : ${croppedFile.path}');
+      String remakeFilePath = await _remakeFile(croppedFile.path);
+      return CroppedFile(remakeFilePath);
+    }else{
+      return null;
+    }
+  }
+
+  static bool isValidEncoded(String input) {
     try {
-      //final MultipartFile multipartFile =  MultipartFile.fromFileSync(targetImage.path, contentType: MediaType("image", "jpg"));
-      var formData = FormData.fromMap({'image': await MultipartFile.fromFile(targetImage.path)});
-      //var formData = FormData.fromMap({'imageKey': multipartFile});
-
-      var dio = Dio();
-      dio.options.contentType = 'multipart/form-data';
-      dio.options.maxRedirects.isFinite;
-      dio.options.headers = {'token': 'HEADER_TOKEN'};
-      final res = await dio.post('BASE_URL', data: formData);
-
-      CommonUtils.log('i', res.statusCode.toString());
-      if (res.statusCode == 200) {
-        return true;
-      } else {
-        return false;
-      }
+      final reqBody = jsonDecode(input);
+      CommonUtils.log('i', 'decoded : ${reqBody.toString()}');
+      return true;
     } catch (e) {
       CommonUtils.log('e', e.toString());
       return false;
