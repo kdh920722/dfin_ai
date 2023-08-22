@@ -6,7 +6,6 @@ import 'package:flutterwebchat/controllers/get_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterwebchat/controllers/logfin_controller.dart';
 import 'package:get/get.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sizer/sizer.dart';
 import 'package:flutter/scheduler.dart';
@@ -14,6 +13,7 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutterwebchat/controllers/gpt_controller.dart';
 import 'package:flutterwebchat/controllers/firebase_controller.dart';
 import 'package:flutterwebchat/styles/ColorStyles.dart';
+import 'package:uni_links/uni_links.dart';
 import '../controllers/codef_controller.dart';
 import '../observers/keyboard_observer.dart';
 import '../styles/TextStyles.dart';
@@ -64,7 +64,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
 
   Future<void> _initFirebase() async {
     // init
-    await FireBaseController.initFirebase((bool isSuccess){
+    await FireBaseController.initFcm((bool isSuccess, String fcmToken){
       if(isSuccess){
         CommonUtils.log("i", "firebase credential : ${FireBaseController.userCredential.toString()}");
       }else{
@@ -131,6 +131,16 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
     });
   }
 
+  Future<String?> _initDeepLink() async {
+    try{
+      final initialLink = await getInitialLink();
+      return initialLink;
+    }catch(e){
+      CommonUtils.log("e", "init deep link error : ${e.toString()}");
+      return null;
+    }
+  }
+
   void _initUiValue(){
     currentScreenHeight = screenHeight;
     switchBarHeight = currentScreenHeight*0.05;
@@ -145,6 +155,15 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
     await _initCLOVA();
     await _initAWS();
     await _initLogfin();
+    await _initDeepLink().then((value){
+      if(value != null){
+        Config.deppLinkInfo = value;
+        String paramValue = CommonUtils.getValueFromDeepLink(Config.deppLinkInfo, "param1");
+        CommonUtils.log("i", "init deep link paramValue : $paramValue");
+      }else{
+        Config.deppLinkInfo = "XXX";
+      }
+    });
     _initUiValue();
     setState(() {});
   }
@@ -234,7 +253,8 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
       return Container(padding: const EdgeInsets.only(bottom: 20),
           child : Column(children: [
             UiUtils.getTextWithFixedScale(messageText, TextStyle(color: chatTextColor, fontSize: fontSize, fontWeight: FontWeight.bold), TextAlign.center, null),
-            UiUtils.getTextWithFixedScale("대출 신청을 위한 고객님의 정보를 자유롭게 말씀 해 주세요.", TextStyle(color: ColorStyles.finAppWhite, fontSize: fontSize*0.4, fontWeight: FontWeight.normal), TextAlign.center, null)
+            //UiUtils.getTextWithFixedScale("대출 신청을 위한 고객님의 정보를 자유롭게 말씀 해 주세요.", TextStyle(color: ColorStyles.finAppWhite, fontSize: fontSize*0.4, fontWeight: FontWeight.normal), TextAlign.center, null)
+            UiUtils.getTextWithFixedScale(Config.deppLinkInfo, TextStyle(color: ColorStyles.finAppWhite, fontSize: fontSize*0.4, fontWeight: FontWeight.normal), TextAlign.center, null)
           ])
       );
     }else{
@@ -736,30 +756,33 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
                     }else if(inputTextController.text.trim() == ""){
                       XFile? image = await CommonUtils.getGalleryImage();
                       if(image != null){
-                        CroppedFile? croppedFile = await CommonUtils.cropImage(image);
-                        if(croppedFile != null){
-                          await CLOVAController.uploadImageToCLOVA(croppedFile.path, (isSuccess, map) async {
-                            if(isSuccess){
-                              CommonUtils.log('i', map.toString());
-                              String path = await CommonUtils.makeMaskingImageAndGetPath(croppedFile.path, map!);
-                              if(path != ""){
-                                await AwsController.uploadImageToAWS(path, (isSuccessToSave, resultUrl) async {
-                                  if(isSuccessToSave){
-                                    setState(() {
-                                      pickedFilePath = path;
-                                    });
-                                  }else{
-                                    // failed to aws s3 save
-                                  }
-                                });
-                              }else{
-                                // failed to masking
-                              }
-                            }else{
-                              // failed to check clova ocr
-                            }
-                          });
+                        String imagePath = await CommonUtils.cropImageAndGetPath(image);
+                        if(imagePath == ""){
+                          // pass image crop
+                          imagePath = image.path;
                         }
+
+                        await CLOVAController.uploadImageToCLOVA(imagePath, (isSuccess, map) async {
+                          if(isSuccess){
+                            CommonUtils.log('i', map.toString());
+                            String path = await CommonUtils.makeMaskingImageAndGetPath(imagePath, map!);
+                            if(path != ""){
+                              await AwsController.uploadImageToAWS(path, (isSuccessToSave, resultUrl) async {
+                                if(isSuccessToSave){
+                                  setState(() {
+                                    pickedFilePath = path;
+                                  });
+                                }else{
+                                  // failed to aws s3 save
+                                }
+                              });
+                            }else{
+                              // failed to masking
+                            }
+                          }else{
+                            // failed to check clova ocr
+                          }
+                        });
                       }
 
                       //_sendMessage("");

@@ -13,8 +13,12 @@ import 'package:transition/transition.dart';
 import '../styles/ColorStyles.dart';
 import '../styles/TextStyles.dart';
 import 'package:image/image.dart' as imglib;
-
 class CommonUtils {
+
+  static void logcat(){
+
+  }
+
   static void log(String logType, String logMessage){
     var logger = Logger();
     switch(logType.toLowerCase()){
@@ -373,14 +377,6 @@ class CommonUtils {
     }
   }
 
-  static Future<void> resizeAndEncodeImage(String targetImagePath) async {
-    List<int> originalBytes = await File(targetImagePath).readAsBytes();
-    imglib.Image originalImage = imglib.decodeImage(Uint8List.fromList(originalBytes))!;
-    List<int> resizedBytes = imglib.encodeJpg(originalImage, quality: 50);
-    await File(targetImagePath).writeAsBytes(resizedBytes);
-    await printFileSize(File(targetImagePath));
-  }
-
   static Future<void> renameFile(String targetImagePath, String newImagePath) async {
     File originalFile = File(targetImagePath);
     await originalFile.rename(newImagePath);
@@ -417,7 +413,6 @@ class CommonUtils {
     CommonUtils.log('i', 'before convert to JPG');
     await printFileSize(File(filePath));
     await convertImageFileToJpg(filePath);
-    //await resizeAndEncodeImage(filePath);
     String newPath = getNewImagePath(filePath);
     CommonUtils.log('i', 'before rename image file');
     await renameFile(filePath, newPath);
@@ -426,14 +421,14 @@ class CommonUtils {
     return newPath;
   }
 
-  static Future<CroppedFile?> cropImage(XFile targetImage) async {
+  static Future<String> cropImageAndGetPath(XFile targetImage) async {
     final croppedFile = await ImageCropper().cropImage(
       sourcePath: targetImage.path,
       compressFormat: ImageCompressFormat.jpg,
-      compressQuality: 70,
+      compressQuality: 100,
       uiSettings: [
         AndroidUiSettings(
-            toolbarTitle: 'Cropper',
+            toolbarTitle: '자르기',
             toolbarColor: Colors.deepOrange,
             toolbarWidgetColor: Colors.white,
             initAspectRatio: CropAspectRatioPreset.original,
@@ -446,9 +441,9 @@ class CommonUtils {
     if (croppedFile != null) {
       CommonUtils.log('i', 'croppedFile path : ${croppedFile.path}');
       String remakeFilePath = await _remakeFileAndGetPath(croppedFile.path);
-      return CroppedFile(remakeFilePath);
+      return remakeFilePath;
     }else{
-      return null;
+      return "";
     }
   }
 
@@ -507,6 +502,23 @@ class CommonUtils {
       CommonUtils.log('e', e.toString());
       return "";
     }
+  }
+
+  static String getValueFromDeepLink(String link, String parameterKey){
+    String parameterValue = "";
+    String paramString = link.split("?").last;
+    List<String> paramList = paramString.split("&");
+    if(paramList.isEmpty){
+      parameterValue = paramString.split("=").last;
+    }else{
+      for(var each in paramList){
+        if(each.contains(parameterKey)){
+          parameterValue = each.split("=").last;
+        }
+      }
+    }
+
+    return parameterValue;
   }
 
 

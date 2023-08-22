@@ -7,6 +7,7 @@ class Config{
   static const double appHeight = 852;
   static bool isWeb = kIsWeb;
   static bool isAndroid = Platform.isAndroid;
+  static String deppLinkInfo = "";
 }
 
 enum SlideType {
