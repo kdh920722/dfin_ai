@@ -58,6 +58,7 @@ dependencies:
   http_parser: ^4.0.2
   image_cropper: ^4.0.1
   dotted_border: ^2.0.0+3
+  aws_s3_upload: ^1.5.0
 
 dev_dependencies:
   flutter_test:

@@ -1,6 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutterwebchat/configs/app_config.dart';
 import '../configs/firebase_options.dart';
 import '../utils/common_utils.dart';
 

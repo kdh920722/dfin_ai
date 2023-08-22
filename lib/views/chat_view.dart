@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
+import 'package:flutterwebchat/controllers/aws_controller.dart';
 import 'package:flutterwebchat/controllers/clova_controller.dart';
 import 'package:flutterwebchat/controllers/get_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterwebchat/controllers/logfin_controller.dart';
 import 'package:get/get.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
@@ -107,6 +109,28 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
     });
   }
 
+  Future<void> _initAWS() async {
+    // init
+    await AwsController.initAWS((bool isSuccess){
+      if(isSuccess){
+        CommonUtils.log("i", "aws keys : ${AwsController.awsAccessKey}\naws secretKey : ${AwsController.awsSecretKey}");
+      }else{
+        CommonUtils.flutterToast("aws init 에러가 발생했습니다.");
+      }
+    });
+  }
+
+  Future<void> _initLogfin() async {
+    // init
+    await LogfinController.initLogfin((bool isSuccess){
+      if(isSuccess){
+        CommonUtils.log("i", "logfin url : ${LogfinController.url}\naws headerKey : ${LogfinController.headerKey}");
+      }else{
+        CommonUtils.flutterToast("logfin init 에러가 발생했습니다.");
+      }
+    });
+  }
+
   void _initUiValue(){
     currentScreenHeight = screenHeight;
     switchBarHeight = currentScreenHeight*0.05;
@@ -119,6 +143,8 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
     await _initGPT();
     await _initCodeF();
     await _initCLOVA();
+    await _initAWS();
+    await _initLogfin();
     _initUiValue();
     setState(() {});
   }
@@ -708,37 +734,34 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
                       inputHeight = inputMinHeight;
                       _sendMessage(message);
                     }else if(inputTextController.text.trim() == ""){
-                      XFile? image = await CommonUtils.getCameraImage();
+                      XFile? image = await CommonUtils.getGalleryImage();
                       if(image != null){
                         CroppedFile? croppedFile = await CommonUtils.cropImage(image);
                         if(croppedFile != null){
-                          await CLOVAController.uploadImageToCLOVA(croppedFile.path, (bool isSuccess, map) async {
+                          await CLOVAController.uploadImageToCLOVA(croppedFile.path, (isSuccess, map) async {
                             if(isSuccess){
                               CommonUtils.log('i', map.toString());
-                              CommonUtils.log('i', map!['personalNum'][0]['maskingPolys'][0]['vertices'].toString());
-                              List<dynamic> listMap = map!['personalNum'][0]['maskingPolys'][0]['vertices'];
-                              List<int> xPointList = [];
-                              List<int> yPointList = [];
-                              for(Map<String,dynamic> each in listMap){
-                                var xPoint = each['x'].toString().split(".")[0];
-                                var yPoint = each['y'].toString().split(".")[0];
-                                xPointList.add(int.parse(xPoint));
-                                yPointList.add(int.parse(yPoint));
+                              String path = await CommonUtils.makeMaskingImageAndGetPath(croppedFile.path, map!);
+                              if(path != ""){
+                                await AwsController.uploadImageToAWS(path, (isSuccessToSave, resultUrl) async {
+                                  if(isSuccessToSave){
+                                    setState(() {
+                                      pickedFilePath = path;
+                                    });
+                                  }else{
+                                    // failed to aws s3 save
+                                  }
+                                });
+                              }else{
+                                // failed to masking
                               }
-                              CommonUtils.log('i', xPointList.toString());
-                              CommonUtils.log('i', yPointList.toString());
-                              String path = await CommonUtils.drawBlackSquareAndSave(croppedFile.path, xPointList, yPointList);
-                              setState(() {
-                                pickedFilePath = path;
-                              });
                             }else{
-
+                              // failed to check clova ocr
                             }
                           });
-
                         }
-
                       }
+
                       //_sendMessage("");
                       //inputTextController.text = "";
                       //currentText = "";

@@ -1,9 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:http/http.dart' as http;
-import 'package:image_picker/image_picker.dart';
 import 'dart:convert';
 import 'dart:io';
-import 'package:dio/dio.dart';
 import '../configs/app_config.dart';
 import '../utils/common_utils.dart';
 
@@ -18,37 +16,20 @@ class CLOVAController{
   static Future<void> initCLOVA(Function(bool) callback) async{
     try{
       final ref = FirebaseDatabase.instance.ref();
-      final snapshot = await ref.child('WEBCHAT/API/clova/url').get();
+      final snapshot = await ref.child('WEBCHAT/API/clova').get();
       if (snapshot.exists) {
-        apiURL =  snapshot.value.toString();
-        await _getKeyForCLOVA((bool isSuccess){
-          if(isSuccess){
-            callback(true);
-          }else{
-            callback(false);
+        for(var each in snapshot.children){
+          switch(each.key){
+            case "url" : apiURL = each.value.toString();
+            case "secret_key" : secretKey = each.value.toString();
           }
-        });
-      } else {
-        callback(false);
-      }
-    }catch(e){
-      CommonUtils.log("e", "clova get url error : ${e.toString()}");
-      callback(false);
-    }
-  }
-
-  static Future<void> _getKeyForCLOVA(Function(bool) callback) async{
-    try{
-      final ref = FirebaseDatabase.instance.ref();
-      final snapshot = await ref.child('WEBCHAT/API/clova/secret_key').get();
-      if (snapshot.exists) {
-        secretKey =  snapshot.value.toString();
+        }
         callback(true);
       } else {
         callback(false);
       }
     }catch(e){
-      CommonUtils.log("e", "clova get key error : ${e.toString()}");
+      CommonUtils.log("e", "clova get url error : ${e.toString()}");
       callback(false);
     }
   }
@@ -79,13 +60,6 @@ class CLOVAController{
         ]
       };
 
-      CommonUtils.log('i', 'input file info start ===========================>');
-      CommonUtils.log('i', 'input file path : $imagePath');
-      CommonUtils.log('i', 'input file base62image : $base64Image\n\n');
-      CommonUtils.log('i', 'input file inputJson : $inputJson\n\n');
-      await CommonUtils.printFileSize(File(imagePath));
-      CommonUtils.log('i', 'input file info end ===========================>');
-
       final url = Uri.parse(targetUrl);
       final reqBody = jsonEncode(inputJson);
       CommonUtils.isValidEncoded(reqBody);
@@ -104,8 +78,8 @@ class CLOVAController{
       if (response.statusCode == 200) { // HTTP_OK
         final resultData = json['images'][0];
         if(resultData['inferResult'] == "SUCCESS"){
-          final resultmap = resultData['idCard']['result']['ic'];
-          callback(true, resultmap);
+          final resultMap = resultData['idCard']['result']['ic'];
+          callback(true, resultMap);
         }else{
           callback(false, null);
         }

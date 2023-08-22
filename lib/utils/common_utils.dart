@@ -413,7 +413,7 @@ class CommonUtils {
     CommonUtils.log('i','XFile Size \nKB : $sizeInKB kb \nMB :  $sizeInMB mb');
   }
 
-  static Future<String> _remakeFile(String filePath) async {
+  static Future<String> _remakeFileAndGetPath(String filePath) async {
     CommonUtils.log('i', 'before convert to JPG');
     await printFileSize(File(filePath));
     await convertImageFileToJpg(filePath);
@@ -445,7 +445,7 @@ class CommonUtils {
     );
     if (croppedFile != null) {
       CommonUtils.log('i', 'croppedFile path : ${croppedFile.path}');
-      String remakeFilePath = await _remakeFile(croppedFile.path);
+      String remakeFilePath = await _remakeFileAndGetPath(croppedFile.path);
       return CroppedFile(remakeFilePath);
     }else{
       return null;
@@ -463,9 +463,18 @@ class CommonUtils {
     }
   }
 
-  static Future<String> drawBlackSquareAndSave(String imagePath, List<int>xPoints, List<int>yPoints) async {
+  static Future<String> makeMaskingImageAndGetPath(String imagePath, Map<String,dynamic> maskingInfoMap) async {
     try {
       final imglib.Image image = imglib.decodeImage(File(imagePath).readAsBytesSync())!;
+      List<dynamic> listMap = maskingInfoMap['personalNum'][0]['maskingPolys'][0]['vertices'];
+      List<int> xPoints = [];
+      List<int> yPoints = [];
+      for(Map<String,dynamic> each in listMap){
+        var xPoint = each['x'].toString().split(".")[0];
+        var yPoint = each['y'].toString().split(".")[0];
+        xPoints.add(int.parse(xPoint));
+        yPoints.add(int.parse(yPoint));
+      }
 
       int squareX = 0;   // X-coordinate of the top-left corner
       int squareY = 0;   // Y-coordinate of the top-left corner
@@ -490,15 +499,13 @@ class CommonUtils {
 
       imglib.fillRect(image, x1: squareX, y1: squareY, x2 : squareX + squareXSize, y2 : squareY + squareYSize, color: imglib.ColorRgba8(0, 0, 0, 255));
 
-      final modifiedImagePath = imagePath.replaceAll('.jpg', '_modified.jpg');
+      final modifiedImagePath = imagePath.replaceAll('.jpg', '_masked.jpg');
       File(modifiedImagePath).writeAsBytesSync(imglib.encodeJpg(image));
-
-      print('Image with black square saved: $modifiedImagePath');
 
       return modifiedImagePath;
     } catch (e) {
       CommonUtils.log('e', e.toString());
-      return imagePath;
+      return "";
     }
   }
 
