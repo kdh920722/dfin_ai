@@ -30,7 +30,7 @@ class GptController{
     }
   }
 
-  static Future<void> getGPTApiKey(Function(bool) callback) async{
+  static Future<void> initGPT(Function(bool) callback) async{
     try{
       final ref = FirebaseDatabase.instance.ref();
       final snapshot = await ref.child('WEBCHAT/API/gpt/key').get();

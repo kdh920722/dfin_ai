@@ -1,4 +1,5 @@
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutterwebchat/controllers/firebase_controller.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../configs/app_config.dart';
@@ -40,6 +41,10 @@ class LogfinController {
       targetUrl = 'https://corsproxy.io/?${Uri.encodeComponent(url+api.value)}';
     }else{
       targetUrl = url+api.value;
+    }
+
+    if(api == LogfinApis.signIn || api == LogfinApis.signUp){
+      inputJson['fcm_token'] = FireBaseController.fcmToken;
     }
 
     if(api != LogfinApis.signIn && api != LogfinApis.signUp){

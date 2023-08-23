@@ -12,6 +12,7 @@ class FireBaseController{
   FireBaseController._internal();
   static FirebaseApp? firebaseApp;
   static UserCredential? userCredential;
+  static String fcmToken = "";
 
   /// firebase database =========================================================================== ///
   static Future<void> _initFirebase(Function(bool) callback) async {
@@ -57,8 +58,11 @@ class FireBaseController{
 
           String? firebaseToken = await messaging.getToken();
           if(firebaseToken != null){
+            fcmToken = firebaseToken;
+            CommonUtils.log("i", "fcm token : $firebaseToken");
             messaging.onTokenRefresh.listen((event) {
               //TODO : 서버에 해당 토큰을 저장하는 로직 구현
+              CommonUtils.log("i", "updated fcm token : $firebaseToken");
             });
 
             //TODO : 서버에 해당 토큰을 저장하는 로직 구현

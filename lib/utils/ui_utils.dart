@@ -4,6 +4,7 @@ import 'package:sizer/sizer.dart';
 import '../styles/ColorStyles.dart';
 import '../styles/TextStyles.dart';
 import '../configs/app_config.dart';
+import '../views/certification_view.dart';
 import 'common_utils.dart';
 
 class UiUtils {
@@ -12,7 +13,12 @@ class UiUtils {
       builder: (BuildContext context, Orientation orientation, DeviceType deviceType) {
         print("rebuild");
         return MaterialApp(
-            home: mainView
+          initialRoute: AppView.rootView.value,
+          routes: {
+            AppView.rootView.value : (context) => mainView,
+            AppView.certificationView.value : (context) => CertificationView(),
+          },
+
         );
       },
     );
@@ -380,5 +386,4 @@ class UiUtils {
       )
     );
   }
-
 }

@@ -208,6 +208,10 @@ class CommonUtils {
     return "$minutes:$seconds";
   }
 
+  static Future<void> moveTo(BuildContext fromContext, String toRoute, Object? arguments) async {
+    await Navigator.of(fromContext).pushNamed(toRoute, arguments: arguments);
+  }
+
   static Future<void> moveView(BuildContext fromContext, Widget toView) async {
     await Navigator.push(fromContext, Transition(child: toView, transitionEffect: TransitionEffect.RIGHT_TO_LEFT));
   }
@@ -520,6 +524,5 @@ class CommonUtils {
 
     return parameterValue;
   }
-
 
 }

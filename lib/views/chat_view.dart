@@ -4,6 +4,7 @@ import 'package:flutterwebchat/controllers/aws_controller.dart';
 import 'package:flutterwebchat/controllers/clova_controller.dart';
 import 'package:flutterwebchat/controllers/get_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:flutterwebchat/controllers/iamport_controller.dart';
 import 'package:flutterwebchat/controllers/logfin_controller.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
@@ -75,7 +76,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
 
   Future<void> _initGPT() async {
     // init
-    await GptController.getGPTApiKey((bool isSuccess){
+    await GptController.initGPT((bool isSuccess){
       if(isSuccess){
         CommonUtils.log("i", "gpt key : ${GptController.gptApiKey}");
       }else{
@@ -141,6 +142,17 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
     }
   }
 
+  Future<String?> _initIamport() async {
+    // init
+    await IamportController.initIamport((bool isSuccess){
+      if(isSuccess){
+        CommonUtils.log("i", "iamport user_code : ${IamportController.iamportUserCode}");
+      }else{
+        CommonUtils.flutterToast("iamport init 에러가 발생했습니다.");
+      }
+    });
+  }
+
   void _initUiValue(){
     currentScreenHeight = screenHeight;
     switchBarHeight = currentScreenHeight*0.05;
@@ -155,6 +167,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
     await _initCLOVA();
     await _initAWS();
     await _initLogfin();
+    await _initIamport();
     await _initDeepLink().then((value){
       if(value != null){
         Config.deppLinkInfo = value;
@@ -164,8 +177,6 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
         Config.deppLinkInfo = "XXX";
       }
     });
-    _initUiValue();
-    setState(() {});
   }
 
   @override
@@ -628,14 +639,28 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
 
   @override
   Widget build(BuildContext context) {
+    String resultMsg = "";
+    Object? result = ModalRoute.of(context)?.settings.arguments;
+    if(result != null){
+      bool isSuccess = IamportController.isCertificationResultSuccess(result as Map<String, String>);
+      if(isSuccess) {
+        resultMsg = "S";
+      } else {
+        resultMsg = "N";
+      }
+    }
+    inputTextController.text = resultMsg;
+
     if(!Config.isAppMainInit){
       _init(context);
     }
 
+    _initUiValue();
+    setState(() {});
+
     scrollToBottom();
 
-    Widget view =
-    AnimatedContainer(duration: const Duration(milliseconds: 100), width: 100.w, height: currentScreenHeight, color: ColorStyles.finAppWhite, child:Column(
+    Widget view = AnimatedContainer(duration: const Duration(milliseconds: 100), width: 100.w, height: currentScreenHeight, color: ColorStyles.finAppWhite, child:Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           /*
@@ -654,8 +679,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
                 UiUtils.getTextWithFixedScale("MOBILE WEB", TextStyles.basicTextStyle, null, null)
               ])
           ),
-
-           */
+          */
 
           SizedBox(height: 30.h,
               child: ConstrainedBox(
@@ -748,12 +772,22 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
                   ColorStyles.finAppGreen,
                       () async {
                     if (inputTextController.text.trim() != "") {
+                      /*
                       String message = inputTextController.text;
                       inputTextController.text = "";
                       currentText = "";
                       inputHeight = inputMinHeight;
                       _sendMessage(message);
+                      */
                     }else if(inputTextController.text.trim() == ""){
+                      Map<String, String> inputJson = {
+                        "carrier": "MVNO",
+                        "name" : "김동환",
+                        "phone" : "01054041099"
+                      };
+                      CommonUtils.moveTo(context, AppView.certificationView.value, inputJson);
+
+                      /*
                       XFile? image = await CommonUtils.getGalleryImage();
                       if(image != null){
                         String imagePath = await CommonUtils.cropImageAndGetPath(image);
@@ -784,6 +818,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
                           }
                         });
                       }
+                      */
 
                       //_sendMessage("");
                       //inputTextController.text = "";

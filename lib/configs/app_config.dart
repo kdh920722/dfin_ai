@@ -10,6 +10,21 @@ class Config{
   static String deppLinkInfo = "";
 }
 
+enum AppView {
+  rootView, certificationView
+}
+
+extension SAppViewExtension on AppView {
+  String get value {
+    switch (this) {
+      case AppView.rootView:
+        return '/';
+      case AppView.certificationView:
+        return '/certification';
+    }
+  }
+}
+
 enum SlideType {
   toLeft, toRight, toTop, toBottom
 }
