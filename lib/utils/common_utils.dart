@@ -9,7 +9,10 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:transition/transition.dart';
+import '../configs/app_config.dart';
 import '../styles/ColorStyles.dart';
 import '../styles/TextStyles.dart';
 import 'package:image/image.dart' as imglib;
@@ -521,8 +524,28 @@ class CommonUtils {
         }
       }
     }
-
     return parameterValue;
   }
+
+  static Future<void> requestPermissions(Function(bool isDenied, List<String>? deniedPermissionsList) callback) async {
+    Map<Permission, PermissionStatus> statuses = await Config.permissionList.request();
+    List<String> deniedPermissions = [];
+    for(var each in Config.permissionList){
+      if(!statuses[each]!.isGranted) {
+        String permissionName = each.toString().split('.').last;
+        switch(permissionName){
+          case "notification" : permissionName = "알림";
+        }
+        deniedPermissions.add(permissionName);
+      }
+    }
+
+    if(deniedPermissions.isNotEmpty){
+      return callback(true, deniedPermissions);
+    }else{
+      return callback(false, null);
+    }
+  }
+
 
 }

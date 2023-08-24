@@ -6,8 +6,10 @@ import 'package:flutterwebchat/controllers/get_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutterwebchat/controllers/iamport_controller.dart';
 import 'package:flutterwebchat/controllers/logfin_controller.dart';
+import 'package:flutterwebchat/controllers/sharedpreference_controller.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sizer/sizer.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -53,7 +55,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
   }
   void _functionForKeyboardShow(){
     currentScreenHeight = screenHeight*0.55;
-    scrollToBottom();
+    _scrollToBottom();
   }
 
   final ScrollController viewScrollController = ScrollController();
@@ -153,14 +155,25 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
     });
   }
 
+  Future<String?> _initSharedPreference() async {
+    // init
+    await SharedPreferenceController.initSharedPreference((bool isSuccess){
+      if(!isSuccess){
+        CommonUtils.flutterToast("sharedPreference init 에러가 발생했습니다.");
+      }
+    });
+  }
+
   void _initUiValue(){
     currentScreenHeight = screenHeight;
     switchBarHeight = currentScreenHeight*0.05;
+    _scrollToBottom();
   }
 
-  Future<void> _init(BuildContext context) async {
+  Future<void> _initAtFirst() async {
     Config.isAppMainInit = true;
     Get.put(GetController());
+    await _initSharedPreference();
     await _initFirebase();
     await _initGPT();
     await _initCodeF();
@@ -177,6 +190,8 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
         Config.deppLinkInfo = "XXX";
       }
     });
+    await _requestPermissions();
+    setState(() {});
   }
 
   @override
@@ -519,7 +534,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
 
   void setAuthPop(Apis apiInfo, Map<String, dynamic> resultInputMap){
     UiUtils.showSlideMenu(context, SlideType.toTop, false, (context, setState) =>
-        Column(mainAxisAlignment: MainAxisAlignment.center, children: [UiUtils.getTextButtonBox(60.w, "인증 확인", ColorStyles.finAppGreen, () async {
+        Column(mainAxisAlignment: MainAxisAlignment.center, children: [UiUtils.getTextButtonBox(60.w, "인증 확인", TextStyles.slidePopButtonText, ColorStyles.finAppGreen, () async {
           await CodeFController.getDataFromApi(apiInfo, resultInputMap, (isSuccess, _, map, listMap){
             if(isSuccess){
               CommonUtils.log('i', '[auth] call api : ${map.toString()}');
@@ -598,7 +613,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
     }
   }
 
-  void scrollToBottom(){
+  void _scrollToBottom(){
     if(messageListViewController.positions.isNotEmpty){
       SchedulerBinding.instance.addPostFrameCallback((_) {
         messageListViewController.jumpTo(messageListViewController.position.maxScrollExtent);
@@ -636,9 +651,35 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
     inputMaxHeight = currentScreenHeight*0.3;
     setState(() {});
   }
+  
+  Future<void> _requestPermissions() async {
+    await CommonUtils.requestPermissions((isDenied, deniedPermissionsList){
+      if(isDenied){
+        String deniedPermissionsString = "";
+        for(int i = 0; i < deniedPermissionsList!.length; i++){
+          deniedPermissionsString += deniedPermissionsList[i];
+          if(i != deniedPermissionsList.length-1){
+            deniedPermissionsString += ", ";
+          }
+        }
 
-  @override
-  Widget build(BuildContext context) {
+        UiUtils.showSlideMenu(context, SlideType.toTop, true, (context, setState) =>
+            Column(mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  UiUtils.getTextWithFixedScale("[$deniedPermissionsString] 권한이 필요합니다. ", TextStyles.slidePopPermissionText, TextAlign.center, null),
+                  UiUtils.getMarginBox(100.w, 2.h),
+                  UiUtils.getTextButtonBox(70.w, "설정 바로가기", TextStyles.slidePopButtonText, ColorStyles.finAppGreen, () {
+                    openAppSettings();
+                    Navigator.of(context).pop();
+                  })
+                ]
+            ));
+        CommonUtils.log("i", "denied permissions : $deniedPermissionsString");
+      }
+    });
+  }
+
+  void _certificationResultCheck(){
     String resultMsg = "";
     Object? result = ModalRoute.of(context)?.settings.arguments;
     if(result != null){
@@ -650,20 +691,25 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
       }
     }
     inputTextController.text = resultMsg;
+  }
 
+  @override
+  Widget build(BuildContext context) {
+    Config.buildCount++;
+    CommonUtils.log("e", " !!!!!!!!!!!! BUILD : ${Config.buildCount}");
+    Widget? view;
     if(!Config.isAppMainInit){
-      _init(context);
-    }
-
-    _initUiValue();
-    setState(() {});
-
-    scrollToBottom();
-
-    Widget view = AnimatedContainer(duration: const Duration(milliseconds: 100), width: 100.w, height: currentScreenHeight, color: ColorStyles.finAppWhite, child:Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          /*
+      CommonUtils.log("e", " @@@@@@ NOT INIT @@@@@@ ");
+      _initAtFirst();
+      view = UiUtils.getInitView();
+    }else{
+      CommonUtils.log("e", " @@@@@@ INIT @@@@@@ ");
+      _initUiValue();
+      _certificationResultCheck();
+      view = AnimatedContainer(duration: const Duration(milliseconds: 100), width: 100.w, height: currentScreenHeight, color: ColorStyles.finAppWhite, child:Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            /*
           AnimatedContainer(height: switchBarHeight, duration: const Duration(milliseconds: 100),
               child: Row(mainAxisAlignment : MainAxisAlignment.center, children: [
                 UiUtils.getTextWithFixedScale("WEB", TextStyles.basicTextStyle, null, null),
@@ -681,96 +727,94 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
           ),
           */
 
-          SizedBox(height: 30.h,
-              child: ConstrainedBox(
-                constraints: BoxConstraints(
-                  maxWidth: 100.w,
-                  maxHeight: 30.h,
-                ),
-                child: pickedFilePath != "" ? Image.file(File(pickedFilePath)) : Container(),
-              )
-          ),
-
-          /// 채팅 메인 화면
-          Expanded(
-              child: Container(
-                  constraints: BoxConstraints(maxHeight: currentScreenHeight*0.9),
-                  color: ColorStyles.finAppGreen, padding : const EdgeInsets.all(10),
-                  child: messages.isEmpty? Container() : ListView.builder(
-                      controller: messageListViewController,
-                      scrollDirection: Axis.vertical,
-                      itemCount: messages.length,
-                      itemBuilder: (context, index) {
-                        return _getChatBox(messages[index]);
-                      })
-              )
-          ),
-
-          /// 채팅 상하 여백
-          UiUtils.getMarginBox(0, screenHeight*0.01),
-
-          /// 채팅 글 입력 칸
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 400), // Optional: Add a duration for smooth animation
-            width: 95.w,
-            color: ColorStyles.finAppWhite,
-            height: inputHeight,
-            constraints: BoxConstraints(
-              minHeight: inputMinHeight,
-              maxHeight: inputMaxHeight,
+            SizedBox(height: 30.h,
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxWidth: 100.w,
+                    maxHeight: 30.h,
+                  ),
+                  child: pickedFilePath != "" ? Image.file(File(pickedFilePath)) : Container(),
+                )
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                SizedBox(
-                  width: 70.w,
-                  child: TextField(
-                    focusNode: _focusNode,
-                    maxLines: null,
-                    style: TextStyles.subTitleTextStyle,
-                    controller: inputTextController,
-                    textAlign: TextAlign.start,
-                    cursorColor: Colors.grey,
-                    onChanged: (text) {
-                      currentWord = CommonUtils.getLastWord(text);
-                      currentText += currentWord;
-                      if(currentWord == " " || currentWord == "\n" || currentWord == "." || currentWord == ","){
 
-                        print(currentText);
-                        final textLinePainterForWidth = TextPainter(
-                          text: TextSpan(text: currentText, style: TextStyles.subTitleTextStyle),
-                          maxLines: null,
-                          textDirection: TextDirection.ltr,
-                        )..layout(minWidth: 0, maxWidth: 85.w);
+            /// 채팅 메인 화면
+            Expanded(
+                child: Container(
+                    constraints: BoxConstraints(maxHeight: currentScreenHeight*0.9),
+                    color: ColorStyles.finAppGreen, padding : const EdgeInsets.all(10),
+                    child: messages.isEmpty? Container() : ListView.builder(
+                        controller: messageListViewController,
+                        scrollDirection: Axis.vertical,
+                        itemCount: messages.length,
+                        itemBuilder: (context, index) {
+                          return _getChatBox(messages[index]);
+                        })
+                )
+            ),
 
-                        if(textLinePainterForWidth.width >= 70.w){
-                          print("${textLinePainterForWidth.width}");
-                          currentText = "";
+            /// 채팅 상하 여백
+            UiUtils.getMarginBox(0, screenHeight*0.01),
 
-                          final textPainterForHeight = TextPainter(
-                            text: TextSpan(text: text, style: TextStyles.subTitleTextStyle),
+            /// 채팅 글 입력 칸
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 400), // Optional: Add a duration for smooth animation
+              width: 95.w,
+              color: ColorStyles.finAppWhite,
+              height: inputHeight,
+              constraints: BoxConstraints(
+                minHeight: inputMinHeight,
+                maxHeight: inputMaxHeight,
+              ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(
+                    width: 70.w,
+                    child: TextField(
+                      focusNode: _focusNode,
+                      maxLines: null,
+                      style: TextStyles.subTitleTextStyle,
+                      controller: inputTextController,
+                      textAlign: TextAlign.start,
+                      cursorColor: Colors.grey,
+                      onChanged: (text) {
+                        currentWord = CommonUtils.getLastWord(text);
+                        currentText += currentWord;
+                        if(currentWord == " " || currentWord == "\n" || currentWord == "." || currentWord == ","){
+
+                          print(currentText);
+                          final textLinePainterForWidth = TextPainter(
+                            text: TextSpan(text: currentText, style: TextStyles.subTitleTextStyle),
                             maxLines: null,
                             textDirection: TextDirection.ltr,
                           )..layout(minWidth: 0, maxWidth: 85.w);
-                          final desiredHeight = inputMinHeight*0.3 + textPainterForHeight.height;
-                          final height = desiredHeight.clamp(inputMinHeight, inputMaxHeight);
-                          setState(() {
-                            inputHeight = height;
-                          });
+
+                          if(textLinePainterForWidth.width >= 70.w){
+                            print("${textLinePainterForWidth.width}");
+                            currentText = "";
+
+                            final textPainterForHeight = TextPainter(
+                              text: TextSpan(text: text, style: TextStyles.subTitleTextStyle),
+                              maxLines: null,
+                              textDirection: TextDirection.ltr,
+                            )..layout(minWidth: 0, maxWidth: 85.w);
+                            final desiredHeight = inputMinHeight*0.3 + textPainterForHeight.height;
+                            final height = desiredHeight.clamp(inputMinHeight, inputMaxHeight);
+                            setState(() {
+                              inputHeight = height;
+                            });
+                          }
                         }
-                      }
-                    },
-                    decoration: UiUtils.getInputDecorationWithNoErrorMessage("입력"),
+                      },
+                      decoration: UiUtils.getInputDecorationWithNoErrorMessage("입력"),
+                    ),
                   ),
-                ),
-                UiUtils.getMarginBox(3.w, 0),
-                UiUtils.getIconButtonBox(
-                  20.w,
-                  Icons.send,
-                  "",
-                  ColorStyles.finAppGreen,
-                      () async {
+                  UiUtils.getMarginBox(3.w, 0),
+                  UiUtils.getIconButtonBox(
+                    20.w,
+                    Icons.send,
+                    ColorStyles.finAppGreen, () async {
                     if (inputTextController.text.trim() != "") {
                       /*
                       String message = inputTextController.text;
@@ -825,17 +869,18 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
                       //currentText = "";
                     }
                   },
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
-          ),
 
-          /// 채팅 상하 여백
-          UiUtils.getMarginBox(0, screenHeight*0.01),
-        ])
-    );
+            /// 채팅 상하 여백
+            UiUtils.getMarginBox(0, screenHeight*0.01),
+          ])
+      );
+    }
 
-    return UiUtils.getView(context, view, CommonUtils.onWillPopForPreventBackButton);
+    return UiUtils.getView(context, view!, CommonUtils.onWillPopForPreventBackButton);
   }
 
 }

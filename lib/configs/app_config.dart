@@ -1,13 +1,18 @@
 import 'package:flutter/foundation.dart';
 import 'dart:io';
 
+import 'package:permission_handler/permission_handler.dart';
+
 class Config{
+  static int buildCount = 0;
+  static const int buildTwice = 2;
   static bool isAppMainInit = false;
   static const double appWidth = 393;
   static const double appHeight = 852;
   static bool isWeb = kIsWeb;
   static bool isAndroid = Platform.isAndroid;
   static String deppLinkInfo = "";
+  static List<Permission> permissionList = [Permission.notification];
 }
 
 enum AppView {

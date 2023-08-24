@@ -85,7 +85,7 @@ class UiUtils {
     return SizedBox(width: marginWidth, height: marginHeight,);
   }
 
-  static SizedBox getIconTextButtonBox(double buttonWidth, IconData icon, String buttonText, Color buttonColor, VoidCallback onPressedCallback) {
+  static SizedBox getIconTextButtonBox(double buttonWidth, IconData icon, String buttonText, TextStyle buttonTextStyles, Color buttonColor, VoidCallback onPressedCallback) {
     return SizedBox(
         width: buttonWidth,
         child: ElevatedButton.icon(
@@ -97,13 +97,13 @@ class UiUtils {
             shadowColor: Colors.grey,
           ),
           icon: Icon(icon, color: ColorStyles.finAppWhite, size: 25.sp),
-          label: getTextWithFixedScale(buttonText,TextStyle(color: ColorStyles.finAppWhite, fontSize: 18.sp, fontWeight: FontWeight.bold),null,null),
+          label: getTextWithFixedScale(buttonText,buttonTextStyles,null,null),
           onPressed: onPressedCallback,
         )
     );
   }
 
-  static SizedBox getIconButtonBox(double buttonWidth, IconData icon, String buttonText, Color buttonColor, VoidCallback onPressedCallback) {
+  static SizedBox getIconButtonBox(double buttonWidth, IconData icon, Color buttonColor, VoidCallback onPressedCallback) {
     return SizedBox(
         width: buttonWidth,
         child: ElevatedButton(
@@ -120,7 +120,7 @@ class UiUtils {
     );
   }
 
-  static SizedBox getTextButtonBox(double buttonWidth, String buttonText, Color buttonColor, VoidCallback onPressedCallback) {
+  static SizedBox getTextButtonBox(double buttonWidth, String buttonText, TextStyle buttonTextStyles, Color buttonColor, VoidCallback onPressedCallback) {
     return SizedBox(
         width: buttonWidth,
         child: ElevatedButton(
@@ -133,7 +133,7 @@ class UiUtils {
           onPressed: onPressedCallback,
           child: Padding(
             padding: const EdgeInsets.all(15.0),
-            child: getTextWithFixedScale(buttonText,TextStyles.buttonTextStyle,TextAlign.center,null)
+            child: getTextWithFixedScale(buttonText,buttonTextStyles,TextAlign.center,null)
           ),
         )
     );
@@ -386,4 +386,10 @@ class UiUtils {
       )
     );
   }
+
+  static Widget getInitView() {
+    return Container(color: Colors.black38, child: Center(child: getTextWithFixedScale("잠시만 기다려 주세요..", TextStyles.initTextStyle, TextAlign.center, null)));
+  }
+
+
 }
