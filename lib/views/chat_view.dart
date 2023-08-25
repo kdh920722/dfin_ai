@@ -383,6 +383,8 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
       UiUtils.closeLoadingPop(context);
     });
 
+
+
     /*
     _getResidentRegistrationAbstract2();
     await Future.delayed(const Duration(milliseconds: 500), () async {
