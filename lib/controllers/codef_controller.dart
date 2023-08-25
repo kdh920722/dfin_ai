@@ -1,8 +1,14 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
+import 'package:flutterwebchat/datas/api_info_data.dart';
 import 'package:http/http.dart' as http;
+import 'package:sizer/sizer.dart';
 import '../configs/app_config.dart';
+import '../styles/ColorStyles.dart';
+import '../styles/TextStyles.dart';
 import '../utils/common_utils.dart';
+import '../utils/ui_utils.dart';
 
 class CodeFController{
 
@@ -101,7 +107,6 @@ class CodeFController{
           // CF-00000 : 성공, CF-03002 : 추가 인증 필요
           if(resultCode == 'CF-00000' || resultCode == 'CF-03002'){
             final resultData = json['data'];
-            CommonUtils.log('i', 'out resultCode : $resultCode\nresultData : \n${resultData.toString()}');
             if (resultData is Map<String, dynamic>) {
               if(resultCode == 'CF-03002') {
                 callback(true, true, resultData, null);
@@ -130,7 +135,179 @@ class CodeFController{
       callback(false, false, null, null);
     }
   }
+
   /// ------------------------------------------------------------------------------------------------------------------------ ///
+  static Future<void> callApis(BuildContext context, StateSetter setState,
+      List<ApiInfoData> apiInfoDataList, Function(List<ApiInfoData> resultApiInfoDataList) callback) async {
+    int callCount = 0;
+    bool isFirstCalledOnCert = false;
+    for(var each in apiInfoDataList){
+      if(each.isCallWithCert){
+        if(!isFirstCalledOnCert){
+          callApiWithCert(context, setState, each.api, each.inputJson, (isSuccess, resultMap, resultListMap) {
+            if(isSuccess){
+              each.isResultSuccess = true;
+              if(resultMap != null){
+                each.resultMap = resultMap;
+              }else{
+                each.resultListMap = resultListMap;
+              }
+            }
+
+            callCount++;
+            if(callCount == apiInfoDataList.length){
+              callback(apiInfoDataList);
+            }
+          });
+          await Future.delayed(const Duration(milliseconds: 500), () async {});
+          isFirstCalledOnCert = true;
+        }else{
+          callApiWithOutCert(context, each.api, each.inputJson, (isSuccess, resultMap, resultListMap){
+            if(isSuccess){
+              each.isResultSuccess = true;
+              if(resultMap != null){
+                each.resultMap = resultMap;
+              }else{
+                each.resultListMap = resultListMap;
+              }
+            }
+
+            callCount++;
+            if(callCount == apiInfoDataList.length){
+              callback(apiInfoDataList);
+            }
+          });
+        }
+      }else{
+        callApiWithOutCert(context, each.api, each.inputJson, (isSuccess, resultMap, resultListMap){
+          if(isSuccess){
+            each.isResultSuccess = true;
+            if(resultMap != null){
+              each.resultMap = resultMap;
+            }else{
+              each.resultListMap = resultListMap;
+            }
+          }
+
+          callCount++;
+          if(callCount == apiInfoDataList.length){
+            callback(apiInfoDataList);
+          }
+        });
+      }
+    }
+  }
+
+  static Future<void> callApiWithOutCert(BuildContext context, Apis api, Map<String, dynamic> inputJson,
+      Function(bool isSuccess, Map<String,dynamic>? resultMap, List<dynamic>? resultListMap) callback) async {
+    CommonUtils.log('i', 'normal call start');
+    CodeFController.getDataFromApi(api, inputJson, (isSuccess, _, map, listMap) {
+      if(isSuccess){
+        if(map != null){
+          callback(true, map, null);
+        }else{
+          callback(true, null, listMap);
+        }
+      }else{
+        CommonUtils.log('e', 'normal call api result error');
+        CommonUtils.flutterToast("에러가 발생했습니다.");
+        callback(false, null, null);
+      }
+    });
+  }
+
+  static Future<void> callApiWithCert(BuildContext context, StateSetter setState, Apis representApi, Map<String, dynamic> inputJson,
+      Function(bool isSuccess, Map<String,dynamic>? resultMap, List<dynamic>? resultListMap) callback) async {
+    CommonUtils.log('i', '[1] call start');
+    await CodeFController.getDataFromApi(representApi, inputJson, (isSuccess, is2WayProcess, map, _) async {
+      if(isSuccess){
+        if(map != null){
+          if(is2WayProcess){
+            Map<String, dynamic>? resultMap = _set2WayMap(inputJson, map);
+            CommonUtils.log('i', '[1] call api result with 2way : ${resultMap.toString()}');
+            if(resultMap != null){
+              setState(() async {
+                await _setAuthPop(context, representApi, resultMap,(isResultSuccess, map, listMap) async {
+                  if(isResultSuccess){
+                    if(map != null){
+                      callback(true, map, null);
+                    }else{
+                      callback(true, null, listMap);
+                    }
+                  }else{
+                    callback(false, null, null);
+                  }
+                });
+              });
+            }else{
+              callback(false, null, null);
+            }
+          }
+        }
+      }else{
+        CommonUtils.log('e', '[1] call api result with 2way error');
+        CommonUtils.flutterToast("추가인증 에러가 발생했습니다.");
+        callback(false, null, null);
+      }
+    });
+  }
+
+  static Map<String, dynamic>? _set2WayMap(Map<String, dynamic> originInputMap, Map<String, dynamic> continue2WayResultMap) {
+    Map<String, dynamic>? resultMap;
+    bool is2way = continue2WayResultMap["continue2Way"] as bool;
+    if(is2way){
+      Map<String, dynamic> authMap = continue2WayResultMap;
+      var jobIndex = authMap["jobIndex"];
+      var threadIndex = authMap["threadIndex"];
+      var jti = authMap["jti"];
+      var twoWayTimestamp = authMap["twoWayTimestamp"];
+      var extraInfo = authMap["extraInfo"];
+      var secNo = extraInfo["reqSecureNo"];
+      var secNoRefresh = extraInfo["reqSecureNoRefresh"];
+
+      Map<String, dynamic> input2WayJson = {
+        "simpleAuth" : "1",
+        "secureNo": secNo,
+        "secureNoRefresh" : secNoRefresh,
+        "is2Way": true,
+        "twoWayInfo": {
+          "jobIndex": jobIndex,
+          "threadIndex": threadIndex,
+          "jti": jti,
+          "twoWayTimestamp": twoWayTimestamp
+        }
+      };
+
+      resultMap = {};
+      resultMap.addAll(originInputMap);
+      resultMap.addAll(input2WayJson);
+    }
+
+    return resultMap;
+  }
+
+  static Future<void> _setAuthPop(BuildContext context, Apis apiInfo, Map<String, dynamic> resultInputMap,
+      Function(bool isSuccess, Map<String,dynamic>? resultMap, List<dynamic>? resultListMap) callback) async {
+    UiUtils.showSlideMenu(context, SlideType.toTop, false, 0.0, (context, setState) =>
+        Column(mainAxisAlignment: MainAxisAlignment.center, children:
+        [UiUtils.getTextButtonBox(60.w, "인증 확인", TextStyles.slidePopButtonText, ColorStyles.finAppGreen, () async {
+          CodeFController.getDataFromApi(apiInfo, resultInputMap, (isSuccess, _, map, listMap){
+            if(isSuccess){
+              if(map != null){
+                callback(true, map, null);
+              }else{
+                callback(true, null, listMap);
+              }
+            }else{
+              callback(false, null, null);
+            }
+          });
+          Navigator.of(context).pop();
+        })])
+    );
+  }
+
+
 }
 
 /// CODEF API CONFIG ------------------------------------------------------------------------------------------------------------------------ ///

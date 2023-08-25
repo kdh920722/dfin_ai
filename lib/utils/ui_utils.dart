@@ -225,16 +225,19 @@ class UiUtils {
         barrierDismissible: false,
         context: targetContext,
         pageBuilder: (context, animation, secondaryAnimation) {
-          return StatefulBuilder(// You need this, notice the parameters below:
-              builder: (BuildContext context, StateSetter setState) {
-                isLoadingPopOn = true;
-                return Container(
-                    width: 100.w,
-                    height: 100.h,
-                    color: ColorStyles.darkGrayWithAlpha,
-                    child: SpinKitCubeGrid(color: ColorStyles.finAppGreen, size: 25.w)
-                );
-              });
+          return WillPopScope(
+            onWillPop: () async => false,
+            child: StatefulBuilder(// You need this, notice the parameters below:
+                builder: (BuildContext context, StateSetter setState) {
+                  isLoadingPopOn = true;
+                  return Container(
+                      width: 100.w,
+                      height: 100.h,
+                      color: ColorStyles.darkGrayWithAlpha,
+                      child: SpinKitCubeGrid(color: ColorStyles.finAppGreen, size: 25.w)
+                  );
+                })
+          );
         },
       );
     }
@@ -268,7 +271,7 @@ class UiUtils {
     );
   }
 
-  static void showSlideMenu(BuildContext parentViewContext, SlideType slideType, bool isDismissible, Widget Function(BuildContext context, StateSetter setState) createWidgetMethod){
+  static void showSlideMenu(BuildContext parentViewContext, SlideType slideType, bool isDismissible, double opacity, Widget Function(BuildContext context, StateSetter setState) createWidgetMethod){
     double popWidth = 66.w;
     double popHeight = 33.h;
     BorderRadius borderRadius = BorderRadius.circular(30);
@@ -277,7 +280,7 @@ class UiUtils {
     showGeneralDialog(
       barrierLabel: "Slide Menu",
       barrierDismissible: isDismissible,
-      barrierColor: Colors.black.withOpacity(0.5),
+      barrierColor: Colors.black.withOpacity(opacity),
       transitionDuration: const Duration(milliseconds: 500),
       context: parentViewContext,
       pageBuilder: (context, anim1, anim2) {
@@ -308,24 +311,27 @@ class UiUtils {
             borderRadius = const BorderRadius.only(topLeft: Radius.circular(30), bottomLeft: Radius.circular(30));
         }
 
-        return Align(
-          alignment: alignment,
-          child: Container(
-            width: popWidth,
-            height: popHeight,
-            decoration: BoxDecoration(
-              color: ColorStyles.finAppWhite,
-              borderRadius: borderRadius,
+        return WillPopScope(
+          onWillPop: () async => false,
+          child: Align(
+            alignment: alignment,
+            child: Container(
+              width: popWidth,
+              height: popHeight,
+              decoration: BoxDecoration(
+                color: ColorStyles.finAppWhite,
+                borderRadius: borderRadius,
+              ),
+              child: SizedBox.expand(
+                  child: StatefulBuilder(
+                      builder: (_, StateSetter popViewSetState){
+                        Widget contentsWidget = createWidgetMethod(parentViewContext, popViewSetState);
+                        return Padding(padding: const EdgeInsets.all(15.0), child: contentsWidget);
+                      }
+                  )
+              ),
             ),
-            child: SizedBox.expand(
-                child: StatefulBuilder(
-                    builder: (_, StateSetter popViewSetState){
-                      Widget contentsWidget = createWidgetMethod(parentViewContext, popViewSetState);
-                      return Padding(padding: const EdgeInsets.all(15.0), child: contentsWidget);
-                    }
-                )
-            ),
-          ),
+          )
         );
       },
       transitionBuilder: (context, anim1, anim2, child) {

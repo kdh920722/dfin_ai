@@ -4,7 +4,7 @@ import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
 
 class Config{
-  static int buildCount = 0;
+  static bool isControllerLoadFinished = false;
   static const int buildTwice = 2;
   static bool isAppMainInit = false;
   static const double appWidth = 393;

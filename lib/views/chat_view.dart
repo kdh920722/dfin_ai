@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutterwebchat/controllers/iamport_controller.dart';
 import 'package:flutterwebchat/controllers/logfin_controller.dart';
 import 'package:flutterwebchat/controllers/sharedpreference_controller.dart';
+import 'package:flutterwebchat/datas/api_info_data.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -191,6 +192,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
       }
     });
     await _requestPermissions();
+    Config.isControllerLoadFinished = true;
     setState(() {});
   }
 
@@ -317,11 +319,77 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
   }
 
   Future<void> _sendMessage(String message) async {
+    String d1 = CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime());
+    String d2 = "20230825150101";
+    int result = d1.compareTo(d2);
+    if(result == -1){
+      SharedPreferenceController.saveSharedPreference("testKey", "123412431aa");
+    }else{
+      SharedPreferenceController.getSharedPreferenceValue("testKey");
+    }
 
-    _getResidentRegistrationAbstract();
-    await Future.delayed(const Duration(milliseconds: 500), () async {
-      _getResidentRegistrationCopy();
+    Map<String, dynamic> inputJson1 = {
+      "organization": "0001",
+      "loginType": "6",
+      "identity": "9207221199215",
+      "timeout": "120",
+      "addrSido": "경기도",
+      "addrSiGunGu": "안양시",
+      "id": "888",
+      "userName": "김동환",
+      "loginTypeLevel": "1",
+      "phoneNo": "01054041099",
+      "personalInfoChangeYN": "0",
+      "pastAddrChangeYN": "0",
+      "nameRelationYN": "1",
+      "militaryServiceYN": "0",
+      "overseasKoreansIDYN": "0",
+      "isIdentityViewYn": "0",
+      "originDataYN": "0",
+      "telecom": ""
+    };
+
+    Map<String, dynamic> inputJson2 = {
+      "organization": "0001",
+      "loginType": "6",
+      "identity": "9207221199215",
+      "timeout": "120",
+      "addrSido": "경기도",
+      "addrSiGunGu": "안양시",
+      "id": "888",
+      "userName": "김동환",
+      "loginTypeLevel": "1",
+      "phoneNo": "01054041099",
+      "pastAddrChangeYN": "0",
+      "inmateYN": "0",
+      "relationWithHHYN": "1",
+      "changeDateYN": "0",
+      "compositionReasonYN": "0",
+      "isIdentityViewYn": "1",
+      "isNameViewYn": "1",
+      "originDataYN": "0",
+      "telecom": ""
+    };
+
+    List<ApiInfoData> apiInfoDataList = [];
+    apiInfoDataList.add(ApiInfoData(0, inputJson1, Apis.residentRegistrationAbstract, true));
+    apiInfoDataList.add(ApiInfoData(1, inputJson2, Apis.residentRegistrationCopy, false));
+    UiUtils.showLoadingPop(context);
+    CodeFController.callApis(context, setState, apiInfoDataList, (resultApiInfoDataList) {
+      CommonUtils.log("i", "CALL FINISHED");
+      for(var each in resultApiInfoDataList){
+        CommonUtils.log("i", each.resultMap.toString());
+      }
+      UiUtils.closeLoadingPop(context);
     });
+
+    /*
+    _getResidentRegistrationAbstract2();
+    await Future.delayed(const Duration(milliseconds: 500), () async {
+      _getResidentRegistrationCopy2();
+    });
+    */
+
 
     /*
     Map<String, dynamic> inputJson = {
@@ -420,16 +488,87 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
     });
   }
 
+  Future<void> _getResidentRegistrationAbstract2() async {
+    Map<String, dynamic> inputJson = {
+      "organization": "0001",
+      "loginType": "6",
+      "identity": "9207221199215",
+      "timeout": "120",
+      "addrSido": "경기도",
+      "addrSiGunGu": "안양시",
+      "id": "888",
+      "userName": "김동환",
+      "loginTypeLevel": "1",
+      "phoneNo": "01054041099",
+      "personalInfoChangeYN": "0",
+      "pastAddrChangeYN": "0",
+      "nameRelationYN": "1",
+      "militaryServiceYN": "0",
+      "overseasKoreansIDYN": "0",
+      "isIdentityViewYn": "0",
+      "originDataYN": "0",
+      "telecom": ""
+    };
+    CodeFController.callApiWithCert(context, setState, Apis.residentRegistrationAbstract, inputJson, (isSuccess, resultMap, resultListMap) {
+      if(isSuccess){
+        if(resultMap != null){
+
+        }else{
+
+        }
+      }else{
+
+      }
+      CommonUtils.log("i", "CALL FINISHED !");
+    });
+  }
+
+  Future<void> _getResidentRegistrationCopy2() async {
+    Map<String, dynamic> inputJson = {
+      "organization": "0001",
+      "loginType": "6",
+      "identity": "9207221199215",
+      "timeout": "120",
+      "addrSido": "경기도",
+      "addrSiGunGu": "안양시",
+      "id": "888",
+      "userName": "김동환",
+      "loginTypeLevel": "1",
+      "phoneNo": "01054041099",
+      "pastAddrChangeYN": "0",
+      "inmateYN": "0",
+      "relationWithHHYN": "1",
+      "changeDateYN": "0",
+      "compositionReasonYN": "0",
+      "isIdentityViewYn": "1",
+      "isNameViewYn": "1",
+      "originDataYN": "0",
+      "telecom": ""
+    };
+    CodeFController.callApiWithOutCert(context, Apis.residentRegistrationCopy, inputJson, (isSuccess, resultMap, resultListMap){
+      if(isSuccess){
+        if(resultMap != null){
+
+        }else{
+
+        }
+      }else{
+
+      }
+      CommonUtils.log("i", "CALL FINISHED !");
+    });
+  }
+
   Future<void> _getResidentRegistrationAbstract() async {
     Map<String, dynamic> inputJson = {
       "organization": "0001",
       "loginType": "6",
-      "identity": "",
+      "identity": "9207221199215",
       "timeout": "120",
       "addrSido": "경기도",
       "addrSiGunGu": "안양시",
       "id": "111",
-      "userName": "",
+      "userName": "김동환",
       "loginTypeLevel": "1",
       "phoneNo": "01054041099",
       "personalInfoChangeYN": "0",
@@ -467,12 +606,12 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
     Map<String, dynamic> inputJson = {
       "organization": "0001",
       "loginType": "6",
-      "identity": "",
+      "identity": "9207221199215",
       "timeout": "120",
       "addrSido": "경기도",
       "addrSiGunGu": "안양시",
       "id": "111",
-      "userName": "",
+      "userName": "김동환",
       "loginTypeLevel": "1",
       "phoneNo": "01054041099",
       "pastAddrChangeYN": "0",
@@ -533,7 +672,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
   }
 
   void setAuthPop(Apis apiInfo, Map<String, dynamic> resultInputMap){
-    UiUtils.showSlideMenu(context, SlideType.toTop, false, (context, setState) =>
+    UiUtils.showSlideMenu(context, SlideType.toTop, false, 0.5, (context, setState) =>
         Column(mainAxisAlignment: MainAxisAlignment.center, children: [UiUtils.getTextButtonBox(60.w, "인증 확인", TextStyles.slidePopButtonText, ColorStyles.finAppGreen, () async {
           await CodeFController.getDataFromApi(apiInfo, resultInputMap, (isSuccess, _, map, listMap){
             if(isSuccess){
@@ -663,7 +802,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
           }
         }
 
-        UiUtils.showSlideMenu(context, SlideType.toTop, true, (context, setState) =>
+        UiUtils.showSlideMenu(context, SlideType.toTop, true, 0.5, (context, setState) =>
             Column(mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   UiUtils.getTextWithFixedScale("[$deniedPermissionsString] 권한이 필요합니다. ", TextStyles.slidePopPermissionText, TextAlign.center, null),
@@ -695,21 +834,20 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
 
   @override
   Widget build(BuildContext context) {
-    Config.buildCount++;
-    CommonUtils.log("e", " !!!!!!!!!!!! BUILD : ${Config.buildCount}");
     Widget? view;
     if(!Config.isAppMainInit){
-      CommonUtils.log("e", " @@@@@@ NOT INIT @@@@@@ ");
       _initAtFirst();
       view = UiUtils.getInitView();
     }else{
-      CommonUtils.log("e", " @@@@@@ INIT @@@@@@ ");
-      _initUiValue();
-      _certificationResultCheck();
-      view = AnimatedContainer(duration: const Duration(milliseconds: 100), width: 100.w, height: currentScreenHeight, color: ColorStyles.finAppWhite, child:Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            /*
+      if(!Config.isControllerLoadFinished){
+        view = UiUtils.getInitView();
+      }else{
+        _initUiValue();
+        _certificationResultCheck();
+        view = AnimatedContainer(duration: const Duration(milliseconds: 100), width: 100.w, height: currentScreenHeight, color: ColorStyles.finAppWhite, child:Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              /*
           AnimatedContainer(height: switchBarHeight, duration: const Duration(milliseconds: 100),
               child: Row(mainAxisAlignment : MainAxisAlignment.center, children: [
                 UiUtils.getTextWithFixedScale("WEB", TextStyles.basicTextStyle, null, null),
@@ -727,111 +865,114 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
           ),
           */
 
-            SizedBox(height: 30.h,
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxWidth: 100.w,
-                    maxHeight: 30.h,
-                  ),
-                  child: pickedFilePath != "" ? Image.file(File(pickedFilePath)) : Container(),
-                )
-            ),
-
-            /// 채팅 메인 화면
-            Expanded(
-                child: Container(
-                    constraints: BoxConstraints(maxHeight: currentScreenHeight*0.9),
-                    color: ColorStyles.finAppGreen, padding : const EdgeInsets.all(10),
-                    child: messages.isEmpty? Container() : ListView.builder(
-                        controller: messageListViewController,
-                        scrollDirection: Axis.vertical,
-                        itemCount: messages.length,
-                        itemBuilder: (context, index) {
-                          return _getChatBox(messages[index]);
-                        })
-                )
-            ),
-
-            /// 채팅 상하 여백
-            UiUtils.getMarginBox(0, screenHeight*0.01),
-
-            /// 채팅 글 입력 칸
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 400), // Optional: Add a duration for smooth animation
-              width: 95.w,
-              color: ColorStyles.finAppWhite,
-              height: inputHeight,
-              constraints: BoxConstraints(
-                minHeight: inputMinHeight,
-                maxHeight: inputMaxHeight,
+              SizedBox(height: 30.h,
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: 100.w,
+                      maxHeight: 30.h,
+                    ),
+                    child: pickedFilePath != "" ? Image.file(File(pickedFilePath)) : Container(),
+                  )
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  SizedBox(
-                    width: 70.w,
-                    child: TextField(
-                      focusNode: _focusNode,
-                      maxLines: null,
-                      style: TextStyles.subTitleTextStyle,
-                      controller: inputTextController,
-                      textAlign: TextAlign.start,
-                      cursorColor: Colors.grey,
-                      onChanged: (text) {
-                        currentWord = CommonUtils.getLastWord(text);
-                        currentText += currentWord;
-                        if(currentWord == " " || currentWord == "\n" || currentWord == "." || currentWord == ","){
 
-                          print(currentText);
-                          final textLinePainterForWidth = TextPainter(
-                            text: TextSpan(text: currentText, style: TextStyles.subTitleTextStyle),
-                            maxLines: null,
-                            textDirection: TextDirection.ltr,
-                          )..layout(minWidth: 0, maxWidth: 85.w);
+              /// 채팅 메인 화면
+              Expanded(
+                  child: Container(
+                      constraints: BoxConstraints(maxHeight: currentScreenHeight*0.9),
+                      color: ColorStyles.finAppGreen, padding : const EdgeInsets.all(10),
+                      child: messages.isEmpty? Container() : ListView.builder(
+                          controller: messageListViewController,
+                          scrollDirection: Axis.vertical,
+                          itemCount: messages.length,
+                          itemBuilder: (context, index) {
+                            return _getChatBox(messages[index]);
+                          })
+                  )
+              ),
 
-                          if(textLinePainterForWidth.width >= 70.w){
-                            print("${textLinePainterForWidth.width}");
-                            currentText = "";
+              /// 채팅 상하 여백
+              UiUtils.getMarginBox(0, screenHeight*0.01),
 
-                            final textPainterForHeight = TextPainter(
-                              text: TextSpan(text: text, style: TextStyles.subTitleTextStyle),
+              /// 채팅 글 입력 칸
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 400), // Optional: Add a duration for smooth animation
+                width: 95.w,
+                color: ColorStyles.finAppWhite,
+                height: inputHeight,
+                constraints: BoxConstraints(
+                  minHeight: inputMinHeight,
+                  maxHeight: inputMaxHeight,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    SizedBox(
+                      width: 70.w,
+                      child: TextField(
+                        focusNode: _focusNode,
+                        maxLines: null,
+                        style: TextStyles.subTitleTextStyle,
+                        controller: inputTextController,
+                        textAlign: TextAlign.start,
+                        cursorColor: Colors.grey,
+                        onChanged: (text) {
+                          currentWord = CommonUtils.getLastWord(text);
+                          currentText += currentWord;
+                          if(currentWord == " " || currentWord == "\n" || currentWord == "." || currentWord == ","){
+
+                            print(currentText);
+                            final textLinePainterForWidth = TextPainter(
+                              text: TextSpan(text: currentText, style: TextStyles.subTitleTextStyle),
                               maxLines: null,
                               textDirection: TextDirection.ltr,
                             )..layout(minWidth: 0, maxWidth: 85.w);
-                            final desiredHeight = inputMinHeight*0.3 + textPainterForHeight.height;
-                            final height = desiredHeight.clamp(inputMinHeight, inputMaxHeight);
-                            setState(() {
-                              inputHeight = height;
-                            });
+
+                            if(textLinePainterForWidth.width >= 70.w){
+                              print("${textLinePainterForWidth.width}");
+                              currentText = "";
+
+                              final textPainterForHeight = TextPainter(
+                                text: TextSpan(text: text, style: TextStyles.subTitleTextStyle),
+                                maxLines: null,
+                                textDirection: TextDirection.ltr,
+                              )..layout(minWidth: 0, maxWidth: 85.w);
+                              final desiredHeight = inputMinHeight*0.3 + textPainterForHeight.height;
+                              final height = desiredHeight.clamp(inputMinHeight, inputMaxHeight);
+                              setState(() {
+                                inputHeight = height;
+                              });
+                            }
                           }
-                        }
-                      },
-                      decoration: UiUtils.getInputDecorationWithNoErrorMessage("입력"),
+                        },
+                        decoration: UiUtils.getInputDecorationWithNoErrorMessage("입력"),
+                      ),
                     ),
-                  ),
-                  UiUtils.getMarginBox(3.w, 0),
-                  UiUtils.getIconButtonBox(
-                    20.w,
-                    Icons.send,
-                    ColorStyles.finAppGreen, () async {
-                    if (inputTextController.text.trim() != "") {
-                      /*
+                    UiUtils.getMarginBox(3.w, 0),
+                    UiUtils.getIconButtonBox(
+                      20.w,
+                      Icons.send,
+                      ColorStyles.finAppGreen, () async {
+                      if (inputTextController.text.trim() != "") {
+                        /*
                       String message = inputTextController.text;
                       inputTextController.text = "";
                       currentText = "";
                       inputHeight = inputMinHeight;
                       _sendMessage(message);
                       */
-                    }else if(inputTextController.text.trim() == ""){
+                      }else if(inputTextController.text.trim() == ""){
+                        _sendMessage("");
+                        /*
                       Map<String, String> inputJson = {
                         "carrier": "MVNO",
                         "name" : "김동환",
                         "phone" : "01054041099"
                       };
                       CommonUtils.moveTo(context, AppView.certificationView.value, inputJson);
+                      */
 
-                      /*
+                        /*
                       XFile? image = await CommonUtils.getGalleryImage();
                       if(image != null){
                         String imagePath = await CommonUtils.cropImageAndGetPath(image);
@@ -864,23 +1005,24 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
                       }
                       */
 
-                      //_sendMessage("");
-                      //inputTextController.text = "";
-                      //currentText = "";
-                    }
-                  },
-                  ),
-                ],
+                        //_sendMessage("");
+                        //inputTextController.text = "";
+                        //currentText = "";
+                      }
+                    },
+                    ),
+                  ],
+                ),
               ),
-            ),
 
-            /// 채팅 상하 여백
-            UiUtils.getMarginBox(0, screenHeight*0.01),
-          ])
-      );
+              /// 채팅 상하 여백
+              UiUtils.getMarginBox(0, screenHeight*0.01),
+            ])
+        );
+      }
     }
 
-    return UiUtils.getView(context, view!, CommonUtils.onWillPopForPreventBackButton);
+    return UiUtils.getView(context, view, CommonUtils.onWillPopForPreventBackButton);
   }
 
 }
