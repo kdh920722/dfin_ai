@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutterwebchat/configs/app_config.dart';
 import 'package:flutterwebchat/controllers/iamport_controller.dart';
 import 'package:flutterwebchat/utils/common_utils.dart';
 import '../utils/ui_utils.dart';
