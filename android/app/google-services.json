@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "121132222404",
+    "firebase_url": "https://upfin-6524b-default-rtdb.firebaseio.com",
     "project_id": "upfin-6524b",
     "storage_bucket": "upfin-6524b.appspot.com"
   },
@@ -13,6 +14,14 @@
         }
       },
       "oauth_client": [
+        {
+          "client_id": "121132222404-tdugpjfo3fr1rhm85qohkal6o6cjmvf4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.ysmeta.upfinai",
+            "certificate_hash": "fc5a8190eaca3a3daf8710b9c2daf238b0535915"
+          }
+        },
         {
           "client_id": "121132222404-mk3dk3t760emd1eqq8smia83utf73dut.apps.googleusercontent.com",
           "client_type": 3
@@ -29,6 +38,13 @@
             {
               "client_id": "121132222404-mk3dk3t760emd1eqq8smia83utf73dut.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "121132222404-is98fn90r7rsqgd59s3c8snehlj3rg5o.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.ysmeta.upfinai"
+              }
             }
           ]
         }

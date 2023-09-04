@@ -24,17 +24,15 @@ class DefaultFirebaseOptions {
         return android;
       case TargetPlatform.iOS:
         return ios;
-      case TargetPlatform.macOS:
-        return macos;
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
+              'you can reconfigure this by running the FlutterFire CLI again.',
         );
       case TargetPlatform.linux:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for linux - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
+              'you can reconfigure this by running the FlutterFire CLI again.',
         );
       default:
         throw UnsupportedError(
@@ -44,46 +42,34 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyAP0g-SSeuXgSa4crBmrCLWavwrksQSOQk',
-    appId: '1:31796873395:web:c4a15d7285eb17dd6848c6',
-    messagingSenderId: '31796873395',
-    projectId: 'soarkidz-8ac85',
-    authDomain: 'soarkidz-8ac85.firebaseapp.com',
-    databaseURL: 'https://soarkidz-8ac85-default-rtdb.firebaseio.com',
-    storageBucket: 'soarkidz-8ac85.appspot.com',
-    measurementId: 'G-50NECGL8FT',
+    apiKey: 'AIzaSyBINsK6iIcIu_e3Tm4HRglg3nmvjrgy-zM',
+    appId: '1:121132222404:web:eef6ccd1145e16904e0691',
+    messagingSenderId: '121132222404',
+    projectId: 'upfin-6524b',
+    authDomain: 'upfin-6524b.firebaseapp.com',
+    databaseURL: 'https://upfin-6524b-default-rtdb.firebaseio.com',
+    storageBucket: 'upfin-6524b.appspot.com',
+    measurementId: 'G-4SL4681NTR',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyDZgw-3_H_sli2Z5PHDIvmF2arw39jx8kA',
-    appId: '1:31796873395:android:028d7b40fa2b75d66848c6',
-    messagingSenderId: '31796873395',
-    projectId: 'soarkidz-8ac85',
-    databaseURL: 'https://soarkidz-8ac85-default-rtdb.firebaseio.com',
-    storageBucket: 'soarkidz-8ac85.appspot.com',
+    apiKey: 'AIzaSyAyBc-0zaE3Acl3I9CjqA7vhIVT665T_q8',
+    appId: '1:121132222404:android:4907f093c687294e4e0691',
+    messagingSenderId: '121132222404',
+    projectId: 'upfin-6524b',
+    databaseURL: 'https://upfin-6524b-default-rtdb.firebaseio.com',
+    storageBucket: 'upfin-6524b.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyBmDlTjUWb-xYjOvRHl_knXQfffxNMKu-M',
-    appId: '1:31796873395:ios:110bf20f5077ffd36848c6',
-    messagingSenderId: '31796873395',
-    projectId: 'soarkidz-8ac85',
-    databaseURL: 'https://soarkidz-8ac85-default-rtdb.firebaseio.com',
-    storageBucket: 'soarkidz-8ac85.appspot.com',
-    androidClientId: '31796873395-bdvg4i9ag22o4fvua33qpi6eh39cb02v.apps.googleusercontent.com',
-    iosClientId: '31796873395-cggm7mn55jk1p5k95q6ddkedv0op00ej.apps.googleusercontent.com',
-    iosBundleId: 'com.example.flutterwebchat',
-  );
-
-  static const FirebaseOptions macos = FirebaseOptions(
-    apiKey: 'AIzaSyBmDlTjUWb-xYjOvRHl_knXQfffxNMKu-M',
-    appId: '1:31796873395:ios:e6bdd340db8d40596848c6',
-    messagingSenderId: '31796873395',
-    projectId: 'soarkidz-8ac85',
-    databaseURL: 'https://soarkidz-8ac85-default-rtdb.firebaseio.com',
-    storageBucket: 'soarkidz-8ac85.appspot.com',
-    androidClientId: '31796873395-bdvg4i9ag22o4fvua33qpi6eh39cb02v.apps.googleusercontent.com',
-    iosClientId: '31796873395-32a3ored7694od5bgjcq4o2qnd5lddvc.apps.googleusercontent.com',
-    iosBundleId: 'com.example.flutterwebchat.RunnerTests',
+    apiKey: 'AIzaSyDsZMz4klE7uxPeKdSFmotSL64WBXobSCk',
+    appId: '1:121132222404:ios:ca637a6877d4fc834e0691',
+    messagingSenderId: '121132222404',
+    projectId: 'upfin-6524b',
+    databaseURL: 'https://upfin-6524b-default-rtdb.firebaseio.com',
+    storageBucket: 'upfin-6524b.appspot.com',
+    androidClientId: '121132222404-tdugpjfo3fr1rhm85qohkal6o6cjmvf4.apps.googleusercontent.com',
+    iosClientId: '121132222404-is98fn90r7rsqgd59s3c8snehlj3rg5o.apps.googleusercontent.com',
+    iosBundleId: 'com.ysmeta.upfinai',
   );
 }
