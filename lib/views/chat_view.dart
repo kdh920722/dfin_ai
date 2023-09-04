@@ -328,6 +328,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
       SharedPreferenceController.getSharedPreferenceValue("testKey");
     }
 
+    String randomKey = CommonUtils.getRandomKey().toString();
     Map<String, dynamic> inputJson1 = {
       "organization": "0001",
       "loginType": "6",
@@ -335,7 +336,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
       "timeout": "120",
       "addrSido": "경기도",
       "addrSiGunGu": "안양시",
-      "id": "888",
+      "id": randomKey,
       "userName": "김동환",
       "loginTypeLevel": "1",
       "phoneNo": "01054041099",
@@ -356,7 +357,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
       "timeout": "120",
       "addrSido": "경기도",
       "addrSiGunGu": "안양시",
-      "id": "888",
+      "id": randomKey,
       "userName": "김동환",
       "loginTypeLevel": "1",
       "phoneNo": "01054041099",
@@ -373,16 +374,17 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
 
     List<ApiInfoData> apiInfoDataList = [];
     apiInfoDataList.add(ApiInfoData(0, inputJson1, Apis.residentRegistrationAbstract, true));
-    apiInfoDataList.add(ApiInfoData(1, inputJson2, Apis.residentRegistrationCopy, false));
+    apiInfoDataList.add(ApiInfoData(1, inputJson2, Apis.residentRegistrationCopy, true));
     UiUtils.showLoadingPop(context);
-    CodeFController.callApis(context, setState, apiInfoDataList, (resultApiInfoDataList) {
+    CodeFController.callApisWithCert(context, setState, apiInfoDataList, (isSuccess, resultApiInfoDataList) {
       CommonUtils.log("i", "CALL FINISHED");
-      for(var each in resultApiInfoDataList){
-        CommonUtils.log("i", each.resultMap.toString());
-      }
       UiUtils.closeLoadingPop(context);
+      if(isSuccess){
+        for(var each in resultApiInfoDataList!){
+          CommonUtils.log("i", each.resultMap.toString());
+        }
+      }
     });
-
 
 
     /*
@@ -463,234 +465,6 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
       UiUtils.closeLoadingPop(context);
     }
     */
-  }
-
-  Future<void> _findInfoByCaseNumber() async {
-    Map<String, dynamic> inputJson = {
-      "organization": "0001",
-      "court_name": "부산회생법원",
-      "caseNumberYear": "2022",
-      "caseNumberType": "개회",
-      "caseNumberNumber": "109637",
-      "userName": "김대성",
-      "timeout": "",
-      "bankCode": "048",
-      "account": "13211616",
-      "userName1": "김대성"
-    };
-
-    await CodeFController.getDataFromApi(Apis.bankruptApi2, inputJson, (isSuccess, is2WayProcess, map, _){
-      if(isSuccess){
-        if(map != null){
-
-        }
-      }else{
-        CommonUtils.flutterToast("추가인증 에러가 발생했습니다.");
-      }
-    });
-  }
-
-  Future<void> _getResidentRegistrationAbstract2() async {
-    Map<String, dynamic> inputJson = {
-      "organization": "0001",
-      "loginType": "6",
-      "identity": "9207221199215",
-      "timeout": "120",
-      "addrSido": "경기도",
-      "addrSiGunGu": "안양시",
-      "id": "888",
-      "userName": "김동환",
-      "loginTypeLevel": "1",
-      "phoneNo": "01054041099",
-      "personalInfoChangeYN": "0",
-      "pastAddrChangeYN": "0",
-      "nameRelationYN": "1",
-      "militaryServiceYN": "0",
-      "overseasKoreansIDYN": "0",
-      "isIdentityViewYn": "0",
-      "originDataYN": "0",
-      "telecom": ""
-    };
-    CodeFController.callApiWithCert(context, setState, Apis.residentRegistrationAbstract, inputJson, (isSuccess, resultMap, resultListMap) {
-      if(isSuccess){
-        if(resultMap != null){
-
-        }else{
-
-        }
-      }else{
-
-      }
-      CommonUtils.log("i", "CALL FINISHED !");
-    });
-  }
-
-  Future<void> _getResidentRegistrationCopy2() async {
-    Map<String, dynamic> inputJson = {
-      "organization": "0001",
-      "loginType": "6",
-      "identity": "9207221199215",
-      "timeout": "120",
-      "addrSido": "경기도",
-      "addrSiGunGu": "안양시",
-      "id": "888",
-      "userName": "김동환",
-      "loginTypeLevel": "1",
-      "phoneNo": "01054041099",
-      "pastAddrChangeYN": "0",
-      "inmateYN": "0",
-      "relationWithHHYN": "1",
-      "changeDateYN": "0",
-      "compositionReasonYN": "0",
-      "isIdentityViewYn": "1",
-      "isNameViewYn": "1",
-      "originDataYN": "0",
-      "telecom": ""
-    };
-    CodeFController.callApiWithOutCert(context, Apis.residentRegistrationCopy, inputJson, (isSuccess, resultMap, resultListMap){
-      if(isSuccess){
-        if(resultMap != null){
-
-        }else{
-
-        }
-      }else{
-
-      }
-      CommonUtils.log("i", "CALL FINISHED !");
-    });
-  }
-
-  Future<void> _getResidentRegistrationAbstract() async {
-    Map<String, dynamic> inputJson = {
-      "organization": "0001",
-      "loginType": "6",
-      "identity": "9207221199215",
-      "timeout": "120",
-      "addrSido": "경기도",
-      "addrSiGunGu": "안양시",
-      "id": "111",
-      "userName": "김동환",
-      "loginTypeLevel": "1",
-      "phoneNo": "01054041099",
-      "personalInfoChangeYN": "0",
-      "pastAddrChangeYN": "0",
-      "nameRelationYN": "1",
-      "militaryServiceYN": "0",
-      "overseasKoreansIDYN": "0",
-      "isIdentityViewYn": "0",
-      "originDataYN": "0",
-      "telecom": ""
-    };
-
-    CommonUtils.log('i', '[1] call start');
-    CodeFController.getDataFromApi(Apis.residentRegistrationAbstract, inputJson, (isSuccess, is2WayProcess, map, _) {
-      if(isSuccess){
-        if(map != null){
-          if(is2WayProcess){
-            Map<String, dynamic>? resultMap = _set2WayMap(inputJson, map);
-            CommonUtils.log('i', '[1] call api result with 2way : ${resultMap.toString()}');
-            if(resultMap != null){
-              setState(() {
-                setAuthPop(Apis.residentRegistrationAbstract, resultMap);
-              });
-            }
-          }
-        }
-      }else{
-        CommonUtils.log('e', '[1] call api result with 2way error');
-        CommonUtils.flutterToast("추가인증 에러가 발생했습니다.");
-      }
-    });
-  }
-
-  Future<void> _getResidentRegistrationCopy() async {
-    Map<String, dynamic> inputJson = {
-      "organization": "0001",
-      "loginType": "6",
-      "identity": "9207221199215",
-      "timeout": "120",
-      "addrSido": "경기도",
-      "addrSiGunGu": "안양시",
-      "id": "111",
-      "userName": "김동환",
-      "loginTypeLevel": "1",
-      "phoneNo": "01054041099",
-      "pastAddrChangeYN": "0",
-      "inmateYN": "0",
-      "relationWithHHYN": "1",
-      "changeDateYN": "0",
-      "compositionReasonYN": "0",
-      "isIdentityViewYn": "1",
-      "isNameViewYn": "1",
-      "originDataYN": "0",
-      "telecom": ""
-    };
-    CommonUtils.log('i', '[2] call start');
-    CodeFController.getDataFromApi(Apis.residentRegistrationCopy, inputJson, (isSuccess, is2WayProcess, map, _) {
-      if(isSuccess){
-        if(map != null){
-          CommonUtils.log('i', '[2] call api result');
-        }
-      }else{
-        CommonUtils.log('e', '[2] call api result with 2way error');
-        CommonUtils.flutterToast("에러가 발생했습니다.");
-      }
-    });
-  }
-
-  Map<String, dynamic>? _set2WayMap(Map<String, dynamic> originInputMap, Map<String, dynamic> continue2WayResultMap) {
-    Map<String, dynamic>? resultMap;
-    bool is2way = continue2WayResultMap["continue2Way"] as bool;
-    if(is2way){
-      Map<String, dynamic> authMap = continue2WayResultMap;
-      var jobIndex = authMap["jobIndex"];
-      var threadIndex = authMap["threadIndex"];
-      var jti = authMap["jti"];
-      var twoWayTimestamp = authMap["twoWayTimestamp"];
-      var extraInfo = authMap["extraInfo"];
-      var secNo = extraInfo["reqSecureNo"];
-      var secNoRefresh = extraInfo["reqSecureNoRefresh"];
-
-      Map<String, dynamic> input2WayJson = {
-        "simpleAuth" : "1",
-        "secureNo": secNo,
-        "secureNoRefresh" : secNoRefresh,
-        "is2Way": true,
-        "twoWayInfo": {
-          "jobIndex": jobIndex,
-          "threadIndex": threadIndex,
-          "jti": jti,
-          "twoWayTimestamp": twoWayTimestamp
-        }
-      };
-
-      resultMap = {};
-      resultMap.addAll(originInputMap);
-      resultMap.addAll(input2WayJson);
-    }
-
-    return resultMap;
-  }
-
-  void setAuthPop(Apis apiInfo, Map<String, dynamic> resultInputMap){
-    UiUtils.showSlideMenu(context, SlideType.toTop, false, 0.5, (context, setState) =>
-        Column(mainAxisAlignment: MainAxisAlignment.center, children: [UiUtils.getTextButtonBox(60.w, "인증 확인", TextStyles.slidePopButtonText, ColorStyles.finAppGreen, () async {
-          await CodeFController.getDataFromApi(apiInfo, resultInputMap, (isSuccess, _, map, listMap){
-            if(isSuccess){
-              CommonUtils.log('i', '[auth] call api : ${map.toString()}');
-              if(map != null){
-
-              }else{
-
-              }
-              Navigator.of(context).pop();
-            }else{
-              CommonUtils.log('e', '[auth] call api error');
-            }
-
-          });
-        })]));
   }
 
   Future<void> _receiveMessage(String message) async{

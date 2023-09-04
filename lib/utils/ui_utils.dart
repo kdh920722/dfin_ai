@@ -244,8 +244,10 @@ class UiUtils {
   }
 
   static void closeLoadingPop(BuildContext targetContext){
-    isLoadingPopOn = false;
-    Navigator.pop(targetContext);
+    if(isLoadingPopOn){
+      isLoadingPopOn = false;
+      Navigator.pop(targetContext);
+    }
   }
 
   static void showPop(BuildContext parentViewContext, Widget Function(BuildContext context, StateSetter setState) createWidgetMethod){

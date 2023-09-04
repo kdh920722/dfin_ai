@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
+import 'package:flutterwebchat/controllers/get_controller.dart';
 import 'package:flutterwebchat/datas/api_info_data.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:http/http.dart' as http;
 import 'package:sizer/sizer.dart';
 import '../configs/app_config.dart';
@@ -73,7 +75,7 @@ class CodeFController{
     }
   }
 
-  static Future<void> getDataFromApi(Apis apiInfo, Map<String, dynamic> inputJson,
+  static Future<void> _getDataFromApi(Apis apiInfo, Map<String, dynamic> inputJson,
       void Function(bool isSuccess, bool is2WayProcess, Map<String, dynamic>? outputJson, List<dynamic>? outputJsonArray) callback) async {
     final baseUrl = hostStatus.value == HostStatus.prod.value ? Host.baseUrl.value : HostDev.baseUrl.value;
     final endPoint = apiInfo.value;
@@ -108,22 +110,25 @@ class CodeFController{
           if(resultCode == 'CF-00000' || resultCode == 'CF-03002'){
             final resultData = json['data'];
             if (resultData is Map<String, dynamic>) {
+              resultData['result_code'] = resultCode;
               if(resultCode == 'CF-03002') {
                 callback(true, true, resultData, null);
               } else {
                 callback(true, false, resultData, null);
               }
             } else if (resultData is List<dynamic>) {
+              resultData[0]['result_code'] = resultCode;
               if(resultCode == 'CF-03002') {
                 callback(true, true, null, resultData);
               } else {
                 callback(true, false, null, resultData);
               }
-
             }
           } else {
+            final Map<String, dynamic> resultData = {};
+            resultData['result_code'] = resultCode;
             CommonUtils.log('e', 'out resultCode error : $resultCode');
-            callback(false, false, null, null);
+            callback(false, false, resultData, null);
           }
         }
       } else {
@@ -137,14 +142,14 @@ class CodeFController{
   }
 
   /// ------------------------------------------------------------------------------------------------------------------------ ///
-  static Future<void> callApis(BuildContext context, StateSetter setState,
-      List<ApiInfoData> apiInfoDataList, Function(List<ApiInfoData> resultApiInfoDataList) callback) async {
+  static Future<void> callApisWithCert(BuildContext context, StateSetter setState,
+      List<ApiInfoData> apiInfoDataList, Function(bool isSuccess, List<ApiInfoData>? resultApiInfoDataList) callback) async {
     int callCount = 0;
     bool isFirstCalledOnCert = false;
     for(var each in apiInfoDataList){
       if(each.isCallWithCert){
         if(!isFirstCalledOnCert){
-          callApiWithCert(context, setState, each.api, each.inputJson, (isSuccess, resultMap, resultListMap) {
+          _callApiWithCert(context, setState, each.api, each.inputJson, (isSuccess, resultMap, resultListMap) {
             if(isSuccess){
               each.isResultSuccess = true;
               if(resultMap != null){
@@ -152,17 +157,29 @@ class CodeFController{
               }else{
                 each.resultListMap = resultListMap;
               }
-            }
 
-            callCount++;
-            if(callCount == apiInfoDataList.length){
-              callback(apiInfoDataList);
+              callCount++;
+              if(callCount == apiInfoDataList.length){
+                callback(true, apiInfoDataList);
+              }
+            }else{
+              Navigator.of(context).pop();
+              if(resultMap != null){
+                switch(resultMap["result_code"]){
+                  case "CF-01004" : CommonUtils.flutterToast("입력시간이 초과되었습니다.");
+                  default : CommonUtils.flutterToast("에러가 발생했습니다.");
+                }
+                callback(false, null);
+              }else{
+                CommonUtils.flutterToast("에러가 발생했습니다.");
+                callback(false, null);
+              }
             }
           });
           await Future.delayed(const Duration(milliseconds: 500), () async {});
           isFirstCalledOnCert = true;
         }else{
-          callApiWithOutCert(context, each.api, each.inputJson, (isSuccess, resultMap, resultListMap){
+          _callApiWithOutCert(context, each.api, each.inputJson, (isSuccess, resultMap, resultListMap){
             if(isSuccess){
               each.isResultSuccess = true;
               if(resultMap != null){
@@ -170,16 +187,37 @@ class CodeFController{
               }else{
                 each.resultListMap = resultListMap;
               }
-            }
 
-            callCount++;
-            if(callCount == apiInfoDataList.length){
-              callback(apiInfoDataList);
+              callCount++;
+              if(callCount == apiInfoDataList.length){
+                callback(true, apiInfoDataList);
+              }
+            }else{
+              Navigator.of(context).pop();
+              if(resultMap != null){
+                switch(resultMap["result_code"]){
+                  case "CF-01004" : CommonUtils.flutterToast("입력시간이 초과되었습니다.");
+                  default : CommonUtils.flutterToast("에러가 발생했습니다.");
+                }
+
+                callback(false, null);
+              }else{
+                CommonUtils.flutterToast("에러가 발생했습니다.");
+                callback(false, null);
+              }
             }
           });
         }
-      }else{
-        callApiWithOutCert(context, each.api, each.inputJson, (isSuccess, resultMap, resultListMap){
+      }
+    }
+  }
+
+  static Future<void> callApisWithOutCert(BuildContext context, StateSetter setState,
+      List<ApiInfoData> apiInfoDataList, Function(bool isSuccess, List<ApiInfoData>? resultApiInfoDataList) callback) async {
+    int callCount = 0;
+    for(var each in apiInfoDataList){
+      if(!each.isCallWithCert){
+        _callApiWithOutCert(context, each.api, each.inputJson, (isSuccess, resultMap, resultListMap){
           if(isSuccess){
             each.isResultSuccess = true;
             if(resultMap != null){
@@ -187,21 +225,34 @@ class CodeFController{
             }else{
               each.resultListMap = resultListMap;
             }
-          }
 
-          callCount++;
-          if(callCount == apiInfoDataList.length){
-            callback(apiInfoDataList);
+            callCount++;
+            if(callCount == apiInfoDataList.length){
+              callback(true, apiInfoDataList);
+            }
+          }else{
+            Navigator.of(context).pop();
+            if(resultMap != null){
+              switch(resultMap["result_code"]){
+                case "CF-01004" : CommonUtils.flutterToast("입력시간이 초과되었습니다.");
+                default : CommonUtils.flutterToast("에러가 발생했습니다.");
+              }
+
+              callback(false, null);
+            }else{
+              CommonUtils.flutterToast("에러가 발생했습니다.");
+              callback(false, null);
+            }
           }
         });
       }
     }
   }
 
-  static Future<void> callApiWithOutCert(BuildContext context, Apis api, Map<String, dynamic> inputJson,
+  static Future<void> _callApiWithOutCert(BuildContext context, Apis api, Map<String, dynamic> inputJson,
       Function(bool isSuccess, Map<String,dynamic>? resultMap, List<dynamic>? resultListMap) callback) async {
     CommonUtils.log('i', 'normal call start');
-    CodeFController.getDataFromApi(api, inputJson, (isSuccess, _, map, listMap) {
+    CodeFController._getDataFromApi(api, inputJson, (isSuccess, _, map, listMap) {
       if(isSuccess){
         if(map != null){
           callback(true, map, null);
@@ -210,24 +261,23 @@ class CodeFController{
         }
       }else{
         CommonUtils.log('e', 'normal call api result error');
-        CommonUtils.flutterToast("에러가 발생했습니다.");
-        callback(false, null, null);
+        callback(false, map, null);
       }
     });
   }
 
-  static Future<void> callApiWithCert(BuildContext context, StateSetter setState, Apis representApi, Map<String, dynamic> inputJson,
+  static Future<void> _callApiWithCert(BuildContext context, StateSetter setState, Apis representApi, Map<String, dynamic> inputJson,
       Function(bool isSuccess, Map<String,dynamic>? resultMap, List<dynamic>? resultListMap) callback) async {
     CommonUtils.log('i', '[1] call start');
-    await CodeFController.getDataFromApi(representApi, inputJson, (isSuccess, is2WayProcess, map, _) async {
+    await CodeFController._getDataFromApi(representApi, inputJson, (isSuccess, is2WayProcess, map, _) async {
       if(isSuccess){
         if(map != null){
           if(is2WayProcess){
             Map<String, dynamic>? resultMap = _set2WayMap(inputJson, map);
             CommonUtils.log('i', '[1] call api result with 2way : ${resultMap.toString()}');
             if(resultMap != null){
-              setState(() async {
-                await _setAuthPop(context, representApi, resultMap,(isResultSuccess, map, listMap) async {
+              setState(() {
+                _setAuthPop(context, representApi, resultMap,(isResultSuccess, map, listMap) async {
                   if(isResultSuccess){
                     if(map != null){
                       callback(true, map, null);
@@ -246,8 +296,7 @@ class CodeFController{
         }
       }else{
         CommonUtils.log('e', '[1] call api result with 2way error');
-        CommonUtils.flutterToast("추가인증 에러가 발생했습니다.");
-        callback(false, null, null);
+        callback(false, map, null);
       }
     });
   }
@@ -288,23 +337,39 @@ class CodeFController{
 
   static Future<void> _setAuthPop(BuildContext context, Apis apiInfo, Map<String, dynamic> resultInputMap,
       Function(bool isSuccess, Map<String,dynamic>? resultMap, List<dynamic>? resultListMap) callback) async {
-    UiUtils.showSlideMenu(context, SlideType.toTop, false, 0.0, (context, setState) =>
-        Column(mainAxisAlignment: MainAxisAlignment.center, children:
-        [UiUtils.getTextButtonBox(60.w, "인증 확인", TextStyles.slidePopButtonText, ColorStyles.finAppGreen, () async {
-          CodeFController.getDataFromApi(apiInfo, resultInputMap, (isSuccess, _, map, listMap){
-            if(isSuccess){
-              if(map != null){
-                callback(true, map, null);
-              }else{
-                callback(true, null, listMap);
-              }
-            }else{
-              callback(false, null, null);
-            }
-          });
-          Navigator.of(context).pop();
-        })])
-    );
+    UiUtils.showSlideMenu(context, SlideType.toTop, false, 0.0, (context, setState){
+      return Obx(()=>
+          Column(mainAxisAlignment: MainAxisAlignment.center, children:
+          [ GetController.to.isWait.value ? UiUtils.getTextWithFixedScale("정보를 가져오는 중입니다...", TextStyles.basicTextStyle, TextAlign.center, null) : UiUtils.getTextWithFixedScale("", TextStyles.basicTextStyle, TextAlign.center, null),
+            !GetController.to.isWait.value ?
+            UiUtils.getTextButtonBox(60.w, "인증 확인", TextStyles.slidePopButtonText, ColorStyles.finAppGreen, () async {
+              GetController.to.updateWait(true);
+              CodeFController._getDataFromApi(apiInfo, resultInputMap, (isSuccess, _, map, listMap){
+                GetController.to.updateWait(false);
+                if(isSuccess){
+                  if(map != null){
+                    if(map['result_code'] == "CF-03002"){
+                      CommonUtils.flutterToast("인증을 진행 해 주세요.");
+                    }else{
+                      Navigator.of(context).pop();
+                      callback(true, map, null);
+                    }
+                  }else{
+                    if(listMap?[0]['result_code'] == "CF-03002"){
+                      CommonUtils.flutterToast("인증을 진행 해 주세요.");
+                    }else{
+                      Navigator.of(context).pop();
+                      callback(true, null, listMap);
+                    }
+                  }
+                }else{
+                  Navigator.of(context).pop();
+                  callback(false, null, null);
+                }
+              });
+            }) : Container()])
+      );
+    });
   }
 
 

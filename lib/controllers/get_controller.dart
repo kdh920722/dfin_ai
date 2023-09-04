@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 class GetController extends GetxController {
   static GetController get to => Get.find();
   RxDouble counter = 0.0.obs;
+  RxBool isWait = false.obs;
 
   @override
   void onInit() {
@@ -37,5 +38,9 @@ class GetController extends GetxController {
 
   void updateCounter(double newValue) {
     counter.value = newValue;
+  }
+
+  void updateWait(bool newValue) {
+    isWait.value = newValue;
   }
 }
