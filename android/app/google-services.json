@@ -1,94 +1,34 @@
 {
   "project_info": {
-    "project_number": "31796873395",
-    "firebase_url": "https://soarkidz-8ac85-default-rtdb.firebaseio.com",
-    "project_id": "soarkidz-8ac85",
-    "storage_bucket": "soarkidz-8ac85.appspot.com"
+    "project_number": "121132222404",
+    "project_id": "upfin-6524b",
+    "storage_bucket": "upfin-6524b.appspot.com"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:31796873395:android:028d7b40fa2b75d66848c6",
+        "mobilesdk_app_id": "1:121132222404:android:4907f093c687294e4e0691",
         "android_client_info": {
-          "package_name": "com.example.flutterwebchat"
+          "package_name": "com.ysmeta.upfinai"
         }
       },
       "oauth_client": [
         {
-          "client_id": "31796873395-ejqq35r7mf3kv3jp4jpu08utj2418bqi.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.flutterwebchat",
-            "certificate_hash": "fc5a8190eaca3a3daf8710b9c2daf238b0535915"
-          }
-        },
-        {
-          "client_id": "31796873395-0gu6b53k3pkc6pc11cltcdjggarfjhkb.apps.googleusercontent.com",
+          "client_id": "121132222404-mk3dk3t760emd1eqq8smia83utf73dut.apps.googleusercontent.com",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDZgw-3_H_sli2Z5PHDIvmF2arw39jx8kA"
+          "current_key": "AIzaSyAyBc-0zaE3Acl3I9CjqA7vhIVT665T_q8"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "31796873395-0gu6b53k3pkc6pc11cltcdjggarfjhkb.apps.googleusercontent.com",
+              "client_id": "121132222404-mk3dk3t760emd1eqq8smia83utf73dut.apps.googleusercontent.com",
               "client_type": 3
-            },
-            {
-              "client_id": "31796873395-cggm7mn55jk1p5k95q6ddkedv0op00ej.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.flutterwebchat"
-              }
-            }
-          ]
-        }
-      }
-    },
-    {
-      "client_info": {
-        "mobilesdk_app_id": "1:31796873395:android:9e66f3988b3d95f56848c6",
-        "android_client_info": {
-          "package_name": "com.ysmeta.roamify"
-        }
-      },
-      "oauth_client": [
-        {
-          "client_id": "31796873395-bdvg4i9ag22o4fvua33qpi6eh39cb02v.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.ysmeta.roamify",
-            "certificate_hash": "86c4ef5bef7bc1c8180b44e0eabb34962999ea53"
-          }
-        },
-        {
-          "client_id": "31796873395-0gu6b53k3pkc6pc11cltcdjggarfjhkb.apps.googleusercontent.com",
-          "client_type": 3
-        }
-      ],
-      "api_key": [
-        {
-          "current_key": "AIzaSyDZgw-3_H_sli2Z5PHDIvmF2arw39jx8kA"
-        }
-      ],
-      "services": {
-        "appinvite_service": {
-          "other_platform_oauth_client": [
-            {
-              "client_id": "31796873395-0gu6b53k3pkc6pc11cltcdjggarfjhkb.apps.googleusercontent.com",
-              "client_type": 3
-            },
-            {
-              "client_id": "31796873395-cggm7mn55jk1p5k95q6ddkedv0op00ej.apps.googleusercontent.com",
-              "client_type": 2,
-              "ios_info": {
-                "bundle_id": "com.example.flutterwebchat"
-              }
             }
           ]
         }

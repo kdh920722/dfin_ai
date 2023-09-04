@@ -8,17 +8,13 @@ import '../views/certification_view.dart';
 import 'common_utils.dart';
 
 class UiUtils {
-  static Widget getMainView(BuildContext context, Widget mainView){
+  static Widget startAppView(){
     return Sizer(
       builder: (BuildContext context, Orientation orientation, DeviceType deviceType) {
-        print("rebuild");
         return MaterialApp(
+          theme: ThemeData(useMaterial3: true),
           initialRoute: AppView.rootView.value,
-          routes: {
-            AppView.rootView.value : (context) => mainView,
-            AppView.certificationView.value : (context) => CertificationView(),
-          },
-
+          routes: Config.appRoutes
         );
       },
     );

@@ -2,40 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <!-- firebase push setting -->
-    <key>NSLocalNetworkUsageDescription</key>
-    <string>We need push notifications to keep you updated.</string>
-
-    <!-- iamport certification setting -->
-    <key>NSAppTransportSecurity</key>
-       <dict>
-            <key>NSAllowsArbitraryLoadsInWebContent</key>
-            <true/>
-            <key>NSAllowsArbitraryLoads</key>
-            <true/>
-       </dict>
-
-    <!-- iamport certification result redirection url and deep link setting -->
-    <key>CFBundleURLTypes</key>
-        <array>
-    		<dict>
-    		    <key>CFBundleTypeRole</key>
-    			<string>Editor</string>
-    			<key>CFBundleURLName</key>
-                <string>deeplink.upcross.ai</string>
-    			<key>CFBundleURLSchemes</key>
-    			<array>
-    				<string>ysmeta</string>
-    			</array>
-    		</dict>
-    	</array>
-
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>Flutterwebchat</string>
+	<string>UpFin</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -43,20 +15,41 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>flutterwebchat</string>
+	<string>UpFin</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
-
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLName</key>
+			<string>ysmeta.upfin.ai</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>upfin</string>
+			</array>
+		</dict>
+	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+		<key>NSAllowsArbitraryLoadsInWebContent</key>
+		<true/>
+	</dict>
 	<key>NSCameraUsageDescription</key>
 	<string>Used to demonstrate image picker plugin</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>We need push notifications to keep you updated.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Used to capture audio for image picker plugin</string>
 	<key>NSPhotoLibraryUsageDescription</key>

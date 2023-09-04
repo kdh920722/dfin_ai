@@ -594,20 +594,6 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
     });
   }
 
-  void _certificationResultCheck(){
-    String resultMsg = "";
-    Object? result = ModalRoute.of(context)?.settings.arguments;
-    if(result != null){
-      bool isSuccess = IamportController.isCertificationResultSuccess(result as Map<String, String>);
-      if(isSuccess) {
-        resultMsg = "S";
-      } else {
-        resultMsg = "N";
-      }
-    }
-    inputTextController.text = resultMsg;
-  }
-
   @override
   Widget build(BuildContext context) {
     Widget? view;
@@ -619,7 +605,6 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
         view = UiUtils.getInitView();
       }else{
         _initUiValue();
-        _certificationResultCheck();
         view = AnimatedContainer(duration: const Duration(milliseconds: 100), width: 100.w, height: currentScreenHeight, color: ColorStyles.finAppWhite, child:Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
@@ -738,10 +723,14 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
                       _sendMessage(message);
                       */
                       }else if(inputTextController.text.trim() == ""){
-                        _sendMessage("");
+                        //_sendMessage("");
+                        Map<String, String> inputJson = {
+                          "url" : "www.google.com",
+                        };
+                        CommonUtils.moveTo(context, AppView.webView.value, inputJson);
                         /*
                       Map<String, String> inputJson = {
-                        "carrier": "MVNO",
+                        "carrier": "",
                         "name" : "김동환",
                         "phone" : "01054041099"
                       };

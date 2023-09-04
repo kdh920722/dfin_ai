@@ -1,7 +1,13 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutterwebchat/views/certification_result_view.dart';
+import 'package:flutterwebchat/views/in_app_web_view.dart';
 import 'dart:io';
 
 import 'package:permission_handler/permission_handler.dart';
+
+import '../views/certification_view.dart';
+import '../views/chat_view.dart';
 
 class Config{
   static bool isControllerLoadFinished = false;
@@ -13,10 +19,18 @@ class Config{
   static bool isAndroid = Platform.isAndroid;
   static String deppLinkInfo = "";
   static List<Permission> permissionList = [Permission.notification];
+
+  static Map<String, WidgetBuilder> appRoutes = {
+    AppView.rootView.value : (context) => ChatView(),
+    AppView.certificationView.value : (context) => CertificationView(),
+    AppView.certificationResultView.value : (context) => CertificationResultView(),
+    AppView.webView.value : (context) => InAppWebView()
+  };
+
 }
 
 enum AppView {
-  rootView, certificationView
+  rootView, certificationView, certificationResultView, webView
 }
 
 extension SAppViewExtension on AppView {
@@ -26,6 +40,10 @@ extension SAppViewExtension on AppView {
         return '/';
       case AppView.certificationView:
         return '/certification';
+      case AppView.certificationResultView:
+        return '/certificationResult';
+      case AppView.webView:
+        return '/webView';
     }
   }
 }

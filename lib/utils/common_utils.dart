@@ -246,6 +246,10 @@ class CommonUtils {
     return Future(() => false);
   }
 
+  static Future<bool> onWillPopForAllowBackButton(BuildContext? context){
+    return Future(() => true);
+  }
+
   static Future<bool> onWillPopForControlFinishApp(BuildContext? context) async {
     bool confirm = await showDialog(
       context: context!,

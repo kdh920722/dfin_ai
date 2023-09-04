@@ -30,7 +30,7 @@ class MyApp extends StatelessWidget {
       ));
     }
 
-    return UiUtils.getMainView(context, ChatView());
+    return UiUtils.startAppView();
   }
 }
 
