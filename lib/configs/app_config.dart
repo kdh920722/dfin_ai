@@ -1,11 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutterwebchat/views/certification_result_view.dart';
-import 'package:flutterwebchat/views/in_app_web_view.dart';
+import 'package:upfin/views/certification_result_view.dart';
+import 'package:upfin/views/in_app_web_view.dart';
 import 'dart:io';
-
 import 'package:permission_handler/permission_handler.dart';
-
 import '../views/certification_view.dart';
 import '../views/chat_view.dart';
 

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutterwebchat/controllers/iamport_controller.dart';
-import 'package:flutterwebchat/utils/common_utils.dart';
+import 'package:upfin/controllers/iamport_controller.dart';
+import 'package:upfin/utils/common_utils.dart';
 import '../utils/ui_utils.dart';
 
 class CertificationResultView extends StatelessWidget {

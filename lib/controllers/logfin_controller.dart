@@ -1,5 +1,5 @@
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutterwebchat/controllers/firebase_controller.dart';
+import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../configs/app_config.dart';
@@ -17,7 +17,7 @@ class LogfinController {
   static Future<void> initLogfin(Function(bool) callback) async {
     try {
       final ref = FirebaseDatabase.instance.ref();
-      final snapshot = await ref.child('WEBCHAT/API/logfin').get();
+      final snapshot = await ref.child('UPFIN/API/logfin').get();
       if (snapshot.exists) {
         for (var each in snapshot.children) {
           switch (each.key) {

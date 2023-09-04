@@ -17,7 +17,7 @@ class AwsController {
   static Future<void> initAWS(Function(bool isSuccess) callback) async{
     try{
       final ref = FirebaseDatabase.instance.ref();
-      final snapshot = await ref.child('WEBCHAT/API/aws').get();
+      final snapshot = await ref.child('UPFIN/API/aws').get();
       if (snapshot.exists) {
         for(var each in snapshot.children){
           switch(each.key){

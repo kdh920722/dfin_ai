@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutterwebchat/utils/common_utils.dart';
+import 'package:upfin/utils/common_utils.dart';
 import 'package:sizer/sizer.dart';
 
 class WebViewController {

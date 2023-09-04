@@ -2,7 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutterwebchat/configs/app_config.dart';
+import 'package:upfin/configs/app_config.dart';
 import '../configs/firebase_options.dart';
 import '../utils/common_utils.dart';
 
@@ -27,10 +27,10 @@ class FireBaseController{
   }
 
   /// firebase FCM =========================================================================== ///
-  static String channelIdForAndroid = "upcross_notification";
-  static String channelNameForAndroid = "upcross notification";
-  static String channelDescForAndroid = "upcross 알림";
-  static String channelTitleForIOS = "upcross 알림";
+  static String channelIdForAndroid = "upfin_notification";
+  static String channelNameForAndroid = "upfin notification";
+  static String channelDescForAndroid = "upfin 알림";
+  static String channelTitleForIOS = "upfin 알림";
 
   static Future<void> initFcm(Function(bool isSuccess, String fcmToken) callback) async {
     try{

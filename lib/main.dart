@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutterwebchat/configs/app_config.dart';
-import 'package:flutterwebchat/utils/ui_utils.dart';
+import 'package:upfin/configs/app_config.dart';
+import 'package:upfin/utils/ui_utils.dart';
 
 void main() async{
   // 화면 회전 제어

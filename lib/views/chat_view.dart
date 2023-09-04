@@ -1,22 +1,22 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
-import 'package:flutterwebchat/controllers/aws_controller.dart';
-import 'package:flutterwebchat/controllers/clova_controller.dart';
-import 'package:flutterwebchat/controllers/get_controller.dart';
+import 'package:upfin/controllers/aws_controller.dart';
+import 'package:upfin/controllers/clova_controller.dart';
+import 'package:upfin/controllers/get_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterwebchat/controllers/iamport_controller.dart';
-import 'package:flutterwebchat/controllers/logfin_controller.dart';
-import 'package:flutterwebchat/controllers/sharedpreference_controller.dart';
-import 'package:flutterwebchat/datas/api_info_data.dart';
+import 'package:upfin/controllers/iamport_controller.dart';
+import 'package:upfin/controllers/logfin_controller.dart';
+import 'package:upfin/controllers/sharedpreference_controller.dart';
+import 'package:upfin/datas/api_info_data.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sizer/sizer.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:flutterwebchat/controllers/gpt_controller.dart';
-import 'package:flutterwebchat/controllers/firebase_controller.dart';
-import 'package:flutterwebchat/styles/ColorStyles.dart';
+import 'package:upfin/controllers/gpt_controller.dart';
+import 'package:upfin/controllers/firebase_controller.dart';
+import 'package:upfin/styles/ColorStyles.dart';
 import 'package:uni_links/uni_links.dart';
 import '../controllers/codef_controller.dart';
 import '../observers/keyboard_observer.dart';
@@ -724,6 +724,7 @@ class ChatViewState extends State<ChatView> with WidgetsBindingObserver{
                       */
                       }else if(inputTextController.text.trim() == ""){
                         //_sendMessage("");
+
                         Map<String, String> inputJson = {
                           "url" : "www.google.com",
                         };

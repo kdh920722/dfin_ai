@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
-import 'package:flutterwebchat/controllers/get_controller.dart';
-import 'package:flutterwebchat/datas/api_info_data.dart';
+import 'package:upfin/controllers/get_controller.dart';
+import 'package:upfin/datas/api_info_data.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:http/http.dart' as http;
 import 'package:sizer/sizer.dart';

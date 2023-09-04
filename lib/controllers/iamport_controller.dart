@@ -1,10 +1,10 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutterwebchat/configs/app_config.dart';
-import 'package:flutterwebchat/styles/ColorStyles.dart';
-import 'package:flutterwebchat/styles/TextStyles.dart';
-import 'package:flutterwebchat/utils/ui_utils.dart';
+import 'package:upfin/configs/app_config.dart';
+import 'package:upfin/styles/ColorStyles.dart';
+import 'package:upfin/styles/TextStyles.dart';
+import 'package:upfin/utils/ui_utils.dart';
 import 'package:sizer/sizer.dart';
 import '../utils/common_utils.dart';
 import 'package:iamport_flutter/iamport_certification.dart';
@@ -21,7 +21,7 @@ class IamportController {
   static Future<void> initIamport(Function(bool) callback) async{
     try{
       final ref = FirebaseDatabase.instance.ref();
-      final snapshot = await ref.child('WEBCHAT/API/iamport/user_code').get();
+      final snapshot = await ref.child('UPFIN/API/iamport/user_code').get();
       if (snapshot.exists) {
         iamportUserCode =  snapshot.value.toString();
         callback(true);

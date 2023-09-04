@@ -16,7 +16,7 @@ class CLOVAController{
   static Future<void> initCLOVA(Function(bool) callback) async{
     try{
       final ref = FirebaseDatabase.instance.ref();
-      final snapshot = await ref.child('WEBCHAT/API/clova').get();
+      final snapshot = await ref.child('UPFIN/API/clova').get();
       if (snapshot.exists) {
         for(var each in snapshot.children){
           switch(each.key){
