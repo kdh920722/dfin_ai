@@ -4,7 +4,6 @@ import 'package:sizer/sizer.dart';
 import '../styles/ColorStyles.dart';
 import '../styles/TextStyles.dart';
 import '../configs/app_config.dart';
-import '../views/certification_view.dart';
 import 'common_utils.dart';
 
 class UiUtils {
@@ -61,11 +60,30 @@ class UiUtils {
     );
   }
 
-  static Text getTextWithFixedScale(String text, TextStyle textStyle, TextAlign? textAlign, int? textMaxLine){
+  static Text getStyledTextWithFixedScale(String text, TextStyle textStyle, TextAlign? textAlign, int? textMaxLine){
     return Text(text, style: textStyle,  textScaleFactor: 1.0, textAlign: textAlign, maxLines: textMaxLine);
   }
 
-  static SelectableText getSelectableTextWithFixedScale(String text, TextStyle textStyle, TextAlign? textAlign, int? textMaxLine){
+  static Text getTextWithFixedScale(String text, double fontSize, Color textColor, TextAlign? textAlign, int? textMaxLine){
+    return Text(text, style: TextStyle(fontSize: fontSize, color: textColor), textScaleFactor: 1.0, textAlign: textAlign, maxLines: textMaxLine);
+  }
+
+  static Widget getBorderTextWithFixedScale(String text, double fontSize, TextAlign? textAlign, Color borderColor, Color textColor){
+    return Container(padding: const EdgeInsets.all(2.0), // 텍스트 주위에 여백 추가
+      decoration: BoxDecoration(border: Border.all(color: borderColor,width: 2.0), borderRadius: BorderRadius.circular(2.0)),
+      child: Text(text, style: TextStyle(fontSize: fontSize)));
+  }
+
+  static Widget getBoxTextWithFixedScale(String text, double fontSize, TextAlign? textAlign, Color boxColor, Color textColor){
+    return Container(color: boxColor, child: FittedBox(fit: BoxFit.contain, alignment: Alignment.center,
+    child: Padding(padding: const EdgeInsets.only(left: 6.0, right: 6.0, bottom: 2.0, top: 2.0), child: Text(text, style: TextStyle(fontSize: fontSize)))));
+  }
+
+  static SelectableText getSelectableTextWithFixedScale(String text, double fontSize, Color textColor, TextAlign? textAlign, int? textMaxLine){
+    return SelectableText(text, style: TextStyle(fontSize: fontSize, color: textColor), textScaleFactor: 1.0, textAlign: textAlign, maxLines: textMaxLine);
+  }
+
+  static SelectableText getSelectableStyledTextWithFixedScale(String text, TextStyle textStyle, TextAlign? textAlign, int? textMaxLine){
     return SelectableText(text, style: textStyle,  textScaleFactor: 1.0, textAlign: textAlign, maxLines: textMaxLine);
   }
 
@@ -74,7 +92,7 @@ class UiUtils {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[Container(padding: const EdgeInsets.only(bottom: 3),
           decoration: BoxDecoration(border: Border(bottom: BorderSide(color: underlineColor, width: 0.5.w))),
-          child: GestureDetector(onTap: onPressedCallback, child: getTextWithFixedScale(text,textStyle,null,null)))]);
+          child: GestureDetector(onTap: onPressedCallback, child: getStyledTextWithFixedScale(text,textStyle,null,null)))]);
   }
 
   static SizedBox getMarginBox(double marginWidth, double marginHeight){
@@ -92,8 +110,8 @@ class UiUtils {
             elevation: 5,
             shadowColor: Colors.grey,
           ),
-          icon: Icon(icon, color: ColorStyles.finAppWhite, size: 25.sp),
-          label: getTextWithFixedScale(buttonText,buttonTextStyles,null,null),
+          icon: Icon(icon, color: ColorStyles.upFinWhite, size: 25.sp),
+          label: getStyledTextWithFixedScale(buttonText,buttonTextStyles,null,null),
           onPressed: onPressedCallback,
         )
     );
@@ -111,7 +129,7 @@ class UiUtils {
             shadowColor: Colors.grey,
           ),
           onPressed: onPressedCallback,
-          child: Icon(icon, color: ColorStyles.finAppWhite, size: 16.sp)
+          child: Icon(icon, color: ColorStyles.upFinWhite, size: 16.sp)
         )
     );
   }
@@ -129,7 +147,7 @@ class UiUtils {
           onPressed: onPressedCallback,
           child: Padding(
             padding: const EdgeInsets.all(15.0),
-            child: getTextWithFixedScale(buttonText,buttonTextStyles,TextAlign.center,null)
+            child: getStyledTextWithFixedScale(buttonText,buttonTextStyles,TextAlign.center,null)
           ),
         )
     );
@@ -146,7 +164,7 @@ class UiUtils {
           onPressed: onPressedCallback,
           child: Padding(
             padding: const EdgeInsets.all(12.0),
-            child: getTextWithFixedScale(buttonText,TextStyles.countDownButtonStyle,TextAlign.center,null)
+            child: getStyledTextWithFixedScale(buttonText,TextStyles.countDownButtonStyle,TextAlign.center,null)
           ),
         )
     );
@@ -163,7 +181,7 @@ class UiUtils {
             onPressed: onPressedCallback,
             child: Padding(
               padding: const EdgeInsets.all(15.0),
-              child: getTextWithFixedScale(buttonText, TextStyles.buttonTextStyle, TextAlign.center, null)
+              child: getStyledTextWithFixedScale(buttonText, TextStyles.buttonTextStyle, TextAlign.center, null)
             ),
           )
       );
@@ -177,7 +195,7 @@ class UiUtils {
             onPressed: () { },
             child: Padding(
               padding: const EdgeInsets.all(15.0),
-              child: getTextWithFixedScale(buttonText, TextStyles.buttonTextStyle, TextAlign.center, null)
+              child: getStyledTextWithFixedScale(buttonText, TextStyles.buttonTextStyle, TextAlign.center, null)
             ),
           )
       );
@@ -185,11 +203,11 @@ class UiUtils {
   }
 
   static Text getTitle(String titleText){
-    return getTextWithFixedScale(titleText, TextStyles.titleTextStyle, TextAlign.start, null);
+    return getStyledTextWithFixedScale(titleText, TextStyles.titleTextStyle, TextAlign.start, null);
   }
 
   static Text getSubTitle(String titleText){
-    return getTextWithFixedScale(titleText, TextStyles.subTitleTextStyle, TextAlign.start, null);
+    return getStyledTextWithFixedScale(titleText, TextStyles.subTitleTextStyle, TextAlign.start, null);
   }
 
   static InputDecoration getInputDecorationWithNoErrorMessage(String labelText){
@@ -210,7 +228,7 @@ class UiUtils {
           borderSide: const BorderSide(color: Colors.redAccent),
         ),
         filled: true,
-        fillColor: ColorStyles.finAppWhite
+        fillColor: ColorStyles.upFinWhite
     );
   }
 
@@ -254,7 +272,7 @@ class UiUtils {
       builder: (_) {
         return Dialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          backgroundColor: ColorStyles.finAppWhite,
+          backgroundColor: ColorStyles.upFinWhite,
           insetPadding: const EdgeInsets.all(10),
           child: StatefulBuilder(
             builder: (__, StateSetter popViewSetState){
@@ -317,7 +335,7 @@ class UiUtils {
               width: popWidth,
               height: popHeight,
               decoration: BoxDecoration(
-                color: ColorStyles.finAppWhite,
+                color: ColorStyles.upFinWhite,
                 borderRadius: borderRadius,
               ),
               child: SizedBox.expand(
@@ -391,8 +409,8 @@ class UiUtils {
     );
   }
 
-  static Widget getInitView() {
-    return Container(color: Colors.black38, child: Center(child: getTextWithFixedScale("잠시만 기다려 주세요..", TextStyles.initTextStyle, TextAlign.center, null)));
+  static Widget getInitLoadingView() {
+    return Container(color: ColorStyles.upFinWhite, child: Center(child: getStyledTextWithFixedScale("잠시만 기다려 주세요..", TextStyles.initTextStyle, TextAlign.center, null)));
   }
 
 

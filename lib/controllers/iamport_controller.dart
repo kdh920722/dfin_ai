@@ -1,5 +1,4 @@
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:upfin/configs/app_config.dart';
 import 'package:upfin/styles/ColorStyles.dart';
@@ -95,8 +94,8 @@ class IamportController {
       buttonColor = Colors.redAccent;
     }
 
-    return Container(color: ColorStyles.finAppWhite, width : 100.w, height: 100.h, child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      UiUtils.getTextWithFixedScale(text, TextStyles.basicTextStyle, TextAlign.center, null),
+    return Container(color: ColorStyles.upFinWhite, width : 100.w, height: 100.h, child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+      UiUtils.getStyledTextWithFixedScale(text, TextStyles.basicTextStyle, TextAlign.center, null),
       UiUtils.getMarginBox(0, 2.h),
       UiUtils.getTextButtonBox(80.w, "확인", TextStyles.buttonTextStyle, buttonColor, () {
         Navigator.pop(parentViewContext);

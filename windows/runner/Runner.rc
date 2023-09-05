@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "flutterwebchat" "\0"
+            VALUE "FileDescription", "upfin" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "flutterwebchat" "\0"
+            VALUE "InternalName", "upfin" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2023 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "flutterwebchat.exe" "\0"
-            VALUE "ProductName", "flutterwebchat" "\0"
+            VALUE "OriginalFilename", "upfin.exe" "\0"
+            VALUE "ProductName", "upfin" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

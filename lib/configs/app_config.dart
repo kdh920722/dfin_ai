@@ -5,7 +5,7 @@ import 'package:upfin/views/in_app_web_view.dart';
 import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
 import '../views/certification_view.dart';
-import '../views/chat_view.dart';
+import '../views/app_start.dart';
 
 class Config{
   static bool isControllerLoadFinished = false;
@@ -19,7 +19,7 @@ class Config{
   static List<Permission> permissionList = [Permission.notification];
 
   static Map<String, WidgetBuilder> appRoutes = {
-    AppView.rootView.value : (context) => ChatView(),
+    AppView.rootView.value : (context) => AppStartView(),
     AppView.certificationView.value : (context) => CertificationView(),
     AppView.certificationResultView.value : (context) => CertificationResultView(),
     AppView.webView.value : (context) => InAppWebView()

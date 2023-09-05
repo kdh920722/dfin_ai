@@ -340,7 +340,7 @@ class CodeFController{
     UiUtils.showSlideMenu(context, SlideType.toTop, false, 0.0, (context, setState){
       return Obx(()=>
           Column(mainAxisAlignment: MainAxisAlignment.center, children:
-          [ GetController.to.isWait.value ? UiUtils.getTextWithFixedScale("정보를 가져오는 중입니다...", TextStyles.basicTextStyle, TextAlign.center, null) : UiUtils.getTextWithFixedScale("", TextStyles.basicTextStyle, TextAlign.center, null),
+          [ GetController.to.isWait.value ? UiUtils.getStyledTextWithFixedScale("정보를 가져오는 중입니다...", TextStyles.basicTextStyle, TextAlign.center, null) : UiUtils.getStyledTextWithFixedScale("", TextStyles.basicTextStyle, TextAlign.center, null),
             !GetController.to.isWait.value ?
             UiUtils.getTextButtonBox(60.w, "인증 확인", TextStyles.slidePopButtonText, ColorStyles.finAppGreen, () async {
               GetController.to.updateWait(true);
