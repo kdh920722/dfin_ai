@@ -43,7 +43,7 @@ class LogfinController {
       targetUrl = url+api.value;
     }
 
-    if(api == LogfinApis.signIn || api == LogfinApis.signUp){
+    if(api == LogfinApis.signIn || api == LogfinApis.signUp || api == LogfinApis.socialLogin){
       inputJson['fcm_token'] = FireBaseController.fcmToken;
     }
 

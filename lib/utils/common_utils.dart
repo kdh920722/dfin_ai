@@ -214,6 +214,11 @@ class CommonUtils {
     await Navigator.of(fromContext).pushNamed(toRoute, arguments: arguments);
   }
 
+  static Future<Object?> moveToWithResult(BuildContext fromContext, String toRoute, Object? arguments) async {
+    final result = await Navigator.of(fromContext).pushNamed(toRoute, arguments: arguments);
+    return result;
+  }
+
   static Future<void> moveWithReplacementTo(BuildContext fromContext, String toRoute, Object? arguments) async {
     await Navigator.of(fromContext).pushReplacementNamed(toRoute, arguments: arguments);
   }

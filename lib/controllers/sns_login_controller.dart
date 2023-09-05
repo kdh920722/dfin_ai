@@ -29,6 +29,8 @@ class SnsLoginController{
   static Future<void> initKakao(Function(bool) callback) async {
     try {
       KakaoSdk.init(nativeAppKey: kakaoKey);
+      var key = await KakaoSdk.origin;
+      CommonUtils.log("I", "kakao init hash key : $key");
       loginPlatform = LoginPlatform.kakao;
       callback(true);
     } catch (e) {
@@ -49,48 +51,51 @@ class SnsLoginController{
         '\nid: ${user.id}');
   }
 
-  static Future<void> kakaoLogin() async {
-    if (await AuthApi.instance.hasToken()) {
-      try {
-        // 카카오계정으로 로그인
-        OAuthToken token;
-        if (await isKakaoTalkInstalled()) {
-          try {
-            token = await UserApi.instance.loginWithKakaoTalk();
-            await _getKakaoAgree();
-            kakaoToken = token.accessToken;
-            CommonUtils.log("i", '카카오계정으로 로그인 성공 ${token.accessToken}');
-          } catch (error) {
-            if (error is PlatformException && error.code == 'CANCELED') {
-              CommonUtils.flutterToast("카카오톡 로그인 중 오류가 발생했습니다.");
-              CommonUtils.log("i", '카카오톡으로 로그인 실패 $error');
-              return;
-            }
-            // 카카오톡에 연결된 카카오계정이 없는 경우, 카카오계정으로 로그인
-            try {
-              token = await UserApi.instance.loginWithKakaoAccount();
-              await _getKakaoAgree();
-              kakaoToken = token.accessToken;
-              CommonUtils.log("i", '카카오계정으로 로그인 성공 ${token.accessToken}');
-            } catch (error) {
-              CommonUtils.log("i", '카카오계정으로 로그인 실패 $error');
-            }
+  static Future<void> kakaoLogin(Function(bool) callback) async {
+    try {
+      // 카카오계정으로 로그인
+      OAuthToken token;
+      if (await isKakaoTalkInstalled()) {
+        try {
+          token = await UserApi.instance.loginWithKakaoTalk();
+          await _getKakaoAgree();
+          kakaoToken = token.accessToken;
+          CommonUtils.log("i", '카카오계정으로 로그인 성공 ${token.accessToken}');
+          callback(true);
+        } catch (error) {
+          if (error is PlatformException && error.code == 'CANCELED') {
+            CommonUtils.flutterToast("카카오톡 로그인 중 오류가 발생했습니다.");
+            CommonUtils.log("e", '카카오톡으로 로그인 실패 $error');
+            callback(false);
+            return;
           }
-        } else {
+          // 카카오톡에 연결된 카카오계정이 없는 경우, 카카오계정으로 로그인
           try {
             token = await UserApi.instance.loginWithKakaoAccount();
             await _getKakaoAgree();
             kakaoToken = token.accessToken;
             CommonUtils.log("i", '카카오계정으로 로그인 성공 ${token.accessToken}');
+            callback(true);
           } catch (error) {
-            CommonUtils.log("i", '카카오계정으로 로그인 실패 $error');
+            CommonUtils.log("e", '카카오계정으로 로그인 실패 $error');
+            callback(false);
           }
         }
-      } catch (error) {
-        CommonUtils.log("e",'로그인 실패 $error');
+      } else {
+        try {
+          token = await UserApi.instance.loginWithKakaoAccount();
+          await _getKakaoAgree();
+          kakaoToken = token.accessToken;
+          CommonUtils.log("i", '카카오계정으로 로그인 성공 ${token.accessToken}');
+          callback(true);
+        } catch (error) {
+          CommonUtils.log("e", '카카오계정으로 로그인 실패 $error');
+          callback(false);
+        }
       }
-    } else {
-      CommonUtils.log("i",'발급된 토큰 없음');
+    } catch (error) {
+      CommonUtils.log("e",'로그인 실패 $error');
+      callback(false);
     }
   }
 

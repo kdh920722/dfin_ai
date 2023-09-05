@@ -1,25 +1,14 @@
-import 'dart:async';
-import 'package:upfin/configs/text_config.dart';
-import 'package:upfin/controllers/aws_controller.dart';
-import 'package:upfin/controllers/clova_controller.dart';
 import 'package:upfin/controllers/get_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:upfin/controllers/iamport_controller.dart';
-import 'package:upfin/controllers/logfin_controller.dart';
-import 'package:upfin/controllers/sharedpreference_controller.dart';
 import 'package:get/get.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:sizer/sizer.dart';
-import 'package:upfin/controllers/gpt_controller.dart';
-import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
-import 'package:uni_links/uni_links.dart';
-import '../controllers/codef_controller.dart';
 import '../styles/TextStyles.dart';
 import '../configs/app_config.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
 class AppSignUpView extends StatefulWidget{
   @override
@@ -33,12 +22,22 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
   final _pwdConfirmTextController = TextEditingController();
   final _loanWantPriceTextController = TextEditingController();
 
+  KeyboardVisibilityController? _keyboardVisibilityController;
+  void _functionForKeyboardHide(){
+    CommonUtils.log("i", "HIDE");
+    _scrollController.jumpTo(0);
+  }
+  void _functionForKeyboardShow(){
+    CommonUtils.log("i", "SHOW");
+  }
+
   @override
   void initState(){
     CommonUtils.log("i", "새 화면 입장");
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _loanWantPriceTextController.addListener(_formatInputValue);
+    _keyboardVisibilityController = CommonUtils.getKeyboardViewController(_functionForKeyboardShow, _functionForKeyboardHide);
   }
 
   @override
@@ -46,6 +45,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
     CommonUtils.log("i", "새 화면 파괴");
     WidgetsBinding.instance.removeObserver(this);
     _loanWantPriceTextController.dispose();
+    _keyboardVisibilityController = null;
     super.dispose();
   }
 
@@ -108,7 +108,9 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                           "name" : MyData.name,
                           "phone" : MyData.phoneNumber
                         };
-                        await CommonUtils.moveTo(context, AppView.certificationView.value, inputJson);
+                        var result = await CommonUtils.moveToWithResult(context, AppView.certificationView.value, inputJson);
+                        CommonUtils.log("i","${result as bool}");
+                        MyData.confirmed = result as bool;
                         if(MyData.confirmed) {
                           CommonUtils.flutterToast("인증 성공");
                         }else{
@@ -120,7 +122,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                     const EdgeInsets.only(left: 10, right: 10, top: 21, bottom: 21), ColorStyles.upFinGray, () {})))
               ])),
               UiUtils.getMarginBox(0, 4.h),
-              UiUtils.getTextFormField(80.w, _pwdTextController, TextInputType.emailAddress, UiUtils.getInputDecoration("비밀번호", ""), (text) { }, (value){
+              UiUtils.getTextFormField(80.w, _pwdTextController, TextInputType.visiblePassword, true, UiUtils.getInputDecoration("비밀번호", ""), (text) { }, (value){
                 if(value != null && value.trim().isEmpty){
                   return "비밀번호를 입력하세요.";
                 }else{
@@ -128,7 +130,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                 }
               }),
               UiUtils.getMarginBox(0, 2.h),
-              UiUtils.getTextFormField(80.w, _pwdConfirmTextController, TextInputType.emailAddress, UiUtils.getInputDecoration("비밀번호 확인", ""), (text) { }, (value){
+              UiUtils.getTextFormField(80.w, _pwdConfirmTextController, TextInputType.visiblePassword, true, UiUtils.getInputDecoration("비밀번호 확인", ""), (text) { }, (value){
                 if(value != null && value.trim().isEmpty){
                   return "비밀번호를 한번 더 입력하세요.";
                 }else{
@@ -140,7 +142,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                 }
               }),
               UiUtils.getMarginBox(0, 2.h),
-              Obx(()=>UiUtils.getTextFormField(80.w, _loanWantPriceTextController, TextInputType.number,
+              Obx(()=>UiUtils.getTextFormField(80.w, _loanWantPriceTextController, TextInputType.number, false,
                   UiUtils.getInputDecoration("대출희망금액(단위:만원)", GetController.to.wantLoanPrice.value),
                   (text) {
                      if(text.trim() != ""){
@@ -156,17 +158,16 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                       return null;
                     }
               })),
-              UiUtils.getMarginBox(0, 2.h),
+              UiUtils.getMarginBox(0, 10.h),
               UiUtils.getTextButtonBox(80.w, "네 맞아요!", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
                 if(_formKey.currentState!.validate() && MyData.confirmed){
-
+                  CommonUtils.log("i", "OK");
                 }
               })
             ])
           )
         ]),
     );
-
 
     return UiUtils.getViewWithScroll(context, view, _scrollController, CommonUtils.onWillPopForPreventBackButton);
   }

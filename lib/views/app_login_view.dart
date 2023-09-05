@@ -28,7 +28,6 @@ class AppLoginView extends StatefulWidget{
 }
 
 class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
-  final ScrollController _scrollController = ScrollController();
 
   Future<void> _initFirebase() async {
     // init
@@ -271,7 +270,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
       }else{
         view = Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: const EdgeInsets.all(20.0),
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              UiUtils.getMarginBox(0, 10.h),
+              UiUtils.getMarginBox(0, 15.h),
               UiUtils.getBorderTextWithFixedScale("업핀", 55.sp, FontWeight.w800, TextAlign.center, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinTextAndBorderBlue),
               UiUtils.getTextWithFixedScale("나에게 꼭 맞는\n개인회생 대출상품", 28.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
               Row(children: [
@@ -279,20 +278,26 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
                 UiUtils.getMarginBox(1.w, 0),
                 UiUtils.getTextWithFixedScale("접수하세요!", 28.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
               ]),
-              UiUtils.getMarginBox(0, 10.h),
+              UiUtils.getMarginBox(0, 15.h),
               Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                 Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
                   UiUtils.getTextButtonBox(80.w, "카카오 로그인", TextStyles.upFinKakaoButtonTextStyle, ColorStyles.upFinKakaoYellow, () async {
                     UiUtils.showLoadingPop(context);
-                    await SnsLoginController.kakaoLogin();
-                    if(context.mounted){
+                    await SnsLoginController.kakaoLogin((bool isSuccess) async {
                       UiUtils.closeLoadingPop(context);
-                      if(await isMember()){
+                      if(isSuccess){
+                        if(await isMember()){
 
+                        }else{
+                          if(context.mounted){
+                            CommonUtils.moveWithReplacementTo(context, AppView.signupView.value, null);
+                          }
+                        }
                       }else{
-                        CommonUtils.moveWithReplacementTo(context, AppView.signupView.value, null);
+                        CommonUtils.flutterToast("${SnsLoginController.loginPlatform.value}로그인에 실패했습니다.");
                       }
-                    }
+                    });
+
                   })
                 ])
               ]),
@@ -304,14 +309,14 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
                   })
                 ])
               ]),
-              UiUtils.getMarginBox(0, 3.h),
-              UiUtils.getSizedScrollView(null, 8.h, Axis.vertical, UiUtils.getTextWithFixedScale(TextConfig.appStartViewIntroText, 10.sp, FontWeight.w300, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null))
+              UiUtils.getMarginBox(0, 5.h),
+              UiUtils.getExpandedScrollView(Axis.vertical, UiUtils.getTextWithFixedScale(TextConfig.appStartViewIntroText, 10.sp, FontWeight.w300, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null))
             ])
         );
       }
     }
 
-    return UiUtils.getViewWithScroll(context, view, _scrollController, CommonUtils.onWillPopForPreventBackButton);
+    return UiUtils.getView(context, view, CommonUtils.onWillPopForPreventBackButton);
   }
 
 }

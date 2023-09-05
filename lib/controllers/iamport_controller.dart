@@ -14,7 +14,6 @@ class IamportController {
   factory IamportController() => _instance;
   IamportController._internal();
 
-  static final telTypeList = ['SKT', 'KT', 'LGU+', 'MVNO'];
   static String iamportUserCode = "";
 
   static Future<void> initIamport(Function(bool) callback) async{
@@ -34,9 +33,6 @@ class IamportController {
   }
 
   static bool isCertificationResultSuccess(Map<String, String> result) {
-    if (result['imp_success'] == 'true') {
-      return true;
-    }
     if (result['success'] == 'true') {
       return true;
     }
@@ -72,35 +68,10 @@ class IamportController {
       ),
       callback: (Map<String, String> result) {
         CommonUtils.log('i', 'result : ${result.toString()}');
-        if(result['error_code'] == "F0000"){
-          Navigator.pop(parentViewContext);
-        }else{
-          MyData.confirmed = IamportController.isCertificationResultSuccess(result);
-          Navigator.pop(parentViewContext);
-        }
+        bool isSuccess = IamportController.isCertificationResultSuccess(result);
+        CommonUtils.log('i', 'isSuccess : ${isSuccess}');
+        Navigator.pop(parentViewContext, isSuccess);
       },
     );
   }
-
-  static Widget getCertificationResultView(BuildContext parentViewContext, bool isSuccess){
-    String text = "인증 완료 되었습니다.";
-    Color buttonColor = ColorStyles.upFinTextAndBorderBlue;
-
-    if(isSuccess){
-      MyData.confirmed = true;
-    }else{
-      MyData.confirmed = false;
-      text = "인증 실패 하였습니다.";
-      buttonColor = ColorStyles.upFinRed;
-    }
-
-    return Container(color: ColorStyles.upFinWhite, width : 100.w, height: 100.h, child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      UiUtils.getStyledTextWithFixedScale(text, TextStyles.upFinBasicTextStyle, TextAlign.center, null),
-      UiUtils.getMarginBox(0, 2.h),
-      UiUtils.getTextButtonBox(80.w, "확인", TextStyles.upFinBasicButtonTextStyle, buttonColor, () {
-        Navigator.pop(parentViewContext);
-      })
-    ]));
-  }
-
 }

@@ -5,6 +5,7 @@ import '../styles/ColorStyles.dart';
 import '../styles/TextStyles.dart';
 import '../configs/app_config.dart';
 import 'common_utils.dart';
+import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
 class UiUtils {
   static Widget startAppView(){
@@ -236,6 +237,10 @@ class UiUtils {
     return container!;
   }
 
+  static Widget getExpandedScrollView(Axis scrollDir, Widget scrollChildView){
+    return Expanded(child: SingleChildScrollView(scrollDirection: scrollDir, physics: const BouncingScrollPhysics(), child: scrollChildView));
+  }
+
   static Text getTitle(String titleText){
     return getStyledTextWithFixedScale(titleText, TextStyles.titleTextStyle, TextAlign.start, null);
   }
@@ -254,9 +259,9 @@ class UiUtils {
         child: TextField(cursorColor: ColorStyles.upFinBlack, controller: textEditingController, keyboardType: textInputType, decoration: inputDecoration, onChanged: onChangedCallback));
   }
 
-  static Widget getTextFormField(double width, TextEditingController textEditingController, TextInputType textInputType, InputDecoration inputDecoration,
+  static Widget getTextFormField(double width, TextEditingController textEditingController, TextInputType textInputType, bool isPwd, InputDecoration inputDecoration,
       ValueChanged<String> onChangedCallback, FormFieldValidator<String> validatorCallback){
-    return SizedBox(width: width, child: TextFormField(cursorColor: ColorStyles.upFinBlack, controller: textEditingController, keyboardType: textInputType, decoration: inputDecoration,
+    return SizedBox(width: width, child: TextFormField(obscureText : isPwd, cursorColor: ColorStyles.upFinBlack, controller: textEditingController, keyboardType: textInputType, decoration: inputDecoration,
             onChanged: onChangedCallback, validator: validatorCallback));
   }
 
