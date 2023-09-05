@@ -5,6 +5,8 @@ class GetController extends GetxController {
   static GetController get to => Get.find();
   RxDouble counter = 0.0.obs;
   RxBool isWait = false.obs;
+  RxBool isConfirmed = false.obs;
+  RxString wantLoanPrice = "만원".obs;
 
   @override
   void onInit() {
@@ -42,5 +44,13 @@ class GetController extends GetxController {
 
   void updateWait(bool newValue) {
     isWait.value = newValue;
+  }
+
+  void updateConfirmed(bool newValue) {
+    isConfirmed.value = newValue;
+  }
+
+  void updateWantLoanPrice(String newValue) {
+    wantLoanPrice.value = newValue;
   }
 }

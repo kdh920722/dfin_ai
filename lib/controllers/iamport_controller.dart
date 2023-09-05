@@ -1,6 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:upfin/configs/app_config.dart';
+import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import 'package:upfin/styles/TextStyles.dart';
 import 'package:upfin/utils/ui_utils.dart';
@@ -75,11 +75,8 @@ class IamportController {
         if(result['error_code'] == "F0000"){
           Navigator.pop(parentViewContext);
         }else{
-          Navigator.pushReplacementNamed(
-            parentViewContext,
-            AppView.certificationResultView.value,
-            arguments: result,
-          );
+          MyData.confirmed = IamportController.isCertificationResultSuccess(result);
+          Navigator.pop(parentViewContext);
         }
       },
     );
@@ -87,17 +84,20 @@ class IamportController {
 
   static Widget getCertificationResultView(BuildContext parentViewContext, bool isSuccess){
     String text = "인증 완료 되었습니다.";
-    Color buttonColor = ColorStyles.finAppGreen;
+    Color buttonColor = ColorStyles.upFinTextAndBorderBlue;
 
-    if(!isSuccess){
+    if(isSuccess){
+      MyData.confirmed = true;
+    }else{
+      MyData.confirmed = false;
       text = "인증 실패 하였습니다.";
-      buttonColor = Colors.redAccent;
+      buttonColor = ColorStyles.upFinRed;
     }
 
     return Container(color: ColorStyles.upFinWhite, width : 100.w, height: 100.h, child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-      UiUtils.getStyledTextWithFixedScale(text, TextStyles.basicTextStyle, TextAlign.center, null),
+      UiUtils.getStyledTextWithFixedScale(text, TextStyles.upFinBasicTextStyle, TextAlign.center, null),
       UiUtils.getMarginBox(0, 2.h),
-      UiUtils.getTextButtonBox(80.w, "확인", TextStyles.buttonTextStyle, buttonColor, () {
+      UiUtils.getTextButtonBox(80.w, "확인", TextStyles.upFinBasicButtonTextStyle, buttonColor, () {
         Navigator.pop(parentViewContext);
       })
     ]));

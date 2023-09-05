@@ -64,23 +64,23 @@ class UiUtils {
     return Text(text, style: textStyle,  textScaleFactor: 1.0, textAlign: textAlign, maxLines: textMaxLine);
   }
 
-  static Text getTextWithFixedScale(String text, double fontSize, Color textColor, TextAlign? textAlign, int? textMaxLine){
-    return Text(text, style: TextStyle(fontSize: fontSize, color: textColor), textScaleFactor: 1.0, textAlign: textAlign, maxLines: textMaxLine);
+  static Text getTextWithFixedScale(String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign? textAlign, int? textMaxLine){
+    return Text(text, style: TextStyle(fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor), textScaleFactor: 1.0, textAlign: textAlign, maxLines: textMaxLine);
   }
 
-  static Widget getBorderTextWithFixedScale(String text, double fontSize, TextAlign? textAlign, Color borderColor, Color textColor){
-    return Container(padding: const EdgeInsets.all(2.0), // 텍스트 주위에 여백 추가
-      decoration: BoxDecoration(border: Border.all(color: borderColor,width: 2.0), borderRadius: BorderRadius.circular(2.0)),
-      child: Text(text, style: TextStyle(fontSize: fontSize)));
+  static Widget getBorderTextWithFixedScale(String text, double fontSize, FontWeight fontWeight, TextAlign? textAlign, Color borderColor, Color textColor){
+    return Container(padding: const EdgeInsets.all(0.2), // 텍스트 주위에 여백 추가
+      decoration: BoxDecoration(border: Border.all(color: borderColor, width: 2.0), borderRadius: BorderRadius.circular(2.0)),
+      child: Text(text, style: TextStyle(fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor)));
   }
 
-  static Widget getBoxTextWithFixedScale(String text, double fontSize, TextAlign? textAlign, Color boxColor, Color textColor){
+  static Widget getBoxTextWithFixedScale(String text, double fontSize, FontWeight fontWeight, TextAlign? textAlign, Color boxColor, Color textColor){
     return Container(color: boxColor, child: FittedBox(fit: BoxFit.contain, alignment: Alignment.center,
-    child: Padding(padding: const EdgeInsets.only(left: 6.0, right: 6.0, bottom: 2.0, top: 2.0), child: Text(text, style: TextStyle(fontSize: fontSize)))));
+    child: Padding(padding: const EdgeInsets.only(left: 6.0, right: 6.0, bottom: 2.0, top: 2.0), child: Text(text, style: TextStyle(fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor)))));
   }
 
-  static SelectableText getSelectableTextWithFixedScale(String text, double fontSize, Color textColor, TextAlign? textAlign, int? textMaxLine){
-    return SelectableText(text, style: TextStyle(fontSize: fontSize, color: textColor), textScaleFactor: 1.0, textAlign: textAlign, maxLines: textMaxLine);
+  static SelectableText getSelectableTextWithFixedScale(String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign? textAlign, int? textMaxLine){
+    return SelectableText(text, style: TextStyle(fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor), textScaleFactor: 1.0, textAlign: textAlign, maxLines: textMaxLine);
   }
 
   static SelectableText getSelectableStyledTextWithFixedScale(String text, TextStyle textStyle, TextAlign? textAlign, int? textMaxLine){
@@ -140,14 +140,34 @@ class UiUtils {
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: buttonColor,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            elevation: 5,
-            shadowColor: Colors.grey,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+            elevation: 3,
+            shadowColor: ColorStyles.upFinGray,
           ),
           onPressed: onPressedCallback,
           child: Padding(
-            padding: const EdgeInsets.all(15.0),
+            padding: const EdgeInsets.all(10.0),
             child: getStyledTextWithFixedScale(buttonText,buttonTextStyles,TextAlign.center,null)
+          ),
+        )
+    );
+  }
+
+  static SizedBox getTextCustomPaddingButtonBox(double buttonWidth, String buttonText, TextStyle buttonTextStyles,
+      EdgeInsets edgeInsets, Color buttonColor, VoidCallback onPressedCallback) {
+    return SizedBox(
+        width: buttonWidth,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: buttonColor,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+            elevation: 3,
+            shadowColor: ColorStyles.upFinGray,
+          ),
+          onPressed: onPressedCallback,
+          child: Padding(
+              padding: edgeInsets,
+              child: getStyledTextWithFixedScale(buttonText,buttonTextStyles,TextAlign.center,null)
           ),
         )
     );
@@ -202,6 +222,20 @@ class UiUtils {
     }
   }
 
+  static Widget getSizedScrollView(double? scrollWidth, double? scrollHeight, Axis scrollDir, Widget scrollChildView){
+    Widget? container;
+    if(scrollWidth != null && scrollHeight != null){
+      container = SizedBox(width: scrollWidth, height: scrollHeight, child: SingleChildScrollView(scrollDirection: scrollDir, physics: const BouncingScrollPhysics(), child: scrollChildView));
+    }else{
+      if(scrollWidth == null){
+        container = SizedBox(height: scrollHeight, child: SingleChildScrollView(scrollDirection: scrollDir, physics: const BouncingScrollPhysics(), child: scrollChildView));
+      }else if(scrollHeight == null){
+        container = SizedBox(width: scrollWidth, child: SingleChildScrollView(scrollDirection: scrollDir, physics: const BouncingScrollPhysics(), child: scrollChildView));
+      }
+    }
+    return container!;
+  }
+
   static Text getTitle(String titleText){
     return getStyledTextWithFixedScale(titleText, TextStyles.titleTextStyle, TextAlign.start, null);
   }
@@ -210,22 +244,42 @@ class UiUtils {
     return getStyledTextWithFixedScale(titleText, TextStyles.subTitleTextStyle, TextAlign.start, null);
   }
 
-  static InputDecoration getInputDecorationWithNoErrorMessage(String labelText){
+  static Widget getEnabledTextField(double width, String initText, InputDecoration inputDecoration){
+    return SizedBox(width: width, child: TextFormField(initialValue: initText, enabled: false, decoration: inputDecoration));
+  }
+
+  static Widget getTextField(double width, TextEditingController textEditingController, TextInputType textInputType,
+      InputDecoration inputDecoration, ValueChanged<String> onChangedCallback){
+    return SizedBox(width: width,
+        child: TextField(cursorColor: ColorStyles.upFinBlack, controller: textEditingController, keyboardType: textInputType, decoration: inputDecoration, onChanged: onChangedCallback));
+  }
+
+  static Widget getTextFormField(double width, TextEditingController textEditingController, TextInputType textInputType, InputDecoration inputDecoration,
+      ValueChanged<String> onChangedCallback, FormFieldValidator<String> validatorCallback){
+    return SizedBox(width: width, child: TextFormField(cursorColor: ColorStyles.upFinBlack, controller: textEditingController, keyboardType: textInputType, decoration: inputDecoration,
+            onChanged: onChangedCallback, validator: validatorCallback));
+  }
+
+  static InputDecoration getInputDecoration(String labelText, String counterText){
     return InputDecoration(
+        labelText: labelText,
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        labelStyle: const TextStyle(color: ColorStyles.upFinTextAndBorderBlue),
         hintText: labelText,
-        counterText: "",
-        hintStyle: TextStyles.labelTextStyle,
+        counterText: counterText,
+        counterStyle: const TextStyle(color: ColorStyles.upFinTextAndBorderBlue),
+        hintStyle: TextStyles.upFinTextFormFieldLabelTextStyle,
         border : OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10)
+          borderRadius: BorderRadius.circular(2),
+          borderSide: const BorderSide(color: ColorStyles.upFinSky),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: ColorStyles.finAppGreen),
+          borderRadius: BorderRadius.circular(2),
+          borderSide: const BorderSide(color: ColorStyles.upFinTextAndBorderBlue),
         ),
-        errorStyle: const TextStyle(height: 0),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: Colors.redAccent),
+          borderRadius: BorderRadius.circular(2),
+          borderSide: const BorderSide(color: ColorStyles.upFinRed),
         ),
         filled: true,
         fillColor: ColorStyles.upFinWhite
@@ -248,7 +302,7 @@ class UiUtils {
                       width: 100.w,
                       height: 100.h,
                       color: ColorStyles.darkGrayWithAlpha,
-                      child: SpinKitCubeGrid(color: ColorStyles.finAppGreen, size: 25.w)
+                      child: SpinKitCubeGrid(color: ColorStyles.upFinTextAndBorderBlue, size: 25.w)
                   );
                 })
           );
@@ -410,7 +464,7 @@ class UiUtils {
   }
 
   static Widget getInitLoadingView() {
-    return Container(color: ColorStyles.upFinWhite, child: Center(child: getStyledTextWithFixedScale("잠시만 기다려 주세요..", TextStyles.initTextStyle, TextAlign.center, null)));
+    return Container(width: 100.w, height: 100.h, color: ColorStyles.upFinWhite, child: Center(child: getStyledTextWithFixedScale("잠시만 기다려 주세요..", TextStyles.upFinInitTextStyle, TextAlign.center, null)));
   }
 
 

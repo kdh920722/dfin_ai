@@ -14,6 +14,7 @@ class GptController{
   static String deletedResultSplitPattern = "DELETED???";
   static String gptApiKey = "";
   static OpenAI? openAI;
+
   static Future<String> sendAndReceiveTextToGPTUsingLib(List<Messages> messageList) async {
     try{
       openAI = OpenAI.instance.build(token: gptApiKey, baseOption: HttpSetup(receiveTimeout: const Duration(seconds: 60)),enableLog: true);

@@ -146,7 +146,7 @@ class CommonUtils {
 
   static String getPriceFormattedString(double price){
     String resultString = "";
-    String targetPriceString = price.toString();
+    String targetPriceString = price.toInt().toString();
     String frontValue = "";
     String backValue = "";
 
@@ -212,6 +212,10 @@ class CommonUtils {
 
   static Future<void> moveTo(BuildContext fromContext, String toRoute, Object? arguments) async {
     await Navigator.of(fromContext).pushNamed(toRoute, arguments: arguments);
+  }
+
+  static Future<void> moveWithReplacementTo(BuildContext fromContext, String toRoute, Object? arguments) async {
+    await Navigator.of(fromContext).pushReplacementNamed(toRoute, arguments: arguments);
   }
 
   static Future<void> moveView(BuildContext fromContext, Widget toView) async {

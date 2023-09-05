@@ -3,8 +3,14 @@ import 'package:sizer/sizer.dart';
 import 'ColorStyles.dart';
 
 class TextStyles {
-  static TextStyle initTextStyle = TextStyle(fontSize: 22.sp, color: ColorStyles.upFinBlue, fontWeight: FontWeight.bold, decoration: TextDecoration.none, decorationThickness: 0.0);
-
+  static TextStyle upFinInitTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 22.sp, color: ColorStyles.upFinTextAndBorderBlue, fontWeight: FontWeight.bold, decoration: TextDecoration.none, decorationThickness: 0.0);
+  static TextStyle upFinBasicTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 14.sp, color: ColorStyles.upFinTextAndBorderBlue, fontWeight: FontWeight.bold, decoration: TextDecoration.none, decorationThickness: 0.0);
+  static TextStyle upFinBasicButtonTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 16.sp, color: ColorStyles.upFinWhite, fontWeight: FontWeight.w500, decoration: TextDecoration.none, decorationThickness: 0.0);
+  static TextStyle upFinSmallButtonTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 14.sp, color: ColorStyles.upFinWhite, fontWeight: FontWeight.w500, decoration: TextDecoration.none, decorationThickness: 0.0);
+  static TextStyle upFinKakaoButtonTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 16.sp, color: ColorStyles.upFinBlack, fontWeight: FontWeight.w500, decoration: TextDecoration.none, decorationThickness: 0.0);
+  static TextStyle upFinAppleButtonTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 16.sp, color: ColorStyles.upFinWhite, fontWeight: FontWeight.w500, decoration: TextDecoration.none, decorationThickness: 0.0);
+  static TextStyle upFinTextFormFieldTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 12.sp, color: ColorStyles.upFinDarkGray, fontWeight: FontWeight.w300, decoration: TextDecoration.none, decorationThickness: 0.0);
+  static TextStyle upFinTextFormFieldLabelTextStyle = TextStyle(fontSize: 14.sp, color: Colors.grey, fontWeight: FontWeight.normal, decoration: TextDecoration.none, decorationThickness: 0.0);
 
   static TextStyle titleTextStyle = TextStyle(fontSize: 22.sp, color: Colors.black54, fontWeight: FontWeight.bold, decoration: TextDecoration.none, decorationThickness: 0.0);
   static TextStyle popTitleTextStyle = TextStyle(fontSize: 22.sp, color: Colors.black87, fontWeight: FontWeight.bold, decoration: TextDecoration.none, decorationThickness: 0.0);
@@ -16,7 +22,7 @@ class TextStyles {
   static TextStyle basicTextStyleBold = TextStyle(fontSize: 22.sp, color: Colors.black, fontWeight: FontWeight.bold, decoration: TextDecoration.none, decorationThickness: 0.0);
   static TextStyle basicTextStyle = TextStyle(fontSize: 10.sp, color: Colors.black, fontWeight: FontWeight.normal, decoration: TextDecoration.none, decorationThickness: 0.0);
   static TextStyle dropDownTextStyle = TextStyle(fontSize: 16.sp, color: Colors.black, fontWeight: FontWeight.normal, decoration: TextDecoration.none, decorationThickness: 0.0);
-  static TextStyle labelTextStyle = TextStyle(fontSize: 14.sp, color: Colors.grey, fontWeight: FontWeight.normal, decoration: TextDecoration.none, decorationThickness: 0.0);
+
   static TextStyle closeTextStyle = TextStyle(fontSize: 20.sp, color: Colors.black26, fontWeight: FontWeight.bold, decoration: TextDecoration.none, decorationThickness: 0.0);
   static TextStyle countDownTextStyle = TextStyle(fontSize: 18.sp, color: ColorStyles.finAppGreen, fontWeight: FontWeight.normal, decoration: TextDecoration.none, decorationThickness: 0.0);
   static TextStyle countDownButtonStyle = TextStyle(fontSize: 14.sp, color: Colors.white, fontWeight: FontWeight.bold, decoration: TextDecoration.none, decorationThickness: 0.0);

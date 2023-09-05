@@ -47,7 +47,7 @@ class LogfinController {
       inputJson['fcm_token'] = FireBaseController.fcmToken;
     }
 
-    if(api != LogfinApis.signIn && api != LogfinApis.signUp){
+    if(api != LogfinApis.signIn && api != LogfinApis.signUp && api != LogfinApis.socialLogin){
       if(userToken != ""){
         inputJson['api_token'] = userToken;
       }else{
@@ -80,6 +80,7 @@ class LogfinController {
           }
           callback(true, resultData['data']);
         }else{
+          CommonUtils.log('e', 'false');
           callback(false, null);
         }
       } else {
@@ -94,7 +95,7 @@ class LogfinController {
 }
 
 enum LogfinApis {
-  signUp, signIn,
+  signUp, signIn, socialLogin,
   getUserInfo, prSearch,
   applyProductDocSearch, applyProduct,
   getAccidentInfo, getOffersInfo,
@@ -108,6 +109,8 @@ extension LogfinApisExtension on LogfinApis {
         return '/users.json';
       case LogfinApis.signIn:
         return '/users/sign_in.json';
+      case LogfinApis.socialLogin:
+        return '/social_login.json';
       case LogfinApis.getUserInfo:
         return '/get_user.json';
       case LogfinApis.prSearch:
