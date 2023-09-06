@@ -227,10 +227,6 @@ class CommonUtils {
     await Navigator.push(fromContext, Transition(child: toView, transitionEffect: TransitionEffect.RIGHT_TO_LEFT));
   }
 
-  static void moveBack(BuildContext fromContext) {
-    Navigator.pop(fromContext);
-  }
-
   static Transition getViewTransition(Widget toView){
     return Transition(child: toView, transitionEffect: TransitionEffect.RIGHT_TO_LEFT);
   }

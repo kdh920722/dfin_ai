@@ -3,14 +3,15 @@ import 'package:sizer/sizer.dart';
 import 'ColorStyles.dart';
 
 class TextStyles {
-  static TextStyle upFinInitTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 22.sp, color: ColorStyles.upFinTextAndBorderBlue, fontWeight: FontWeight.bold, decoration: TextDecoration.none, decorationThickness: 0.0);
-  static TextStyle upFinBasicTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 14.sp, color: ColorStyles.upFinTextAndBorderBlue, fontWeight: FontWeight.bold, decoration: TextDecoration.none, decorationThickness: 0.0);
-  static TextStyle upFinBasicButtonTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 16.sp, color: ColorStyles.upFinWhite, fontWeight: FontWeight.w500, decoration: TextDecoration.none, decorationThickness: 0.0);
-  static TextStyle upFinSmallButtonTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 14.sp, color: ColorStyles.upFinWhite, fontWeight: FontWeight.w500, decoration: TextDecoration.none, decorationThickness: 0.0);
-  static TextStyle upFinKakaoButtonTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 16.sp, color: ColorStyles.upFinBlack, fontWeight: FontWeight.w500, decoration: TextDecoration.none, decorationThickness: 0.0);
-  static TextStyle upFinAppleButtonTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 16.sp, color: ColorStyles.upFinWhite, fontWeight: FontWeight.w500, decoration: TextDecoration.none, decorationThickness: 0.0);
-  static TextStyle upFinTextFormFieldTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 12.sp, color: ColorStyles.upFinDarkGray, fontWeight: FontWeight.w300, decoration: TextDecoration.none, decorationThickness: 0.0);
-  static TextStyle upFinTextFormFieldLabelTextStyle = TextStyle(fontSize: 14.sp, color: Colors.grey, fontWeight: FontWeight.normal, decoration: TextDecoration.none, decorationThickness: 0.0);
+  static TextStyle upFinInitTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 22.sp, color: ColorStyles.upFinTextAndBorderBlue, fontWeight: FontWeight.bold, decoration: TextDecoration.none, decorationThickness: 0.0, height: 1);
+  static TextStyle upFinBasicTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 14.sp, color: ColorStyles.upFinTextAndBorderBlue, fontWeight: FontWeight.bold, decoration: TextDecoration.none, decorationThickness: 0.0, height: 1);
+  static TextStyle upFinSkyTextInButtonStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 16.sp, color: ColorStyles.upFinTextAndBorderBlue, fontWeight: FontWeight.w500, decoration: TextDecoration.none, decorationThickness: 0.0, height: 1);
+  static TextStyle upFinBasicButtonTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 16.sp, color: ColorStyles.upFinWhite, fontWeight: FontWeight.w500, decoration: TextDecoration.none, decorationThickness: 0.0, height: 1);
+  static TextStyle upFinSmallButtonTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 14.sp, color: ColorStyles.upFinWhite, fontWeight: FontWeight.w500, decoration: TextDecoration.none, decorationThickness: 0.0, height: 1);
+  static TextStyle upFinKakaoButtonTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 16.sp, color: ColorStyles.upFinBlack, fontWeight: FontWeight.w700, decoration: TextDecoration.none, decorationThickness: 0.0, height: 1);
+  static TextStyle upFinAppleButtonTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 16.sp, color: ColorStyles.upFinWhite, fontWeight: FontWeight.w700, decoration: TextDecoration.none, decorationThickness: 0.0, height: 1);
+  static TextStyle upFinTextFormFieldTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 12.sp, color: ColorStyles.upFinDarkGray, fontWeight: FontWeight.w300, decoration: TextDecoration.none, decorationThickness: 0.0, height: 1);
+  static TextStyle upFinTextFormFieldLabelTextStyle = TextStyle(fontSize: 14.sp, color: Colors.grey, fontWeight: FontWeight.normal, decoration: TextDecoration.none, decorationThickness: 0.0, height: 1);
 
   static TextStyle titleTextStyle = TextStyle(fontSize: 22.sp, color: Colors.black54, fontWeight: FontWeight.bold, decoration: TextDecoration.none, decorationThickness: 0.0);
   static TextStyle popTitleTextStyle = TextStyle(fontSize: 22.sp, color: Colors.black87, fontWeight: FontWeight.bold, decoration: TextDecoration.none, decorationThickness: 0.0);

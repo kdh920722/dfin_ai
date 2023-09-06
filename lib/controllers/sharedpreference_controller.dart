@@ -27,11 +27,19 @@ class SharedPreferenceController {
     CommonUtils.log('i', "sharedPreference saved value : $returnValue");
   }
 
-  static Future<String> getSharedPreferenceValue(String key) async {
+  static String getSharedPreferenceValue(String key){
     try{
-      String returnValue = sharedPreferences!.getString(key)!;
-      CommonUtils.log('i', "sharedPreference get value : $returnValue");
-      return returnValue;
+      if(sharedPreferences!.containsKey(key)){
+        String? returnValue = sharedPreferences!.getString(key);
+        if(returnValue != null){
+          CommonUtils.log('i', "sharedPreference get value : $returnValue");
+          return returnValue;
+        }else{
+          return "";
+        }
+      }else{
+        return "";
+      }
     }catch(e){
       CommonUtils.log('e', e.toString());
       return "";

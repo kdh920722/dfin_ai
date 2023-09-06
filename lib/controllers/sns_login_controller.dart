@@ -1,7 +1,15 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
+import 'package:sizer/sizer.dart';
 import 'package:upfin/datas/my_data.dart';
+import '../configs/app_config.dart';
+import '../styles/ColorStyles.dart';
+import '../styles/TextStyles.dart';
 import '../utils/common_utils.dart';
+import '../utils/ui_utils.dart';
+import 'logfin_controller.dart';
 
 enum LoginPlatform {
   kakao, apple, none
@@ -39,19 +47,78 @@ class SnsLoginController{
     }
   }
 
-  static void _setUserInfo(User user) async {
-    MyData.name = user.kakaoAccount!.name!;
-    MyData.email = user.kakaoAccount!.email!;
-    List<String> phoneDataTemp = user.kakaoAccount!.phoneNumber!.split("-");
-    MyData.phoneNumber = "0${phoneDataTemp[0].split(" ")[1]}${phoneDataTemp[1]}${phoneDataTemp[2]}";
-    CommonUtils.log("i",
-        '이름: ${MyData.name}'
-        '\n이메일: ${MyData.email}'
-        '\n전화번호: ${MyData.phoneNumber}'
-        '\nid: ${user.id}');
+  static Widget getKakaoLoginButton(BuildContext context, double size, Function(bool isSuccessToLogin) callback){
+    return UiUtils.getIconButton(Icons.add_box, size, ColorStyles.upFinKakaoYellow, () async {
+      UiUtils.showLoadingPop(context);
+      await SnsLoginController._kakaoLogin((bool isSuccess) async {
+        UiUtils.closeLoadingPop(context);
+        if(isSuccess){
+          if(await _isMemberFromSns()){
+            callback(true);
+          }else{
+            CommonUtils.flutterToast("회원가입이 필요합니다.");
+            callback(false);
+          }
+        }else{
+          CommonUtils.flutterToast("${SnsLoginController.loginPlatform.value}로그인에 실패했습니다.");
+          callback(false);
+        }
+      });
+    });
   }
 
-  static Future<void> kakaoLogin(Function(bool) callback) async {
+  static Widget getAppleLoginButton(BuildContext context, double size, Function(bool isSuccessToLogin) callback){
+    return UiUtils.getIconButton(Icons.add_box, size, ColorStyles.upFinBlack, () async {
+      UiUtils.showLoadingPop(context);
+      await SnsLoginController._kakaoLogin((bool isSuccess) async {
+        UiUtils.closeLoadingPop(context);
+        if(isSuccess){
+          if(await _isMemberFromSns()){
+            callback(true);
+          }else{
+            CommonUtils.flutterToast("회원가입이 필요합니다.");
+            callback(false);
+          }
+        }else{
+          CommonUtils.flutterToast("${SnsLoginController.loginPlatform.value}로그인에 실패했습니다.");
+          callback(false);
+        }
+      });
+    });
+  }
+
+  static Future<bool> _isMember() async {
+    try{
+      bool isMember = false;
+      String token = "";
+      String id = "";
+      if(SnsLoginController.loginPlatform == LoginPlatform.kakao){
+        token = SnsLoginController.kakaoToken;
+        id = SnsLoginController.kakaoId;
+      }else{
+
+      }
+
+      Map<String, String> inputJson = {
+        "email": MyData.email,
+        "token": token,
+        "user_id": id,
+        "provider": SnsLoginController.loginPlatform.value
+      };
+
+      await LogfinController.callLogfinApi(LogfinApis.socialLogin, inputJson, (isSuccess, outputJson) {
+        isMember = isSuccess;
+        MyData.confirmed = isMember;
+      });
+
+      return isMember;
+    }catch(error){
+      return false;
+    }
+
+  }
+
+  static Future<void> _kakaoLogin(Function(bool) callback) async {
     try {
       // 카카오계정으로 로그인
       OAuthToken token;
@@ -124,7 +191,7 @@ class SnsLoginController{
         }
 
         kakaoId = user.id.toString();
-        _setUserInfo(user);
+        _setUserInfoFromKakao(user);
       } catch (error) {
         CommonUtils.log("e", '사용자 정보 요청 실패 $error');
         CommonUtils.flutterToast("카카오톡 로그인 중 오류가 발생했습니다.");
@@ -132,6 +199,18 @@ class SnsLoginController{
     } else {
       CommonUtils.flutterToast("카카오톡 설치 후 진행 해 주세요.");
     }
+  }
+
+  static void _setUserInfoFromKakao(User user) async {
+    MyData.name = user.kakaoAccount!.name!;
+    MyData.email = user.kakaoAccount!.email!;
+    List<String> phoneDataTemp = user.kakaoAccount!.phoneNumber!.split("-");
+    MyData.phoneNumber = "0${phoneDataTemp[0].split(" ")[1]}${phoneDataTemp[1]}${phoneDataTemp[2]}";
+    CommonUtils.log("i",
+        '이름: ${MyData.name}'
+            '\n이메일: ${MyData.email}'
+            '\n전화번호: ${MyData.phoneNumber}'
+            '\nid: ${user.id}');
   }
 
   static void logOut() async {
@@ -146,5 +225,36 @@ class SnsLoginController{
     }
 
     loginPlatform = LoginPlatform.none;
+  }
+
+  static Future<bool> _isMemberFromSns() async {
+    try{
+      bool isMember = false;
+      String token = "";
+      String id = "";
+      if(SnsLoginController.loginPlatform == LoginPlatform.kakao){
+        token = SnsLoginController.kakaoToken;
+        id = SnsLoginController.kakaoId;
+      }else{
+
+      }
+
+      Map<String, String> inputJson = {
+        "email": MyData.email,
+        "token": token,
+        "user_id": id,
+        "provider": SnsLoginController.loginPlatform.value
+      };
+
+      await LogfinController.callLogfinApi(LogfinApis.socialLogin, inputJson, (isSuccess, outputJson) {
+        isMember = isSuccess;
+        MyData.confirmed = isMember;
+      });
+
+      return isMember;
+    }catch(error){
+      return false;
+    }
+
   }
 }

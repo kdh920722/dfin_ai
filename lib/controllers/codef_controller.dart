@@ -337,7 +337,7 @@ class CodeFController{
 
   static Future<void> _setAuthPop(BuildContext context, Apis apiInfo, Map<String, dynamic> resultInputMap,
       Function(bool isSuccess, Map<String,dynamic>? resultMap, List<dynamic>? resultListMap) callback) async {
-    UiUtils.showSlideMenu(context, SlideType.toTop, false, 0.0, (context, setState){
+    UiUtils.showSlideMenu(context, SlideType.bottomToTop, false, null, null, 0.0, (context, setState){
       return Obx(()=>
           Column(mainAxisAlignment: MainAxisAlignment.center, children:
           [ GetController.to.isWait.value ? UiUtils.getStyledTextWithFixedScale("정보를 가져오는 중입니다...", TextStyles.basicTextStyle, TextAlign.center, null) : UiUtils.getStyledTextWithFixedScale("", TextStyles.basicTextStyle, TextAlign.center, null),

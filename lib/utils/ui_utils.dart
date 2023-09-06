@@ -1,11 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
+import '../configs/text_config.dart';
 import '../styles/ColorStyles.dart';
 import '../styles/TextStyles.dart';
 import '../configs/app_config.dart';
 import 'common_utils.dart';
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
 class UiUtils {
   static Widget startAppView(){
@@ -66,13 +67,26 @@ class UiUtils {
   }
 
   static Text getTextWithFixedScale(String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign? textAlign, int? textMaxLine){
-    return Text(text, style: TextStyle(fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor), textScaleFactor: 1.0, textAlign: textAlign, maxLines: textMaxLine);
+    return Text(text, style: TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor), textScaleFactor: 1.0, textAlign: textAlign, maxLines: textMaxLine);
+  }
+
+  static Widget getTextStyledButtonWithFixedScale(String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign? textAlign, int? textMaxLine, Function() onPressedCallback){
+    return TextButton(
+      onPressed: onPressedCallback,
+      child: getTextWithFixedScale(text, fontSize, fontWeight, textColor, textAlign, textMaxLine)
+    );
+  }
+
+  static Widget getTextWithIconStyledButtonWithFixedScale(TextDirection textDirection, String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign? textAlign, int? textMaxLine,
+      IconData icon, double iconSize, Color iconColor, Function() onPressedCallback){
+    return Directionality(textDirection: textDirection, child: TextButton.icon(onPressed: onPressedCallback, icon: Icon(icon, color: iconColor, size: iconSize),
+        label: getTextWithFixedScale(text, fontSize, fontWeight, textColor, textAlign, textMaxLine)));
   }
 
   static Widget getBorderTextWithFixedScale(String text, double fontSize, FontWeight fontWeight, TextAlign? textAlign, Color borderColor, Color textColor){
     return Container(padding: const EdgeInsets.all(0.2), // 텍스트 주위에 여백 추가
       decoration: BoxDecoration(border: Border.all(color: borderColor, width: 2.0), borderRadius: BorderRadius.circular(2.0)),
-      child: Text(text, style: TextStyle(fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor)));
+      child: Text(text, style: TextStyle(decoration: TextDecoration.none, height: 1, fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor)));
   }
 
   static Widget getBoxTextWithFixedScale(String text, double fontSize, FontWeight fontWeight, TextAlign? textAlign, Color boxColor, Color textColor){
@@ -81,7 +95,7 @@ class UiUtils {
   }
 
   static SelectableText getSelectableTextWithFixedScale(String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign? textAlign, int? textMaxLine){
-    return SelectableText(text, style: TextStyle(fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor), textScaleFactor: 1.0, textAlign: textAlign, maxLines: textMaxLine);
+    return SelectableText(text, style: TextStyle(decoration: TextDecoration.none, height: 1, fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor), textScaleFactor: 1.0, textAlign: textAlign, maxLines: textMaxLine);
   }
 
   static SelectableText getSelectableStyledTextWithFixedScale(String text, TextStyle textStyle, TextAlign? textAlign, int? textMaxLine){
@@ -100,7 +114,7 @@ class UiUtils {
     return SizedBox(width: marginWidth, height: marginHeight,);
   }
 
-  static SizedBox getIconTextButtonBox(double buttonWidth, IconData icon, String buttonText, TextStyle buttonTextStyles, Color buttonColor, VoidCallback onPressedCallback) {
+  static SizedBox getIconInTextButtonBox(double buttonWidth, IconData icon, String buttonText, TextStyle buttonTextStyles, Color buttonColor, VoidCallback onPressedCallback) {
     return SizedBox(
         width: buttonWidth,
         child: ElevatedButton.icon(
@@ -118,7 +132,7 @@ class UiUtils {
     );
   }
 
-  static SizedBox getIconButtonBox(double buttonWidth, IconData icon, Color buttonColor, VoidCallback onPressedCallback) {
+  static SizedBox getIconInButtonBox(double buttonWidth, IconData icon, Color buttonColor, VoidCallback onPressedCallback) {
     return SizedBox(
         width: buttonWidth,
         child: ElevatedButton(
@@ -135,6 +149,10 @@ class UiUtils {
     );
   }
 
+  static Widget getIconButton(IconData icon, double size, Color iconColor, VoidCallback onPressedCallback) {
+    return SizedBox(child: IconButton(onPressed: onPressedCallback, icon: Icon(icon, color: iconColor, size: size)));
+  }
+
   static SizedBox getTextButtonBox(double buttonWidth, String buttonText, TextStyle buttonTextStyles, Color buttonColor, VoidCallback onPressedCallback) {
     return SizedBox(
         width: buttonWidth,
@@ -142,12 +160,12 @@ class UiUtils {
           style: ElevatedButton.styleFrom(
             backgroundColor: buttonColor,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
-            elevation: 3,
+            elevation: 0.5,
             shadowColor: ColorStyles.upFinGray,
           ),
           onPressed: onPressedCallback,
           child: Padding(
-            padding: const EdgeInsets.all(10.0),
+            padding: const EdgeInsets.all(15.0),
             child: getStyledTextWithFixedScale(buttonText,buttonTextStyles,TextAlign.center,null)
           ),
         )
@@ -162,7 +180,7 @@ class UiUtils {
           style: ElevatedButton.styleFrom(
             backgroundColor: buttonColor,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
-            elevation: 3,
+            elevation: 0.5,
             shadowColor: ColorStyles.upFinGray,
           ),
           onPressed: onPressedCallback,
@@ -272,6 +290,7 @@ class UiUtils {
         labelStyle: const TextStyle(color: ColorStyles.upFinTextAndBorderBlue),
         hintText: labelText,
         counterText: counterText,
+        errorStyle: TextStyle(fontSize: 0.sp),
         counterStyle: const TextStyle(color: ColorStyles.upFinTextAndBorderBlue),
         hintStyle: TextStyles.upFinTextFormFieldLabelTextStyle,
         border : OutlineInputBorder(
@@ -346,9 +365,38 @@ class UiUtils {
     );
   }
 
-  static void showSlideMenu(BuildContext parentViewContext, SlideType slideType, bool isDismissible, double opacity, Widget Function(BuildContext context, StateSetter setState) createWidgetMethod){
-    double popWidth = 66.w;
-    double popHeight = 33.h;
+  static Widget getRowColumnWithAlignCenter(List<Widget> viewList){
+    return Row(mainAxisAlignment: MainAxisAlignment.center,
+        children: [Column(crossAxisAlignment: CrossAxisAlignment.center, children: viewList)]);
+  }
+
+  static Widget getCircleCheckBox(StateSetter setState, double size, bool checkedValue, Function(bool?) onChanged){
+    return Transform.scale(scale: size, child: Checkbox(
+        value: checkedValue,
+        onChanged: onChanged,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        checkColor: ColorStyles.upFinWhite,
+        activeColor: ColorStyles.upFinSky,
+        side: MaterialStateBorderSide.resolveWith((states) =>
+         !checkedValue? const BorderSide(width: 2.0, color: ColorStyles.upFinGray) : const BorderSide(width: 2.0, color: ColorStyles.upFinSky))
+    ));
+  }
+
+  static void showSlideMenu(BuildContext parentViewContext, SlideType slideType, bool isDismissible,
+      double? width, double? height, double opacity, Widget Function(BuildContext context, StateSetter setState) createWidgetMethod){
+    double popWidth = 0.0;
+    double popHeight = 0.0;
+    if(width == null) {
+      popWidth = 66.w;
+    }else{
+      popWidth = width;
+    }
+    if(height == null) {
+      popHeight = 3.w;
+    }else{
+      popHeight = height;
+    }
+
     BorderRadius borderRadius = BorderRadius.circular(30);
     Alignment alignment = Alignment.bottomCenter;
 
@@ -360,22 +408,22 @@ class UiUtils {
       context: parentViewContext,
       pageBuilder: (context, anim1, anim2) {
         switch (slideType) {
-          case SlideType.toRight:
+          case SlideType.leftToRight:
             popHeight = 100.h;
             alignment = Alignment.centerLeft;
             borderRadius = const BorderRadius.only(topRight: Radius.circular(30), bottomRight: Radius.circular(30));
             break;
-          case SlideType.toLeft:
+          case SlideType.rightToLeft:
             popHeight = 100.h;
             alignment = Alignment.centerRight;
             borderRadius = const BorderRadius.only(topLeft: Radius.circular(30), bottomLeft: Radius.circular(30));
             break;
-          case SlideType.toTop:
+          case SlideType.bottomToTop:
             popWidth = 100.w;
             alignment = Alignment.bottomCenter;
             borderRadius = const BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30));
             break;
-          case SlideType.toBottom:
+          case SlideType.topToBottom:
             popWidth = 100.w;
             alignment = Alignment.topCenter;
             borderRadius = const BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30));
@@ -401,7 +449,7 @@ class UiUtils {
                   child: StatefulBuilder(
                       builder: (_, StateSetter popViewSetState){
                         Widget contentsWidget = createWidgetMethod(parentViewContext, popViewSetState);
-                        return Padding(padding: const EdgeInsets.all(15.0), child: contentsWidget);
+                        return Padding(padding: const EdgeInsets.all(20.0), child: contentsWidget);
                       }
                   )
               ),
@@ -411,22 +459,22 @@ class UiUtils {
       },
       transitionBuilder: (context, anim1, anim2, child) {
         switch (slideType) {
-          case SlideType.toLeft:
+          case SlideType.rightToLeft:
             return SlideTransition(
               position: Tween(begin: const Offset(1, 0), end: const Offset(0,0)).animate(anim1),
               child: child,
             );
-          case SlideType.toRight:
+          case SlideType.leftToRight:
             return SlideTransition(
               position: Tween(begin: const Offset(-1, 0), end: const Offset(0,0)).animate(anim1),
               child: child,
             );
-          case SlideType.toTop:
+          case SlideType.bottomToTop:
             return SlideTransition(
               position: Tween(begin: const Offset(0, 1), end: const Offset(0,0)).animate(anim1),
               child: child,
             );
-          case SlideType.toBottom:
+          case SlideType.topToBottom:
             return SlideTransition(
               position: Tween(begin: const Offset(0, -1), end: const Offset(0,0)).animate(anim1),
               child: child,
@@ -469,7 +517,20 @@ class UiUtils {
   }
 
   static Widget getInitLoadingView() {
-    return Container(width: 100.w, height: 100.h, color: ColorStyles.upFinWhite, child: Center(child: getStyledTextWithFixedScale("잠시만 기다려 주세요..", TextStyles.upFinInitTextStyle, TextAlign.center, null)));
+    return Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: const EdgeInsets.all(20.0),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          UiUtils.getMarginBox(0, 20.h),
+          UiUtils.getBorderTextWithFixedScale("업핀", 55.sp, FontWeight.w800, TextAlign.center, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinTextAndBorderBlue),
+          UiUtils.getTextWithFixedScale("나에게 꼭 맞는\n개인회생 대출상품", 28.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
+          Row(children: [
+            UiUtils.getBoxTextWithFixedScale("ASAP", 28.sp, FontWeight.w500, TextAlign.center, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite),
+            UiUtils.getMarginBox(1.w, 0),
+            UiUtils.getTextWithFixedScale("접수하세요!", 28.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
+          ]),
+          UiUtils.getMarginBox(0, 20.h),
+          UiUtils.getExpandedScrollView(Axis.vertical, UiUtils.getTextWithFixedScale(TextConfig.appStartViewIntroText, 10.sp, FontWeight.w300, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null))
+        ])
+    );
   }
 
 

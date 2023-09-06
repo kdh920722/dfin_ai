@@ -47,19 +47,19 @@ extension SAppViewExtension on AppView {
 }
 
 enum SlideType {
-  toLeft, toRight, toTop, toBottom
+  rightToLeft, leftToRight, bottomToTop, topToBottom
 }
 
 extension SlideTypeExtension on SlideType {
   String get value {
     switch (this) {
-      case SlideType.toLeft:
+      case SlideType.rightToLeft:
         return 'LEFT';
-      case SlideType.toRight:
+      case SlideType.leftToRight:
         return 'RIGHT';
-      case SlideType.toTop:
+      case SlideType.bottomToTop:
         return 'TOP';
-      case SlideType.toBottom:
+      case SlideType.topToBottom:
         return 'BOTTOM';
       default:
         throw Exception('Unknown SlideType value');
