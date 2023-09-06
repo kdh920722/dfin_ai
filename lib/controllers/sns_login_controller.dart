@@ -51,17 +51,21 @@ class SnsLoginController{
     return UiUtils.getIconButton(Icons.add_box, size, ColorStyles.upFinKakaoYellow, () async {
       UiUtils.showLoadingPop(context);
       await SnsLoginController._kakaoLogin((bool isSuccess) async {
-        UiUtils.closeLoadingPop(context);
-        if(isSuccess){
-          if(await _isMemberFromSns()){
-            callback(true);
+        if(Config.isControllerLoadFinished){
+          UiUtils.closeLoadingPop(context);
+          if(isSuccess){
+            if(await _isMemberFromSns()){
+              callback(true);
+            }else{
+              CommonUtils.flutterToast("회원가입이 필요합니다.");
+              callback(false);
+            }
           }else{
-            CommonUtils.flutterToast("회원가입이 필요합니다.");
+            CommonUtils.flutterToast("${SnsLoginController.loginPlatform.value}로그인에 실패했습니다.");
             callback(false);
           }
         }else{
-          CommonUtils.flutterToast("${SnsLoginController.loginPlatform.value}로그인에 실패했습니다.");
-          callback(false);
+          CommonUtils.flutterToast("데이터 로딩에 실패했습니다. 앱을 다시 실행 해 주세요.");
         }
       });
     });
@@ -69,21 +73,11 @@ class SnsLoginController{
 
   static Widget getAppleLoginButton(BuildContext context, double size, Function(bool isSuccessToLogin) callback){
     return UiUtils.getIconButton(Icons.add_box, size, ColorStyles.upFinBlack, () async {
-      UiUtils.showLoadingPop(context);
-      await SnsLoginController._kakaoLogin((bool isSuccess) async {
-        UiUtils.closeLoadingPop(context);
-        if(isSuccess){
-          if(await _isMemberFromSns()){
-            callback(true);
-          }else{
-            CommonUtils.flutterToast("회원가입이 필요합니다.");
-            callback(false);
-          }
-        }else{
-          CommonUtils.flutterToast("${SnsLoginController.loginPlatform.value}로그인에 실패했습니다.");
-          callback(false);
-        }
-      });
+      if(Config.isControllerLoadFinished){
+
+      }else{
+        CommonUtils.flutterToast("데이터 로딩에 실패했습니다. 앱을 다시 실행 해 주세요.");
+      }
     });
   }
 

@@ -253,104 +253,111 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
       _initAtFirst();
       view = UiUtils.getInitLoadingView();
     }else{
-      if(!Config.isControllerLoadFinished){
-        view = UiUtils.getInitLoadingView();
-      }else{
-        view = Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: const EdgeInsets.all(20.0), child:
-            Column(children: [
-              SizedBox(width: 100.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                UiUtils.getMarginBox(0, 7.h),
-                UiUtils.getTextWithFixedScale("업핀", 55.sp, FontWeight.w800, ColorStyles.upFinButtonBlue, TextAlign.start, null),
-                UiUtils.getMarginBox(0, 2.h),
-                UiUtils.getTextWithFixedScale("나에게 꼭 맞는", 28.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
-                UiUtils.getMarginBox(0, 0.5.h),
-                UiUtils.getTextWithFixedScale("개인회생 대출상품", 28.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
-                UiUtils.getMarginBox(0, 0.5.h),
-                UiUtils.getTextWithFixedScale("바로 접수하세요!", 28.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
-                UiUtils.getMarginBox(0, 7.h)
-              ])),
-              Form(key: _formKey,
-                  child: UiUtils.getRowColumnWithAlignCenter([
-                    UiUtils.getTextFormField(90.w, _emailTextController, TextInputType.emailAddress, false, UiUtils.getInputDecoration("이메일", ""), (text) { }, (value){
-                      if(value != null && value.trim().isEmpty){
-                        return "이메일을 입력하세요.";
-                      }else{
-                        return null;
-                      }
-                    }),
-                    UiUtils.getMarginBox(0, 2.h),
-                    UiUtils.getTextFormField(90.w, _pwdTextController, TextInputType.visiblePassword, true, UiUtils.getInputDecoration("비밀번호", ""), (text) { }, (value){
-                      if(value != null && value.trim().isEmpty){
-                        return "비밀번호를 입력하세요.";
-                      }else{
-                        return null;
-                      }
-                    }),
-                    UiUtils.getMarginBox(0, 1.h),
-                    UiUtils.getTextButtonBox(90.w, "로그인", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
-                      if(_formKey.currentState!.validate()){
-                        CommonUtils.log("i", "OK");
-                        Map<String, dynamic> inputJson = {
-                          "user" : {
-                            "email": _emailTextController.text.trim(),
-                            "password": _pwdTextController.text.trim()
-                          }
-                        };
-
-                        LogfinController.callLogfinApi(LogfinApis.signIn, inputJson, (isSuccess, outputJson){
-                          if(isSuccess){
-                            CommonUtils.flutterToast("환영합니다.");
-                            // 1) 캐시 데이터 저장
-                            SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceIdKey, _emailTextController.text.trim());
-                            SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferencePwKey, _pwdTextController.text.trim());
-
-                            // 2) 유저정보 가져오기
-
-                            // 3) 사건정보 조회
-
-                            // 4-1) 사건정보 없으면 한도금리 조회를 위한 조건 입력 화면으로 이동(한도금리 조회 시, 사건정보 저장)
-
-                            // 4-2) 사건정보 있으면 사건정보 이력화면(메인 뷰)로 이동
-                          }else{
-                            CommonUtils.flutterToast("로그인에 실패했습니다.");
-                          }
-                        });
-                      }
-                    }),
-                    UiUtils.getMarginBox(0, 0.7.h),
-                    UiUtils.getTextButtonBox(90.w, "회원가입", TextStyles.upFinSkyTextInButtonStyle, ColorStyles.upFinWhiteSky, () {
-                      CommonUtils.moveTo(context, AppView.signupView.value, null);
-                    }),
-                  ])
-              ),
-              UiUtils.getExpandedScrollView(Axis.vertical, SizedBox(width: 100.w, child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-                UiUtils.getMarginBox(0, 7.h),
-                UiUtils.getTextWithFixedScale("소셜 계정으로 로그인", 12.sp, FontWeight.w300, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, null),
-                UiUtils.getMarginBox(0, 0.1.h),
-                Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.end, children: [
-                  SnsLoginController.getKakaoLoginButton(context, 20.w, (isSuccessToLogin){
-                    if(isSuccessToLogin){
-
-                    }else{
-                      if(context.mounted){
-                        CommonUtils.moveTo(context, AppView.signupView.value, null);
-                      }
+      //Config.isControllerLoadFinished
+      view = Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: const EdgeInsets.all(20.0), child:
+      Column(children: [
+        SizedBox(width: 100.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          UiUtils.getMarginBox(0, 7.h),
+          UiUtils.getTextWithFixedScale("업핀", 55.sp, FontWeight.w800, ColorStyles.upFinButtonBlue, TextAlign.start, null),
+          UiUtils.getMarginBox(0, 2.h),
+          UiUtils.getTextWithFixedScale("나에게 꼭 맞는", 28.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
+          UiUtils.getMarginBox(0, 0.5.h),
+          UiUtils.getTextWithFixedScale("개인회생 대출상품", 28.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
+          UiUtils.getMarginBox(0, 0.5.h),
+          UiUtils.getTextWithFixedScale("바로 접수하세요!", 28.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
+          UiUtils.getMarginBox(0, 7.h)
+        ])),
+        Form(key: _formKey,
+            child: UiUtils.getRowColumnWithAlignCenter([
+              UiUtils.getTextFormField(90.w, _emailTextController, TextInputType.emailAddress, false, UiUtils.getInputDecoration("이메일", ""), (text) { }, (value){
+                if(value != null && value.trim().isEmpty){
+                  return "이메일을 입력하세요.";
+                }else{
+                  return null;
+                }
+              }),
+              UiUtils.getMarginBox(0, 2.h),
+              UiUtils.getTextFormField(90.w, _pwdTextController, TextInputType.visiblePassword, true, UiUtils.getInputDecoration("비밀번호", ""), (text) { }, (value){
+                if(value != null && value.trim().isEmpty){
+                  return "비밀번호를 입력하세요.";
+                }else{
+                  return null;
+                }
+              }),
+              UiUtils.getMarginBox(0, 2.h),
+              UiUtils.getTextButtonBox(90.w, "로그인", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
+                if(_formKey.currentState!.validate() && Config.isControllerLoadFinished){
+                  CommonUtils.log("i", "OK");
+                  Map<String, dynamic> inputJson = {
+                    "user" : {
+                      "email": _emailTextController.text.trim(),
+                      "password": _pwdTextController.text.trim()
                     }
-                  }),
-                  SnsLoginController.getAppleLoginButton(context, 20.w, (isSuccessToLogin){
-                    if(isSuccessToLogin){
+                  };
 
+                  LogfinController.callLogfinApi(LogfinApis.signIn, inputJson, (isSuccess, outputJson){
+                    if(isSuccess){
+                      CommonUtils.flutterToast("환영합니다.");
+                      // 1) 캐시 데이터 저장
+                      SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceIdKey, _emailTextController.text.trim());
+                      SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferencePwKey, _pwdTextController.text.trim());
+
+                      // 2) 유저정보 가져오기
+
+                      // 3) 사건정보 조회
+
+                      // 4-1) 사건정보 없으면 한도금리 조회를 위한 조건 입력 화면으로 이동(한도금리 조회 시, 사건정보 저장)
+
+                      // 4-2) 사건정보 있으면 사건정보 이력화면(메인 뷰)로 이동
                     }else{
-                      if(context.mounted){
-                        CommonUtils.moveTo(context, AppView.signupView.value, null);
-                      }
+                      CommonUtils.flutterToast("로그인에 실패했습니다.");
                     }
-                  })
-                ])
-              ])))
+                  });
+                }else{
+                  if(!Config.isControllerLoadFinished){
+                    CommonUtils.flutterToast("데이터 로딩에 실패했습니다. 앱을 다시 실행 해 주세요.");
+                  }else{
+                    CommonUtils.flutterToast("입력하신 정보를 확인 해 주세요.");
+                  }
+                }
+              }),
+              UiUtils.getMarginBox(0, 0.7.h),
+              UiUtils.getTextButtonBox(90.w, "회원가입", TextStyles.upFinSkyTextInButtonStyle, ColorStyles.upFinWhiteSky, () {
+                if(Config.isControllerLoadFinished){
+                  CommonUtils.moveTo(context, AppView.signupView.value, null);
+                }else{
+                  CommonUtils.flutterToast("데이터 로딩에 실패했습니다. 앱을 다시 실행 해 주세요.");
+                }
+              }),
             ])
-        );
-      }
+        ),
+        UiUtils.getExpandedScrollView(Axis.vertical, SizedBox(width: 100.w, child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+          UiUtils.getMarginBox(0, 7.h),
+          UiUtils.getTextWithFixedScale("소셜 계정으로 로그인", 12.sp, FontWeight.w300, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, null),
+          UiUtils.getMarginBox(0, 0.1.h),
+          Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.end, children: [
+            SnsLoginController.getKakaoLoginButton(context, 20.w, (isSuccessToLogin){
+              if(isSuccessToLogin){
+
+              }else{
+                if(context.mounted){
+                  CommonUtils.moveTo(context, AppView.signupView.value, null);
+                }
+              }
+            }),
+            SnsLoginController.getAppleLoginButton(context, 20.w, (isSuccessToLogin){
+              if(isSuccessToLogin){
+
+              }else{
+                if(context.mounted){
+                  CommonUtils.moveTo(context, AppView.signupView.value, null);
+                }
+              }
+            })
+          ])
+        ])))
+      ])
+      );
     }
 
     return UiUtils.getViewWithScroll(context, view, _scrollController, CommonUtils.onWillPopForPreventBackButton);

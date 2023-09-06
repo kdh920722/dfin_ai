@@ -288,23 +288,15 @@ class UiUtils {
         labelText: labelText,
         floatingLabelBehavior: FloatingLabelBehavior.always,
         labelStyle: const TextStyle(color: ColorStyles.upFinTextAndBorderBlue),
-        hintText: labelText,
+        hintText: "",
         counterText: counterText,
         errorStyle: TextStyle(fontSize: 0.sp),
         counterStyle: const TextStyle(color: ColorStyles.upFinTextAndBorderBlue),
         hintStyle: TextStyles.upFinTextFormFieldLabelTextStyle,
-        border : OutlineInputBorder(
-          borderRadius: BorderRadius.circular(2),
-          borderSide: const BorderSide(color: ColorStyles.upFinSky),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(2),
-          borderSide: const BorderSide(color: ColorStyles.upFinTextAndBorderBlue),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(2),
-          borderSide: const BorderSide(color: ColorStyles.upFinRed),
-        ),
+        enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: ColorStyles.upFinButtonBlue)),
+        border: const UnderlineInputBorder(borderSide: BorderSide(color: ColorStyles.upFinButtonBlue)),
+        focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: ColorStyles.upFinTextAndBorderBlue)),
+        errorBorder: const UnderlineInputBorder(borderSide: BorderSide(color: ColorStyles.upFinRed)),
         filled: true,
         fillColor: ColorStyles.upFinWhite
     );
@@ -517,20 +509,7 @@ class UiUtils {
   }
 
   static Widget getInitLoadingView() {
-    return Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: const EdgeInsets.all(20.0),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          UiUtils.getMarginBox(0, 20.h),
-          UiUtils.getBorderTextWithFixedScale("업핀", 55.sp, FontWeight.w800, TextAlign.center, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinTextAndBorderBlue),
-          UiUtils.getTextWithFixedScale("나에게 꼭 맞는\n개인회생 대출상품", 28.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
-          Row(children: [
-            UiUtils.getBoxTextWithFixedScale("ASAP", 28.sp, FontWeight.w500, TextAlign.center, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite),
-            UiUtils.getMarginBox(1.w, 0),
-            UiUtils.getTextWithFixedScale("접수하세요!", 28.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
-          ]),
-          UiUtils.getMarginBox(0, 20.h),
-          UiUtils.getExpandedScrollView(Axis.vertical, UiUtils.getTextWithFixedScale(TextConfig.appStartViewIntroText, 10.sp, FontWeight.w300, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null))
-        ])
-    );
+    return Container();
   }
 
 

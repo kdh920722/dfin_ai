@@ -14,6 +14,10 @@ class LogfinController {
   static String headerKey = "";
   static String userToken = "";
 
+  static List<String> jobList = [];
+  static List<String> courtList = [];
+  static List<String> bankList = [];
+
   static Future<void> initLogfin(Function(bool) callback) async {
     try {
       final ref = FirebaseDatabase.instance.ref();
@@ -25,12 +29,74 @@ class LogfinController {
             case "header_key" : headerKey = each.value.toString();
           }
         }
-        callback(true);
-        } else {
+
+        await _initLogfinListData((isDataCallSuccess){
+          if(isDataCallSuccess){
+            callback(true);
+          }else{
+            callback(false);
+          }
+        });
+      } else {
         callback(false);
       }
     } catch (e) {
       CommonUtils.log("e", "gpt init error : ${e.toString()}");
+      callback(false);
+    }
+  }
+
+  static Future<void> _initLogfinListData(Function(bool) callback) async {
+    try {
+      final ref = FirebaseDatabase.instance.ref();
+      int failCount = 0;
+
+      final jobSnapshot = await ref.child('UPFIN/API/logfin/list_data/job').get();
+      if (jobSnapshot.exists) {
+        List<String> tempList = [];
+        for (var each in jobSnapshot.children) {
+          tempList.add(each.value.toString());
+        }
+        tempList.sort((a,b)=>int.parse(a.split("@")[1]).compareTo(int.parse(b.split("@")[1])));
+        jobList.addAll(tempList);
+      } else {
+        failCount++;
+      }
+      CommonUtils.log("i", "list : $jobList");
+
+      final courtSnapshot = await ref.child('UPFIN/API/logfin/list_data/court').get();
+      if (courtSnapshot.exists) {
+        List<String> tempList = [];
+        for (var each in courtSnapshot.children) {
+          tempList.add(each.value.toString());
+        }
+        tempList.sort((a,b)=>int.parse(a.split("@")[1]).compareTo(int.parse(b.split("@")[1])));
+        courtList.addAll(tempList);
+      } else {
+        failCount++;
+      }
+      CommonUtils.log("i", "list : $courtList");
+
+      final bankSnapshot = await ref.child('UPFIN/API/logfin/list_data/bank').get();
+      if (bankSnapshot.exists) {
+        List<String> tempList = [];
+        for (var each in bankSnapshot.children) {
+          tempList.add(each.value.toString());
+        }
+        tempList.sort((a,b)=>int.parse(a.split("@")[1].replaceAll("000", "").replaceAll("00", "")).compareTo(int.parse(b.split("@")[1].replaceAll("000", "").replaceAll("00", ""))));
+        bankList.addAll(tempList);
+      } else {
+        failCount++;
+      }
+      CommonUtils.log("i", "list : $bankList");
+
+      if(failCount > 0){
+        callback(false);
+      }else{
+        callback(true);
+      }
+    } catch (e) {
+      CommonUtils.log("e", "logfin data init error : ${e.toString()}");
       callback(false);
     }
   }
