@@ -384,7 +384,7 @@ class UiUtils {
       popWidth = width;
     }
     if(height == null) {
-      popHeight = 3.w;
+      popHeight = 33.w;
     }else{
       popHeight = height;
     }

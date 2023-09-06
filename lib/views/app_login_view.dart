@@ -194,7 +194,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
   }
 
   Future<void> _requestPermissions() async {
-    await CommonUtils.requestPermissions((isDenied, deniedPermissionsList){
+    await CommonUtils.requestPermissions((isDenied, deniedPermissionsList) async {
       if(isDenied){
         String deniedPermissionsString = "";
         for(int i = 0; i < deniedPermissionsList!.length; i++){
@@ -204,17 +204,21 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
           }
         }
 
-        UiUtils.showSlideMenu(context, SlideType.bottomToTop, true, null, null, 0.5, (context, setState) =>
-            Column(mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  UiUtils.getStyledTextWithFixedScale("[$deniedPermissionsString] 권한이 필요합니다. ", TextStyles.slidePopPermissionText, TextAlign.center, null),
-                  UiUtils.getMarginBox(100.w, 2.h),
-                  UiUtils.getTextButtonBox(70.w, "설정 바로가기", TextStyles.slidePopButtonText, ColorStyles.finAppGreen, () {
-                    openAppSettings();
-                    Navigator.of(context).pop();
-                  })
-                ]
-            ));
+        await Future.delayed(const Duration(milliseconds: 1500), () async {
+          UiUtils.showSlideMenu(context, SlideType.bottomToTop, true, null, 33.h, 0.5, (context, setState) =>
+              Column(mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    UiUtils.getStyledTextWithFixedScale("[$deniedPermissionsString] 권한이 필요합니다. ", TextStyles.slidePopPermissionText, TextAlign.center, null),
+                    UiUtils.getMarginBox(100.w, 2.h),
+                    UiUtils.getTextButtonBox(70.w, "설정 바로가기", TextStyles.slidePopButtonText, ColorStyles.finAppGreen, () {
+                      openAppSettings();
+                      Navigator.of(context).pop();
+                    })
+                  ]
+              ));
+        });
+
+
         CommonUtils.log("i", "denied permissions : $deniedPermissionsString");
       }
     });
@@ -338,20 +342,20 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
           Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.end, children: [
             SnsLoginController.getKakaoLoginButton(context, 20.w, (isSuccessToLogin){
               if(isSuccessToLogin){
-
-              }else{
                 if(context.mounted){
                   CommonUtils.moveTo(context, AppView.signupView.value, null);
                 }
+              }else{
+
               }
             }),
             SnsLoginController.getAppleLoginButton(context, 20.w, (isSuccessToLogin){
               if(isSuccessToLogin){
-
-              }else{
                 if(context.mounted){
                   CommonUtils.moveTo(context, AppView.signupView.value, null);
                 }
+              }else{
+
               }
             })
           ])
