@@ -47,11 +47,11 @@ class SnsLoginController{
     }
   }
 
-  static Widget getKakaoLoginButton(BuildContext context, double size, Function(bool isSuccessToLogin) callback){
+  static Widget getKakaoLoginButton(BuildContext context, double size, Function(bool? isSuccessToLogin) callback){
     return UiUtils.getIconButton(Icons.add_box, size, ColorStyles.upFinKakaoYellow, () async {
-      UiUtils.showLoadingPop(context);
-      await SnsLoginController._kakaoLogin((bool isSuccess) async {
-        if(Config.isControllerLoadFinished){
+      if(Config.isControllerLoadFinished){
+        UiUtils.showLoadingPop(context);
+        await SnsLoginController._kakaoLogin((bool isSuccess) async {
           UiUtils.closeLoadingPop(context);
           if(isSuccess){
             if(await _isMemberFromSns()){
@@ -64,19 +64,21 @@ class SnsLoginController{
             CommonUtils.flutterToast("${SnsLoginController.loginPlatform.value}로그인에 실패했습니다.");
             callback(false);
           }
-        }else{
-          CommonUtils.flutterToast("데이터 로딩에 실패했습니다. 앱을 다시 실행 해 주세요.");
-        }
-      });
+        });
+      }else{
+        CommonUtils.flutterToast("데이터 로딩 실패\n다시 실행 해 주세요.");
+        callback(null);
+      }
     });
   }
 
-  static Widget getAppleLoginButton(BuildContext context, double size, Function(bool isSuccessToLogin) callback){
+  static Widget getAppleLoginButton(BuildContext context, double size, Function(bool? isSuccessToLogin) callback){
     return UiUtils.getIconButton(Icons.add_box, size, ColorStyles.upFinBlack, () async {
       if(Config.isControllerLoadFinished){
 
       }else{
-        CommonUtils.flutterToast("데이터 로딩에 실패했습니다. 앱을 다시 실행 해 주세요.");
+        CommonUtils.flutterToast("데이터 로딩 실패\n다시 실행 해 주세요.");
+        callback(null);
       }
     });
   }
@@ -125,7 +127,7 @@ class SnsLoginController{
           callback(true);
         } catch (error) {
           if (error is PlatformException && error.code == 'CANCELED') {
-            CommonUtils.flutterToast("카카오톡 로그인 중 오류가 발생했습니다.");
+            CommonUtils.flutterToast("카카오톡 로그인 실패\n다시 실행 해 주세요.");
             CommonUtils.log("e", '카카오톡으로 로그인 실패 $error');
             callback(false);
             return;
@@ -188,7 +190,7 @@ class SnsLoginController{
         _setUserInfoFromKakao(user);
       } catch (error) {
         CommonUtils.log("e", '사용자 정보 요청 실패 $error');
-        CommonUtils.flutterToast("카카오톡 로그인 중 오류가 발생했습니다.");
+        CommonUtils.flutterToast("카카오 로그인 실패\n다시 실행 해 주세요.");
       }
     } else {
       CommonUtils.flutterToast("카카오톡 설치 후 진행 해 주세요.");

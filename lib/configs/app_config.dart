@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:upfin/views/app_main_view.dart';
+import 'package:upfin/views/app_search_accident_view.dart';
 import 'package:upfin/views/app_signup_view.dart';
-import 'package:upfin/views/in_app_web_view.dart';
+import 'package:upfin/views/app_web_view.dart';
 import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
-import '../views/certification_view.dart';
+import '../views/app_login_certification_view.dart';
 import '../views/app_login_view.dart';
 
 class Config{
@@ -19,29 +21,35 @@ class Config{
   static List<Permission> permissionList = [Permission.notification];
 
   static Map<String, WidgetBuilder> appRoutes = {
-    AppView.rootView.value : (context) => AppLoginView(),
-    AppView.certificationView.value : (context) => CertificationView(),
-    AppView.webView.value : (context) => InAppWebView(),
-    AppView.signupView.value : (context) => AppSignUpView()
+    AppView.rootLoginView.value : (context) => AppLoginView(),
+    AppView.certificationView.value : (context) => AppLoginCertificationView(),
+    AppView.webView.value : (context) => AppWebView(),
+    AppView.signupView.value : (context) => AppSignUpView(),
+    AppView.mainView.value : (context) => AppMainView(),
+    AppView.searchAccidentView.value : (context) => AppSearchAccidentView()
   };
 
 }
 
 enum AppView {
-  rootView, certificationView, webView, signupView
+  rootLoginView, certificationView, webView, signupView, mainView, searchAccidentView
 }
 
 extension SAppViewExtension on AppView {
   String get value {
     switch (this) {
-      case AppView.rootView:
-        return '/';
+      case AppView.rootLoginView:
+        return '/loginView';
       case AppView.certificationView:
         return '/certification';
       case AppView.webView:
         return '/webView';
       case AppView.signupView:
         return '/signupView';
+      case AppView.mainView:
+        return '/mainView';
+      case AppView.searchAccidentView:
+        return '/searchAccidentView';
     }
   }
 }

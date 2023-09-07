@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
+import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:sizer/sizer.dart';
-import '../configs/text_config.dart';
 import '../styles/ColorStyles.dart';
 import '../styles/TextStyles.dart';
 import '../configs/app_config.dart';
@@ -14,7 +14,7 @@ class UiUtils {
       builder: (BuildContext context, Orientation orientation, DeviceType deviceType) {
         return MaterialApp(
           theme: ThemeData(useMaterial3: true),
-          initialRoute: AppView.rootView.value,
+          initialRoute: AppView.rootLoginView.value,
           routes: Config.appRoutes
         );
       },
@@ -25,7 +25,7 @@ class UiUtils {
   static Widget getView(BuildContext context, Widget view, Future<bool> Function(BuildContext? context) callbackBackButtonForView){
     return GestureDetector(
         onTap: () {
-          CommonUtils.hideKeyBoard(context);
+          CommonUtils.hideKeyBoard();
         },
         child: SafeArea(
             child: WillPopScope(
@@ -42,7 +42,7 @@ class UiUtils {
   static Widget getViewWithScroll(BuildContext context, Widget view, ScrollController scrollController, Future<bool> Function(BuildContext? context) callbackBackButtonForView){
     return GestureDetector(
       onTap: () {
-        CommonUtils.hideKeyBoard(context);
+        CommonUtils.hideKeyBoard();
         scrollController.jumpTo(0);
       },
       child: SafeArea(
@@ -84,14 +84,14 @@ class UiUtils {
   }
 
   static Widget getBorderTextWithFixedScale(String text, double fontSize, FontWeight fontWeight, TextAlign? textAlign, Color borderColor, Color textColor){
-    return Container(padding: const EdgeInsets.all(0.2), // 텍스트 주위에 여백 추가
+    return Container(padding: EdgeInsets.all(0.1.w), // 텍스트 주위에 여백 추가
       decoration: BoxDecoration(border: Border.all(color: borderColor, width: 2.0), borderRadius: BorderRadius.circular(2.0)),
       child: Text(text, style: TextStyle(decoration: TextDecoration.none, height: 1, fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor)));
   }
 
   static Widget getBoxTextWithFixedScale(String text, double fontSize, FontWeight fontWeight, TextAlign? textAlign, Color boxColor, Color textColor){
     return Container(color: boxColor, child: FittedBox(fit: BoxFit.contain, alignment: Alignment.center,
-    child: Padding(padding: const EdgeInsets.only(left: 6.0, right: 6.0, bottom: 2.0, top: 2.0), child: Text(text, style: TextStyle(fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor)))));
+    child: Padding(padding: EdgeInsets.only(left: 2.w, right: 2.w, bottom: 1.w, top: 1.w), child: Text(text, style: TextStyle(fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor)))));
   }
 
   static SelectableText getSelectableTextWithFixedScale(String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign? textAlign, int? textMaxLine){
@@ -105,7 +105,7 @@ class UiUtils {
   static Widget getTextWithUnderline(String text, TextStyle textStyle, Color underlineColor, VoidCallback? onPressedCallback){
     return Column(mainAxisSize: MainAxisSize.max,
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[Container(padding: const EdgeInsets.only(bottom: 3),
+      children: <Widget>[Container(padding: EdgeInsets.only(bottom: 1.w),
           decoration: BoxDecoration(border: Border(bottom: BorderSide(color: underlineColor, width: 0.5.w))),
           child: GestureDetector(onTap: onPressedCallback, child: getStyledTextWithFixedScale(text,textStyle,null,null)))]);
   }
@@ -120,7 +120,7 @@ class UiUtils {
         child: ElevatedButton.icon(
           style: ElevatedButton.styleFrom(
             backgroundColor: buttonColor,
-            padding: const EdgeInsets.all(15),
+            padding: EdgeInsets.all(3.w),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             elevation: 5,
             shadowColor: Colors.grey,
@@ -138,7 +138,7 @@ class UiUtils {
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: buttonColor,
-            padding: const EdgeInsets.all(20),
+            padding: EdgeInsets.all(5.w),
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             elevation: 5,
             shadowColor: Colors.grey,
@@ -153,6 +153,10 @@ class UiUtils {
     return SizedBox(child: IconButton(onPressed: onPressedCallback, icon: Icon(icon, color: iconColor, size: size)));
   }
 
+  static Widget getIconButtonWithHeight(double height, IconData icon, double size, Color iconColor, VoidCallback onPressedCallback) {
+    return SizedBox(height: height,child: IconButton(onPressed: onPressedCallback, icon: Icon(icon, color: iconColor, size: size)));
+  }
+
   static SizedBox getTextButtonBox(double buttonWidth, String buttonText, TextStyle buttonTextStyles, Color buttonColor, VoidCallback onPressedCallback) {
     return SizedBox(
         width: buttonWidth,
@@ -165,7 +169,7 @@ class UiUtils {
           ),
           onPressed: onPressedCallback,
           child: Padding(
-            padding: const EdgeInsets.all(15.0),
+            padding: EdgeInsets.all(4.w),
             child: getStyledTextWithFixedScale(buttonText,buttonTextStyles,TextAlign.center,null)
           ),
         )
@@ -202,7 +206,7 @@ class UiUtils {
           ),
           onPressed: onPressedCallback,
           child: Padding(
-            padding: const EdgeInsets.all(12.0),
+            padding: EdgeInsets.all(4.w),
             child: getStyledTextWithFixedScale(buttonText,TextStyles.countDownButtonStyle,TextAlign.center,null)
           ),
         )
@@ -219,7 +223,7 @@ class UiUtils {
             ),
             onPressed: onPressedCallback,
             child: Padding(
-              padding: const EdgeInsets.all(15.0),
+              padding: EdgeInsets.all(4.w),
               child: getStyledTextWithFixedScale(buttonText, TextStyles.buttonTextStyle, TextAlign.center, null)
             ),
           )
@@ -233,7 +237,7 @@ class UiUtils {
             ),
             onPressed: () { },
             child: Padding(
-              padding: const EdgeInsets.all(15.0),
+              padding: EdgeInsets.all(4.w),
               child: getStyledTextWithFixedScale(buttonText, TextStyles.buttonTextStyle, TextAlign.center, null)
             ),
           )
@@ -267,32 +271,34 @@ class UiUtils {
     return getStyledTextWithFixedScale(titleText, TextStyles.subTitleTextStyle, TextAlign.start, null);
   }
 
-  static Widget getEnabledTextField(double width, String initText, InputDecoration inputDecoration){
-    return SizedBox(width: width, child: TextFormField(initialValue: initText, enabled: false, decoration: inputDecoration));
+  static Widget getDisabledTextField(double width, String initText, TextStyle textStyle, InputDecoration inputDecoration){
+    return SizedBox(width: width, child: TextFormField(initialValue: initText, enabled: false,
+        decoration: inputDecoration, style: textStyle));
   }
 
-  static Widget getTextField(double width, TextEditingController textEditingController, TextInputType textInputType,
+  static Widget getTextField(double width, TextStyle textStyle, FocusNode focusNode, TextEditingController textEditingController, TextInputType textInputType,
       InputDecoration inputDecoration, ValueChanged<String> onChangedCallback){
     return SizedBox(width: width,
-        child: TextField(cursorColor: ColorStyles.upFinBlack, controller: textEditingController, keyboardType: textInputType, decoration: inputDecoration, onChanged: onChangedCallback));
+        child: TextField(focusNode: focusNode, cursorColor: ColorStyles.upFinBlack, controller: textEditingController,
+            keyboardType: textInputType, decoration: inputDecoration, onChanged: onChangedCallback, style: textStyle));
   }
 
-  static Widget getTextFormField(double width, TextEditingController textEditingController, TextInputType textInputType, bool isPwd, InputDecoration inputDecoration,
-      ValueChanged<String> onChangedCallback, FormFieldValidator<String> validatorCallback){
-    return SizedBox(width: width, child: TextFormField(obscureText : isPwd, cursorColor: ColorStyles.upFinBlack, controller: textEditingController, keyboardType: textInputType, decoration: inputDecoration,
-            onChanged: onChangedCallback, validator: validatorCallback));
+  static Widget getTextFormField(double width, TextStyle textStyle, FocusNode focusNode, TextEditingController textEditingController, TextInputType textInputType, bool isPwd,
+      InputDecoration inputDecoration, ValueChanged<String> onChangedCallback, FormFieldValidator<String> validatorCallback){
+    return SizedBox(width: width,
+        child: TextFormField(focusNode: focusNode, obscureText : isPwd, cursorColor: ColorStyles.upFinBlack, controller: textEditingController,
+            keyboardType: textInputType, decoration: inputDecoration, onChanged: onChangedCallback, validator: validatorCallback, style: textStyle));
   }
 
   static InputDecoration getInputDecoration(String labelText, String counterText){
     return InputDecoration(
         labelText: labelText,
         floatingLabelBehavior: FloatingLabelBehavior.always,
-        labelStyle: const TextStyle(color: ColorStyles.upFinTextAndBorderBlue),
+        labelStyle: const TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "SpoqaHanSansNeo", color: ColorStyles.upFinTextAndBorderBlue),
         hintText: "",
         counterText: counterText,
         errorStyle: TextStyle(fontSize: 0.sp),
-        counterStyle: const TextStyle(color: ColorStyles.upFinTextAndBorderBlue),
-        hintStyle: TextStyles.upFinTextFormFieldLabelTextStyle,
+        counterStyle: const TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "SpoqaHanSansNeo", color: ColorStyles.upFinTextAndBorderBlue),
         enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: ColorStyles.upFinButtonBlue)),
         border: const UnderlineInputBorder(borderSide: BorderSide(color: ColorStyles.upFinButtonBlue)),
         focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: ColorStyles.upFinTextAndBorderBlue)),
@@ -304,6 +310,7 @@ class UiUtils {
 
   static bool isLoadingPopOn = false;
   static void showLoadingPop(BuildContext targetContext){
+    CommonUtils.log("i", "loading show : ${!isLoadingPopOn}");
     if(!isLoadingPopOn){
       showGeneralDialog(
         barrierDismissible: false,
@@ -312,7 +319,7 @@ class UiUtils {
           return WillPopScope(
             onWillPop: () async => false,
             child: StatefulBuilder(// You need this, notice the parameters below:
-                builder: (BuildContext context, StateSetter setState) {
+                builder: (_, StateSetter setState) {
                   isLoadingPopOn = true;
                   return Container(
                       width: 100.w,
@@ -328,6 +335,7 @@ class UiUtils {
   }
 
   static void closeLoadingPop(BuildContext targetContext){
+    CommonUtils.log("i", "loading close");
     if(isLoadingPopOn){
       isLoadingPopOn = false;
       Navigator.pop(targetContext);
@@ -343,13 +351,13 @@ class UiUtils {
         return Dialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           backgroundColor: ColorStyles.upFinWhite,
-          insetPadding: const EdgeInsets.all(10),
+          insetPadding: EdgeInsets.all(3.w),
           child: StatefulBuilder(
             builder: (__, StateSetter popViewSetState){
               Widget contentsWidget = createWidgetMethod(parentViewContext, popViewSetState);
               return SizedBox(
                   width: popWidth,
-                  child: Padding(padding: const EdgeInsets.all(15.0), child: contentsWidget));
+                  child: Padding(padding: EdgeInsets.all(3.w), child: contentsWidget));
             }
           )
         );
@@ -362,7 +370,7 @@ class UiUtils {
         children: [Column(crossAxisAlignment: CrossAxisAlignment.center, children: viewList)]);
   }
 
-  static Widget getCircleCheckBox(StateSetter setState, double size, bool checkedValue, Function(bool?) onChanged){
+  static Widget getCircleCheckBox(double size, bool checkedValue, Function(bool?) onChanged){
     return Transform.scale(scale: size, child: Checkbox(
         value: checkedValue,
         onChanged: onChanged,
@@ -371,6 +379,20 @@ class UiUtils {
         activeColor: ColorStyles.upFinSky,
         side: MaterialStateBorderSide.resolveWith((states) =>
          !checkedValue? const BorderSide(width: 2.0, color: ColorStyles.upFinGray) : const BorderSide(width: 2.0, color: ColorStyles.upFinSky))
+    ));
+  }
+
+  static Widget getCustomCircleCheckBox(Key key, double size, bool checkedValue,
+      Color activeCheckColor, Color activeFillColor, Color borderColor, Color activeBorderColor, Function(bool?) onChanged){
+    return Transform.scale(scale: size, child: Checkbox(
+        key: key,
+        value: checkedValue,
+        onChanged: onChanged,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        checkColor: activeCheckColor,
+        activeColor: activeFillColor,
+        side: MaterialStateBorderSide.resolveWith((states) =>
+        !checkedValue? BorderSide(width: 2.0, color: borderColor) : BorderSide(width: 2.0, color: activeBorderColor))
     ));
   }
 
@@ -396,7 +418,7 @@ class UiUtils {
       barrierLabel: "Slide Menu",
       barrierDismissible: isDismissible,
       barrierColor: Colors.black.withOpacity(opacity),
-      transitionDuration: const Duration(milliseconds: 500),
+      transitionDuration: const Duration(milliseconds: 300),
       context: parentViewContext,
       pageBuilder: (context, anim1, anim2) {
         switch (slideType) {
@@ -441,7 +463,7 @@ class UiUtils {
                   child: StatefulBuilder(
                       builder: (_, StateSetter popViewSetState){
                         Widget contentsWidget = createWidgetMethod(parentViewContext, popViewSetState);
-                        return Padding(padding: const EdgeInsets.all(20.0), child: contentsWidget);
+                        return Padding(padding: EdgeInsets.all(5.w), child: contentsWidget);
                       }
                   )
               ),
@@ -497,7 +519,7 @@ class UiUtils {
     return Align(
       alignment: alignment,
       child: Padding(
-          padding: const EdgeInsets.all(20),
+          padding: EdgeInsets.all(5.w),
           child: FloatingActionButton.extended(
             label: Text(text!),
             icon: Icon(icon),
@@ -508,9 +530,20 @@ class UiUtils {
     );
   }
 
-  static Widget getInitLoadingView() {
-    return Container();
+  static Widget getInitLoadingView(int percent) {
+    return Container(width: 100.w, height: 100.h, color: ColorStyles.upFinWhite,
+        child: Center(child: CircularPercentIndicator(
+          animateFromLastPercent: true,
+          radius: 65.0,
+          lineWidth: 15.0,
+          animation: true,
+          percent: percent/100,
+          center: getTextWithFixedScale("$percent%", 14.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, null),
+          footer: Column(children: [getMarginBox(0, 3.h),getTextWithFixedScale("데이터를 가져오는 중입니다.", 13.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, null)]),
+          circularStrokeCap: CircularStrokeCap.round,
+          progressColor: ColorStyles.upFinButtonBlue,
+        ))
+    );
   }
-
 
 }

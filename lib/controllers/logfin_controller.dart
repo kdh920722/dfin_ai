@@ -1,4 +1,5 @@
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -41,7 +42,7 @@ class LogfinController {
         callback(false);
       }
     } catch (e) {
-      CommonUtils.log("e", "gpt init error : ${e.toString()}");
+      CommonUtils.log("e", "logfin init error : ${e.toString()}");
       callback(false);
     }
   }
@@ -110,10 +111,10 @@ class LogfinController {
     }
 
     if(api == LogfinApis.signIn || api == LogfinApis.signUp || api == LogfinApis.socialLogin){
-      inputJson['fcm_token'] = FireBaseController.fcmToken;
+      inputJson['user']['fcm_token'] = FireBaseController.fcmToken;
     }
 
-    if(api != LogfinApis.signIn && api != LogfinApis.signUp && api != LogfinApis.socialLogin){
+    if(api != LogfinApis.signIn && api != LogfinApis.signUp && api != LogfinApis.socialLogin && api != LogfinApis.deleteAccount){
       if(userToken != ""){
         inputJson['api_token'] = userToken;
       }else{
@@ -121,6 +122,8 @@ class LogfinController {
         callback(false, null);
       }
     }
+
+    CommonUtils.log("i", "inputJson : $inputJson");
 
     try {
       final url = Uri.parse(targetUrl);
@@ -140,7 +143,7 @@ class LogfinController {
       if (response.statusCode == 200) { // HTTP_OK
         final resultData = json;
         if(resultData["success"]){
-          if(api == LogfinApis.signIn){
+          if(api == LogfinApis.signIn || api == LogfinApis.signUp || api == LogfinApis.socialLogin){
             LogfinController.userToken = resultData["data"]['api_token'];
             CommonUtils.log('i', "userToken : ${LogfinController.userToken}");
           }
@@ -158,10 +161,37 @@ class LogfinController {
       callback(false, null);
     }
   }
+
+  static Future<void> getMainOrSearchView(BuildContext context, Function(bool isSuccess, AppView? appView) callback) async {
+    // 1) 유저정보 가져오기
+    callLogfinApi(LogfinApis.getUserInfo, <String, dynamic>{}, (isSuccessToGetUserInfo, userInfoOutputJson){
+      if(isSuccessToGetUserInfo){
+        // 2) 사건정보 조회
+        callLogfinApi(LogfinApis.getAccidentInfo, <String, dynamic>{}, (isSuccessToGetAccidentInfo, accidentInfoOutputJson){
+          if(isSuccessToGetAccidentInfo){
+            List<dynamic> accidentList = accidentInfoOutputJson!["accidents"];
+            if(accidentList.isEmpty){
+              // 3-1) 사건정보 없으면 한도금리 조회를 위한 조건 입력 화면으로 이동(한도금리 조회 시, 사건정보 저장)
+              callback(true, AppView.searchAccidentView);
+            }else{
+              // 3-2) 사건정보 있으면 사건정보 이력화면(메인 뷰)로 이동
+              callback(true, AppView.mainView);
+            }
+          }else{
+            CommonUtils.flutterToast("데이터 로딩 실패\n다시 실행 해 주세요.");
+            callback(false, null);
+          }
+        });
+      }else{
+        CommonUtils.flutterToast("데이터 로딩 실패\n다시 실행 해 주세요.");
+        callback(false, null);
+      }
+    });
+  }
 }
 
 enum LogfinApis {
-  signUp, signIn, socialLogin,
+  signUp, signIn, socialLogin, deleteAccount,
   getUserInfo, prSearch,
   applyProductDocSearch, applyProduct,
   getAccidentInfo, getOffersInfo,
@@ -177,6 +207,8 @@ extension LogfinApisExtension on LogfinApis {
         return '/users/sign_in.json';
       case LogfinApis.socialLogin:
         return '/social_login.json';
+      case LogfinApis.deleteAccount:
+        return '/delete_account.json';
       case LogfinApis.getUserInfo:
         return '/get_user.json';
       case LogfinApis.prSearch:

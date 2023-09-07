@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:upfin/configs/text_config.dart';
 import 'package:upfin/controllers/aws_controller.dart';
 import 'package:upfin/controllers/clova_controller.dart';
 import 'package:upfin/controllers/get_controller.dart';
@@ -32,10 +31,24 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
   final _formKey = GlobalKey<FormState>();
   final _emailTextController = TextEditingController();
   final _pwdTextController = TextEditingController();
+  final _emailTextFocus = FocusNode();
+  final _pwdTextFocus = FocusNode();
+
+  void _unFocusAllNodes(){
+    _emailTextFocus.unfocus();
+    _pwdTextFocus.unfocus();
+  }
+
+  void _disposeAllTextControllers(){
+    _emailTextController.dispose();
+    _pwdTextController.dispose();
+    _keyboardVisibilityController = null;
+  }
 
   KeyboardVisibilityController? _keyboardVisibilityController;
   void _functionForKeyboardHide(){
     CommonUtils.log("i", "HIDE");
+    CommonUtils.hideKeyBoard();
     _scrollController.jumpTo(0);
   }
   void _functionForKeyboardShow(){
@@ -54,7 +67,8 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
   void dispose(){
     CommonUtils.log("i", "새 화면 파괴");
     WidgetsBinding.instance.removeObserver(this);
-    _keyboardVisibilityController = null;
+    _unFocusAllNodes();
+    _disposeAllTextControllers();
     super.dispose();
   }
 
@@ -83,6 +97,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     // init
     await FireBaseController.initFcm((bool isSuccess, String fcmToken){
       if(isSuccess){
+        GetController.to.updatePercent(10);
         CommonUtils.log("i", "firebase credential : ${FireBaseController.userCredential.toString()}");
       }else{
         CommonUtils.flutterToast("firebase init 에러가 발생했습니다.");
@@ -94,6 +109,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     // init
     await GptController.initGPT((bool isSuccess){
       if(isSuccess){
+        GetController.to.updatePercent(10);
         CommonUtils.log("i", "gpt key : ${GptController.gptApiKey}");
       }else{
         CommonUtils.flutterToast("gpt init 에러가 발생했습니다.");
@@ -108,6 +124,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     // init
     await CodeFController.initAccessToken((bool isSuccess){
       if(isSuccess){
+        GetController.to.updatePercent(10);
         CommonUtils.log("i", "codef token : ${CodeFController.token}");
       }else{
         CommonUtils.flutterToast("codef init 에러가 발생했습니다.");
@@ -119,6 +136,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     // init
     await CLOVAController.initCLOVA((bool isSuccess){
       if(isSuccess){
+        GetController.to.updatePercent(10);
         CommonUtils.log("i", "clova url : ${CLOVAController.apiURL}\nclova secretKey : ${CLOVAController.secretKey}");
       }else{
         CommonUtils.flutterToast("clova init 에러가 발생했습니다.");
@@ -130,6 +148,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     // init
     await AwsController.initAWS((bool isSuccess){
       if(isSuccess){
+        GetController.to.updatePercent(10);
         CommonUtils.log("i", "aws keys : ${AwsController.awsAccessKey}\naws secretKey : ${AwsController.awsSecretKey}");
       }else{
         CommonUtils.flutterToast("aws init 에러가 발생했습니다.");
@@ -141,7 +160,8 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     // init
     await LogfinController.initLogfin((bool isSuccess){
       if(isSuccess){
-        CommonUtils.log("i", "logfin url : ${LogfinController.url}\naws headerKey : ${LogfinController.headerKey}");
+        GetController.to.updatePercent(10);
+        CommonUtils.log("i", "logfin url : ${LogfinController.url}\nlogfin headerKey : ${LogfinController.userToken}");
       }else{
         CommonUtils.flutterToast("logfin init 에러가 발생했습니다.");
       }
@@ -151,6 +171,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
   Future<String?> _initDeepLink() async {
     try{
       final initialLink = await getInitialLink();
+      GetController.to.updatePercent(10);
       return initialLink;
     }catch(e){
       CommonUtils.log("e", "init deep link error : ${e.toString()}");
@@ -162,6 +183,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     // init
     await IamportController.initIamport((bool isSuccess){
       if(isSuccess){
+        GetController.to.updatePercent(10);
         CommonUtils.log("i", "iamport user_code : ${IamportController.iamportUserCode}");
       }else{
         CommonUtils.flutterToast("iamport init 에러가 발생했습니다.");
@@ -173,6 +195,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     // init
     await SnsLoginController.initKakao((bool isSuccess){
       if(isSuccess){
+        GetController.to.updatePercent(10);
         CommonUtils.log("i", "kakao key : ${SnsLoginController.kakaoKey}");
       }else{
         CommonUtils.flutterToast("iamport init 에러가 발생했습니다.");
@@ -183,12 +206,13 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
   Future<void> _initSharedPreference() async {
     // init
     await SharedPreferenceController.initSharedPreference((bool isSuccess){
-      if(!isSuccess){
-        CommonUtils.flutterToast("sharedPreference init 에러가 발생했습니다.");
-      }else{
+      if(isSuccess){
+        GetController.to.updatePercent(10);
         CommonUtils.log("i","sharedPreference init.");
         _emailTextController.text = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceIdKey);
         _pwdTextController.text = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferencePwKey);
+      }else{
+        CommonUtils.flutterToast("sharedPreference init 에러가 발생했습니다.");
       }
     });
   }
@@ -252,116 +276,164 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
 
   @override
   Widget build(BuildContext context) {
+    CommonUtils.hideKeyBoard();
+
     Widget? view;
     if(!Config.isAppMainInit){
       _initAtFirst();
-      view = UiUtils.getInitLoadingView();
+      view = Obx(()=>UiUtils.getInitLoadingView(GetController.to.loadingPercent.value));
     }else{
-      //Config.isControllerLoadFinished
-      view = Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: const EdgeInsets.all(20.0), child:
-      Column(children: [
-        SizedBox(width: 100.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          UiUtils.getMarginBox(0, 7.h),
-          UiUtils.getTextWithFixedScale("업핀", 55.sp, FontWeight.w800, ColorStyles.upFinButtonBlue, TextAlign.start, null),
-          UiUtils.getMarginBox(0, 2.h),
-          UiUtils.getTextWithFixedScale("나에게 꼭 맞는", 28.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
-          UiUtils.getMarginBox(0, 0.5.h),
-          UiUtils.getTextWithFixedScale("개인회생 대출상품", 28.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
-          UiUtils.getMarginBox(0, 0.5.h),
-          UiUtils.getTextWithFixedScale("바로 접수하세요!", 28.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
-          UiUtils.getMarginBox(0, 7.h)
-        ])),
-        Form(key: _formKey,
-            child: UiUtils.getRowColumnWithAlignCenter([
-              UiUtils.getTextFormField(90.w, _emailTextController, TextInputType.emailAddress, false, UiUtils.getInputDecoration("이메일", ""), (text) { }, (value){
-                if(value != null && value.trim().isEmpty){
-                  return "이메일을 입력하세요.";
-                }else{
-                  return null;
-                }
-              }),
-              UiUtils.getMarginBox(0, 2.h),
-              UiUtils.getTextFormField(90.w, _pwdTextController, TextInputType.visiblePassword, true, UiUtils.getInputDecoration("비밀번호", ""), (text) { }, (value){
-                if(value != null && value.trim().isEmpty){
-                  return "비밀번호를 입력하세요.";
-                }else{
-                  return null;
-                }
-              }),
-              UiUtils.getMarginBox(0, 2.h),
-              UiUtils.getTextButtonBox(90.w, "로그인", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
-                if(_formKey.currentState!.validate() && Config.isControllerLoadFinished){
-                  CommonUtils.log("i", "OK");
-                  Map<String, dynamic> inputJson = {
-                    "user" : {
-                      "email": _emailTextController.text.trim(),
-                      "password": _pwdTextController.text.trim()
-                    }
-                  };
-
-                  LogfinController.callLogfinApi(LogfinApis.signIn, inputJson, (isSuccess, outputJson){
-                    if(isSuccess){
-                      CommonUtils.flutterToast("환영합니다.");
-                      // 1) 캐시 데이터 저장
-                      SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceIdKey, _emailTextController.text.trim());
-                      SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferencePwKey, _pwdTextController.text.trim());
-
-                      // 2) 유저정보 가져오기
-
-                      // 3) 사건정보 조회
-
-                      // 4-1) 사건정보 없으면 한도금리 조회를 위한 조건 입력 화면으로 이동(한도금리 조회 시, 사건정보 저장)
-
-                      // 4-2) 사건정보 있으면 사건정보 이력화면(메인 뷰)로 이동
-                    }else{
-                      CommonUtils.flutterToast("로그인에 실패했습니다.");
-                    }
-                  });
-                }else{
-                  if(!Config.isControllerLoadFinished){
-                    CommonUtils.flutterToast("데이터 로딩에 실패했습니다. 앱을 다시 실행 해 주세요.");
+      if(!Config.isControllerLoadFinished){
+        view = Obx(()=>UiUtils.getInitLoadingView(GetController.to.loadingPercent.value));
+      }else{
+        view = Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: EdgeInsets.all(5.w), child:
+        Column(children: [
+          SizedBox(width: 100.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            UiUtils.getMarginBox(0, 7.h),
+            UiUtils.getTextWithFixedScale("업핀", 55.sp, FontWeight.w800, ColorStyles.upFinButtonBlue, TextAlign.start, null),
+            UiUtils.getMarginBox(0, 2.h),
+            UiUtils.getTextWithFixedScale("나에게 꼭 맞는", 28.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
+            UiUtils.getMarginBox(0, 0.5.h),
+            UiUtils.getTextWithFixedScale("개인회생 대출상품", 28.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
+            UiUtils.getMarginBox(0, 0.5.h),
+            UiUtils.getTextWithFixedScale("바로 접수하세요!", 28.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
+            UiUtils.getMarginBox(0, 7.h)
+          ])),
+          Form(key: _formKey,
+              child: UiUtils.getRowColumnWithAlignCenter([
+                UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _emailTextFocus, _emailTextController, TextInputType.emailAddress, false, UiUtils.getInputDecoration("이메일", ""), (text) { }, (value){
+                  if(value != null && value.trim().isEmpty){
+                    return "이메일을 입력하세요.";
                   }else{
-                    CommonUtils.flutterToast("입력하신 정보를 확인 해 주세요.");
+                    return null;
                   }
-                }
-              }),
-              UiUtils.getMarginBox(0, 0.7.h),
-              UiUtils.getTextButtonBox(90.w, "회원가입", TextStyles.upFinSkyTextInButtonStyle, ColorStyles.upFinWhiteSky, () {
-                if(Config.isControllerLoadFinished){
-                  CommonUtils.moveTo(context, AppView.signupView.value, null);
+                }),
+                UiUtils.getMarginBox(0, 2.h),
+                UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _pwdTextFocus, _pwdTextController, TextInputType.visiblePassword, true, UiUtils.getInputDecoration("비밀번호", ""), (text) { }, (value){
+                  if(value != null && value.trim().isEmpty){
+                    return "비밀번호를 입력하세요.";
+                  }else{
+                    return null;
+                  }
+                }),
+                UiUtils.getMarginBox(0, 2.h),
+                UiUtils.getTextButtonBox(90.w, "로그인", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
+                  if(_formKey.currentState!.validate() && Config.isControllerLoadFinished){
+                    CommonUtils.log("i", "OK");
+                    Map<String, dynamic> inputJson = {
+                      "user" : {
+                        "email": _emailTextController.text.trim(),
+                        "password": _pwdTextController.text.trim()
+                      }
+                    };
+
+                    UiUtils.showLoadingPop(context);
+                    LogfinController.callLogfinApi(LogfinApis.signIn, inputJson, (isSuccessToLogin, outputJson) async {
+                      if(isSuccessToLogin){
+                        CommonUtils.flutterToast("환영합니다!");
+                        // 캐시 데이터 저장
+                        SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceIdKey, _emailTextController.text.trim());
+                        SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferencePwKey, _pwdTextController.text.trim());
+
+                        await LogfinController.getMainOrSearchView(context, (isSuccessToGetViewInfo, viewInfo){
+                          UiUtils.closeLoadingPop(context);
+                          if(isSuccessToGetViewInfo){
+                            CommonUtils.moveWithRemoveUntil(context, viewInfo!.value, null);
+                          }
+                        });
+                      }else{
+                        UiUtils.closeLoadingPop(context);
+                        CommonUtils.flutterToast("로그인에 실패했습니다.");
+                      }
+                    });
+                  }else{
+                    if(!Config.isControllerLoadFinished){
+                      CommonUtils.flutterToast("데이터 로딩 실패\n다시 실행 해 주세요.");
+                    }else{
+                      CommonUtils.flutterToast("입력하신 정보를\n다시 확인 해 주세요.");
+                    }
+                  }
+                }),
+                UiUtils.getMarginBox(0, 0.7.h),
+                UiUtils.getTextButtonBox(90.w, "회원가입", TextStyles.upFinSkyTextInButtonStyle, ColorStyles.upFinWhiteSky, () async {
+                  _unFocusAllNodes();
+                  if(Config.isControllerLoadFinished){
+                    CommonUtils.moveTo(context, AppView.signupView.value, null);
+                  }else{
+                    CommonUtils.flutterToast("데이터 로딩 실패\n다시 실행 해 주세요.");
+                  }
+                })
+              ])
+          ),
+          UiUtils.getExpandedScrollView(Axis.vertical, SizedBox(width: 100.w, child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+            UiUtils.getMarginBox(0, 7.h),
+            UiUtils.getTextWithFixedScale("소셜 계정으로 로그인", 12.sp, FontWeight.w300, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, null),
+            UiUtils.getMarginBox(0, 0.1.h),
+            Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.end, children: [
+              SnsLoginController.getKakaoLoginButton(context, 20.w, (isSuccessToLogin) async {
+                _unFocusAllNodes();
+                if(isSuccessToLogin != null){
+                  if(isSuccessToLogin){
+                    CommonUtils.flutterToast("환영합니다!");
+                    UiUtils.showLoadingPop(context);
+                    await LogfinController.getMainOrSearchView(context, (isSuccessToGetViewInfo, viewInfo){
+                      UiUtils.closeLoadingPop(context);
+                      if(isSuccessToGetViewInfo){
+                        CommonUtils.moveWithRemoveUntil(context, viewInfo!.value, null);
+                      }
+                    });
+                  }else{
+                    UiUtils.closeLoadingPop(context);
+                    await CommonUtils.moveToWithResult(context, AppView.signupView.value, null);
+                  }
                 }else{
-                  CommonUtils.flutterToast("데이터 로딩에 실패했습니다. 앱을 다시 실행 해 주세요.");
+                  UiUtils.closeLoadingPop(context);
                 }
               }),
-            ])
-        ),
-        UiUtils.getExpandedScrollView(Axis.vertical, SizedBox(width: 100.w, child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-          UiUtils.getMarginBox(0, 7.h),
-          UiUtils.getTextWithFixedScale("소셜 계정으로 로그인", 12.sp, FontWeight.w300, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, null),
-          UiUtils.getMarginBox(0, 0.1.h),
-          Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.end, children: [
-            SnsLoginController.getKakaoLoginButton(context, 20.w, (isSuccessToLogin){
-              if(isSuccessToLogin){
-                if(context.mounted){
-                  CommonUtils.moveTo(context, AppView.signupView.value, null);
+              SnsLoginController.getAppleLoginButton(context, 20.w, (isSuccessToLogin) async {
+                _unFocusAllNodes();
+                if(isSuccessToLogin != null){
+                  if(isSuccessToLogin){
+                    CommonUtils.flutterToast("환영합니다!");
+                    UiUtils.showLoadingPop(context);
+                    await LogfinController.getMainOrSearchView(context, (isSuccessToGetViewInfo, viewInfo){
+                      UiUtils.closeLoadingPop(context);
+                      if(isSuccessToGetViewInfo){
+                        CommonUtils.moveWithRemoveUntil(context, viewInfo!.value, null);
+                      }
+                    });
+                  }else{
+                    UiUtils.closeLoadingPop(context);
+                    await CommonUtils.moveToWithResult(context, AppView.signupView.value, null);
+                  }
+                }else{
+                  UiUtils.closeLoadingPop(context);
                 }
+              })
+            ]),
+            UiUtils.getTextButtonBox(90.w, "회원탈퇴 for test", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinRed, () {
+              if(Config.isControllerLoadFinished){
+                Map<String, dynamic> inputJson = {
+                  "user" : {
+                    "email": _emailTextController.text.trim(),
+                    "password": _pwdTextController.text.trim()
+                  }
+                };
+                LogfinController.callLogfinApi(LogfinApis.deleteAccount, inputJson, (isSuccess, outputJson){
+                  if(isSuccess){
+                    CommonUtils.flutterToast("회원삭제 성공");
+                  }else{
+                    CommonUtils.flutterToast("회원삭제 실패");
+                  }
+                });
               }else{
-
-              }
-            }),
-            SnsLoginController.getAppleLoginButton(context, 20.w, (isSuccessToLogin){
-              if(isSuccessToLogin){
-                if(context.mounted){
-                  CommonUtils.moveTo(context, AppView.signupView.value, null);
-                }
-              }else{
-
+                CommonUtils.flutterToast("데이터 로딩 실패\n다시 실행 해 주세요.");
               }
             })
-          ])
-        ])))
-      ])
-      );
+          ])))
+        ])
+        );
+      }
     }
 
     return UiUtils.getViewWithScroll(context, view, _scrollController, CommonUtils.onWillPopForPreventBackButton);

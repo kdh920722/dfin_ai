@@ -3,7 +3,7 @@ import 'package:upfin/controllers/iamport_controller.dart';
 import 'package:upfin/utils/common_utils.dart';
 import '../utils/ui_utils.dart';
 
-class CertificationView extends StatelessWidget {
+class AppLoginCertificationView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {

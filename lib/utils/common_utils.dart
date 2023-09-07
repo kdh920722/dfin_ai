@@ -60,7 +60,7 @@ class CommonUtils {
     return randomNumber.toString();
   }
 
-  static void hideKeyBoard(BuildContext context){
+  static void hideKeyBoard(){
     FocusManager.instance.primaryFocus?.unfocus();
   }
 
@@ -219,16 +219,12 @@ class CommonUtils {
     return result;
   }
 
+  static Future<void> moveWithRemoveUntil(BuildContext fromContext, String toRoute, Object? arguments) async {
+    await Navigator.of(fromContext).pushNamedAndRemoveUntil(toRoute, (route) => false, arguments: arguments);
+  }
+
   static Future<void> moveWithReplacementTo(BuildContext fromContext, String toRoute, Object? arguments) async {
     await Navigator.of(fromContext).pushReplacementNamed(toRoute, arguments: arguments);
-  }
-
-  static Future<void> moveView(BuildContext fromContext, Widget toView) async {
-    await Navigator.push(fromContext, Transition(child: toView, transitionEffect: TransitionEffect.RIGHT_TO_LEFT));
-  }
-
-  static Transition getViewTransition(Widget toView){
-    return Transition(child: toView, transitionEffect: TransitionEffect.RIGHT_TO_LEFT);
   }
 
   static bool isKeyboardUp = false;
