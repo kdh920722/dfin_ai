@@ -1,3 +1,4 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:upfin/views/app_main_view.dart';
@@ -6,6 +7,7 @@ import 'package:upfin/views/app_signup_view.dart';
 import 'package:upfin/views/app_web_view.dart';
 import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
+import '../utils/common_utils.dart';
 import '../views/app_login_certification_view.dart';
 import '../views/app_login_view.dart';
 
@@ -15,6 +17,9 @@ class Config{
   static bool isAppMainInit = false;
   static const double appWidth = 393;
   static const double appHeight = 852;
+  static const int appOpenState = 10;
+  static const int appCloseState = 99;
+  static int appState = 10; // 10 : open, 99: close
   static bool isWeb = kIsWeb;
   static bool isAndroid = Platform.isAndroid;
   static String deppLinkInfo = "";
@@ -29,6 +34,25 @@ class Config{
     AppView.searchAccidentView.value : (context) => AppSearchAccidentView()
   };
 
+  static Future<void> initAppState(Function(bool isSuccess) callback) async{
+    try{
+      final ref = FirebaseDatabase.instance.ref();
+      final snapshot = await ref.child('UPFIN/APP_STATE').get();
+      if (snapshot.exists) {
+        for(var each in snapshot.children){
+          switch(each.key){
+            case "open_state" : appState = int.parse(each.value.toString());
+          }
+        }
+        callback(true);
+      } else {
+        callback(false);
+      }
+    }catch(e){
+      CommonUtils.log("e", "init app state error : ${e.toString()}");
+      callback(false);
+    }
+  }
 }
 
 enum AppView {

@@ -251,7 +251,6 @@ class CodeFController{
 
   static Future<void> _callApiWithOutCert(BuildContext context, Apis api, Map<String, dynamic> inputJson,
       Function(bool isSuccess, Map<String,dynamic>? resultMap, List<dynamic>? resultListMap) callback) async {
-    CommonUtils.log('i', 'normal call start');
     CodeFController._getDataFromApi(api, inputJson, (isSuccess, _, map, listMap) {
       if(isSuccess){
         if(map != null){
@@ -260,7 +259,6 @@ class CodeFController{
           callback(true, null, listMap);
         }
       }else{
-        CommonUtils.log('e', 'normal call api result error');
         callback(false, map, null);
       }
     });
@@ -268,13 +266,11 @@ class CodeFController{
 
   static Future<void> _callApiWithCert(BuildContext context, StateSetter setState, Apis representApi, Map<String, dynamic> inputJson,
       Function(bool isSuccess, Map<String,dynamic>? resultMap, List<dynamic>? resultListMap) callback) async {
-    CommonUtils.log('i', '[1] call start');
     await CodeFController._getDataFromApi(representApi, inputJson, (isSuccess, is2WayProcess, map, _) async {
       if(isSuccess){
         if(map != null){
           if(is2WayProcess){
             Map<String, dynamic>? resultMap = _set2WayMap(inputJson, map);
-            CommonUtils.log('i', '[1] call api result with 2way : ${resultMap.toString()}');
             if(resultMap != null){
               setState(() {
                 _setAuthPop(context, representApi, resultMap,(isResultSuccess, map, listMap) async {
@@ -295,7 +291,6 @@ class CodeFController{
           }
         }
       }else{
-        CommonUtils.log('e', '[1] call api result with 2way error');
         callback(false, map, null);
       }
     });

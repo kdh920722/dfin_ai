@@ -77,7 +77,7 @@ class UiUtils {
     );
   }
 
-  static Widget getTextWithIconStyledButtonWithFixedScale(TextDirection textDirection, String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign? textAlign, int? textMaxLine,
+  static Widget getTextStyledWithIconAndText(TextDirection textDirection, String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign? textAlign, int? textMaxLine,
       IconData icon, double iconSize, Color iconColor, Function() onPressedCallback){
     return Directionality(textDirection: textDirection, child: TextButton.icon(onPressed: onPressedCallback, icon: Icon(icon, color: iconColor, size: iconSize),
         label: getTextWithFixedScale(text, fontSize, fontWeight, textColor, textAlign, textMaxLine)));
@@ -114,47 +114,16 @@ class UiUtils {
     return SizedBox(width: marginWidth, height: marginHeight,);
   }
 
-  static SizedBox getIconInTextButtonBox(double buttonWidth, IconData icon, String buttonText, TextStyle buttonTextStyles, Color buttonColor, VoidCallback onPressedCallback) {
-    return SizedBox(
-        width: buttonWidth,
-        child: ElevatedButton.icon(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: buttonColor,
-            padding: EdgeInsets.all(3.w),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            elevation: 5,
-            shadowColor: Colors.grey,
-          ),
-          icon: Icon(icon, color: ColorStyles.upFinWhite, size: 25.sp),
-          label: getStyledTextWithFixedScale(buttonText,buttonTextStyles,null,null),
-          onPressed: onPressedCallback,
-        )
-    );
-  }
-
-  static SizedBox getIconInButtonBox(double buttonWidth, IconData icon, Color buttonColor, VoidCallback onPressedCallback) {
-    return SizedBox(
-        width: buttonWidth,
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: buttonColor,
-            padding: EdgeInsets.all(5.w),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            elevation: 5,
-            shadowColor: Colors.grey,
-          ),
-          onPressed: onPressedCallback,
-          child: Icon(icon, color: ColorStyles.upFinWhite, size: 16.sp)
-        )
-    );
-  }
-
   static Widget getIconButton(IconData icon, double size, Color iconColor, VoidCallback onPressedCallback) {
     return SizedBox(child: IconButton(onPressed: onPressedCallback, icon: Icon(icon, color: iconColor, size: size)));
   }
 
   static Widget getIconButtonWithHeight(double height, IconData icon, double size, Color iconColor, VoidCallback onPressedCallback) {
     return SizedBox(height: height,child: IconButton(onPressed: onPressedCallback, icon: Icon(icon, color: iconColor, size: size)));
+  }
+
+  static Widget getIconButtonWithBoxSize(Color backgroundColor, double width, double height, IconData icon, double size, Color iconColor, VoidCallback onPressedCallback) {
+    return Container(color: backgroundColor, width: width, height: height,child: IconButton(onPressed: onPressedCallback, icon: Icon(icon, color: iconColor, size: size)));
   }
 
   static SizedBox getTextButtonBox(double buttonWidth, String buttonText, TextStyle buttonTextStyles, Color buttonColor, VoidCallback onPressedCallback) {
@@ -177,7 +146,7 @@ class UiUtils {
   }
 
   static SizedBox getTextCustomPaddingButtonBox(double buttonWidth, String buttonText, TextStyle buttonTextStyles,
-      EdgeInsets edgeInsets, Color buttonColor, VoidCallback onPressedCallback) {
+      EdgeInsets edgeInsets, Color buttonColor, VoidCallback onPressedCallback, int maxLine) {
     return SizedBox(
         width: buttonWidth,
         child: ElevatedButton(
@@ -190,7 +159,7 @@ class UiUtils {
           onPressed: onPressedCallback,
           child: Padding(
               padding: edgeInsets,
-              child: getStyledTextWithFixedScale(buttonText,buttonTextStyles,TextAlign.center,null)
+              child: getStyledTextWithFixedScale(buttonText,buttonTextStyles,TextAlign.center,maxLine)
           ),
         )
     );
@@ -290,15 +259,15 @@ class UiUtils {
             keyboardType: textInputType, decoration: inputDecoration, onChanged: onChangedCallback, validator: validatorCallback, style: textStyle));
   }
 
-  static InputDecoration getInputDecoration(String labelText, String counterText){
+  static InputDecoration getInputDecoration(String labelText, double labelTextSize, String counterText, double counterTextSize){
     return InputDecoration(
         labelText: labelText,
         floatingLabelBehavior: FloatingLabelBehavior.always,
-        labelStyle: const TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "SpoqaHanSansNeo", color: ColorStyles.upFinTextAndBorderBlue),
+        labelStyle: TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "SpoqaHanSansNeo", color: ColorStyles.upFinTextAndBorderBlue, fontSize: labelTextSize, fontWeight: FontWeight.w500),
         hintText: "",
         counterText: counterText,
         errorStyle: TextStyle(fontSize: 0.sp),
-        counterStyle: const TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "SpoqaHanSansNeo", color: ColorStyles.upFinTextAndBorderBlue),
+        counterStyle: TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "SpoqaHanSansNeo", color: ColorStyles.upFinTextAndBorderBlue, fontSize: counterTextSize, fontWeight: FontWeight.w500),
         enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: ColorStyles.upFinButtonBlue)),
         border: const UnderlineInputBorder(borderSide: BorderSide(color: ColorStyles.upFinButtonBlue)),
         focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: ColorStyles.upFinTextAndBorderBlue)),
@@ -310,7 +279,6 @@ class UiUtils {
 
   static bool isLoadingPopOn = false;
   static void showLoadingPop(BuildContext targetContext){
-    CommonUtils.log("i", "loading show : ${!isLoadingPopOn}");
     if(!isLoadingPopOn){
       showGeneralDialog(
         barrierDismissible: false,
@@ -335,7 +303,6 @@ class UiUtils {
   }
 
   static void closeLoadingPop(BuildContext targetContext){
-    CommonUtils.log("i", "loading close");
     if(isLoadingPopOn){
       isLoadingPopOn = false;
       Navigator.pop(targetContext);

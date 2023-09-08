@@ -93,10 +93,19 @@ class IamportController {
         final jsonForDetailedInfo = jsonDecode(responseForDetailedInfo.body);
         CommonUtils.log('i', 'out full : \n$jsonForDetailedInfo');
         if (responseForDetailedInfo.statusCode == 200){
+          String name = jsonForDetailedInfo["response"]["name"];
+          String birthday = jsonForDetailedInfo["response"]["birthday"];
+          String gender = jsonForDetailedInfo["response"]["gender"];
+          String phone = jsonForDetailedInfo["response"]["phone"];
           String carrier = jsonForDetailedInfo["response"]["carrier"];
+
           Map<String, dynamic> output = {
             "isSuccess": true,
-            "carrier": carrier
+            "name": name,
+            "birth": birthday,
+            "gender": gender,
+            "phone": phone,
+            "carrier": carrier,
           };
           callback(true, output);
         }else{

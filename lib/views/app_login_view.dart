@@ -16,6 +16,7 @@ import 'package:upfin/controllers/sns_login_controller.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import 'package:uni_links/uni_links.dart';
 import '../controllers/codef_controller.dart';
+import '../datas/my_data.dart';
 import '../styles/TextStyles.dart';
 import '../configs/app_config.dart';
 import '../utils/common_utils.dart';
@@ -47,25 +48,24 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
 
   KeyboardVisibilityController? _keyboardVisibilityController;
   void _functionForKeyboardHide(){
-    CommonUtils.log("i", "HIDE");
     CommonUtils.hideKeyBoard();
     _scrollController.jumpTo(0);
   }
   void _functionForKeyboardShow(){
-    CommonUtils.log("i", "SHOW");
   }
 
   @override
   void initState(){
-    CommonUtils.log("i", "새 화면 입장");
+    CommonUtils.log("i", "AppLoginViewState 화면 입장");
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    MyData.resetMyData();
     _keyboardVisibilityController = CommonUtils.getKeyboardViewController(_functionForKeyboardShow, _functionForKeyboardHide);
   }
 
   @override
   void dispose(){
-    CommonUtils.log("i", "새 화면 파괴");
+    CommonUtils.log("i", "AppLoginViewState 화면 파괴");
     WidgetsBinding.instance.removeObserver(this);
     _unFocusAllNodes();
     _disposeAllTextControllers();
@@ -76,17 +76,17 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
-        CommonUtils.log('i','SelectView resumed');
+        CommonUtils.log('i','AppLoginViewState resumed');
         break;
       case AppLifecycleState.inactive:
-        CommonUtils.log('i','SelectView inactive');
+        CommonUtils.log('i','AppLoginViewState inactive');
         break;
       case AppLifecycleState.detached:
-        CommonUtils.log('i','SelectView detached');
+        CommonUtils.log('i','AppLoginViewState detached');
         // DO SOMETHING!
         break;
       case AppLifecycleState.paused:
-        CommonUtils.log('i','SelectView paused');
+        CommonUtils.log('i','AppLoginViewState paused');
         break;
       default:
         break;
@@ -101,6 +101,17 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
         CommonUtils.log("i", "firebase credential : ${FireBaseController.userCredential.toString()}");
       }else{
         CommonUtils.flutterToast("firebase init 에러가 발생했습니다.");
+      }
+    });
+  }
+
+  Future<void> _initAppState() async {
+    // init
+    await Config.initAppState((bool isSuccess){
+      if(isSuccess){
+        CommonUtils.log("i", "app state : ${Config.appState}");
+      }else{
+        CommonUtils.flutterToast("");
       }
     });
   }
@@ -242,7 +253,6 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
               ));
         });
 
-
         CommonUtils.log("i", "denied permissions : $deniedPermissionsString");
       }
     });
@@ -253,24 +263,33 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     Get.put(GetController());
     await _initSharedPreference();
     await _initFirebase();
-    await _initGPT();
-    await _initCodeF();
-    await _initCLOVA();
-    await _initAWS();
-    await _initLogfin();
-    await _initIamport();
-    await _initKakao();
-    await _initDeepLink().then((value){
-      if(value != null){
-        Config.deppLinkInfo = value;
-        String paramValue = CommonUtils.getValueFromDeepLink(Config.deppLinkInfo, "param1");
-        CommonUtils.log("i", "init deep link paramValue : $paramValue");
-      }else{
-        Config.deppLinkInfo = "";
+    await _initAppState();
+    if(Config.appState == Config.appOpenState){
+      await _initGPT();
+      await _initCodeF();
+      await _initCLOVA();
+      await _initAWS();
+      await _initLogfin();
+      await _initIamport();
+      await _initKakao();
+      await _initDeepLink().then((value){
+        if(value != null){
+          Config.deppLinkInfo = value;
+          String paramValue = CommonUtils.getValueFromDeepLink(Config.deppLinkInfo, "param1");
+          CommonUtils.log("i", "init deep link paramValue : $paramValue");
+        }else{
+          Config.deppLinkInfo = "";
+        }
+      });
+      await _requestPermissions();
+      Config.isControllerLoadFinished = true;
+    }else{
+      if(context.mounted){
+        UiUtils.showSlideMenu(context, SlideType.bottomToTop, false, 100.w, 30.h, 0.5, (context, setState){
+          return Center(child: UiUtils.getTextWithFixedScale("시스템 점검중입니다.", 20.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, null));
+        });
       }
-    });
-    await _requestPermissions();
-    Config.isControllerLoadFinished = true;
+    }
     setState(() {});
   }
 
@@ -301,7 +320,8 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
           ])),
           Form(key: _formKey,
               child: UiUtils.getRowColumnWithAlignCenter([
-                UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _emailTextFocus, _emailTextController, TextInputType.emailAddress, false, UiUtils.getInputDecoration("이메일", ""), (text) { }, (value){
+                UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _emailTextFocus, _emailTextController, TextInputType.emailAddress, false,
+                    UiUtils.getInputDecoration("이메일", 14.sp, "", 0.sp), (text) { }, (value){
                   if(value != null && value.trim().isEmpty){
                     return "이메일을 입력하세요.";
                   }else{
@@ -309,7 +329,8 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
                   }
                 }),
                 UiUtils.getMarginBox(0, 2.h),
-                UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _pwdTextFocus, _pwdTextController, TextInputType.visiblePassword, true, UiUtils.getInputDecoration("비밀번호", ""), (text) { }, (value){
+                UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _pwdTextFocus, _pwdTextController, TextInputType.visiblePassword, true,
+                    UiUtils.getInputDecoration("비밀번호", 14.sp, "", 0.sp), (text) { }, (value){
                   if(value != null && value.trim().isEmpty){
                     return "비밀번호를 입력하세요.";
                   }else{
@@ -343,7 +364,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
                         });
                       }else{
                         UiUtils.closeLoadingPop(context);
-                        CommonUtils.flutterToast("로그인에 실패했습니다.");
+                        CommonUtils.flutterToast(outputJson!["error"]);
                       }
                     });
                   }else{
@@ -357,6 +378,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
                 UiUtils.getMarginBox(0, 0.7.h),
                 UiUtils.getTextButtonBox(90.w, "회원가입", TextStyles.upFinSkyTextInButtonStyle, ColorStyles.upFinWhiteSky, () async {
                   _unFocusAllNodes();
+                  MyData.resetMyData();
                   if(Config.isControllerLoadFinished){
                     CommonUtils.moveTo(context, AppView.signupView.value, null);
                   }else{
@@ -423,7 +445,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
                   if(isSuccess){
                     CommonUtils.flutterToast("회원삭제 성공");
                   }else{
-                    CommonUtils.flutterToast("회원삭제 실패");
+                    CommonUtils.flutterToast(outputJson!["error"]);
                   }
                 });
               }else{

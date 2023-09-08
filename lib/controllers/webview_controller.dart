@@ -46,7 +46,7 @@ class WebViewController {
                 ),
               ),
               onLoadStop: (InAppWebViewController controller, uri) {
-                CommonUtils.log("i", "UPDATED URL CHECK : $uri");
+                CommonUtils.log("i", "web view url : $uri");
                 setState(() {myUrl = uri!;});
               },
               onCreateWindow: (controller, createWindowRequest) async{

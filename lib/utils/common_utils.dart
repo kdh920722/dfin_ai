@@ -21,17 +21,56 @@ class CommonUtils {
 
   }
 
+  static const int logMaxSize = 2000;
   static void log(String logType, String logMessage){
     var logger = Logger();
-    switch(logType.toLowerCase()){
-      case "d":
-        return logger.d(logMessage);
-      case "i":
-        return logger.i(logMessage);
-      case "e":
-        return logger.e(logMessage);
-      default :
-        return logger.wtf(logMessage);
+    if(logMessage.length > 2000){
+      switch(logType.toLowerCase()){
+        case "d":
+          logger.d("long log start=======================>");
+        case "i":
+          logger.i("long log start=======================>");
+        case "e":
+          logger.e("long log start=======================>");
+        default :
+          logger.wtf("long log start=======================>");
+      }
+
+      for (int i = 0; i < logMessage.length; i += logMaxSize) {
+        int end = (i + logMaxSize < logMessage.length) ? i + logMaxSize : logMessage.length;
+        switch(logType.toLowerCase()){
+          case "d":
+            logger.d(logMessage.substring(i, end));
+          case "i":
+            logger.i(logMessage.substring(i, end));
+          case "e":
+            logger.e(logMessage.substring(i, end));
+          default :
+            logger.wtf(logMessage.substring(i, end));
+        }
+      }
+
+      switch(logType.toLowerCase()){
+        case "d":
+          logger.d("long log end=======================>");
+        case "i":
+          logger.i("long log end=======================>");
+        case "e":
+          logger.e("long log end=======================>");
+        default :
+          logger.wtf("long log end=======================>");
+      }
+    }else{
+      switch(logType.toLowerCase()){
+        case "d":
+          return logger.d(logMessage);
+        case "i":
+          return logger.i(logMessage);
+        case "e":
+          return logger.e(logMessage);
+        default :
+          return logger.wtf(logMessage);
+      }
     }
   }
 
@@ -455,17 +494,6 @@ class CommonUtils {
       return remakeFilePath;
     }else{
       return "";
-    }
-  }
-
-  static bool isValidEncoded(String input) {
-    try {
-      final reqBody = jsonDecode(input);
-      CommonUtils.log('i', 'decoded : ${reqBody.toString()}');
-      return true;
-    } catch (e) {
-      CommonUtils.log('e', e.toString());
-      return false;
     }
   }
 

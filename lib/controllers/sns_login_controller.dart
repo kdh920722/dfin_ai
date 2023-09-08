@@ -2,11 +2,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
-import 'package:sizer/sizer.dart';
 import 'package:upfin/datas/my_data.dart';
 import '../configs/app_config.dart';
 import '../styles/ColorStyles.dart';
-import '../styles/TextStyles.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
 import 'logfin_controller.dart';
@@ -30,6 +28,7 @@ extension LoginPlatformExtension on LoginPlatform {
 
 class SnsLoginController{
   static LoginPlatform loginPlatform = LoginPlatform.none;
+
   static const String kakaoKey = "077c95950e4c99aefd181d2cd069524a";
   static String kakaoToken = "";
   static String kakaoId = "";
@@ -54,6 +53,7 @@ class SnsLoginController{
         await SnsLoginController._kakaoLogin((bool isSuccess) async {
           UiUtils.closeLoadingPop(context);
           if(isSuccess){
+            MyData.isSnsLogin = true;
             if(await _isMemberFromSns()){
               callback(true);
             }else{
@@ -61,6 +61,7 @@ class SnsLoginController{
               callback(false);
             }
           }else{
+            MyData.isSnsLogin = false;
             CommonUtils.flutterToast("${SnsLoginController.loginPlatform.value}로그인에 실패했습니다.");
             callback(false);
           }
@@ -83,37 +84,6 @@ class SnsLoginController{
     });
   }
 
-  static Future<bool> _isMember() async {
-    try{
-      bool isMember = false;
-      String token = "";
-      String id = "";
-      if(SnsLoginController.loginPlatform == LoginPlatform.kakao){
-        token = SnsLoginController.kakaoToken;
-        id = SnsLoginController.kakaoId;
-      }else{
-
-      }
-
-      Map<String, String> inputJson = {
-        "email": MyData.email,
-        "token": token,
-        "user_id": id,
-        "provider": SnsLoginController.loginPlatform.value
-      };
-
-      await LogfinController.callLogfinApi(LogfinApis.socialLogin, inputJson, (isSuccess, outputJson) {
-        isMember = isSuccess;
-        MyData.confirmed = isMember;
-      });
-
-      return isMember;
-    }catch(error){
-      return false;
-    }
-
-  }
-
   static Future<void> _kakaoLogin(Function(bool) callback) async {
     try {
       // 카카오계정으로 로그인
@@ -123,7 +93,6 @@ class SnsLoginController{
           token = await UserApi.instance.loginWithKakaoTalk();
           await _getKakaoAgree();
           kakaoToken = token.accessToken;
-          CommonUtils.log("i", '카카오계정으로 로그인 성공 ${token.accessToken}');
           callback(true);
         } catch (error) {
           if (error is PlatformException && error.code == 'CANCELED') {
@@ -137,7 +106,6 @@ class SnsLoginController{
             token = await UserApi.instance.loginWithKakaoAccount();
             await _getKakaoAgree();
             kakaoToken = token.accessToken;
-            CommonUtils.log("i", '카카오계정으로 로그인 성공 ${token.accessToken}');
             callback(true);
           } catch (error) {
             CommonUtils.log("e", '카카오계정으로 로그인 실패 $error');
@@ -149,7 +117,6 @@ class SnsLoginController{
           token = await UserApi.instance.loginWithKakaoAccount();
           await _getKakaoAgree();
           kakaoToken = token.accessToken;
-          CommonUtils.log("i", '카카오계정으로 로그인 성공 ${token.accessToken}');
           callback(true);
         } catch (error) {
           CommonUtils.log("e", '카카오계정으로 로그인 실패 $error');
@@ -157,7 +124,7 @@ class SnsLoginController{
         }
       }
     } catch (error) {
-      CommonUtils.log("e",'로그인 실패 $error');
+      CommonUtils.log("e",'카카오 로그인 실패 $error');
       callback(false);
     }
   }
@@ -189,7 +156,7 @@ class SnsLoginController{
         kakaoId = user.id.toString();
         _setUserInfoFromKakao(user);
       } catch (error) {
-        CommonUtils.log("e", '사용자 정보 요청 실패 $error');
+        CommonUtils.log("e", '카카오 사용자 정보 요청 실패 $error');
         CommonUtils.flutterToast("카카오 로그인 실패\n다시 실행 해 주세요.");
       }
     } else {
@@ -198,29 +165,10 @@ class SnsLoginController{
   }
 
   static void _setUserInfoFromKakao(User user) async {
-    MyData.name = user.kakaoAccount!.name!;
-    MyData.email = user.kakaoAccount!.email!;
+    MyData.nameFromSns = user.kakaoAccount!.name!;
+    MyData.emailFromSns = user.kakaoAccount!.email!;
     List<String> phoneDataTemp = user.kakaoAccount!.phoneNumber!.split("-");
-    MyData.phoneNumber = "0${phoneDataTemp[0].split(" ")[1]}${phoneDataTemp[1]}${phoneDataTemp[2]}";
-    CommonUtils.log("i",
-        '이름: ${MyData.name}'
-            '\n이메일: ${MyData.email}'
-            '\n전화번호: ${MyData.phoneNumber}'
-            '\nid: ${user.id}');
-  }
-
-  static void logOut() async {
-    switch (loginPlatform) {
-      case LoginPlatform.kakao:
-        await UserApi.instance.logout();
-        break;
-      case LoginPlatform.apple:
-        break;
-      case LoginPlatform.none:
-        break;
-    }
-
-    loginPlatform = LoginPlatform.none;
+    MyData.phoneNumberFromSns = "0${phoneDataTemp[0].split(" ")[1]}${phoneDataTemp[1]}${phoneDataTemp[2]}";
   }
 
   static Future<bool> _isMemberFromSns() async {
@@ -236,21 +184,35 @@ class SnsLoginController{
       }
 
       Map<String, String> inputJson = {
-        "email": MyData.email,
+        "email": MyData.emailFromSns,
         "token": token,
         "user_id": id,
         "provider": SnsLoginController.loginPlatform.value
       };
 
+      CommonUtils.log("i", "social login :\n$inputJson");
       await LogfinController.callLogfinApi(LogfinApis.socialLogin, inputJson, (isSuccess, outputJson) {
         isMember = isSuccess;
-        MyData.confirmed = isMember;
       });
-
+      CommonUtils.log("i", "social login 2");
       return isMember;
     }catch(error){
+      CommonUtils.log("e", "$error");
       return false;
     }
+  }
 
+  static void logOut() async {
+    switch (loginPlatform) {
+      case LoginPlatform.kakao:
+        await UserApi.instance.logout();
+        break;
+      case LoginPlatform.apple:
+        break;
+      case LoginPlatform.none:
+        break;
+    }
+
+    loginPlatform = LoginPlatform.none;
   }
 }

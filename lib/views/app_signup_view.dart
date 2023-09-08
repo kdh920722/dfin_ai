@@ -26,7 +26,6 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
   final _phoneNumberTextController = TextEditingController();
   final _pwdTextController = TextEditingController();
   final _pwdConfirmTextController = TextEditingController();
-  final _loanWantPriceTextController = TextEditingController();
 
   final _nameTextFocus = FocusNode();
   final _emailTextFocus = FocusNode();
@@ -34,6 +33,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
   final _pwdTextFocus = FocusNode();
   final _pwdConfirmFocus = FocusNode();
 
+  bool isConfirmed = false;
   String confirmedName = "";
   String confirmedPhone = "";
   bool? allAgreed = false;
@@ -49,7 +49,6 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
   }
 
   void _disposeAllTextControllers(){
-    _loanWantPriceTextController.dispose();
     _nameTextController.dispose();
     _phoneNumberTextController.dispose();
     _emailTextController.dispose();
@@ -58,31 +57,32 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
 
   KeyboardVisibilityController? _keyboardVisibilityController;
   void _functionForKeyboardHide(){
-    CommonUtils.log("i", "HIDE");
     CommonUtils.hideKeyBoard();
     _scrollController.jumpTo(0);
   }
   void _functionForKeyboardShow(){
-    CommonUtils.log("i", "SHOW");
   }
 
   @override
   void initState(){
-    CommonUtils.log("i", "새 화면 입장");
+    CommonUtils.log("i", "AppSignUpViewState 화면 입장");
     super.initState();
+    confirmedName = "X";
+    confirmedPhone = "X";
     WidgetsBinding.instance.addObserver(this);
-    _loanWantPriceTextController.addListener(_formatInputValue);
     _nameTextController.addListener(_nameListener);
     _phoneNumberTextController.addListener(_phoneListener);
     _keyboardVisibilityController = CommonUtils.getKeyboardViewController(_functionForKeyboardShow, _functionForKeyboardHide);
-    _nameTextController.text = MyData.name;
-    _emailTextController.text = MyData.email;
-    _phoneNumberTextController.text = MyData.phoneNumber;
+    if(MyData.isSnsLogin){
+      _nameTextController.text = MyData.nameFromSns;
+      _emailTextController.text = MyData.emailFromSns;
+      _phoneNumberTextController.text = MyData.phoneNumberFromSns;
+    }
   }
 
   @override
   void dispose(){
-    CommonUtils.log("i", "새 화면 파괴");
+    CommonUtils.log("i", "AppSignUpViewState 화면 파괴");
     WidgetsBinding.instance.removeObserver(this);
     _unFocusAllNodes();
     _disposeAllTextControllers();
@@ -93,17 +93,17 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
-        CommonUtils.log('i','SelectView resumed');
+        CommonUtils.log('i','AppSignUpView resumed');
         break;
       case AppLifecycleState.inactive:
-        CommonUtils.log('i','SelectView inactive');
+        CommonUtils.log('i','AppSignUpView inactive');
         break;
       case AppLifecycleState.detached:
-        CommonUtils.log('i','SelectView detached');
+        CommonUtils.log('i','AppSignUpView detached');
         // DO SOMETHING!
         break;
       case AppLifecycleState.paused:
-        CommonUtils.log('i','SelectView paused');
+        CommonUtils.log('i','AppSignUpView paused');
         break;
       default:
         break;
@@ -112,35 +112,21 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
 
   void _nameListener() {
     if(_nameTextController.text.trim() != confirmedName){
-      MyData.confirmed = false;
-      GetController.to.updateConfirmed(MyData.confirmed);
+      isConfirmed = false;
+      GetController.to.updateConfirmed(isConfirmed);
     }else{
-      MyData.confirmed = true;
-      GetController.to.updateConfirmed(MyData.confirmed);
+      isConfirmed = true;
+      GetController.to.updateConfirmed(isConfirmed);
     }
   }
 
   void _phoneListener() {
     if(_phoneNumberTextController.text.trim() != confirmedPhone){
-      MyData.confirmed = false;
-      GetController.to.updateConfirmed(MyData.confirmed);
+      isConfirmed = false;
+      GetController.to.updateConfirmed(isConfirmed);
     }else{
-      MyData.confirmed = true;
-      GetController.to.updateConfirmed(MyData.confirmed);
-    }
-  }
-
-  void _formatInputValue() {
-    final text = _loanWantPriceTextController.text.trim();
-    final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
-    if (number != null) {
-      final formattedText = CommonUtils.getPriceCommaFormattedString(number);
-      if (formattedText != text) {
-        _loanWantPriceTextController.value = TextEditingValue(
-          text: formattedText,
-          selection: TextSelection.collapsed(offset: formattedText.length),
-        );
-      }
+      isConfirmed = true;
+      GetController.to.updateConfirmed(isConfirmed);
     }
   }
 
@@ -190,13 +176,13 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
               ],
             )),
             Container(padding: EdgeInsets.only(left: 20.w), height: 3.5.h, child: Row(children: [
-              UiUtils.getTextWithIconStyledButtonWithFixedScale(TextDirection.rtl, "업핀 서비스 이용약관", 12.sp, FontWeight.w500, ColorStyles.upFinDarkWhiteGray, TextAlign.start, null,
+              UiUtils.getTextStyledWithIconAndText(TextDirection.rtl, "업핀 서비스 이용약관", 10.sp, FontWeight.w500, ColorStyles.upFinDarkWhiteGray, TextAlign.start, null,
                   Icons.arrow_back_ios, 3.5.w, ColorStyles.upFinDarkWhiteGray, (){
 
               }),
             ])),
             Container(padding: EdgeInsets.only(left: 20.w), height: 3.5.h, child: Row(children: [
-              UiUtils.getTextWithIconStyledButtonWithFixedScale(TextDirection.rtl, "개인(신용)정보 수집 이용 제공 동의서", 12.sp, FontWeight.w500, ColorStyles.upFinDarkWhiteGray, TextAlign.start, null,
+              UiUtils.getTextStyledWithIconAndText(TextDirection.rtl, "개인(신용)정보 수집 이용 제공 동의서", 10.sp, FontWeight.w500, ColorStyles.upFinDarkWhiteGray, TextAlign.start, null,
                   Icons.arrow_back_ios, 3.5.w, ColorStyles.upFinDarkWhiteGray, (){
 
                   }),
@@ -220,13 +206,13 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
               ],
             )),
             Container(padding: EdgeInsets.only(left: 20.w), height: 3.5.h, child: Row(children: [
-              UiUtils.getTextWithIconStyledButtonWithFixedScale(TextDirection.rtl, "마케팅 정보 수신 동의", 12.sp, FontWeight.w500, ColorStyles.upFinDarkWhiteGray, TextAlign.start, null,
+              UiUtils.getTextStyledWithIconAndText(TextDirection.rtl, "마케팅 정보 수신 동의", 10.sp, FontWeight.w500, ColorStyles.upFinDarkWhiteGray, TextAlign.start, null,
                   Icons.arrow_back_ios, 3.5.w, ColorStyles.upFinDarkWhiteGray, (){
 
                   }),
             ])),
             Container(padding: EdgeInsets.only(left: 20.w), height: 3.5.h, child: Row(children: [
-              UiUtils.getTextWithIconStyledButtonWithFixedScale(TextDirection.rtl, "야간 마케팅 정보 수신 동의", 12.sp, FontWeight.w500, ColorStyles.upFinDarkWhiteGray, TextAlign.start, null,
+              UiUtils.getTextStyledWithIconAndText(TextDirection.rtl, "야간 마케팅 정보 수신 동의", 10.sp, FontWeight.w500, ColorStyles.upFinDarkWhiteGray, TextAlign.start, null,
                   Icons.arrow_back_ios, 3.5.w, ColorStyles.upFinDarkWhiteGray, (){
 
                   }),
@@ -242,10 +228,13 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                 "password_confirmation": _pwdConfirmTextController.text.trim(),
                 "name" : _nameTextController.text.trim(),
                 "contact_no" : _phoneNumberTextController.text.trim(),
-                "telecom" : MyData.carrierType
+                "telecom" : MyData.carrierTypeFromPhoneCert,
+                "birthday" : MyData.birthFromPhoneCert,
+                "gender" : MyData.isMaleFromPhoneCert? "1" : "2",
               }
             };
-            CommonUtils.log("i", "${UiUtils.isLoadingPopOn}");
+            CommonUtils.log("i", "signup input :\n$inputJson");
+
             UiUtils.showLoadingPop(thisContext);
             LogfinController.callLogfinApi(LogfinApis.signUp, inputJson, (isSuccessToSignup, outputJson) async {
               if(isSuccessToSignup){
@@ -261,7 +250,8 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                 });
               }else{
                 UiUtils.closeLoadingPop(thisContext);
-                CommonUtils.flutterToast("회원가입에 실패했습니다.");
+                CommonUtils.flutterToast(outputJson!["error"]);
+                Navigator.pop(context);
               }
             });
           }) : UiUtils.getTextButtonBox(90.w, "동의하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinGray, () {})
@@ -272,7 +262,6 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
   @override
   Widget build(BuildContext context) {
     CommonUtils.hideKeyBoard();
-    CommonUtils.log("i", "signup : ${UiUtils.isLoadingPopOn}");
 
     Widget view = Container(width: 100.w, height: 100.h, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -283,7 +272,8 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
             UiUtils.getMarginBox(0, 3.h),
             SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("회원가입", 24.sp, FontWeight.w700, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
             UiUtils.getMarginBox(0, 5.h),
-            UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _nameTextFocus, _nameTextController, TextInputType.text, false, UiUtils.getInputDecoration("이름", ""), (text) { }, (value){
+            UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _nameTextFocus, _nameTextController, TextInputType.text, false,
+                UiUtils.getInputDecoration("이름", 14.sp, "", 0.sp), (text) { }, (value){
               if(value != null && value.trim().isEmpty){
                 return "이름을 입력하세요.";
               }else{
@@ -291,7 +281,8 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
               }
             }),
             UiUtils.getMarginBox(0, 2.h),
-            UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _emailTextFocus, _emailTextController, TextInputType.emailAddress, false, UiUtils.getInputDecoration("이메일", ""), (text) { }, (value){
+            UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _emailTextFocus, _emailTextController, TextInputType.emailAddress, false,
+                UiUtils.getInputDecoration("이메일", 14.sp, "", 0.sp), (text) { }, (value){
               if(value != null && value.trim().isEmpty){
                 return "이메일을 입력하세요.";
               }else{
@@ -300,17 +291,19 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
             }),
             UiUtils.getMarginBox(0, 2.h),
             SizedBox(width: 90.w, child: Row(children: [
-              UiUtils.getTextFormField(50.w, TextStyles.upFinTextFormFieldTextStyle, _phoneNumberTextFocus, _phoneNumberTextController, TextInputType.phone, false, UiUtils.getInputDecoration("휴대전화 번호", ""), (text) { }, (value){
+              UiUtils.getTextFormField(60.w, TextStyles.upFinTextFormFieldTextStyle, _phoneNumberTextFocus, _phoneNumberTextController, TextInputType.phone, false,
+                  UiUtils.getInputDecoration("휴대전화 번호", 14.sp, "", 0.sp), (text) { }, (value){
                 if(value != null && value.trim().isEmpty){
                   return "휴대전화 번호를 입력하세요.";
                 }else{
                   return null;
                 }
               }),
-              UiUtils.getMarginBox(2.w, 0),
+              UiUtils.getMarginBox(1.w, 0),
               Obx(()=>!GetController.to.isConfirmed.value?
-              Expanded(child: UiUtils.getTextCustomPaddingButtonBox(38.w, "본인인증", TextStyles.upFinSmallButtonTextStyle,
-                  EdgeInsets.only(left: 2.5.w, right: 2.5.w, top: 5.w, bottom: 5.w), ColorStyles.upFinButtonBlue, () async {
+              Expanded(child: UiUtils.getTextCustomPaddingButtonBox(30.w, "본인인증", TextStyles.upFinSmallButtonTextStyle,
+                  EdgeInsets.only(left: 0.1.w, right: 0.1.w, top: 7.w, bottom: 7.w), ColorStyles.upFinBlack, () async {
+                    CommonUtils.hideKeyBoard();
                     if(_phoneNumberTextController.text.trim() != ""){
                       Map<String, String> inputJson = {
                         "carrier": "",
@@ -319,35 +312,42 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                       };
                       var result = await CommonUtils.moveToWithResult(context, AppView.certificationView.value, inputJson);
                       if(result != null){
-                        MyData.confirmed = true;
+                        isConfirmed = true;
                         Map<String, dynamic> resultMap = result as Map<String, dynamic>;
                         for(var each in IamportController.carrierList){
                           if(each.split("@")[0] == resultMap["carrier"]){
-                            MyData.carrierType = each.split("@")[1];
-                            CommonUtils.log('i', 'carrierType : ${MyData.carrierType}');
+                            MyData.carrierTypeFromPhoneCert = each.split("@")[1];
                           }
                         }
+                        if(resultMap["gender"] == "male"){
+                          MyData.isMaleFromPhoneCert = true;
+                        }else{
+                          MyData.isMaleFromPhoneCert = false;
+                        }
+                        MyData.birthFromPhoneCert = (resultMap["birth"] as String).split("-")[0]+(resultMap["birth"] as String).split("-")[1]+(resultMap["birth"] as String).split("-")[2];
                       }else{
-                        MyData.confirmed = false;
+                        isConfirmed = false;
                       }
+                      CommonUtils.log("i", "cert info : \n${MyData.carrierTypeFromPhoneCert}\n${MyData.birthFromPhoneCert}\n${MyData.isMaleFromPhoneCert}");
 
-                      if(MyData.confirmed) {
+                      if(isConfirmed) {
                         CommonUtils.flutterToast("인증 성공");
                         confirmedName = _nameTextController.text.trim();
                         confirmedPhone = _phoneNumberTextController.text.trim();
                       }else{
                         CommonUtils.flutterToast("인증 실패");
                       }
-                      GetController.to.updateConfirmed(MyData.confirmed);
+                      GetController.to.updateConfirmed(isConfirmed);
                     }else{
                       CommonUtils.flutterToast("휴대전화 번호를 입력하세요.");
                     }
-                  })) :
-              Expanded(child: UiUtils.getTextCustomPaddingButtonBox(38.w, "인증완료", TextStyles.upFinSmallButtonTextStyle,
-                  EdgeInsets.only(left: 2.5.w, right: 2.5.w, top: 5.w, bottom: 5.w), ColorStyles.upFinGray, () {})))
+                  },1)) :
+              Expanded(child: UiUtils.getTextCustomPaddingButtonBox(30.w, "인증완료", TextStyles.upFinSmallButtonTextStyle,
+                  EdgeInsets.only(left: 0.1.w, right: 0.1.w, top: 7.w, bottom: 7.w), ColorStyles.upFinGray, () {},1)))
             ])),
             UiUtils.getMarginBox(0, 2.h),
-            UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _pwdTextFocus, _pwdTextController, TextInputType.visiblePassword, true, UiUtils.getInputDecoration("비밀번호", ""), (text) { }, (value){
+            UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _pwdTextFocus, _pwdTextController, TextInputType.visiblePassword, true,
+                UiUtils.getInputDecoration("비밀번호 확인", 14.sp, "", 0.sp), (text) { }, (value){
               if(value != null && value.trim().isEmpty){
                 return "비밀번호를 입력하세요.";
               }else{
@@ -359,7 +359,8 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
               }
             }),
             UiUtils.getMarginBox(0, 2.h),
-            UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _pwdConfirmFocus, _pwdConfirmTextController, TextInputType.visiblePassword, true, UiUtils.getInputDecoration("비밀번호 확인", ""), (text) { }, (value){
+            UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _pwdConfirmFocus, _pwdConfirmTextController, TextInputType.visiblePassword, true,
+                UiUtils.getInputDecoration("비밀번호 확인", 14.sp, "", 0.sp), (text) { }, (value){
               if(value != null && value.trim().isEmpty){
                 return "비밀번호를 한번 더 입력하세요.";
               }else{
@@ -374,36 +375,16 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                 }
               }
             }),
-            UiUtils.getMarginBox(0, 2.h),
-
-            /*
-              Obx(()=>UiUtils.getTextFormField(80.w, _loanWantPriceTextController, TextInputType.number, false,
-                  UiUtils.getInputDecoration("대출희망금액(단위:만원)", GetController.to.wantLoanPrice.value),
-                  (text) {
-                     if(text.trim() != ""){
-                       final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
-                       GetController.to.updateWantLoanPrice(CommonUtils.getPriceFormattedString(number!));
-                     }else{
-                       GetController.to.updateWantLoanPrice("만원");
-                     }
-                  }, (value){
-                    if(value != null && value.trim().isEmpty){
-                      return "희망하시는 대출금액을 입력하세요.";
-                    }else{
-                      return null;
-                    }
-              })),
-               */
             UiUtils.getMarginBox(0, 10.h),
             UiUtils.getTextButtonBox(90.w, "가입하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
-              if(_formKey.currentState!.validate() && MyData.confirmed){
+              if(_formKey.currentState!.validate() && isConfirmed){
                 CommonUtils.log("i", "OK");
                 CommonUtils.hideKeyBoard();
                 _unFocusAllNodes();
                 CommonUtils.log("i", "${UiUtils.isLoadingPopOn}");
                 UiUtils.showSlideMenu(context, SlideType.bottomToTop, false, 100.w, 70.h, 0.5, makeAgreeWidget);
               }else{
-                if(!MyData.confirmed){
+                if(!isConfirmed){
                   CommonUtils.flutterToast("휴대전화 본인인증이 필요합니다.");
                 }else{
                   if(_pwdTextController.text.trim() == _pwdConfirmTextController.text.trim() && _pwdTextController.text.length <= 6){

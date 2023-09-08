@@ -2,6 +2,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:http/http.dart' as http;
+import 'package:upfin/datas/my_data.dart';
 import 'dart:convert';
 import '../configs/app_config.dart';
 import '../utils/common_utils.dart';
@@ -18,6 +19,7 @@ class LogfinController {
   static List<String> jobList = [];
   static List<String> courtList = [];
   static List<String> bankList = [];
+  static List<String> preLoanCountList = [];
 
   static Future<void> initLogfin(Function(bool) callback) async {
     try {
@@ -58,7 +60,7 @@ class LogfinController {
         for (var each in jobSnapshot.children) {
           tempList.add(each.value.toString());
         }
-        tempList.sort((a,b)=>int.parse(a.split("@")[1]).compareTo(int.parse(b.split("@")[1])));
+        tempList.sort((a,b)=>int.parse(a.split("@")[2]).compareTo(int.parse(b.split("@")[2])));
         jobList.addAll(tempList);
       } else {
         failCount++;
@@ -71,7 +73,7 @@ class LogfinController {
         for (var each in courtSnapshot.children) {
           tempList.add(each.value.toString());
         }
-        tempList.sort((a,b)=>int.parse(a.split("@")[1]).compareTo(int.parse(b.split("@")[1])));
+        tempList.sort((a,b)=>int.parse(a.split("@")[2]).compareTo(int.parse(b.split("@")[2])));
         courtList.addAll(tempList);
       } else {
         failCount++;
@@ -84,12 +86,25 @@ class LogfinController {
         for (var each in bankSnapshot.children) {
           tempList.add(each.value.toString());
         }
-        tempList.sort((a,b)=>int.parse(a.split("@")[1].replaceAll("000", "").replaceAll("00", "")).compareTo(int.parse(b.split("@")[1].replaceAll("000", "").replaceAll("00", ""))));
+        tempList.sort((a,b)=>int.parse(a.split("@")[2]).compareTo(int.parse(b.split("@")[2])));
         bankList.addAll(tempList);
       } else {
         failCount++;
       }
       CommonUtils.log("i", "list : $bankList");
+
+      final loanCountSnapshot = await ref.child('UPFIN/API/logfin/list_data/loan_count').get();
+      if (loanCountSnapshot.exists) {
+        List<String> tempList = [];
+        for (var each in loanCountSnapshot.children) {
+          tempList.add(each.value.toString());
+        }
+        tempList.sort((a,b)=>int.parse(a.split("@")[2]).compareTo(int.parse(b.split("@")[2])));
+        preLoanCountList.addAll(tempList);
+      } else {
+        failCount++;
+      }
+      CommonUtils.log("i", "list : $preLoanCountList");
 
       if(failCount > 0){
         callback(false);
@@ -110,8 +125,10 @@ class LogfinController {
       targetUrl = url+api.value;
     }
 
-    if(api == LogfinApis.signIn || api == LogfinApis.signUp || api == LogfinApis.socialLogin){
+    if(api == LogfinApis.signIn || api == LogfinApis.signUp){
       inputJson['user']['fcm_token'] = FireBaseController.fcmToken;
+    }else if(api == LogfinApis.socialLogin){
+      inputJson['fcm_token'] = FireBaseController.fcmToken;
     }
 
     if(api != LogfinApis.signIn && api != LogfinApis.signUp && api != LogfinApis.socialLogin && api != LogfinApis.deleteAccount){
@@ -123,7 +140,7 @@ class LogfinController {
       }
     }
 
-    CommonUtils.log("i", "inputJson : $inputJson");
+    CommonUtils.log("i", "${api.value} inputJson :\n$inputJson");
 
     try {
       final url = Uri.parse(targetUrl);
@@ -143,22 +160,27 @@ class LogfinController {
       if (response.statusCode == 200) { // HTTP_OK
         final resultData = json;
         if(resultData["success"]){
-          if(api == LogfinApis.signIn || api == LogfinApis.signUp || api == LogfinApis.socialLogin){
+          if(api == LogfinApis.signUp){
+            LogfinController.userToken = resultData["data"]["user"]['api_token'];
+            CommonUtils.log('i', "userToken : ${LogfinController.userToken}");
+          }else if(api == LogfinApis.socialLogin){
+            LogfinController.userToken = resultData['api_token'];
+            CommonUtils.log('i', "userToken : ${LogfinController.userToken}");
+          }else if(api == LogfinApis.signIn){
             LogfinController.userToken = resultData["data"]['api_token'];
             CommonUtils.log('i', "userToken : ${LogfinController.userToken}");
           }
           callback(true, resultData['data']);
         }else{
-          CommonUtils.log('e', 'false');
-          callback(false, null);
+          callback(false, resultData);
         }
       } else {
         CommonUtils.log('e', 'http error code : ${response.statusCode}');
-        callback(false, null);
+        callback(false, <String,dynamic>{"error":"http연결에\n에러가 발생했습니다."});
       }
     } catch (e) {
       CommonUtils.log('e', e.toString());
-      callback(false, null);
+      callback(false, <String,dynamic>{"error":"에러가 발생했습니다."});
     }
   }
 
@@ -166,22 +188,41 @@ class LogfinController {
     // 1) 유저정보 가져오기
     callLogfinApi(LogfinApis.getUserInfo, <String, dynamic>{}, (isSuccessToGetUserInfo, userInfoOutputJson){
       if(isSuccessToGetUserInfo){
-        // 2) 사건정보 조회
-        callLogfinApi(LogfinApis.getAccidentInfo, <String, dynamic>{}, (isSuccessToGetAccidentInfo, accidentInfoOutputJson){
-          if(isSuccessToGetAccidentInfo){
-            List<dynamic> accidentList = accidentInfoOutputJson!["accidents"];
-            if(accidentList.isEmpty){
-              // 3-1) 사건정보 없으면 한도금리 조회를 위한 조건 입력 화면으로 이동(한도금리 조회 시, 사건정보 저장)
-              callback(true, AppView.searchAccidentView);
+        if(userInfoOutputJson != null){
+          MyData.name = userInfoOutputJson["user"]["name"];
+          MyData.email =  userInfoOutputJson["user"]["email"];
+          MyData.phoneNumber = userInfoOutputJson["user"]["contact_no"];
+          MyData.carrierType = userInfoOutputJson["user"]["telecom"];
+          MyData.birth =  userInfoOutputJson["user"]["birthday"];
+          MyData.isMale =  userInfoOutputJson["user"]["gender"] == "1"? true : false;
+
+          MyData.printData();
+
+          // 2) 사건정보 조회
+          callLogfinApi(LogfinApis.getAccidentInfo, <String, dynamic>{}, (isSuccessToGetAccidentInfo, accidentInfoOutputJson){
+            if(isSuccessToGetAccidentInfo){
+              List<dynamic> accidentList = accidentInfoOutputJson!["accidents"];
+              if(accidentList.isEmpty){
+                // 3-1) 사건정보 없으면 한도금리 조회를 위한 조건 입력 화면으로 이동(한도금리 조회 시, 사건정보 저장)
+                MyData.initSearchViewFromMainView = false;
+                callback(true, AppView.searchAccidentView);
+              }else{
+                // 3-2) 사건정보 있으면 사건정보 이력화면(메인 뷰)로 이동(저장한걸 보여줌)
+                //var dataResult = jsonDecode(accidentList[0]["res_data"].toString());
+                //CommonUtils.log("i", "each in : ${dataResult["data"]}");
+
+                MyData.initSearchViewFromMainView = true;
+                callback(true, AppView.mainView);
+              }
             }else{
-              // 3-2) 사건정보 있으면 사건정보 이력화면(메인 뷰)로 이동
-              callback(true, AppView.mainView);
+              CommonUtils.flutterToast(accidentInfoOutputJson!["error"]);
+              callback(false, null);
             }
-          }else{
-            CommonUtils.flutterToast("데이터 로딩 실패\n다시 실행 해 주세요.");
-            callback(false, null);
-          }
-        });
+          });
+        }else{
+          CommonUtils.flutterToast("유저정보 로딩 실패\n다시 실행 해 주세요.");
+          callback(false, null);
+        }
       }else{
         CommonUtils.flutterToast("데이터 로딩 실패\n다시 실행 해 주세요.");
         callback(false, null);

@@ -62,7 +62,6 @@ class CLOVAController{
 
       final url = Uri.parse(targetUrl);
       final reqBody = jsonEncode(inputJson);
-      CommonUtils.isValidEncoded(reqBody);
       final response = await http.post(
         url,
         headers: {
