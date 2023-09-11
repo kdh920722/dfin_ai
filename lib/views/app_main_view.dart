@@ -1,6 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
+import 'package:upfin/configs/app_config.dart';
+import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/datas/my_data.dart';
+import 'package:upfin/datas/pr_info_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
@@ -18,6 +23,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     CommonUtils.log("i", "AppMainView 화면 입장");
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    MyData.initSearchViewFromMainView = true;
   }
 
   @override
@@ -49,26 +55,34 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   }
 
   Widget _getMyView(){
-    List<String> accidentList = ["1"];
     List<Widget> accidentWidgetList = [];
-
-    for(var each in accidentList){
+    for(var each in MyData.getAccidentInfoList()){
       accidentWidgetList.add(
           GestureDetector(child: Container(width: 90.w, padding: EdgeInsets.all(5.w), decoration: BoxDecoration(border: Border.all(width: 2, color: ColorStyles.upFinGray)), //  POINT: BoxDecoration
               child: Row(mainAxisSize: MainAxisSize.max, children: [
                 Expanded(flex: 15, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  UiUtils.getTextWithFixedScale("서울동부지방법원", 14.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.center, 1),
+                  UiUtils.getTextWithFixedScale(each.accidentCourtName, 14.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.center, 1),
                   UiUtils.getMarginBox(0, 1.h),
-                  UiUtils.getTextWithFixedScale("2022 개회 109233", 22.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.center, 1),
+                  UiUtils.getTextWithFixedScale("${each.accidentCaseNumberYear}${each.accidentCaseNumberType}${each.accidentCaseNumberNumber}", 22.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.center, 1),
                   UiUtils.getMarginBox(0, 1.h),
-                  UiUtils.getTextWithFixedScale("우리은행 10239481", 10.sp, FontWeight.w300, ColorStyles.upFinRealGray, TextAlign.center, 1),
+                  UiUtils.getTextWithFixedScale("${each.accidentBankName} ${each.accidentBankAccount}", 10.sp, FontWeight.w300, ColorStyles.upFinRealGray, TextAlign.center, 1),
                 ])),
                 Expanded(flex: 1, child: Icon(Icons.arrow_forward_ios_rounded, color: ColorStyles.upFinDarkGray, size: 5.5.w)),
               ])
           ), onTap: (){
-            CommonUtils.log("i", "gogo");
+            UiUtils.showLoadingPop(context);
+            LogfinController.getPrList("${each.accidentCaseNumberYear}${each.accidentCaseNumberType}${each.accidentCaseNumberNumber}", (isSuccessToGetOffers, outputJsonForGetOffers){
+              UiUtils.closeLoadingPop(context);
+              if(isSuccessToGetOffers){
+                CommonUtils.moveTo(context, AppView.resultPrView.value, null);
+              }else{
+                // findUidInAccidentInfoList 실패
+                CommonUtils.flutterToast("에러가 발생했습니다.");
+              }
+            });
           })
       );
+      accidentWidgetList.add(UiUtils.getMarginBox(0, 1.5.h));
     }
 
     return Column(children: [
@@ -83,7 +97,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
         UiUtils.getTextWithFixedScale("나의 사건기록", 20.sp, FontWeight.w800, ColorStyles.darkGray, TextAlign.center, 1),
         const Spacer(flex: 2),
         UiUtils.getIconButtonWithBoxSize(ColorStyles.upFinWhiteSky, 15.w, 5.h, Icons.add, 3.h, ColorStyles.upFinButtonBlue, () {
-
+          CommonUtils.moveTo(context, AppView.searchAccidentView.value, null);
         })
       ])),
       UiUtils.getExpandedScrollView(Axis.vertical, Column(children: accidentWidgetList))
@@ -118,20 +132,16 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   Widget build(BuildContext context) {
     Widget view = Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, child: Column(children: [
       viewTypeId == 1? Expanded(child: _getMyView()) : viewTypeId == 2? Expanded(child: _getAIChatView()) : Expanded(child: _getSettingView()),
-      Container(color: ColorStyles.upFinButtonBlue, height: 8.h, child: Row(mainAxisSize: MainAxisSize.max, children: [
-        const Spacer(flex: 1),
-        UiUtils.getTextStyledButtonWithFixedScale("MY", 14.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.center, 1,(){
+      SizedBox(width: 100.w, height: 7.h, child: Row(mainAxisAlignment: MainAxisAlignment.center, mainAxisSize: MainAxisSize.max, children: [
+        Expanded(child: Container(height: 7.h, color: viewTypeId == 1? ColorStyles.upFinSky : ColorStyles.upFinButtonBlue, child: UiUtils.getTextStyledButtonWithFixedScale("MY", 14.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.center, 1,(){
           setState(() {viewTypeId = 1;});
-        }),
-        const Spacer(flex: 2),
-        UiUtils.getTextStyledButtonWithFixedScale("AI 어드바이저", 14.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.center, 1,(){
+        }))),
+        Expanded(child: Container(height: 7.h, color: viewTypeId == 2? ColorStyles.upFinSky : ColorStyles.upFinButtonBlue, child: UiUtils.getTextStyledButtonWithFixedScale("AI 어드바이저", 14.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.center, 1,(){
           setState(() {viewTypeId = 2;});
-        }),
-        const Spacer(flex: 2),
-        UiUtils.getTextStyledButtonWithFixedScale("설정", 14.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.center, 1,(){
+        }))),
+        Expanded(child: Container(height: 7.h, color: viewTypeId == 3? ColorStyles.upFinSky : ColorStyles.upFinButtonBlue, child: UiUtils.getTextStyledButtonWithFixedScale("설정", 14.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.center, 1,(){
           setState(() {viewTypeId = 3;});
-        }),
-        const Spacer(flex: 1)
+        }))),
       ])),
     ]));
     return UiUtils.getView(context, view, CommonUtils.onWillPopForPreventBackButton);

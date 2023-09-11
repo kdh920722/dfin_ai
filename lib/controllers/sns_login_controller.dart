@@ -194,7 +194,6 @@ class SnsLoginController{
       await LogfinController.callLogfinApi(LogfinApis.socialLogin, inputJson, (isSuccess, outputJson) {
         isMember = isSuccess;
       });
-      CommonUtils.log("i", "social login 2");
       return isMember;
     }catch(error){
       CommonUtils.log("e", "$error");

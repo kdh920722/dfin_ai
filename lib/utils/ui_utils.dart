@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -20,7 +19,6 @@ class UiUtils {
       },
     );
   }
-
 
   static Widget getView(BuildContext context, Widget view, Future<bool> Function(BuildContext? context) callbackBackButtonForView){
     return GestureDetector(
@@ -140,6 +138,25 @@ class UiUtils {
           child: Padding(
             padding: EdgeInsets.all(4.w),
             child: getStyledTextWithFixedScale(buttonText,buttonTextStyles,TextAlign.center,null)
+          ),
+        )
+    );
+  }
+
+  static SizedBox getCustomTextButtonBox(double buttonWidth, String buttonText, double fontSize, FontWeight fontWeight, Color buttonColor, Color textColor, VoidCallback onPressedCallback) {
+    return SizedBox(
+        width: buttonWidth,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: buttonColor,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+            elevation: 0.5,
+            shadowColor: ColorStyles.upFinGray,
+          ),
+          onPressed: onPressedCallback,
+          child: Padding(
+              padding: EdgeInsets.zero,
+              child: getStyledTextWithFixedScale(buttonText,TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: fontSize, color: textColor, fontWeight: fontWeight, decoration: TextDecoration.none, decorationThickness: 0.0, height: 1), TextAlign.start,1)
           ),
         )
     );

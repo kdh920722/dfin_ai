@@ -202,12 +202,12 @@ class CommonUtils {
       }
 
       if(backValue == ""){
-        resultString = "$frontValue억원";
+        resultString = "${getPriceCommaFormattedString(double.parse(frontValue))}억원";
       }else{
-        resultString = "$frontValue억 $backValue만원";
+        resultString = "${getPriceCommaFormattedString(double.parse(frontValue))}억 ${getPriceCommaFormattedString(double.parse(backValue))}만원";
       }
     }else{
-      resultString = "$backValue만원";
+      resultString = "${getPriceCommaFormattedString(double.parse(backValue))}만원";
     }
 
     return resultString;

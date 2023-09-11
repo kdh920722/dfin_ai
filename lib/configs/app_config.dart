@@ -2,6 +2,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:upfin/views/app_main_view.dart';
+import 'package:upfin/views/app_result_pr_view.dart';
 import 'package:upfin/views/app_search_accident_view.dart';
 import 'package:upfin/views/app_signup_view.dart';
 import 'package:upfin/views/app_web_view.dart';
@@ -31,7 +32,8 @@ class Config{
     AppView.webView.value : (context) => AppWebView(),
     AppView.signupView.value : (context) => AppSignUpView(),
     AppView.mainView.value : (context) => AppMainView(),
-    AppView.searchAccidentView.value : (context) => AppSearchAccidentView()
+    AppView.searchAccidentView.value : (context) => AppSearchAccidentView(),
+    AppView.resultPrView.value : (context) => AppResultPrView()
   };
 
   static Future<void> initAppState(Function(bool isSuccess) callback) async{
@@ -56,7 +58,7 @@ class Config{
 }
 
 enum AppView {
-  rootLoginView, certificationView, webView, signupView, mainView, searchAccidentView
+  rootLoginView, certificationView, webView, signupView, mainView, searchAccidentView, resultPrView
 }
 
 extension SAppViewExtension on AppView {
@@ -74,6 +76,8 @@ extension SAppViewExtension on AppView {
         return '/mainView';
       case AppView.searchAccidentView:
         return '/searchAccidentView';
+      case AppView.resultPrView:
+        return '/resultPrView';
     }
   }
 }

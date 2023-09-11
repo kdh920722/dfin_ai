@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:upfin/controllers/get_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,6 +6,9 @@ import 'package:sizer/sizer.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
+import '../configs/app_config.dart';
+import '../datas/accident_info_data.dart';
+import '../datas/pr_info_data.dart';
 import '../styles/TextStyles.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
@@ -258,7 +260,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
           CommonUtils.log("i", "court : $selectedCourtInfo");
           if(selectedCourtInfo.isNotEmpty){
-
+            nextInputView();
           }
         })
       ]);
@@ -474,8 +476,9 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       UiUtils.getMarginBox(0, 3.h),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("인가후 대출 총금액을", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("알려주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      UiUtils.getMarginBox(0, 1.h),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력단위(*만원)", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
-
       Obx(()=>UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _preLoanPriceFocus, _preLoanPriceTextController, TextInputType.number, false,
           UiUtils.getInputDecoration("", 0.sp, GetController.to.preLoanPrice.value, 14.sp), (text) {
             if(text.trim() != ""){
@@ -516,8 +519,9 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       UiUtils.getMarginBox(0, 3.h),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("희망하시는 대출금액을", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("알려주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      UiUtils.getMarginBox(0, 1.h),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력단위(*만원)", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
-
       Obx(()=>UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _wantLoanPriceFocus, _wantLoanPriceTextController, TextInputType.number, false,
           UiUtils.getInputDecoration("", 0.sp, GetController.to.wantLoanPrice.value, 14.sp), (text) {
             if(text.trim() != ""){
@@ -681,11 +685,14 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         };
         CommonUtils.log("i", "pr search info:\n$inputJson");
 
+        String caseYear = "2023";
+        String caseType = "개회";
+        String caseNumber = "1000794";
         Map<String, dynamic> inputJsonForTest = {
           "court_name": "서울회생법원",
-          "caseNumberYear": "2023",
-          "caseNumberType": "개회",
-          "caseNumberNumber": "1000794",
+          "caseNumberYear": caseYear,
+          "caseNumberType": caseType,
+          "caseNumberNumber": caseNumber,
           "userName": "정혜경",
           "bankCode": "004",
           "account": "40240104",
@@ -696,14 +703,46 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
           "wish_amount": "300",
 
         };
+
+        UiUtils.showLoadingPop(context);
         LogfinController.callLogfinApi(LogfinApis.prSearch, inputJsonForTest, (isSuccess, outputJson){
           if(isSuccess){
-            // 1) 한도금리 목록 조회 후 저장
+            // 1) 한도금리 목록 조회 후 사건정보 재조회
+            LogfinController.callLogfinApi(LogfinApis.getAccidentInfo, <String, dynamic>{}, (isSuccessToGetAccidentInfo, accidentInfoOutputJson){
+              if(isSuccessToGetAccidentInfo){
+                List<dynamic> accidentList = accidentInfoOutputJson!["accidents"];
+                String bankName = "";
+                for(var each in accidentList){
+                  var dataResult = jsonDecode(each["req_data"].toString())["pr"];
+                  for(var eachBank in LogfinController.bankList){
+                    if(eachBank.split("@")[1].substring(1) == dataResult["bankCode"]){
+                      bankName = eachBank.split("@")[0];
+                    }
+                  }
+                  MyData.addToAccidentInfoList(AccidentInfoData(each["uid"], dataResult["caseNumberYear"], dataResult["caseNumberType"], dataResult["caseNumberNumber"],
+                      dataResult["court_name"], bankName, dataResult["bankCode"], dataResult["account"]));
+                }
 
-            // 2) 한도금리 목록 화면으로 이동(저장한걸 보여줌)
-
-            // 3-1) 한도금리 목록 화면에서 뒤로가기 누르면 사건 정보 조회 후 저장하고 메인뷰로 이동(저장한걸 보여줌) *(if initSearchViewFromMainView == false)
-            // 3-2) 한도금리 목록 화면에서 뒤로가기 누르면 pop하여 메인뷰로 이동 *(if initSearchViewFromMainView == true)
+                // 2) 한도금리 목록 화면으로 이동(저장한 accident uid로 한도금리 조회한 뒤 저장하여 보여줌)
+                LogfinController.getPrList(caseYear+caseType+caseNumber, (isSuccessToGetOffers, outputJsonForGetOffers){
+                  UiUtils.closeLoadingPop(context);
+                  if(isSuccessToGetOffers){
+                    CommonUtils.moveWithReplacementTo(context, AppView.resultPrView.value, null);
+                  }else{
+                    // findUidInAccidentInfoList 실패
+                    CommonUtils.flutterToast("에러가 발생했습니다.");
+                  }
+                });
+              }else{
+                // getAccidentInfo 실패
+                UiUtils.closeLoadingPop(context);
+                CommonUtils.flutterToast(accidentInfoOutputJson!["error"]);
+              }
+            });
+          }else{
+            // prSearch 실패
+            UiUtils.closeLoadingPop(context);
+            CommonUtils.flutterToast(outputJson!["error"]);
           }
         });
       })

@@ -2,9 +2,11 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:http/http.dart' as http;
+import 'package:upfin/datas/accident_info_data.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'dart:convert';
 import '../configs/app_config.dart';
+import '../datas/pr_info_data.dart';
 import '../utils/common_utils.dart';
 
 class LogfinController {
@@ -169,6 +171,9 @@ class LogfinController {
           }else if(api == LogfinApis.signIn){
             LogfinController.userToken = resultData["data"]['api_token'];
             CommonUtils.log('i', "userToken : ${LogfinController.userToken}");
+          }else if(api == LogfinApis.getOffers){
+            callback(true, resultData);
+            return;
           }
           callback(true, resultData['data']);
         }else{
@@ -192,7 +197,7 @@ class LogfinController {
           MyData.name = userInfoOutputJson["user"]["name"];
           MyData.email =  userInfoOutputJson["user"]["email"];
           MyData.phoneNumber = userInfoOutputJson["user"]["contact_no"];
-          MyData.carrierType = userInfoOutputJson["user"]["telecom"];
+          MyData.telecom = userInfoOutputJson["user"]["telecom"];
           MyData.birth =  userInfoOutputJson["user"]["birthday"];
           MyData.isMale =  userInfoOutputJson["user"]["gender"] == "1"? true : false;
 
@@ -208,8 +213,17 @@ class LogfinController {
                 callback(true, AppView.searchAccidentView);
               }else{
                 // 3-2) 사건정보 있으면 사건정보 이력화면(메인 뷰)로 이동(저장한걸 보여줌)
-                //var dataResult = jsonDecode(accidentList[0]["res_data"].toString());
-                //CommonUtils.log("i", "each in : ${dataResult["data"]}");
+                String bankName = "";
+                for(var each in accidentList){
+                  var dataResult = jsonDecode(each["req_data"].toString())["pr"];
+                  for(var eachBank in bankList){
+                    if(eachBank.split("@")[1].substring(1) == dataResult["bankCode"]){
+                      bankName = eachBank.split("@")[0];
+                    }
+                  }
+                  MyData.addToAccidentInfoList(AccidentInfoData(each["uid"], dataResult["caseNumberYear"], dataResult["caseNumberType"], dataResult["caseNumberNumber"],
+                      dataResult["court_name"], bankName, dataResult["bankCode"], dataResult["account"]));
+                }
 
                 MyData.initSearchViewFromMainView = true;
                 callback(true, AppView.mainView);
@@ -229,11 +243,36 @@ class LogfinController {
       }
     });
   }
+
+  static Future<void> getPrList(String accidentCase, Function(bool isSuccess, Map<String, dynamic>? outputJson) callback) async {
+    String accidentUid = MyData.findUidInAccidentInfoList(accidentCase);
+    if(accidentUid != ""){
+      Map<String, dynamic> inputJsonForGetOffers= {
+        "accident_uid": accidentUid
+      };
+      callLogfinApi(LogfinApis.getOffers, inputJsonForGetOffers, (isSuccessToGetOffers, outputJsonForGetOffers){
+        if(isSuccessToGetOffers){
+          MyData.clearPrInfoList();
+          List<dynamic> offerPrList = outputJsonForGetOffers!["data"];
+          for(var each in offerPrList){
+            CommonUtils.log("i", "$each");
+            MyData.addToPrInfoList(PrInfoData(each["lender_name"], each["lender_id"].toString(), each["product_name"], each["rid"], each["min_rate"].toString(), each["limit"].toString(), each["result"] as bool, each["msg"]));
+          }
+          MyData.prInfoListReOrderBy(false);
+          callback(true, outputJsonForGetOffers);
+        }else{
+          callback(false, null);
+        }
+      });
+    }else{
+      callback(false, null);
+    }
+  }
 }
 
 enum LogfinApis {
   signUp, signIn, socialLogin, deleteAccount,
-  getUserInfo, prSearch,
+  getUserInfo, prSearch, getOffers,
   applyProductDocSearch, applyProduct,
   getAccidentInfo, getOffersInfo,
   getLoansInfo, getLoansDetailInfo
@@ -266,6 +305,8 @@ extension LogfinApisExtension on LogfinApis {
         return '/get_loans.json';
       case LogfinApis.getLoansDetailInfo:
         return '/get_loan.json';
+      case LogfinApis.getOffers:
+        return '/get_offers.json';
     }
   }
 }
