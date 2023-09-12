@@ -1,11 +1,6 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:upfin/configs/app_config.dart';
-import 'package:upfin/controllers/logfin_controller.dart';
-import 'package:upfin/datas/my_data.dart';
-import 'package:upfin/datas/pr_info_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import 'package:upfin/styles/TextStyles.dart';
 import '../utils/common_utils.dart';
@@ -80,7 +75,7 @@ class AppDetailPrViewState extends State<AppDetailPrView> with WidgetsBindingObs
     item2Agreed = true;
   }
 
-  Widget makeAgreeWidget(BuildContext thisContext, StateSetter thisSetState){
+  Widget _makeAgreeWidget(BuildContext thisContext, StateSetter thisSetState){
     return Material(child: Container(color: ColorStyles.upFinWhite,
         child: Column(children: [
           Row(mainAxisAlignment: MainAxisAlignment.end,children: [
@@ -188,7 +183,7 @@ class AppDetailPrViewState extends State<AppDetailPrView> with WidgetsBindingObs
       UiUtils.getExpandedScrollView(Axis.vertical, Container()),
       UiUtils.getMarginBox(0, 2.h),
       UiUtils.getTextButtonBox(90.w, "접수하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
-        UiUtils.showSlideMenu(context, SlideType.bottomToTop, true, 100.w, 65.h, 0.5, makeAgreeWidget);
+        UiUtils.showSlideMenu(context, SlideType.bottomToTop, true, 100.w, 65.h, 0.5, _makeAgreeWidget);
       })
     ]));
     return UiUtils.getView(context, view, CommonUtils.onWillPopForPreventBackButton);

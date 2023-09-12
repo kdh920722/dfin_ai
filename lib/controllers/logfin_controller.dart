@@ -202,6 +202,11 @@ class LogfinController {
             MyData.telecom = userInfoOutputJson["user"]["telecom"];
             MyData.birth =  userInfoOutputJson["user"]["birthday"];
             MyData.isMale =  userInfoOutputJson["user"]["gender"] == "1"? true : false;
+            for(var each in jobList){
+              if(each.split("@")[1] == "1"){
+                MyData.jobInfo = each;
+              }
+            }
 
             MyData.printData();
 

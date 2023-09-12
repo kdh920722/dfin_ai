@@ -1,5 +1,3 @@
-import 'dart:js_interop';
-
 import 'package:upfin/datas/accident_info_data.dart';
 import 'package:upfin/datas/pr_docs_info_data.dart';
 import 'package:upfin/datas/pr_info_data.dart';
@@ -107,6 +105,10 @@ class MyData {
   static PrInfoData? selectedPrInfoData;
 
   static void printData(){
+    String selectedPrInfoDataCheck = "";
+    if(selectedPrInfoData != null){
+      selectedPrInfoDataCheck = selectedPrInfoData!.productOfferRid.toString();
+    }
     CommonUtils.log("i", "\n"
         "name:$name\n"
         "phoneNumber:$phoneNumber\n"
@@ -117,7 +119,7 @@ class MyData {
         "accidentInfoList: ${_accidentInfoList.length}\n"
         "prInfoList: ${_prInfoList.length}\n"
         "prDocsInfoList: ${_prDocsInfoList.length}\n"
-        "selectedPrInfoData: ${!selectedPrInfoData.isNull}\n"
+        "selectedPrInfoData: $selectedPrInfoDataCheck\n"
     );
   }
 

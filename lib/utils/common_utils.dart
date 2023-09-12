@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'package:flutter/services.dart';
@@ -479,8 +478,8 @@ class CommonUtils {
       uiSettings: [
         AndroidUiSettings(
             toolbarTitle: '자르기',
-            toolbarColor: Colors.deepOrange,
-            toolbarWidgetColor: Colors.white,
+            toolbarColor: ColorStyles.upFinTextAndBorderBlue,
+            toolbarWidgetColor: ColorStyles.upFinWhite,
             initAspectRatio: CropAspectRatioPreset.original,
             lockAspectRatio: false),
         IOSUiSettings(

@@ -1,17 +1,18 @@
-import 'dart:convert';
-import 'dart:core';
-
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:sizer/sizer.dart';
 import 'package:upfin/configs/app_config.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/datas/my_data.dart';
-import 'package:upfin/datas/pr_docs_info_data.dart';
 import 'package:upfin/datas/pr_info_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import 'package:upfin/styles/TextStyles.dart';
+import '../controllers/aws_controller.dart';
+import '../controllers/clova_controller.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
+import 'dart:io';
 
 class AppApplyPrView extends StatefulWidget{
   @override
@@ -60,6 +61,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   int cameraForIdCheckViewId = 0;
   int cameraId = 99;
   String cameraName = "신분증 확인";
+  bool isDriveCardForImageType = false;
+  String pickedFilePath = "";
   bool cameraForIdCheckConfirmed = false;
 
   final List<Map<String, dynamic>> addedDocsList = [];
@@ -336,12 +339,14 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       ])),
       UiUtils.getMarginBox(0, 3.h),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("개인사업자인 경우", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("주거래 은행정보가 필요해요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("주거래 은행정보가", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("필요해요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: bankCodeList)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
         CommonUtils.log("i", "bank code : $selectedBankCodeInfo");
+        nextInputView();
         if(selectedBankCodeInfo.isNotEmpty){
           nextInputView();
         }
@@ -412,18 +417,145 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       ])),
       UiUtils.getMarginBox(0, 3.h),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("신분증을 준비해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      UiUtils.getMarginBox(0, 1.h),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("주민등록증과 운전면허증 중", 12.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("하나를 선택 해 주세요.", 12.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
+      UiUtils.getMarginBox(0, 10.h),
+      SizedBox(width: 85.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        UiUtils.getTextWithFixedScale("주민등록증", 12.sp, FontWeight.w500, !isDriveCardForImageType? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRealGray, TextAlign.start, null),
+        CupertinoSwitch(
+          trackColor: ColorStyles.upFinTextAndBorderBlue,
+          activeColor: ColorStyles.upFinTextAndBorderBlue,
+          value: isDriveCardForImageType,
+          onChanged: (value) {
+            if(pickedFilePath != ""){
+              UiUtils.showSlideMenu(context, SlideType.bottomToTop, false, 100.w, 37.h, 0.5, _makeRePickImageWidget);
+            }else{
+              setState(() {
+                isDriveCardForImageType = value;
+              });
+            }
+          },
+        ),
+        UiUtils.getTextWithFixedScale("운전면허증", 12.sp, FontWeight.w500, isDriveCardForImageType? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRealGray, TextAlign.start, null)
+      ])),
+      UiUtils.getMarginBox(0, 1.h),
+      SizedBox(width: 85.w, height: 30.h,
+          child: ConstrainedBox(constraints: BoxConstraints(maxWidth: 85.w, maxHeight: 30.h),
+            child: pickedFilePath != "" ? Image.file(File(pickedFilePath)) : Container(color: Colors.black))
+      ),
+      UiUtils.getMarginBox(0, 0.5.h),
+      SizedBox(width: 85.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        UiUtils.getBorderButtonBox(42.w, ColorStyles.upFinWhite, ColorStyles.upFinTextAndBorderBlue,
+            UiUtils.getTextWithFixedScale("촬영하기", 11.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
+                () {
+                  _takeImage(true);
+                }),
+        UiUtils.getMarginBox(1.w, 0),
+        UiUtils.getBorderButtonBox(42.w, ColorStyles.upFinWhite, ColorStyles.upFinTextAndBorderBlue,
+            UiUtils.getTextWithFixedScale("앨범에서 가져오기", 11.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
+                () {
+              _takeImage(false);
+            }),
+      ])),
       UiUtils.getMarginBox(0, 5.h),
-
-      UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-        selectedBusinessNumberInfo = _businessNumberInfoTextController.text.trim();
-        CommonUtils.log("i", "selectedBusinessNumberInfo : $selectedBusinessNumberInfo");
-        if(selectedBusinessNumberInfo.isNotEmpty){
+      UiUtils.getExpandedScrollView(Axis.vertical, Container()),
+      pickedFilePath != "" ? UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+        await _uploadToServer(pickedFilePath);
+        if(cameraForIdCheckConfirmed){
           nextInputView();
         }
-      })
+      }) : Container()
     ]);
+  }
+  Future<void> _takeImage(bool isGetImageFromCamera) async {
+    try{
+      XFile? image = isGetImageFromCamera? await CommonUtils.getCameraImage() : await CommonUtils.getGalleryImage();
+      if(image != null){
+        String imagePath = await CommonUtils.cropImageAndGetPath(image);
+        if(imagePath == ""){
+          imagePath = image.path;
+          await _checkValidCertImage(imagePath);
+        }else{
+          CommonUtils.flutterToast("사진을 가져오는 중\n에러가 발생했습니다.");
+        }
+      }
+    }catch(error){
+      CommonUtils.log("i", "tage image error : $error");
+      CommonUtils.flutterToast("사진을 가져오는 중\n에러가 발생했습니다.");
+    }
+  }
+  Future<void> _checkValidCertImage(String imagePath) async {
+    try{
+      await CLOVAController.uploadImageToCLOVA(imagePath, (isSuccess, map) async {
+        if(isSuccess){
+          CommonUtils.log('i', map.toString());
+          String croppedImagePath = await CommonUtils.makeMaskingImageAndGetPath(imagePath, map!);
+          if(croppedImagePath != ""){
+            setState(() {
+              pickedFilePath = croppedImagePath;
+            });
+          }else{
+            // failed to masking
+            CommonUtils.flutterToast("마스킹 중\n에러가 발생했습니다.");
+          }
+        }else{
+          // failed to check clova ocr
+          CommonUtils.flutterToast("신분증 확인 중\n에러가 발생했습니다.");
+        }
+      });
+    }catch(error){
+      CommonUtils.log("i", "tage image error : $error");
+      CommonUtils.flutterToast("사진을 가져오는 중\n에러가 발생했습니다.");
+    }
+  }
+  Future<void> _uploadToServer(String croppedImagePath) async {
+    try{
+      await AwsController.uploadImageToAWS(croppedImagePath, (isSuccessToSave, resultUrl) async {
+        if(isSuccessToSave){
+          cameraForIdCheckConfirmed = true;
+        }else{
+          // failed to aws s3 save
+          cameraForIdCheckConfirmed = false;
+          CommonUtils.flutterToast("사진을 저장하는 중\n에러가 발생했습니다.");
+        }
+      });
+    }catch(error){
+      cameraForIdCheckConfirmed = false;
+      CommonUtils.log("i", "tage image error : $error");
+      CommonUtils.flutterToast("사진을 처리하는 중\n에러가 발생했습니다.");
+    }
+  }
+  Widget _makeRePickImageWidget(BuildContext thisContext, StateSetter thisSetState){
+    return Material(child: Container(color: ColorStyles.upFinWhite,
+        child: Column(children: [
+          UiUtils.getMarginBox(0, 5.h),
+          Row(mainAxisAlignment: MainAxisAlignment.start,children: [
+            UiUtils.getTextWithFixedScale("신분증 타입을 변경하면", 16.sp, FontWeight.w800, ColorStyles.upFinBlack, TextAlign.start, null)
+          ]),
+          Row(mainAxisAlignment: MainAxisAlignment.start,children: [
+            UiUtils.getTextWithFixedScale("다시 촬영하셔야 합니다.", 16.sp, FontWeight.w800, ColorStyles.upFinBlack, TextAlign.start, null)
+          ]),
+          Row(mainAxisAlignment: MainAxisAlignment.start,children: [
+            UiUtils.getTextWithFixedScale("그래도 진행 하시겠습니까?", 16.sp, FontWeight.w800, ColorStyles.upFinBlack, TextAlign.start, null)
+          ]),
+          UiUtils.getMarginBox(0, 5.h),
+          UiUtils.getTextButtonBox(90.w, "예, 다시촬영 할게요", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
+            Navigator.pop(thisContext);
+            setState(() {
+              if(isDriveCardForImageType){
+                isDriveCardForImageType = false;
+              }else{
+                isDriveCardForImageType = true;
+              }
+            });
+          }),
+          UiUtils.getMarginBox(0, 0.5.h),
+          UiUtils.getTextButtonBox(90.w, "취소할게요", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinRealGray, () {
+            Navigator.pop(thisContext);
+          })
+        ])
+    ));
   }
   /// camera for id check view end
 

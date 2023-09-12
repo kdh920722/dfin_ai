@@ -1,11 +1,8 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:upfin/configs/app_config.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/datas/my_data.dart';
-import 'package:upfin/datas/pr_info_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';

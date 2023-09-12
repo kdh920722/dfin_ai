@@ -666,8 +666,6 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: confirmWidgetList)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "네 좋아요!", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
-        MyData.jobInfo = selectedJobInfo;
-
         Map<String, dynamic> inputJson = {
           "court_name": selectedCourtInfo.split("@")[0],
           "caseNumberYear": selectedAccidentInfo.split("개회")[0],
