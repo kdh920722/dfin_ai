@@ -1,4 +1,7 @@
+import 'dart:js_interop';
+
 import 'package:upfin/datas/accident_info_data.dart';
+import 'package:upfin/datas/pr_docs_info_data.dart';
 import 'package:upfin/datas/pr_info_data.dart';
 import '../utils/common_utils.dart';
 
@@ -19,6 +22,8 @@ class MyData {
   static String nameFromSns = "";
   static String emailFromSns = "";
   static String phoneNumberFromSns = "";
+
+  static String jobInfo = "";
 
   static final List<AccidentInfoData> _accidentInfoList = [];
   static List<AccidentInfoData> getAccidentInfoList(){
@@ -55,7 +60,7 @@ class MyData {
   static List<PrInfoData> getPrInfoList(){
     return _prInfoList;
   }
-  static void prInfoListReOrderBy(bool isOrderByLimit){
+  static void sortPrInfoListBy(bool isOrderByLimit){
     if(isOrderByLimit){
       _prInfoList.sort((a,b){
         int comparison = double.parse(a.productLoanLimit).compareTo(double.parse(b.productLoanLimit));
@@ -83,6 +88,24 @@ class MyData {
     _prInfoList.clear();
   }
 
+  static final List<PrDocsInfoData> _prDocsInfoList = [];
+  static List<PrDocsInfoData> getPrDocsInfoList(){
+    return _prDocsInfoList;
+  }
+  static void sortPrDocsInfoList(){
+    _prDocsInfoList.sort((a,b){
+      return a.productDocsOrderId.compareTo(b.productDocsOrderId);
+    });
+  }
+  static void addToPrDocsInfoList(PrDocsInfoData prDocsInfoData){
+    _prDocsInfoList.add(prDocsInfoData);
+  }
+  static void clearPrDocsInfoList(){
+    _prDocsInfoList.clear();
+  }
+
+  static PrInfoData? selectedPrInfoData;
+
   static void printData(){
     CommonUtils.log("i", "\n"
         "name:$name\n"
@@ -93,6 +116,8 @@ class MyData {
         "isMale:$isMale\n"
         "accidentInfoList: ${_accidentInfoList.length}\n"
         "prInfoList: ${_prInfoList.length}\n"
+        "prDocsInfoList: ${_prDocsInfoList.length}\n"
+        "selectedPrInfoData: ${!selectedPrInfoData.isNull}\n"
     );
   }
 
@@ -111,7 +136,10 @@ class MyData {
     birthFromPhoneCert = "";
     carrierTypeFromPhoneCert = "";
     isMaleFromPhoneCert = false;
+    jobInfo = "";
     clearAccidentInfoList();
     clearPrInfoList();
+    clearPrDocsInfoList();
+    selectedPrInfoData = null;
   }
 }

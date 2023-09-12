@@ -124,6 +124,22 @@ class UiUtils {
     return Container(color: backgroundColor, width: width, height: height,child: IconButton(onPressed: onPressedCallback, icon: Icon(icon, color: iconColor, size: size)));
   }
 
+  static SizedBox getIconButtonBox(double buttonWidth, Color buttonColor, IconData icon, double size, Color iconColor, VoidCallback onPressedCallback) {
+    return SizedBox(
+        width: buttonWidth,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: buttonColor,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+            elevation: 0.5,
+            shadowColor: ColorStyles.upFinGray,
+          ),
+          onPressed: onPressedCallback,
+          child: Icon(icon, color: iconColor, size: size),
+        )
+    );
+  }
+
   static SizedBox getTextButtonBox(double buttonWidth, String buttonText, TextStyle buttonTextStyles, Color buttonColor, VoidCallback onPressedCallback) {
     return SizedBox(
         width: buttonWidth,
@@ -195,6 +211,26 @@ class UiUtils {
             padding: EdgeInsets.all(4.w),
             child: getStyledTextWithFixedScale(buttonText,TextStyles.countDownButtonStyle,TextAlign.center,null)
           ),
+        )
+    );
+  }
+
+  static SizedBox getBorderButtonBox(double buttonWidth, Color buttonColor, Color borderColor, Widget childWidget, VoidCallback onPressedCallback){
+    return SizedBox(
+        width: buttonWidth,
+        child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: buttonColor,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+              side: BorderSide(width: 1.3, color: borderColor),
+              elevation: 1,
+              shadowColor: ColorStyles.upFinGray,
+            ),
+            onPressed: onPressedCallback,
+            child: Padding(
+                padding: EdgeInsets.only(left: 0, right: 0, top: 4.w, bottom: 4.w),
+                child: childWidget
+            ),
         )
     );
   }
@@ -399,7 +435,7 @@ class UiUtils {
     Alignment alignment = Alignment.bottomCenter;
 
     showGeneralDialog(
-      barrierLabel: "Slide Menu",
+      barrierLabel: "",
       barrierDismissible: isDismissible,
       barrierColor: Colors.black.withOpacity(opacity),
       transitionDuration: const Duration(milliseconds: 300),
@@ -433,7 +469,7 @@ class UiUtils {
         }
 
         return WillPopScope(
-          onWillPop: () async => false,
+          onWillPop: () async => isDismissible,
           child: Align(
             alignment: alignment,
             child: Container(

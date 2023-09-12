@@ -1,4 +1,6 @@
 class PrInfoData {
+  String productOfferId;
+  String productOfferRid;
   String productCompanyName;
   String productCompanyCode;
   String productName;
@@ -8,5 +10,6 @@ class PrInfoData {
   bool isPossible;
   List<dynamic> failReason;
 
-  PrInfoData(this.productCompanyName, this.productCompanyCode, this.productName, this.productCode, this.productLoanRates, this.productLoanLimit, this.isPossible, this.failReason);
+  PrInfoData(this.productOfferId, this.productOfferRid, this.productCompanyName, this.productCompanyCode, this.productName,
+      this.productCode, this.productLoanRates, this.productLoanLimit, this.isPossible, this.failReason);
 }

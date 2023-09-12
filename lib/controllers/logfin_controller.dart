@@ -4,6 +4,7 @@ import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:http/http.dart' as http;
 import 'package:upfin/datas/accident_info_data.dart';
 import 'package:upfin/datas/my_data.dart';
+import 'package:upfin/datas/pr_docs_info_data.dart';
 import 'dart:convert';
 import '../configs/app_config.dart';
 import '../datas/pr_info_data.dart';
@@ -190,81 +191,128 @@ class LogfinController {
   }
 
   static Future<void> getMainOrSearchView(BuildContext context, Function(bool isSuccess, AppView? appView) callback) async {
-    // 1) 유저정보 가져오기
-    callLogfinApi(LogfinApis.getUserInfo, <String, dynamic>{}, (isSuccessToGetUserInfo, userInfoOutputJson){
-      if(isSuccessToGetUserInfo){
-        if(userInfoOutputJson != null){
-          MyData.name = userInfoOutputJson["user"]["name"];
-          MyData.email =  userInfoOutputJson["user"]["email"];
-          MyData.phoneNumber = userInfoOutputJson["user"]["contact_no"];
-          MyData.telecom = userInfoOutputJson["user"]["telecom"];
-          MyData.birth =  userInfoOutputJson["user"]["birthday"];
-          MyData.isMale =  userInfoOutputJson["user"]["gender"] == "1"? true : false;
+    try{
+      // 1) 유저정보 가져오기
+      callLogfinApi(LogfinApis.getUserInfo, <String, dynamic>{}, (isSuccessToGetUserInfo, userInfoOutputJson){
+        if(isSuccessToGetUserInfo){
+          if(userInfoOutputJson != null){
+            MyData.name = userInfoOutputJson["user"]["name"];
+            MyData.email =  userInfoOutputJson["user"]["email"];
+            MyData.phoneNumber = userInfoOutputJson["user"]["contact_no"];
+            MyData.telecom = userInfoOutputJson["user"]["telecom"];
+            MyData.birth =  userInfoOutputJson["user"]["birthday"];
+            MyData.isMale =  userInfoOutputJson["user"]["gender"] == "1"? true : false;
 
-          MyData.printData();
+            MyData.printData();
 
-          // 2) 사건정보 조회
-          callLogfinApi(LogfinApis.getAccidentInfo, <String, dynamic>{}, (isSuccessToGetAccidentInfo, accidentInfoOutputJson){
-            if(isSuccessToGetAccidentInfo){
-              List<dynamic> accidentList = accidentInfoOutputJson!["accidents"];
-              if(accidentList.isEmpty){
-                // 3-1) 사건정보 없으면 한도금리 조회를 위한 조건 입력 화면으로 이동(한도금리 조회 시, 사건정보 저장)
-                MyData.initSearchViewFromMainView = false;
-                callback(true, AppView.searchAccidentView);
-              }else{
-                // 3-2) 사건정보 있으면 사건정보 이력화면(메인 뷰)로 이동(저장한걸 보여줌)
-                String bankName = "";
-                for(var each in accidentList){
-                  var dataResult = jsonDecode(each["req_data"].toString())["pr"];
-                  for(var eachBank in bankList){
-                    if(eachBank.split("@")[1].substring(1) == dataResult["bankCode"]){
-                      bankName = eachBank.split("@")[0];
+            // 2) 사건정보 조회
+            callLogfinApi(LogfinApis.getAccidentInfo, <String, dynamic>{}, (isSuccessToGetAccidentInfo, accidentInfoOutputJson){
+              if(isSuccessToGetAccidentInfo){
+                List<dynamic> accidentList = accidentInfoOutputJson!["accidents"];
+                if(accidentList.isEmpty){
+                  // 3-1) 사건정보 없으면 한도금리 조회를 위한 조건 입력 화면으로 이동(한도금리 조회 시, 사건정보 저장)
+                  MyData.initSearchViewFromMainView = false;
+                  callback(true, AppView.searchAccidentView);
+                }else{
+                  // 3-2) 사건정보 있으면 사건정보 이력화면(메인 뷰)로 이동(저장한걸 보여줌)
+                  String bankName = "";
+                  for(var each in accidentList){
+                    var dataResult = jsonDecode(each["req_data"].toString())["pr"];
+                    for(var eachBank in bankList){
+                      if(eachBank.split("@")[1].substring(1) == dataResult["bankCode"]){
+                        bankName = eachBank.split("@")[0];
+                      }
                     }
+                    MyData.addToAccidentInfoList(AccidentInfoData(each["uid"], dataResult["caseNumberYear"], dataResult["caseNumberType"], dataResult["caseNumberNumber"],
+                        dataResult["court_name"], bankName, dataResult["bankCode"], dataResult["account"]));
                   }
-                  MyData.addToAccidentInfoList(AccidentInfoData(each["uid"], dataResult["caseNumberYear"], dataResult["caseNumberType"], dataResult["caseNumberNumber"],
-                      dataResult["court_name"], bankName, dataResult["bankCode"], dataResult["account"]));
-                }
 
-                MyData.initSearchViewFromMainView = true;
-                callback(true, AppView.mainView);
+                  MyData.initSearchViewFromMainView = true;
+                  callback(true, AppView.mainView);
+                }
+              }else{
+                CommonUtils.flutterToast(accidentInfoOutputJson!["error"]);
+                callback(false, null);
               }
-            }else{
-              CommonUtils.flutterToast(accidentInfoOutputJson!["error"]);
-              callback(false, null);
-            }
-          });
+            });
+          }else{
+            CommonUtils.flutterToast("유저정보 로딩 실패\n다시 실행 해 주세요.");
+            callback(false, null);
+          }
         }else{
-          CommonUtils.flutterToast("유저정보 로딩 실패\n다시 실행 해 주세요.");
+          CommonUtils.flutterToast("데이터 로딩 실패\n다시 실행 해 주세요.");
           callback(false, null);
         }
-      }else{
-        CommonUtils.flutterToast("데이터 로딩 실패\n다시 실행 해 주세요.");
-        callback(false, null);
-      }
-    });
+      });
+    }catch(error){
+      CommonUtils.flutterToast("데이터 로딩 실패\n다시 실행 해 주세요.");
+      callback(false, null);
+    }
   }
 
   static Future<void> getPrList(String accidentCase, Function(bool isSuccess, Map<String, dynamic>? outputJson) callback) async {
-    String accidentUid = MyData.findUidInAccidentInfoList(accidentCase);
-    if(accidentUid != ""){
-      Map<String, dynamic> inputJsonForGetOffers= {
-        "accident_uid": accidentUid
-      };
-      callLogfinApi(LogfinApis.getOffers, inputJsonForGetOffers, (isSuccessToGetOffers, outputJsonForGetOffers){
-        if(isSuccessToGetOffers){
-          MyData.clearPrInfoList();
-          List<dynamic> offerPrList = outputJsonForGetOffers!["data"];
-          for(var each in offerPrList){
-            CommonUtils.log("i", "$each");
-            MyData.addToPrInfoList(PrInfoData(each["lender_name"], each["lender_id"].toString(), each["product_name"], each["rid"], each["min_rate"].toString(), each["limit"].toString(), each["result"] as bool, each["msg"]));
+    try{
+      String accidentUid = MyData.findUidInAccidentInfoList(accidentCase);
+      if(accidentUid != ""){
+        Map<String, dynamic> inputJsonForGetOffers= {
+          "accident_uid": accidentUid
+        };
+        callLogfinApi(LogfinApis.getOffers, inputJsonForGetOffers, (isSuccessToGetOffers, outputJsonForGetOffers){
+          if(isSuccessToGetOffers){
+            MyData.clearPrInfoList();
+            String offerId = outputJsonForGetOffers!["offer_id"].toString();
+            List<dynamic> offerPrList = outputJsonForGetOffers["data"];
+            for(var each in offerPrList){
+              CommonUtils.log("i", "$each");
+              MyData.addToPrInfoList(PrInfoData(offerId, each["rid"], each["lender_name"], each["lender_id"].toString(),
+                  each["product_name"], each["rid"], each["min_rate"].toString(), each["limit"].toString(), each["result"] as bool, each["msg"]));
+            }
+
+            if(MyData.getPrInfoList().isNotEmpty){
+              MyData.sortPrInfoListBy(false);
+              callback(true, outputJsonForGetOffers);
+            }else{
+              callback(false, null);
+            }
+          }else{
+            callback(false, null);
           }
-          MyData.prInfoListReOrderBy(false);
-          callback(true, outputJsonForGetOffers);
+        });
+      }else{
+        callback(false, null);
+      }
+    }catch(error){
+      callback(false, null);
+    }
+  }
+
+  static Future<void> getPrDocsList(String offerId, String offerRid, Function(bool isSuccess, Map<String, dynamic>? outputJson) callback) async {
+    try{
+      MyData.clearPrDocsInfoList();
+      Map<String, dynamic> inputJson = {
+        "offer_id": offerId,
+        "offer_rid": offerRid,
+      };
+      LogfinController.callLogfinApi(LogfinApis.applyProductDocSearch, inputJson, (isSuccessToSearchDocs, outputJsonForSearchDocs){
+        if(isSuccessToSearchDocs){
+          for(var each in outputJsonForSearchDocs!["documents"]){
+            MyData.addToPrDocsInfoList(PrDocsInfoData(each["id"], each["name"], each["del_flg"], each["disp_order"]));
+          }
+
+          if(MyData.getPrDocsInfoList().isNotEmpty){
+            MyData.sortPrDocsInfoList();
+            for(var eachInList in MyData.getPrDocsInfoList()){
+              CommonUtils.log("i", "${eachInList.productDocsOrderId}\n${eachInList.productDocsId}\n${eachInList.productDocsName}\n");
+            }
+            callback(true, outputJsonForSearchDocs);
+          }else{
+            callback(false, null);
+          }
         }else{
           callback(false, null);
         }
       });
-    }else{
+    }catch(error){
       callback(false, null);
     }
   }

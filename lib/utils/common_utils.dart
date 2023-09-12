@@ -21,10 +21,10 @@ class CommonUtils {
 
   }
 
-  static const int logMaxSize = 2000;
+  static const int logMaxSize = 600;
   static void log(String logType, String logMessage){
     var logger = Logger();
-    if(logMessage.length > 2000){
+    if(logMessage.length > logMaxSize){
       switch(logType.toLowerCase()){
         case "d":
           logger.d("long log start=======================>");

@@ -159,66 +159,68 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
             ],
           )),
           UiUtils.getMarginBox(0, 2.h),
-          Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
-            Container(padding: EdgeInsets.only(left: 5.w), height: 3.h, child: Row(
-              children: [
-                UiUtils.getCircleCheckBox(1, item1Agreed!, (isChanged) {
-                  thisSetState(() {
-                    item1Agreed = isChanged;
-                    if(item1Agreed == item2Agreed){
-                      allAgreed = isChanged;
-                    }else{
-                      allAgreed = false;
-                    }
-                  });
-                }),
-                UiUtils.getTextWithFixedScale("(필수)전체 동의하기", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null)
-              ],
-            )),
-            Container(padding: EdgeInsets.only(left: 20.w), height: 3.5.h, child: Row(children: [
-              UiUtils.getTextStyledWithIconAndText(TextDirection.rtl, "업핀 서비스 이용약관", 10.sp, FontWeight.w500, ColorStyles.upFinDarkWhiteGray, TextAlign.start, null,
-                  Icons.arrow_back_ios, 3.5.w, ColorStyles.upFinDarkWhiteGray, (){
-
-              }),
-            ])),
-            Container(padding: EdgeInsets.only(left: 20.w), height: 3.5.h, child: Row(children: [
-              UiUtils.getTextStyledWithIconAndText(TextDirection.rtl, "개인(신용)정보 수집 이용 제공 동의서", 10.sp, FontWeight.w500, ColorStyles.upFinDarkWhiteGray, TextAlign.start, null,
-                  Icons.arrow_back_ios, 3.5.w, ColorStyles.upFinDarkWhiteGray, (){
-
+          UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
+            Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
+              Container(padding: EdgeInsets.only(left: 5.w), height: 3.h, child: Row(
+                children: [
+                  UiUtils.getCircleCheckBox(1, item1Agreed!, (isChanged) {
+                    thisSetState(() {
+                      item1Agreed = isChanged;
+                      if(item1Agreed == item2Agreed){
+                        allAgreed = isChanged;
+                      }else{
+                        allAgreed = false;
+                      }
+                    });
                   }),
-            ]))
-          ]),
-          UiUtils.getMarginBox(0, 2.h),
-          Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
-            Container(padding: EdgeInsets.only(left: 5.w), height: 3.h, child: Row(
-              children: [
-                UiUtils.getCircleCheckBox(1, item2Agreed!, (isChanged) {
-                  thisSetState(() {
-                    item2Agreed = isChanged;
-                    if(item1Agreed == item2Agreed){
-                      allAgreed = isChanged;
-                    }else{
-                      allAgreed = false;
-                    }
-                  });
-                }),
-                UiUtils.getTextWithFixedScale("(선택)전체 동의하기", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null)
-              ],
-            )),
-            Container(padding: EdgeInsets.only(left: 20.w), height: 3.5.h, child: Row(children: [
-              UiUtils.getTextStyledWithIconAndText(TextDirection.rtl, "마케팅 정보 수신 동의", 10.sp, FontWeight.w500, ColorStyles.upFinDarkWhiteGray, TextAlign.start, null,
-                  Icons.arrow_back_ios, 3.5.w, ColorStyles.upFinDarkWhiteGray, (){
+                  UiUtils.getTextWithFixedScale("(필수)전체 동의하기", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null)
+                ],
+              )),
+              Container(padding: EdgeInsets.only(left: 20.w), height: 3.5.h, child: Row(children: [
+                UiUtils.getTextStyledWithIconAndText(TextDirection.rtl, "업핀 서비스 이용약관", 10.sp, FontWeight.w500, ColorStyles.upFinDarkWhiteGray, TextAlign.start, null,
+                    Icons.arrow_back_ios, 3.5.w, ColorStyles.upFinDarkWhiteGray, (){
 
-                  }),
-            ])),
-            Container(padding: EdgeInsets.only(left: 20.w), height: 3.5.h, child: Row(children: [
-              UiUtils.getTextStyledWithIconAndText(TextDirection.rtl, "야간 마케팅 정보 수신 동의", 10.sp, FontWeight.w500, ColorStyles.upFinDarkWhiteGray, TextAlign.start, null,
-                  Icons.arrow_back_ios, 3.5.w, ColorStyles.upFinDarkWhiteGray, (){
+                    }),
+              ])),
+              Container(padding: EdgeInsets.only(left: 20.w), height: 3.5.h, child: Row(children: [
+                UiUtils.getTextStyledWithIconAndText(TextDirection.rtl, "개인(신용)정보 수집 이용 제공 동의서", 10.sp, FontWeight.w500, ColorStyles.upFinDarkWhiteGray, TextAlign.start, null,
+                    Icons.arrow_back_ios, 3.5.w, ColorStyles.upFinDarkWhiteGray, (){
 
+                    }),
+              ]))
+            ]),
+            UiUtils.getMarginBox(0, 2.h),
+            Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
+              Container(padding: EdgeInsets.only(left: 5.w), height: 3.h, child: Row(
+                children: [
+                  UiUtils.getCircleCheckBox(1, item2Agreed!, (isChanged) {
+                    thisSetState(() {
+                      item2Agreed = isChanged;
+                      if(item1Agreed == item2Agreed){
+                        allAgreed = isChanged;
+                      }else{
+                        allAgreed = false;
+                      }
+                    });
                   }),
-            ]))
-          ]),
-          UiUtils.getMarginBox(0, 5.h),
+                  UiUtils.getTextWithFixedScale("(선택)전체 동의하기", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null)
+                ],
+              )),
+              Container(padding: EdgeInsets.only(left: 20.w), height: 3.5.h, child: Row(children: [
+                UiUtils.getTextStyledWithIconAndText(TextDirection.rtl, "마케팅 정보 수신 동의", 10.sp, FontWeight.w500, ColorStyles.upFinDarkWhiteGray, TextAlign.start, null,
+                    Icons.arrow_back_ios, 3.5.w, ColorStyles.upFinDarkWhiteGray, (){
+
+                    }),
+              ])),
+              Container(padding: EdgeInsets.only(left: 20.w), height: 3.5.h, child: Row(children: [
+                UiUtils.getTextStyledWithIconAndText(TextDirection.rtl, "야간 마케팅 정보 수신 동의", 10.sp, FontWeight.w500, ColorStyles.upFinDarkWhiteGray, TextAlign.start, null,
+                    Icons.arrow_back_ios, 3.5.w, ColorStyles.upFinDarkWhiteGray, (){
+
+                    }),
+              ]))
+            ]),
+          ])),
+          UiUtils.getMarginBox(0, 3.h),
           item1Agreed!? UiUtils.getTextButtonBox(90.w, "동의하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
             // 1) 가입 & 로그인
             Map<String, dynamic> inputJson = {
@@ -302,7 +304,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
               UiUtils.getMarginBox(1.w, 0),
               Obx(()=>!GetController.to.isConfirmed.value?
               Expanded(child: UiUtils.getTextCustomPaddingButtonBox(30.w, "본인인증", TextStyles.upFinSmallButtonTextStyle,
-                  EdgeInsets.only(left: 0.1.w, right: 0.1.w, top: 7.w, bottom: 7.w), ColorStyles.upFinBlack, () async {
+                  EdgeInsets.only(left: 0.1.w, right: 0.1.w, top: 7.w, bottom: 7.w), ColorStyles.upFinButtonBlue, () async {
                     CommonUtils.hideKeyBoard();
                     if(_phoneNumberTextController.text.trim() != ""){
                       Map<String, String> inputJson = {
@@ -313,30 +315,29 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                       var result = await CommonUtils.moveToWithResult(context, AppView.certificationView.value, inputJson);
                       if(result != null){
                         isConfirmed = true;
+                        CommonUtils.flutterToast("인증 성공");
+
                         Map<String, dynamic> resultMap = result as Map<String, dynamic>;
                         for(var each in IamportController.carrierList){
                           if(each.split("@")[0] == resultMap["carrier"]){
                             MyData.carrierTypeFromPhoneCert = each.split("@")[1];
                           }
                         }
+
                         if(resultMap["gender"] == "male"){
                           MyData.isMaleFromPhoneCert = true;
                         }else{
                           MyData.isMaleFromPhoneCert = false;
                         }
                         MyData.birthFromPhoneCert = (resultMap["birth"] as String).split("-")[0]+(resultMap["birth"] as String).split("-")[1]+(resultMap["birth"] as String).split("-")[2];
-                      }else{
-                        isConfirmed = false;
-                      }
-                      CommonUtils.log("i", "cert info : \n${MyData.carrierTypeFromPhoneCert}\n${MyData.birthFromPhoneCert}\n${MyData.isMaleFromPhoneCert}");
 
-                      if(isConfirmed) {
-                        CommonUtils.flutterToast("인증 성공");
                         confirmedName = _nameTextController.text.trim();
                         confirmedPhone = _phoneNumberTextController.text.trim();
                       }else{
-                        CommonUtils.flutterToast("인증 실패");
+                        isConfirmed = false;
+                        CommonUtils.flutterToast("본인인증에 실패했습니다.");
                       }
+
                       GetController.to.updateConfirmed(isConfirmed);
                     }else{
                       CommonUtils.flutterToast("휴대전화 번호를 입력하세요.");
@@ -346,43 +347,46 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                   EdgeInsets.only(left: 0.1.w, right: 0.1.w, top: 7.w, bottom: 7.w), ColorStyles.upFinGray, () {},1)))
             ])),
             UiUtils.getMarginBox(0, 2.h),
-            UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _pwdTextFocus, _pwdTextController, TextInputType.visiblePassword, true,
+            Obx(()=>GetController.to.isConfirmed.value?
+              UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _pwdTextFocus, _pwdTextController, TextInputType.visiblePassword, true,
                 UiUtils.getInputDecoration("비밀번호 확인", 14.sp, "", 0.sp), (text) { }, (value){
-              if(value != null && value.trim().isEmpty){
-                return "비밀번호를 입력하세요.";
-              }else{
-                if(value!.trim().length <= 6){
-                  return "비밀번호는 6자를 넘어야 합니다.";
-                }else{
-                  return null;
-                }
-              }
-            }),
-            UiUtils.getMarginBox(0, 2.h),
-            UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _pwdConfirmFocus, _pwdConfirmTextController, TextInputType.visiblePassword, true,
-                UiUtils.getInputDecoration("비밀번호 확인", 14.sp, "", 0.sp), (text) { }, (value){
-              if(value != null && value.trim().isEmpty){
-                return "비밀번호를 한번 더 입력하세요.";
-              }else{
-                if(_pwdTextController.text.toString() != _pwdConfirmTextController.text.toString()){
-                  return "비밀번호가 일치하지 않습니다.";
-                }else{
-                  if(value!.trim().length <= 6){
-                    return "비밀번호는 6자를 넘어야 합니다.";
+                  if(value != null && value.trim().isEmpty){
+                    return "비밀번호를 입력하세요.";
                   }else{
-                    return null;
+                    if(value!.trim().length <= 6){
+                      return "비밀번호는 6자를 넘어야 합니다.";
+                    }else{
+                      return null;
+                    }
                   }
-                }
-              }
-            }),
+                }) : Container()
+            ),
+            UiUtils.getMarginBox(0, 2.h),
+            Obx(()=>GetController.to.isConfirmed.value?
+              UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _pwdConfirmFocus, _pwdConfirmTextController, TextInputType.visiblePassword, true,
+                UiUtils.getInputDecoration("비밀번호 확인", 14.sp, "", 0.sp), (text) { }, (value){
+                  if(value != null && value.trim().isEmpty){
+                    return "비밀번호를 한번 더 입력하세요.";
+                  }else{
+                    if(_pwdTextController.text.toString() != _pwdConfirmTextController.text.toString()){
+                      return "비밀번호가 일치하지 않습니다.";
+                    }else{
+                      if(value!.trim().length <= 6){
+                        return "비밀번호는 6자를 넘어야 합니다.";
+                      }else{
+                        return null;
+                      }
+                    }
+                  }
+                }) : Container()
+            ),
             UiUtils.getMarginBox(0, 10.h),
-            UiUtils.getTextButtonBox(90.w, "가입하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
+            Obx(()=>GetController.to.isConfirmed.value?
+              UiUtils.getTextButtonBox(90.w, "가입하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
               if(_formKey.currentState!.validate() && isConfirmed){
-                CommonUtils.log("i", "OK");
                 CommonUtils.hideKeyBoard();
                 _unFocusAllNodes();
-                CommonUtils.log("i", "${UiUtils.isLoadingPopOn}");
-                UiUtils.showSlideMenu(context, SlideType.bottomToTop, false, 100.w, 70.h, 0.5, makeAgreeWidget);
+                UiUtils.showSlideMenu(context, SlideType.bottomToTop, true, 100.w, 62.h, 0.5, makeAgreeWidget);
               }else{
                 if(!isConfirmed){
                   CommonUtils.flutterToast("휴대전화 본인인증이 필요합니다.");
@@ -394,7 +398,8 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                   }
                 }
               }
-            })
+            }) : Container()
+            )
           ])),
         ])
     );

@@ -8,7 +8,6 @@ import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import '../configs/app_config.dart';
 import '../datas/accident_info_data.dart';
-import '../datas/pr_info_data.dart';
 import '../styles/TextStyles.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
@@ -242,7 +241,6 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
           )
       );
     }
-
 
     if(MyData.initSearchViewFromMainView){
       return UiUtils.getRowColumnWithAlignCenter([
@@ -668,6 +666,8 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: confirmWidgetList)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "네 좋아요!", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
+        MyData.jobInfo = selectedJobInfo;
+
         Map<String, dynamic> inputJson = {
           "court_name": selectedCourtInfo.split("@")[0],
           "caseNumberYear": selectedAccidentInfo.split("개회")[0],
@@ -724,7 +724,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                 }
 
                 // 2) 한도금리 목록 화면으로 이동(저장한 accident uid로 한도금리 조회한 뒤 저장하여 보여줌)
-                LogfinController.getPrList(caseYear+caseType+caseNumber, (isSuccessToGetOffers, outputJsonForGetOffers){
+                LogfinController.getPrList(caseYear+caseType+caseNumber, (isSuccessToGetOffers, _){
                   UiUtils.closeLoadingPop(context);
                   if(isSuccessToGetOffers){
                     CommonUtils.moveWithReplacementTo(context, AppView.resultPrView.value, null);

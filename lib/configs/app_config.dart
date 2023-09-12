@@ -1,6 +1,8 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:upfin/views/app_apply_pr_view.dart';
+import 'package:upfin/views/app_detail_pr_view.dart';
 import 'package:upfin/views/app_main_view.dart';
 import 'package:upfin/views/app_result_pr_view.dart';
 import 'package:upfin/views/app_search_accident_view.dart';
@@ -33,7 +35,9 @@ class Config{
     AppView.signupView.value : (context) => AppSignUpView(),
     AppView.mainView.value : (context) => AppMainView(),
     AppView.searchAccidentView.value : (context) => AppSearchAccidentView(),
-    AppView.resultPrView.value : (context) => AppResultPrView()
+    AppView.resultPrView.value : (context) => AppResultPrView(),
+    AppView.detailPrView.value : (context) => AppDetailPrView(),
+    AppView.applyPrView.value : (context) => AppApplyPrView()
   };
 
   static Future<void> initAppState(Function(bool isSuccess) callback) async{
@@ -58,7 +62,7 @@ class Config{
 }
 
 enum AppView {
-  rootLoginView, certificationView, webView, signupView, mainView, searchAccidentView, resultPrView
+  rootLoginView, certificationView, webView, signupView, mainView, searchAccidentView, resultPrView, detailPrView, applyPrView
 }
 
 extension SAppViewExtension on AppView {
@@ -78,6 +82,10 @@ extension SAppViewExtension on AppView {
         return '/searchAccidentView';
       case AppView.resultPrView:
         return '/resultPrView';
+      case AppView.detailPrView:
+        return '/detailPrView';
+      case AppView.applyPrView:
+        return '/applyPrView';
     }
   }
 }

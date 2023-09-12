@@ -11,7 +11,7 @@ class ColorStyles {
 
 
   static const Color upFinSky = Color(0xff87a5ff);
-  static const Color upFinWhiteSky = Color(0xffebf0ff);
+  static const Color upFinWhiteSky = Color(0xffccd9ff);
   static const Color upFinButtonBlue = Color(0xff3a6cff);
   static const Color upFinTextAndBorderBlue = Color(0xff5681ff);
   static const Color upFinRed = Color(0xffe9603c);
@@ -23,6 +23,7 @@ class ColorStyles {
   static const Color upFinRealGray = Colors.grey;
   static const Color upFinBlack = Color(0xff202020);
   static const Color upFinWhite = Color(0xfff9f9f9);
+  static const Color upFinRealWhite = Colors.white;
 
 
 }
