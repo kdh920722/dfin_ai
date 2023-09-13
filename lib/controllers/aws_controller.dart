@@ -44,9 +44,9 @@ class AwsController {
           accessKey: awsAccessKey,
           secretKey: awsSecretKey,
           file: File(filePath),
-          bucket: "logfinbucket",
+          bucket: bucket,
           region: awsRegion,
-          destDir: "uploads/masked_images",
+          destDir: maskedImageDir,
           metadata: {"test": "test"} // optional
       );
       if(result != null){

@@ -30,6 +30,8 @@ class AppLoginView extends StatefulWidget{
 
 class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
   final ScrollController _scrollController = ScrollController();
+  final int necessaryCount = 8;
+  int necessaryLoadCount = 0;
   final _formKey = GlobalKey<FormState>();
   final _emailTextController = TextEditingController();
   final _pwdTextController = TextEditingController();
@@ -112,9 +114,10 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     // init
     await Config.initAppState((bool isSuccess){
       if(isSuccess){
+        GetController.to.updatePercent(10);
         CommonUtils.log("i", "app state : ${Config.appState}");
       }else{
-        CommonUtils.flutterToast("");
+        CommonUtils.flutterToast("에러가 발생했습니다.");
       }
     });
   }
@@ -124,7 +127,14 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     await GptController.initGPT((bool isSuccess){
       if(isSuccess){
         GetController.to.updatePercent(10);
+        necessaryLoadCount++;
         CommonUtils.log("i", "gpt key : ${GptController.gptApiKey}");
+
+        if(necessaryLoadCount == necessaryCount){
+          setState(() {
+            Config.isControllerLoadFinished = true;
+          });
+        }
       }else{
         CommonUtils.flutterToast("gpt init 에러가 발생했습니다.");
       }
@@ -139,7 +149,14 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     await CodeFController.initAccessToken((bool isSuccess){
       if(isSuccess){
         GetController.to.updatePercent(10);
+        necessaryLoadCount++;
         CommonUtils.log("i", "codef token : ${CodeFController.token}");
+
+        if(necessaryLoadCount == necessaryCount){
+          setState(() {
+            Config.isControllerLoadFinished = true;
+          });
+        }
       }else{
         CommonUtils.flutterToast("codef init 에러가 발생했습니다.");
       }
@@ -151,7 +168,14 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     await JusoController.initJuso((bool isSuccess){
       if(isSuccess){
         GetController.to.updatePercent(10);
+        necessaryLoadCount++;
         CommonUtils.log("i", "juso token : ${JusoController.confirmKey}");
+
+        if(necessaryLoadCount == necessaryCount){
+          setState(() {
+            Config.isControllerLoadFinished = true;
+          });
+        }
       }else{
         CommonUtils.flutterToast("juso init 에러가 발생했습니다.");
       }
@@ -163,7 +187,14 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     await CLOVAController.initCLOVA((bool isSuccess){
       if(isSuccess){
         GetController.to.updatePercent(10);
+        necessaryLoadCount++;
         CommonUtils.log("i", "clova url : ${CLOVAController.apiURL}\nclova secretKey : ${CLOVAController.secretKey}");
+
+        if(necessaryLoadCount == necessaryCount){
+          setState(() {
+            Config.isControllerLoadFinished = true;
+          });
+        }
       }else{
         CommonUtils.flutterToast("clova init 에러가 발생했습니다.");
       }
@@ -175,7 +206,14 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     await AwsController.initAWS((bool isSuccess){
       if(isSuccess){
         GetController.to.updatePercent(10);
+        necessaryLoadCount++;
         CommonUtils.log("i", "aws keys : ${AwsController.awsAccessKey}\naws secretKey : ${AwsController.awsSecretKey}");
+
+        if(necessaryLoadCount == necessaryCount){
+          setState(() {
+            Config.isControllerLoadFinished = true;
+          });
+        }
       }else{
         CommonUtils.flutterToast("aws init 에러가 발생했습니다.");
       }
@@ -187,9 +225,75 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     await LogfinController.initLogfin((bool isSuccess){
       if(isSuccess){
         GetController.to.updatePercent(10);
+        necessaryLoadCount++;
         CommonUtils.log("i", "logfin url : ${LogfinController.url}\nlogfin headerKey : ${LogfinController.userToken}");
+
+        if(necessaryLoadCount == necessaryCount){
+          setState(() {
+            Config.isControllerLoadFinished = true;
+          });
+        }
       }else{
         CommonUtils.flutterToast("logfin init 에러가 발생했습니다.");
+      }
+    });
+  }
+
+  Future<void> _initIamport() async {
+    // init
+    await IamportController.initIamport((bool isSuccess){
+      if(isSuccess){
+        GetController.to.updatePercent(10);
+        necessaryLoadCount++;
+        CommonUtils.log("i", "iamport user_code : ${IamportController.iamportUserCode}");
+
+        if(necessaryLoadCount == necessaryCount){
+          setState(() {
+            Config.isControllerLoadFinished = true;
+          });
+        }
+      }else{
+        CommonUtils.flutterToast("iamport init 에러가 발생했습니다.");
+      }
+    });
+  }
+
+  Future<void> _initKakao() async {
+    // init
+    await SnsLoginController.initKakao((bool isSuccess){
+      if(isSuccess){
+        GetController.to.updatePercent(10);
+        necessaryLoadCount++;
+        CommonUtils.log("i", "kakao key : ${SnsLoginController.kakaoKey}");
+
+        if(necessaryLoadCount == necessaryCount){
+          setState(() {
+            Config.isControllerLoadFinished = true;
+          });
+        }
+      }else{
+        CommonUtils.flutterToast("iamport init 에러가 발생했습니다.");
+      }
+    });
+  }
+
+  Future<void> _initSharedPreference() async {
+    // init
+    await SharedPreferenceController.initSharedPreference((bool isSuccess){
+      if(isSuccess){
+        GetController.to.updatePercent(10);
+        necessaryLoadCount++;
+        CommonUtils.log("i","sharedPreference init.");
+        _emailTextController.text = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceIdKey);
+        _pwdTextController.text = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferencePwKey);
+
+        if(necessaryLoadCount == necessaryCount){
+          setState(() {
+            Config.isControllerLoadFinished = true;
+          });
+        }
+      }else{
+        CommonUtils.flutterToast("sharedPreference init 에러가 발생했습니다.");
       }
     });
   }
@@ -222,44 +326,6 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     } catch (e) {
       print('Error initializing deep link handling: $e');
     }
-  }
-
-  Future<void> _initIamport() async {
-    // init
-    await IamportController.initIamport((bool isSuccess){
-      if(isSuccess){
-        GetController.to.updatePercent(10);
-        CommonUtils.log("i", "iamport user_code : ${IamportController.iamportUserCode}");
-      }else{
-        CommonUtils.flutterToast("iamport init 에러가 발생했습니다.");
-      }
-    });
-  }
-
-  Future<void> _initKakao() async {
-    // init
-    await SnsLoginController.initKakao((bool isSuccess){
-      if(isSuccess){
-        GetController.to.updatePercent(10);
-        CommonUtils.log("i", "kakao key : ${SnsLoginController.kakaoKey}");
-      }else{
-        CommonUtils.flutterToast("iamport init 에러가 발생했습니다.");
-      }
-    });
-  }
-
-  Future<void> _initSharedPreference() async {
-    // init
-    await SharedPreferenceController.initSharedPreference((bool isSuccess){
-      if(isSuccess){
-        GetController.to.updatePercent(10);
-        CommonUtils.log("i","sharedPreference init.");
-        _emailTextController.text = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceIdKey);
-        _pwdTextController.text = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferencePwKey);
-      }else{
-        CommonUtils.flutterToast("sharedPreference init 에러가 발생했습니다.");
-      }
-    });
   }
 
   Future<void> _requestPermissions() async {
@@ -295,29 +361,26 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
   Future<void> _initAtFirst() async {
     Config.isAppMainInit = true;
     Get.put(GetController());
-    await _initSharedPreference();
-    await _initFirebase();
-    await _initAppState();
+    await _initFirebase(); // count
+    await _initAppState(); // count
     if(Config.appState == Config.appOpenState){
-      await _initGPT();
-      await _initCodeF();
-      await _initJuso();
-      await _initCLOVA();
-      await _initAWS();
-      await _initLogfin();
-      await _initIamport();
-      await _initKakao();
       await _initDeepLink().then((value){
         if(value != null){
           Config.deppLinkInfo = value;
-          String paramValue = CommonUtils.getValueFromDeepLink(Config.deppLinkInfo, "param1");
-          CommonUtils.log("i", "init deep link paramValue : $paramValue");
         }else{
           Config.deppLinkInfo = "";
         }
       });
       await _requestPermissions();
-      Config.isControllerLoadFinished = true;
+      await _initSharedPreference(); // count
+      //_initGPT(); // count
+      _initCodeF(); // count
+      _initJuso(); // count
+      _initCLOVA(); // count
+      _initAWS(); // count
+      _initLogfin(); // count
+      _initIamport(); // count
+      _initKakao(); // count
     }else{
       if(context.mounted){
         UiUtils.showSlideMenu(context, SlideType.bottomToTop, false, 100.w, 30.h, 0.5, (context, setState){
@@ -325,7 +388,6 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
         });
       }
     }
-    setState(() {});
   }
 
   @override
