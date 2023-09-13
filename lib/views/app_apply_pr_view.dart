@@ -642,10 +642,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       pickedFilePath != "" ? UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
         if(_isDocItemConfirmedByViewId(currentViewId)){
           nextInputView();
-        }else{
-          await _uploadToServer(pickedFilePath);
-          _setConfirmedToDocItemByViewId(currentViewId, true);
-          nextInputView();
         }
       }) : Container()
     ]);
@@ -676,10 +672,11 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         UiUtils.closeLoadingPop(context);
         if(isSuccess){
           CommonUtils.log('i', map!['personalNum'][0]["text"]);
-          MyData.idNumber = map['personalNum'][0]["text"];
           String croppedImagePath = await CommonUtils.makeMaskingImageAndGetPath(imagePath, map!);
           if(croppedImagePath != ""){
             setState(() {
+              MyData.idNumber = map['personalNum'][0]["text"];
+              _setConfirmedToDocItemByViewId(currentViewId, true);
               pickedFilePath = croppedImagePath;
             });
           }else{
@@ -734,6 +731,11 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           UiUtils.getTextButtonBox(90.w, "예, 다시촬영 할게요", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
             Navigator.pop(thisContext);
             setState(() {
+              if(_isDocItemConfirmedByViewId(currentViewId)){
+                _setConfirmedToDocItemByViewId(currentViewId, false);
+                pickedFilePath = "";
+              }
+
               if(isDriveCardForImageType){
                 isDriveCardForImageType = false;
               }else{
