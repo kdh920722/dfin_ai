@@ -61,7 +61,7 @@ class UiUtils {
   }
 
   static Text getStyledTextWithFixedScale(String text, TextStyle textStyle, TextAlign? textAlign, int? textMaxLine){
-    return Text(text, style: textStyle,  textScaleFactor: 1.0, textAlign: textAlign, maxLines: textMaxLine);
+    return Text(text, style: textStyle, textScaleFactor: 1.0, textAlign: textAlign, maxLines: textMaxLine);
   }
 
   static Text getTextWithFixedScale(String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign? textAlign, int? textMaxLine){
@@ -70,6 +70,7 @@ class UiUtils {
 
   static Widget getTextStyledButtonWithFixedScale(String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign? textAlign, int? textMaxLine, Function() onPressedCallback){
     return TextButton(
+      style: ButtonStyle(padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.only(left: 0.w, right: 0.w, top: 0, bottom: 0))),
       onPressed: onPressedCallback,
       child: getTextWithFixedScale(text, fontSize, fontWeight, textColor, textAlign, textMaxLine)
     );
@@ -114,6 +115,18 @@ class UiUtils {
 
   static Widget getIconButton(IconData icon, double size, Color iconColor, VoidCallback onPressedCallback) {
     return SizedBox(child: IconButton(onPressed: onPressedCallback, icon: Icon(icon, color: iconColor, size: size)));
+  }
+
+  static Widget getImageButton(Image image, double size, Color iconColor, VoidCallback onPressedCallback) {
+    return SizedBox(width: size, height: size, child: IconButton(onPressed: onPressedCallback, icon: image, iconSize: size));
+  }
+
+  static Widget getImage(double width, double height, Image image) {
+    return SizedBox(width: width, height: height, child: image);
+  }
+
+  static Widget getIcon(double width, double height, IconData icon, double size, Color iconColor) {
+    return SizedBox(width: width, height: height, child: Icon(icon, color: iconColor, size: size));
   }
 
   static Widget getIconButtonWithHeight(double height, IconData icon, double size, Color iconColor, VoidCallback onPressedCallback) {
@@ -184,6 +197,7 @@ class UiUtils {
         width: buttonWidth,
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.zero,
             backgroundColor: buttonColor,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
             elevation: 0.5,

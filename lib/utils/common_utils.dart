@@ -544,17 +544,21 @@ class CommonUtils {
 
   static String getValueFromDeepLink(String link, String parameterKey){
     String parameterValue = "";
-    String paramString = link.split("?").last;
-    List<String> paramList = paramString.split("&");
-    if(paramList.isEmpty){
-      parameterValue = paramString.split("=").last;
-    }else{
-      for(var each in paramList){
-        if(each.contains(parameterKey)){
-          parameterValue = each.split("=").last;
+
+    if(link.contains("?")){
+      String paramString = link.split("?").last;
+      List<String> paramList = paramString.split("&");
+      if(paramList.isEmpty){
+        parameterValue = paramString.split("=").last;
+      }else{
+        for(var each in paramList){
+          if(each.contains(parameterKey)){
+            parameterValue = each.split("=").last;
+          }
         }
       }
     }
+
     return parameterValue;
   }
 

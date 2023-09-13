@@ -5,6 +5,7 @@ import 'package:upfin/controllers/clova_controller.dart';
 import 'package:upfin/controllers/get_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:upfin/controllers/iamport_controller.dart';
+import 'package:upfin/controllers/juso_controller.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/controllers/sharedpreference_controller.dart';
 import 'package:get/get.dart';
@@ -61,6 +62,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     WidgetsBinding.instance.addObserver(this);
     MyData.resetMyData();
     _keyboardVisibilityController = CommonUtils.getKeyboardViewController(_functionForKeyboardShow, _functionForKeyboardHide);
+    _initDeepLinkHandling();
   }
 
   @override
@@ -69,6 +71,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     WidgetsBinding.instance.removeObserver(this);
     _unFocusAllNodes();
     _disposeAllTextControllers();
+    GetController.to.resetPercent();
     super.dispose();
   }
 
@@ -143,6 +146,18 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     });
   }
 
+  Future<void> _initJuso() async {
+    // init
+    await JusoController.initJuso((bool isSuccess){
+      if(isSuccess){
+        GetController.to.updatePercent(10);
+        CommonUtils.log("i", "juso token : ${JusoController.confirmKey}");
+      }else{
+        CommonUtils.flutterToast("juso init 에러가 발생했습니다.");
+      }
+    });
+  }
+
   Future<void> _initCLOVA() async {
     // init
     await CLOVAController.initCLOVA((bool isSuccess){
@@ -182,11 +197,30 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
   Future<String?> _initDeepLink() async {
     try{
       final initialLink = await getInitialLink();
-      GetController.to.updatePercent(10);
       return initialLink;
     }catch(e){
       CommonUtils.log("e", "init deep link error : ${e.toString()}");
       return null;
+    }
+  }
+
+  Future<void> _initDeepLinkHandling() async {
+    try {
+      uriLinkStream.listen((Uri? uri) {
+        if (!mounted) return;
+
+        if (uri != null) {
+          CommonUtils.log("i", "depp link uri : $uri");
+          Config.deppLinkInfo = uri.toString();
+          String paramValue = CommonUtils.getValueFromDeepLink(Config.deppLinkInfo, "param1");
+          CommonUtils.log("i", "init deep link paramValue : $paramValue");
+        }else{
+          CommonUtils.log("i", "depp link uri is null");
+          Config.deppLinkInfo = "";
+        }
+      });
+    } catch (e) {
+      print('Error initializing deep link handling: $e');
     }
   }
 
@@ -267,6 +301,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     if(Config.appState == Config.appOpenState){
       await _initGPT();
       await _initCodeF();
+      await _initJuso();
       await _initCLOVA();
       await _initAWS();
       await _initLogfin();
@@ -401,7 +436,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
                     await LogfinController.getMainOrSearchView(context, (isSuccessToGetViewInfo, viewInfo){
                       UiUtils.closeLoadingPop(context);
                       if(isSuccessToGetViewInfo){
-                        CommonUtils.moveWithRemoveUntil(context, viewInfo!.value, null);
+                        CommonUtils.moveTo(context, viewInfo!.value, null);
                       }
                     });
                   }else{
@@ -421,7 +456,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
                     await LogfinController.getMainOrSearchView(context, (isSuccessToGetViewInfo, viewInfo){
                       UiUtils.closeLoadingPop(context);
                       if(isSuccessToGetViewInfo){
-                        CommonUtils.moveWithRemoveUntil(context, viewInfo!.value, null);
+                        CommonUtils.moveTo(context, viewInfo!.value, null);
                       }
                     });
                   }else{

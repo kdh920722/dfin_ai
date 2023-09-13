@@ -42,20 +42,39 @@ class GetController extends GetxController {
   void updatePercent(int newValue) {
     loadingPercent.value += newValue;
   }
+  void resetPercent() {
+    loadingPercent = 0.obs;
+  }
+
 
   void updateWait(bool newValue) {
     isWait.value = newValue;
   }
+  void resetIsWait() {
+    isWait = false.obs;
+  }
+
 
   void updateConfirmed(bool newValue) {
     isConfirmed.value = newValue;
   }
+  void resetConfirmed() {
+    isConfirmed = false.obs;
+  }
+
 
   void updateWantLoanPrice(String newValue) {
     wantLoanPrice.value = newValue;
   }
+  void resetWantLoanPrice() {
+    preLoanPrice = "만원".obs;
+  }
+
 
   void updatePreLoanPrice(String newValue) {
     preLoanPrice.value = newValue;
+  }
+  void resetPreLoanPrice() {
+    preLoanPrice = "만원".obs;
   }
 }

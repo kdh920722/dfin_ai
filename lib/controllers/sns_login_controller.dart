@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
+import 'package:sizer/sizer.dart';
 import 'package:upfin/datas/my_data.dart';
 import '../configs/app_config.dart';
 import '../styles/ColorStyles.dart';
@@ -47,7 +48,7 @@ class SnsLoginController{
   }
 
   static Widget getKakaoLoginButton(BuildContext context, double size, Function(bool? isSuccessToLogin) callback){
-    return UiUtils.getIconButton(Icons.add_box, size, ColorStyles.upFinKakaoYellow, () async {
+    return UiUtils.getImageButton(Image.asset('assets/images/kakao_icon.png'), size, ColorStyles.upFinKakaoYellow, () async {
       if(Config.isControllerLoadFinished){
         UiUtils.showLoadingPop(context);
         await SnsLoginController._kakaoLogin((bool isSuccess) async {
@@ -74,7 +75,7 @@ class SnsLoginController{
   }
 
   static Widget getAppleLoginButton(BuildContext context, double size, Function(bool? isSuccessToLogin) callback){
-    return UiUtils.getIconButton(Icons.add_box, size, ColorStyles.upFinBlack, () async {
+    return UiUtils.getImageButton(Image.asset('assets/images/apple_icon.png'), size, ColorStyles.upFinBlack, () async {
       if(Config.isControllerLoadFinished){
 
       }else{

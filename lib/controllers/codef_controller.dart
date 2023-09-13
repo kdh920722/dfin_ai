@@ -212,8 +212,8 @@ class CodeFController{
     }
   }
 
-  static Future<void> callApisWithOutCert(BuildContext context, StateSetter setState,
-      List<ApiInfoData> apiInfoDataList, Function(bool isSuccess, List<ApiInfoData>? resultApiInfoDataList) callback) async {
+  static Future<void> callApisWithOutCert(BuildContext context, List<ApiInfoData> apiInfoDataList,
+      Function(bool isSuccess, List<ApiInfoData>? resultApiInfoDataList) callback) async {
     int callCount = 0;
     for(var each in apiInfoDataList){
       if(!each.isCallWithCert){
@@ -231,7 +231,6 @@ class CodeFController{
               callback(true, apiInfoDataList);
             }
           }else{
-            Navigator.of(context).pop();
             if(resultMap != null){
               switch(resultMap["result_code"]){
                 case "CF-01004" : CommonUtils.flutterToast("입력시간이 초과되었습니다.");

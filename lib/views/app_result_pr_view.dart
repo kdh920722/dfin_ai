@@ -90,30 +90,34 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
               Row(mainAxisSize: MainAxisSize.max, children: [
                 Expanded(flex: 15, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
                   SizedBox(width: 90.w, child: Row(children: [
-                    UiUtils.getTextWithFixedScale(each.productCompanyName, 14.sp, FontWeight.w800, ColorStyles.upFinDarkGray, TextAlign.start, 1),
-                    const Spacer(flex: 2),
-                    each.isPossible? UiUtils.getTextWithFixedScale("신청 가능", 9.sp, FontWeight.w600, ColorStyles.upFinTextAndBorderBlue, TextAlign.end, 1)
-                        : UiUtils.getTextWithFixedScale("신청 불가능", 9.sp, FontWeight.w600, ColorStyles.upFinRed, TextAlign.end, 1),
+                    UiUtils.getImage(9.w, 9.w, Image.asset(each.productCompanyLogo)),
+                    UiUtils.getMarginBox(1.5.w, 0),
+                    UiUtils.getTextWithFixedScale(each.productCompanyName, 15.sp, FontWeight.w800, ColorStyles.upFinBlack, TextAlign.start, null),
                   ])),
-                  UiUtils.getMarginBox(0, 0.5.h),
-                  UiUtils.getTextWithFixedScale(each.productName, 10.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null),
-                  UiUtils.getMarginBox(0, 1.5.h),
+                  UiUtils.getMarginBox(0, 1.h),
+                  UiUtils.getTextWithFixedScale(each.productName, 10.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null),
+                  UiUtils.getMarginBox(0, 2.h),
                   SizedBox(width: 80.w, child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     SizedBox(width: 20.w, child: UiUtils.getTextWithFixedScale("최저금리", 10.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, 1)),
                     UiUtils.getMarginBox(5.w, 0),
                     SizedBox(width: 45.w, child: UiUtils.getTextWithFixedScale("최대한도", 10.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, 1))
                   ])),
                   SizedBox(width: 80.w, child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    SizedBox(width: 20.w, child: UiUtils.getTextWithFixedScale("${each.productLoanRates}%", 18.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1)),
+                    SizedBox(width: 20.w, child: UiUtils.getTextWithFixedScale("${each.productLoanMinRates}%", 18.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1)),
                     UiUtils.getMarginBox(5.w, 0),
                     SizedBox(width: 45.w, child: UiUtils.getTextWithFixedScale(CommonUtils.getPriceFormattedString(double.parse(each.productLoanLimit)), 18.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1))
                   ])),
-                  UiUtils.getMarginBox(0, 1.5.h),
+                  UiUtils.getMarginBox(0, 2.h),
+                  each.isPossible? UiUtils.getTextWithFixedScale("신청 가능", 12.sp, FontWeight.w600, ColorStyles.upFinTextAndBorderBlue, TextAlign.end, 1)
+                      : UiUtils.getTextWithFixedScale("신청 불가능", 12.sp, FontWeight.w600, ColorStyles.upFinRed, TextAlign.end, 1),
+                  UiUtils.getMarginBox(0, 0.5.h),
                   each.isPossible? UiUtils.getTextWithFixedScale(msg, 10.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)
                       : UiUtils.getTextWithFixedScale(msg, 10.sp, FontWeight.w500, ColorStyles.upFinRed, TextAlign.start, null),
                 ])),
                 Expanded(flex: 1, child: each.isPossible? Icon(Icons.arrow_forward_ios_rounded, color: ColorStyles.upFinButtonBlue, size: 5.5.w) : Container()),
               ]), () {
+
+            // 신청 가능 상태일 때만
                 UiUtils.showLoadingPop(context);
                 LogfinController.getPrDocsList(each.productOfferId, each.productOfferRid, (isSuccessToSearchDocs, _){
                   UiUtils.closeLoadingPop(context);

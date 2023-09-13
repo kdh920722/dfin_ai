@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:upfin/configs/app_config.dart';
+import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import 'package:upfin/styles/TextStyles.dart';
 import '../utils/common_utils.dart';
@@ -180,7 +181,35 @@ class AppDetailPrViewState extends State<AppDetailPrView> with WidgetsBindingObs
         }),
       ])) : Container(),
       Config.deppLinkInfo == "" ? UiUtils.getMarginBox(0, 7.h) : UiUtils.getMarginBox(0, 10.h),
-      UiUtils.getExpandedScrollView(Axis.vertical, Container()),
+      UiUtils.getTextWithFixedScale(MyData.selectedPrInfoData!.productCompanyName, 20.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null),
+      UiUtils.getMarginBox(0, 0.5.h),
+      UiUtils.getTextWithFixedScale(MyData.selectedPrInfoData!.productName, 16.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.center, null),
+      UiUtils.getMarginBox(0, 1.5.h),
+      UiUtils.getExpandedScrollView(Axis.vertical, SizedBox(width: 95.w, child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+        SizedBox(width: 95.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          UiUtils.getImage(40.w, 20.h, Image.asset(MyData.selectedPrInfoData!.productCompanyLogo))
+        ])),
+        UiUtils.getMarginBox(0, 2.h),
+        SizedBox(width: 95.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Column(children: [
+            SizedBox(width: 25.w, child: UiUtils.getTextWithFixedScale("최저금리", 14.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1)),
+            UiUtils.getMarginBox(0, 0.5.h),
+            SizedBox(width: 25.w, child: UiUtils.getTextWithFixedScale("${MyData.selectedPrInfoData!.productLoanMinRates}%", 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, 1)),
+          ]),
+          UiUtils.getMarginBox(2.w, 0),
+          Column(children: [
+            SizedBox(width: 25.w, child: UiUtils.getTextWithFixedScale("최대금리", 14.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1)),
+            UiUtils.getMarginBox(0, 0.5.h),
+            SizedBox(width: 25.w, child: UiUtils.getTextWithFixedScale("${MyData.selectedPrInfoData!.productLoanMaxRates}%", 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, 1)),
+          ]),
+          UiUtils.getMarginBox(2.w, 0),
+          Column(children: [
+            SizedBox(width: 35.w, child: UiUtils.getTextWithFixedScale("최대한도", 14.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1)),
+            UiUtils.getMarginBox(0, 0.5.h),
+            SizedBox(width: 35.w, child: UiUtils.getTextWithFixedScale(CommonUtils.getPriceFormattedString(double.parse(MyData.selectedPrInfoData!.productLoanLimit)), 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, 1)),
+          ]),
+        ])),
+      ]))),
       UiUtils.getMarginBox(0, 2.h),
       UiUtils.getTextButtonBox(90.w, "접수하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
         UiUtils.showSlideMenu(context, SlideType.bottomToTop, true, 100.w, 65.h, 0.5, _makeAgreeWidget);

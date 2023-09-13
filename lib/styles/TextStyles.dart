@@ -11,6 +11,7 @@ class TextStyles {
   static TextStyle upFinKakaoButtonTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 15.sp, color: ColorStyles.upFinBlack, fontWeight: FontWeight.w700, decoration: TextDecoration.none, decorationThickness: 0.0, height: 1);
   static TextStyle upFinAppleButtonTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 15.sp, color: ColorStyles.upFinWhite, fontWeight: FontWeight.w700, decoration: TextDecoration.none, decorationThickness: 0.0, height: 1);
   static TextStyle upFinTextFormFieldTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 13.sp, color: ColorStyles.upFinBlack, fontWeight: FontWeight.w300, decoration: TextDecoration.none, decorationThickness: 0.0, height: 1.5);
+  static TextStyle upFinSmallTextFormFieldTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 11.sp, color: ColorStyles.upFinBlack, fontWeight: FontWeight.w300, decoration: TextDecoration.none, decorationThickness: 0.0, height: 1.5);
   static TextStyle upFinDisabledTextFormFieldTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 13.sp, color: ColorStyles.upFinRealGray, fontWeight: FontWeight.w600, decoration: TextDecoration.none, decorationThickness: 0.0, height: 1.5);
 
 

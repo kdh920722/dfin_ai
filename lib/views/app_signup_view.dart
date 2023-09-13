@@ -78,6 +78,8 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
       _emailTextController.text = MyData.emailFromSns;
       _phoneNumberTextController.text = MyData.phoneNumberFromSns;
     }
+    isConfirmed = false;
+    GetController.to.resetConfirmed();
   }
 
   @override
@@ -86,6 +88,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
     WidgetsBinding.instance.removeObserver(this);
     _unFocusAllNodes();
     _disposeAllTextControllers();
+    GetController.to.resetConfirmed();
     super.dispose();
   }
 

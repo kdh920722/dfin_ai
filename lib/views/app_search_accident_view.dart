@@ -18,6 +18,7 @@ class AppSearchAccidentView extends StatefulWidget{
 }
 
 class AppSearchAccidentViewState extends State<AppSearchAccidentView> with WidgetsBindingObserver{
+  final String errorMsg = "정보를 입력해주세요";
   int currentViewId = 1;
 
   final int courtViewId = 1;
@@ -155,6 +156,8 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
     _preLoanPriceTextController.addListener(_preLoanPriceInfoTextControllerListener);
     _wantLoanPriceTextController.addListener(_wantLoanPriceInfoTextControllerListener);
     _checkView();
+    GetController.to.resetPreLoanPrice();
+    GetController.to.resetWantLoanPrice();
   }
 
   @override
@@ -163,6 +166,8 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
     WidgetsBinding.instance.removeObserver(this);
     _unFocusAllNodes();
     _disposeAllTextControllers();
+    GetController.to.resetPreLoanPrice();
+    GetController.to.resetWantLoanPrice();
     super.dispose();
   }
 
@@ -259,6 +264,8 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
           CommonUtils.log("i", "court : $selectedCourtInfo");
           if(selectedCourtInfo.isNotEmpty){
             nextInputView();
+          }else{
+            CommonUtils.flutterToast(errorMsg);
           }
         })
       ]);
@@ -274,13 +281,14 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
           CommonUtils.log("i", "court : $selectedCourtInfo");
           if(selectedCourtInfo.isNotEmpty){
             nextInputView();
+          }else{
+            CommonUtils.flutterToast(errorMsg);
           }
         })
       ]);
     }
   }
   /// court view end
-
 
   /// accident view
   Widget _getAccidentView(){
@@ -309,8 +317,10 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
         selectedAccidentInfo = "${_accidentInfoTextController1.text.trim()}개회${_accidentInfoTextController2.text.trim()}";
         CommonUtils.log("i", "selectedAccidentInfo : $selectedAccidentInfo");
-        if(selectedAccidentInfo.isNotEmpty){
+        if(selectedAccidentInfo != "개회" && _accidentInfoTextController1.text.trim() != "" && _accidentInfoTextController2.text.trim() != ""){
           nextInputView();
+        }else{
+          CommonUtils.flutterToast(errorMsg);
         }
       })
     ]);
@@ -372,6 +382,8 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         CommonUtils.log("i", "bank code : $selectedBankCodeInfo");
         if(selectedBankCodeInfo.isNotEmpty){
           nextInputView();
+        }else{
+          CommonUtils.flutterToast(errorMsg);
         }
       })
     ]);
@@ -398,6 +410,8 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         CommonUtils.log("i", "selectedBankAccountInfo : $selectedBankAccountInfo");
         if(selectedBankAccountInfo.isNotEmpty){
           nextInputView();
+        }else{
+          CommonUtils.flutterToast(errorMsg);
         }
       })
     ]);
@@ -457,6 +471,8 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         CommonUtils.log("i", "loan count : $selectedPreLoanCountInfo");
         if(selectedPreLoanCountInfo.isNotEmpty){
           nextInputView();
+        }else{
+          CommonUtils.flutterToast(errorMsg);
         }
       })
     ]);
@@ -500,7 +516,11 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
           selectedPreLoanPriceInfo = "0";
         }
         CommonUtils.log("i", "selectedPreLoanPriceInfo : $selectedPreLoanPriceInfo");
-        nextInputView();
+        if(selectedPreLoanPriceInfo != "0"){
+          nextInputView();
+        }else{
+          CommonUtils.flutterToast(errorMsg);
+        }
       })
     ]);
   }
@@ -543,7 +563,11 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
           selectedWantLoanPriceInfo = "0";
         }
         CommonUtils.log("i", "selectedWantLoanPriceInfo : $selectedWantLoanPriceInfo");
-        nextInputView();
+        if(selectedWantLoanPriceInfo != "0"){
+          nextInputView();
+        }else{
+          CommonUtils.flutterToast(errorMsg);
+        }
       })
     ]);
   }
@@ -601,6 +625,8 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         CommonUtils.log("i", "selectedJobInfo : $selectedJobInfo");
         if(selectedJobInfo.isNotEmpty){
           nextInputView();
+        }else{
+          CommonUtils.flutterToast(errorMsg);
         }
       })
     ]);

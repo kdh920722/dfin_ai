@@ -270,7 +270,8 @@ class LogfinController {
             for(var each in offerPrList){
               CommonUtils.log("i", "$each");
               MyData.addToPrInfoList(PrInfoData(offerId, each["rid"], each["lender_name"], each["lender_id"].toString(),
-                  each["product_name"], each["rid"], each["min_rate"].toString(), each["limit"].toString(), each["result"] as bool, each["msg"]));
+                  each["product_name"], each["rid"], each["min_rate"].toString(), each["max_rate"].toString(),
+                  each["limit"].toString(), "assets/images/deutsche_bank_icon.png", each["result"] as bool, each["msg"]));
             }
 
             if(MyData.getPrInfoList().isNotEmpty){

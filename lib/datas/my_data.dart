@@ -10,6 +10,8 @@ class MyData {
   static String email = "";
   static String birth = "";
   static bool isMale = false;
+  static String jobInfo = "";
+  static String idNumber = "";
   static bool initSearchViewFromMainView = false;
 
   static String birthFromPhoneCert = "";
@@ -20,8 +22,6 @@ class MyData {
   static String nameFromSns = "";
   static String emailFromSns = "";
   static String phoneNumberFromSns = "";
-
-  static String jobInfo = "";
 
   static final List<AccidentInfoData> _accidentInfoList = [];
   static List<AccidentInfoData> getAccidentInfoList(){
@@ -54,6 +54,7 @@ class MyData {
     _accidentInfoList.clear();
   }
 
+  //12:신분증  13:개인회생사건조회  1:주민등록등본  2:주민등록초본  3:건강보험자격득실확인서  4:건강보험납부확인서
   static final List<PrInfoData> _prInfoList = [];
   static List<PrInfoData> getPrInfoList(){
     return _prInfoList;
@@ -63,18 +64,18 @@ class MyData {
       _prInfoList.sort((a,b){
         int comparison = double.parse(a.productLoanLimit).compareTo(double.parse(b.productLoanLimit));
         if (comparison == 0) {
-          return double.parse(a.productLoanRates).compareTo(double.parse(b.productLoanRates));
+          return double.parse(a.productLoanMinRates).compareTo(double.parse(b.productLoanMinRates));
         } else {
           return double.parse(b.productLoanLimit).compareTo(double.parse(a.productLoanLimit));
         }
       });
     }else{
       _prInfoList.sort((a,b){
-        int comparison = double.parse(a.productLoanRates).compareTo(double.parse(b.productLoanRates));
+        int comparison = double.parse(a.productLoanMinRates).compareTo(double.parse(b.productLoanMinRates));
         if (comparison == 0) {
           return double.parse(b.productLoanLimit).compareTo(double.parse(a.productLoanLimit));
         } else {
-          return double.parse(a.productLoanRates).compareTo(double.parse(b.productLoanRates));
+          return double.parse(a.productLoanMinRates).compareTo(double.parse(b.productLoanMinRates));
         }
       });
     }
@@ -116,6 +117,7 @@ class MyData {
         "email:$email\n"
         "birth:$birth\n"
         "isMale:$isMale\n"
+        "jobInfo:$jobInfo\n"
         "accidentInfoList: ${_accidentInfoList.length}\n"
         "prInfoList: ${_prInfoList.length}\n"
         "prDocsInfoList: ${_prDocsInfoList.length}\n"
