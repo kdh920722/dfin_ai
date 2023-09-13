@@ -668,7 +668,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   }
   Future<void> _checkValidCertImage(String imagePath) async {
     try{
-      await CLOVAController.uploadImageToCLOVA(imagePath, (isSuccess, map) async {
+      await CLOVAController.uploadImageToCLOVA(imagePath, isDriveCardForImageType, (isSuccess, map) async {
         UiUtils.closeLoadingPop(context);
         if(isSuccess){
           CommonUtils.log('i', map!['personalNum'][0]["text"]);
@@ -676,6 +676,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           if(croppedImagePath != ""){
             setState(() {
               MyData.idNumber = map['personalNum'][0]["text"];
+              CommonUtils.log('i', MyData.idNumber);
               _setConfirmedToDocItemByViewId(currentViewId, true);
               pickedFilePath = croppedImagePath;
             });

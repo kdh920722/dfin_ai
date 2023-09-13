@@ -34,7 +34,7 @@ class CLOVAController{
     }
   }
 
-  static Future<void> uploadImageToCLOVA(String imagePath, Function(bool, Map<String, dynamic>? outputJson) callback) async {
+  static Future<void> uploadImageToCLOVA(String imagePath, bool isDriveCardForImageType, Function(bool, Map<String, dynamic>? outputJson) callback) async {
     var targetUrl = "";
 
     if(Config.isWeb){
@@ -77,8 +77,13 @@ class CLOVAController{
       if (response.statusCode == 200) { // HTTP_OK
         final resultData = json['images'][0];
         if(resultData['inferResult'] == "SUCCESS"){
-          final resultMap = resultData['idCard']['result']['ic'];
-          callback(true, resultMap);
+          if(isDriveCardForImageType){
+            final resultMap = resultData['idCard']['result']['dl'];
+            callback(true, resultMap);
+          }else{
+            final resultMap = resultData['idCard']['result']['ic'];
+            callback(true, resultMap);
+          }
         }else{
           callback(false, null);
         }
