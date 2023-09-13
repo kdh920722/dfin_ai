@@ -587,7 +587,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
   /// camera for id check view
   Widget _getCameraForIdCheckView(){
-    CommonUtils.log("i", "view id : ${_getIdFromListByViewId(currentViewId)}");
     return UiUtils.getRowColumnWithAlignCenter([
       SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
@@ -671,12 +670,10 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       await CLOVAController.uploadImageToCLOVA(imagePath, isDriveCardForImageType, (isSuccess, map) async {
         UiUtils.closeLoadingPop(context);
         if(isSuccess){
-          CommonUtils.log('i', map!['personalNum'][0]["text"]);
           String croppedImagePath = await CommonUtils.makeMaskingImageAndGetPath(imagePath, map!);
           if(croppedImagePath != ""){
             setState(() {
               MyData.idNumber = map['personalNum'][0]["text"];
-              CommonUtils.log('i', MyData.idNumber);
               _setConfirmedToDocItemByViewId(currentViewId, true);
               pickedFilePath = croppedImagePath;
             });
