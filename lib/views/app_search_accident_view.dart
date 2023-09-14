@@ -225,7 +225,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       courtList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                UiUtils.getCustomCircleCheckBox(key, 1.5, selectedCourtKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                selectedCourtKey == key? UiUtils.getCustomCircleCheckBox(key, 1.5, selectedCourtKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
                     ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
                   setState(() {
                     if(checkedValue != null){
@@ -235,7 +235,17 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                       }
                     }
                   });
-                }),
+                }) : UiUtils.getCustomCircleCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
+                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
+                      setState(() {
+                        if(checkedValue != null){
+                          if(!checkedValue) {
+                            selectedCourtKey = key;
+                            selectedCourtInfo = each;
+                          }
+                        }
+                      });
+                    }),
                 UiUtils.getTextStyledButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.center, null, (){
                   setState(() {
                     selectedCourtKey = key;
@@ -342,11 +352,21 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       bankCodeList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                UiUtils.getCustomCircleCheckBox(key, 1.5, selectedBankCodeKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                selectedBankCodeKey == key? UiUtils.getCustomCircleCheckBox(key, 1.5, selectedBankCodeKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
                     ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
                           if(checkedValue) {
+                            selectedBankCodeKey = key;
+                            selectedBankCodeInfo = each;
+                          }
+                        }
+                      });
+                    }) : UiUtils.getCustomCircleCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
+                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
+                      setState(() {
+                        if(checkedValue != null){
+                          if(!checkedValue) {
                             selectedBankCodeKey = key;
                             selectedBankCodeInfo = each;
                           }
@@ -404,6 +424,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextField(90.w, TextStyles.upFinTextFormFieldTextStyle, _bankAccountInfoFocus, _bankAccountInfoTextController, TextInputType.number,
           UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
+      UiUtils.getExpandedScrollView(Axis.vertical, Container()),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
         selectedBankAccountInfo = _bankAccountInfoTextController.text.trim();
@@ -433,7 +454,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       loanCountList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                UiUtils.getCustomCircleCheckBox(key, 1.5, selectedPreLoanCountKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                selectedPreLoanCountKey == key? UiUtils.getCustomCircleCheckBox(key, 1.5, selectedPreLoanCountKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
                     ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
@@ -443,8 +464,18 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                           }
                         }
                       });
+                    }) : UiUtils.getCustomCircleCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
+                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
+                      setState(() {
+                        if(checkedValue != null){
+                          if(!checkedValue) {
+                            selectedPreLoanCountKey = key;
+                            selectedPreLoanCountInfo = each;
+                          }
+                        }
+                      });
                     }),
-                UiUtils.getTextStyledButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.center, null, (){
+                UiUtils.getTextStyledButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.start, null, (){
                   setState(() {
                     selectedPreLoanCountKey = key;
                     selectedPreLoanCountInfo = each;
@@ -504,6 +535,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
           }, (value){})
       ),
       UiUtils.getMarginBox(0, 5.h),
+      UiUtils.getExpandedScrollView(Axis.vertical, Container()),
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
         if(_preLoanPriceTextController.text.trim() != ""){
           final number = double.tryParse(_preLoanPriceTextController.text.trim().replaceAll(',', '')); // 콤마 제거 후 숫자 변환
@@ -551,6 +583,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
           }, (value){})
       ),
       UiUtils.getMarginBox(0, 5.h),
+      UiUtils.getExpandedScrollView(Axis.vertical, Container()),
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
         if(_wantLoanPriceTextController.text.trim() != ""){
           final number = double.tryParse(_wantLoanPriceTextController.text.trim().replaceAll(',', '')); // 콤마 제거 후 숫자 변환
@@ -588,11 +621,21 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       jobList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                UiUtils.getCustomCircleCheckBox(key, 1.5, selectedJobKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                selectedJobKey == key? UiUtils.getCustomCircleCheckBox(key, 1.5, selectedJobKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
                     ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
                           if(checkedValue) {
+                            selectedJobKey = key;
+                            selectedJobInfo = each;
+                          }
+                        }
+                      });
+                    }) : UiUtils.getCustomCircleCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
+                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
+                      setState(() {
+                        if(checkedValue != null){
+                          if(!checkedValue) {
                             selectedJobKey = key;
                             selectedJobInfo = each;
                           }

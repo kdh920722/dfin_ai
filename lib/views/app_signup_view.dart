@@ -233,7 +233,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                 "password_confirmation": _pwdConfirmTextController.text.trim(),
                 "name" : _nameTextController.text.trim(),
                 "contact_no" : _phoneNumberTextController.text.trim(),
-                "telecom" : MyData.carrierTypeFromPhoneCert,
+                "telecom" : MyData.telecomTypeFromPhoneCert,
                 "birthday" : MyData.birthFromPhoneCert,
                 "gender" : MyData.isMaleFromPhoneCert? "1" : "2",
               }
@@ -323,7 +323,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                         Map<String, dynamic> resultMap = result as Map<String, dynamic>;
                         for(var each in IamportController.carrierList){
                           if(each.split("@")[0] == resultMap["carrier"]){
-                            MyData.carrierTypeFromPhoneCert = each.split("@")[1];
+                            MyData.telecomTypeFromPhoneCert = each.split("@")[1];
                           }
                         }
 

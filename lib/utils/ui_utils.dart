@@ -69,11 +69,7 @@ class UiUtils {
   }
 
   static Widget getTextStyledButtonWithFixedScale(String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign? textAlign, int? textMaxLine, Function() onPressedCallback){
-    return TextButton(
-      style: ButtonStyle(padding: MaterialStateProperty.all<EdgeInsets>(EdgeInsets.only(left: 0.w, right: 0.w, top: 0, bottom: 0))),
-      onPressed: onPressedCallback,
-      child: getTextWithFixedScale(text, fontSize, fontWeight, textColor, textAlign, textMaxLine)
-    );
+    return GestureDetector(onTap: onPressedCallback, child : UiUtils.getTextWithFixedScale(text, fontSize, fontWeight, textColor, textAlign, null));
   }
 
   static Widget getTextStyledWithIconAndText(TextDirection textDirection, String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign? textAlign, int? textMaxLine,
@@ -237,7 +233,7 @@ class UiUtils {
               backgroundColor: buttonColor,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
               side: BorderSide(width: 1.3, color: borderColor),
-              elevation: 1,
+              elevation: 0.5,
               shadowColor: ColorStyles.upFinGray,
             ),
             onPressed: onPressedCallback,

@@ -6,6 +6,7 @@ import 'package:upfin/datas/api_info_data.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:http/http.dart' as http;
 import 'package:sizer/sizer.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../configs/app_config.dart';
 import '../styles/ColorStyles.dart';
 import '../styles/TextStyles.dart';
@@ -21,7 +22,7 @@ class CodeFController{
   /// CODEF API ------------------------------------------------------------------------------------------------------------------------ ///
   static HostStatus hostStatus = HostStatus.prod;
   static String token = "";
-
+  static const errorCodeKey = "codefError";
   static void setHostStatus(HostStatus host){
     hostStatus = host;
   }
@@ -79,6 +80,7 @@ class CodeFController{
       void Function(bool isSuccess, bool is2WayProcess, Map<String, dynamic>? outputJson, List<dynamic>? outputJsonArray) callback) async {
     final baseUrl = hostStatus.value == HostStatus.prod.value ? Host.baseUrl.value : HostDev.baseUrl.value;
     final endPoint = apiInfo.value;
+    CommonUtils.log("i", "call api : $endPoint");
     final url = baseUrl + endPoint;
     var targetUrl = "";
     if(Config.isWeb){
@@ -107,72 +109,95 @@ class CodeFController{
           CommonUtils.log('i', 'out full : \n$json');
 
           // CF-00000 : 성공, CF-03002 : 추가 인증 필요
+          final msg = result['message'];
           if(resultCode == 'CF-00000' || resultCode == 'CF-03002'){
             final resultData = json['data'];
             if (resultData is Map<String, dynamic>) {
-              resultData['result_code'] = resultCode;
-              if(resultCode == 'CF-03002') {
-                callback(true, true, resultData, null);
-              } else {
+              if(resultData.isNotEmpty){
+                resultData['result_code'] = resultCode;
+                if(resultCode == 'CF-03002') {
+                  callback(true, true, resultData, null);
+                } else {
+                  callback(true, false, resultData, null);
+                }
+              }else{
+                final Map<String, dynamic> resultData = {};
+                resultData['result_code'] = errorCodeKey;
+                resultData['result_msg'] = msg;
+                CommonUtils.log('e', 'out resultCode error : $resultCode');
                 callback(true, false, resultData, null);
               }
             } else if (resultData is List<dynamic>) {
-              resultData[0]['result_code'] = resultCode;
-              if(resultCode == 'CF-03002') {
-                callback(true, true, null, resultData);
-              } else {
-                callback(true, false, null, resultData);
+              if(resultData.isNotEmpty){
+                resultData[0]['result_code'] = resultCode;
+                if(resultCode == 'CF-03002') {
+                  callback(true, true, null, resultData);
+                } else {
+                  callback(true, false, null, resultData);
+                }
+              }else{
+                final Map<String, dynamic> resultData = {};
+                resultData['result_code'] = errorCodeKey;
+                resultData['result_msg'] = msg;
+                CommonUtils.log('e', 'out resultCode error : $resultCode');
+                callback(true, false, resultData, null);
               }
             }
           } else {
             final Map<String, dynamic> resultData = {};
-            resultData['result_code'] = resultCode;
+            resultData['result_code'] = errorCodeKey;
+            resultData['result_msg'] = msg;
             CommonUtils.log('e', 'out resultCode error : $resultCode');
-            callback(false, false, resultData, null);
+            callback(true, false, resultData, null);
           }
         }
       } else {
         CommonUtils.log('e', 'http error code : ${response.statusCode}');
-        callback(false, false, null, null);
+        final Map<String, dynamic> resultData = {};
+        resultData['result_code'] = errorCodeKey;
+        resultData['result_msg'] = "인터넷 연결에러가 발생했습니다.";
+        callback(true, false, resultData, null);
       }
     } catch (e) {
       CommonUtils.log('e', e.toString());
-      callback(false, false, null, null);
+      final Map<String, dynamic> resultData = {};
+      resultData['result_code'] = errorCodeKey;
+      resultData['result_msg'] = "에러가 발생했습니다.";
+      callback(true, false, resultData, null);
     }
   }
 
   /// ------------------------------------------------------------------------------------------------------------------------ ///
-  static Future<void> callApisWithCert(BuildContext context, StateSetter setState,
+  static Future<void> callApisWithCert(BuildContext context, StateSetter setState, int certType,
       List<ApiInfoData> apiInfoDataList, Function(bool isSuccess, List<ApiInfoData>? resultApiInfoDataList) callback) async {
     int callCount = 0;
     bool isFirstCalledOnCert = false;
     for(var each in apiInfoDataList){
       if(each.isCallWithCert){
         if(!isFirstCalledOnCert){
-          _callApiWithCert(context, setState, each.api, each.inputJson, (isSuccess, resultMap, resultListMap) {
+          _callApiWithCert(context, setState, certType, each.api, each.inputJson, (isSuccess, resultMap, resultListMap) {
             if(isSuccess){
-              each.isResultSuccess = true;
               if(resultMap != null){
-                each.resultMap = resultMap;
+                if(resultMap["result_code"] == errorCodeKey){
+                  each.isResultSuccess = false;
+                  CommonUtils.log("i", "error api : ${each.api.value}");
+                  String errorMsg = resultMap["result_msg"];
+                  if(errorMsg == "성공"){
+                    errorMsg = "조회결과가 없습니다.";
+                  }
+                  //CommonUtils.flutterToast(errorMsg.replaceAll("+", " "));
+                }else{
+                  each.isResultSuccess = true;
+                  each.resultMap = resultMap;
+                }
               }else{
+                each.isResultSuccess = true;
                 each.resultListMap = resultListMap;
               }
 
               callCount++;
               if(callCount == apiInfoDataList.length){
                 callback(true, apiInfoDataList);
-              }
-            }else{
-              Navigator.of(context).pop();
-              if(resultMap != null){
-                switch(resultMap["result_code"]){
-                  case "CF-01004" : CommonUtils.flutterToast("입력시간이 초과되었습니다.");
-                  default : CommonUtils.flutterToast("에러가 발생했습니다.");
-                }
-                callback(false, null);
-              }else{
-                CommonUtils.flutterToast("에러가 발생했습니다.");
-                callback(false, null);
               }
             }
           });
@@ -181,29 +206,27 @@ class CodeFController{
         }else{
           _callApiWithOutCert(context, each.api, each.inputJson, (isSuccess, resultMap, resultListMap){
             if(isSuccess){
-              each.isResultSuccess = true;
               if(resultMap != null){
-                each.resultMap = resultMap;
+                if(resultMap["result_code"] == errorCodeKey){
+                  each.isResultSuccess = false;
+                  CommonUtils.log("i", "error api : ${each.api.value}");
+                  String errorMsg = resultMap["result_msg"];
+                  if(errorMsg == "성공"){
+                    errorMsg = "조회결과가 없습니다.";
+                  }
+                  //CommonUtils.flutterToast(errorMsg.replaceAll("+", " "));
+                }else{
+                  each.isResultSuccess = true;
+                  each.resultMap = resultMap;
+                }
               }else{
+                each.isResultSuccess = true;
                 each.resultListMap = resultListMap;
               }
 
               callCount++;
               if(callCount == apiInfoDataList.length){
                 callback(true, apiInfoDataList);
-              }
-            }else{
-              Navigator.of(context).pop();
-              if(resultMap != null){
-                switch(resultMap["result_code"]){
-                  case "CF-01004" : CommonUtils.flutterToast("입력시간이 초과되었습니다.");
-                  default : CommonUtils.flutterToast("에러가 발생했습니다.");
-                }
-
-                callback(false, null);
-              }else{
-                CommonUtils.flutterToast("에러가 발생했습니다.");
-                callback(false, null);
               }
             }
           });
@@ -219,28 +242,27 @@ class CodeFController{
       if(!each.isCallWithCert){
         _callApiWithOutCert(context, each.api, each.inputJson, (isSuccess, resultMap, resultListMap){
           if(isSuccess){
-            each.isResultSuccess = true;
             if(resultMap != null){
-              each.resultMap = resultMap;
+              if(resultMap["result_code"] == errorCodeKey){
+                each.isResultSuccess = false;
+                CommonUtils.log("i", "error api : ${each.api.value}");
+                String errorMsg = resultMap["result_msg"];
+                if(errorMsg == "성공"){
+                  errorMsg = "조회결과가 없습니다.";
+                }
+                //CommonUtils.flutterToast(errorMsg.replaceAll("+", " "));
+              }else{
+                each.isResultSuccess = true;
+                each.resultMap = resultMap;
+              }
             }else{
+              each.isResultSuccess = true;
               each.resultListMap = resultListMap;
             }
 
             callCount++;
             if(callCount == apiInfoDataList.length){
               callback(true, apiInfoDataList);
-            }
-          }else{
-            if(resultMap != null){
-              switch(resultMap["result_code"]){
-                case "CF-01004" : CommonUtils.flutterToast("입력시간이 초과되었습니다.");
-                default : CommonUtils.flutterToast("에러가 발생했습니다.");
-              }
-
-              callback(false, null);
-            }else{
-              CommonUtils.flutterToast("에러가 발생했습니다.");
-              callback(false, null);
             }
           }
         });
@@ -257,40 +279,36 @@ class CodeFController{
         }else{
           callback(true, null, listMap);
         }
-      }else{
-        callback(false, map, null);
       }
     });
   }
 
-  static Future<void> _callApiWithCert(BuildContext context, StateSetter setState, Apis representApi, Map<String, dynamic> inputJson,
+  static Future<void> _callApiWithCert(BuildContext context, StateSetter setState, int certType, Apis representApi, Map<String, dynamic> inputJson,
       Function(bool isSuccess, Map<String,dynamic>? resultMap, List<dynamic>? resultListMap) callback) async {
-    await CodeFController._getDataFromApi(representApi, inputJson, (isSuccess, is2WayProcess, map, _) async {
+    await CodeFController._getDataFromApi(representApi, inputJson, (isSuccess, is2WayProcess, map, listMap) async {
       if(isSuccess){
         if(map != null){
           if(is2WayProcess){
             Map<String, dynamic>? resultMap = _set2WayMap(inputJson, map);
             if(resultMap != null){
               setState(() {
-                _setAuthPop(context, representApi, resultMap,(isResultSuccess, map, listMap) async {
-                  if(isResultSuccess){
-                    if(map != null){
-                      callback(true, map, null);
+                if(certType == 1){
+                  launchUrl(Uri.parse("kakaotalk://launch"));
+                }
+
+                _setAuthPop(context, representApi, certType, resultMap,(isAuthSuccess, authMap, authListMap) async {
+                  if(isAuthSuccess){
+                    if(authMap != null){
+                      callback(true, authMap, null);
                     }else{
-                      callback(true, null, listMap);
+                      callback(true, null, authListMap);
                     }
-                  }else{
-                    callback(false, null, null);
                   }
                 });
               });
-            }else{
-              callback(false, null, null);
             }
           }
         }
-      }else{
-        callback(false, map, null);
       }
     });
   }
@@ -329,43 +347,187 @@ class CodeFController{
     return resultMap;
   }
 
-  static Future<void> _setAuthPop(BuildContext context, Apis apiInfo, Map<String, dynamic> resultInputMap,
+  static Future<void> _setAuthPop(BuildContext context, Apis apiInfo, int certType, Map<String, dynamic> resultInputMap,
       Function(bool isSuccess, Map<String,dynamic>? resultMap, List<dynamic>? resultListMap) callback) async {
-    UiUtils.showSlideMenu(context, SlideType.bottomToTop, false, null, null, 0.0, (context, setState){
+    String certName = "인증을 완료하셨다면,";
+    if(certType == 1){
+      certName = "카카오앱에서 $certName";
+    }
+
+    UiUtils.showSlideMenu(context, SlideType.bottomToTop, false, null, 25.h, 0.0, (context, setState){
       return Obx(()=>
-          Column(mainAxisAlignment: MainAxisAlignment.center, children:
-          [ GetController.to.isWait.value ? UiUtils.getStyledTextWithFixedScale("정보를 가져오는 중입니다...", TextStyles.basicTextStyle, TextAlign.center, null) : UiUtils.getStyledTextWithFixedScale("", TextStyles.basicTextStyle, TextAlign.center, null),
-            !GetController.to.isWait.value ?
-            UiUtils.getTextButtonBox(60.w, "인증 확인", TextStyles.slidePopButtonText, ColorStyles.finAppGreen, () async {
-              GetController.to.updateWait(true);
-              CodeFController._getDataFromApi(apiInfo, resultInputMap, (isSuccess, _, map, listMap){
-                GetController.to.updateWait(false);
-                if(isSuccess){
-                  if(map != null){
-                    if(map['result_code'] == "CF-03002"){
-                      CommonUtils.flutterToast("인증을 진행 해 주세요.");
-                    }else{
-                      Navigator.of(context).pop();
-                      callback(true, map, null);
-                    }
-                  }else{
-                    if(listMap?[0]['result_code'] == "CF-03002"){
-                      CommonUtils.flutterToast("인증을 진행 해 주세요.");
-                    }else{
-                      Navigator.of(context).pop();
-                      callback(true, null, listMap);
-                    }
-                  }
-                }else{
-                  Navigator.of(context).pop();
-                  callback(false, null, null);
-                }
-              });
-            }) : Container()])
+          Column(mainAxisAlignment: MainAxisAlignment.start, children:
+          [
+            UiUtils.getMarginBox(0, 3.h),
+            GetController.to.isWait.value ? UiUtils.getStyledTextWithFixedScale("인증 정보를 확인하는 중입니다...", TextStyles.upFinBasicTextStyle, TextAlign.center, null) : UiUtils.getStyledTextWithFixedScale("", TextStyles.basicTextStyle, TextAlign.center, null),
+            GetController.to.isWait.value ? Container() : Column(children: [
+              UiUtils.getStyledTextWithFixedScale(certName, TextStyles.upFinBasicTextStyle, TextAlign.center, null),
+              UiUtils.getMarginBox(0, 0.5.h),
+              UiUtils.getStyledTextWithFixedScale("아래 인증확인 버튼을 눌러주세요.", TextStyles.upFinBasicTextStyle, TextAlign.center, null),
+              UiUtils.getMarginBox(0, 3.h),
+              UiUtils.getBorderButtonBox(85.w, ColorStyles.upFinWhite, ColorStyles.upFinTextAndBorderBlue,
+                  UiUtils.getTextWithFixedScale("인증확인", 15.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null), () {
+                    GetController.to.updateWait(true);
+                    CodeFController._getDataFromApi(apiInfo, resultInputMap, (isSuccess, _, map, listMap){
+                      GetController.to.updateWait(false);
+                      if(isSuccess){
+                        if(map != null){
+                          if(map['result_code'] == "CF-03002"){
+                            CommonUtils.flutterToast("인증을 진행 해 주세요.");
+                          }else{
+                            Navigator.of(context).pop();
+                            callback(true, map, null);
+                          }
+                        }else{
+                          if(listMap?[0]['result_code'] == "CF-03002"){
+                            CommonUtils.flutterToast("인증을 진행 해 주세요.");
+                          }else{
+                            Navigator.of(context).pop();
+                            callback(true, null, listMap);
+                          }
+                        }
+                      }
+                    });
+                  })
+            ])])
       );
     });
   }
 
+  static Map<String, dynamic> makeInputJsonForCertApis(Apis api, String identity, String birth, String name, String phoneNo, String telecom,
+      String address, String loginCertType, String randomKey){
+    if(api == Apis.gov24residentRegistrationAbstract){
+      Map<String, dynamic> inputJsonForAbstract = {
+        "organization": "0001",
+        "loginType": "6",
+        "identity": identity,
+        "timeout": "120",
+        "addrSido": address.split(" ")[0],
+        "addrSiGunGu": address.split(" ")[1],
+        "id": randomKey,
+        "userName": name,
+        "loginTypeLevel": loginCertType,
+        "phoneNo": phoneNo,
+        "personalInfoChangeYN": "0",
+        "pastAddrChangeYN": "0",
+        "nameRelationYN": "1",
+        "militaryServiceYN": "0",
+        "overseasKoreansIDYN": "0",
+        "isIdentityViewYn": "0",
+        "originDataYN": "0",
+        "telecom": telecom
+      };
+
+      return inputJsonForAbstract;
+    }else if(api == Apis.gov24residentRegistrationCopy){
+      Map<String, dynamic> inputJsonForCopy = {
+        "organization": "0001",
+        "loginType": "6",
+        "identity": identity,
+        "timeout": "120",
+        "addrSido": address.split(" ")[0],
+        "addrSiGunGu": address.split(" ")[1],
+        "id": randomKey,
+        "userName": name,
+        "loginTypeLevel": loginCertType,
+        "phoneNo": phoneNo,
+        "pastAddrChangeYN": "0",
+        "inmateYN": "0",
+        "relationWithHHYN": "1",
+        "changeDateYN": "0",
+        "compositionReasonYN": "0",
+        "isIdentityViewYn": "1",
+        "isNameViewYn": "1",
+        "originDataYN": "0",
+        "telecom": telecom
+      };
+
+      return inputJsonForCopy;
+    }else if(api == Apis.gov24localTaxPaymentCert){
+      Map<String, dynamic> inputJsonForlocalTaxPaymentCert = {
+        "organization": "0001",
+        "loginType": "6",
+        "userName": name,
+        "identity": identity,
+        "id": randomKey,
+        "loginTypeLevel": loginCertType,
+        "phoneNo": phoneNo,
+        "address": address,
+        "addrDetail": "",
+        "phoneNo1": phoneNo,
+        "openDate": "",
+        "proofType": "",
+        "contents": "",
+        "date": "",
+        "isIdentityViewYn": "1",
+        "telecom": telecom
+      };
+
+      return inputJsonForlocalTaxPaymentCert;
+    }else if(api == Apis.ntsTaxCert){
+      Map<String, dynamic> inputJsonForNtsCert = {
+        "organization": "0001",
+        "loginType": "6",
+        "id": randomKey,
+        "loginIdentity": identity,
+        "userName": name,
+        "loginTypeLevel": loginCertType,
+        "phoneNo": phoneNo,
+        "loginBirthDate": "",
+        "isIdentityViewYN": "1",
+        "isAddrViewYn": "0",
+        "proofType": "B0006",
+        "submitTargets": "04",
+        "applicationType": "01",
+        "clientTypeLevel": "1",
+        "identity": identity,
+        "birthDate": "",
+        "telecom": telecom,
+        "originDataYN": "0"
+      };
+
+      return inputJsonForNtsCert;
+    }else if(api == Apis.nhisIdentifyConfirmation){
+      Map<String, dynamic> inputJsonForNhisIdConfirm = {
+        "organization": "0002",
+        "loginType": "5",
+        "identity": birth,
+        "loginTypeLevel": loginCertType,
+        "userName": name,
+        "phoneNo": phoneNo,
+        "useType": "0",
+        "isIdentityViewYN": "0",
+        "id": randomKey,
+        "originDataYN": "0 ",
+        "telecom": telecom
+      };
+
+      return inputJsonForNhisIdConfirm;
+    }else{
+      DateTime now = CommonUtils.getCurrentLocalTime();
+      String endDate = CommonUtils.convertTimeToString(now);
+      String startDate = CommonUtils.convertTimeToString(now.subtract(const Duration(days: 365)));
+      CommonUtils.log("i", "$startDate ~ $endDate");
+
+      Map<String, dynamic> inputJsonForNhisConfirm = {
+        "organization": "0002",
+        "loginType": "5",
+        "id": randomKey,
+        "identity": birth,
+        "loginTypeLevel": loginCertType,
+        "userName": name,
+        "phoneNo": phoneNo,
+        "startDate": startDate.substring(0,6),
+        "endDate": endDate.substring(0,6),
+        "usePurposes": "2",
+        "useType": "01",
+        "originDataYN": "",
+        "telecom": telecom
+      };
+
+      return inputJsonForNhisConfirm;
+    }
+  }
 
 }
 
@@ -427,7 +589,9 @@ extension HostDevExtension on HostDev {
 
 enum Apis {
   addressApi1, addressApi2, carRegistration1Api, carRegistration2Api, bankruptApi1, bankruptApi2,
-  residentRegistrationAbstract, residentRegistrationCopy
+  gov24residentRegistrationAbstract, gov24residentRegistrationCopy, gov24localTaxPaymentCert,
+  nhisIdentifyConfirmation, nhisConfirmation,
+  ntsTaxCert,
 }
 
 extension ApisExtension on Apis {
@@ -445,10 +609,18 @@ extension ApisExtension on Apis {
         return '/v1/kr/public/ck/rehab-bankruptcy/list';
       case Apis.bankruptApi2:
         return '/v1/kr/public/ck/scourt-events/search';
-      case Apis.residentRegistrationAbstract:
+      case Apis.gov24residentRegistrationAbstract:
         return '/v1/kr/public/mw/resident-registration-abstract/issuance';
-      case Apis.residentRegistrationCopy:
+      case Apis.gov24residentRegistrationCopy:
         return '/v1/kr/public/mw/resident-registration-copy/issuance';
+      case Apis.gov24localTaxPaymentCert:
+        return '/v1/kr/public/mw/localtax-payment-certificate/inquiry';
+      case Apis.nhisIdentifyConfirmation:
+        return '/v1/kr/public/pp/nhis-join/identify-confirmation';
+      case Apis.nhisConfirmation:
+        return '/v1/kr/public/pp/nhis-insurance-payment/confirmation';
+      case Apis.ntsTaxCert:
+        return '/v1/kr/public/nt/proof-issue/tax-cert-all';
       default:
         throw Exception('Unknown host value');
     }

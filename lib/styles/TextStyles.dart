@@ -14,7 +14,6 @@ class TextStyles {
   static TextStyle upFinSmallTextFormFieldTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 11.sp, color: ColorStyles.upFinBlack, fontWeight: FontWeight.w300, decoration: TextDecoration.none, decorationThickness: 0.0, height: 1.5);
   static TextStyle upFinDisabledTextFormFieldTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 13.sp, color: ColorStyles.upFinRealGray, fontWeight: FontWeight.w600, decoration: TextDecoration.none, decorationThickness: 0.0, height: 1.5);
 
-
   static TextStyle titleTextStyle = TextStyle(fontSize: 22.sp, color: Colors.black54, fontWeight: FontWeight.bold, decoration: TextDecoration.none, decorationThickness: 0.0);
   static TextStyle popTitleTextStyle = TextStyle(fontSize: 22.sp, color: Colors.black87, fontWeight: FontWeight.bold, decoration: TextDecoration.none, decorationThickness: 0.0);
   static TextStyle popSubUnderTextStyle = TextStyle(fontSize: 14.sp, color: Colors.black26, fontWeight: FontWeight.normal, decoration: TextDecoration.none, decorationThickness: 0.0);

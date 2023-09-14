@@ -15,7 +15,7 @@ class MyData {
   static bool initSearchViewFromMainView = false;
 
   static String birthFromPhoneCert = "";
-  static String carrierTypeFromPhoneCert = "";
+  static String telecomTypeFromPhoneCert = "";
   static bool isMaleFromPhoneCert = false;
 
   static bool isSnsLogin = false;
@@ -91,11 +91,6 @@ class MyData {
   static List<PrDocsInfoData> getPrDocsInfoList(){
     return _prDocsInfoList;
   }
-  static void sortPrDocsInfoList(){
-    _prDocsInfoList.sort((a,b){
-      return a.productDocsOrderId.compareTo(b.productDocsOrderId);
-    });
-  }
   static void addToPrDocsInfoList(PrDocsInfoData prDocsInfoData){
     _prDocsInfoList.add(prDocsInfoData);
   }
@@ -138,7 +133,7 @@ class MyData {
     emailFromSns = "";
     phoneNumberFromSns = "";
     birthFromPhoneCert = "";
-    carrierTypeFromPhoneCert = "";
+    telecomTypeFromPhoneCert = "";
     isMaleFromPhoneCert = false;
     jobInfo = "";
     clearAccidentInfoList();

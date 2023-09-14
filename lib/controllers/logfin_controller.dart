@@ -302,13 +302,12 @@ class LogfinController {
       LogfinController.callLogfinApi(LogfinApis.applyProductDocSearch, inputJson, (isSuccessToSearchDocs, outputJsonForSearchDocs){
         if(isSuccessToSearchDocs){
           for(var each in outputJsonForSearchDocs!["documents"]){
-            MyData.addToPrDocsInfoList(PrDocsInfoData(each["id"], each["name"], each["del_flg"], each["disp_order"]));
+            MyData.addToPrDocsInfoList(PrDocsInfoData(each["id"], each["name"], each["del_flg"]));
           }
 
           if(MyData.getPrDocsInfoList().isNotEmpty){
-            MyData.sortPrDocsInfoList();
             for(var eachInList in MyData.getPrDocsInfoList()){
-              CommonUtils.log("i", "${eachInList.productDocsOrderId}\n${eachInList.productDocsId}\n${eachInList.productDocsName}\n");
+              CommonUtils.log("i", "${eachInList.productDocsId}\n${eachInList.productDocsName}\n");
             }
             callback(true, outputJsonForSearchDocs);
           }else{

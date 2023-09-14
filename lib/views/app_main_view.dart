@@ -85,11 +85,11 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     return Column(children: [
       Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 5.h, bottom: 1.h),
           child: Row(mainAxisSize: MainAxisSize.max, crossAxisAlignment: CrossAxisAlignment.end, children: [
-            UiUtils.getTextWithFixedScale("${MyData.name}님, ", 26.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1),
+            UiUtils.getTextWithFixedScale("${MyData.name}님, ", 24.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1),
             UiUtils.getTextWithFixedScale("안녕하세요!", 20.sp, FontWeight.w400, ColorStyles.upFinBlack, TextAlign.start, 1),
       ])),
       Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 2.h, bottom: 1.h), child: Row(mainAxisSize: MainAxisSize.max, children: [
-        UiUtils.getTextWithFixedScale("사건기록", 20.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1),
+        UiUtils.getTextWithFixedScale("사건기록", 18.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1),
         const Spacer(flex: 2),
         UiUtils.getIconButtonBox(18.w, ColorStyles.upFinWhiteSky, Icons.add, 3.h, ColorStyles.upFinButtonBlue, () {
           CommonUtils.moveTo(context, AppView.searchAccidentView.value, null);
@@ -129,17 +129,23 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
       viewTypeId == 1? Expanded(child: _getMyView()) : viewTypeId == 2? Expanded(child: _getAIChatView()) : Expanded(child: _getSettingView()),
       SizedBox(width: 100.w, height: 7.h, child: Row(mainAxisAlignment: MainAxisAlignment.center, mainAxisSize: MainAxisSize.max, children: [
         Container(width: 30.w, height: 7.h, color: ColorStyles.upFinWhiteSky,
-            child: UiUtils.getTextStyledButtonWithFixedScale("MY", 13.sp, viewTypeId == 1? FontWeight.w800 : FontWeight.w400, viewTypeId == 1? ColorStyles.upFinButtonBlue : ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1,(){
-          setState(() {viewTypeId = 1;});
-        })),
+            child: Center(child: UiUtils.getTextStyledButtonWithFixedScale("MY", 13.sp, viewTypeId == 1? FontWeight.w800 : FontWeight.w400,
+                viewTypeId == 1? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, TextAlign.center, 1,(){
+                  setState(() {viewTypeId = 1;});
+                }))
+        ),
         Container(width: 40.w, height: 7.h, color: ColorStyles.upFinWhiteSky,
-            child: UiUtils.getTextStyledButtonWithFixedScale("AI 어드바이저", 13.sp, viewTypeId == 2? FontWeight.w800 : FontWeight.w400, viewTypeId == 2? ColorStyles.upFinButtonBlue : ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1,(){
-          setState(() {viewTypeId = 2;});
-        })),
+            child: Center(child: UiUtils.getTextStyledButtonWithFixedScale("AI 어드바이저", 13.sp, viewTypeId == 2? FontWeight.w800 : FontWeight.w400,
+                viewTypeId == 2? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, TextAlign.center, 1,(){
+                  setState(() {viewTypeId = 2;});
+                }))
+        ),
         Container(width: 30.w, height: 7.h, color: ColorStyles.upFinWhiteSky,
-            child: UiUtils.getTextStyledButtonWithFixedScale("설정", 13.sp, viewTypeId == 3? FontWeight.w800 : FontWeight.w400, viewTypeId == 3? ColorStyles.upFinButtonBlue : ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1,(){
-          setState(() {viewTypeId = 3;});
-        })),
+            child: Center(child: UiUtils.getTextStyledButtonWithFixedScale("설정", 13.sp, viewTypeId == 3? FontWeight.w800 : FontWeight.w400,
+                viewTypeId == 3? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, TextAlign.center, 1,(){
+                  setState(() {viewTypeId = 3;});
+                }))
+        ),
       ])),
     ]));
     return UiUtils.getView(context, view, CommonUtils.onWillPopForPreventBackButton);

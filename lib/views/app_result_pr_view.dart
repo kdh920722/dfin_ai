@@ -92,7 +92,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                   SizedBox(width: 90.w, child: Row(children: [
                     UiUtils.getImage(9.w, 9.w, Image.asset(each.productCompanyLogo)),
                     UiUtils.getMarginBox(1.5.w, 0),
-                    UiUtils.getTextWithFixedScale(each.productCompanyName, 15.sp, FontWeight.w800, ColorStyles.upFinBlack, TextAlign.start, null),
+                    UiUtils.getTextWithFixedScale(each.productCompanyName, 15.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null),
                   ])),
                   UiUtils.getMarginBox(0, 1.h),
                   UiUtils.getTextWithFixedScale(each.productName, 10.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null),

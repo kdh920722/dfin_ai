@@ -25,6 +25,7 @@ class AppApplyPrView extends StatefulWidget{
 
 class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObserver{
   final String errorMsg = "정보를 입력해주세요";
+  bool isInputValid = true;
 
   PrInfoData? selectedPrInfoData;
   int currentViewId = 1;
@@ -78,16 +79,22 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   bool isDriveCardForImageType = false;
   String pickedFilePath = "";
 
+  int certType = 1; //1: 카카오 인증, 6:네이버 인증, 5:PASS 인증
   final List<Map<String, dynamic>> addedDocsList = [];
+  int gov24Count = 0;
+  int nhisCount = 0;
+  int ntsCount = 0;
   void _initDocsList(){
     int addedIndexId = addedInfoIntroViewId+1;
-
     if(MyData.jobInfo.split("@")[1] == "1"){
       Map<String, dynamic> mainBankInfo = {
         "id" : 0,
         "name" : "",
         "view_id" : 0,
-        "is_confirmed" : false
+        "result" : null,
+        "is_confirmed" : false,
+        "is_docs" : false,
+        "docs_type" : ""
       };
       mainBankInfo["id"] = mainBankId;
       mainBankInfo["name"] = mainBankName;
@@ -100,7 +107,10 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         "id" : 0,
         "name" : "",
         "view_id" : 0,
-        "is_confirmed" : false
+        "result" : null,
+        "is_confirmed" : false,
+        "is_docs" : false,
+        "docs_type" : ""
       };
       mainBankAccountInfo["id"] = mainBankAccountId;
       mainBankAccountInfo["name"] = mainBankAccountName;
@@ -113,7 +123,10 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         "id" : 0,
         "name" : "",
         "view_id" : 0,
-        "is_confirmed" : false
+        "result" : null,
+        "is_confirmed" : false,
+        "is_docs" : false,
+        "docs_type" : ""
       };
       businessNumberInfo["id"] = businessNumberId;
       businessNumberInfo["name"] = businessNumberName;
@@ -127,7 +140,10 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       "id" : 0,
       "name" : "",
       "view_id" : 0,
-      "is_confirmed" : false
+      "result" : null,
+      "is_confirmed" : false,
+      "is_docs" : false,
+      "docs_type" : ""
     };
     addressInfo["id"] = addressId;
     addressInfo["name"] = addressName;
@@ -140,51 +156,103 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       "id" : 0,
       "name" : "",
       "view_id" : 0,
-      "is_confirmed" : false
+      "result" : null,
+      "is_confirmed" : false,
+      "is_docs" : false,
+      "docs_type" : ""
     };
     cameraInfo["id"] = cameraId;
     cameraInfo["name"] = cameraName;
     cameraInfo["view_id"] = addedIndexId;
     cameraInfo["is_confirmed"] = false;
     addedDocsList.add(cameraInfo);
-    addedIndexId++;
 
-    //12:신분증  13:개인회생사건조회  1:주민등록등본  2:주민등록초본  3:건강보험자격득실확인서  4:건강보험납부확인서
+    //1:주민등록등본  2:주민등록초본  15:지방세납세증명서
+    //3:건강보험자격득실확인서  4:건강보험납부확인서
+    //14:국세납세증명서
     for(var each in MyData.getPrDocsInfoList()){
-      if(each.productDocsId == 1 || each.productDocsId == 2 || each.productDocsId == 3 || each.productDocsId == 4){
+      CommonUtils.log("i", "each docs : ${each.productDocsId}  ${each.productDocsName}");
+      if(each.productDocsId == 1 || each.productDocsId == 2 || each.productDocsId == 3 || each.productDocsId == 4 ||each.productDocsId == 14 || each.productDocsId == 15){
+        String docsType = "";
+        if(each.productDocsId == 1 || each.productDocsId == 2 || each.productDocsId == 15){
+          docsType = "gov24";
+        }else if(each.productDocsId == 3 || each.productDocsId == 4){
+          docsType = "nhis";
+        }else{
+          docsType = "nts";
+        }
         Map<String, dynamic> addedDocsInfo = {
           "id" : 0,
           "name" : "",
+          "result" : null,
           "view_id" : 0,
-          "is_confirmed" : false
+          "is_confirmed" : false,
+          "is_docs" : true,
+          "docs_type" : docsType
         };
         addedDocsInfo["id"] = each.productDocsId;
         addedDocsInfo["name"] = each.productDocsName;
-        addedDocsInfo["view_id"] = addedIndexId;
         addedDocsInfo["is_confirmed"] = false;
         addedDocsList.add(addedDocsInfo);
+      }
+    }
+    for(var each in addedDocsList){
+      if(each["id"] == 1){
         addedIndexId++;
+        each["view_id"] = addedIndexId;
+      }else if(each["id"] == 2){
+        addedIndexId++;
+        each["view_id"] = addedIndexId;
+      }else if(each["id"] == 15){
+        addedIndexId++;
+        each["view_id"] = addedIndexId;
+      }
+    }
+    for(var each in addedDocsList){
+      if(each["id"] == 3){
+        addedIndexId++;
+        each["view_id"] = addedIndexId;
+      }else if(each["id"] == 4){
+        addedIndexId++;
+        each["view_id"] = addedIndexId;
+      }
+    }
+    for(var each in addedDocsList){
+      if(each["id"] == 14){
+        addedIndexId++;
+        each["view_id"] = addedIndexId;
       }
     }
 
+    addedIndexId++;
     Map<String, dynamic> lastInfo = {
       "id" : 0,
       "name" : "",
       "view_id" : 0,
-      "is_confirmed" : false
+      "result" : null,
+      "is_confirmed" : false,
+      "is_docs" : false,
+      "docs_type" : ""
     };
     lastInfo["id"] = lastId;
     lastInfo["name"] = lastName;
     lastInfo["view_id"] = addedIndexId;
     lastInfo["is_confirmed"] = false;
     addedDocsList.add(lastInfo);
-    addedIndexId++;
-
-    finishedViewId = addedIndexId;
-
+    addedDocsList.sort((a,b)=>a["view_id"].compareTo(b["view_id"]));
     for(var each in addedDocsList){
-      CommonUtils.log("i", "\nview_id : ${each["view_id"]}|| view_id :  ${each["id"]}");
+      CommonUtils.log("i", "each added doc :  ${each["view_id"]} ${each["id"]} ${each["name"]}");
     }
+
+    if(_isIdHereFromListById(1)) gov24Count++;
+    if(_isIdHereFromListById(2)) gov24Count++;
+    if(_isIdHereFromListById(15)) gov24Count++;
+    if(_isIdHereFromListById(3)) nhisCount++;
+    if(_isIdHereFromListById(4)) nhisCount++;
+    if(_isIdHereFromListById(14)) ntsCount++;
+
+    addedIndexId++;
+    finishedViewId = addedIndexId;
   }
   bool _isIdHereFromListById(int id){
     bool isHere = false;
@@ -246,7 +314,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _initDocsList();
-    _checkView();
     _addressInfoTextController.addListener(_addressTextControllerListener);
     _bankAccountInfoTextController.addListener(_bankAccountInfoTextControllerListener);
     _businessNumberInfoTextController.addListener(_businessNumberTextControllerListener);
@@ -294,40 +361,29 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     _businessNumberInfoTextController.dispose();
   }
 
-  void _checkView(){
-    if(!finishedConfirmed){
-      for(int i = 0 ; i < addedDocsList.length ; i++){
-        Map<String, dynamic> addedDocsInfo = addedDocsList[i];
-        if(!addedDocsInfo["is_confirmed"]){
-          if(i == 0){
-            currentViewId = 1;
-          }else{
-            currentViewId = addedDocsInfo["view_id"];
-          }
-          return;
-        }
-      }
-    }else{
-      currentViewId = finishedViewId;
+  Future<void> backInputView() async {
+    if(isInputValid){
+      isInputValid = false;
+      _unFocusAllNodes();
+      CommonUtils.hideKeyBoard();
+      await Future.delayed(const Duration(milliseconds: 120), () async {});
+      setState(() {
+        currentViewId--;
+        isInputValid = true;
+      });
     }
   }
 
-  Future<void> backInputView() async {
-    _unFocusAllNodes();
-    CommonUtils.hideKeyBoard();
-    await Future.delayed(const Duration(milliseconds: 120), () async {});
-    setState(() {
-      currentViewId--;
-    });
-  }
-
   Future<void> nextInputView() async {
-    _unFocusAllNodes();
-    CommonUtils.hideKeyBoard();
-    await Future.delayed(const Duration(milliseconds: 120), () async {});
-    setState(() {
-      currentViewId++;
-    });
+    if(isInputValid){
+      _unFocusAllNodes();
+      CommonUtils.hideKeyBoard();
+      await Future.delayed(const Duration(milliseconds: 120), () async {});
+      setState(() {
+        currentViewId++;
+        isInputValid = true;
+      });
+    }
   }
 
   /// added info intro view
@@ -339,7 +395,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       introWidgetList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                UiUtils.getCustomCircleCheckBox(key, 1.5, true, ColorStyles.upFinRealGray, ColorStyles.upFinWhite,
+                UiUtils.getCustomCircleCheckBox(key, 0.1, true, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
                     ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
                 UiUtils.getTextStyledButtonWithFixedScale(introList[i]["name"], 13.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.center, null, (){})
               ])
@@ -382,11 +438,22 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       bankCodeList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
+                selectedBankCodeKey == key?
                 UiUtils.getCustomCircleCheckBox(key, 1.5, selectedBankCodeKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
                     ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
                           if(checkedValue) {
+                            selectedBankCodeKey = key;
+                            selectedBankCodeInfo = each;
+                          }
+                        }
+                      });
+                    }) : UiUtils.getCustomCircleCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
+                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
+                      setState(() {
+                        if(checkedValue != null){
+                          if(!checkedValue) {
                             selectedBankCodeKey = key;
                             selectedBankCodeInfo = each;
                           }
@@ -494,7 +561,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     Color textColor = ColorStyles.upFinBlack;
     Color textSubColor = ColorStyles.upFinRealGray;
     for(var each in addressList){
-      Key key = Key(each["roadAddr"]!);
+      Key key = Key(each["jibunAddr"]!);
       if(selectedAddressKey == key) {
         textColor = ColorStyles.upFinTextAndBorderBlue;
         textSubColor = ColorStyles.upFinTextAndBorderBlue;
@@ -506,8 +573,9 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       addressWidgetList.add(
           SizedBox(width: 85.w,
               child: Row(mainAxisSize : MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-                SizedBox(width: 5.w, child: UiUtils.getCustomCircleCheckBox(key, 1, selectedAddressKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
-                    ColorStyles.upFinRealGray,  ColorStyles.upFinWhite, (checkedValue){
+                SizedBox(width: 5.w, child:
+                selectedAddressKey == key? UiUtils.getCustomCircleCheckBox(key, 1.2, selectedAddressKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
                           if(checkedValue) {
@@ -517,17 +585,29 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                           }
                         }
                       });
-                    })),
+                    }) : UiUtils.getCustomCircleCheckBox(key, 1.2, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
+                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
+                      setState(() {
+                        if(checkedValue != null){
+                          if(!checkedValue) {
+                            selectedAddressKey = key;
+                            selectedAddressInfo = each["roadAddr"]!;
+                            _addressInfoTextController.text = selectedAddressInfo;
+                          }
+                        }
+                      });
+                    })
+                ),
                 UiUtils.getMarginBox(3.w, 0),
-                SizedBox(width: 77.w, child: Column(mainAxisSize : MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  SizedBox(child: UiUtils.getTextStyledButtonWithFixedScale(each["roadAddr"]!, 14.sp, FontWeight.w600, textColor, TextAlign.start, null, (){
+                SizedBox(width: 77.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  UiUtils.getTextStyledButtonWithFixedScale(each["roadAddr"]!, 14.sp, FontWeight.w500, textColor, TextAlign.start, null, (){
                     setState(() {
                       selectedAddressKey = key;
                       selectedAddressInfo = each["roadAddr"]!;
                       _addressInfoTextController.text = selectedAddressInfo;
                     });
-                  })),
-                  UiUtils.getTextWithFixedScale(each["jibunAddr"]!, 10.sp, FontWeight.w500, textSubColor, TextAlign.start, null)
+                  }),
+                  UiUtils.getTextWithFixedScale(each["jibunAddr"]!, 12.sp, FontWeight.w500, textSubColor, TextAlign.start, null)
                 ])),
               ])
           )
@@ -599,28 +679,10 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("주민등록증과 운전면허증 중", 12.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("하나를 선택 해 주세요.", 12.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 10.h),
-      SizedBox(width: 85.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-        UiUtils.getTextWithFixedScale("주민등록증", 12.sp, FontWeight.w500, !isDriveCardForImageType? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRealGray, TextAlign.start, null),
-        CupertinoSwitch(
-          trackColor: ColorStyles.upFinTextAndBorderBlue,
-          activeColor: ColorStyles.upFinTextAndBorderBlue,
-          value: isDriveCardForImageType,
-          onChanged: (value) {
-            if(pickedFilePath != ""){
-              UiUtils.showSlideMenu(context, SlideType.bottomToTop, false, 100.w, 37.h, 0.5, _makeRePickImageWidget);
-            }else{
-              setState(() {
-                isDriveCardForImageType = value;
-              });
-            }
-          },
-        ),
-        UiUtils.getTextWithFixedScale("운전면허증", 12.sp, FontWeight.w500, isDriveCardForImageType? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRealGray, TextAlign.start, null)
-      ])),
-      UiUtils.getMarginBox(0, 1.h),
       SizedBox(width: 85.w, height: 30.h,
           child: ConstrainedBox(constraints: BoxConstraints(maxWidth: 85.w, maxHeight: 30.h),
-            child: pickedFilePath != "" ? Container(color: ColorStyles.upFinBlack, child: UiUtils.getImage(85.w, 30.h, Image.file(File(pickedFilePath)))) : Container(color: ColorStyles.upFinBlack, child: UiUtils.getIcon(85.w, 30.h, Icons.photo_camera_front_outlined, 50.w, ColorStyles.upFinWhite)))
+            child: pickedFilePath != "" ? Container(decoration: BoxDecoration(color: ColorStyles.upFinBlack, borderRadius: BorderRadius.circular(10)), child: UiUtils.getImage(85.w, 30.h, Image.file(File(pickedFilePath))))
+                : Container(decoration: BoxDecoration(color: ColorStyles.upFinBlack, borderRadius: BorderRadius.circular(10)), child: UiUtils.getIcon(85.w, 30.h, Icons.photo_camera_front_outlined, 50.w, ColorStyles.upFinWhite)))
       ),
       UiUtils.getMarginBox(0, 0.5.h),
       SizedBox(width: 85.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -640,6 +702,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       UiUtils.getExpandedScrollView(Axis.vertical, Container()),
       pickedFilePath != "" ? UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
         if(_isDocItemConfirmedByViewId(currentViewId)){
+          CommonUtils.log("i", "Current view id : $currentViewId");
           nextInputView();
         }
       }) : Container()
@@ -667,23 +730,27 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   }
   Future<void> _checkValidCertImage(String imagePath) async {
     try{
-      await CLOVAController.uploadImageToCLOVA(imagePath, isDriveCardForImageType, (isSuccess, map) async {
+      await CLOVAController.uploadImageToCLOVA(imagePath, (isSuccess, map) async {
         UiUtils.closeLoadingPop(context);
-        if(isSuccess){
-          String croppedImagePath = await CommonUtils.makeMaskingImageAndGetPath(imagePath, map!);
-          if(croppedImagePath != ""){
-            setState(() {
-              MyData.idNumber = map['personalNum'][0]["text"];
-              _setConfirmedToDocItemByViewId(currentViewId, true);
-              pickedFilePath = croppedImagePath;
-            });
+        if(map != null){
+          if(isSuccess){
+            String croppedImagePath = await CommonUtils.makeMaskingImageAndGetPath(imagePath, map!);
+            if(croppedImagePath != ""){
+              setState(() {
+                MyData.idNumber = map['personalNum'][0]["text"];
+                _setConfirmedToDocItemByViewId(currentViewId, true);
+                pickedFilePath = croppedImagePath;
+              });
+            }else{
+              // failed to masking
+              CommonUtils.flutterToast("마스킹 중\n에러가 발생했습니다.");
+            }
           }else{
-            // failed to masking
-            CommonUtils.flutterToast("마스킹 중\n에러가 발생했습니다.");
+            // failed to check clova ocr
+            CommonUtils.flutterToast("신분증 확인 중\n에러가 발생했습니다.");
           }
         }else{
-          // failed to check clova ocr
-          CommonUtils.flutterToast("신분증 확인 중\n에러가 발생했습니다.");
+          CommonUtils.flutterToast("신분증을 확인할 수 없습니다.");
         }
       });
     }catch(error){
@@ -750,21 +817,142 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   }
   /// camera for id check view end
 
-  /// id:1,2 view
-  Widget _getId1And2View(){
-    int thisId = _getIdFromListByViewId(currentViewId);
-    String thisViewName = _getItemFromListByViewId(currentViewId)!["name"];
-    bool isCallMany = false;
-    if(thisId == 1){
-      if(_isIdHereFromListById(2)){
-        isCallMany = true;
-      }
-    }else{
-      if(_isIdHereFromListById(2)){
-        isCallMany = true;
+  /// gov24(id:1,2,15) view
+  Widget _getGov24View(){
+    String subTitle = "'정부24'";
+    String title1 = "간편인증을 통해";
+    String title2 = "비대면 서류 제출이";
+    String title3 = "가능합니다.";
+    for(var each in addedDocsList){
+      if(each["view_id"] < currentViewId){
+        if(each["is_docs"]){
+          title1 = "아직 받지 못한 서류들은";
+          title2 = "정부기관이 달라서";
+          title3 = "다시 한번 인증을 해야해요";
+        }
       }
     }
 
+    List<Widget> docsWidgetList = [];
+    Color textColor = ColorStyles.upFinBlack;
+    for(var each in addedDocsList){
+      if(each["docs_type"] == "gov24"){
+        Key key = UniqueKey();
+        String name = "";
+        textColor = _isDocItemConfirmedByViewId(currentViewId)? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRealGray;
+        if(each["id"] == 1) name = "주민등록등본";
+        if(each["id"] == 2) name = "주민등록초본";
+        if(each["id"] == 15) name = "지방세납세증명서";
+        docsWidgetList.add(
+            SizedBox(width: 90.w,
+                child: Row(children: [
+                  UiUtils.getCustomCircleCheckBox(key, 1.5, true, textColor, ColorStyles.upFinWhite,
+                      ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
+                  UiUtils.getTextStyledButtonWithFixedScale(name, 15.sp, FontWeight.w600, textColor, TextAlign.center, null, (){})
+                ])
+            )
+        );
+      }
+    }
+    if(!_isDocItemConfirmedByViewId(currentViewId)){
+      docsWidgetList.add(SizedBox(width: 90.w, child: Column(children: [
+        UiUtils.getMarginBox(0, 2.h),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("민간 인증서를 선택하세요", 14.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
+        UiUtils.getMarginBox(0, 1.5.h),
+        SizedBox(width: 85.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Column(children: [
+            Container(padding: EdgeInsets.zero, decoration: BoxDecoration(color: certType == 1? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, borderRadius: BorderRadius.circular(20)),
+                child: UiUtils.getImageButton(Image.asset('assets/images/kakao_icon.png'), 20.w, ColorStyles.upFinBlack, () async {
+                  setState(() { certType = 1; });
+                })),
+            UiUtils.getMarginBox(0, 1.h),
+            UiUtils.getTextWithFixedScale("카카오톡", 14.sp, FontWeight.w500, certType == 1? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinDarkGray, TextAlign.start, null)
+          ]),
+          UiUtils.getMarginBox(5.w, 0),
+          Column(children: [
+            Container(padding: EdgeInsets.zero, decoration: BoxDecoration(color: certType == 6? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, borderRadius: BorderRadius.circular(20)),
+                child: UiUtils.getImageButton(Image.asset('assets/images/apple_icon.png'), 20.w, ColorStyles.upFinBlack, () async {
+                  setState(() { certType = 6; });
+                })),
+            UiUtils.getMarginBox(0, 1.h),
+            UiUtils.getTextWithFixedScale("네이버", 14.sp, FontWeight.w500, certType == 6? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinDarkGray, TextAlign.start, null)
+          ]),
+          UiUtils.getMarginBox(5.w, 0),
+          Column(children: [
+            Container(padding: EdgeInsets.zero, decoration: BoxDecoration(color: certType == 5? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, borderRadius: BorderRadius.circular(20)),
+                child: UiUtils.getImageButton(Image.asset('assets/images/iamport_logo.png'), 20.w, ColorStyles.upFinBlack, () async {
+                  setState(() { certType = 5; });
+                })),
+            UiUtils.getMarginBox(0, 1.h),
+            UiUtils.getTextWithFixedScale("PASS", 14.sp, FontWeight.w500, certType == 5? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinDarkGray, TextAlign.start, null)
+          ]),
+        ])),
+        UiUtils.getMarginBox(0, 2.h),
+        UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinTextAndBorderBlue,
+            UiUtils.getTextWithFixedScale(_isDocItemConfirmedByViewId(currentViewId)? "인증완료" : "간편인증 진행하기", 11.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null), () {
+              if(!_isDocItemConfirmedByViewId(currentViewId)){
+                String loginCertType = certType.toString();
+                String name = MyData.name;
+                String birth = MyData.birth;
+                String phoneNo = MyData.phoneNumber;
+                String identity = MyData.idNumber.split("-")[0]+MyData.idNumber.split("-")[1];
+                String address = selectedAddressInfo;
+                String telecom = (int.parse(MyData.telecom)-1).toString();
+                if(int.parse(telecom) >= 3){
+                  telecom = (int.parse(telecom)-3).toString();
+                }
+
+                CommonUtils.log("i", "$identity\n$telecom\n$phoneNo\n$birth\n$address");
+                String randomKey = gov24Count==1 ? "" : CommonUtils.getRandomKey().toString();
+                List<ApiInfoData> apiInfoDataList = [];
+                for(var each in addedDocsList){
+                  if(each["docs_type"] == "gov24"){
+                    if(each["id"] == 1){
+                      CommonUtils.log("i", "here1");
+                      // 등본
+                      Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.gov24residentRegistrationCopy,
+                          identity, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
+                      apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.gov24residentRegistrationCopy, true));
+                    }else if(each["id"] == 2){
+                      CommonUtils.log("i", "here2");
+                      // 초본
+                      Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.gov24residentRegistrationAbstract,
+                          identity, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
+                      apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.gov24residentRegistrationAbstract, true));
+                    }else if(each["id"] == 15){
+                      CommonUtils.log("i", "here3");
+                      // 지방세
+                      Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.gov24localTaxPaymentCert,
+                          identity, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
+                      apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.gov24localTaxPaymentCert, true));
+                    }
+                  }
+                }
+                UiUtils.showLoadingPop(context);
+                CodeFController.callApisWithCert(context, setState, certType, apiInfoDataList, (isSuccess, resultApiInfoDataList) {
+                  UiUtils.closeLoadingPop(context);
+                  if(isSuccess){
+                    CommonUtils.log("i", "call success");
+                    CommonUtils.flutterToast("$subTitle에서 서류를 가져왔습니다");
+                    for(var each in resultApiInfoDataList!){
+                      CommonUtils.log("i", each.resultMap.toString());
+                    }
+                    setState(() {
+                      _setConfirmedToDocItemByViewId(currentViewId, true);
+                    });
+                  }else{
+                    CommonUtils.log("i", "call fail");
+                    setState(() {
+                      _setConfirmedToDocItemByViewId(currentViewId, false);
+                    });
+                  }
+                });
+              }else{
+                CommonUtils.flutterToast("이미 인증을\n완료하셨습니다.");
+              }
+            })
+      ])));
+    }
 
     return UiUtils.getRowColumnWithAlignCenter([
       SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -773,69 +961,339 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         }),
       ])),
       UiUtils.getMarginBox(0, 3.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("사업자 번호를", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale(title1, 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale(title2, 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale(title3, 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      UiUtils.getMarginBox(0, 1.h),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("$subTitle에서 해당 서류들을 가져옵니다.", 14.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getTextField(90.w, TextStyles.upFinTextFormFieldTextStyle, _businessNumberInfoFocus,
-          _businessNumberInfoTextController, TextInputType.number, UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
-      UiUtils.getExpandedScrollView(Axis.vertical, Container()),
+      UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: docsWidgetList)),
       UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-        selectedBusinessNumberInfo = _businessNumberInfoTextController.text.trim();
-        CommonUtils.log("i", "selectedBusinessNumberInfo : $selectedBusinessNumberInfo");
-        if(selectedBusinessNumberInfo.isNotEmpty){
-          _setConfirmedToDocItemByViewId(currentViewId, true);
+      _isDocItemConfirmedByViewId(currentViewId)? UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+        if(gov24Count == 1){
           nextInputView();
         }else{
-          CommonUtils.flutterToast(errorMsg);
+          currentViewId = currentViewId+gov24Count-1;
+          nextInputView();
         }
-      })
+      }) : Container()
     ]);
   }
-  /// id:1,2 view end
+  /// gov24(id:1,2,15) view end
 
-  /// id:3,4 view
-  Widget _getId3And4View(){
-    int thisId = _getIdFromListByViewId(currentViewId);
-    String thisViewName = _getItemFromListByViewId(currentViewId)!["name"];
-    bool isCallMany = false;
-    if(thisId == 3){
-      if(_isIdHereFromListById(4)){
-        isCallMany = true;
+  /// nhis(id:3,4) view
+  Widget _getNhisView(){
+    String subTitle = "'건강보험공단'";
+    String title1 = "간편인증을 통해";
+    String title2 = "비대면 서류 제출이";
+    String title3 = "가능합니다.";
+    for(var each in addedDocsList){
+      if(each["view_id"] < currentViewId){
+        if(each["is_docs"]){
+          title1 = "아직 받지 못한 서류들은";
+          title2 = "정부기관이 달라서";
+          title3 = "다시 한번 인증을 해야해요";
+        }
       }
-    }else{
-      if(_isIdHereFromListById(3)){
-        isCallMany = true;
+    }
+
+    List<Widget> docsWidgetList = [];
+    Color textColor = ColorStyles.upFinBlack;
+    for(var each in addedDocsList){
+      if(each["docs_type"] == "nhis"){
+        Key key = UniqueKey();
+        String name = "";
+        textColor = _isDocItemConfirmedByViewId(currentViewId)? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRealGray;
+        if(each["id"] == 3) name = "건강보험자격득실확인서";
+        if(each["id"] == 4) name = "건강보험납부확인서";
+        docsWidgetList.add(
+            SizedBox(width: 90.w,
+                child: Row(children: [
+                  UiUtils.getCustomCircleCheckBox(key, 1.5, true, textColor, ColorStyles.upFinWhite,
+                      ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
+                  UiUtils.getTextStyledButtonWithFixedScale(name, 15.sp, FontWeight.w600, textColor, TextAlign.center, null, (){})
+                ])
+            )
+        );
       }
+    }
+
+    if(!_isDocItemConfirmedByViewId(currentViewId)){
+      docsWidgetList.add(SizedBox(width: 90.w, child: Column(children: [
+        UiUtils.getMarginBox(0, 2.h),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("민간 인증서를 선택하세요", 14.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
+        UiUtils.getMarginBox(0, 1.5.h),
+        SizedBox(width: 85.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Column(children: [
+            Container(padding: EdgeInsets.zero, decoration: BoxDecoration(color: certType == 1? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, borderRadius: BorderRadius.circular(20)),
+                child: UiUtils.getImageButton(Image.asset('assets/images/kakao_icon.png'), 20.w, ColorStyles.upFinBlack, () async {
+                  setState(() { certType = 1; });
+                })),
+            UiUtils.getMarginBox(0, 1.h),
+            UiUtils.getTextWithFixedScale("카카오톡", 14.sp, FontWeight.w500, certType == 1? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinDarkGray, TextAlign.start, null)
+          ]),
+          UiUtils.getMarginBox(5.w, 0),
+          Column(children: [
+            Container(padding: EdgeInsets.zero, decoration: BoxDecoration(color: certType == 6? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, borderRadius: BorderRadius.circular(20)),
+                child: UiUtils.getImageButton(Image.asset('assets/images/apple_icon.png'), 20.w, ColorStyles.upFinBlack, () async {
+                  setState(() { certType = 6; });
+                })),
+            UiUtils.getMarginBox(0, 1.h),
+            UiUtils.getTextWithFixedScale("네이버", 14.sp, FontWeight.w500, certType == 6? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinDarkGray, TextAlign.start, null)
+          ]),
+          UiUtils.getMarginBox(5.w, 0),
+          Column(children: [
+            Container(padding: EdgeInsets.zero, decoration: BoxDecoration(color: certType == 5? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, borderRadius: BorderRadius.circular(20)),
+                child: UiUtils.getImageButton(Image.asset('assets/images/iamport_logo.png'), 20.w, ColorStyles.upFinBlack, () async {
+                  setState(() { certType = 5; });
+                })),
+            UiUtils.getMarginBox(0, 1.h),
+            UiUtils.getTextWithFixedScale("PASS", 14.sp, FontWeight.w500, certType == 5? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinDarkGray, TextAlign.start, null)
+          ]),
+        ])),
+        UiUtils.getMarginBox(0, 2.h),
+        UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinTextAndBorderBlue,
+            UiUtils.getTextWithFixedScale(_isDocItemConfirmedByViewId(currentViewId)? "인증완료" : "간편인증 진행하기", 11.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null), () {
+              if(!_isDocItemConfirmedByViewId(currentViewId)){
+                String loginCertType = certType.toString();
+                String name = MyData.name;
+                String birth = MyData.birth;
+                String phoneNo = MyData.phoneNumber;
+                String identity = MyData.idNumber.split("-")[0]+MyData.idNumber.split("-")[1];
+                String address = selectedAddressInfo;
+                String telecom = (int.parse(MyData.telecom)-1).toString();
+                if(int.parse(telecom) >= 3){
+                  telecom = (int.parse(telecom)-3).toString();
+                }
+                String randomKey = nhisCount==1 ? "" : CommonUtils.getRandomKey().toString();
+                List<ApiInfoData> apiInfoDataList = [];
+                for(var each in addedDocsList){
+                  if(each["docs_type"] == "nhis"){
+                    if(each["id"] == 3){
+                      // 자격득실확인서
+                      Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.nhisIdentifyConfirmation,
+                          identity, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
+                      apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.nhisIdentifyConfirmation, true));
+                    }else if(each["id"] == 4){
+                      // 납부확인서
+                      Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.nhisConfirmation,
+                          identity, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
+                      apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.nhisConfirmation, true));
+                    }
+                  }
+                }
+
+                UiUtils.showLoadingPop(context);
+                CodeFController.callApisWithCert(context, setState, certType, apiInfoDataList, (isSuccess, resultApiInfoDataList) {
+                  UiUtils.closeLoadingPop(context);
+                  if(isSuccess){
+                    CommonUtils.log("i", "call success");
+                    CommonUtils.flutterToast("$subTitle에서 서류를 가져왔습니다");
+                    for(var each in resultApiInfoDataList!){
+                      CommonUtils.log("i", each.resultMap.toString());
+                    }
+                    setState(() {
+                      _setConfirmedToDocItemByViewId(currentViewId, true);
+                    });
+                  }else{
+                    CommonUtils.log("i", "call fail");
+                    setState(() {
+                      _setConfirmedToDocItemByViewId(currentViewId, false);
+                    });
+                  }
+                });
+              }else{
+                CommonUtils.flutterToast("이미 인증을\n완료하셨습니다.");
+              }
+            })
+      ])));
     }
 
     return UiUtils.getRowColumnWithAlignCenter([
       SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+          if(gov24Count>0){
+            currentViewId = currentViewId-gov24Count+1;
+          }else{
+            currentViewId = currentViewId-gov24Count;
+          }
           backInputView();
         }),
       ])),
       UiUtils.getMarginBox(0, 3.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("사업자 번호를", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale(title1, 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale(title2, 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale(title3, 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      UiUtils.getMarginBox(0, 1.h),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("$subTitle에서 해당 서류들을 가져옵니다.", 14.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getTextField(90.w, TextStyles.upFinTextFormFieldTextStyle, _businessNumberInfoFocus,
-          _businessNumberInfoTextController, TextInputType.number, UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
-      UiUtils.getExpandedScrollView(Axis.vertical, Container()),
+      UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: docsWidgetList)),
       UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-        selectedBusinessNumberInfo = _businessNumberInfoTextController.text.trim();
-        CommonUtils.log("i", "selectedBusinessNumberInfo : $selectedBusinessNumberInfo");
-        if(selectedBusinessNumberInfo.isNotEmpty){
-          _setConfirmedToDocItemByViewId(currentViewId, true);
+      _isDocItemConfirmedByViewId(currentViewId)? UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+        if(nhisCount == 1){
           nextInputView();
         }else{
-          CommonUtils.flutterToast(errorMsg);
+          currentViewId = currentViewId+nhisCount-1;
+          nextInputView();
         }
-      })
+      }) : Container()
     ]);
   }
-  /// id:3,4 view end
+  /// nhis(id:3,4) view end
+
+  /// nts(id:14) view
+  Widget _getNtsView(){
+    String subTitle = "'국세청'";
+    String title1 = "간편인증을 통해";
+    String title2 = "비대면 서류 제출이";
+    String title3 = "가능합니다.";
+    for(var each in addedDocsList){
+      if(each["view_id"] < currentViewId){
+        if(each["is_docs"]){
+          title1 = "아직 받지 못한 서류들은";
+          title2 = "정부기관이 달라서";
+          title3 = "다시 한번 인증을 해야해요";
+        }
+      }
+    }
+
+    List<Widget> docsWidgetList = [];
+    Color textColor = ColorStyles.upFinBlack;
+    for(var each in addedDocsList){
+      if(each["docs_type"] == "nts"){
+        Key key = UniqueKey();
+        String name = "";
+        textColor = _isDocItemConfirmedByViewId(currentViewId)? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRealGray;
+        if(each["id"] == 14) name = "국세납세증명서";
+        docsWidgetList.add(
+            SizedBox(width: 90.w,
+                child: Row(children: [
+                  UiUtils.getCustomCircleCheckBox(key, 1.5, true, textColor, ColorStyles.upFinWhite,
+                      ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
+                  UiUtils.getTextStyledButtonWithFixedScale(name, 15.sp, FontWeight.w600, textColor, TextAlign.center, null, (){})
+                ])
+            )
+        );
+      }
+    }
+
+    if(!_isDocItemConfirmedByViewId(currentViewId)){
+      docsWidgetList.add(SizedBox(width: 90.w, child: Column(children: [
+        UiUtils.getMarginBox(0, 5.h),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("민간 인증서를 선택하세요", 14.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
+        UiUtils.getMarginBox(0, 1.5.h),
+        SizedBox(width: 85.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          Column(children: [
+            Container(padding: EdgeInsets.zero, decoration: BoxDecoration(color: certType == 1? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, borderRadius: BorderRadius.circular(20)),
+                child: UiUtils.getImageButton(Image.asset('assets/images/kakao_icon.png'), 20.w, ColorStyles.upFinBlack, () async {
+                  setState(() { certType = 1; });
+                })),
+            UiUtils.getMarginBox(0, 1.h),
+            UiUtils.getTextWithFixedScale("카카오톡", 14.sp, FontWeight.w500, certType == 1? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinDarkGray, TextAlign.start, null)
+          ]),
+          UiUtils.getMarginBox(5.w, 0),
+          Column(children: [
+            Container(padding: EdgeInsets.zero, decoration: BoxDecoration(color: certType == 6? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, borderRadius: BorderRadius.circular(20)),
+                child: UiUtils.getImageButton(Image.asset('assets/images/apple_icon.png'), 20.w, ColorStyles.upFinBlack, () async {
+                  setState(() { certType = 6; });
+                })),
+            UiUtils.getMarginBox(0, 1.h),
+            UiUtils.getTextWithFixedScale("네이버", 14.sp, FontWeight.w500, certType == 6? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinDarkGray, TextAlign.start, null)
+          ]),
+          UiUtils.getMarginBox(5.w, 0),
+          Column(children: [
+            Container(padding: EdgeInsets.zero, decoration: BoxDecoration(color: certType == 5? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, borderRadius: BorderRadius.circular(20)),
+                child: UiUtils.getImageButton(Image.asset('assets/images/iamport_logo.png'), 20.w, ColorStyles.upFinBlack, () async {
+                  setState(() { certType = 5; });
+                })),
+            UiUtils.getMarginBox(0, 1.h),
+            UiUtils.getTextWithFixedScale("PASS", 14.sp, FontWeight.w500, certType == 5? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinDarkGray, TextAlign.start, null)
+          ]),
+        ])),
+        UiUtils.getMarginBox(0, 2.h),
+        UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinTextAndBorderBlue,
+            UiUtils.getTextWithFixedScale(_isDocItemConfirmedByViewId(currentViewId)? "인증완료" : "간편인증 진행하기", 11.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null), () {
+              if(!_isDocItemConfirmedByViewId(currentViewId)){
+                String loginCertType = certType.toString();
+                String name = MyData.name;
+                String birth = MyData.birth;
+                String phoneNo = MyData.phoneNumber;
+                String identity = MyData.idNumber.split("-")[0]+MyData.idNumber.split("-")[1];
+                String address = selectedAddressInfo;
+                String telecom = (int.parse(MyData.telecom)-1).toString();
+                if(int.parse(telecom) >= 3){
+                  telecom = (int.parse(telecom)-3).toString();
+                }
+                String randomKey = ntsCount==1 ? "" : CommonUtils.getRandomKey().toString();
+                List<ApiInfoData> apiInfoDataList = [];
+                for(var each in addedDocsList){
+                  if(each["docs_type"] == "nts"){
+                    if(each["id"] == 14){
+                      // 국세납세증명서
+                      Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.ntsTaxCert,
+                          identity, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
+                      apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.ntsTaxCert, true));
+                    }
+                  }
+                }
+
+                UiUtils.showLoadingPop(context);
+                CodeFController.callApisWithCert(context, setState, certType, apiInfoDataList, (isSuccess, resultApiInfoDataList) {
+                  UiUtils.closeLoadingPop(context);
+                  if(isSuccess){
+                    CommonUtils.log("i", "call success");
+                    CommonUtils.flutterToast("$subTitle에서 서류를 가져왔습니다");
+                    for(var each in resultApiInfoDataList!){
+                      //CommonUtils.log("i", each.resultMap.toString());
+                    }
+                    setState(() {
+                      _setConfirmedToDocItemByViewId(currentViewId, true);
+                    });
+                  }else{
+                    CommonUtils.log("i", "call fail");
+                    setState(() {
+                      _setConfirmedToDocItemByViewId(currentViewId, false);
+                    });
+                  }
+                });
+              }else{
+                CommonUtils.flutterToast("이미 인증을\n완료하셨습니다.");
+              }
+            })
+      ])));
+    }
+
+    return UiUtils.getRowColumnWithAlignCenter([
+      SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+          if(nhisCount>0){
+            currentViewId = currentViewId-nhisCount+1;
+          }else{
+            currentViewId = currentViewId-nhisCount;
+          }
+          backInputView();
+        }),
+      ])),
+      UiUtils.getMarginBox(0, 3.h),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale(title1, 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale(title2, 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale(title3, 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      UiUtils.getMarginBox(0, 1.h),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("$subTitle에서 해당 서류들을 가져옵니다.", 14.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
+      UiUtils.getMarginBox(0, 5.h),
+      UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: docsWidgetList)),
+      UiUtils.getMarginBox(0, 5.h),
+      _isDocItemConfirmedByViewId(currentViewId)? UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+        if(ntsCount == 1){
+          nextInputView();
+        }else{
+          currentViewId = currentViewId+ntsCount-1;
+          nextInputView();
+        }
+      }) : Container()
+    ]);
+  }
+  /// nts(id:14) view end
 
   /// last view
   Widget _getLastView(){
@@ -926,12 +1384,14 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getAddressView());
       }else if(_getIdFromListByViewId(currentViewId) == cameraId){
         view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getCameraForIdCheckView());
+      }else if(_getIdFromListByViewId(currentViewId) == 1 || _getIdFromListByViewId(currentViewId) == 2 || _getIdFromListByViewId(currentViewId) == 15){
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getGov24View());
+      }else if(_getIdFromListByViewId(currentViewId) == 3 || _getIdFromListByViewId(currentViewId) == 4){
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getNhisView());
+      }else if(_getIdFromListByViewId(currentViewId) == 14){
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getNtsView());
       }else if(_getIdFromListByViewId(currentViewId) == lastId){
         view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getLastView());
-      }else if(_getIdFromListByViewId(currentViewId) == 1 || _getIdFromListByViewId(currentViewId) == 2){
-        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getId1And2View());
-      }else if(_getIdFromListByViewId(currentViewId) == 3 || _getIdFromListByViewId(currentViewId) == 4){
-        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getId3And4View());
       }else {
         view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getFinishConfirmView());
       }

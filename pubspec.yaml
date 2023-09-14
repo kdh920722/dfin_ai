@@ -68,6 +68,7 @@ dependencies:
   flutter_inappwebview: ^5.7.2+3
   kakao_flutter_sdk_user: ^1.5.0
   percent_indicator: ^4.2.3
+  url_launcher: ^6.1.14
 
 dev_dependencies:
   flutter_test:
