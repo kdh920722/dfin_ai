@@ -7,6 +7,7 @@ class ApiInfoData {
   bool isCallWithCert;
   List<dynamic>? resultListMap;
   Map<String,dynamic>? resultMap;
+  Map<String,dynamic>? resultFullMap;
   bool isResultSuccess = false;
 
   ApiInfoData(this.apiId, this.inputJson, this.api, this.isCallWithCert);

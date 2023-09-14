@@ -935,7 +935,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                     CommonUtils.log("i", "call success");
                     CommonUtils.flutterToast("$subTitle에서 서류를 가져왔습니다");
                     for(var each in resultApiInfoDataList!){
-                      CommonUtils.log("i", each.resultMap.toString());
+                      CommonUtils.log("i", "${each.apiId}\n${each.resultFullMap}");
                     }
                     setState(() {
                       _setConfirmedToDocItemByViewId(currentViewId, true);
@@ -1090,7 +1090,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                     CommonUtils.log("i", "call success");
                     CommonUtils.flutterToast("$subTitle에서 서류를 가져왔습니다");
                     for(var each in resultApiInfoDataList!){
-                      CommonUtils.log("i", each.resultMap.toString());
+                      CommonUtils.log("i", "${each.apiId}\n${each.resultFullMap}");
                     }
                     setState(() {
                       _setConfirmedToDocItemByViewId(currentViewId, true);
@@ -1244,7 +1244,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                     CommonUtils.log("i", "call success");
                     CommonUtils.flutterToast("$subTitle에서 서류를 가져왔습니다");
                     for(var each in resultApiInfoDataList!){
-                      //CommonUtils.log("i", each.resultMap.toString());
+                      CommonUtils.log("i", "${each.apiId}\n${each.resultFullMap}");
                     }
                     setState(() {
                       _setConfirmedToDocItemByViewId(currentViewId, true);

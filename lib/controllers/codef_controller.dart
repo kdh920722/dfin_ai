@@ -77,7 +77,7 @@ class CodeFController{
   }
 
   static Future<void> _getDataFromApi(Apis apiInfo, Map<String, dynamic> inputJson,
-      void Function(bool isSuccess, bool is2WayProcess, Map<String, dynamic>? outputJson, List<dynamic>? outputJsonArray) callback) async {
+      void Function(bool isSuccess, bool is2WayProcess, Map<String, dynamic>? outputJson, List<dynamic>? outputJsonArray, Map<String, dynamic>? fullOutPut) callback) async {
     final baseUrl = hostStatus.value == HostStatus.prod.value ? Host.baseUrl.value : HostDev.baseUrl.value;
     final endPoint = apiInfo.value;
     CommonUtils.log("i", "call api : $endPoint");
@@ -116,31 +116,31 @@ class CodeFController{
               if(resultData.isNotEmpty){
                 resultData['result_code'] = resultCode;
                 if(resultCode == 'CF-03002') {
-                  callback(true, true, resultData, null);
+                  callback(true, true, resultData, null, json);
                 } else {
-                  callback(true, false, resultData, null);
+                  callback(true, false, resultData, null, json);
                 }
               }else{
                 final Map<String, dynamic> resultData = {};
                 resultData['result_code'] = errorCodeKey;
                 resultData['result_msg'] = msg;
                 CommonUtils.log('e', 'out resultCode error : $resultCode');
-                callback(true, false, resultData, null);
+                callback(true, false, resultData, null, json);
               }
             } else if (resultData is List<dynamic>) {
               if(resultData.isNotEmpty){
                 resultData[0]['result_code'] = resultCode;
                 if(resultCode == 'CF-03002') {
-                  callback(true, true, null, resultData);
+                  callback(true, true, null, resultData, json);
                 } else {
-                  callback(true, false, null, resultData);
+                  callback(true, false, null, resultData, json);
                 }
               }else{
                 final Map<String, dynamic> resultData = {};
                 resultData['result_code'] = errorCodeKey;
                 resultData['result_msg'] = msg;
                 CommonUtils.log('e', 'out resultCode error : $resultCode');
-                callback(true, false, resultData, null);
+                callback(true, false, resultData, null, json);
               }
             }
           } else {
@@ -148,7 +148,7 @@ class CodeFController{
             resultData['result_code'] = errorCodeKey;
             resultData['result_msg'] = msg;
             CommonUtils.log('e', 'out resultCode error : $resultCode');
-            callback(true, false, resultData, null);
+            callback(true, false, resultData, null, json);
           }
         }
       } else {
@@ -156,14 +156,14 @@ class CodeFController{
         final Map<String, dynamic> resultData = {};
         resultData['result_code'] = errorCodeKey;
         resultData['result_msg'] = "인터넷 연결에러가 발생했습니다.";
-        callback(true, false, resultData, null);
+        callback(true, false, resultData, null, null);
       }
     } catch (e) {
       CommonUtils.log('e', e.toString());
       final Map<String, dynamic> resultData = {};
       resultData['result_code'] = errorCodeKey;
       resultData['result_msg'] = "에러가 발생했습니다.";
-      callback(true, false, resultData, null);
+      callback(true, false, resultData, null, null);
     }
   }
 
@@ -175,7 +175,7 @@ class CodeFController{
     for(var each in apiInfoDataList){
       if(each.isCallWithCert){
         if(!isFirstCalledOnCert){
-          _callApiWithCert(context, setState, certType, each.api, each.inputJson, (isSuccess, resultMap, resultListMap) {
+          _callApiWithCert(context, setState, certType, each.api, each.inputJson, (isSuccess, resultMap, resultListMap, fullMap) {
             if(isSuccess){
               if(resultMap != null){
                 if(resultMap["result_code"] == errorCodeKey){
@@ -189,10 +189,12 @@ class CodeFController{
                 }else{
                   each.isResultSuccess = true;
                   each.resultMap = resultMap;
+                  each.resultFullMap = fullMap;
                 }
               }else{
                 each.isResultSuccess = true;
                 each.resultListMap = resultListMap;
+                each.resultFullMap = fullMap;
               }
 
               callCount++;
@@ -204,7 +206,7 @@ class CodeFController{
           await Future.delayed(const Duration(milliseconds: 500), () async {});
           isFirstCalledOnCert = true;
         }else{
-          _callApiWithOutCert(context, each.api, each.inputJson, (isSuccess, resultMap, resultListMap){
+          _callApiWithOutCert(context, each.api, each.inputJson, (isSuccess, resultMap, resultListMap, fullMap){
             if(isSuccess){
               if(resultMap != null){
                 if(resultMap["result_code"] == errorCodeKey){
@@ -218,10 +220,12 @@ class CodeFController{
                 }else{
                   each.isResultSuccess = true;
                   each.resultMap = resultMap;
+                  each.resultFullMap = fullMap;
                 }
               }else{
                 each.isResultSuccess = true;
                 each.resultListMap = resultListMap;
+                each.resultFullMap = fullMap;
               }
 
               callCount++;
@@ -240,7 +244,7 @@ class CodeFController{
     int callCount = 0;
     for(var each in apiInfoDataList){
       if(!each.isCallWithCert){
-        _callApiWithOutCert(context, each.api, each.inputJson, (isSuccess, resultMap, resultListMap){
+        _callApiWithOutCert(context, each.api, each.inputJson, (isSuccess, resultMap, resultListMap, fullMap){
           if(isSuccess){
             if(resultMap != null){
               if(resultMap["result_code"] == errorCodeKey){
@@ -254,10 +258,12 @@ class CodeFController{
               }else{
                 each.isResultSuccess = true;
                 each.resultMap = resultMap;
+                each.resultFullMap = fullMap;
               }
             }else{
               each.isResultSuccess = true;
               each.resultListMap = resultListMap;
+              each.resultFullMap = fullMap;
             }
 
             callCount++;
@@ -271,21 +277,21 @@ class CodeFController{
   }
 
   static Future<void> _callApiWithOutCert(BuildContext context, Apis api, Map<String, dynamic> inputJson,
-      Function(bool isSuccess, Map<String,dynamic>? resultMap, List<dynamic>? resultListMap) callback) async {
-    CodeFController._getDataFromApi(api, inputJson, (isSuccess, _, map, listMap) {
+      Function(bool isSuccess, Map<String,dynamic>? resultMap, List<dynamic>? resultListMap, Map<String,dynamic>? fullMap) callback) async {
+    CodeFController._getDataFromApi(api, inputJson, (isSuccess, _, map, listMap, fullResultMap) {
       if(isSuccess){
         if(map != null){
-          callback(true, map, null);
+          callback(true, map, null, fullResultMap);
         }else{
-          callback(true, null, listMap);
+          callback(true, null, listMap, fullResultMap);
         }
       }
     });
   }
 
   static Future<void> _callApiWithCert(BuildContext context, StateSetter setState, int certType, Apis representApi, Map<String, dynamic> inputJson,
-      Function(bool isSuccess, Map<String,dynamic>? resultMap, List<dynamic>? resultListMap) callback) async {
-    await CodeFController._getDataFromApi(representApi, inputJson, (isSuccess, is2WayProcess, map, listMap) async {
+      Function(bool isSuccess, Map<String,dynamic>? resultMap, List<dynamic>? resultListMap, Map<String,dynamic>? fullMap) callback) async {
+    await CodeFController._getDataFromApi(representApi, inputJson, (isSuccess, is2WayProcess, map, listMap, fullResultMap) async {
       if(isSuccess){
         if(map != null){
           if(is2WayProcess){
@@ -296,12 +302,12 @@ class CodeFController{
                   launchUrl(Uri.parse("kakaotalk://launch"));
                 }
 
-                _setAuthPop(context, representApi, certType, resultMap,(isAuthSuccess, authMap, authListMap) async {
+                _setAuthPop(context, representApi, certType, resultMap,(isAuthSuccess, authMap, authListMap, fullMap) async {
                   if(isAuthSuccess){
                     if(authMap != null){
-                      callback(true, authMap, null);
+                      callback(true, authMap, null, fullMap);
                     }else{
-                      callback(true, null, authListMap);
+                      callback(true, null, authListMap, fullMap);
                     }
                   }
                 });
@@ -348,7 +354,7 @@ class CodeFController{
   }
 
   static Future<void> _setAuthPop(BuildContext context, Apis apiInfo, int certType, Map<String, dynamic> resultInputMap,
-      Function(bool isSuccess, Map<String,dynamic>? resultMap, List<dynamic>? resultListMap) callback) async {
+      Function(bool isSuccess, Map<String,dynamic>? resultMap, List<dynamic>? resultListMap, Map<String,dynamic>? fullResultMap) callback) async {
     String certName = "인증을 완료하셨다면,";
     if(certType == 1){
       certName = "카카오앱에서 $certName";
@@ -368,7 +374,7 @@ class CodeFController{
               UiUtils.getBorderButtonBox(85.w, ColorStyles.upFinWhite, ColorStyles.upFinTextAndBorderBlue,
                   UiUtils.getTextWithFixedScale("인증확인", 15.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null), () {
                     GetController.to.updateWait(true);
-                    CodeFController._getDataFromApi(apiInfo, resultInputMap, (isSuccess, _, map, listMap){
+                    CodeFController._getDataFromApi(apiInfo, resultInputMap, (isSuccess, _, map, listMap, fullMap){
                       GetController.to.updateWait(false);
                       if(isSuccess){
                         if(map != null){
@@ -376,14 +382,14 @@ class CodeFController{
                             CommonUtils.flutterToast("인증을 진행 해 주세요.");
                           }else{
                             Navigator.of(context).pop();
-                            callback(true, map, null);
+                            callback(true, map, null, fullMap);
                           }
                         }else{
                           if(listMap?[0]['result_code'] == "CF-03002"){
                             CommonUtils.flutterToast("인증을 진행 해 주세요.");
                           }else{
                             Navigator.of(context).pop();
-                            callback(true, null, listMap);
+                            callback(true, null, listMap, fullMap);
                           }
                         }
                       }
