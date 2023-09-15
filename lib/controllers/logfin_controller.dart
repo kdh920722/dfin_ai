@@ -18,6 +18,8 @@ class LogfinController {
   static String url = "";
   static String headerKey = "";
   static String userToken = "";
+  static String niceUrl = "";
+  static String niceSuccessUrl = "";
 
   static List<String> jobList = [];
   static List<String> courtList = [];
@@ -36,7 +38,7 @@ class LogfinController {
           }
         }
 
-        await _initLogfinListData((isDataCallSuccess){
+        await _initLogfinOtherData((isDataCallSuccess){
           if(isDataCallSuccess){
             callback(true);
           }else{
@@ -52,7 +54,7 @@ class LogfinController {
     }
   }
 
-  static Future<void> _initLogfinListData(Function(bool) callback) async {
+  static Future<void> _initLogfinOtherData(Function(bool) callback) async {
     try {
       final ref = FirebaseDatabase.instance.ref();
       int failCount = 0;
@@ -109,13 +111,26 @@ class LogfinController {
       }
       CommonUtils.log("i", "list : $preLoanCountList");
 
+      final niceSnapshot = await ref.child('UPFIN/API/logfin/nice').get();
+      if (niceSnapshot.exists) {
+        for (var each in niceSnapshot.children) {
+          switch (each.key) {
+            case "nice_url" : niceUrl = each.value.toString();
+            case "nice_success_url" : niceSuccessUrl = each.value.toString();
+          }
+        }
+      } else {
+        failCount++;
+      }
+      CommonUtils.log("i", "niceUrl : $niceUrl");
+
       if(failCount > 0){
         callback(false);
       }else{
         callback(true);
       }
     } catch (e) {
-      CommonUtils.log("e", "logfin data init error : ${e.toString()}");
+      CommonUtils.log("e", "logfin other data init error : ${e.toString()}");
       callback(false);
     }
   }
@@ -201,6 +216,7 @@ class LogfinController {
             MyData.phoneNumber = userInfoOutputJson["user"]["contact_no"];
             MyData.telecom = userInfoOutputJson["user"]["telecom"];
             MyData.birth =  userInfoOutputJson["user"]["birthday"];
+            MyData.customerUidForNiceCert =  userInfoOutputJson["customer"]["uid"].toString();
             MyData.isMale =  userInfoOutputJson["user"]["gender"] == "1"? true : false;
             for(var each in jobList){
               if(each.split("@")[1] == "1"){

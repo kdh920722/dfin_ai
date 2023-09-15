@@ -199,6 +199,8 @@ class CodeFController{
 
               callCount++;
               if(callCount == apiInfoDataList.length){
+                GetController.to.updateWait(false);
+                Navigator.of(context).pop();
                 callback(true, apiInfoDataList);
               }
             }
@@ -230,6 +232,8 @@ class CodeFController{
 
               callCount++;
               if(callCount == apiInfoDataList.length){
+                GetController.to.updateWait(false);
+                Navigator.of(context).pop();
                 callback(true, apiInfoDataList);
               }
             }
@@ -375,20 +379,19 @@ class CodeFController{
                   UiUtils.getTextWithFixedScale("인증확인", 15.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null), () {
                     GetController.to.updateWait(true);
                     CodeFController._getDataFromApi(apiInfo, resultInputMap, (isSuccess, _, map, listMap, fullMap){
-                      GetController.to.updateWait(false);
                       if(isSuccess){
                         if(map != null){
                           if(map['result_code'] == "CF-03002"){
-                            CommonUtils.flutterToast("인증을 진행 해 주세요.");
+                            CommonUtils.flutterToast("인증을 진행해주세요.");
+                            GetController.to.updateWait(false);
                           }else{
-                            Navigator.of(context).pop();
                             callback(true, map, null, fullMap);
                           }
                         }else{
                           if(listMap?[0]['result_code'] == "CF-03002"){
-                            CommonUtils.flutterToast("인증을 진행 해 주세요.");
+                            CommonUtils.flutterToast("인증을 진행해주세요.");
+                            GetController.to.updateWait(false);
                           }else{
-                            Navigator.of(context).pop();
                             callback(true, null, listMap, fullMap);
                           }
                         }

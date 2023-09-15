@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:transition/transition.dart';
+import 'package:upfin/controllers/sharedpreference_controller.dart';
 import '../configs/app_config.dart';
 import '../styles/ColorStyles.dart';
 import '../styles/TextStyles.dart';
@@ -499,7 +500,8 @@ class CommonUtils {
   static Future<String> makeMaskingImageAndGetPath(String imagePath, Map<String,dynamic> maskingInfoMap) async {
     try {
       final imglib.Image image = imglib.decodeImage(File(imagePath).readAsBytesSync())!;
-      List<dynamic> listMap = maskingInfoMap['personalNum'][0]['maskingPolys'][0]['vertices'];
+      //boundingPolys
+      List<dynamic> listMap = maskingInfoMap['personalNum'][0]['boundingPolys'][0]['vertices'];
       List<int> xPoints = [];
       List<int> yPoints = [];
       for(Map<String,dynamic> each in listMap){
@@ -530,7 +532,46 @@ class CommonUtils {
         squareYSize = yPoints[2] - yPoints[0];
       }
 
-      imglib.fillRect(image, x1: squareX, y1: squareY, x2 : squareX + squareXSize, y2 : squareY + squareYSize, color: imglib.ColorRgba8(0, 0, 0, 255));
+      bool isVerticalImage = false;
+      if(squareYSize > squareXSize) isVerticalImage = true;
+      CommonUtils.log("i", "masking size : \nw:$squareXSize h:$squareYSize");
+
+      //maskingPolys
+      List<dynamic> listMaskingMap = maskingInfoMap['personalNum'][0]['maskingPolys'][0]['vertices'];
+      List<int> xPointsForMasking = [];
+      List<int> yPointsForMasking = [];
+      for(Map<String,dynamic> each in listMaskingMap){
+        var xPointForMasking = each['x'].toString().split(".")[0];
+        var yPointForMasking = each['y'].toString().split(".")[0];
+        xPointsForMasking.add(int.parse(xPointForMasking));
+        yPointsForMasking.add(int.parse(yPointForMasking));
+      }
+
+      int squareXForMasking = 0;   // X-coordinate of the top-left corner
+      int squareYForMasking = 0;   // Y-coordinate of the top-left corner
+      if(xPointsForMasking[0] > xPointsForMasking[2]){
+        squareXForMasking = xPointsForMasking[2];
+      }else{
+        squareXForMasking = xPointsForMasking[0];
+      }
+
+      if(yPointsForMasking[0] > yPointsForMasking[2]){
+        squareYForMasking = yPointsForMasking[2];
+      }else{
+        squareYForMasking = yPointsForMasking[0];
+      }
+
+      if(isVerticalImage){
+        CommonUtils.log("i", "vertical");
+        int verticalHalfMaskingSize = (squareYSize/2).round()+((squareYSize/2)*0.1).round();
+        CommonUtils.log("i", "masking x:$squareXForMasking y:$squareYForMasking maskingSize:$verticalHalfMaskingSize");
+        imglib.fillRect(image, x1: squareX, x2 : squareX + squareXSize, y1: squareYForMasking, y2 : squareYForMasking + verticalHalfMaskingSize, color: imglib.ColorRgba8(0, 0, 0, 255));
+      }else{
+        CommonUtils.log("i", "horizontal");
+        int horizonHalfMaskingSize = (squareXSize/2).round()+((squareXSize/2)*0.1).round();
+        CommonUtils.log("i", "masking x:$squareXForMasking y:$squareYForMasking maskingSize:$horizonHalfMaskingSize");
+        imglib.fillRect(image, x1: squareXForMasking, x2 : squareXForMasking + horizonHalfMaskingSize, y1: squareY, y2 : squareY + squareYSize, color: imglib.ColorRgba8(0, 0, 0, 255));
+      }
 
       final modifiedImagePath = imagePath.replaceAll('.jpg', '_masked.jpg');
       File(modifiedImagePath).writeAsBytesSync(imglib.encodeJpg(image));
@@ -583,4 +624,15 @@ class CommonUtils {
   }
 
 
+  static bool isValidStateByAPiExpiredDate(){
+    bool result = false;
+    String thirtyMinutesLaterString = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceValidDateKey);
+    if(thirtyMinutesLaterString != ""){
+      result = CommonUtils.getCurrentLocalTime().isBefore(CommonUtils.convertStringToTime(thirtyMinutesLaterString));
+    } else{
+      result = false;
+    }
+
+    return result;
+  }
 }

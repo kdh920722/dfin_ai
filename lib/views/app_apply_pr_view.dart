@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sizer/sizer.dart';
 import 'package:upfin/configs/app_config.dart';
+import 'package:upfin/controllers/hyphen_controller.dart';
 import 'package:upfin/controllers/juso_controller.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/datas/my_data.dart';
@@ -79,6 +80,9 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   bool isDriveCardForImageType = false;
   String pickedFilePath = "";
 
+  int niceId = 94;
+  String niceName = "나이즈Key 인증";
+
   int certType = 1; //1: 카카오 인증, 6:네이버 인증, 5:PASS 인증
   final List<Map<String, dynamic>> addedDocsList = [];
   int gov24Count = 0;
@@ -91,7 +95,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         "id" : 0,
         "name" : "",
         "view_id" : 0,
-        "result" : null,
+        "result" : <String, dynamic>{},
         "is_confirmed" : false,
         "is_docs" : false,
         "docs_type" : ""
@@ -107,7 +111,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         "id" : 0,
         "name" : "",
         "view_id" : 0,
-        "result" : null,
+        "result" : <String, dynamic>{},
         "is_confirmed" : false,
         "is_docs" : false,
         "docs_type" : ""
@@ -123,7 +127,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         "id" : 0,
         "name" : "",
         "view_id" : 0,
-        "result" : null,
+        "result" : <String, dynamic>{},
         "is_confirmed" : false,
         "is_docs" : false,
         "docs_type" : ""
@@ -140,7 +144,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       "id" : 0,
       "name" : "",
       "view_id" : 0,
-      "result" : null,
+      "result" : <String, dynamic>{},
       "is_confirmed" : false,
       "is_docs" : false,
       "docs_type" : ""
@@ -156,7 +160,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       "id" : 0,
       "name" : "",
       "view_id" : 0,
-      "result" : null,
+      "result" : <String, dynamic>{},
       "is_confirmed" : false,
       "is_docs" : false,
       "docs_type" : ""
@@ -184,7 +188,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         Map<String, dynamic> addedDocsInfo = {
           "id" : 0,
           "name" : "",
-          "result" : null,
+          "result" : <String, dynamic>{},
           "view_id" : 0,
           "is_confirmed" : false,
           "is_docs" : true,
@@ -225,11 +229,27 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     }
 
     addedIndexId++;
+    Map<String, dynamic> niceInfo = {
+      "id" : 0,
+      "name" : "",
+      "view_id" : 0,
+      "result" : <String, dynamic>{},
+      "is_confirmed" : false,
+      "is_docs" : false,
+      "docs_type" : ""
+    };
+    niceInfo["id"] = niceId;
+    niceInfo["name"] = niceName;
+    niceInfo["view_id"] = addedIndexId;
+    niceInfo["is_confirmed"] = false;
+    addedDocsList.add(niceInfo);
+
+    addedIndexId++;
     Map<String, dynamic> lastInfo = {
       "id" : 0,
       "name" : "",
       "view_id" : 0,
-      "result" : null,
+      "result" : <String, dynamic>{},
       "is_confirmed" : false,
       "is_docs" : false,
       "docs_type" : ""
@@ -264,11 +284,18 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
     return isHere;
   }
-  Map<String, dynamic>? _getItemFromListByViewId(int viewId){
-    Map<String, dynamic>? resultMap;
+  void _setResultToListById(int id, Map<String, dynamic>? resultMap){
+    for(var eachMap in addedDocsList){
+      if(eachMap["id"] == id){
+        eachMap["result"] = resultMap;
+      }
+    }
+  }
+  Map<String, dynamic> _getResultFromListById(int id){
+    Map<String, dynamic> resultMap = {};
     for(var each in addedDocsList){
-      if(each["view_id"] == viewId){
-        resultMap = each;
+      if(each["id"] == id){
+        resultMap = each["result"];
       }
     }
 
@@ -488,6 +515,10 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         CommonUtils.log("i", "bank code : $selectedBankCodeInfo");
         if(selectedBankCodeInfo.isNotEmpty){
           _setConfirmedToDocItemByViewId(currentViewId, true);
+          Map<String, dynamic> resultMap = {
+            "resultValue" : selectedBankCodeInfo
+          };
+          _setResultToListById(mainBankId, resultMap);
           nextInputView();
         }
       })
@@ -516,6 +547,10 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         CommonUtils.log("i", "selectedBankAccountInfo : $selectedBankAccountInfo");
         if(selectedBankAccountInfo.isNotEmpty){
           _setConfirmedToDocItemByViewId(currentViewId, true);
+          Map<String, dynamic> resultMap = {
+            "resultValue" : selectedBankAccountInfo
+          };
+          _setResultToListById(mainBankAccountId, resultMap);
           nextInputView();
         }else{
           CommonUtils.flutterToast(errorMsg);
@@ -546,6 +581,10 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         CommonUtils.log("i", "selectedBusinessNumberInfo : $selectedBusinessNumberInfo");
         if(selectedBusinessNumberInfo.isNotEmpty){
           _setConfirmedToDocItemByViewId(currentViewId, true);
+          Map<String, dynamic> resultMap = {
+            "resultValue" : selectedBusinessNumberInfo
+          };
+          _setResultToListById(businessNumberId, resultMap);
           nextInputView();
         }else{
           CommonUtils.flutterToast(errorMsg);
@@ -561,7 +600,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     Color textColor = ColorStyles.upFinBlack;
     Color textSubColor = ColorStyles.upFinRealGray;
     for(var each in addressList){
-      Key key = Key(each["jibunAddr"]!);
+      Key key = Key(each["roadAddr"]!+each["jibunAddr"]!);
       if(selectedAddressKey == key) {
         textColor = ColorStyles.upFinTextAndBorderBlue;
         textSubColor = ColorStyles.upFinTextAndBorderBlue;
@@ -659,6 +698,10 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       selectedAddressKey != null ?
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
         _setConfirmedToDocItemByViewId(currentViewId, true);
+        Map<String, dynamic> resultMap = {
+          "resultValue" : selectedAddressInfo
+        };
+        _setResultToListById(addressId, resultMap);
         nextInputView();
       }) : Container()
     ]);
@@ -702,7 +745,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       UiUtils.getExpandedScrollView(Axis.vertical, Container()),
       pickedFilePath != "" ? UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
         if(_isDocItemConfirmedByViewId(currentViewId)){
-          CommonUtils.log("i", "Current view id : $currentViewId");
           nextInputView();
         }
       }) : Container()
@@ -712,13 +754,14 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     try{
       UiUtils.showLoadingPop(context);
       XFile? image = isGetImageFromCamera? await CommonUtils.getCameraImage() : await CommonUtils.getGalleryImage();
+
       if(image != null){
         String imagePath = await CommonUtils.cropImageAndGetPath(image);
-        if(imagePath == ""){
-          imagePath = image.path;
+        if(imagePath != ""){
+          _checkValidCertImage(imagePath);
+        }else{
+          if(context.mounted) UiUtils.closeLoadingPop(context);
         }
-
-        await _checkValidCertImage(imagePath);
       }else{
         if(context.mounted) UiUtils.closeLoadingPop(context);
       }
@@ -730,90 +773,145 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   }
   Future<void> _checkValidCertImage(String imagePath) async {
     try{
+      CommonUtils.flutterToast("신분증을 인식중입니다..");
       await CLOVAController.uploadImageToCLOVA(imagePath, (isSuccess, map) async {
-        UiUtils.closeLoadingPop(context);
         if(map != null){
           if(isSuccess){
-            String croppedImagePath = await CommonUtils.makeMaskingImageAndGetPath(imagePath, map!);
+            CommonUtils.flutterToast("인식된 신분증을\n마스킹 중입니다..");
+            String croppedImagePath = await CommonUtils.makeMaskingImageAndGetPath(imagePath, map);
             if(croppedImagePath != ""){
-              setState(() {
-                MyData.idNumber = map['personalNum'][0]["text"];
+              CommonUtils.flutterToast("신분증 진위확인 중입니다..");
+              MyData.idNumber = map['personalNum'][0]["formatted"]["value"];
+              CommonUtils.log("i", "id : ${MyData.idNumber}");
+              if(map['id_type'] == "dl"){
+                CommonUtils.log("i", "dl : infos\n${map["code"][0]["formatted"]["value"]}${map["num"][0]["formatted"]["value"]}");
+                String licenseNum = map["num"][0]["formatted"]["value"];
+                Map<String, dynamic> inputJson = {
+                  "ownerNm": MyData.name,
+                  "juminNo": MyData.birth,
+                  "licence01": licenseNum.split("-")[0],
+                  "licence02": licenseNum.split("-")[1],
+                  "licence03": licenseNum.split("-")[2],
+                  "licence04": licenseNum.split("-")[3],
+                  "serialNo": map["code"][0]["formatted"]["value"]
+                };
                 _setConfirmedToDocItemByViewId(currentViewId, true);
-                pickedFilePath = croppedImagePath;
-              });
+                Map<String, dynamic> resultMap = {
+                  "resultValue" : croppedImagePath
+                };
+                _setResultToListById(cameraId, resultMap);
+                setState(() {
+                  pickedFilePath = croppedImagePath;
+                });
+                /*
+                HyphenController.callHyphenApiForCert(HyphenApis.driveIdCert, inputJson, (isSuccessToCertId){
+                  UiUtils.closeLoadingPop(context);
+                  if(isSuccessToCertId){
+                    _setConfirmedToDocItemByViewId(currentViewId, true);
+                    Map<String, dynamic> resultMap = {
+                      "resultValue" : croppedImagePath
+                    };
+                    _setResultToListById(cameraId, resultMap);
+                    setState(() {
+                      pickedFilePath = croppedImagePath;
+                    });
+                  }else{
+                    _setConfirmedToDocItemByViewId(currentViewId, false);
+                    setState(() {
+                      pickedFilePath = "";
+                    });
+                  }
+                });
+
+                 */
+              }else{
+                CommonUtils.log("i", "ic : infos\n${map["issueDate"][0]["formatted"]["year"]}${map["issueDate"][0]["formatted"]["month"]}${map["issueDate"][0]["formatted"]["day"]}");
+                Map<String, dynamic> inputJson = {
+                  "ownerNm": MyData.name,
+                  "juminNo": MyData.idNumber.replaceAll("-", ""),
+                  "issueDt": "${map["issueDate"][0]["formatted"]["year"]}${map["issueDate"][0]["formatted"]["month"]}${map["issueDate"][0]["formatted"]["day"]}"
+                };
+                _setConfirmedToDocItemByViewId(currentViewId, true);
+                Map<String, dynamic> resultMap = {
+                  "resultValue" : croppedImagePath
+                };
+                _setResultToListById(cameraId, resultMap);
+                setState(() {
+                  pickedFilePath = croppedImagePath;
+                });
+                /*
+                HyphenController.callHyphenApiForCert(HyphenApis.idCert, inputJson, (isSuccessToCertId){
+                  UiUtils.closeLoadingPop(context);
+                  if(isSuccessToCertId){
+                    _setConfirmedToDocItemByViewId(currentViewId, true);
+                    Map<String, dynamic> resultMap = {
+                      "resultValue" : croppedImagePath
+                    };
+                    _setResultToListById(cameraId, resultMap);
+                    setState(() {
+                      pickedFilePath = croppedImagePath;
+                    });
+                  }else{
+                    _setConfirmedToDocItemByViewId(currentViewId, false);
+                    setState(() {
+                      pickedFilePath = "";
+                    });
+                  }
+                });
+
+                 */
+              }
             }else{
               // failed to masking
+              if(context.mounted) UiUtils.closeLoadingPop(context);
+              _setConfirmedToDocItemByViewId(currentViewId, false);
+              setState(() {
+                pickedFilePath = "";
+              });
               CommonUtils.flutterToast("마스킹 중\n에러가 발생했습니다.");
             }
           }else{
             // failed to check clova ocr
+            UiUtils.closeLoadingPop(context);
+            _setConfirmedToDocItemByViewId(currentViewId, false);
+            setState(() {
+              pickedFilePath = "";
+            });
             CommonUtils.flutterToast("신분증 확인 중\n에러가 발생했습니다.");
           }
         }else{
+          UiUtils.closeLoadingPop(context);
+          _setConfirmedToDocItemByViewId(currentViewId, false);
+          setState(() {
+            pickedFilePath = "";
+          });
           CommonUtils.flutterToast("신분증을 확인할 수 없습니다.");
         }
       });
     }catch(error){
       UiUtils.closeLoadingPop(context);
+      _setConfirmedToDocItemByViewId(currentViewId, false);
+      setState(() {
+        pickedFilePath = "";
+      });
       CommonUtils.log("i", "tage image error : $error");
       CommonUtils.flutterToast("사진을 가져오는 중\n에러가 발생했습니다.");
     }
   }
   Future<void> _uploadToServer(String croppedImagePath) async {
     try{
-      UiUtils.showLoadingPop(context);
       await AwsController.uploadImageToAWS(croppedImagePath, (isSuccessToSave, resultUrl) async {
-        UiUtils.closeLoadingPop(context);
         if(isSuccessToSave){
-          _setConfirmedToDocItemByViewId(currentViewId, true);
+
         }else{
           // failed to aws s3 save
-          _setConfirmedToDocItemByViewId(currentViewId, false);
           CommonUtils.flutterToast("사진을 저장하는 중\n에러가 발생했습니다.");
         }
       });
     }catch(error){
-      UiUtils.closeLoadingPop(context);
-      _setConfirmedToDocItemByViewId(currentViewId, false);
       CommonUtils.log("i", "tage image error : $error");
       CommonUtils.flutterToast("사진을 처리하는 중\n에러가 발생했습니다.");
     }
-  }
-  Widget _makeRePickImageWidget(BuildContext thisContext, StateSetter thisSetState){
-    return Material(child: Container(color: ColorStyles.upFinWhite,
-        child: Column(children: [
-          UiUtils.getMarginBox(0, 5.h),
-          Row(mainAxisAlignment: MainAxisAlignment.start,children: [
-            UiUtils.getTextWithFixedScale("신분증 타입을 변경하면", 16.sp, FontWeight.w800, ColorStyles.upFinBlack, TextAlign.start, null)
-          ]),
-          Row(mainAxisAlignment: MainAxisAlignment.start,children: [
-            UiUtils.getTextWithFixedScale("다시 촬영하셔야 합니다.", 16.sp, FontWeight.w800, ColorStyles.upFinBlack, TextAlign.start, null)
-          ]),
-          Row(mainAxisAlignment: MainAxisAlignment.start,children: [
-            UiUtils.getTextWithFixedScale("그래도 진행 하시겠습니까?", 16.sp, FontWeight.w800, ColorStyles.upFinBlack, TextAlign.start, null)
-          ]),
-          UiUtils.getMarginBox(0, 5.h),
-          UiUtils.getTextButtonBox(90.w, "예, 다시촬영 할게요", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
-            Navigator.pop(thisContext);
-            setState(() {
-              if(_isDocItemConfirmedByViewId(currentViewId)){
-                _setConfirmedToDocItemByViewId(currentViewId, false);
-                pickedFilePath = "";
-              }
-
-              if(isDriveCardForImageType){
-                isDriveCardForImageType = false;
-              }else{
-                isDriveCardForImageType = true;
-              }
-            });
-          }),
-          UiUtils.getMarginBox(0, 0.5.h),
-          UiUtils.getTextButtonBox(90.w, "취소할게요", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinRealGray, () {
-            Navigator.pop(thisContext);
-          })
-        ])
-    ));
   }
   /// camera for id check view end
 
@@ -936,14 +1034,23 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                     CommonUtils.flutterToast("$subTitle에서 서류를 가져왔습니다");
                     for(var each in resultApiInfoDataList!){
                       CommonUtils.log("i", "${each.apiId}\n${each.resultFullMap}");
+                      Map<String, dynamic> resultMap = {
+                        "resultValue" : each.resultFullMap
+                      };
+                      _setResultToListById(each.apiId, resultMap);
+
                     }
                     setState(() {
-                      _setConfirmedToDocItemByViewId(currentViewId, true);
+                      for(int i = 0 ; i < gov24Count ; i++){
+                        _setConfirmedToDocItemByViewId(currentViewId+i, true);
+                      }
                     });
                   }else{
                     CommonUtils.log("i", "call fail");
                     setState(() {
-                      _setConfirmedToDocItemByViewId(currentViewId, false);
+                      for(int i = 0 ; i < gov24Count ; i++){
+                        _setConfirmedToDocItemByViewId(currentViewId+i, false);
+                      }
                     });
                   }
                 });
@@ -965,7 +1072,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale(title2, 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale(title3, 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 1.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("$subTitle에서 해당 서류들을 가져옵니다.", 14.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("$subTitle에서 해당 서류들을 가져옵니다.", 12.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: docsWidgetList)),
       UiUtils.getMarginBox(0, 5.h),
@@ -1091,14 +1198,22 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                     CommonUtils.flutterToast("$subTitle에서 서류를 가져왔습니다");
                     for(var each in resultApiInfoDataList!){
                       CommonUtils.log("i", "${each.apiId}\n${each.resultFullMap}");
+                      Map<String, dynamic> resultMap = {
+                        "resultValue" : each.resultFullMap
+                      };
+                      _setResultToListById(each.apiId, resultMap);
                     }
                     setState(() {
-                      _setConfirmedToDocItemByViewId(currentViewId, true);
+                      for(int i = 0 ; i < nhisCount ; i++){
+                        _setConfirmedToDocItemByViewId(currentViewId+i, true);
+                      }
                     });
                   }else{
                     CommonUtils.log("i", "call fail");
                     setState(() {
-                      _setConfirmedToDocItemByViewId(currentViewId, false);
+                      for(int i = 0 ; i < nhisCount ; i++){
+                        _setConfirmedToDocItemByViewId(currentViewId+i, false);
+                      }
                     });
                   }
                 });
@@ -1125,7 +1240,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale(title2, 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale(title3, 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 1.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("$subTitle에서 해당 서류들을 가져옵니다.", 14.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("$subTitle에서 해당 서류들을 가져옵니다.", 12.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: docsWidgetList)),
       UiUtils.getMarginBox(0, 5.h),
@@ -1245,14 +1360,22 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                     CommonUtils.flutterToast("$subTitle에서 서류를 가져왔습니다");
                     for(var each in resultApiInfoDataList!){
                       CommonUtils.log("i", "${each.apiId}\n${each.resultFullMap}");
+                      Map<String, dynamic> resultMap = {
+                        "resultValue" : each.resultFullMap
+                      };
+                      _setResultToListById(each.apiId, resultMap);
                     }
                     setState(() {
-                      _setConfirmedToDocItemByViewId(currentViewId, true);
+                      for(int i = 0 ; i < ntsCount ; i++){
+                        _setConfirmedToDocItemByViewId(currentViewId+i, true);
+                      }
                     });
                   }else{
                     CommonUtils.log("i", "call fail");
                     setState(() {
-                      _setConfirmedToDocItemByViewId(currentViewId, false);
+                      for(int i = 0 ; i < ntsCount ; i++){
+                        _setConfirmedToDocItemByViewId(currentViewId+i, false);
+                      }
                     });
                   }
                 });
@@ -1279,7 +1402,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale(title2, 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale(title3, 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 1.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("$subTitle에서 해당 서류들을 가져옵니다.", 14.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("$subTitle에서 해당 서류들을 가져옵니다.", 12.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: docsWidgetList)),
       UiUtils.getMarginBox(0, 5.h),
@@ -1294,6 +1417,45 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     ]);
   }
   /// nts(id:14) view end
+
+  /// nice key cert web view
+  Widget _getNiceKeyCertView(){
+    return UiUtils.getRowColumnWithAlignCenter([
+      SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+          backInputView();
+        }),
+      ])),
+      UiUtils.getMarginBox(0, 3.h),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("고객님의 민감한 정보를", 20.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("보호하기 위해", 20.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("NICE신용평가 기관을 통해", 20.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("Safe-Key를 생성하세요.", 20.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      UiUtils.getMarginBox(0, 15.h),
+      UiUtils.getExpandedScrollView(Axis.vertical, Container(child: UiUtils.getImage(30.w, 30.w, Image.asset('assets/images/deutsche_bank_icon.png')))),
+      UiUtils.getMarginBox(0, 5.h),
+      UiUtils.getTextButtonBox(90.w, _isDocItemConfirmedByViewId(currentViewId)? "다음" : "Safe-Key 만들기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+        if(_isDocItemConfirmedByViewId(currentViewId)){
+          nextInputView();
+        }else{
+          Map<String, String> urlInfoMap = {
+            "url" : "${LogfinController.niceUrl}/${MyData.customerUidForNiceCert}?checklist=1"
+          };
+          bool isSuccess = false;
+          var result = await CommonUtils.moveToWithResult(context, AppView.webView.value, urlInfoMap);
+          if(result != null){
+            isSuccess = result as bool;
+            if(isSuccess){
+              CommonUtils.log("i", "success returned");
+              _setConfirmedToDocItemByViewId(currentViewId, true);
+              nextInputView();
+            }
+          }
+        }
+      })
+    ]);
+  }
+  /// nice key cert web view end
 
   /// last view
   Widget _getLastView(){
@@ -1334,7 +1496,19 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
   /// finish view
   Widget _getFinishConfirmView(){
-    CommonUtils.log("i", "view id : ${_getIdFromListByViewId(currentViewId)}");
+    for(var each in addedDocsList){
+      Map<String, dynamic> resultMap = each["result"];
+      CommonUtils.log("i", "finish check\n"
+          "view_id:${each["view_id"]}\n"
+          "id:${each["id"]}\n"
+          "name:${each["name"]}\n"
+          "is_confirmed:${each["is_confirmed"]}\n"
+          "is_docs:${each["is_docs"]}\n"
+          "docs_type:${each["docs_type"]}\n"
+          "result:${resultMap.isEmpty? "" : each["result"]["resultValue"]}\n"
+      );
+    }
+
     List<Widget> introWidgetList = [];
     for(int i = 0 ; i < addedDocsList.length-1 ; i++){
       Key key = UniqueKey();
@@ -1362,7 +1536,33 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: introWidgetList)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+        List<dynamic> docResultList = [];
+        for(var each in addedDocsList){
+          if(each["is_docs"]){
+            Map<String, dynamic> eachMap = {
+              "pr_document_id" : each["id"],
+              "response_data" : each["result"]["resultValue"]
+            };
+            docResultList.add(eachMap);
+          }
+        }
+        String address = _getResultFromListById(addressId)["resultValue"];
+        Map<String, dynamic> applyInputMap = {
+          "offer_id": MyData.selectedPrInfoData!.productOfferId,
+          "offer_rid": MyData.selectedPrInfoData!.productOfferRid,
+          "address": address,
+          "contact_no1": MyData.phoneNumber.substring(0,3),
+          "contact_no2": MyData.phoneNumber.substring(3,7),
+          "contact_no3": MyData.phoneNumber.substring(7),
+          "jumin_no1": MyData.idNumber.split("-")[0],
+          "jumin_no2": MyData.idNumber.split("-")[1],
+          "memo": '모바일 신청 메모테스트',
+          "documents": docResultList
+        };
 
+        LogfinController.callLogfinApi(LogfinApis.applyProduct, applyInputMap, (isSuccess, outputJson){
+
+        });
       })
     ]);
   }
@@ -1390,10 +1590,14 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getNhisView());
       }else if(_getIdFromListByViewId(currentViewId) == 14){
         view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getNtsView());
+      }else if(_getIdFromListByViewId(currentViewId) == niceId){
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getNiceKeyCertView());
       }else if(_getIdFromListByViewId(currentViewId) == lastId){
         view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getLastView());
-      }else {
+      }else if(currentViewId == finishedViewId){
         view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getFinishConfirmView());
+      }else{
+        view = Container();
       }
     }
 

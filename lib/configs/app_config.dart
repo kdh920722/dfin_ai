@@ -45,11 +45,16 @@ class Config{
       final ref = FirebaseDatabase.instance.ref();
       final snapshot = await ref.child('UPFIN/APP_STATE').get();
       if (snapshot.exists) {
+        int androidState = 99;
+        int iosState = 99;
         for(var each in snapshot.children){
           switch(each.key){
-            case "open_state" : appState = int.parse(each.value.toString());
+            case "android_open_state" : androidState = int.parse(each.value.toString());
+            case "ios_open_state" : iosState = int.parse(each.value.toString());
           }
         }
+        appState = isAndroid? androidState : iosState;
+
         callback(true);
       } else {
         callback(false);

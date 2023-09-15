@@ -183,7 +183,7 @@ class AppDetailPrViewState extends State<AppDetailPrView> with WidgetsBindingObs
       Config.deppLinkInfo == "" ? UiUtils.getMarginBox(0, 7.h) : UiUtils.getMarginBox(0, 10.h),
       SizedBox(width: 95.w, child: UiUtils.getTextWithFixedScale(MyData.selectedPrInfoData!.productCompanyName, 20.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 0.5.h),
-      UiUtils.getTextWithFixedScale(MyData.selectedPrInfoData!.productName, 16.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null),
+      SizedBox(width: 95.w, child: UiUtils.getTextWithFixedScale(MyData.selectedPrInfoData!.productName, 16.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 2.h),
       UiUtils.getExpandedScrollView(Axis.vertical, SizedBox(width: 95.w, child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
         SizedBox(width: 95.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [

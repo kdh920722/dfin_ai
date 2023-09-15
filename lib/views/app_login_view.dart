@@ -4,6 +4,7 @@ import 'package:upfin/controllers/aws_controller.dart';
 import 'package:upfin/controllers/clova_controller.dart';
 import 'package:upfin/controllers/get_controller.dart';
 import 'package:flutter/material.dart';
+import 'package:upfin/controllers/hyphen_controller.dart';
 import 'package:upfin/controllers/iamport_controller.dart';
 import 'package:upfin/controllers/juso_controller.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
@@ -30,8 +31,6 @@ class AppLoginView extends StatefulWidget{
 
 class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
   final ScrollController _scrollController = ScrollController();
-  final int necessaryCount = 8;
-  int necessaryLoadCount = 0;
   final _formKey = GlobalKey<FormState>();
   final _emailTextController = TextEditingController();
   final _pwdTextController = TextEditingController();
@@ -102,7 +101,6 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     // init
     await FireBaseController.initFcm((bool isSuccess, String fcmToken){
       if(isSuccess){
-        GetController.to.updatePercent(10);
         CommonUtils.log("i", "firebase credential : ${FireBaseController.userCredential.toString()}");
       }else{
         CommonUtils.flutterToast("firebase init 에러가 발생했습니다.");
@@ -114,7 +112,6 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     // init
     await Config.initAppState((bool isSuccess){
       if(isSuccess){
-        GetController.to.updatePercent(10);
         CommonUtils.log("i", "app state : ${Config.appState}");
       }else{
         CommonUtils.flutterToast("에러가 발생했습니다.");
@@ -127,10 +124,9 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     await GptController.initGPT((bool isSuccess){
       if(isSuccess){
         GetController.to.updatePercent(10);
-        necessaryLoadCount++;
         CommonUtils.log("i", "gpt key : ${GptController.gptApiKey}");
 
-        if(necessaryLoadCount == necessaryCount){
+        if(GetController.to.loadingPercent.value == 100){
           setState(() {
             Config.isControllerLoadFinished = true;
           });
@@ -148,11 +144,10 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     // init
     await CodeFController.initAccessToken((bool isSuccess){
       if(isSuccess){
-        GetController.to.updatePercent(10);
-        necessaryLoadCount++;
+        GetController.to.updatePercent(20);
         CommonUtils.log("i", "codef token : ${CodeFController.token}");
-
-        if(necessaryLoadCount == necessaryCount){
+        CommonUtils.log("i", "percent : ${GetController.to.loadingPercent.value}");
+        if(GetController.to.loadingPercent.value == 100){
           setState(() {
             Config.isControllerLoadFinished = true;
           });
@@ -168,10 +163,9 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     await JusoController.initJuso((bool isSuccess){
       if(isSuccess){
         GetController.to.updatePercent(10);
-        necessaryLoadCount++;
         CommonUtils.log("i", "juso token : ${JusoController.confirmKey}");
-
-        if(necessaryLoadCount == necessaryCount){
+        CommonUtils.log("i", "percent : ${GetController.to.loadingPercent.value}");
+        if(GetController.to.loadingPercent.value == 100){
           setState(() {
             Config.isControllerLoadFinished = true;
           });
@@ -187,10 +181,9 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     await CLOVAController.initCLOVA((bool isSuccess){
       if(isSuccess){
         GetController.to.updatePercent(10);
-        necessaryLoadCount++;
         CommonUtils.log("i", "clova url : ${CLOVAController.apiURL}\nclova secretKey : ${CLOVAController.secretKey}");
-
-        if(necessaryLoadCount == necessaryCount){
+        CommonUtils.log("i", "percent : ${GetController.to.loadingPercent.value}");
+        if(GetController.to.loadingPercent.value == 100){
           setState(() {
             Config.isControllerLoadFinished = true;
           });
@@ -206,10 +199,9 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     await AwsController.initAWS((bool isSuccess){
       if(isSuccess){
         GetController.to.updatePercent(10);
-        necessaryLoadCount++;
         CommonUtils.log("i", "aws keys : ${AwsController.awsAccessKey}\naws secretKey : ${AwsController.awsSecretKey}");
-
-        if(necessaryLoadCount == necessaryCount){
+        CommonUtils.log("i", "percent : ${GetController.to.loadingPercent.value}");
+        if(GetController.to.loadingPercent.value == 100){
           setState(() {
             Config.isControllerLoadFinished = true;
           });
@@ -225,10 +217,12 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     await LogfinController.initLogfin((bool isSuccess){
       if(isSuccess){
         GetController.to.updatePercent(10);
-        necessaryLoadCount++;
-        CommonUtils.log("i", "logfin url : ${LogfinController.url}\nlogfin headerKey : ${LogfinController.userToken}");
+        CommonUtils.log("i", "logfin url : ${LogfinController.url}");
+        CommonUtils.log("i", "percent : ${GetController.to.loadingPercent.value}");
 
-        if(necessaryLoadCount == necessaryCount){
+        DateTime thirtyMinutesLater = CommonUtils.getCurrentLocalTime().add(const Duration(minutes: 30));
+        SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceValidDateKey, CommonUtils.convertTimeToString(thirtyMinutesLater));
+        if(GetController.to.loadingPercent.value == 100){
           setState(() {
             Config.isControllerLoadFinished = true;
           });
@@ -239,15 +233,32 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     });
   }
 
+  Future<void> _initHyphen() async {
+    // init
+    await HyphenController.initHyphen((bool isSuccess){
+      if(isSuccess){
+        GetController.to.updatePercent(10);
+        CommonUtils.log("i", "hyphen url : ${HyphenController.url}\hyphen hKey : ${HyphenController.hkey}");
+        CommonUtils.log("i", "percent : ${GetController.to.loadingPercent.value}");
+        if(GetController.to.loadingPercent.value == 100){
+          setState(() {
+            Config.isControllerLoadFinished = true;
+          });
+        }
+      }else{
+        CommonUtils.flutterToast("hyphen init 에러가 발생했습니다.");
+      }
+    });
+  }
+
   Future<void> _initIamport() async {
     // init
     await IamportController.initIamport((bool isSuccess){
       if(isSuccess){
         GetController.to.updatePercent(10);
-        necessaryLoadCount++;
         CommonUtils.log("i", "iamport user_code : ${IamportController.iamportUserCode}");
-
-        if(necessaryLoadCount == necessaryCount){
+        CommonUtils.log("i", "percent : ${GetController.to.loadingPercent.value}");
+        if(GetController.to.loadingPercent.value == 100){
           setState(() {
             Config.isControllerLoadFinished = true;
           });
@@ -262,11 +273,10 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     // init
     await SnsLoginController.initKakao((bool isSuccess){
       if(isSuccess){
-        GetController.to.updatePercent(10);
-        necessaryLoadCount++;
+        GetController.to.updatePercent(20);
         CommonUtils.log("i", "kakao key : ${SnsLoginController.kakaoKey}");
-
-        if(necessaryLoadCount == necessaryCount){
+        CommonUtils.log("i", "percent : ${GetController.to.loadingPercent.value}");
+        if(GetController.to.loadingPercent.value == 100){
           setState(() {
             Config.isControllerLoadFinished = true;
           });
@@ -281,17 +291,9 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     // init
     await SharedPreferenceController.initSharedPreference((bool isSuccess){
       if(isSuccess){
-        GetController.to.updatePercent(10);
-        necessaryLoadCount++;
         CommonUtils.log("i","sharedPreference init.");
         _emailTextController.text = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceIdKey);
         _pwdTextController.text = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferencePwKey);
-
-        if(necessaryLoadCount == necessaryCount){
-          setState(() {
-            Config.isControllerLoadFinished = true;
-          });
-        }
       }else{
         CommonUtils.flutterToast("sharedPreference init 에러가 발생했습니다.");
       }
@@ -361,8 +363,8 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
   Future<void> _initAtFirst() async {
     Config.isAppMainInit = true;
     Get.put(GetController());
-    await _initFirebase(); // count
-    await _initAppState(); // count
+    await _initFirebase();
+    await _initAppState();
     if(Config.appState == Config.appOpenState){
       await _initDeepLink().then((value){
         if(value != null){
@@ -372,15 +374,16 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
         }
       });
       await _requestPermissions();
-      await _initSharedPreference(); // count
+      await _initSharedPreference();
       //_initGPT(); // count
-      _initCodeF(); // count
-      _initJuso(); // count
-      _initCLOVA(); // count
-      _initAWS(); // count
-      _initLogfin(); // count
-      _initIamport(); // count
-      _initKakao(); // count
+      _initCodeF(); // count aa
+      _initJuso(); // count aa
+      _initCLOVA(); // count aa
+      _initAWS(); // count aa
+      _initLogfin(); // count aa
+      _initHyphen(); // count
+      _initIamport(); // count aa
+      _initKakao(); // count aa
     }else{
       if(context.mounted){
         UiUtils.showSlideMenu(context, SlideType.bottomToTop, false, 100.w, 30.h, 0.5, (context, setState){

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
+import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/utils/common_utils.dart';
 import '../utils/ui_utils.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -14,7 +15,7 @@ class AppWebViewState extends State<AppWebView> {
   static Uri myUrl = Uri.parse("");
 
   Widget _getWebView(BuildContext context, StateSetter setState, String url){
-    myUrl = Uri.parse("https://$url");
+    myUrl = Uri.parse("$url");
     return SafeArea(
         child : Scaffold(
           backgroundColor: Colors.black,
@@ -49,7 +50,12 @@ class AppWebViewState extends State<AppWebView> {
               ),
               onLoadStop: (InAppWebViewController controller, uri) {
                 CommonUtils.log("i", "UPDATED URL CHECK : $uri");
-                setState(() {myUrl = uri!;});
+                setState(() {
+                  myUrl = uri!;
+                  if(LogfinController.niceSuccessUrl == myUrl.toString()){
+                    Navigator.pop(context, true);
+                  }
+                });
               },
               onCreateWindow: (controller, createWindowRequest) async{
                 showDialog(
