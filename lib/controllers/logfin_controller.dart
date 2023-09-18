@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:http/http.dart' as http;
 import 'package:upfin/datas/accident_info_data.dart';
+import 'package:upfin/datas/loan_info_data.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/datas/pr_docs_info_data.dart';
 import 'dart:convert';
@@ -224,32 +225,58 @@ class LogfinController {
               }
             }
 
-            MyData.printData();
-
             // 2) 사건정보 조회
             callLogfinApi(LogfinApis.getAccidentInfo, <String, dynamic>{}, (isSuccessToGetAccidentInfo, accidentInfoOutputJson){
               if(isSuccessToGetAccidentInfo){
                 List<dynamic> accidentList = accidentInfoOutputJson!["accidents"];
                 if(accidentList.isEmpty){
                   // 3-1) 사건정보 없으면 한도금리 조회를 위한 조건 입력 화면으로 이동(한도금리 조회 시, 사건정보 저장)
+                  MyData.printData();
                   MyData.initSearchViewFromMainView = false;
                   callback(true, AppView.searchAccidentView);
                 }else{
                   // 3-2) 사건정보 있으면 사건정보 이력화면(메인 뷰)로 이동(저장한걸 보여줌)
                   String bankName = "";
-                  for(var each in accidentList){
-                    var dataResult = jsonDecode(each["req_data"].toString())["pr"];
+                  for(var eachAccident in accidentList){
+                    var dataResult = jsonDecode(eachAccident["req_data"].toString())["pr"];
                     for(var eachBank in bankList){
                       if(eachBank.split("@")[1].substring(1) == dataResult["bankCode"]){
                         bankName = eachBank.split("@")[0];
                       }
                     }
-                    MyData.addToAccidentInfoList(AccidentInfoData(each["uid"], dataResult["caseNumberYear"], dataResult["caseNumberType"], dataResult["caseNumberNumber"],
+                    MyData.addToAccidentInfoList(AccidentInfoData(eachAccident["uid"], dataResult["caseNumberYear"], dataResult["caseNumberType"], dataResult["caseNumberNumber"],
                         dataResult["court_name"], bankName, dataResult["bankCode"], dataResult["account"]));
                   }
 
-                  MyData.initSearchViewFromMainView = true;
-                  callback(true, AppView.mainView);
+                  callLogfinApi(LogfinApis.getLoansInfo, <String, dynamic>{}, (isSuccessToGetLoansInfo, loansInfoOutputJson){
+                    if(isSuccessToGetLoansInfo){
+                      List<dynamic> loansList = loansInfoOutputJson!["loans"];
+                      if(loansList.isNotEmpty){
+                        for(var eachLoans in loansList){
+                          MyData.addToLoanInfoList(LoanInfoData(eachLoans["accident_uid"], eachLoans["uid"],
+                              int.parse(eachLoans["selected_offer_id"].toString()), int.parse(eachLoans["current_status"].toString()), int.parse(eachLoans["loan_type_id"].toString()),
+                              eachLoans["created_at"], eachLoans["updated_at"], eachLoans["amount"].toString()));
+                        }
+                      }
+
+                      MyData.printData();
+
+                      for(var eachLoans in MyData.getLoanInfoList()){
+                        CommonUtils.log("i", eachLoans.printLoanData());
+                        /*
+                        callLogfinApi(LogfinApis.getLoansDetailInfo, <String, dynamic>{"loan_uid" : eachLoans.loanUid}, (isSuccessToGetLoanDetail, detailedLoanInfoOutputJson){
+
+                        });
+                        */
+                      }
+
+                      MyData.initSearchViewFromMainView = true;
+                      callback(true, AppView.mainView);
+                    }else{
+                      CommonUtils.flutterToast(loansInfoOutputJson!["error"]);
+                      callback(false, null);
+                    }
+                  });
                 }
               }else{
                 CommonUtils.flutterToast(accidentInfoOutputJson!["error"]);

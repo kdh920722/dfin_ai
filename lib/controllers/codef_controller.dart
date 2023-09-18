@@ -180,11 +180,13 @@ class CodeFController{
               if(resultMap != null){
                 if(resultMap["result_code"] == errorCodeKey){
                   each.isResultSuccess = false;
-                  CommonUtils.log("i", "error api : ${each.api.value}");
+                  CommonUtils.log("e", "error api : ${each.api.value}");
                   String errorMsg = resultMap["result_msg"];
                   if(errorMsg == "성공"){
                     errorMsg = "조회결과가 없습니다.";
                   }
+                  each.resultMap = null;
+                  each.resultFullMap = fullMap;
                   //CommonUtils.flutterToast(errorMsg.replaceAll("+", " "));
                 }else{
                   each.isResultSuccess = true;
@@ -200,8 +202,17 @@ class CodeFController{
               callCount++;
               if(callCount == apiInfoDataList.length){
                 GetController.to.updateWait(false);
+                isSetAuthPopOn = false;
                 Navigator.of(context).pop();
                 callback(true, apiInfoDataList);
+              }
+            }else{
+              callCount++;
+              if(callCount == apiInfoDataList.length){
+                each.isResultSuccess = false;
+                each.resultMap = null;
+                each.resultFullMap = fullMap;
+                callback(false, apiInfoDataList);
               }
             }
           });
@@ -213,11 +224,13 @@ class CodeFController{
               if(resultMap != null){
                 if(resultMap["result_code"] == errorCodeKey){
                   each.isResultSuccess = false;
-                  CommonUtils.log("i", "error api : ${each.api.value}");
+                  CommonUtils.log("e", "error api : ${each.api.value}");
                   String errorMsg = resultMap["result_msg"];
                   if(errorMsg == "성공"){
                     errorMsg = "조회결과가 없습니다.";
                   }
+                  each.resultMap = null;
+                  each.resultFullMap = fullMap;
                   //CommonUtils.flutterToast(errorMsg.replaceAll("+", " "));
                 }else{
                   each.isResultSuccess = true;
@@ -232,8 +245,11 @@ class CodeFController{
 
               callCount++;
               if(callCount == apiInfoDataList.length){
-                GetController.to.updateWait(false);
-                Navigator.of(context).pop();
+                if(isSetAuthPopOn){
+                  GetController.to.updateWait(false);
+                  isSetAuthPopOn = false;
+                  Navigator.of(context).pop();
+                }
                 callback(true, apiInfoDataList);
               }
             }
@@ -253,11 +269,13 @@ class CodeFController{
             if(resultMap != null){
               if(resultMap["result_code"] == errorCodeKey){
                 each.isResultSuccess = false;
-                CommonUtils.log("i", "error api : ${each.api.value}");
+                CommonUtils.log("e", "error api : ${each.api.value}");
                 String errorMsg = resultMap["result_msg"];
                 if(errorMsg == "성공"){
                   errorMsg = "조회결과가 없습니다.";
                 }
+                each.resultMap = null;
+                each.resultFullMap = fullMap;
                 //CommonUtils.flutterToast(errorMsg.replaceAll("+", " "));
               }else{
                 each.isResultSuccess = true;
@@ -305,7 +323,7 @@ class CodeFController{
                 if(certType == 1){
                   launchUrl(Uri.parse("kakaotalk://launch"));
                 }
-
+                isSetAuthPopOn = true;
                 _setAuthPop(context, representApi, certType, resultMap,(isAuthSuccess, authMap, authListMap, fullMap) async {
                   if(isAuthSuccess){
                     if(authMap != null){
@@ -318,6 +336,8 @@ class CodeFController{
               });
             }
           }
+        }else{
+          callback(false, null, null, fullResultMap);
         }
       }
     });
@@ -357,6 +377,7 @@ class CodeFController{
     return resultMap;
   }
 
+  static bool isSetAuthPopOn = false;
   static Future<void> _setAuthPop(BuildContext context, Apis apiInfo, int certType, Map<String, dynamic> resultInputMap,
       Function(bool isSuccess, Map<String,dynamic>? resultMap, List<dynamic>? resultListMap, Map<String,dynamic>? fullResultMap) callback) async {
     String certName = "인증을 완료하셨다면,";
@@ -420,7 +441,7 @@ class CodeFController{
         "personalInfoChangeYN": "0",
         "pastAddrChangeYN": "0",
         "nameRelationYN": "1",
-        "militaryServiceYN": "0",
+        "militaryServiceYN": "1",
         "overseasKoreansIDYN": "0",
         "isIdentityViewYn": "0",
         "originDataYN": "0",
@@ -473,29 +494,6 @@ class CodeFController{
       };
 
       return inputJsonForlocalTaxPaymentCert;
-    }else if(api == Apis.ntsTaxCert){
-      Map<String, dynamic> inputJsonForNtsCert = {
-        "organization": "0001",
-        "loginType": "6",
-        "id": randomKey,
-        "loginIdentity": identity,
-        "userName": name,
-        "loginTypeLevel": loginCertType,
-        "phoneNo": phoneNo,
-        "loginBirthDate": "",
-        "isIdentityViewYN": "1",
-        "isAddrViewYn": "0",
-        "proofType": "B0006",
-        "submitTargets": "04",
-        "applicationType": "01",
-        "clientTypeLevel": "1",
-        "identity": identity,
-        "birthDate": "",
-        "telecom": telecom,
-        "originDataYN": "0"
-      };
-
-      return inputJsonForNtsCert;
     }else if(api == Apis.nhisIdentifyConfirmation){
       Map<String, dynamic> inputJsonForNhisIdConfirm = {
         "organization": "0002",
@@ -507,15 +505,18 @@ class CodeFController{
         "useType": "0",
         "isIdentityViewYN": "0",
         "id": randomKey,
-        "originDataYN": "0 ",
+        "originDataYN": "0",
         "telecom": telecom
       };
 
       return inputJsonForNhisIdConfirm;
-    }else{
+    }else if(api == Apis.nhisConfirmation){
       DateTime now = CommonUtils.getCurrentLocalTime();
-      String endDate = CommonUtils.convertTimeToString(now);
-      String startDate = CommonUtils.convertTimeToString(now.subtract(const Duration(days: 365)));
+      DateTime lastYearDate =DateTime(now.year - 1, 12, 31); // 7월 1일 이후이면 작년 날짜
+      String lastYearString = CommonUtils.convertTimeToString(lastYearDate).substring(0,4);
+
+      String startDate = "${lastYearString}01";
+      String endDate = "${lastYearString}12";
       CommonUtils.log("i", "$startDate ~ $endDate");
 
       Map<String, dynamic> inputJsonForNhisConfirm = {
@@ -526,15 +527,104 @@ class CodeFController{
         "loginTypeLevel": loginCertType,
         "userName": name,
         "phoneNo": phoneNo,
-        "startDate": startDate.substring(0,6),
-        "endDate": endDate.substring(0,6),
+        "startDate": startDate,
+        "endDate": endDate,
         "usePurposes": "2",
         "useType": "01",
-        "originDataYN": "",
+        "originDataYN": "0",
         "telecom": telecom
       };
 
       return inputJsonForNhisConfirm;
+    }else if(api == Apis.ntsProofCorporateRegistration){
+      Map<String, dynamic> inputJsonForNtsPoorfCorporateRegistration = {
+        "organization": "0001",
+        "loginType": "6",
+        "loginIdentity": identity,
+        "userName": name,
+        "id": randomKey,
+        "usePurposes": "01",
+        "submitTargets": "01",
+        "isIdentityViewYN": "0",
+        "originDataYN": "0",
+        "applicationType": "01",
+        "identity": "",
+        "loginTypeLevel": loginCertType,
+        "phoneNo": phoneNo,
+        "telecom": telecom
+      };
+
+      return inputJsonForNtsPoorfCorporateRegistration;
+    }else if(api == Apis.ntsProofIssue){
+      DateTime now = CommonUtils.getCurrentLocalTime();
+      DateTime julyFirst = DateTime(now.year, 7, 1);
+
+      DateTime lastYearDate = now.isBefore(julyFirst)
+          ? DateTime(now.year - 2, 12, 31) // 7월 1일 이전이면 재작년 날짜
+          : DateTime(now.year - 1, 12, 31); // 7월 1일 이후이면 작년 날짜
+
+      String lastYearString = CommonUtils.convertTimeToString(lastYearDate).substring(0,4);
+      CommonUtils.log("i", "last year : $lastYearString");
+
+      Map<String, dynamic> inputJsonForNtsPoorfIssue = {
+        "organization": "0001",
+        "loginType": "6",
+        "loginTypeLevel": loginCertType,
+        "loginIdentity": identity,
+        "userName": name,
+        "phoneNo": phoneNo,
+        "birthDate": "",
+        "id": randomKey,
+        "startYear": lastYearString,
+        "endYear": lastYearString,
+        "usePurposes": "01",
+        "submitTargets": "02",
+        "isIdentityViewYn": "1",
+        "isAddrViewYn": "0",
+        "originDataYN": "0",
+        "applicationType": "",
+        "clientTypeLevel": "",
+        "identity": "",
+        "sourceIncomeYN": "",
+        "telecom": telecom
+      };
+
+      return inputJsonForNtsPoorfIssue;
+    }else{
+      DateTime now = CommonUtils.getCurrentLocalTime();
+      DateTime julyFirst = DateTime(now.year, 7, 1);
+      bool isBeforeJuly = now.isBefore(julyFirst);
+      DateTime lastYearDate = isBeforeJuly
+          ? DateTime(now.year - 2, 12, 31) // 7월 1일 이전이면 재작년 날짜
+          : DateTime(now.year - 1, 12, 31); // 7월 1일 이후이면 작년 날짜
+
+      String lastYearString = CommonUtils.convertTimeToString(lastYearDate).substring(0,4);
+      String startDate = isBeforeJuly? "${lastYearString}07" : "${lastYearString}01";
+      String endDate = isBeforeJuly? "${CommonUtils.convertTimeToString(DateTime(now.year - 1, 12, 31)).substring(0,4)}06" : "${lastYearString}12";
+      CommonUtils.log("i", "last year : $lastYearString $startDate $endDate");
+
+      Map<String, dynamic> inputJsonForNtsProofAdditionalTasStandard = {
+        "organization": "0001",
+        "loginType": "6",
+        "loginTypeLevel": loginCertType,
+        "loginIdentity": identity,
+        "userName": name,
+        "phoneNo": phoneNo,
+        "manageNo": "",
+        "managePassword": "",
+        "id": randomKey,
+        "startDate": startDate,
+        "endDate": endDate,
+        "isIdentityViewYN": "0",
+        "usePurposes": "04",
+        "submitTargets": "01",
+        "identity": "*************",
+        "applicationType": "01",
+        "originDataYN": "0",
+        "telecom": telecom
+      };
+
+      return inputJsonForNtsProofAdditionalTasStandard;
     }
   }
 
@@ -600,7 +690,7 @@ enum Apis {
   addressApi1, addressApi2, carRegistration1Api, carRegistration2Api, bankruptApi1, bankruptApi2,
   gov24residentRegistrationAbstract, gov24residentRegistrationCopy, gov24localTaxPaymentCert,
   nhisIdentifyConfirmation, nhisConfirmation,
-  ntsTaxCert,
+  ntsProofCorporateRegistration, ntsProofIssue, ntsProofAdditionalTasStandard
 }
 
 extension ApisExtension on Apis {
@@ -628,8 +718,12 @@ extension ApisExtension on Apis {
         return '/v1/kr/public/pp/nhis-join/identify-confirmation';
       case Apis.nhisConfirmation:
         return '/v1/kr/public/pp/nhis-insurance-payment/confirmation';
-      case Apis.ntsTaxCert:
-        return '/v1/kr/public/nt/proof-issue/tax-cert-all';
+      case Apis.ntsProofCorporateRegistration:
+        return '/v1/kr/public/nt/proof-issue/corporate-registration';
+      case Apis.ntsProofIssue:
+        return '/v1/kr/public/nt/proof-issue/proof-income';
+      case Apis.ntsProofAdditionalTasStandard:
+        return '/v1/kr/public/nt/proof-issue/additional-tax-standard';
       default:
         throw Exception('Unknown host value');
     }

@@ -13,6 +13,7 @@ class AwsController {
   static String awsRegion = "";
   static String bucket = "";
   static String maskedImageDir = "";
+  static String uploadedUrl = "";
 
   static Future<void> initAWS(Function(bool isSuccess) callback) async{
     try{
@@ -26,6 +27,7 @@ class AwsController {
             case "region" : awsRegion = each.value.toString();
             case "bucket" : bucket = each.value.toString();
             case "masked_img_dir" : maskedImageDir = each.value.toString();
+            case "uploaded_url" : uploadedUrl = each.value.toString();
           }
         }
         callback(true);

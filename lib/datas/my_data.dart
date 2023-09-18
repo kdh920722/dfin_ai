@@ -1,4 +1,5 @@
 import 'package:upfin/datas/accident_info_data.dart';
+import 'package:upfin/datas/loan_info_data.dart';
 import 'package:upfin/datas/pr_docs_info_data.dart';
 import 'package:upfin/datas/pr_info_data.dart';
 import '../utils/common_utils.dart';
@@ -53,6 +54,26 @@ class MyData {
   }
   static void clearAccidentInfoList(){
     _accidentInfoList.clear();
+  }
+
+  static final List<LoanInfoData> _loanInfoList = [];
+  static List<LoanInfoData> getLoanInfoList(){
+    return _loanInfoList;
+  }
+  static void addToLoanInfoList(LoanInfoData loanInfoData){
+    bool isAdded = false;
+    for(var each in _loanInfoList){
+      if(each.loanUid == loanInfoData.loanUid){
+        isAdded = true;
+      }
+    }
+
+    if(!isAdded){
+      _loanInfoList.add(loanInfoData);
+    }
+  }
+  static void clearLoanInfoList(){
+    _loanInfoList.clear();
   }
 
   //12:신분증  13:개인회생사건조회  1:주민등록등본  2:주민등록초본  3:건강보험자격득실확인서  4:건강보험납부확인서
@@ -116,6 +137,7 @@ class MyData {
         "customerUidForNiceCert:$customerUidForNiceCert\n"
         "jobInfo:$jobInfo\n"
         "accidentInfoList: ${_accidentInfoList.length}\n"
+        "loanInfoList: ${_loanInfoList.length}\n"
         "prInfoList: ${_prInfoList.length}\n"
         "prDocsInfoList: ${_prDocsInfoList.length}\n"
         "selectedPrInfoData: $selectedPrInfoDataCheck\n"
@@ -139,6 +161,7 @@ class MyData {
     isMaleFromPhoneCert = false;
     jobInfo = "";
     clearAccidentInfoList();
+    clearLoanInfoList();
     clearPrInfoList();
     clearPrDocsInfoList();
     selectedPrInfoData = null;

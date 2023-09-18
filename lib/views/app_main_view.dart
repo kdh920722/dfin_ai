@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:upfin/configs/app_config.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
+import 'package:upfin/datas/loan_info_data.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import '../utils/common_utils.dart';
@@ -54,39 +55,88 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   Widget _getMyView(){
     List<Widget> accidentWidgetList = [];
     for(var each in MyData.getAccidentInfoList()){
+      bool isLoanHere = false;
+      String accidentUid = "";
+      String loanUid = "";
+      List<LoanInfoData> loanInfoList = [];
+      LoanInfoData? loanInfoData;
+      for(var eachLoan in MyData.getLoanInfoList()){
+        if(eachLoan.accidentUid == each.accidentUid){
+          loanInfoList.add(eachLoan);
+        }
+      }
+      loanInfoList.sort((a,b) => DateTime.parse(a.updatedDate).compareTo(DateTime.parse(b.updatedDate)));
+      for(var eachLoan in loanInfoList){
+        CommonUtils.log("i", eachLoan.printLoanData());
+      }
+
       accidentWidgetList.add(
-          UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinRealWhite, ColorStyles.upFinGray,
-              Row(mainAxisSize: MainAxisSize.max, children: [
-                Expanded(flex: 15, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  UiUtils.getTextWithFixedScale(each.accidentCourtName, 14.sp, FontWeight.w600, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1),
-                  UiUtils.getMarginBox(0, 0.7.h),
-                  UiUtils.getTextWithFixedScale("${each.accidentCaseNumberYear}${each.accidentCaseNumberType}${each.accidentCaseNumberNumber}", 16.sp,
-                      FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null),
-                  UiUtils.getMarginBox(0, 0.7.h),
-                  UiUtils.getTextWithFixedScale("${each.accidentBankName} ${each.accidentBankAccount}", 10.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, 1),
-                ])),
-                Expanded(flex: 1, child: Icon(Icons.arrow_forward_ios_rounded, color: ColorStyles.upFinDarkGray, size: 5.5.w)),
-              ]), () {
-                UiUtils.showLoadingPop(context);
-                LogfinController.getPrList("${each.accidentCaseNumberYear}${each.accidentCaseNumberType}${each.accidentCaseNumberNumber}", (isSuccessToGetOffers, _){
-                  UiUtils.closeLoadingPop(context);
-                  if(isSuccessToGetOffers){
-                    CommonUtils.moveTo(context, AppView.resultPrView.value, null);
-                  }else{
-                    // findUidInAccidentInfoList 실패
-                    CommonUtils.flutterToast("에러가 발생했습니다.");
-                  }
-                });
-              })
+          Column(children: [
+            UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinRealWhite, ColorStyles.upFinGray,
+                Row(mainAxisSize: MainAxisSize.max, children: [
+                  Expanded(flex: 15, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    UiUtils.getTextWithFixedScale(each.accidentCourtName, 14.sp, FontWeight.w600, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1),
+                    UiUtils.getMarginBox(0, 0.7.h),
+                    UiUtils.getTextWithFixedScale("${each.accidentCaseNumberYear}${each.accidentCaseNumberType}${each.accidentCaseNumberNumber}", 16.sp,
+                        FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null),
+                    UiUtils.getMarginBox(0, 0.7.h),
+                    UiUtils.getTextWithFixedScale("${each.accidentBankName} ${each.accidentBankAccount}", 10.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, 1),
+                  ])),
+                  Expanded(flex: 1, child: Icon(Icons.arrow_forward_ios_rounded, color: ColorStyles.upFinDarkGray, size: 5.5.w)),
+                ]), () {
+                  UiUtils.showLoadingPop(context);
+                  LogfinController.getPrList("${each.accidentCaseNumberYear}${each.accidentCaseNumberType}${each.accidentCaseNumberNumber}", (isSuccessToGetOffers, _){
+                    UiUtils.closeLoadingPop(context);
+                    if(isSuccessToGetOffers){
+                      CommonUtils.moveTo(context, AppView.resultPrView.value, null);
+                    }else{
+                      // findUidInAccidentInfoList 실패
+                      CommonUtils.flutterToast("에러가 발생했습니다.");
+                    }
+                  });
+                }),
+            UiUtils.getMarginBox(0, 0.5.h),
+            UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
+                Row(mainAxisSize: MainAxisSize.max, children: [
+                  Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    SizedBox(width: 50.w, child: Row(children: [
+                      UiUtils.getImage(10.w, 10.w, Image.asset('assets/images/apple_icon.png')),
+                      UiUtils.getMarginBox(2.w, 0),
+                      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        UiUtils.getTextWithFixedScale("OK 저축은행", 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null),
+                        UiUtils.getMarginBox(0, 0.1.h),
+                        UiUtils.getTextWithFixedScale("특별론 대출상품1", 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null),
+                      ])
+                    ])),
+                    UiUtils.getMarginBox(0, 2.h),
+                    UiUtils.getTextWithFixedScale("신청일자 : 2023.08.29", 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null),
+                    UiUtils.getMarginBox(0, 2.h),
+                    UiUtils.getTextWithFixedScale("심사 대기중", 20.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
+                  ])
+                ]), () {})
+          ])
       );
-      accidentWidgetList.add(UiUtils.getMarginBox(0, 1.5.h));
+      accidentWidgetList.add(UiUtils.getMarginBox(0, 3.h));
     }
 
     return Column(children: [
-      Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 5.h, bottom: 1.h),
-          child: Row(mainAxisSize: MainAxisSize.max, crossAxisAlignment: CrossAxisAlignment.end, children: [
+      Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 4.h, bottom: 1.h),
+          child: Row(mainAxisSize: MainAxisSize.max, crossAxisAlignment: CrossAxisAlignment.center, children: [
             UiUtils.getTextWithFixedScale("${MyData.name}님, ", 24.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1),
             UiUtils.getTextWithFixedScale("안녕하세요!", 20.sp, FontWeight.w400, ColorStyles.upFinBlack, TextAlign.start, 1),
+            const Spacer(flex: 2),
+            UiUtils.getIconButton(Icons.refresh, 8.w, ColorStyles.upFinSky, () {
+              UiUtils.showLoadingPop(context);
+              MyData.resetMyData();
+              LogfinController.getMainOrSearchView(context, (isSuccessToGetViewInfo, viewInfo){
+                UiUtils.closeLoadingPop(context);
+                if(isSuccessToGetViewInfo){
+                  setState(() {});
+                }else{
+                  CommonUtils.flutterToast("화면을 불러오는데 실패했습니다.\n다시 실행해주세요.");
+                }
+              });
+            })
       ])),
       Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 2.h, bottom: 1.h), child: Row(mainAxisSize: MainAxisSize.max, children: [
         UiUtils.getTextWithFixedScale("사건기록", 18.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1),
