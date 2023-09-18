@@ -134,6 +134,7 @@ class MyData {
         "email:$email\n"
         "birth:$birth\n"
         "isMale:$isMale\n"
+        "idNumber:$idNumber\n"
         "customerUidForNiceCert:$customerUidForNiceCert\n"
         "jobInfo:$jobInfo\n"
         "accidentInfoList: ${_accidentInfoList.length}\n"
@@ -151,6 +152,7 @@ class MyData {
     email = "";
     birth = "";
     isMale = false;
+    idNumber = "";
     initSearchViewFromMainView = false;
     isSnsLogin = false;
     nameFromSns = "";
