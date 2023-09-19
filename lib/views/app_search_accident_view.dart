@@ -259,11 +259,11 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
 
     if(MyData.initSearchViewFromMainView){
       return UiUtils.getRowColumnWithAlignCenter([
-        SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        MyData.initSearchViewFromMainView ? SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () {
             Navigator.pop(context);
           }),
-        ])),
+        ])) : Container(),
         UiUtils.getMarginBox(0, 3.h),
         SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("개인회생 사건정보", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
         SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("법원을 선택해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
@@ -692,7 +692,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
     confirmDataList.add("${MyData.birth.substring(0,4)}년 $birthMonth월 $birthDay일");
     confirmDataList.add("[법원]  ${selectedCourtInfo.split("@")[0]}");
     confirmDataList.add("[사건번호]  $selectedAccidentInfo");
-    confirmDataList.add("[환급계]  ${selectedBankCodeInfo.split("@")[0]} $selectedBankAccountInfo");
+    confirmDataList.add("[환급계좌]  ${selectedBankCodeInfo.split("@")[0]} $selectedBankAccountInfo");
     confirmDataList.add("[기대출]  ${selectedPreLoanCountInfo.split("@")[0]}");
     if(selectedPreLoanPriceInfo != "0"){
       confirmDataList.add("[인가후 대출금액]  ${CommonUtils.getPriceFormattedString(double.parse(selectedPreLoanPriceInfo))}");
@@ -774,36 +774,14 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         UiUtils.showLoadingPop(context);
         LogfinController.callLogfinApi(LogfinApis.prSearch, inputJsonForTest, (isSuccess, outputJson){
           if(isSuccess){
-            // 1) 한도금리 목록 조회 후 사건정보 재조회
-            LogfinController.callLogfinApi(LogfinApis.getAccidentInfo, <String, dynamic>{}, (isSuccessToGetAccidentInfo, accidentInfoOutputJson){
-              if(isSuccessToGetAccidentInfo){
-                List<dynamic> accidentList = accidentInfoOutputJson!["accidents"];
-                String bankName = "";
-                for(var each in accidentList){
-                  var dataResult = jsonDecode(each["req_data"].toString())["pr"];
-                  for(var eachBank in LogfinController.bankList){
-                    if(eachBank.split("@")[1].substring(1) == dataResult["bankCode"]){
-                      bankName = eachBank.split("@")[0];
-                    }
-                  }
-                  MyData.addToAccidentInfoList(AccidentInfoData(each["uid"], dataResult["caseNumberYear"], dataResult["caseNumberType"], dataResult["caseNumberNumber"],
-                      dataResult["court_name"], bankName, dataResult["bankCode"], dataResult["account"]));
-                }
-
-                // 2) 한도금리 목록 화면으로 이동(저장한 accident uid로 한도금리 조회한 뒤 저장하여 보여줌)
-                LogfinController.getPrList(caseYear+caseType+caseNumber, (isSuccessToGetOffers, _){
-                  UiUtils.closeLoadingPop(context);
-                  if(isSuccessToGetOffers){
-                    CommonUtils.moveWithReplacementTo(context, AppView.resultPrView.value, null);
-                  }else{
-                    // findUidInAccidentInfoList 실패
-                    CommonUtils.flutterToast("에러가 발생했습니다.");
-                  }
-                });
+            // 메인뷰로 이동
+            MyData.resetMyData();
+            LogfinController.getMainOrSearchView((isSuccessToGetViewInfo, viewInfo){
+              UiUtils.closeLoadingPop(context);
+              if(isSuccessToGetViewInfo){
+                CommonUtils.moveWithReplacementTo(context, viewInfo!.value, null);
               }else{
-                // getAccidentInfo 실패
-                UiUtils.closeLoadingPop(context);
-                CommonUtils.flutterToast(accidentInfoOutputJson!["error"]);
+                CommonUtils.flutterToast("화면을 불러오는데 실패했습니다.\n다시 실행해주세요.");
               }
             });
           }else{

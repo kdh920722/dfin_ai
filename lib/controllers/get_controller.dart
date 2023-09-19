@@ -1,3 +1,4 @@
+import '../datas/loan_info_data.dart';
 import '../utils/common_utils.dart';
 import 'package:get/get.dart';
 

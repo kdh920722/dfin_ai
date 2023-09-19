@@ -262,6 +262,10 @@ class CommonUtils {
     await Navigator.of(fromContext).pushNamedAndRemoveUntil(toRoute, (route) => false, arguments: arguments);
   }
 
+  static void moveWithUntil(BuildContext fromContext, String toRoute) {
+    Navigator.popUntil(fromContext, ModalRoute.withName(toRoute));
+  }
+
   static Future<void> moveWithReplacementTo(BuildContext fromContext, String toRoute, Object? arguments) async {
     await Navigator.of(fromContext).pushReplacementNamed(toRoute, arguments: arguments);
   }

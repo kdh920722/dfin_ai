@@ -6,6 +6,7 @@ import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/datas/pr_info_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import '../utils/common_utils.dart';
+import '../utils/pop_result.dart';
 import '../utils/ui_utils.dart';
 
 class AppResultPrView extends StatefulWidget{
@@ -123,7 +124,11 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                   UiUtils.closeLoadingPop(context);
                   if(isSuccessToSearchDocs){
                     MyData.selectedPrInfoData = each;
-                    CommonUtils.moveTo(context, AppView.detailPrView.value, null);
+                    Navigator.of(context).pushNamed(AppView.detailPrView.value).then((results) {
+                      if (results is PopWithResults) {
+                        Navigator.of(context).pop(results);
+                      }
+                    });
                   }
                 });
           })
@@ -139,13 +144,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
     Widget view = Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: EdgeInsets.all(5.w), child: Column(children: [
       SizedBox(width: 95.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () {
-          // 한도금리 목록 화면에서 뒤로가기 누르면 pop하여 메인뷰로 이동 *(if initSearchViewFromMainView == true)
-          // 한도금리 목록 화면에서 뒤로가기 누르면 이미 사전에 AccidentInfoList 가져왔기에 메인뷰로 replace *(if initSearchViewFromMainView == false)
-          if(MyData.initSearchViewFromMainView){
-            Navigator.pop(context);
-          }else{
-            CommonUtils.moveWithReplacementTo(context, AppView.mainView.value, null);
-          }
+          Navigator.pop(context);
         }),
       ])),
       UiUtils.getMarginBox(0, 3.h),

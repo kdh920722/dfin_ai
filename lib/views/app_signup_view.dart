@@ -247,10 +247,10 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                 // 캐시 데이터 저장
                 SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceIdKey, _emailTextController.text.trim());
                 SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferencePwKey, _pwdTextController.text.trim());
-                await LogfinController.getMainOrSearchView(context, (isSuccessToGetViewInfo, viewInfo){
+                await LogfinController.getMainOrSearchView((isSuccessToGetViewInfo, viewInfo){
                   UiUtils.closeLoadingPop(thisContext);
                   if(isSuccessToGetViewInfo){
-                    CommonUtils.moveWithRemoveUntil(context, viewInfo!.value, null);
+                    CommonUtils.moveWithReplacementTo(context, viewInfo!.value, null);
                   }
                 });
               }else{
@@ -295,60 +295,57 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
               }
             }),
             UiUtils.getMarginBox(0, 2.h),
-            SizedBox(width: 90.w, child: Row(children: [
-              UiUtils.getTextFormField(60.w, TextStyles.upFinTextFormFieldTextStyle, _phoneNumberTextFocus, _phoneNumberTextController, TextInputType.phone, false,
-                  UiUtils.getInputDecoration("휴대전화 번호", 14.sp, "", 0.sp), (text) { }, (value){
-                if(value != null && value.trim().isEmpty){
-                  return "휴대전화 번호를 입력하세요.";
-                }else{
-                  return null;
-                }
-              }),
-              UiUtils.getMarginBox(1.w, 0),
-              Obx(()=>!GetController.to.isConfirmed.value?
-              Expanded(child: UiUtils.getTextCustomPaddingButtonBox(30.w, "본인인증", TextStyles.upFinSmallButtonTextStyle,
-                  EdgeInsets.only(left: 0.1.w, right: 0.1.w, top: 7.w, bottom: 7.w), ColorStyles.upFinButtonBlue, () async {
-                    CommonUtils.hideKeyBoard();
-                    if(_phoneNumberTextController.text.trim() != ""){
-                      Map<String, String> inputJson = {
-                        "carrier": "",
-                        "name" : _nameTextController.text.trim(),
-                        "phone" : _phoneNumberTextController.text.trim()
-                      };
-                      var result = await CommonUtils.moveToWithResult(context, AppView.certificationView.value, inputJson);
-                      if(result != null){
-                        isConfirmed = true;
-                        CommonUtils.flutterToast("인증 성공");
+            UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _phoneNumberTextFocus, _phoneNumberTextController, TextInputType.phone, false,
+                UiUtils.getInputDecoration("휴대전화 번호", 14.sp, "", 0.sp), (text) { }, (value){
+                  if(value != null && value.trim().isEmpty){
+                    return "휴대전화 번호를 입력하세요.";
+                  }else{
+                    return null;
+                  }
+                }),
+            UiUtils.getMarginBox(0, 1.h),
+            Obx(()=>!GetController.to.isConfirmed.value?
+            UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinTextAndBorderBlue,
+                UiUtils.getTextWithFixedScale("본인인증", 13.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, null), () async {
+                  CommonUtils.hideKeyBoard();
+                  if(_phoneNumberTextController.text.trim() != ""){
+                    Map<String, String> inputJson = {
+                      "carrier": "",
+                      "name" : _nameTextController.text.trim(),
+                      "phone" : _phoneNumberTextController.text.trim()
+                    };
+                    var result = await CommonUtils.moveToWithResult(context, AppView.certificationView.value, inputJson);
+                    if(result != null){
+                      isConfirmed = true;
+                      CommonUtils.flutterToast("인증 성공");
 
-                        Map<String, dynamic> resultMap = result as Map<String, dynamic>;
-                        for(var each in IamportController.carrierList){
-                          if(each.split("@")[0] == resultMap["carrier"]){
-                            MyData.telecomTypeFromPhoneCert = each.split("@")[1];
-                          }
+                      Map<String, dynamic> resultMap = result as Map<String, dynamic>;
+                      for(var each in IamportController.carrierList){
+                        if(each.split("@")[0] == resultMap["carrier"]){
+                          MyData.telecomTypeFromPhoneCert = each.split("@")[1];
                         }
-
-                        if(resultMap["gender"] == "male"){
-                          MyData.isMaleFromPhoneCert = true;
-                        }else{
-                          MyData.isMaleFromPhoneCert = false;
-                        }
-                        MyData.birthFromPhoneCert = (resultMap["birth"] as String).split("-")[0]+(resultMap["birth"] as String).split("-")[1]+(resultMap["birth"] as String).split("-")[2];
-
-                        confirmedName = _nameTextController.text.trim();
-                        confirmedPhone = _phoneNumberTextController.text.trim();
-                      }else{
-                        isConfirmed = false;
-                        CommonUtils.flutterToast("본인인증에 실패했습니다.");
                       }
 
-                      GetController.to.updateConfirmed(isConfirmed);
+                      if(resultMap["gender"] == "male"){
+                        MyData.isMaleFromPhoneCert = true;
+                      }else{
+                        MyData.isMaleFromPhoneCert = false;
+                      }
+                      MyData.birthFromPhoneCert = (resultMap["birth"] as String).split("-")[0]+(resultMap["birth"] as String).split("-")[1]+(resultMap["birth"] as String).split("-")[2];
+
+                      confirmedName = _nameTextController.text.trim();
+                      confirmedPhone = _phoneNumberTextController.text.trim();
                     }else{
-                      CommonUtils.flutterToast("휴대전화 번호를 입력하세요.");
+                      isConfirmed = false;
+                      CommonUtils.flutterToast("본인인증에 실패했습니다.");
                     }
-                  },1)) :
-              Expanded(child: UiUtils.getTextCustomPaddingButtonBox(30.w, "인증완료", TextStyles.upFinSmallButtonTextStyle,
-                  EdgeInsets.only(left: 0.1.w, right: 0.1.w, top: 7.w, bottom: 7.w), ColorStyles.upFinGray, () {},1)))
-            ])),
+
+                    GetController.to.updateConfirmed(isConfirmed);
+                  }else{
+                    CommonUtils.flutterToast("휴대전화 번호를 입력하세요.");
+                  }
+                }) : Container()
+            ),
             UiUtils.getMarginBox(0, 2.h),
             Obx(()=>GetController.to.isConfirmed.value?
               UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _pwdTextFocus, _pwdTextController, TextInputType.visiblePassword, true,

@@ -5,6 +5,7 @@ import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import 'package:upfin/styles/TextStyles.dart';
 import '../utils/common_utils.dart';
+import '../utils/pop_result.dart';
 import '../utils/ui_utils.dart';
 
 class AppDetailPrView extends StatefulWidget{
@@ -166,7 +167,13 @@ class AppDetailPrViewState extends State<AppDetailPrView> with WidgetsBindingObs
           ])),
           UiUtils.getMarginBox(0, 3.h),
           item1Agreed!? UiUtils.getTextButtonBox(90.w, "동의하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
-            CommonUtils.moveTo(context, AppView.applyPrView.value, null);
+            Navigator.pop(thisContext);
+            Navigator.of(context).pushNamed(AppView.applyPrView.value).then((results) {
+              if (results is PopWithResults) {
+                Navigator.of(context).pop(results);
+              }
+            });
+
           }) : UiUtils.getTextButtonBox(90.w, "동의하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinGray, () {})
         ])
     ));

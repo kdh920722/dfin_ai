@@ -146,6 +146,7 @@ class MyData {
   }
 
   static void resetMyData(){
+    CommonUtils.log("i", "Clear my data");
     name = "";
     phoneNumber = "";
     telecom = "";

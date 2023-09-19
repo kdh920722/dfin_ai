@@ -16,6 +16,7 @@ import '../controllers/clova_controller.dart';
 import '../controllers/codef_controller.dart';
 import '../datas/api_info_data.dart';
 import '../utils/common_utils.dart';
+import '../utils/pop_result.dart';
 import '../utils/ui_utils.dart';
 import 'dart:io';
 
@@ -421,25 +422,29 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
   Future<void> backInputView() async {
     if(isInputValid){
+      CommonUtils.log("i", "current id : $currentViewId");
       bool isPrevDocs = false;
       String prevDocsType = "";
       int prevDocsCount = 0;
+      int prevId = _getIdFromListByViewId(currentViewId-1);
       for(var each in addedDocsList){
-        if(each["id"] == _getIdFromListByViewId(currentViewId-1) && each["is_docs"]){
+        if(each["id"] == prevId && each["is_docs"]){
+          CommonUtils.log("i", " is prev");
           isPrevDocs = true;
           prevDocsType = each["docs_type"];
           if(prevDocsType == "gov24") prevDocsCount = gov24Count;
           if(prevDocsType == "nhis") prevDocsCount = nhisCount;
           if(prevDocsType == "nts") prevDocsCount = ntsCount;
+
+          if(prevId == 1 || prevId == 2 || prevId == 15 || prevId == 3 || prevId == 4 || prevId == 6 || prevId == 10 || prevId == 11 ){
+            if(isPrevDocs){
+              currentViewId = currentViewId-prevDocsCount+1;
+            }
+          }
         }
       }
-      if(_getIdFromListByViewId(currentViewId) == 1 || _getIdFromListByViewId(currentViewId) == 2 || _getIdFromListByViewId(currentViewId) == 15
-          || _getIdFromListByViewId(currentViewId) == 3 || _getIdFromListByViewId(currentViewId) == 4
-          || _getIdFromListByViewId(currentViewId) == 6 || _getIdFromListByViewId(currentViewId) == 10 || _getIdFromListByViewId(currentViewId) == 11 ){
-        if(isPrevDocs){
-          currentViewId = currentViewId-prevDocsCount+1;
-        }
-      }
+
+      CommonUtils.log("i", "prev id : ${currentViewId-1}");
       isInputValid = false;
       _unFocusAllNodes();
       CommonUtils.hideKeyBoard();
@@ -453,6 +458,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
   Future<void> nextInputView() async {
     if(isInputValid){
+      CommonUtils.log("i", "current id : $currentViewId");
       if(_getIdFromListByViewId(currentViewId) == 1 || _getIdFromListByViewId(currentViewId) == 2 || _getIdFromListByViewId(currentViewId) == 15){
         if(gov24Count != 1){
           currentViewId = currentViewId+gov24Count-1;
@@ -466,7 +472,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           currentViewId = currentViewId+ntsCount-1;
         }
       }
-      CommonUtils.log("i", "$currentViewId $nhisCount");
+      CommonUtils.log("i", "next id : ${currentViewId+1}");
       isInputValid = false;
       _unFocusAllNodes();
       CommonUtils.hideKeyBoard();
@@ -1225,7 +1231,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             ]);
           });
         }else{
-          CommonUtils.log("i", "$currentViewId");
           nextInputView();
         }
 
@@ -1716,6 +1721,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               Map<String, dynamic> applyInputMap = {
                 "offer_id": MyData.selectedPrInfoData!.productOfferId,
                 "offer_rid": MyData.selectedPrInfoData!.productOfferRid,
+                "lender_pr_id": MyData.selectedPrInfoData!.productOfferLenderPrId,
                 "address": address,
                 "contact_no1": MyData.phoneNumber.substring(0,3),
                 "contact_no2": MyData.phoneNumber.substring(3,7),
@@ -1729,7 +1735,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               LogfinController.callLogfinApi(LogfinApis.applyProduct, applyInputMap, (isSuccess, outputJson){
                 UiUtils.closeLoadingPop(context);
                 if(isSuccess){
-                  UiUtils.showSlideMenu(context, SlideType.bottomToTop, false, null, 25.h, 0.5, (context, setState){
+                  UiUtils.showSlideMenu(context, SlideType.bottomToTop, false, null, 25.h, 0.5, (slideContext, setState){
                     return Column(mainAxisAlignment: MainAxisAlignment.start, children:
                     [
                       UiUtils.getMarginBox(0, 3.h),
@@ -1742,13 +1748,21 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                             UiUtils.getTextWithFixedScale("확인", 15.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null), () {
                               UiUtils.showLoadingPop(context);
                               MyData.resetMyData();
-                              LogfinController.getMainOrSearchView(context, (isSuccessToGetViewInfo, viewInfo){
+                              LogfinController.getMainOrSearchView((isSuccessToGetViewInfo, viewInfo){
                                 UiUtils.closeLoadingPop(context);
+                                Navigator.pop(slideContext);
                                 if(isSuccessToGetViewInfo){
-                                  CommonUtils.moveWithRemoveUntil(context, AppView.mainView.value, null);
+                                  Navigator.of(context).pop(
+                                    PopWithResults(
+                                      fromPage: AppView.applyPrView.value,
+                                      toPage: AppView.mainView.value,
+                                      results: {"pop_result": "update"},
+                                    ),
+                                  );
                                 }else{
                                   CommonUtils.flutterToast("화면을 불러오는데 실패했습니다.\n다시 실행해주세요.");
                                 }
+
                               });
                             })
                       ])]);

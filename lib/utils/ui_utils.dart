@@ -60,12 +60,26 @@ class UiUtils {
     );
   }
 
+  static bool isTextOverflow(String text, TextStyle style, double maxWidth) {
+    final textPainter = TextPainter(
+      text: TextSpan(text: text, style: style),
+      textDirection: TextDirection.ltr,
+      maxLines: 1, // 최대 한 줄 텍스트로 제한
+    )..layout(maxWidth: maxWidth);
+
+    return textPainter.didExceedMaxLines;
+  }
+
   static Text getStyledTextWithFixedScale(String text, TextStyle textStyle, TextAlign? textAlign, int? textMaxLine){
     return Text(text, style: textStyle, textScaleFactor: 1.0, textAlign: textAlign, maxLines: textMaxLine);
   }
 
   static Text getTextWithFixedScale(String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign? textAlign, int? textMaxLine){
     return Text(text, style: TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor), textScaleFactor: 1.0, textAlign: textAlign, maxLines: textMaxLine);
+  }
+
+  static Text getTextWithFixedScaleAndOverFlow(String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign? textAlign, int? textMaxLine){
+    return Text(overflow: TextOverflow.ellipsis, text, style: TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor), textScaleFactor: 1.0, textAlign: textAlign, maxLines: textMaxLine);
   }
 
   static Widget getTextStyledButtonWithFixedScale(String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign? textAlign, int? textMaxLine, Function() onPressedCallback){
@@ -275,6 +289,23 @@ class UiUtils {
           )
       );
     }
+  }
+
+  static Widget getCountCircleBox(double circleBoxSize, int messageCount, double fontSize, FontWeight fontWeight, Color textColor, TextAlign textAlign, int textMaxLine){
+    return Stack(
+      alignment: Alignment.center,
+      children: [Container(
+          width: circleBoxSize,
+          height: circleBoxSize,
+          decoration: const BoxDecoration(
+            shape: BoxShape.circle,
+            color: ColorStyles.upFinRed, // 빨간색 배경
+          ),
+        ),
+        // 안읽은 메시지 숫자 텍스트
+        getTextWithFixedScale(messageCount.toString(), fontSize, fontWeight, textColor, textAlign, textMaxLine)
+      ],
+    );
   }
 
   static Widget getSizedScrollView(double? scrollWidth, double? scrollHeight, Axis scrollDir, Widget scrollChildView){

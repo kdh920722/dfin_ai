@@ -2,6 +2,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:http/http.dart' as http;
+import 'package:upfin/controllers/get_controller.dart';
 import 'package:upfin/datas/accident_info_data.dart';
 import 'package:upfin/datas/loan_info_data.dart';
 import 'package:upfin/datas/my_data.dart';
@@ -206,7 +207,7 @@ class LogfinController {
     }
   }
 
-  static Future<void> getMainOrSearchView(BuildContext context, Function(bool isSuccess, AppView? appView) callback) async {
+  static Future<void> getMainOrSearchView(Function(bool isSuccess, AppView? appView) callback) async {
     try{
       // 1) 유저정보 가져오기
       callLogfinApi(LogfinApis.getUserInfo, <String, dynamic>{}, (isSuccessToGetUserInfo, userInfoOutputJson){
@@ -217,12 +218,19 @@ class LogfinController {
             MyData.phoneNumber = userInfoOutputJson["user"]["contact_no"];
             MyData.telecom = userInfoOutputJson["user"]["telecom"];
             MyData.birth =  userInfoOutputJson["user"]["birthday"];
-            MyData.customerUidForNiceCert =  userInfoOutputJson["customer"]["uid"].toString();
-            MyData.idNumber =  userInfoOutputJson["customer"]["registration_no"].toString();
             MyData.isMale =  userInfoOutputJson["user"]["gender"] == "1"? true : false;
-            for(var each in jobList){
-              if(each.split("@")[1] == "1"){
-                MyData.jobInfo = each;
+            if(userInfoOutputJson.containsKey("customer")){
+              Map<String, dynamic> customerMap = userInfoOutputJson["customer"];
+              if(customerMap.containsKey("uid")) MyData.customerUidForNiceCert = customerMap["uid"].toString();
+              if(customerMap.containsKey("registration_no")) MyData.idNumber = customerMap["registration_no"].toString();
+              if(customerMap.containsKey("job_type_id")){
+
+                CommonUtils.log("i", "jobjobjobjob : ${customerMap["job_type_id"]}");
+                for(var each in jobList){
+                  if(each.split("@")[1] == customerMap["job_type_id"].toString()){
+                    MyData.jobInfo = each;
+                  }
+                }
               }
             }
 
@@ -253,7 +261,12 @@ class LogfinController {
                     if(isSuccessToGetLoansInfo){
                       List<dynamic> loansList = loansInfoOutputJson!["loans"];
                       if(loansList.isNotEmpty){
+                        CommonUtils.log("i", " loan list in!");
                         for(var eachLoans in loansList){
+                          CommonUtils.log("i", " loan ${eachLoans["accident_uid"]}\n${eachLoans["uid"]}\n"
+                              "${eachLoans["selected_offer_id"]}\n${eachLoans["current_status"]}\n"
+                              "${eachLoans["loan_type_id"]}\n${eachLoans["created_at"]}\n"
+                              "${eachLoans["updated_at"]}\n${eachLoans["amount"]}\n");
                           MyData.addToLoanInfoList(LoanInfoData(eachLoans["accident_uid"], eachLoans["uid"],
                               int.parse(eachLoans["selected_offer_id"].toString()), int.parse(eachLoans["current_status"].toString()), int.parse(eachLoans["loan_type_id"].toString()),
                               eachLoans["created_at"], eachLoans["updated_at"], eachLoans["amount"].toString()));
@@ -261,16 +274,6 @@ class LogfinController {
                       }
 
                       MyData.printData();
-
-                      for(var eachLoans in MyData.getLoanInfoList()){
-                        CommonUtils.log("i", eachLoans.printLoanData());
-                        /*
-                        callLogfinApi(LogfinApis.getLoansDetailInfo, <String, dynamic>{"loan_uid" : eachLoans.loanUid}, (isSuccessToGetLoanDetail, detailedLoanInfoOutputJson){
-
-                        });
-                        */
-                      }
-
                       MyData.initSearchViewFromMainView = true;
                       callback(true, AppView.mainView);
                     }else{
@@ -313,7 +316,7 @@ class LogfinController {
             List<dynamic> offerPrList = outputJsonForGetOffers["data"];
             for(var each in offerPrList){
               CommonUtils.log("i", "$each");
-              MyData.addToPrInfoList(PrInfoData(offerId, each["rid"], each["lender_name"], each["lender_id"].toString(),
+              MyData.addToPrInfoList(PrInfoData(offerId, each["rid"], each["lender_pr_id"].toString(), each["lender_name"], each["lender_id"].toString(),
                   each["product_name"], each["rid"], each["min_rate"].toString(), each["max_rate"].toString(),
                   each["limit"].toString(), "assets/images/deutsche_bank_icon.png", each["result"] as bool, each["msg"]));
             }

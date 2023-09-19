@@ -456,10 +456,10 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
                         SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceIdKey, _emailTextController.text.trim());
                         SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferencePwKey, _pwdTextController.text.trim());
 
-                        await LogfinController.getMainOrSearchView(context, (isSuccessToGetViewInfo, viewInfo){
+                        await LogfinController.getMainOrSearchView((isSuccessToGetViewInfo, viewInfo){
                           UiUtils.closeLoadingPop(context);
                           if(isSuccessToGetViewInfo){
-                            CommonUtils.moveWithRemoveUntil(context, viewInfo!.value, null);
+                            CommonUtils.moveTo(context, viewInfo!.value, null);
                           }
                         });
                       }else{
@@ -498,7 +498,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
                   if(isSuccessToLogin){
                     CommonUtils.flutterToast("환영합니다!");
                     UiUtils.showLoadingPop(context);
-                    await LogfinController.getMainOrSearchView(context, (isSuccessToGetViewInfo, viewInfo){
+                    await LogfinController.getMainOrSearchView((isSuccessToGetViewInfo, viewInfo){
                       UiUtils.closeLoadingPop(context);
                       if(isSuccessToGetViewInfo){
                         CommonUtils.moveTo(context, viewInfo!.value, null);
@@ -518,7 +518,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
                   if(isSuccessToLogin){
                     CommonUtils.flutterToast("환영합니다!");
                     UiUtils.showLoadingPop(context);
-                    await LogfinController.getMainOrSearchView(context, (isSuccessToGetViewInfo, viewInfo){
+                    await LogfinController.getMainOrSearchView((isSuccessToGetViewInfo, viewInfo){
                       UiUtils.closeLoadingPop(context);
                       if(isSuccessToGetViewInfo){
                         CommonUtils.moveTo(context, viewInfo!.value, null);
