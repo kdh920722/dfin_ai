@@ -9,6 +9,7 @@ class GetController extends GetxController {
   RxBool isConfirmed = false.obs;
   RxString preLoanPrice = "만원".obs;
   RxString wantLoanPrice = "만원".obs;
+  RxList<LoanInfoData> loanInfoDataList = <LoanInfoData>[].obs;
 
   @override
   void onInit() {
@@ -77,5 +78,9 @@ class GetController extends GetxController {
   }
   void resetPreLoanPrice() {
     preLoanPrice = "만원".obs;
+  }
+
+  void updateLoanInfoList(List<LoanInfoData> newList) {
+    loanInfoDataList.assignAll(newList);
   }
 }

@@ -1,5 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:get/get.dart';
 import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:http/http.dart' as http;
 import 'package:upfin/controllers/get_controller.dart';
@@ -271,6 +272,8 @@ class LogfinController {
                               int.parse(eachLoans["selected_offer_id"].toString()), int.parse(eachLoans["current_status"].toString()), int.parse(eachLoans["loan_type_id"].toString()),
                               eachLoans["created_at"], eachLoans["updated_at"], eachLoans["amount"].toString()));
                         }
+
+                        GetController.to.updateLoanInfoList(MyData.getLoanInfoList());
                       }
 
                       MyData.printData();

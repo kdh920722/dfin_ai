@@ -63,7 +63,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
       String loanUid = "";
       List<LoanInfoData> loanInfoList = [];
       LoanInfoData? loanInfoData;
-      for(var eachLoan in MyData.getLoanInfoList()){
+      for(var eachLoan in GetController.to.loanInfoDataList){
         if(eachLoan.accidentUid == each.accidentUid){
           loanInfoList.add(eachLoan);
         }
@@ -91,15 +91,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                   LogfinController.getPrList("${each.accidentCaseNumberYear}${each.accidentCaseNumberType}${each.accidentCaseNumberNumber}", (isSuccessToGetOffers, _){
                     UiUtils.closeLoadingPop(context);
                     if(isSuccessToGetOffers){
-                      Navigator.of(context).pushNamed(AppView.resultPrView.value).then((results) {
-                        if (results is PopWithResults) {
-                          PopWithResults popResult = results;
-                          Map<String, dynamic> resultMap = popResult.results;
-                          if(resultMap.containsKey("pop_result") && resultMap["pop_result"] == "update"){
-                            setState(() {});
-                          }
-                        }
-                      });
+                      CommonUtils.moveTo(context, AppView.resultPrView.value, null);
                     }else{
                       // findUidInAccidentInfoList 실패
                       CommonUtils.flutterToast("에러가 발생했습니다.");
@@ -144,7 +136,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               LogfinController.getMainOrSearchView((isSuccessToGetViewInfo, viewInfo){
                 UiUtils.closeLoadingPop(context);
                 if(isSuccessToGetViewInfo){
-                  setState(() {});
+                  //setState(() {});
                 }else{
                   CommonUtils.flutterToast("화면을 불러오는데 실패했습니다.\n다시 실행해주세요.");
                 }
@@ -216,7 +208,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   @override
   Widget build(BuildContext context) {
     Widget view = Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, child: Column(children: [
-      viewTypeId == 1? Expanded(child: _getMyView()) : viewTypeId == 2? Expanded(child: _getAiAdvisorView()) : Expanded(child: _getSettingView()),
+      viewTypeId == 1? Expanded(child: Obx(()=>_getMyView())) : viewTypeId == 2? Expanded(child: _getAiAdvisorView()) : Expanded(child: _getSettingView()),
       SizedBox(width: 100.w, height: 7.h, child: Row(mainAxisAlignment: MainAxisAlignment.center, mainAxisSize: MainAxisSize.max, children: [
         Container(width: 30.w, height: 7.h, color: ColorStyles.upFinWhiteSky,
             child: Center(child: UiUtils.getTextStyledButtonWithFixedScale("MY", 13.sp, viewTypeId == 1? FontWeight.w800 : FontWeight.w400,

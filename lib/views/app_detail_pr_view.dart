@@ -168,12 +168,7 @@ class AppDetailPrViewState extends State<AppDetailPrView> with WidgetsBindingObs
           UiUtils.getMarginBox(0, 3.h),
           item1Agreed!? UiUtils.getTextButtonBox(90.w, "동의하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
             Navigator.pop(thisContext);
-            Navigator.of(context).pushNamed(AppView.applyPrView.value).then((results) {
-              if (results is PopWithResults) {
-                Navigator.of(context).pop(results);
-              }
-            });
-
+            CommonUtils.moveTo(context, AppView.applyPrView.value, null);
           }) : UiUtils.getTextButtonBox(90.w, "동의하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinGray, () {})
         ])
     ));

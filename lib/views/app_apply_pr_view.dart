@@ -1752,13 +1752,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                                 UiUtils.closeLoadingPop(context);
                                 Navigator.pop(slideContext);
                                 if(isSuccessToGetViewInfo){
-                                  Navigator.of(context).pop(
-                                    PopWithResults(
-                                      fromPage: AppView.applyPrView.value,
-                                      toPage: AppView.mainView.value,
-                                      results: {"pop_result": "update"},
-                                    ),
-                                  );
+                                  CommonUtils.moveWithUntil(context, AppView.mainView.value);
                                 }else{
                                   CommonUtils.flutterToast("화면을 불러오는데 실패했습니다.\n다시 실행해주세요.");
                                 }

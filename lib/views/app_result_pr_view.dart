@@ -124,11 +124,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                   UiUtils.closeLoadingPop(context);
                   if(isSuccessToSearchDocs){
                     MyData.selectedPrInfoData = each;
-                    Navigator.of(context).pushNamed(AppView.detailPrView.value).then((results) {
-                      if (results is PopWithResults) {
-                        Navigator.of(context).pop(results);
-                      }
-                    });
+                    CommonUtils.moveTo(context, AppView.detailPrView.value, null);
                   }
                 });
           })
