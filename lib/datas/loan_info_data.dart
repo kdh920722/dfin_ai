@@ -1,17 +1,21 @@
 class LoanInfoData {
   String accidentUid;
   String loanUid;
-  int offerId;
-  int currentStatus;
-  int loanTypeId;
+  String lenderPrId;
+  String submitAmount;
+  String submitRate;
+  String companyName;
+  String productName;
+  String contactNo;
   String createdDate;
   String updatedDate;
-  String amount;
+  String statueId;
 
-  LoanInfoData(this.accidentUid, this.loanUid, this.offerId, this.currentStatus, this.loanTypeId, this.createdDate, this.updatedDate, this.amount);
+  LoanInfoData(this.accidentUid, this.loanUid, this.lenderPrId, this.submitAmount, this.submitRate,
+      this.companyName, this.productName,  this.contactNo, this.createdDate, this.updatedDate, this.statueId);
   String printLoanData(){
-    return "accidentUid: $accidentUid\nloanUid: $loanUid\nofferId: $offerId"
-        "\ncurrentStatus: $currentStatus\nloanTypeId: $loanTypeId\ncreatedDate: $createdDate"
-        "\nupdatedDate: $updatedDate\namount: $amount";
+    return "\naccidentUid: $accidentUid\nloanUid: $loanUid\nlenderPrId: $lenderPrId\nsubmitAmount: $submitAmount"
+        "\nsubmitRate: $submitRate\ncompanyName: $companyName\nproductName: $productName\ncompanyCallNum: $contactNo"
+        "\ncreatedDate: $createdDate\nupdatedDate: $updatedDate\nstatueId: $statueId";
   }
 }

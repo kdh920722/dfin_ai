@@ -8,7 +8,6 @@ import 'package:upfin/controllers/hyphen_controller.dart';
 import 'package:upfin/controllers/juso_controller.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/datas/my_data.dart';
-import 'package:upfin/datas/pr_info_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import 'package:upfin/styles/TextStyles.dart';
 import '../controllers/aws_controller.dart';
@@ -16,7 +15,6 @@ import '../controllers/clova_controller.dart';
 import '../controllers/codef_controller.dart';
 import '../datas/api_info_data.dart';
 import '../utils/common_utils.dart';
-import '../utils/pop_result.dart';
 import '../utils/ui_utils.dart';
 import 'dart:io';
 
@@ -95,54 +93,62 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   int ntsCount = 0;
   void _initDocsList(){
     int addedIndexId = addedInfoIntroViewId+1;
-    if(!isReApply && MyData.jobInfo.split("@")[1] == "1"){
-      Map<String, dynamic> mainBankInfo = {
-        "id" : 0,
-        "name" : "",
-        "view_id" : 0,
-        "result" : <String, dynamic>{},
-        "is_confirmed" : false,
-        "is_docs" : false,
-        "docs_type" : ""
-      };
-      mainBankInfo["id"] = mainBankId;
-      mainBankInfo["name"] = mainBankName;
-      mainBankInfo["view_id"] = addedIndexId;
-      mainBankInfo["is_confirmed"] = false;
-      addedDocsList.add(mainBankInfo);
-      addedIndexId++;
+    if(!isReApply){
+      bool isJobType1 = false;
+      for(var eachAccident in MyData.getAccidentInfoList()){
+        if(eachAccident.accidentUid == MyData.selectedPrInfoData!.accidentUid){
+          if(eachAccident.accidentJobInfo.split("@")[1] == "1") isJobType1 = true;
+        }
+      }
+      if(isJobType1){
+        Map<String, dynamic> mainBankInfo = {
+          "id" : 0,
+          "name" : "",
+          "view_id" : 0,
+          "result" : <String, dynamic>{},
+          "is_confirmed" : false,
+          "is_docs" : false,
+          "docs_type" : ""
+        };
+        mainBankInfo["id"] = mainBankId;
+        mainBankInfo["name"] = mainBankName;
+        mainBankInfo["view_id"] = addedIndexId;
+        mainBankInfo["is_confirmed"] = false;
+        addedDocsList.add(mainBankInfo);
+        addedIndexId++;
 
-      Map<String, dynamic> mainBankAccountInfo = {
-        "id" : 0,
-        "name" : "",
-        "view_id" : 0,
-        "result" : <String, dynamic>{},
-        "is_confirmed" : false,
-        "is_docs" : false,
-        "docs_type" : ""
-      };
-      mainBankAccountInfo["id"] = mainBankAccountId;
-      mainBankAccountInfo["name"] = mainBankAccountName;
-      mainBankAccountInfo["view_id"] = addedIndexId;
-      mainBankAccountInfo["is_confirmed"] = false;
-      addedDocsList.add(mainBankAccountInfo);
-      addedIndexId++;
+        Map<String, dynamic> mainBankAccountInfo = {
+          "id" : 0,
+          "name" : "",
+          "view_id" : 0,
+          "result" : <String, dynamic>{},
+          "is_confirmed" : false,
+          "is_docs" : false,
+          "docs_type" : ""
+        };
+        mainBankAccountInfo["id"] = mainBankAccountId;
+        mainBankAccountInfo["name"] = mainBankAccountName;
+        mainBankAccountInfo["view_id"] = addedIndexId;
+        mainBankAccountInfo["is_confirmed"] = false;
+        addedDocsList.add(mainBankAccountInfo);
+        addedIndexId++;
 
-      Map<String, dynamic> businessNumberInfo = {
-        "id" : 0,
-        "name" : "",
-        "view_id" : 0,
-        "result" : <String, dynamic>{},
-        "is_confirmed" : false,
-        "is_docs" : false,
-        "docs_type" : ""
-      };
-      businessNumberInfo["id"] = businessNumberId;
-      businessNumberInfo["name"] = businessNumberName;
-      businessNumberInfo["view_id"] = addedIndexId;
-      businessNumberInfo["is_confirmed"] = false;
-      addedDocsList.add(businessNumberInfo);
-      addedIndexId++;
+        Map<String, dynamic> businessNumberInfo = {
+          "id" : 0,
+          "name" : "",
+          "view_id" : 0,
+          "result" : <String, dynamic>{},
+          "is_confirmed" : false,
+          "is_docs" : false,
+          "docs_type" : ""
+        };
+        businessNumberInfo["id"] = businessNumberId;
+        businessNumberInfo["name"] = businessNumberName;
+        businessNumberInfo["view_id"] = addedIndexId;
+        businessNumberInfo["is_confirmed"] = false;
+        addedDocsList.add(businessNumberInfo);
+        addedIndexId++;
+      }
     }
 
     if(!isReApply){
@@ -1022,7 +1028,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   }
   /// camera for id check view end
 
-  void showAuth(String subTitle, String docsType,  List<ApiInfoData> apiInfoDataList){
+  void _showAuth(String subTitle, String docsType,  List<ApiInfoData> apiInfoDataList){
     UiUtils.showLoadingPop(context);
     CodeFController.callApisWithCert(context, setState, certType, apiInfoDataList, (isSuccess, resultApiInfoDataList) {
       UiUtils.closeLoadingPop(context);
@@ -1151,9 +1157,10 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, !_isDocsAllConfirmed("gov24")? "인증하기" : "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
         if(!_isDocsAllConfirmed("gov24")){
-          UiUtils.showSlideMenu(context, SlideType.bottomToTop, true, null, 30.h, 0.5, (context, setState){
+          UiUtils.showSlideMenu(context, SlideType.bottomToTop, true, null, 34.h, 0.5, (context, setState){
             return Column(mainAxisAlignment: MainAxisAlignment.start, children:
             [
+              UiUtils.getMarginBox(0, 3.h),
               SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("민간 인증서를 선택하세요", 14.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
               UiUtils.getMarginBox(0, 1.5.h),
               SizedBox(width: 85.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -1225,7 +1232,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                         }
                       }
                       Navigator.of(context).pop();
-                      showAuth(subTitle, "gov24", apiInfoDataList);
+                      _showAuth(subTitle, "gov24", apiInfoDataList);
                     }
                   })
             ]);
@@ -1328,9 +1335,10 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, !_isDocsAllConfirmed("nhis")? "인증하기" : "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
         if(!_isDocsAllConfirmed("nhis")){
-          UiUtils.showSlideMenu(context, SlideType.bottomToTop, true, null, 30.h, 0.5, (context, setState){
+          UiUtils.showSlideMenu(context, SlideType.bottomToTop, true, null, 34.h, 0.5, (context, setState){
             return Column(mainAxisAlignment: MainAxisAlignment.start, children:
             [
+              UiUtils.getMarginBox(0, 3.h),
               SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("민간 인증서를 선택하세요", 14.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
               UiUtils.getMarginBox(0, 1.5.h),
               SizedBox(width: 85.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -1397,7 +1405,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                         }
                       }
                       Navigator.of(context).pop();
-                      showAuth(subTitle, "nhis", apiInfoDataList);
+                      _showAuth(subTitle, "nhis", apiInfoDataList);
                     }
                   })
             ]);
@@ -1515,9 +1523,10 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, !_isDocsAllConfirmed("nts")? "인증하기" : "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
         if(!_isDocsAllConfirmed("nts")){
-          UiUtils.showSlideMenu(context, SlideType.bottomToTop, true, null, 30.h, 0.5, (context, setState){
+          UiUtils.showSlideMenu(context, SlideType.bottomToTop, true, null, 34.h, 0.5, (context, setState){
             return Column(mainAxisAlignment: MainAxisAlignment.start, children:
             [
+              UiUtils.getMarginBox(0, 3.h),
               SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("민간 인증서를 선택하세요", 14.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
               UiUtils.getMarginBox(0, 1.5.h),
               SizedBox(width: 85.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -1589,7 +1598,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                         }
                       }
                       Navigator.of(context).pop();
-                      showAuth(subTitle, "nts", apiInfoDataList);
+                      _showAuth(subTitle, "nts", apiInfoDataList);
                     }
                   })
             ]);
@@ -1735,14 +1744,12 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               LogfinController.callLogfinApi(LogfinApis.applyProduct, applyInputMap, (isSuccess, outputJson){
                 UiUtils.closeLoadingPop(context);
                 if(isSuccess){
-                  UiUtils.showSlideMenu(context, SlideType.bottomToTop, false, null, 25.h, 0.5, (slideContext, setState){
+                  UiUtils.showSlideMenu(context, SlideType.bottomToTop, false, null, 22.h, 0.5, (slideContext, setState){
                     return Column(mainAxisAlignment: MainAxisAlignment.start, children:
                     [
                       UiUtils.getMarginBox(0, 3.h),
                       UiUtils.getStyledTextWithFixedScale("상품신청 접수를 완료했습니다.", TextStyles.upFinBasicTextStyle, TextAlign.center, null),
                       Column(children: [
-                        UiUtils.getMarginBox(0, 2.h),
-                        UiUtils.getStyledTextWithFixedScale("메인 화면으로 돌아갑니다.", TextStyles.upFinBasicTextStyle, TextAlign.center, null),
                         UiUtils.getMarginBox(0, 3.h),
                         UiUtils.getBorderButtonBox(85.w, ColorStyles.upFinWhite, ColorStyles.upFinTextAndBorderBlue,
                             UiUtils.getTextWithFixedScale("확인", 15.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null), () {

@@ -12,44 +12,23 @@ import '../styles/TextStyles.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
 
-class AppSearchAccidentView extends StatefulWidget{
+class AppUpdateAccidentView extends StatefulWidget{
   @override
-  AppSearchAccidentViewState createState() => AppSearchAccidentViewState();
+  AppUpdateAccidentViewState createState() => AppUpdateAccidentViewState();
 }
 
-class AppSearchAccidentViewState extends State<AppSearchAccidentView> with WidgetsBindingObserver{
+class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with WidgetsBindingObserver{
   bool isInputValid = true;
 
   final String errorMsg = "정보를 입력해주세요";
   int currentViewId = 1;
 
-  final int courtViewId = 1;
-  Key? selectedCourtKey;
-  String selectedCourtInfo = "";
-
-  final int accidentViewId = 2;
-  String selectedAccidentInfo = "";
-  final _accidentInfoFocus1 = FocusNode();
-  final _accidentInfoFocus2 = FocusNode();
-  final _accidentInfoTextController1 = TextEditingController();
-  final _accidentInfoTextController2 = TextEditingController();
-  void _accidentInfoTextController1Listener() {
-    if(_accidentInfoTextController1.text.trim().length > 4){
-      _accidentInfoTextController1.text = _accidentInfoTextController1.text.trim().substring(0,4);
-    }
-  }
-  void _accidentInfoTextController2Listener() {
-    if(_accidentInfoTextController2.text.trim().length > 7){
-      _accidentInfoTextController2.text = _accidentInfoTextController2.text.trim().substring(0,7);
-    }
-  }
-
-  final int bankCodeViewId = 3;
+  final int bankCodeViewId = 1;
   Key? selectedBankCodeKey;
   final ScrollController _bankScrollController = ScrollController();
   String selectedBankCodeInfo = "";
 
-  final int bankAccountViewId = 4;
+  final int bankAccountViewId = 2;
   String selectedBankAccountInfo = "";
   final _bankAccountInfoFocus = FocusNode();
   final _bankAccountInfoTextController = TextEditingController();
@@ -59,11 +38,11 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
     }
   }
 
-  final int preLoanCountViewId = 5;
+  final int preLoanCountViewId = 3;
   Key? selectedPreLoanCountKey;
   String selectedPreLoanCountInfo = "";
 
-  final int preLoanPriceViewId = 6;
+  final int preLoanPriceViewId = 4;
   String selectedPreLoanPriceInfo = "";
   final _preLoanPriceFocus = FocusNode();
   final _preLoanPriceTextController = TextEditingController();
@@ -82,7 +61,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
     }
   }
 
-  final int wantLoanPriceViewId = 7;
+  final int wantLoanPriceViewId = 5;
   String selectedWantLoanPriceInfo = "";
   final _wantLoanPriceFocus = FocusNode();
   final _wantLoanPriceTextController = TextEditingController();
@@ -101,24 +80,20 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
     }
   }
 
-  final int jobViewId = 8;
+  final int jobViewId = 6;
   Key? selectedJobKey;
   String selectedJobInfo = "";
 
-  final int finishedViewId = 9;
+  final int finishedViewId = 7;
   bool finishedConfirmed = false;
 
   void _unFocusAllNodes(){
-    _accidentInfoFocus1.unfocus();
-    _accidentInfoFocus2.unfocus();
     _bankAccountInfoFocus.unfocus();
     _preLoanPriceFocus.unfocus();
     _wantLoanPriceFocus.unfocus();
   }
 
   void _disposeAllTextControllers(){
-    _accidentInfoTextController1.dispose();
-    _accidentInfoTextController2.dispose();
     _bankScrollController.dispose();
     _bankAccountInfoTextController.dispose();
     _preLoanPriceTextController.dispose();
@@ -127,11 +102,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
 
   void _checkView(){
     if(!finishedConfirmed){
-      if(selectedCourtInfo.isEmpty){
-        currentViewId = courtViewId;
-      }else if(selectedAccidentInfo.isEmpty){
-        currentViewId = accidentViewId;
-      }else if(selectedBankCodeInfo.isEmpty){
+      if(selectedBankCodeInfo.isEmpty){
         currentViewId = bankCodeViewId;
       }else if(selectedBankAccountInfo.isEmpty){
         currentViewId = bankAccountViewId;
@@ -154,14 +125,32 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
     CommonUtils.log("i", "AppSearchAccidentView 화면 입장");
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _accidentInfoTextController1.addListener(_accidentInfoTextController1Listener);
-    _accidentInfoTextController2.addListener(_accidentInfoTextController2Listener);
     _bankAccountInfoTextController.addListener(_bankAccountInfoTextControllerListener);
     _preLoanPriceTextController.addListener(_preLoanPriceInfoTextControllerListener);
     _wantLoanPriceTextController.addListener(_wantLoanPriceInfoTextControllerListener);
     _checkView();
     GetController.to.resetPreLoanPrice();
     GetController.to.resetWantLoanPrice();
+    selectedBankCodeKey = Key(MyData.selectedAccidentInfoData!.accidentBankInfo);
+    selectedBankCodeInfo = MyData.selectedAccidentInfoData!.accidentBankInfo;
+
+    _bankAccountInfoTextController.text = MyData.selectedAccidentInfoData!.accidentBankAccount;
+
+    _preLoanPriceTextController.text = MyData.selectedAccidentInfoData!.accidentLendAmount;
+    final number = double.tryParse(_preLoanPriceTextController.text.trim().replaceAll(',', ''));
+    GetController.to.updatePreLoanPrice(CommonUtils.getPriceFormattedString(number!));
+
+    _wantLoanPriceTextController.text = MyData.selectedAccidentInfoData!.accidentWishAmount;
+    if(_wantLoanPriceTextController.text.trim() != ""){
+      final number = double.tryParse(_wantLoanPriceTextController.text.trim().replaceAll(',', ''));
+      GetController.to.updateWantLoanPrice(CommonUtils.getPriceFormattedString(number!));
+    }
+
+    selectedPreLoanCountInfo = MyData.selectedAccidentInfoData!.accidentLendCount;
+    selectedPreLoanCountKey = Key(MyData.selectedAccidentInfoData!.accidentLendCount);
+
+    selectedJobInfo = MyData.selectedAccidentInfoData!.accidentJobInfo;
+    selectedJobKey = Key(MyData.selectedAccidentInfoData!.accidentJobInfo);
   }
 
   @override
@@ -196,16 +185,24 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
     }
   }
 
+  void _scrollTo(ScrollController controller, double pos) {
+    controller.jumpTo(pos);
+  }
+
   Future<void> backInputView() async {
-    if(isInputValid) {
+    if(isInputValid){
       isInputValid = false;
       _unFocusAllNodes();
       CommonUtils.hideKeyBoard();
       await Future.delayed(const Duration(milliseconds: 120), () async {});
-      setState(() {
-        currentViewId--;
-        isInputValid = true;
-      });
+      if(currentViewId-1 == 0){
+        if(context.mounted) Navigator.pop(context);
+      }else{
+        setState(() {
+          isInputValid = true;
+          currentViewId--;
+        });
+      }
     }
   }
 
@@ -216,150 +213,11 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       CommonUtils.hideKeyBoard();
       await Future.delayed(const Duration(milliseconds: 120), () async {});
       setState(() {
-        currentViewId++;
         isInputValid = true;
+        currentViewId++;
       });
     }
   }
-
-  /// court view
-  Widget _getCourtView(){
-    List<Widget> courtList = [];
-    Color textColor = ColorStyles.upFinBlack;
-    for(var each in LogfinController.courtList){
-      Key key = Key(each);
-      if(selectedCourtKey == key) {
-        textColor = ColorStyles.upFinTextAndBorderBlue;
-      }
-      else{
-        textColor = ColorStyles.upFinBlack;
-      }
-      courtList.add(
-          SizedBox(width: 90.w,
-              child: Row(children: [
-                selectedCourtKey == key? UiUtils.getCustomCircleCheckBox(key, 1.5, selectedCourtKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
-                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
-                  setState(() {
-                    if(checkedValue != null){
-                      if(checkedValue) {
-                        selectedCourtKey = key;
-                        selectedCourtInfo = each;
-                      }
-                    }
-                  });
-                }) : UiUtils.getCustomCircleCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
-                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
-                      setState(() {
-                        if(checkedValue != null){
-                          if(!checkedValue) {
-                            selectedCourtKey = key;
-                            selectedCourtInfo = each;
-                          }
-                        }
-                      });
-                    }),
-                UiUtils.getTextStyledButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.center, null, (){
-                  setState(() {
-                    selectedCourtKey = key;
-                    selectedCourtInfo = each;
-                  });
-                })
-              ])
-          )
-      );
-    }
-
-    if(MyData.initSearchViewFromMainView){
-      return UiUtils.getRowColumnWithAlignCenter([
-        MyData.initSearchViewFromMainView ? SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () {
-            Navigator.pop(context);
-          }),
-        ])) : Container(),
-        UiUtils.getMarginBox(0, 3.h),
-        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("개인회생 사건정보", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("법원을 선택해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-        UiUtils.getMarginBox(0, 5.h),
-        UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: courtList)),
-        UiUtils.getMarginBox(0, 5.h),
-        UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-          CommonUtils.log("i", "court : $selectedCourtInfo");
-          if(selectedCourtInfo.isNotEmpty){
-            nextInputView();
-          }else{
-            CommonUtils.flutterToast(errorMsg);
-          }
-        })
-      ]);
-    }else{
-      return UiUtils.getRowColumnWithAlignCenter([
-        UiUtils.getMarginBox(0, 10.h),
-        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("개인회생 사건정보", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("법원을 선택해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-        UiUtils.getMarginBox(0, 5.h),
-        UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: courtList)),
-        UiUtils.getMarginBox(0, 5.h),
-        UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-          CommonUtils.log("i", "court : $selectedCourtInfo");
-          if(selectedCourtInfo.isNotEmpty){
-            nextInputView();
-          }else{
-            CommonUtils.flutterToast(errorMsg);
-          }
-        })
-      ]);
-    }
-  }
-  /// court view end
-
-  /// accident view
-  Widget _getAccidentView(){
-    return UiUtils.getRowColumnWithAlignCenter([
-      SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
-          backInputView();
-        }),
-      ])),
-      UiUtils.getMarginBox(0, 3.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("사건번호를 입력해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      UiUtils.getMarginBox(0, 1.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("예) 2023개회1234567", 14.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
-      UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getExpandedScrollView(Axis.vertical,
-          SizedBox(width: 85.w, child: Row(children: [
-            UiUtils.getTextField(20.w, TextStyles.upFinTextFormFieldTextStyle, _accidentInfoFocus1, _accidentInfoTextController1, TextInputType.number,
-                UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
-            UiUtils.getDisabledTextField(18.w, "개회", TextStyles.upFinDisabledTextFormFieldTextStyle,
-                UiUtils.getInputDecoration("", 0.sp, "", 0.sp)),
-            UiUtils.getTextField(28.w, TextStyles.upFinTextFormFieldTextStyle, _accidentInfoFocus2, _accidentInfoTextController2, TextInputType.number,
-                UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
-          ]))
-      ),
-      UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-        selectedAccidentInfo = "${_accidentInfoTextController1.text.trim()}개회${_accidentInfoTextController2.text.trim()}";
-        CommonUtils.log("i", "selectedAccidentInfo : $selectedAccidentInfo");
-        if(selectedAccidentInfo != "개회" && _accidentInfoTextController1.text.trim() != "" && _accidentInfoTextController2.text.trim() != ""){
-          bool isValid = true;
-          for(var eachAccident in MyData.getAccidentInfoList()){
-            if(eachAccident.accidentCaseNumberYear+eachAccident.accidentCaseNumberType+eachAccident.accidentCaseNumberNumber == selectedAccidentInfo){
-              selectedAccidentInfo = "";
-              isValid = false;
-            }
-          }
-
-          if(isValid){
-            nextInputView();
-          }else{
-            CommonUtils.flutterToast("이미 조회하신 사건번호입니다.");
-          }
-        }else{
-          CommonUtils.flutterToast(errorMsg);
-        }
-      })
-    ]);
-  }
-  /// accident view end
 
   /// bank code view
   Widget _getBankCodeView(){
@@ -425,6 +283,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
         CommonUtils.log("i", "bank code : $selectedBankCodeInfo");
         if(selectedBankCodeInfo.isNotEmpty){
+          isAutoScrollableForTarget = true;
           nextInputView();
         }else{
           CommonUtils.flutterToast(errorMsg);
@@ -702,18 +561,9 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
 
   /// finish confirm view
   Widget _getFinishConfirmView(){
-    String birthMonth = MyData.birth.substring(4,6);
-    if(birthMonth.substring(0,1) == "0"){
-      birthMonth = birthMonth.substring(1);
-    }
-
-    String birthDay = MyData.birth.substring(6);
-    if(birthDay.substring(0,1) == "0"){
-      birthDay = birthDay.substring(1);
-    }
+    String court = MyData.selectedAccidentInfoData!.accidentCourtInfo.split("@")[0];
+    String accidentNo = "${MyData.selectedAccidentInfoData!.accidentCaseNumberYear}${MyData.selectedAccidentInfoData!.accidentCaseNumberType}${MyData.selectedAccidentInfoData!.accidentCaseNumberNumber}";
     List<String> confirmDataList = [];
-    confirmDataList.add(MyData.name);
-    confirmDataList.add("${MyData.birth.substring(0,4)}년 $birthMonth월 $birthDay일");
     confirmDataList.add("[환급]  ${selectedBankCodeInfo.split("@")[0]} $selectedBankAccountInfo");
     confirmDataList.add("기대출  ${selectedPreLoanCountInfo.split("@")[0]}");
     if(selectedPreLoanPriceInfo != "0"){
@@ -751,18 +601,17 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         }),
       ])),
       UiUtils.getMarginBox(0, 3.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("해당 조건으로", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출상품을 찾아볼까요?", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale(court, 20.sp, FontWeight.w800, ColorStyles.upFinBlack, TextAlign.start, null)),
+      UiUtils.getMarginBox(0, 0.5.h),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale(accidentNo, 20.sp, FontWeight.w800, ColorStyles.upFinBlack, TextAlign.start, null)),
+      UiUtils.getMarginBox(0, 1.h),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("해당 사건번호의 정보를", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("수정할까요?", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: confirmWidgetList)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "네 좋아요!", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
         Map<String, dynamic> inputJson = {
-          "court_name": selectedCourtInfo.split("@")[0],
-          "caseNumberYear": selectedAccidentInfo.split("개회")[0],
-          "caseNumberType": "개회",
-          "caseNumberNumber": selectedAccidentInfo.split("개회")[1],
-          "userName": MyData.name,
           "bankCode": selectedBankCodeInfo.split("@")[1],
           "account": selectedBankAccountInfo,
           "birthday": MyData.birth,
@@ -770,7 +619,6 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
           "lend_count": selectedPreLoanCountInfo.split("@")[1],
           "lend_amount": selectedPreLoanPriceInfo,
           "wish_amount": selectedWantLoanPriceInfo,
-
         };
         CommonUtils.log("i", "pr search info:\n$inputJson");
 
@@ -812,20 +660,37 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
             CommonUtils.flutterToast(errorMsg.replaceAll("+", "").replaceAll("()", "").replaceAll(".", "\n"));
           }
         });
+
       })
     ]);
   }
   /// finish confirm view end
 
+  void _scrollBankCode(){
+    double scrollSize = _bankScrollController.position.maxScrollExtent;
+    int size = LogfinController.bankList.length;
+    double eachSize = scrollSize/size;
+    int posIdx = LogfinController.bankList.indexOf(selectedBankCodeInfo);
+    if(posIdx != -1){
+      double pos = eachSize*posIdx;
+      _scrollTo(_bankScrollController, pos);
+    }else{
+      CommonUtils.log("e", "!!!!!");
+    }
+  }
+
+  bool isAutoScrollableForTarget = true;
   @override
   Widget build(BuildContext context) {
     Widget? view;
 
-    if(currentViewId == courtViewId){
-      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getCourtView());
-    }else if(currentViewId == accidentViewId){
-      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getAccidentView());
-    }else if(currentViewId == bankCodeViewId){
+    if(currentViewId == bankCodeViewId){
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if(isAutoScrollableForTarget) {
+          isAutoScrollableForTarget = false;
+          _scrollBankCode();
+        }
+      });
       view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getBankCodeView());
     }else if(currentViewId == bankAccountViewId){
       view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getBankAccountView());
@@ -840,7 +705,6 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
     }else{
       view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getFinishConfirmView());
     }
-
     return UiUtils.getView(context, view, CommonUtils.onWillPopForPreventBackButton);
   }
 

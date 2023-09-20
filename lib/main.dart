@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:upfin/configs/app_config.dart';
 import 'package:upfin/utils/ui_utils.dart';
 
@@ -10,6 +11,8 @@ void main() async{
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
+
+  await initializeDateFormatting();
 
   runApp(const MyApp());
 }

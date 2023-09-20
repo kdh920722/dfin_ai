@@ -239,8 +239,8 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
               }
             };
             CommonUtils.log("i", "signup input :\n$inputJson");
-
-            UiUtils.showLoadingPop(thisContext);
+            Navigator.pop(thisContext);
+            UiUtils.showLoadingPop(context);
             LogfinController.callLogfinApi(LogfinApis.signUp, inputJson, (isSuccessToSignup, outputJson) async {
               if(isSuccessToSignup){
                 CommonUtils.flutterToast("환영합니다!");
@@ -248,15 +248,14 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                 SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceIdKey, _emailTextController.text.trim());
                 SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferencePwKey, _pwdTextController.text.trim());
                 await LogfinController.getMainOrSearchView((isSuccessToGetViewInfo, viewInfo){
-                  UiUtils.closeLoadingPop(thisContext);
+                  UiUtils.closeLoadingPop(context);
                   if(isSuccessToGetViewInfo){
                     CommonUtils.moveWithReplacementTo(context, viewInfo!.value, null);
                   }
                 });
               }else{
-                UiUtils.closeLoadingPop(thisContext);
+                UiUtils.closeLoadingPop(context);
                 CommonUtils.flutterToast(outputJson!["error"]);
-                Navigator.pop(context);
               }
             });
           }) : UiUtils.getTextButtonBox(90.w, "동의하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinGray, () {})
@@ -380,7 +379,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                   }
                 }) : Container()
             ),
-            UiUtils.getMarginBox(0, 10.h),
+            UiUtils.getMarginBox(0, 15.h),
             Obx(()=>GetController.to.isConfirmed.value?
               UiUtils.getTextButtonBox(90.w, "가입하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
               if(_formKey.currentState!.validate() && isConfirmed){
@@ -399,7 +398,8 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                 }
               }
             }) : Container()
-            )
+            ),
+            UiUtils.getMarginBox(0, 2.h),
           ])),
         ])
     );

@@ -342,15 +342,16 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
         }
 
         await Future.delayed(const Duration(milliseconds: 1500), () async {
-          UiUtils.showSlideMenu(context, SlideType.bottomToTop, true, null, 33.h, 0.5, (context, setState) =>
+          UiUtils.showSlideMenu(context, SlideType.bottomToTop, false, null, 18.h, 0.5, (slideContext, setState) =>
               Column(mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    UiUtils.getStyledTextWithFixedScale("[$deniedPermissionsString] 권한이 필요합니다. ", TextStyles.slidePopPermissionText, TextAlign.center, null),
+                    UiUtils.getStyledTextWithFixedScale("[$deniedPermissionsString] 권한이 필요합니다. ", TextStyles.upFinBasicTextStyle, TextAlign.center, null),
                     UiUtils.getMarginBox(100.w, 2.h),
-                    UiUtils.getTextButtonBox(70.w, "설정 바로가기", TextStyles.slidePopButtonText, ColorStyles.finAppGreen, () {
-                      openAppSettings();
-                      Navigator.of(context).pop();
-                    })
+                    UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinTextAndBorderBlue,
+                        UiUtils.getTextWithFixedScale("설정 바로가기", 12.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null), () {
+                          openAppSettings();
+                          Navigator.of(slideContext).pop();
+                        })
                   ]
               ));
         });
@@ -408,7 +409,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
         view = Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: EdgeInsets.all(5.w), child:
         Column(children: [
           SizedBox(width: 100.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            UiUtils.getMarginBox(0, 7.h),
+            UiUtils.getMarginBox(0, 8.h),
             UiUtils.getTextWithFixedScale("업핀", 55.sp, FontWeight.w800, ColorStyles.upFinButtonBlue, TextAlign.start, null),
             UiUtils.getMarginBox(0, 2.h),
             UiUtils.getTextWithFixedScale("나에게 꼭 맞는", 28.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
@@ -416,7 +417,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
             UiUtils.getTextWithFixedScale("개인회생 대출상품", 28.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
             UiUtils.getMarginBox(0, 0.5.h),
             UiUtils.getTextWithFixedScale("바로 접수하세요!", 28.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
-            UiUtils.getMarginBox(0, 7.h)
+            UiUtils.getMarginBox(0, 8.h)
           ])),
           Form(key: _formKey,
               child: UiUtils.getRowColumnWithAlignCenter([
@@ -476,19 +477,20 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
                   }
                 }),
                 UiUtils.getMarginBox(0, 0.7.h),
-                UiUtils.getTextButtonBox(90.w, "회원가입", TextStyles.upFinSkyTextInButtonStyle, ColorStyles.upFinWhiteSky, () async {
-                  _unFocusAllNodes();
-                  MyData.resetMyData();
-                  if(Config.isControllerLoadFinished){
-                    CommonUtils.moveTo(context, AppView.signupView.value, null);
-                  }else{
-                    CommonUtils.flutterToast("데이터 로딩 실패\n다시 실행 해 주세요.");
-                  }
-                })
+                UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinTextAndBorderBlue,
+                    UiUtils.getTextWithFixedScale("회원가입", 14.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null), () {
+                      _unFocusAllNodes();
+                      MyData.resetMyData();
+                      if(Config.isControllerLoadFinished){
+                        CommonUtils.moveTo(context, AppView.signupView.value, null);
+                      }else{
+                        CommonUtils.flutterToast("데이터 로딩 실패\n다시 실행 해 주세요.");
+                      }
+                    }),
               ])
           ),
           UiUtils.getExpandedScrollView(Axis.vertical, SizedBox(width: 100.w, child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-            UiUtils.getMarginBox(0, 7.h),
+            UiUtils.getMarginBox(0, 3.h),
             UiUtils.getTextWithFixedScale("소셜 계정으로 로그인", 12.sp, FontWeight.w300, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, null),
             UiUtils.getMarginBox(0, 0.1.h),
             Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.end, children: [
@@ -533,6 +535,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
                 }
               })
             ]),
+            UiUtils.getMarginBox(0, 5.h),
             UiUtils.getTextButtonBox(90.w, "회원탈퇴 for test", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinRed, () {
               if(Config.isControllerLoadFinished){
                 Map<String, dynamic> inputJson = {

@@ -1,6 +1,4 @@
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:get/get.dart';
 import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:http/http.dart' as http;
 import 'package:upfin/controllers/get_controller.dart';
@@ -223,16 +221,7 @@ class LogfinController {
             if(userInfoOutputJson.containsKey("customer")){
               Map<String, dynamic> customerMap = userInfoOutputJson["customer"];
               if(customerMap.containsKey("uid")) MyData.customerUidForNiceCert = customerMap["uid"].toString();
-              if(customerMap.containsKey("registration_no")) MyData.idNumber = customerMap["registration_no"].toString();
-              if(customerMap.containsKey("job_type_id")){
-
-                CommonUtils.log("i", "jobjobjobjob : ${customerMap["job_type_id"]}");
-                for(var each in jobList){
-                  if(each.split("@")[1] == customerMap["job_type_id"].toString()){
-                    MyData.jobInfo = each;
-                  }
-                }
-              }
+              if(customerMap.containsKey("registration_no")) MyData.idNumber = customerMap["registration_no"] == null? "" : customerMap["registration_no"].toString();
             }
 
             // 2) 사건정보 조회
@@ -246,16 +235,50 @@ class LogfinController {
                   callback(true, AppView.searchAccidentView);
                 }else{
                   // 3-2) 사건정보 있으면 사건정보 이력화면(메인 뷰)로 이동(저장한걸 보여줌)
-                  String bankName = "";
+                  String bankInfo = "";
+                  String jobInfo = "";
+                  String courtInfo = "";
+                  String lendCountInfo = "";
                   for(var eachAccident in accidentList){
                     var dataResult = jsonDecode(eachAccident["req_data"].toString())["pr"];
+
                     for(var eachBank in bankList){
-                      if(eachBank.split("@")[1].substring(1) == dataResult["bankCode"]){
-                        bankName = eachBank.split("@")[0];
+                      if(eachBank.split("@")[1] == dataResult["bankCode"]){
+                        bankInfo = eachBank;
                       }
                     }
+                    for(var eachJob in jobList){
+                      if(eachJob.split("@")[1] == dataResult["job"]){
+                        jobInfo = eachJob;
+                      }
+                    }
+                    for(var eachCourt in courtList){
+                      if(eachCourt.split("@")[0] == dataResult["court_name"]){
+                        courtInfo = eachCourt;
+                      }
+                    }
+                    int count = int.parse(dataResult["lend_count"]);
+                    if(count == 0){
+                      lendCountInfo = preLoanCountList[0];
+                    }else if(count == 1){
+                      lendCountInfo = preLoanCountList[1];
+                    }else{
+                      lendCountInfo = preLoanCountList[2];
+                    }
+
+                    CommonUtils.log("", "accident data ====>\n"
+                        "accidentUid: ${eachAccident["uid"]}\n"
+                        "accidentCaseNo: ${dataResult["caseNumberYear"]}${dataResult["caseNumberType"]}${dataResult["caseNumberNumber"]}\n"
+                        "courtInfo: $courtInfo\n"
+                        "bankInfo: $bankInfo\n"
+                        "account: ${dataResult["account"]}\n"
+                        "jobIno: $jobInfo\n"
+                        "lendCountInfo: $lendCountInfo\n"
+                        "lend_amount: ${dataResult["lend_amount"]}\n"
+                        "wish_amount: ${dataResult["wish_amount"]}\n");
                     MyData.addToAccidentInfoList(AccidentInfoData(eachAccident["uid"], dataResult["caseNumberYear"], dataResult["caseNumberType"], dataResult["caseNumberNumber"],
-                        dataResult["court_name"], bankName, dataResult["bankCode"], dataResult["account"]));
+                        courtInfo, bankInfo, dataResult["account"], jobInfo, lendCountInfo, dataResult["lend_amount"], dataResult["wish_amount"]
+                    ));
                   }
 
                   callLogfinApi(LogfinApis.getLoansInfo, <String, dynamic>{}, (isSuccessToGetLoansInfo, loansInfoOutputJson){
@@ -264,13 +287,23 @@ class LogfinController {
                       if(loansList.isNotEmpty){
                         CommonUtils.log("i", " loan list in!");
                         for(var eachLoans in loansList){
-                          CommonUtils.log("i", " loan ${eachLoans["accident_uid"]}\n${eachLoans["uid"]}\n"
-                              "${eachLoans["selected_offer_id"]}\n${eachLoans["current_status"]}\n"
-                              "${eachLoans["loan_type_id"]}\n${eachLoans["created_at"]}\n"
-                              "${eachLoans["updated_at"]}\n${eachLoans["amount"]}\n");
-                          MyData.addToLoanInfoList(LoanInfoData(eachLoans["accident_uid"], eachLoans["uid"],
-                              int.parse(eachLoans["selected_offer_id"].toString()), int.parse(eachLoans["current_status"].toString()), int.parse(eachLoans["loan_type_id"].toString()),
-                              eachLoans["created_at"], eachLoans["updated_at"], eachLoans["amount"].toString()));
+                          CommonUtils.log("", "loan data ====>\n"
+                              "accidentUid: ${eachLoans["accident_uid"]}\n"
+                              "loanUid: ${eachLoans["uid"]}\n"
+                              "lenderPrId: ${eachLoans["lender_pr_id"]}\n"
+                              "submitAmount: ${eachLoans["submit_offer"]["amount"]}\n"
+                              "submitRate: ${eachLoans["submit_offer"]["interest_rate"]}\n"
+                              "companyName: ${eachLoans["lender_pr"]["lender"]["name"]}\n"
+                              "productName: ${eachLoans["lender_pr"]["lender"]["product_name"]}\n"
+                              "contactNo: ${eachLoans["lender_pr"]["lender"]["contact_no"]}\n"
+                              "createdDate: ${eachLoans["submit_offer"]["created_at"]}\n"
+                              "updatedDate: ${eachLoans["submit_offer"]["updated_at"]}\n"
+                              "statueId: ${eachLoans["status_info"]["id"]}\n");
+
+                          MyData.addToLoanInfoList(LoanInfoData(eachLoans["accident_uid"].toString(), eachLoans["uid"].toString(), eachLoans["lender_pr_id"].toString(),
+                              eachLoans["submit_offer"]["amount"].toString(), eachLoans["submit_offer"]["interest_rate"].toString(),
+                              eachLoans["lender_pr"]["lender"]["name"].toString(), eachLoans["lender_pr"]["lender"]["product_name"].toString(), eachLoans["lender_pr"]["lender"]["contact_no"].toString(),
+                              eachLoans["submit_offer"]["created_at"].toString(), eachLoans["submit_offer"]["updated_at"].toString(), eachLoans["status_info"]["id"].toString()));
                         }
 
                         GetController.to.updateLoanInfoList(MyData.getLoanInfoList());
@@ -319,7 +352,7 @@ class LogfinController {
             List<dynamic> offerPrList = outputJsonForGetOffers["data"];
             for(var each in offerPrList){
               CommonUtils.log("i", "$each");
-              MyData.addToPrInfoList(PrInfoData(offerId, each["rid"], each["lender_pr_id"].toString(), each["lender_name"], each["lender_id"].toString(),
+              MyData.addToPrInfoList(PrInfoData(accidentUid, offerId, each["rid"], each["lender_pr_id"].toString(), each["lender_name"], each["lender_id"].toString(),
                   each["product_name"], each["rid"], each["min_rate"].toString(), each["max_rate"].toString(),
                   each["limit"].toString(), "assets/images/deutsche_bank_icon.png", each["result"] as bool, each["msg"]));
             }
@@ -405,7 +438,7 @@ extension LogfinApisExtension on LogfinApis {
       case LogfinApis.getOffersInfo:
         return '/get_offers.json';
       case LogfinApis.getLoansInfo:
-        return '/get_loans.json';
+          return '/get_loans.json';
       case LogfinApis.getLoansDetailInfo:
         return '/get_loan.json';
       case LogfinApis.getOffers:

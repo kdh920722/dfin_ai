@@ -81,6 +81,7 @@ class CodeFController{
     final baseUrl = hostStatus.value == HostStatus.prod.value ? Host.baseUrl.value : HostDev.baseUrl.value;
     final endPoint = apiInfo.value;
     CommonUtils.log("i", "call api : $endPoint");
+    CommonUtils.log("i", "call input json : \n$inputJson");
     final url = baseUrl + endPoint;
     var targetUrl = "";
     if(Config.isWeb){
@@ -276,7 +277,6 @@ class CodeFController{
                 }
                 each.resultMap = null;
                 each.resultFullMap = fullMap;
-                //CommonUtils.flutterToast(errorMsg.replaceAll("+", " "));
               }else{
                 each.isResultSuccess = true;
                 each.resultMap = resultMap;

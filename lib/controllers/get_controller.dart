@@ -81,6 +81,14 @@ class GetController extends GetxController {
   }
 
   void updateLoanInfoList(List<LoanInfoData> newList) {
+    loanInfoDataList.clear();
     loanInfoDataList.assignAll(newList);
+    CommonUtils.log("i", "loanInfoDataList length : ${loanInfoDataList.length}");
+  }
+  void resetLoanInfoList() {
+    List<LoanInfoData> emptyList = [];
+    loanInfoDataList.clear();
+    loanInfoDataList.assignAll(emptyList);
+    CommonUtils.log("i", "loanInfoDataList length : ${loanInfoDataList.length}");
   }
 }

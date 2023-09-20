@@ -7,6 +7,7 @@ import 'package:upfin/views/app_main_view.dart';
 import 'package:upfin/views/app_result_pr_view.dart';
 import 'package:upfin/views/app_search_accident_view.dart';
 import 'package:upfin/views/app_signup_view.dart';
+import 'package:upfin/views/app_update_accident_view.dart';
 import 'package:upfin/views/app_web_view.dart';
 import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
@@ -35,6 +36,7 @@ class Config{
     AppView.signupView.value : (context) => AppSignUpView(),
     AppView.mainView.value : (context) => AppMainView(),
     AppView.searchAccidentView.value : (context) => AppSearchAccidentView(),
+    AppView.updateAccidentView.value : (context) => AppUpdateAccidentView(),
     AppView.resultPrView.value : (context) => AppResultPrView(),
     AppView.detailPrView.value : (context) => AppDetailPrView(),
     AppView.applyPrView.value : (context) => AppApplyPrView()
@@ -67,7 +69,7 @@ class Config{
 }
 
 enum AppView {
-  rootLoginView, certificationView, webView, signupView, mainView, searchAccidentView, resultPrView, detailPrView, applyPrView
+  rootLoginView, certificationView, webView, signupView, mainView, searchAccidentView, updateAccidentView, resultPrView, detailPrView, applyPrView
 }
 
 extension SAppViewExtension on AppView {
@@ -85,6 +87,8 @@ extension SAppViewExtension on AppView {
         return '/mainView';
       case AppView.searchAccidentView:
         return '/searchAccidentView';
+      case AppView.updateAccidentView:
+        return '/updateAccidentView';
       case AppView.resultPrView:
         return '/resultPrView';
       case AppView.detailPrView:

@@ -11,11 +11,10 @@ class MyData {
   static String email = "";
   static String birth = "";
   static bool isMale = false;
-  static String jobInfo = "";
   static String idNumber = "";
   static String customerUidForNiceCert = "";
-  static bool initSearchViewFromMainView = false;
 
+  static bool initSearchViewFromMainView = false;
   static String birthFromPhoneCert = "";
   static String telecomTypeFromPhoneCert = "";
   static bool isMaleFromPhoneCert = false;
@@ -121,13 +120,18 @@ class MyData {
   }
 
   static PrInfoData? selectedPrInfoData;
+  static AccidentInfoData? selectedAccidentInfoData;
 
   static void printData(){
     String selectedPrInfoDataCheck = "";
     if(selectedPrInfoData != null){
       selectedPrInfoDataCheck = selectedPrInfoData!.productOfferRid.toString();
     }
-    CommonUtils.log("i", "\n"
+    String selectedAccidentInfoDataCheck = "";
+    if(selectedAccidentInfoData != null){
+      selectedAccidentInfoDataCheck = selectedAccidentInfoData!.accidentUid.toString();
+    }
+    CommonUtils.log("", "\n"
         "name:$name\n"
         "phoneNumber:$phoneNumber\n"
         "carrierType:$telecom\n"
@@ -136,12 +140,12 @@ class MyData {
         "isMale:$isMale\n"
         "idNumber:$idNumber\n"
         "customerUidForNiceCert:$customerUidForNiceCert\n"
-        "jobInfo:$jobInfo\n"
         "accidentInfoList: ${_accidentInfoList.length}\n"
         "loanInfoList: ${_loanInfoList.length}\n"
         "prInfoList: ${_prInfoList.length}\n"
         "prDocsInfoList: ${_prDocsInfoList.length}\n"
         "selectedPrInfoData: $selectedPrInfoDataCheck\n"
+        "selectedAccidentInfoData: $selectedAccidentInfoDataCheck\n"
     );
   }
 
@@ -162,11 +166,11 @@ class MyData {
     birthFromPhoneCert = "";
     telecomTypeFromPhoneCert = "";
     isMaleFromPhoneCert = false;
-    jobInfo = "";
     clearAccidentInfoList();
     clearLoanInfoList();
     clearPrInfoList();
     clearPrDocsInfoList();
     selectedPrInfoData = null;
+    selectedAccidentInfoData = null;
   }
 }

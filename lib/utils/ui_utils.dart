@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
@@ -244,6 +245,7 @@ class UiUtils {
         width: buttonWidth,
         child: ElevatedButton(
             style: ElevatedButton.styleFrom(
+              padding: EdgeInsets.only(left: 4.w, right: 4.w, top: 4.w, bottom: 4.w),
               backgroundColor: buttonColor,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
               side: BorderSide(width: 1.3, color: borderColor),
@@ -251,10 +253,7 @@ class UiUtils {
               shadowColor: ColorStyles.upFinGray,
             ),
             onPressed: onPressedCallback,
-            child: Padding(
-                padding: EdgeInsets.only(left: 0, right: 0, top: 4.w, bottom: 4.w),
-                child: childWidget
-            ),
+            child: childWidget,
         )
     );
   }
@@ -324,6 +323,10 @@ class UiUtils {
 
   static Widget getExpandedScrollView(Axis scrollDir, Widget scrollChildView){
     return Expanded(child: SingleChildScrollView(scrollDirection: scrollDir, physics: const BouncingScrollPhysics(), child: scrollChildView));
+  }
+
+  static Widget getExpandedScrollViewWithController(Axis scrollDir, Widget scrollChildView, ScrollController controller){
+    return Expanded(child: SingleChildScrollView(controller: controller, scrollDirection: scrollDir, physics: const BouncingScrollPhysics(), child: scrollChildView));
   }
 
   static Text getTitle(String titleText){
