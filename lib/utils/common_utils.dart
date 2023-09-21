@@ -505,6 +505,47 @@ class CommonUtils {
     try {
       final imglib.Image image = imglib.decodeImage(File(imagePath).readAsBytesSync())!;
       //boundingPolys
+      List<dynamic> listMap = maskingInfoMap['personalNum'][0]['maskingPolys'][0]['vertices'];
+      List<int> xPoints = [];
+      List<int> yPoints = [];
+      for(Map<String,dynamic> each in listMap){
+        var xPoint = each['x'].toString().split(".")[0];
+        var yPoint = each['y'].toString().split(".")[0];
+        xPoints.add(int.parse(xPoint));
+        yPoints.add(int.parse(yPoint));
+      }
+
+      int minXValue = xPoints.reduce((min, current) => min < current ? min : current);
+      int maxXValue = xPoints.reduce((max, current) => max > current ? max : current);
+      int minYValue = yPoints.reduce((min, current) => min < current ? min : current);
+      int maxYValue = yPoints.reduce((max, current) => max > current ? max : current);
+      int maskingXSize = maxXValue - minXValue;
+      int maskingYSize = maxYValue - minYValue;
+      int startXPoint = minXValue;
+      int startYPoint = minYValue;
+      int endXPoint = maxXValue;
+      int endYPoint = maxYValue;
+
+      CommonUtils.log("i", "masking info ===========>\n"
+          "maskingXSize:$maskingXSize maskingYSize:$maskingYSize\n"
+          "startXPoint:$startXPoint startYPoint: $startYPoint");
+
+      imglib.fillRect(image, x1: startXPoint, x2 : endXPoint, y1: startYPoint, y2 : endYPoint, color: imglib.ColorRgba8(0, 0, 0, 255));
+
+      final modifiedImagePath = imagePath.replaceAll('.jpg', '_masked.jpg');
+      File(modifiedImagePath).writeAsBytesSync(imglib.encodeJpg(image));
+
+      return modifiedImagePath;
+    } catch (e) {
+      CommonUtils.log('e', e.toString());
+      return "";
+    }
+  }
+
+  static Future<String> makeMaskingImageAndGetPath2(String imagePath, Map<String,dynamic> maskingInfoMap) async {
+    try {
+      final imglib.Image image = imglib.decodeImage(File(imagePath).readAsBytesSync())!;
+      //boundingPolys
       List<dynamic> listMap = maskingInfoMap['personalNum'][0]['boundingPolys'][0]['vertices'];
       List<int> xPoints = [];
       List<int> yPoints = [];

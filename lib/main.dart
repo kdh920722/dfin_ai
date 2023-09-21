@@ -11,7 +11,6 @@ void main() async{
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-
   await initializeDateFormatting();
 
   runApp(const MyApp());

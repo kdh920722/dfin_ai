@@ -69,6 +69,8 @@ dependencies:
   kakao_flutter_sdk_user: ^1.5.0
   percent_indicator: ^4.2.3
   url_launcher: ^6.1.14
+  camera: ^0.10.5+4
+  path_provider: ^2.1.1
 
 dev_dependencies:
   flutter_test:

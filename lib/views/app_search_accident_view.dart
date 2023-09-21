@@ -572,11 +572,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
           selectedPreLoanPriceInfo = "0";
         }
         CommonUtils.log("i", "selectedPreLoanPriceInfo : $selectedPreLoanPriceInfo");
-        if(selectedPreLoanPriceInfo != "0"){
-          nextInputView();
-        }else{
-          CommonUtils.flutterToast(errorMsg);
-        }
+        nextInputView();
       })
     ]);
   }
@@ -620,11 +616,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
           selectedWantLoanPriceInfo = "0";
         }
         CommonUtils.log("i", "selectedWantLoanPriceInfo : $selectedWantLoanPriceInfo");
-        if(selectedWantLoanPriceInfo != "0"){
-          nextInputView();
-        }else{
-          CommonUtils.flutterToast(errorMsg);
-        }
+        nextInputView();
       })
     ]);
   }

@@ -190,9 +190,23 @@ class CodeFController{
                   each.resultFullMap = fullMap;
                   //CommonUtils.flutterToast(errorMsg.replaceAll("+", " "));
                 }else{
-                  each.isResultSuccess = true;
-                  each.resultMap = resultMap;
-                  each.resultFullMap = fullMap;
+                  if(fullMap == null){
+                    each.isResultSuccess = false;
+                    resultMap["result_msg"] = "조회에 실패했습니다.";
+                    each.resultMap = null;
+                    each.resultFullMap = fullMap;
+                  }else{
+                    if(fullMap["result"]["code"] == "CF-03002"){
+                      resultMap["result_msg"] = "인증에 실패했습니다.";
+                      each.isResultSuccess = false;
+                      each.resultMap = null;
+                      each.resultFullMap = fullMap;
+                    }else{
+                      each.isResultSuccess = true;
+                      each.resultMap = resultMap;
+                      each.resultFullMap = fullMap;
+                    }
+                  }
                 }
               }else{
                 each.isResultSuccess = true;
@@ -208,13 +222,16 @@ class CodeFController{
                 callback(true, apiInfoDataList);
               }
             }else{
-              callCount++;
-              if(callCount == apiInfoDataList.length){
-                each.isResultSuccess = false;
-                each.resultMap = null;
-                each.resultFullMap = fullMap;
-                callback(false, apiInfoDataList);
+              if(isSetAuthPopOn){
+                GetController.to.updateWait(false);
+                isSetAuthPopOn = false;
+                Navigator.of(context).pop();
               }
+              each.isResultSuccess = false;
+              each.resultMap = null;
+              each.resultListMap = null;
+              each.resultFullMap = null;
+              callback(false, apiInfoDataList);
             }
           });
           await Future.delayed(const Duration(milliseconds: 500), () async {});
@@ -234,9 +251,23 @@ class CodeFController{
                   each.resultFullMap = fullMap;
                   //CommonUtils.flutterToast(errorMsg.replaceAll("+", " "));
                 }else{
-                  each.isResultSuccess = true;
-                  each.resultMap = resultMap;
-                  each.resultFullMap = fullMap;
+                  if(fullMap == null){
+                    each.isResultSuccess = false;
+                    resultMap["result_msg"] = "조회에 실패했습니다.";
+                    each.resultMap = null;
+                    each.resultFullMap = fullMap;
+                  }else{
+                    if(fullMap["result"]["code"] == "CF-03002"){
+                      resultMap["result_msg"] = "인증에 실패했습니다.";
+                      each.isResultSuccess = false;
+                      each.resultMap = null;
+                      each.resultFullMap = fullMap;
+                    }else{
+                      each.isResultSuccess = true;
+                      each.resultMap = resultMap;
+                      each.resultFullMap = fullMap;
+                    }
+                  }
                 }
               }else{
                 each.isResultSuccess = true;
@@ -319,11 +350,59 @@ class CodeFController{
           if(is2WayProcess){
             Map<String, dynamic>? resultMap = _set2WayMap(inputJson, map);
             if(resultMap != null){
-              setState(() {
-                if(certType == 1){
+              if(certType == 1){
+                if(await canLaunchUrl(Uri.parse("kakaotalk://launch"))){
                   launchUrl(Uri.parse("kakaotalk://launch"));
+                }else{
+                  Config.isAndroid ? launchUrl(Uri.parse("market://details?id=com.kakao.talk"))
+                      : launchUrl(Uri.parse("https://apps.apple.com/kr/app/kakaotalk/id869223134?mt=12"));
                 }
-                isSetAuthPopOn = true;
+              }else if(certType == 6){
+                if(await canLaunchUrl(Uri.parse("naversearchapp://default?version=1"))){
+                  launchUrl(Uri.parse("naversearchapp://default?version=1"));
+                }else{
+                  Config.isAndroid ? launchUrl(Uri.parse("market://details?id=com.nhn.android.search"))
+                      : launchUrl(Uri.parse("https://apps.apple.com/kr/app/%EB%84%A4%EC%9D%B4%EB%B2%84-naver/id393499958"));
+                }
+              }else if(certType == 8){
+                if(await canLaunchUrl(Uri.parse("supertoss://launch"))){
+                  launchUrl(Uri.parse("supertoss://launch"));
+                }else{
+                  Config.isAndroid ? launchUrl(Uri.parse("market://details?id=viva.republica.toss"))
+                      : launchUrl(Uri.parse("https://apps.apple.com/kr/app/%ED%86%A0%EC%8A%A4/id839333328"));
+                }
+              }else if(certType == 5){
+                if(inputJson.containsKey("telecom")){
+                  String telecom = inputJson["telecom"];
+                  if(telecom == "0"){
+                    if(await canLaunchUrl(Uri.parse("tauthlink://launch"))){
+                      //launchUrl(Uri.parse("tauthlink://launch"));
+                      launchUrl(Uri.parse("market://details?id=com.sktelecom.tauth"));
+                    }else{
+                      Config.isAndroid ? launchUrl(Uri.parse("market://details?id=com.sktelecom.tauth"))
+                          : launchUrl(Uri.parse("https://apps.apple.com/kr/app/pass-by-skt/id1141258007"));
+                    }
+                  }else if(telecom == "1"){
+                    if(await canLaunchUrl(Uri.parse("ktauthexternalcall://launch"))){
+                      //launchUrl(Uri.parse("ktauthexternalcall://launch"));
+                      launchUrl(Uri.parse("market://details?id=com.kt.ktauth"));
+                    }else{
+                      Config.isAndroid ? launchUrl(Uri.parse("market://details?id=com.kt.ktauth"))
+                          : launchUrl(Uri.parse("https://apps.apple.com/kr/app/pass-by-kt/id1134371550"));
+                    }
+                  }else{
+                    if(await canLaunchUrl(Uri.parse("upluscorporation://launch"))){
+                      //launchUrl(Uri.parse("upluscorporation://launch"));
+                      launchUrl(Uri.parse("market://details?id=com.lguplus.smartotp"));
+                    }else{
+                      Config.isAndroid ? launchUrl(Uri.parse("market://details?id=com.lguplus.smartotp"))
+                          : launchUrl(Uri.parse("https://apps.apple.com/kr/app/pass-by-u/id1147394645"));
+                    }
+                  }
+                }
+              }
+              isSetAuthPopOn = true;
+              if(context.mounted){
                 _setAuthPop(context, representApi, certType, resultMap,(isAuthSuccess, authMap, authListMap, fullMap) async {
                   if(isAuthSuccess){
                     if(authMap != null){
@@ -331,13 +410,16 @@ class CodeFController{
                     }else{
                       callback(true, null, authListMap, fullMap);
                     }
+                  }else{
+                    callback(false, null, null, null);
                   }
                 });
-              });
+              }
+              setState(() {});
             }
+          }else{
+            callback(true, map, null, fullResultMap);
           }
-        }else{
-          callback(false, null, null, fullResultMap);
         }
       }
     });
@@ -383,6 +465,12 @@ class CodeFController{
     String certName = "인증을 완료하셨다면,";
     if(certType == 1){
       certName = "카카오앱에서 $certName";
+    }else if(certType == 6){
+      certName = "네이버앱에서 $certName";
+    }else if(certType == 8){
+      certName = "토스앱에서 $certName";
+    }else if(certType == 5){
+      certName = "PASS앱에서 $certName";
     }
 
     UiUtils.showSlideMenu(context, SlideType.bottomToTop, false, null, 25.h, 0.0, (context, setState){
@@ -405,14 +493,36 @@ class CodeFController{
                           if(map['result_code'] == "CF-03002"){
                             CommonUtils.flutterToast("인증을 진행해주세요.");
                             GetController.to.updateWait(false);
+                          }else if(fullMap!['result']['code'] == "CF-12872"){
+                            CommonUtils.log("i","cancel");
+                            CommonUtils.flutterToast("인증에 실패했습니다.\n다시 시도해주세요.");
+                            GetController.to.updateWait(false);
+                            callback(false, null, null, null);
+                          }else if(fullMap!['result']['code'] == "CF-12835"){
+                            CommonUtils.log("i","cancel");
+                            CommonUtils.flutterToast("인증서 정보가 없습니다.");
+                            GetController.to.updateWait(false);
+                            callback(false, null, null, null);
                           }else{
+                            CommonUtils.log("i","no cancel");
                             callback(true, map, null, fullMap);
                           }
                         }else{
                           if(listMap?[0]['result_code'] == "CF-03002"){
                             CommonUtils.flutterToast("인증을 진행해주세요.");
                             GetController.to.updateWait(false);
+                          }else if(fullMap!['result']['code'] == "CF-12872"){
+                            CommonUtils.log("i","cancel");
+                            CommonUtils.flutterToast("인증에 실패했습니다.\n다시 시도해주세요.");
+                            GetController.to.updateWait(false);
+                            callback(false, null, null, null);
+                          }else if(fullMap!['result']['code'] == "CF-12835"){
+                            CommonUtils.log("i","cancel");
+                            CommonUtils.flutterToast("인증서 정보가 없습니다.");
+                            GetController.to.updateWait(false);
+                            callback(false, null, null, null);
                           }else{
+                            CommonUtils.log("i","no cancel");
                             callback(true, null, listMap, fullMap);
                           }
                         }
@@ -495,6 +605,7 @@ class CodeFController{
 
       return inputJsonForlocalTaxPaymentCert;
     }else if(api == Apis.nhisIdentifyConfirmation){
+
       Map<String, dynamic> inputJsonForNhisIdConfirm = {
         "organization": "0002",
         "loginType": "5",
@@ -512,11 +623,23 @@ class CodeFController{
       return inputJsonForNhisIdConfirm;
     }else if(api == Apis.nhisConfirmation){
       DateTime now = CommonUtils.getCurrentLocalTime();
-      DateTime lastYearDate =DateTime(now.year - 1, 12, 31); // 7월 1일 이후이면 작년 날짜
+      DateTime oneMonthAgo = DateTime(
+        now.year,
+        now.month - 1,
+        now.day,
+        now.hour,
+        now.minute,
+        now.second,
+      );
+
+      String oneMonthAgoString = CommonUtils.convertTimeToString(oneMonthAgo);
+      DateTime lastYearDate = DateTime(oneMonthAgo.year - 1, 12, 31);
+      String targetMonth = oneMonthAgoString.substring(4,6);
+      String oneMonthAgoYearString = oneMonthAgoString.substring(0,4);
       String lastYearString = CommonUtils.convertTimeToString(lastYearDate).substring(0,4);
 
-      String startDate = "${lastYearString}01";
-      String endDate = "${lastYearString}12";
+      String startDate = "$lastYearString$targetMonth";
+      String endDate = "$oneMonthAgoYearString$targetMonth";
       CommonUtils.log("i", "$startDate ~ $endDate");
 
       Map<String, dynamic> inputJsonForNhisConfirm = {

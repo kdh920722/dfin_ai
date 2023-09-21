@@ -6,6 +6,48 @@
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
 
     <queries>
+        <package android:name="com.kakao.talk" /> <!-- 카카오톡 -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.BROWSABLE"/>
+            <data android:scheme="kakaotalk" />
+        </intent>
+
+        <package android:name="com.nhn.android.search" /> <!-- 네이버 -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.BROWSABLE"/>
+            <data android:scheme="naversearchapp" />
+        </intent>
+
+        <package android:name="viva.republica.toss" /> <!-- 토스-->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.BROWSABLE"/>
+            <data android:scheme="supertoss" />
+        </intent>
+
+        <package android:name="com.sktelecom.tauth" /> <!--PASS SKT-->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.BROWSABLE"/>
+            <data android:scheme="tauthlink" />
+        </intent>
+
+        <package android:name="com.kt.ktauth" /> <!--PASS KT-->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.BROWSABLE"/>
+            <data android:scheme="ktauthexternalcall" />
+        </intent>
+
+        <package android:name="com.lguplus.smartotp" /> <!--PASS LGU-->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.BROWSABLE"/>
+            <data android:scheme="upluscorporation" />
+        </intent>
+
         <!-- If your app opens https URLs -->
         <intent>
             <action android:name="android.intent.action.VIEW" />

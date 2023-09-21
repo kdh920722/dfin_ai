@@ -129,7 +129,12 @@ class UiUtils {
   }
 
   static Widget getImageButton(Image image, double size, Color iconColor, VoidCallback onPressedCallback) {
-    return SizedBox(width: size, height: size, child: IconButton(onPressed: onPressedCallback, icon: image, iconSize: size));
+    return SizedBox(width: size, height: size, child: IconButton(padding: const EdgeInsets.all(4.5), onPressed: onPressedCallback, icon: image, iconSize: size));
+  }
+
+  static Widget getRoundImageButton(Image image, double size, Color iconColor, VoidCallback onPressedCallback) {
+    return SizedBox(width: size, height: size, child: IconButton(padding: const EdgeInsets.all(4.5), onPressed: onPressedCallback, icon: ClipRRect(
+      borderRadius: BorderRadius.circular(10.0), child: image)));
   }
 
   static Widget getImage(double width, double height, Image image) {

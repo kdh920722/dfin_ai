@@ -222,6 +222,13 @@ class LogfinController {
               Map<String, dynamic> customerMap = userInfoOutputJson["customer"];
               if(customerMap.containsKey("uid")) MyData.customerUidForNiceCert = customerMap["uid"].toString();
               if(customerMap.containsKey("registration_no")) MyData.idNumber = customerMap["registration_no"] == null? "" : customerMap["registration_no"].toString();
+              if(customerMap.containsKey("job_type_id")){
+                for(var eachJob in jobList){
+                  if(eachJob.split("@")[1] == customerMap["job_type_id"].toString()){
+                    MyData.jobInfo = eachJob;
+                  }
+                }
+              }
             }
 
             // 2) 사건정보 조회
@@ -236,28 +243,23 @@ class LogfinController {
                 }else{
                   // 3-2) 사건정보 있으면 사건정보 이력화면(메인 뷰)로 이동(저장한걸 보여줌)
                   String bankInfo = "";
-                  String jobInfo = "";
                   String courtInfo = "";
                   String lendCountInfo = "";
                   for(var eachAccident in accidentList){
-                    var dataResult = jsonDecode(eachAccident["req_data"].toString())["pr"];
+                    Map<String, dynamic> dataResult = eachAccident;
 
                     for(var eachBank in bankList){
-                      if(eachBank.split("@")[1] == dataResult["bankCode"]){
+                      if(eachBank.split("@")[0] == dataResult["refund_bank"]){
                         bankInfo = eachBank;
                       }
                     }
-                    for(var eachJob in jobList){
-                      if(eachJob.split("@")[1] == dataResult["job"]){
-                        jobInfo = eachJob;
-                      }
-                    }
                     for(var eachCourt in courtList){
-                      if(eachCourt.split("@")[0] == dataResult["court_name"]){
+                      if(eachCourt.split("@")[0] == dataResult["courtname"]){
                         courtInfo = eachCourt;
                       }
                     }
-                    int count = int.parse(dataResult["lend_count"]);
+                    String lendCount = dataResult["lend_count"].toString() == ""? "0" : dataResult["lend_count"].toString();
+                    int count = int.parse(lendCount);
                     if(count == 0){
                       lendCountInfo = preLoanCountList[0];
                     }else if(count == 1){
@@ -266,19 +268,20 @@ class LogfinController {
                       lendCountInfo = preLoanCountList[2];
                     }
 
+                    String lendAmount = dataResult["lend_amount"].toString() == ""? "0" : dataResult["lend_amount"].toString();
+                    String wishAmount = dataResult["wish_amount"].toString() == ""? "0" : dataResult["wish_amount"].toString();
+                    String accidentNo = dataResult["issue_no"];
                     CommonUtils.log("", "accident data ====>\n"
                         "accidentUid: ${eachAccident["uid"]}\n"
-                        "accidentCaseNo: ${dataResult["caseNumberYear"]}${dataResult["caseNumberType"]}${dataResult["caseNumberNumber"]}\n"
+                        "accidentCaseNo: $accidentNo\n"
                         "courtInfo: $courtInfo\n"
                         "bankInfo: $bankInfo\n"
-                        "account: ${dataResult["account"]}\n"
-                        "jobIno: $jobInfo\n"
+                        "account: ${dataResult["refund_account"]}\n"
                         "lendCountInfo: $lendCountInfo\n"
                         "lend_amount: ${dataResult["lend_amount"]}\n"
                         "wish_amount: ${dataResult["wish_amount"]}\n");
-                    MyData.addToAccidentInfoList(AccidentInfoData(eachAccident["uid"], dataResult["caseNumberYear"], dataResult["caseNumberType"], dataResult["caseNumberNumber"],
-                        courtInfo, bankInfo, dataResult["account"], jobInfo, lendCountInfo, dataResult["lend_amount"], dataResult["wish_amount"]
-                    ));
+                    MyData.addToAccidentInfoList(AccidentInfoData(eachAccident["uid"], accidentNo.substring(0,4), accidentNo.substring(4,6), accidentNo.substring(6),
+                        courtInfo, bankInfo, dataResult["refund_account"].toString(), lendCountInfo, lendAmount, wishAmount));
                   }
 
                   callLogfinApi(LogfinApis.getLoansInfo, <String, dynamic>{}, (isSuccessToGetLoansInfo, loansInfoOutputJson){
@@ -307,6 +310,8 @@ class LogfinController {
                         }
 
                         GetController.to.updateLoanInfoList(MyData.getLoanInfoList());
+                      }else{
+                        GetController.to.resetLoanInfoList();
                       }
 
                       MyData.printData();
@@ -407,7 +412,7 @@ class LogfinController {
 }
 
 enum LogfinApis {
-  signUp, signIn, socialLogin, deleteAccount,
+  signUp, signIn, socialLogin, deleteAccount, prUpdateInfo,
   getUserInfo, prSearch, getOffers,
   applyProductDocSearch, applyProduct,
   getAccidentInfo, getOffersInfo,
@@ -443,6 +448,8 @@ extension LogfinApisExtension on LogfinApis {
         return '/get_loan.json';
       case LogfinApis.getOffers:
         return '/get_offers.json';
+      case LogfinApis.prUpdateInfo:
+        return '/pr_edit_complete.json';
     }
   }
 }

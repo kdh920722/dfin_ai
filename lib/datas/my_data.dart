@@ -12,6 +12,7 @@ class MyData {
   static String birth = "";
   static bool isMale = false;
   static String idNumber = "";
+  static String jobInfo = "";
   static String customerUidForNiceCert = "";
 
   static bool initSearchViewFromMainView = false;
@@ -138,6 +139,7 @@ class MyData {
         "email:$email\n"
         "birth:$birth\n"
         "isMale:$isMale\n"
+        "jobInfo:$jobInfo\n"
         "idNumber:$idNumber\n"
         "customerUidForNiceCert:$customerUidForNiceCert\n"
         "accidentInfoList: ${_accidentInfoList.length}\n"
@@ -157,6 +159,7 @@ class MyData {
     email = "";
     birth = "";
     isMale = false;
+    jobInfo = "";
     idNumber = "";
     initSearchViewFromMainView = false;
     isSnsLogin = false;

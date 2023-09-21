@@ -112,21 +112,21 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                   each.isPossible? UiUtils.getTextWithFixedScale("신청 가능", 12.sp, FontWeight.w600, ColorStyles.upFinTextAndBorderBlue, TextAlign.end, 1)
                       : UiUtils.getTextWithFixedScale("신청 불가능", 12.sp, FontWeight.w600, ColorStyles.upFinRed, TextAlign.end, 1),
                   UiUtils.getMarginBox(0, 0.5.h),
-                  each.isPossible? UiUtils.getTextWithFixedScale(msg, 10.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)
+                  each.isPossible? Container()
                       : UiUtils.getTextWithFixedScale(msg, 10.sp, FontWeight.w500, ColorStyles.upFinRed, TextAlign.start, null),
                 ])),
                 Expanded(flex: 1, child: each.isPossible? Icon(Icons.arrow_forward_ios_rounded, color: ColorStyles.upFinButtonBlue, size: 5.5.w) : Container()),
               ]), () {
-
-            // 신청 가능 상태일 때만
-                UiUtils.showLoadingPop(context);
-                LogfinController.getPrDocsList(each.productOfferId, each.productOfferRid, (isSuccessToSearchDocs, _){
-                  UiUtils.closeLoadingPop(context);
-                  if(isSuccessToSearchDocs){
-                    MyData.selectedPrInfoData = each;
-                    CommonUtils.moveTo(context, AppView.detailPrView.value, null);
+                  if(each.isPossible) {
+                    UiUtils.showLoadingPop(context);
+                    LogfinController.getPrDocsList(each.productOfferId, each.productOfferRid, (isSuccessToSearchDocs, _){
+                      UiUtils.closeLoadingPop(context);
+                      if(isSuccessToSearchDocs){
+                        MyData.selectedPrInfoData = each;
+                        CommonUtils.moveTo(context, AppView.detailPrView.value, null);
+                      }
+                    });
                   }
-                });
           })
       );
       prInfoWidgetList.add(UiUtils.getMarginBox(0, 1.2.h));

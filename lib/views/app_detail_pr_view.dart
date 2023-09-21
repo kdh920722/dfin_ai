@@ -77,6 +77,12 @@ class AppDetailPrViewState extends State<AppDetailPrView> with WidgetsBindingObs
     item2Agreed = true;
   }
 
+  void _setAllUnChecked(){
+    allAgreed = false;
+    item1Agreed = false;
+    item2Agreed = false;
+  }
+
   Widget _makeAgreeWidget(BuildContext thisContext, StateSetter thisSetState){
     return Material(child: Container(color: ColorStyles.upFinWhite,
         child: Column(children: [
@@ -97,10 +103,22 @@ class AppDetailPrViewState extends State<AppDetailPrView> with WidgetsBindingObs
             children: [
               UiUtils.getCircleCheckBox(1.4, allAgreed!, (isChanged) {
                 thisSetState(() {
-                  _setAllChecked();
+                  if(allAgreed!){
+                    _setAllUnChecked();
+                  }else{
+                    _setAllChecked();
+                  }
                 });
               }),
-              UiUtils.getTextWithFixedScale("전체동의", 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null)
+              SizedBox(width: 70.w, child: UiUtils.getTextStyledButtonWithFixedScale("전체동의", 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null, (){
+                thisSetState(() {
+                  if(allAgreed!){
+                    _setAllUnChecked();
+                  }else{
+                    _setAllChecked();
+                  }
+                });
+              }))
             ],
           )),
           UiUtils.getMarginBox(0, 2.h),
