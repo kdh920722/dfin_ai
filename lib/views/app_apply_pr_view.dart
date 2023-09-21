@@ -405,16 +405,14 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     await _cameraController!.setFocusMode(FocusMode.locked);
     await _cameraController!.setExposureMode(ExposureMode.locked);
     final imageFile = await _cameraController!.takePicture();
-    await _cameraController!.setFocusMode(FocusMode.auto);
-    await _cameraController!.setExposureMode(ExposureMode.auto);
     setState(() {
       currentViewId = _getViewIdFromListById(cameraId);
     });
-
-    final imagePath = imageFile.path;
+    await _cameraController!.setFocusMode(FocusMode.auto);
+    await _cameraController!.setExposureMode(ExposureMode.auto);
     if(context.mounted){
-      if(imagePath != ""){
-        await _checkValidCertImage(imagePath);
+      if(imageFile.path != ""){
+        _checkValidCertImage(imageFile.path);
       }else{
         if(context.mounted) UiUtils.closeLoadingPop(context);
       }

@@ -366,7 +366,7 @@ class CodeFController{
                 }
               }else if(certType == 8){
                 if(await canLaunchUrl(Uri.parse("supertoss://launch"))){
-                  launchUrl(Uri.parse("supertoss://launch"));
+                  launchUrl(Uri.parse("market://details?id=viva.republica.toss"));
                 }else{
                   Config.isAndroid ? launchUrl(Uri.parse("market://details?id=viva.republica.toss"))
                       : launchUrl(Uri.parse("https://apps.apple.com/kr/app/%ED%86%A0%EC%8A%A4/id839333328"));
