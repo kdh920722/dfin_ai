@@ -913,18 +913,20 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           ),
         ),
         Positioned(
+          top: 35.h,
           left: 0,
           child: Container(
             width: 8.w,
-            height: 35.h,
+            height: 25.h,
             color: Colors.black54,
           ),
         ),
         Positioned(
+          top: 35.h,
           right: 0,
           child: Container(
             width: 8.w,
-            height: 35.h,
+            height: 25.h,
             color: Colors.black54,
           ),
         ),
