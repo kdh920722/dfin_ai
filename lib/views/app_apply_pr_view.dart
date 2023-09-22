@@ -855,7 +855,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("신분증을 준비해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 1.h),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("주민등록증과 운전면허증 중", 12.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("하나를 선택 해 주세요.", 12.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("하나를 촬영 해 주세요.", 12.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 10.h),
       SizedBox(width: 85.w, height: 30.h,
           child: ConstrainedBox(constraints: BoxConstraints(maxWidth: 85.w, maxHeight: 30.h),
@@ -864,7 +864,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       ),
       UiUtils.getMarginBox(0, 0.5.h),
       SizedBox(width: 85.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-        UiUtils.getBorderButtonBox(42.w, ColorStyles.upFinWhite, ColorStyles.upFinTextAndBorderBlue,
+        UiUtils.getBorderButtonBox(85.w, ColorStyles.upFinWhite, ColorStyles.upFinTextAndBorderBlue,
             UiUtils.getTextWithFixedScale("촬영하기", 11.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
                 () {
                   //_takeImage(true);
@@ -873,12 +873,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
                   });
                 }),
-        UiUtils.getMarginBox(1.w, 0),
-        UiUtils.getBorderButtonBox(42.w, ColorStyles.upFinWhite, ColorStyles.upFinTextAndBorderBlue,
-            UiUtils.getTextWithFixedScale("앨범에서 가져오기", 11.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
-                () {
-              _takeImage(false);
-            }),
       ])),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getExpandedScrollView(Axis.vertical, Container()),
@@ -900,35 +894,44 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           top: 0,
           child: Container(
             width: 100.w,
-            height: 35.h,
+            height: 35.4.h,
             color: Colors.black54,
           ),
         ),
         Positioned(
-          top: 60.h,
+          top: 59.595.h,
           child: Container(
             width: 100.w,
-            height: 40.h,
+            height: 40.4.h,
             color: Colors.black54,
           ),
         ),
         Positioned(
-          top: 35.h,
+          top: 35.4.h,
           left: 0,
           child: Container(
             width: 8.w,
-            height: 25.h,
+            height: 24.2.h,
             color: Colors.black54,
           ),
         ),
         Positioned(
-          top: 35.h,
+          top: 35.4.h,
           right: 0,
           child: Container(
             width: 8.w,
-            height: 25.h,
+            height: 24.2.h,
             color: Colors.black54,
           ),
+        ),
+        Positioned(
+          top: 3.h,
+          right: 5.w,
+          child: UiUtils.getIconButton(Icons.close, 10.w, ColorStyles.upFinWhite, () {
+            setState(() {
+              currentViewId = _getViewIdFromListById(cameraId);
+            });
+          })
         ),
         Positioned(
             top: 28.h,
@@ -940,6 +943,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               width: 85.w,
               height: 25.h,
               decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
                 border: Border.all(
                   color: ColorStyles.upFinButtonBlue,
                   width: 1.w,
