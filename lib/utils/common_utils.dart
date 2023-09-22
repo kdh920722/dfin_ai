@@ -214,7 +214,7 @@ class CommonUtils {
   }
 
   static void flutterToast(String msgString){
-    Fluttertoast.showToast(msg: msgString, gravity: ToastGravity.BOTTOM, backgroundColor: ColorStyles.darkGray, fontSize: 20, textColor: Colors.white, toastLength: Toast.LENGTH_LONG);
+    Fluttertoast.showToast(msg: msgString, gravity: ToastGravity.BOTTOM, backgroundColor: ColorStyles.upFinDarkGray, fontSize: 20, textColor: Colors.white, toastLength: Toast.LENGTH_LONG);
   }
 
   static Size _getSize(GlobalKey key) {
@@ -298,16 +298,16 @@ class CommonUtils {
       context: context!,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('FinApp 종료', style: TextStyles.finishPopTitleStyle),
-          content: Text('앱을 종료 하시겠습니까?', style: TextStyles.finishPopContentsStyle),
+          title: Text('FinApp 종료', style: TextStyles.upFinTitleTextStyle),
+          content: Text('앱을 종료 하시겠습니까?', style: TextStyles.upFinBasicTextStyle),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: Text('아니오', style: TextStyles.finishPopButtonTextStyle),
+              child: Text('아니오', style: TextStyles.upFinBasicTextStyle),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: Text('예', style: TextStyles.finishPopButtonTextStyle),
+              child: Text('예', style: TextStyles.upFinBasicTextStyle),
             ),
           ],
         );

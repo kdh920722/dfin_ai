@@ -478,7 +478,8 @@ class CodeFController{
           Column(mainAxisAlignment: MainAxisAlignment.start, children:
           [
             UiUtils.getMarginBox(0, 3.h),
-            GetController.to.isWait.value ? UiUtils.getStyledTextWithFixedScale("인증 정보를 확인하는 중입니다...", TextStyles.upFinBasicTextStyle, TextAlign.center, null) : UiUtils.getStyledTextWithFixedScale("", TextStyles.basicTextStyle, TextAlign.center, null),
+            GetController.to.isWait.value ? UiUtils.getStyledTextWithFixedScale("인증 정보를 확인하는 중입니다...", TextStyles.upFinBasicTextStyle, TextAlign.center, null) :
+            UiUtils.getStyledTextWithFixedScale("", TextStyles.upFinBasicTextStyle, TextAlign.center, null),
             GetController.to.isWait.value ? Container() : Column(children: [
               UiUtils.getStyledTextWithFixedScale(certName, TextStyles.upFinBasicTextStyle, TextAlign.center, null),
               UiUtils.getMarginBox(0, 0.5.h),

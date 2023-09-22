@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:sizer/sizer.dart';
 import '../styles/ColorStyles.dart';
-import '../styles/TextStyles.dart';
 import '../configs/app_config.dart';
 import 'common_utils.dart';
 
@@ -228,23 +227,6 @@ class UiUtils {
     );
   }
 
-  static SizedBox getCountDownButtonBox(double buttonWidth, String buttonText, Color buttonColor, VoidCallback onPressedCallback) {
-    return SizedBox(
-        width: buttonWidth,
-        child: ElevatedButton(
-          style: ButtonStyle(
-            elevation: MaterialStateProperty.all(0.0),
-            backgroundColor: MaterialStateProperty.all(buttonColor),
-          ),
-          onPressed: onPressedCallback,
-          child: Padding(
-            padding: EdgeInsets.all(4.w),
-            child: getStyledTextWithFixedScale(buttonText,TextStyles.countDownButtonStyle,TextAlign.center,null)
-          ),
-        )
-    );
-  }
-
   static SizedBox getBorderButtonBox(double buttonWidth, Color buttonColor, Color borderColor, Widget childWidget, VoidCallback onPressedCallback){
     return SizedBox(
         width: buttonWidth,
@@ -261,38 +243,6 @@ class UiUtils {
             child: childWidget,
         )
     );
-  }
-
-  static SizedBox getActiveButtonBox(double buttonWidth, String buttonText, bool isActive, Color activeButtonColor, Color inactiveButtonColor, VoidCallback onPressedCallback) {
-    if(isActive){
-      return SizedBox(
-          width: buttonWidth,
-          child: ElevatedButton(
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all(activeButtonColor),
-            ),
-            onPressed: onPressedCallback,
-            child: Padding(
-              padding: EdgeInsets.all(4.w),
-              child: getStyledTextWithFixedScale(buttonText, TextStyles.buttonTextStyle, TextAlign.center, null)
-            ),
-          )
-      );
-    }else{
-      return SizedBox(
-          width: buttonWidth,
-          child: ElevatedButton(
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all(inactiveButtonColor),
-            ),
-            onPressed: () { },
-            child: Padding(
-              padding: EdgeInsets.all(4.w),
-              child: getStyledTextWithFixedScale(buttonText, TextStyles.buttonTextStyle, TextAlign.center, null)
-            ),
-          )
-      );
-    }
   }
 
   static Widget getCountCircleBox(double circleBoxSize, int messageCount, double fontSize, FontWeight fontWeight, Color textColor, TextAlign textAlign, int textMaxLine){
@@ -332,14 +282,6 @@ class UiUtils {
 
   static Widget getExpandedScrollViewWithController(Axis scrollDir, Widget scrollChildView, ScrollController controller){
     return Expanded(child: SingleChildScrollView(controller: controller, scrollDirection: scrollDir, physics: const BouncingScrollPhysics(), child: scrollChildView));
-  }
-
-  static Text getTitle(String titleText){
-    return getStyledTextWithFixedScale(titleText, TextStyles.titleTextStyle, TextAlign.start, null);
-  }
-
-  static Text getSubTitle(String titleText){
-    return getStyledTextWithFixedScale(titleText, TextStyles.subTitleTextStyle, TextAlign.start, null);
   }
 
   static Widget getDisabledTextField(double width, String initText, TextStyle textStyle, InputDecoration inputDecoration){
@@ -394,7 +336,7 @@ class UiUtils {
                   return Container(
                       width: 100.w,
                       height: 100.h,
-                      color: ColorStyles.darkGrayWithAlpha,
+                      color: ColorStyles.upFinDarkGrayWithAlpha,
                       child: SpinKitCubeGrid(color: ColorStyles.upFinTextAndBorderBlue, size: 25.w)
                   );
                 })
