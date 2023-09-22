@@ -296,6 +296,13 @@ class UiUtils {
             keyboardType: textInputType, decoration: inputDecoration, onChanged: onChangedCallback, style: textStyle));
   }
 
+  static Widget getChatTextField(double width, TextStyle textStyle, FocusNode focusNode, TextEditingController textEditingController, TextInputType textInputType,
+      InputDecoration inputDecoration, ValueChanged<String> onChangedCallback){
+    return SizedBox(width: width,
+        child: TextField(maxLines: null, focusNode: focusNode, cursorColor: ColorStyles.upFinBlack, controller: textEditingController,
+            keyboardType: textInputType, decoration: inputDecoration, onChanged: onChangedCallback, style: textStyle));
+  }
+
   static Widget getTextFormField(double width, TextStyle textStyle, FocusNode focusNode, TextEditingController textEditingController, TextInputType textInputType, bool isPwd,
       InputDecoration inputDecoration, ValueChanged<String> onChangedCallback, FormFieldValidator<String> validatorCallback){
     return SizedBox(width: width,

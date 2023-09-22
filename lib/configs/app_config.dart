@@ -12,6 +12,7 @@ import 'package:upfin/views/app_web_view.dart';
 import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
 import '../utils/common_utils.dart';
+import '../views/app_chat_view.dart';
 import '../views/app_login_certification_view.dart';
 import '../views/app_login_view.dart';
 
@@ -39,7 +40,8 @@ class Config{
     AppView.updateAccidentView.value : (context) => AppUpdateAccidentView(),
     AppView.resultPrView.value : (context) => AppResultPrView(),
     AppView.detailPrView.value : (context) => AppDetailPrView(),
-    AppView.applyPrView.value : (context) => AppApplyPrView()
+    AppView.applyPrView.value : (context) => AppApplyPrView(),
+    AppView.appChatView.value : (context) => AppChatView()
   };
 
   static Future<void> initAppState(Function(bool isSuccess) callback) async{
@@ -69,7 +71,7 @@ class Config{
 }
 
 enum AppView {
-  rootLoginView, certificationView, webView, signupView, mainView, searchAccidentView, updateAccidentView, resultPrView, detailPrView, applyPrView
+  rootLoginView, certificationView, webView, signupView, mainView, searchAccidentView, updateAccidentView, resultPrView, detailPrView, applyPrView, appChatView
 }
 
 extension SAppViewExtension on AppView {
@@ -95,6 +97,8 @@ extension SAppViewExtension on AppView {
         return '/detailPrView';
       case AppView.applyPrView:
         return '/applyPrView';
+      case AppView.appChatView:
+        return '/appChatView';
     }
   }
 }

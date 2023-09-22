@@ -389,9 +389,11 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         _cameraController = CameraController(
           cameras.first,
           ResolutionPreset.medium,
+          enableAudio: false
         );
 
         _cameraController!.initialize().then((_) {
+          _cameraController!.setFlashMode(FlashMode.off);
           setState(() {
             _isCameraReady = true;
           });
@@ -402,6 +404,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
   Future<void> _onTakePicture(BuildContext context) async {
     UiUtils.showLoadingPop(context);
+    _cameraController!.setFlashMode(FlashMode.off);
     await _cameraController!.setFocusMode(FocusMode.locked);
     await _cameraController!.setExposureMode(ExposureMode.locked);
     final imageFile = await _cameraController!.takePicture();

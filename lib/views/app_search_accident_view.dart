@@ -46,7 +46,6 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
 
   final int bankCodeViewId = 3;
   Key? selectedBankCodeKey;
-  final ScrollController _bankScrollController = ScrollController();
   String selectedBankCodeInfo = "";
 
   final int bankAccountViewId = 4;
@@ -119,7 +118,6 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
   void _disposeAllTextControllers(){
     _accidentInfoTextController1.dispose();
     _accidentInfoTextController2.dispose();
-    _bankScrollController.dispose();
     _bankAccountInfoTextController.dispose();
     _preLoanPriceTextController.dispose();
     _wantLoanPriceTextController.dispose();
@@ -420,7 +418,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       UiUtils.getMarginBox(0, 1.h),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("개인회생 신청 시 제출했던 본인의 계좌", 14.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getExpandedScrollViewWithController(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: bankCodeList), _bankScrollController),
+      UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: bankCodeList)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
         CommonUtils.log("i", "bank code : $selectedBankCodeInfo");
