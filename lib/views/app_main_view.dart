@@ -471,6 +471,9 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                 UiUtils.getMarginBox(0, 3.h),
                 UiUtils.getBorderButtonBox(80.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
                     UiUtils.getTextWithFixedScale("시작하기", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, null), () {
+                      setState(() {
+                        doCheckToSearchAccident = false;
+                      });
                       CommonUtils.moveTo(context, AppView.searchAccidentView.value, null);
                     }),
                 UiUtils.getMarginBox(0, 2.h),
