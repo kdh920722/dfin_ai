@@ -197,8 +197,13 @@ class LogfinController {
           callback(false, resultData);
         }
       } else {
-        CommonUtils.log('e', 'http error code : ${response.statusCode}');
-        callback(false, <String,dynamic>{"error":"http연결에\n에러가 발생했습니다."});
+        final resultData = json;
+        if(resultData["error"] == "Invalid Email or password."){
+          callback(false, <String,dynamic>{"error":"회원가입이 필요합니다."});
+        }else{
+          CommonUtils.log('e', 'http error code : ${response.statusCode}');
+          callback(false, <String,dynamic>{"error":"http연결에\n에러가 발생했습니다."});
+        }
       }
     } catch (e) {
       CommonUtils.log('e', e.toString());
@@ -232,13 +237,14 @@ class LogfinController {
             }
 
             // 2) 사건정보 조회
+            GetController.to.updateMainDataChangedFlag();
             callLogfinApi(LogfinApis.getAccidentInfo, <String, dynamic>{}, (isSuccessToGetAccidentInfo, accidentInfoOutputJson){
+              MyData.clearAccidentInfoList();
               if(isSuccessToGetAccidentInfo){
                 List<dynamic> accidentList = accidentInfoOutputJson!["accidents"];
                 if(accidentList.isEmpty){
                   // 3-1) 사건정보 없으면 한도금리 조회를 위한 조건 입력 화면으로 이동(한도금리 조회 시, 사건정보 저장)
                   MyData.printData();
-                  MyData.initSearchViewFromMainView = false;
                   callback(true, AppView.searchAccidentView);
                 }else{
                   // 3-2) 사건정보 있으면 사건정보 이력화면(메인 뷰)로 이동(저장한걸 보여줌)
@@ -283,8 +289,9 @@ class LogfinController {
                     MyData.addToAccidentInfoList(AccidentInfoData(eachAccident["uid"], accidentNo.substring(0,4), accidentNo.substring(4,6), accidentNo.substring(6),
                         courtInfo, bankInfo, dataResult["refund_account"].toString(), lendCountInfo, lendAmount, wishAmount));
                   }
-
+                  GetController.to.updateMainDataChangedFlag();
                   callLogfinApi(LogfinApis.getLoansInfo, <String, dynamic>{}, (isSuccessToGetLoansInfo, loansInfoOutputJson){
+                    MyData.clearLoanInfoList();
                     if(isSuccessToGetLoansInfo){
                       List<dynamic> loansList = loansInfoOutputJson!["loans"];
                       if(loansList.isNotEmpty){
@@ -308,14 +315,10 @@ class LogfinController {
                               eachLoans["lender_pr"]["lender"]["name"].toString(), eachLoans["lender_pr"]["lender"]["product_name"].toString(), eachLoans["lender_pr"]["lender"]["contact_no"].toString(),
                               eachLoans["submit_offer"]["created_at"].toString(), eachLoans["submit_offer"]["updated_at"].toString(), eachLoans["status_info"]["id"].toString()));
                         }
-
-                        GetController.to.updateLoanInfoList(MyData.getLoanInfoList());
-                      }else{
-                        GetController.to.resetLoanInfoList();
                       }
 
                       MyData.printData();
-                      MyData.initSearchViewFromMainView = true;
+                      GetController.to.updateMainDataChangedFlag();
                       callback(true, AppView.mainView);
                     }else{
                       CommonUtils.flutterToast(loansInfoOutputJson!["error"]);
@@ -337,6 +340,7 @@ class LogfinController {
           callback(false, null);
         }
       });
+
     }catch(error){
       CommonUtils.flutterToast("데이터 로딩 실패\n다시 실행 해 주세요.");
       callback(false, null);
@@ -359,7 +363,7 @@ class LogfinController {
               CommonUtils.log("i", "$each");
               MyData.addToPrInfoList(PrInfoData(accidentUid, offerId, each["rid"], each["lender_pr_id"].toString(), each["lender_name"], each["lender_id"].toString(),
                   each["product_name"], each["rid"], each["min_rate"].toString(), each["max_rate"].toString(),
-                  each["limit"].toString(), "assets/images/deutsche_bank_icon.png", each["result"] as bool, each["msg"]));
+                  each["limit"].toString(), "assets/images/temp_bank_logo.png", each["result"] as bool, each["msg"]));
             }
 
             if(MyData.getPrInfoList().isNotEmpty){

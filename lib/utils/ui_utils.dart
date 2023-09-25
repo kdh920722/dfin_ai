@@ -13,7 +13,7 @@ class UiUtils {
       builder: (BuildContext context, Orientation orientation, DeviceType deviceType) {
         return MaterialApp(
           theme: ThemeData(useMaterial3: true),
-          initialRoute: AppView.rootLoginView.value,
+          initialRoute: AppView.rootView.value,
           routes: Config.appRoutes
         );
       },
@@ -72,6 +72,10 @@ class UiUtils {
 
   static Text getStyledTextWithFixedScale(String text, TextStyle textStyle, TextAlign? textAlign, int? textMaxLine){
     return Text(text, style: textStyle, textScaleFactor: 1.0, textAlign: textAlign, maxLines: textMaxLine);
+  }
+
+  static Text getTitleWithFixedScale(String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign? textAlign, int? textMaxLine){
+    return Text(text, style: TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "Pacifico", fontWeight: fontWeight, fontSize: fontSize, color: textColor), textScaleFactor: 1.0, textAlign: textAlign, maxLines: textMaxLine);
   }
 
   static Text getTextWithFixedScale(String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign? textAlign, int? textMaxLine){
@@ -152,9 +156,11 @@ class UiUtils {
     return Container(color: backgroundColor, width: width, height: height,child: IconButton(onPressed: onPressedCallback, icon: Icon(icon, color: iconColor, size: size)));
   }
 
-  static SizedBox getIconButtonBox(double buttonWidth, Color buttonColor, IconData icon, double size, Color iconColor, VoidCallback onPressedCallback) {
-    return SizedBox(
+  static Widget getIconButtonBox(double buttonWidth, Color buttonColor, IconData icon, double size, Color iconColor, VoidCallback onPressedCallback) {
+    return Container(
         width: buttonWidth,
+        height: buttonWidth,
+        padding: EdgeInsets.zero,
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
             backgroundColor: buttonColor,
@@ -175,7 +181,7 @@ class UiUtils {
           style: ElevatedButton.styleFrom(
             backgroundColor: buttonColor,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
-            elevation: 0.5,
+            elevation: 0.0,
             shadowColor: ColorStyles.upFinGray,
           ),
           onPressed: onPressedCallback,
@@ -236,11 +242,30 @@ class UiUtils {
               backgroundColor: buttonColor,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
               side: BorderSide(width: 1.3, color: borderColor),
-              elevation: 0.5,
+              elevation: 0.0,
               shadowColor: ColorStyles.upFinGray,
             ),
             onPressed: onPressedCallback,
             child: childWidget,
+        )
+    );
+  }
+
+  static SizedBox getBannerButtonBox(double buttonWidth, double buttonHeight, Color buttonColor, Color borderColor, Widget childWidget, VoidCallback onPressedCallback){
+    return SizedBox(
+        width: buttonWidth,
+        height: buttonHeight,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.only(left: 4.w, right: 4.w, top: 4.w, bottom: 4.w),
+            backgroundColor: buttonColor,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            side: BorderSide(width: 1.3, color: borderColor),
+            elevation: 0.0,
+            shadowColor: ColorStyles.upFinGray,
+          ),
+          onPressed: onPressedCallback,
+          child: childWidget,
         )
     );
   }
@@ -313,15 +338,19 @@ class UiUtils {
   static InputDecoration getInputDecoration(String labelText, double labelTextSize, String counterText, double counterTextSize){
     return InputDecoration(
         labelText: labelText,
-        floatingLabelBehavior: FloatingLabelBehavior.always,
+        floatingLabelBehavior: FloatingLabelBehavior.auto,
         labelStyle: TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "SpoqaHanSansNeo", color: ColorStyles.upFinTextAndBorderBlue, fontSize: labelTextSize, fontWeight: FontWeight.w500),
         hintText: "",
         counterText: counterText,
         errorStyle: TextStyle(fontSize: 0.sp),
         counterStyle: TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "SpoqaHanSansNeo", color: ColorStyles.upFinTextAndBorderBlue, fontSize: counterTextSize, fontWeight: FontWeight.w500),
-        enabledBorder: const UnderlineInputBorder(borderSide: BorderSide(color: ColorStyles.upFinButtonBlue)),
-        border: const UnderlineInputBorder(borderSide: BorderSide(color: ColorStyles.upFinButtonBlue)),
-        focusedBorder: const UnderlineInputBorder(borderSide: BorderSide(color: ColorStyles.upFinTextAndBorderBlue)),
+        enabledBorder: const UnderlineInputBorder(
+            borderSide: BorderSide(color: ColorStyles.upFinButtonBlue)),
+
+        focusedBorder: UnderlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: ColorStyles.upFinButtonBlue),
+        ),
         errorBorder: const UnderlineInputBorder(borderSide: BorderSide(color: ColorStyles.upFinRed)),
         filled: true,
         fillColor: ColorStyles.upFinWhite
@@ -549,7 +578,18 @@ class UiUtils {
   }
 
   static Widget getInitLoadingView(int percent) {
-    return Container(width: 100.w, height: 100.h, color: ColorStyles.upFinWhite,
+    return Container(width: 100.w, height: 100.h, color: ColorStyles.upFinButtonBlue,
+        child: Stack(alignment: Alignment.center, children: [
+          Positioned(
+              bottom: 0,
+              child: UiUtils.getImage(90.w, 90.w, Image.asset(fit: BoxFit.fill,'assets/images/img_man_searcher.png'))),
+          Positioned(
+              top: 35.h,
+              child: UiUtils.getTitleWithFixedScale("upfin", 75.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null))
+        ])
+    );
+      /*
+      Container(width: 100.w, height: 100.h, color: ColorStyles.upFinWhite,
         child: Center(child: CircularPercentIndicator(
           animateFromLastPercent: true,
           radius: 65.0,
@@ -562,6 +602,7 @@ class UiUtils {
           progressColor: ColorStyles.upFinButtonBlue,
         ))
     );
+       */
   }
 
 }

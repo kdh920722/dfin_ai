@@ -267,46 +267,27 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       );
     }
 
-    if(MyData.initSearchViewFromMainView){
-      return UiUtils.getRowColumnWithAlignCenter([
-        MyData.initSearchViewFromMainView ? SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () {
-            Navigator.pop(context);
-          }),
-        ])) : Container(),
-        UiUtils.getMarginBox(0, 3.h),
-        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("개인회생 사건정보", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("법원을 선택해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-        UiUtils.getMarginBox(0, 5.h),
-        UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: courtList)),
-        UiUtils.getMarginBox(0, 5.h),
-        UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-          CommonUtils.log("i", "court : $selectedCourtInfo");
-          if(selectedCourtInfo.isNotEmpty){
-            nextInputView();
-          }else{
-            CommonUtils.flutterToast(errorMsg);
-          }
-        })
-      ]);
-    }else{
-      return UiUtils.getRowColumnWithAlignCenter([
-        UiUtils.getMarginBox(0, 10.h),
-        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("개인회생 사건정보", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("법원을 선택해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-        UiUtils.getMarginBox(0, 5.h),
-        UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: courtList)),
-        UiUtils.getMarginBox(0, 5.h),
-        UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-          CommonUtils.log("i", "court : $selectedCourtInfo");
-          if(selectedCourtInfo.isNotEmpty){
-            nextInputView();
-          }else{
-            CommonUtils.flutterToast(errorMsg);
-          }
-        })
-      ]);
-    }
+    return UiUtils.getRowColumnWithAlignCenter([
+      SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () {
+          Navigator.pop(context, "back");
+        }),
+      ])),
+      UiUtils.getMarginBox(0, 3.h),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("개인회생 사건정보", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("법원을 선택해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      UiUtils.getMarginBox(0, 5.h),
+      UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: courtList)),
+      UiUtils.getMarginBox(0, 5.h),
+      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+        CommonUtils.log("i", "court : $selectedCourtInfo");
+        if(selectedCourtInfo.isNotEmpty){
+          nextInputView();
+        }else{
+          CommonUtils.flutterToast(errorMsg);
+        }
+      })
+    ]);
   }
   /// court view end
 
@@ -790,7 +771,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
             LogfinController.getMainOrSearchView((isSuccessToGetViewInfo, viewInfo){
               UiUtils.closeLoadingPop(context);
               if(isSuccessToGetViewInfo){
-                CommonUtils.moveWithReplacementTo(context, viewInfo!.value, null);
+                CommonUtils.moveWithUntil(context, viewInfo!.value);
               }else{
                 CommonUtils.flutterToast("화면을 불러오는데 실패했습니다.\n다시 실행해주세요.");
               }

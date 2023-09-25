@@ -5,6 +5,7 @@ import 'package:upfin/views/app_apply_pr_view.dart';
 import 'package:upfin/views/app_detail_pr_view.dart';
 import 'package:upfin/views/app_main_view.dart';
 import 'package:upfin/views/app_result_pr_view.dart';
+import 'package:upfin/views/app_root_view.dart';
 import 'package:upfin/views/app_search_accident_view.dart';
 import 'package:upfin/views/app_signup_view.dart';
 import 'package:upfin/views/app_update_accident_view.dart';
@@ -31,7 +32,8 @@ class Config{
   static List<Permission> permissionList = [Permission.notification];
 
   static Map<String, WidgetBuilder> appRoutes = {
-    AppView.rootLoginView.value : (context) => AppLoginView(),
+    AppView.rootView.value : (context) => AppRootView(),
+    AppView.loginView.value : (context) => AppLoginView(),
     AppView.certificationView.value : (context) => AppLoginCertificationView(),
     AppView.webView.value : (context) => AppWebView(),
     AppView.signupView.value : (context) => AppSignUpView(),
@@ -71,13 +73,15 @@ class Config{
 }
 
 enum AppView {
-  rootLoginView, certificationView, webView, signupView, mainView, searchAccidentView, updateAccidentView, resultPrView, detailPrView, applyPrView, appChatView
+  rootView, loginView, certificationView, webView, signupView, mainView, searchAccidentView, updateAccidentView, resultPrView, detailPrView, applyPrView, appChatView
 }
 
 extension SAppViewExtension on AppView {
   String get value {
     switch (this) {
-      case AppView.rootLoginView:
+      case AppView.rootView:
+        return '/rootView';
+      case AppView.loginView:
         return '/loginView';
       case AppView.certificationView:
         return '/certification';

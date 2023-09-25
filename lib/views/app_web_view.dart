@@ -15,7 +15,7 @@ class AppWebViewState extends State<AppWebView> {
   static Uri myUrl = Uri.parse("");
 
   Widget _getWebView(BuildContext context, StateSetter setState, String url){
-    myUrl = Uri.parse("$url");
+    myUrl = Uri.parse(url);
     return SafeArea(
         child : Scaffold(
           backgroundColor: Colors.black,

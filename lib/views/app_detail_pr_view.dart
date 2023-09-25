@@ -194,46 +194,49 @@ class AppDetailPrViewState extends State<AppDetailPrView> with WidgetsBindingObs
 
   @override
   Widget build(BuildContext context) {
-    Widget view = Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: EdgeInsets.all(5.w), child: Column(children: [
-      Config.deppLinkInfo == "" ? SizedBox(width: 95.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () {
+    Widget view = Container(color: ColorStyles.upFinButtonBlue, width: 100.w, height: 100.h, padding: EdgeInsets.all(5.w), child: Column(children: [
+      SizedBox(width: 95.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        UiUtils.getIconButtonWithHeight(3.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinWhite, () {
           Navigator.pop(context);
         }),
-      ])) : Container(),
-      Config.deppLinkInfo == "" ? UiUtils.getMarginBox(0, 7.h) : UiUtils.getMarginBox(0, 10.h),
-      SizedBox(width: 95.w, child: UiUtils.getTextWithFixedScale(MyData.selectedPrInfoData!.productCompanyName, 20.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
-      UiUtils.getMarginBox(0, 0.5.h),
-      SizedBox(width: 95.w, child: UiUtils.getTextWithFixedScale(MyData.selectedPrInfoData!.productName, 16.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
+      ])),
       UiUtils.getMarginBox(0, 2.h),
-      UiUtils.getExpandedScrollView(Axis.vertical, SizedBox(width: 95.w, child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-        SizedBox(width: 95.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          UiUtils.getImage(40.w, 20.h, Image.asset(MyData.selectedPrInfoData!.productCompanyLogo))
-        ])),
-        UiUtils.getMarginBox(0, 3.h),
-        SizedBox(width: 95.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          Column(children: [
-            SizedBox(width: 25.w, child: UiUtils.getTextWithFixedScale("최저금리", 14.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1)),
-            UiUtils.getMarginBox(0, 0.5.h),
-            SizedBox(width: 25.w, child: UiUtils.getTextWithFixedScale("${MyData.selectedPrInfoData!.productLoanMinRates}%", 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, 1)),
-          ]),
-          UiUtils.getMarginBox(2.w, 0),
-          Column(children: [
-            SizedBox(width: 25.w, child: UiUtils.getTextWithFixedScale("최대금리", 14.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1)),
-            UiUtils.getMarginBox(0, 0.5.h),
-            SizedBox(width: 25.w, child: UiUtils.getTextWithFixedScale("${MyData.selectedPrInfoData!.productLoanMaxRates}%", 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, 1)),
-          ]),
-          UiUtils.getMarginBox(2.w, 0),
-          Column(children: [
-            SizedBox(width: 35.w, child: UiUtils.getTextWithFixedScale("최대한도", 14.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1)),
-            UiUtils.getMarginBox(0, 0.5.h),
-            SizedBox(width: 35.w, child: UiUtils.getTextWithFixedScale(CommonUtils.getPriceFormattedString(double.parse(MyData.selectedPrInfoData!.productLoanLimit)), 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, 1)),
-          ]),
-        ])),
+      UiUtils.getTitleWithFixedScale("upfin", 75.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null),
+      UiUtils.getMarginBox(0, 3.h),
+      UiUtils.getImage(90.w, 90.w, Image.asset(fit: BoxFit.fill,'assets/images/img_man_welcome.png')),
+      SizedBox(width: 95.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        UiUtils.getImage(10.w, 10.h, Image.asset(MyData.selectedPrInfoData!.productCompanyLogo)),
+        UiUtils.getMarginBox(2.w, 0),
+        Column(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScaleAndOverFlow(MyData.selectedPrInfoData!.productCompanyName, 18.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, null)),
+          UiUtils.getMarginBox(0, 1.h),
+          SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScaleAndOverFlow(MyData.selectedPrInfoData!.productName, 10.sp, FontWeight.w300, ColorStyles.upFinWhite, TextAlign.start, 1))
+        ])
+      ])),
+      UiUtils.getExpandedScrollView(Axis.vertical, SizedBox(width: 95.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center, mainAxisSize: MainAxisSize.max, children: [
+        UiUtils.getMarginBox(2.w, 0),
+        Column(children: [
+          SizedBox(width: 25.w, child: UiUtils.getTextWithFixedScale("최저금리", 12.sp, FontWeight.w300, ColorStyles.upFinWhite, TextAlign.center, 1)),
+          UiUtils.getMarginBox(0, 0.5.h),
+          SizedBox(width: 25.w, child: UiUtils.getTextWithFixedScale("${MyData.selectedPrInfoData!.productLoanMinRates}%", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, 1)),
+        ]),
+        UiUtils.getMarginBox(2.w, 0),
+        Column(children: [
+          SizedBox(width: 25.w, child: UiUtils.getTextWithFixedScale("최대금리", 12.sp, FontWeight.w300, ColorStyles.upFinWhite, TextAlign.center, 1)),
+          UiUtils.getMarginBox(0, 0.5.h),
+          SizedBox(width: 25.w, child: UiUtils.getTextWithFixedScale("${MyData.selectedPrInfoData!.productLoanMaxRates}%", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, 1)),
+        ]),
+        Column(children: [
+          SizedBox(width: 35.w, child: UiUtils.getTextWithFixedScale("최대한도", 12.sp, FontWeight.w300, ColorStyles.upFinWhite, TextAlign.center, 1)),
+          UiUtils.getMarginBox(0, 0.5.h),
+          SizedBox(width: 35.w, child: UiUtils.getTextWithFixedScale(CommonUtils.getPriceFormattedString(double.parse(MyData.selectedPrInfoData!.productLoanLimit)), 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, 1)),
+        ]),
       ]))),
       UiUtils.getMarginBox(0, 2.h),
-      UiUtils.getTextButtonBox(90.w, "접수하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
-        UiUtils.showSlideMenu(context, SlideType.bottomToTop, true, 100.w, 65.h, 0.5, _makeAgreeWidget);
-      })
+      UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
+          UiUtils.getTextWithFixedScale("다이렉트 접수하기", 12.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.center, null), () {
+            UiUtils.showSlideMenu(context, SlideType.bottomToTop, true, 100.w, 65.h, 0.5, _makeAgreeWidget);
+          })
     ]));
     return UiUtils.getView(context, view, CommonUtils.onWillPopForPreventBackButton);
   }

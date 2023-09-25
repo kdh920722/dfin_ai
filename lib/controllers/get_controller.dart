@@ -9,7 +9,8 @@ class GetController extends GetxController {
   RxBool isConfirmed = false.obs;
   RxString preLoanPrice = "만원".obs;
   RxString wantLoanPrice = "만원".obs;
-  RxList<LoanInfoData> loanInfoDataList = <LoanInfoData>[].obs;
+  RxBool isMainDataChanged = false.obs;
+  RxList<LoanInfoData> loanInfoHistDataList = <LoanInfoData>[].obs;
 
   @override
   void onInit() {
@@ -80,15 +81,23 @@ class GetController extends GetxController {
     preLoanPrice = "만원".obs;
   }
 
-  void updateLoanInfoList(List<LoanInfoData> newList) {
-    loanInfoDataList.clear();
-    loanInfoDataList.assignAll(newList);
-    CommonUtils.log("i", "loanInfoDataList length : ${loanInfoDataList.length}");
+  void updateLoanHistInfoList(List<LoanInfoData> newList) {
+    loanInfoHistDataList.clear();
+    loanInfoHistDataList.assignAll(newList);
+    CommonUtils.log("i", "loanInfoDataList length : ${loanInfoHistDataList.length}");
   }
-  void resetLoanInfoList() {
+  void resetLoanHistInfoList() {
     List<LoanInfoData> emptyList = [];
-    loanInfoDataList.clear();
-    loanInfoDataList.assignAll(emptyList);
-    CommonUtils.log("i", "loanInfoDataList length : ${loanInfoDataList.length}");
+    loanInfoHistDataList.clear();
+    loanInfoHistDataList.assignAll(emptyList);
+    CommonUtils.log("i", "loanInfoDataList length : ${loanInfoHistDataList.length}");
+  }
+
+  void updateMainDataChangedFlag() {
+    isMainDataChanged.value = false;
+    isMainDataChanged.value = true;
+  }
+  void resetMainDataChangedFlag() {
+    isMainDataChanged = false.obs;
   }
 }

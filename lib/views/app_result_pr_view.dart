@@ -96,7 +96,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                     UiUtils.getTextWithFixedScale(each.productCompanyName, 15.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null),
                   ])),
                   UiUtils.getMarginBox(0, 1.h),
-                  UiUtils.getTextWithFixedScale(each.productName, 10.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null),
+                  UiUtils.getTextWithFixedScale(each.productName, 10.sp, FontWeight.w300, ColorStyles.upFinBlack, TextAlign.start, null),
                   UiUtils.getMarginBox(0, 2.h),
                   SizedBox(width: 80.w, child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     SizedBox(width: 20.w, child: UiUtils.getTextWithFixedScale("최저금리", 10.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, 1)),
@@ -140,6 +140,8 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
     Widget view = Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: EdgeInsets.all(5.w), child: Column(children: [
       SizedBox(width: 95.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () {
+          MyData.selectedAccidentInfoData = null;
+          MyData.selectedPrInfoData = null;
           Navigator.pop(context);
         }),
       ])),

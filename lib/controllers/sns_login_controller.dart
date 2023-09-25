@@ -48,7 +48,11 @@ class SnsLoginController{
   }
 
   static Widget getKakaoLoginButton(BuildContext context, double size, Function(bool? isSuccessToLogin) callback){
-    return UiUtils.getImageButton(Image.asset('assets/images/kakao_icon.png'), size, ColorStyles.upFinKakaoYellow, () async {
+    return UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinKakaoYellow, ColorStyles.upFinKakaoYellow, Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+      UiUtils.getImage(7.w, 2.2.h, Image.asset(fit: BoxFit.fitWidth,'assets/images/kakao_icon.png')),
+      UiUtils.getMarginBox(2.w, 0),
+      UiUtils.getTextWithFixedScale("Kakao로 로그인", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null)
+    ]), () async {
       if(Config.isControllerLoadFinished){
         UiUtils.showLoadingPop(context);
         await SnsLoginController._kakaoLogin((bool isSuccess) async {
@@ -75,9 +79,29 @@ class SnsLoginController{
   }
 
   static Widget getAppleLoginButton(BuildContext context, double size, Function(bool? isSuccessToLogin) callback){
-    return UiUtils.getImageButton(Image.asset('assets/images/apple_icon.png'), size, ColorStyles.upFinBlack, () async {
+    return UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinBlack, ColorStyles.upFinBlack, Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+      UiUtils.getImage(7.w, 2.2.h, Image.asset(fit: BoxFit.fitWidth,'assets/images/apple_icon.png')),
+      UiUtils.getMarginBox(2.w, 0),
+      UiUtils.getTextWithFixedScale("Apple로 로그인", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null)
+    ]), () async {
       if(Config.isControllerLoadFinished){
-
+        UiUtils.showLoadingPop(context);
+        await SnsLoginController._kakaoLogin((bool isSuccess) async {
+          UiUtils.closeLoadingPop(context);
+          if(isSuccess){
+            MyData.isSnsLogin = true;
+            if(await _isMemberFromSns()){
+              callback(true);
+            }else{
+              CommonUtils.flutterToast("회원가입이 필요합니다.");
+              callback(false);
+            }
+          }else{
+            MyData.isSnsLogin = false;
+            CommonUtils.flutterToast("${SnsLoginController.loginPlatform.value}로그인에 실패했습니다.");
+            callback(false);
+          }
+        });
       }else{
         CommonUtils.flutterToast("데이터 로딩 실패\n다시 실행 해 주세요.");
         callback(null);

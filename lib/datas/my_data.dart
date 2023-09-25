@@ -15,7 +15,6 @@ class MyData {
   static String jobInfo = "";
   static String customerUidForNiceCert = "";
 
-  static bool initSearchViewFromMainView = false;
   static String birthFromPhoneCert = "";
   static String telecomTypeFromPhoneCert = "";
   static bool isMaleFromPhoneCert = false;
@@ -161,7 +160,6 @@ class MyData {
     isMale = false;
     jobInfo = "";
     idNumber = "";
-    initSearchViewFromMainView = false;
     isSnsLogin = false;
     nameFromSns = "";
     emailFromSns = "";

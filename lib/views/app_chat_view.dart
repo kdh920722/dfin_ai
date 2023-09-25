@@ -62,6 +62,58 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     for(var each in chatInfoList){
       chatList.add(each);
     }
+    chatList.add(
+        Container(
+            padding: EdgeInsets.only(left: 5.w, right: 5.w),
+            width: 100.w,
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              UiUtils.getImage(10.w, 10.w, Image.asset(fit: BoxFit.fitWidth,'assets/images/chatbot_icon.png')),
+              UiUtils.getMarginBox(2.w, 0),
+              Column(children: [
+                UiUtils.getMarginBox(0, 2.h),
+                Container(
+                    padding: EdgeInsets.all(3.w),
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.only(topRight: Radius.circular(15), bottomRight: Radius.circular(15), bottomLeft: Radius.circular(15)),
+                      color: ColorStyles.upFinSky,
+                    ),
+                    width: 70.w,
+                    child: UiUtils.getTextWithFixedScale("테스트 데이터 인풋입니다.테스트 데이터 인풋입니다.테스트 데이터 인풋입니다.테스트 데이터 인풋입니다.테스트 데이터 인풋입니다.테스트 데이터 인풋입니다.테스트 데이터 인풋입니다.테스트 데이터 인풋입니다.테스트 데이터 인풋입니다.",
+                        12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null))
+              ])
+            ])
+        )
+    );
+
+    chatList.add(
+        Container(
+            padding: EdgeInsets.only(left: 5.w, right: 5.w),
+            width: 100.w,
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              UiUtils.getImage(10.w, 10.w, Image.asset(fit: BoxFit.fitWidth,'assets/images/chatbot_icon.png')),
+              UiUtils.getMarginBox(2.w, 0),
+              Column(children: [
+                UiUtils.getMarginBox(0, 2.h),
+                Container(
+                    padding: EdgeInsets.all(3.w),
+                    decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.only(topRight: Radius.circular(15), bottomRight: Radius.circular(15), bottomLeft: Radius.circular(15)),
+                      color: ColorStyles.upFinSky,
+                    ),
+                    width: 70.w,
+                    child: Column(children: [
+                      UiUtils.getTextWithFixedScale("테스트 데이터 인풋입니다.테스트 데이터 인풋입니다.테스트 데이터 인풋입니다.테스트 데이터 인풋입니다.테스트 데이터 인풋입니다.테스트 데이터 인풋입니다.테스트 데이터 인풋입니다.테스트 데이터 인풋입니다.테스트 데이터 인풋입니다.",
+                          12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null),
+                      UiUtils.getMarginBox(0, 2.h),
+                      UiUtils.getBorderButtonBox(60.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
+                          UiUtils.getTextWithFixedScale("확인", 12.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
+
+                          })
+                    ]))
+              ])
+            ])
+        )
+    );
 
     return chatList;
   }
@@ -84,19 +136,21 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         height: 100.h,
         child: Column(children: [
           UiUtils.getMarginBox(0, 2.h),
-          SizedBox(width: 100.w, height: 10.h, child: Row(children: [
+          SizedBox(width: 100.w, height: 12.h, child: Row(children: [
             UiUtils.getMarginBox(3.w, 0),
-            UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () {
+            UiUtils.getIconButtonWithHeight(5.h, Icons.arrow_back_ios_new_sharp, 6.w, ColorStyles.upFinDarkGray, () {
               Navigator.pop(context);
             }),
             UiUtils.getMarginBox(24.w, 0),
             Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-              UiUtils.getIcon(10.w, 10.w, Icons.account_box_rounded, 10.w, ColorStyles.upFinButtonBlue),
-              UiUtils.getTextWithFixedScale("AI어드바이저", 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, 1)
+              UiUtils.getImage(12.w, 12.w, Image.asset(fit: BoxFit.fitWidth,'assets/images/chatbot_icon.png')),
+              UiUtils.getMarginBox(0, 1.h),
+              UiUtils.getTextWithFixedScale("AI어드바이저", 12.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, 1)
             ]),
           ])),
 
-          UiUtils.getExpandedScrollViewWithController(Axis.vertical, Container(color: ColorStyles.upFinWhiteSky, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: _getChatList())), _chatScrollController),
+          UiUtils.getMarginBox(0, 2.h),
+          UiUtils.getExpandedScrollViewWithController(Axis.vertical, Column(mainAxisAlignment: MainAxisAlignment.start, children: _getChatList()), _chatScrollController),
 
           AnimatedContainer(
               duration: const Duration(milliseconds: 400),
@@ -121,7 +175,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                       )..layout(minWidth: 0, maxWidth: 60.w);
 
                       if(textLinePainter.width >= 59.w){
-                        CommonUtils.log("i", "setupdate");
                         final desiredHeight = inputMinHeight*0.7+textLinePainter.height;
                         final height = desiredHeight.clamp(inputMinHeight, inputMaxHeight);
                         setState(() {
