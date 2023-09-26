@@ -255,7 +255,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
                         }
                       });
                     }),
-                UiUtils.getTextStyledButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.center, null, (){
+                UiUtils.getTextButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.center, null, (){
                   setState(() {
                     selectedBankCodeKey = key;
                     selectedBankCodeInfo = each;
@@ -360,7 +360,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
                         }
                       });
                     }),
-                UiUtils.getTextStyledButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.start, null, (){
+                UiUtils.getTextButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.start, null, (){
                   setState(() {
                     selectedPreLoanCountKey = key;
                     selectedPreLoanCountInfo = each;
@@ -521,7 +521,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
                         }
                       });
                     }),
-                UiUtils.getTextStyledButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.center, null, (){
+                UiUtils.getTextButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.center, null, (){
                   setState(() {
                     selectedJobKey = key;
                     selectedJobInfo = each;
@@ -585,7 +585,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
               child: Row(children: [
                 UiUtils.getCustomCircleCheckBox(key, 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
                     ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-                UiUtils.getTextStyledButtonWithFixedScale(each, 13.sp, FontWeight.w800, textColor, TextAlign.center, null, (){})
+                UiUtils.getTextButtonWithFixedScale(each, 13.sp, FontWeight.w800, textColor, TextAlign.center, null, (){})
               ])
           )
       );
@@ -624,10 +624,14 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
         LogfinController.callLogfinApi(LogfinApis.prUpdateInfo, inputJson, (isSuccessToUpdate, outputJson){
           if(isSuccessToUpdate){
             CommonUtils.flutterToast("수정 완료했습니다.");
-            LogfinController.getMainOrSearchView((isSuccessToGetViewInfo, viewInfo){
+            LogfinController.getAccidentInfo((isSuccessToGetAccidentInfo, isNotEmpty){
               UiUtils.closeLoadingPop(context);
-              if(isSuccessToGetViewInfo){
-                CommonUtils.moveWithUntil(context, viewInfo!.value);
+              if(isSuccessToGetAccidentInfo){
+                if(isNotEmpty){
+                  CommonUtils.moveWithUntil(context, AppView.appMainView.value);
+                }else{
+                  CommonUtils.flutterToast("정보 수정에 실패했습니다.\n다시 실행해주세요.");
+                }
               }
             });
           }else{

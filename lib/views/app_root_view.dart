@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:upfin/controllers/aws_controller.dart';
 import 'package:upfin/controllers/clova_controller.dart';
 import 'package:upfin/controllers/get_controller.dart';
@@ -387,73 +386,57 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
           ])),
           UiUtils.getExpandedScrollView(Axis.vertical, SizedBox(width: 100.w, child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
             UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                UiUtils.getTextWithFixedScale("Email 로그인", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
-                  CommonUtils.moveTo(context, AppView.loginView.value, null);
+                UiUtils.getTextWithFixedScale("로그인", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
+                  CommonUtils.moveTo(context, AppView.appLoginView.value, null);
                 }),
             UiUtils.getMarginBox(0, 0.5.h),
-            SnsLoginController.getKakaoLoginButton(context, 20.w, (isSuccessToLogin) async {
-              if(isSuccessToLogin != null){
-                if(isSuccessToLogin){
-                  CommonUtils.flutterToast("환영합니다!");
-                  UiUtils.showLoadingPop(context);
-                  await LogfinController.getMainOrSearchView((isSuccessToGetViewInfo, viewInfo){
-                    UiUtils.closeLoadingPop(context);
-                    if(isSuccessToGetViewInfo){
-                      CommonUtils.moveTo(context, AppView.mainView.value, null);
-                    }
-                  });
-                }else{
-                  UiUtils.closeLoadingPop(context);
-                  await CommonUtils.moveToWithResult(context, AppView.signupView.value, null);
-                }
-              }else{
-                UiUtils.closeLoadingPop(context);
-              }
-            }),
-            UiUtils.getMarginBox(0, 0.5.h),
-            SnsLoginController.getAppleLoginButton(context, 20.w, (isSuccessToLogin) async {
-              if(isSuccessToLogin != null){
-                if(isSuccessToLogin){
-                  CommonUtils.flutterToast("환영합니다!");
-                  UiUtils.showLoadingPop(context);
-                  await LogfinController.getMainOrSearchView((isSuccessToGetViewInfo, viewInfo){
-                    UiUtils.closeLoadingPop(context);
-                    if(isSuccessToGetViewInfo){
-                      CommonUtils.moveTo(context, AppView.mainView.value, null);
-                    }
-                  });
-                }else{
-                  UiUtils.closeLoadingPop(context);
-                  await CommonUtils.moveToWithResult(context, AppView.signupView.value, null);
-                }
-              }else{
-                UiUtils.closeLoadingPop(context);
-              }
-            }),
-            UiUtils.getMarginBox(0, 0.5.h),
-            UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinButtonBlue,
+            UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinButtonBlue,
                 UiUtils.getTextWithFixedScale("회원가입", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
-                  CommonUtils.moveTo(context, AppView.signupView.value, null);
+                  CommonUtils.moveTo(context, AppView.appSignupView.value, null);
                 }),
-            UiUtils.getMarginBox(0, 0.5.h),
-            UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinRed, ColorStyles.upFinRed,
-                UiUtils.getTextWithFixedScale("회원탈퇴(테스트용)", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
-                  Map<String, dynamic> inputJson = {
-                    "user" : {
-                      "email": "lalalllaa@kakao.com",
-                      "password": "1111111"
-                    }
-                  };
-                  UiUtils.showLoadingPop(context);
-                  LogfinController.callLogfinApi(LogfinApis.deleteAccount, inputJson, (isSuccessToLogin, outputJson) async {
+            UiUtils.getMarginBox(0, 4.h),
+            SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("소셜계정으로 로그인", 12.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, null)),
+            UiUtils.getMarginBox(0, 1.h),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              SnsLoginController.getKakaoLoginButton(context, 18.w, (isSuccessToLogin) async {
+                if(isSuccessToLogin != null){
+                  if(isSuccessToLogin){
+                    CommonUtils.flutterToast("환영합니다!");
+                    UiUtils.showLoadingPop(context);
+                    await LogfinController.getMainViewInfo((isSuccessToGetMainInfo){
+                      UiUtils.closeLoadingPop(context);
+                      if(isSuccessToGetMainInfo){
+                        CommonUtils.moveTo(context, AppView.appMainView.value, null);
+                      }
+                    });
+                  }else{
                     UiUtils.closeLoadingPop(context);
-                    if(isSuccessToLogin){
-                      CommonUtils.flutterToast("회원삭제");
-                    }else{
-                      CommonUtils.flutterToast(outputJson!["error"]);
-                    }
-                  });
-                }),
+                    await CommonUtils.moveToWithResult(context, AppView.appSignupView.value, null);
+                  }
+                }else{
+                  UiUtils.closeLoadingPop(context);
+                }
+              }),
+              SnsLoginController.getAppleLoginButton(context, 18.w, (isSuccessToLogin) async {
+                if(isSuccessToLogin != null){
+                  if(isSuccessToLogin){
+                    CommonUtils.flutterToast("환영합니다!");
+                    UiUtils.showLoadingPop(context);
+                    await LogfinController.getMainViewInfo((isSuccessToGetMainInfo){
+                      UiUtils.closeLoadingPop(context);
+                      if(isSuccessToGetMainInfo){
+                        CommonUtils.moveTo(context, AppView.appMainView.value, null);
+                      }
+                    });
+                  }else{
+                    UiUtils.closeLoadingPop(context);
+                    await CommonUtils.moveToWithResult(context, AppView.appSignupView.value, null);
+                  }
+                }else{
+                  UiUtils.closeLoadingPop(context);
+                }
+              })
+            ])
           ])))
         ])
         );

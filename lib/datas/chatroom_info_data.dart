@@ -1,4 +1,4 @@
-class AiChatRoomInfoData {
+class ChatRoomInfoData {
   int chatRoomId; // uid
   int chatRoomType; //0 : upfin chat room  1: other chat room
   String chatRoomIconPath;
@@ -8,7 +8,7 @@ class AiChatRoomInfoData {
   String chatRoomLastMsgTime;
   int chatRoomLastMsgCnt;
 
-  AiChatRoomInfoData(this.chatRoomId, this.chatRoomType, this.chatRoomIconPath, this.chatRoomTitle, this.chatRoomSubTitle,
+  ChatRoomInfoData(this.chatRoomId, this.chatRoomType, this.chatRoomIconPath, this.chatRoomTitle, this.chatRoomSubTitle,
       this.chatRoomLastMsg, this.chatRoomLastMsgTime, this.chatRoomLastMsgCnt);
   String printAiChatRoomInfoData(){
     return "chatRoomId: $chatRoomId\nchatRoomType: $chatRoomType\chatRoomIconPath: $chatRoomIconPath\n"

@@ -256,7 +256,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                         }
                       });
                     }),
-                UiUtils.getTextStyledButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.center, null, (){
+                UiUtils.getTextButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.center, null, (){
                   setState(() {
                     selectedCourtKey = key;
                     selectedCourtInfo = each;
@@ -376,7 +376,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                         }
                       });
                     }),
-                UiUtils.getTextStyledButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.center, null, (){
+                UiUtils.getTextButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.center, null, (){
                   setState(() {
                     selectedBankCodeKey = key;
                     selectedBankCodeInfo = each;
@@ -478,7 +478,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                         }
                       });
                     }),
-                UiUtils.getTextStyledButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.start, null, (){
+                UiUtils.getTextButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.start, null, (){
                   setState(() {
                     selectedPreLoanCountKey = key;
                     selectedPreLoanCountInfo = each;
@@ -504,7 +504,13 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
         CommonUtils.log("i", "loan count : $selectedPreLoanCountInfo");
         if(selectedPreLoanCountInfo.isNotEmpty){
-          nextInputView();
+          if(selectedPreLoanCountInfo.split("@")[1] == "0"){
+            selectedPreLoanPriceInfo = "0";
+            currentViewId++;
+            nextInputView();
+          }else{
+            nextInputView();
+          }
         }else{
           CommonUtils.flutterToast(errorMsg);
         }
@@ -562,7 +568,12 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
     return UiUtils.getRowColumnWithAlignCenter([
       SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
-          backInputView();
+          if(selectedPreLoanCountInfo.split("@")[1] == "0"){
+            currentViewId--;
+            backInputView();
+          }else{
+            backInputView();
+          }
         }),
       ])),
       UiUtils.getMarginBox(0, 3.h),
@@ -637,7 +648,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                         }
                       });
                     }),
-                UiUtils.getTextStyledButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.center, null, (){
+                UiUtils.getTextButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.center, null, (){
                   setState(() {
                     selectedJobKey = key;
                     selectedJobInfo = each;
@@ -672,6 +683,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
   /// job view end
 
   /// finish confirm view
+  bool isSuccessToGetAccident = false;
   Widget _getFinishConfirmView(){
     String birthMonth = MyData.birth.substring(4,6);
     if(birthMonth.substring(0,1) == "0"){
@@ -709,25 +721,25 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
               child: Row(children: [
                 UiUtils.getCustomCircleCheckBox(key, 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
                     ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-                UiUtils.getTextStyledButtonWithFixedScale(each, 13.sp, FontWeight.w800, textColor, TextAlign.center, null, (){})
+                UiUtils.getTextButtonWithFixedScale(each, 13.sp, FontWeight.w800, textColor, TextAlign.center, null, (){})
               ])
           )
       );
     }
 
     return UiUtils.getRowColumnWithAlignCenter([
-      SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      !isSuccessToGetAccident? SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () {
           backInputView();
         }),
-      ])),
-      UiUtils.getMarginBox(0, 3.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("해당 조건으로", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출상품을 찾아볼까요?", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      ])) : Container(),
+      !isSuccessToGetAccident? UiUtils.getMarginBox(0, 3.h) : UiUtils.getMarginBox(0, 10.h),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale(!isSuccessToGetAccident? "아래 정보로" : "해당 조건으로", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale(!isSuccessToGetAccident? "사건정보를 추가할까요?" : "대출상품을 찾아볼까요?", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: confirmWidgetList)),
       UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getTextButtonBox(90.w, "네 좋아요!", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
+      !isSuccessToGetAccident? UiUtils.getTextButtonBox(90.w, "사건 추가하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
         Map<String, dynamic> inputJson = {
           "court_name": selectedCourtInfo.split("@")[0],
           "caseNumberYear": selectedAccidentInfo.split("개회")[0],
@@ -745,14 +757,12 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         };
         CommonUtils.log("i", "pr search info:\n$inputJson");
 
-        String caseYear = "2023";
-        String caseType = "개회";
-        String caseNumber = "1000794";
+        selectedAccidentInfo = "2023개회1000794";
         Map<String, dynamic> inputJsonForTest = {
           "court_name": "서울회생법원",
-          "caseNumberYear": caseYear,
-          "caseNumberType": caseType,
-          "caseNumberNumber": caseNumber,
+          "caseNumberYear": selectedAccidentInfo.split("개회")[0],
+          "caseNumberType": "개회",
+          "caseNumberNumber": selectedAccidentInfo.split("개회")[1],
           "userName": "정혜경",
           "bankCode": "004",
           "account": "40240104",
@@ -767,13 +777,16 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         LogfinController.callLogfinApi(LogfinApis.prSearch, inputJsonForTest, (isSuccess, outputJson){
           if(isSuccess){
             // 메인뷰로 이동
-            MyData.resetMyData();
-            LogfinController.getMainOrSearchView((isSuccessToGetViewInfo, viewInfo){
+            LogfinController.getAccidentInfo((isSuccessToGetAccidentInfo, isNotEmpty){
               UiUtils.closeLoadingPop(context);
-              if(isSuccessToGetViewInfo){
-                CommonUtils.moveWithUntil(context, viewInfo!.value);
-              }else{
-                CommonUtils.flutterToast("화면을 불러오는데 실패했습니다.\n다시 실행해주세요.");
+              if(isSuccessToGetAccidentInfo){
+                if(isNotEmpty){
+                  setState(() {
+                    isSuccessToGetAccident = true;
+                  });
+                }else{
+                  CommonUtils.flutterToast("사건정보 찾기 실패\n다시 실행해주세요.");
+                }
               }
             });
           }else{
@@ -783,7 +796,32 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
             CommonUtils.flutterToast(errorMsg.replaceAll("+", "").replaceAll("()", "").replaceAll(".", "\n"));
           }
         });
-      })
+      }) : Row(children: [
+        UiUtils.getBorderButtonBox(42.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+            UiUtils.getTextWithFixedScale("네 좋아요!", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
+              for(var each in MyData.getAccidentInfoList()){
+                if(each.accidentCaseNumberYear == selectedAccidentInfo.split("개회")[0] && each.accidentCaseNumberNumber == selectedAccidentInfo.split("개회")[1]){
+                  MyData.selectedAccidentInfoData = each;
+                }
+              }
+
+              UiUtils.showLoadingPop(context);
+              LogfinController.getPrList("${MyData.selectedAccidentInfoData!.accidentCaseNumberYear}${MyData.selectedAccidentInfoData!.accidentCaseNumberType}${MyData.selectedAccidentInfoData!.accidentCaseNumberNumber}", (isSuccessToGetOffers, _){
+                UiUtils.closeLoadingPop(context);
+                if(isSuccessToGetOffers){
+                  CommonUtils.moveWithReplacementTo(context, AppView.appResultPrView.value, null);
+                }else{
+                  // findUidInAccidentInfoList 실패
+                  CommonUtils.flutterToast("에러가 발생했습니다.");
+                }
+              });
+            }),
+        UiUtils.getMarginBox(2.w, 0),
+        UiUtils.getBorderButtonBox(42.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
+            UiUtils.getTextWithFixedScale("다음에 할게요", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
+              CommonUtils.moveWithUntil(context, AppView.appMainView.value);
+            })
+      ])
     ]);
   }
   /// finish confirm view end

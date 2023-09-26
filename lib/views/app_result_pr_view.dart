@@ -87,7 +87,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
       }
 
       prInfoWidgetList.add(
-          UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinRealWhite, ColorStyles.upFinGray,
+          UiUtils.getBorderButtonBox(90.w, each.isPossible? ColorStyles.upFinRealWhite : ColorStyles.upFinWhiteRed, each.isPossible? ColorStyles.upFinGray : ColorStyles.upFinWhiteRed,
               Row(mainAxisSize: MainAxisSize.max, children: [
                 Expanded(flex: 15, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
                   SizedBox(width: 90.w, child: Row(children: [
@@ -123,7 +123,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                       UiUtils.closeLoadingPop(context);
                       if(isSuccessToSearchDocs){
                         MyData.selectedPrInfoData = each;
-                        CommonUtils.moveTo(context, AppView.detailPrView.value, null);
+                        CommonUtils.moveTo(context, AppView.appDetailPrView.value, null);
                       }
                     });
                   }

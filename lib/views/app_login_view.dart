@@ -1,24 +1,9 @@
-import 'dart:async';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:upfin/controllers/aws_controller.dart';
-import 'package:upfin/controllers/clova_controller.dart';
-import 'package:upfin/controllers/get_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:upfin/controllers/hyphen_controller.dart';
-import 'package:upfin/controllers/iamport_controller.dart';
-import 'package:upfin/controllers/juso_controller.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/controllers/sharedpreference_controller.dart';
-import 'package:get/get.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:sizer/sizer.dart';
-import 'package:upfin/controllers/gpt_controller.dart';
-import 'package:upfin/controllers/firebase_controller.dart';
-import 'package:upfin/controllers/sns_login_controller.dart';
 import 'package:upfin/styles/ColorStyles.dart';
-import 'package:uni_links/uni_links.dart';
-import '../controllers/codef_controller.dart';
-import '../datas/my_data.dart';
 import '../styles/TextStyles.dart';
 import '../configs/app_config.dart';
 import '../utils/common_utils.dart';
@@ -61,7 +46,6 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     CommonUtils.log("i", "AppLoginView 화면 입장");
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    MyData.resetMyData();
     _keyboardVisibilityController = CommonUtils.getKeyboardViewController(_functionForKeyboardShow, _functionForKeyboardHide);
     _emailTextController.text = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceIdKey);
     _pwdTextController.text = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferencePwKey);
@@ -110,7 +94,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
           ])),
           SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             UiUtils.getMarginBox(0, 5.h),
-            UiUtils.getTextWithFixedScale("로그인", 26.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
+            UiUtils.getTextWithFixedScale("로그인", 26.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
             UiUtils.getMarginBox(0, 3.h)
           ])),
           UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _emailTextFocus, _emailTextController, TextInputType.emailAddress, false,
@@ -150,17 +134,17 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
                   SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceIdKey, _emailTextController.text.trim());
                   SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferencePwKey, _pwdTextController.text.trim());
 
-                  await LogfinController.getMainOrSearchView((isSuccessToGetViewInfo, viewInfo){
+                  await LogfinController.getMainViewInfo((isSuccessToGetMainInfo){
                     UiUtils.closeLoadingPop(context);
-                    if(isSuccessToGetViewInfo){
-                      CommonUtils.moveWithReplacementTo(context, AppView.mainView.value, null);
+                    if(isSuccessToGetMainInfo){
+                      CommonUtils.moveWithReplacementTo(context, AppView.appMainView.value, null);
                     }
                   });
                 }else{
                   UiUtils.closeLoadingPop(context);
                   CommonUtils.flutterToast(outputJson!["error"]);
                   if(outputJson["error"] == "회원가입이 필요합니다."){
-                    CommonUtils.moveWithReplacementTo(context, AppView.signupView.value, null);
+                    CommonUtils.moveWithReplacementTo(context, AppView.appSignupView.value, null);
                   }
                 }
               });

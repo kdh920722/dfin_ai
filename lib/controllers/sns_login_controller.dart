@@ -48,11 +48,7 @@ class SnsLoginController{
   }
 
   static Widget getKakaoLoginButton(BuildContext context, double size, Function(bool? isSuccessToLogin) callback){
-    return UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinKakaoYellow, ColorStyles.upFinKakaoYellow, Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-      UiUtils.getImage(7.w, 2.2.h, Image.asset(fit: BoxFit.fitWidth,'assets/images/kakao_icon.png')),
-      UiUtils.getMarginBox(2.w, 0),
-      UiUtils.getTextWithFixedScale("Kakao로 로그인", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null)
-    ]), () async {
+    return UiUtils.getRoundImageButton(Image.asset('assets/images/kakao_icon.png', fit: BoxFit.fill), size, ColorStyles.upFinBlack, () async {
       if(Config.isControllerLoadFinished){
         UiUtils.showLoadingPop(context);
         await SnsLoginController._kakaoLogin((bool isSuccess) async {
@@ -79,11 +75,7 @@ class SnsLoginController{
   }
 
   static Widget getAppleLoginButton(BuildContext context, double size, Function(bool? isSuccessToLogin) callback){
-    return UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinBlack, ColorStyles.upFinBlack, Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-      UiUtils.getImage(7.w, 2.2.h, Image.asset(fit: BoxFit.fitWidth,'assets/images/apple_icon.png')),
-      UiUtils.getMarginBox(2.w, 0),
-      UiUtils.getTextWithFixedScale("Apple로 로그인", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null)
-    ]), () async {
+    return UiUtils.getRoundImageButton(Image.asset('assets/images/apple_icon.png', fit: BoxFit.fill), size, ColorStyles.upFinBlack, () async {
       if(Config.isControllerLoadFinished){
         UiUtils.showLoadingPop(context);
         await SnsLoginController._kakaoLogin((bool isSuccess) async {

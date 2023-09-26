@@ -3,8 +3,10 @@ import 'package:upfin/datas/loan_info_data.dart';
 import 'package:upfin/datas/pr_docs_info_data.dart';
 import 'package:upfin/datas/pr_info_data.dart';
 import '../utils/common_utils.dart';
+import 'chatroom_info_data.dart';
 
 class MyData {
+  // user data
   static String name = "";
   static String phoneNumber = "";
   static String telecom = "";
@@ -14,16 +16,15 @@ class MyData {
   static String idNumber = "";
   static String jobInfo = "";
   static String customerUidForNiceCert = "";
-
   static String birthFromPhoneCert = "";
   static String telecomTypeFromPhoneCert = "";
   static bool isMaleFromPhoneCert = false;
-
   static bool isSnsLogin = false;
   static String nameFromSns = "";
   static String emailFromSns = "";
   static String phoneNumberFromSns = "";
 
+  // accident data
   static final List<AccidentInfoData> _accidentInfoList = [];
   static List<AccidentInfoData> getAccidentInfoList(){
     return _accidentInfoList;
@@ -55,6 +56,7 @@ class MyData {
     _accidentInfoList.clear();
   }
 
+  // loan data
   static final List<LoanInfoData> _loanInfoList = [];
   static List<LoanInfoData> getLoanInfoList(){
     return _loanInfoList;
@@ -71,8 +73,53 @@ class MyData {
       _loanInfoList.add(loanInfoData);
     }
   }
+  static void sortLoanInfoList(){
+    _loanInfoList.sort((a,b) => DateTime.parse(a.createdDate).compareTo(DateTime.parse(b.createdDate)));
+  }
   static void clearLoanInfoList(){
     _loanInfoList.clear();
+  }
+
+  // loan chat data
+  static final List<ChatRoomInfoData> _chatRoomInfoList = [];
+  static List<ChatRoomInfoData> getChatRoomInfoList(){
+    return _chatRoomInfoList;
+  }
+  static void addToChatRoomInfoList(ChatRoomInfoData chatRoomInfoData){
+    bool isAdded = false;
+    for(var each in _chatRoomInfoList){
+      if(each.chatRoomId == chatRoomInfoData.chatRoomId){
+        isAdded = true;
+      }
+    }
+
+    if(!isAdded){
+      _chatRoomInfoList.add(chatRoomInfoData);
+    }
+  }
+  static void sortChatRoomInfoList(){
+    _chatRoomInfoList.sort((a,b){
+      int yearA = int.parse(a.chatRoomLastMsgTime.substring(0, 4));
+      int monthA = int.parse(a.chatRoomLastMsgTime.substring(4, 6));
+      int dayA = int.parse(a.chatRoomLastMsgTime.substring(6, 8));
+      int hourA = int.parse(a.chatRoomLastMsgTime.substring(8, 10));
+      int minuteA = int.parse(a.chatRoomLastMsgTime.substring(10, 12));
+      int secondA = int.parse(a.chatRoomLastMsgTime.substring(12, 14));
+      var dateA = DateTime(yearA, monthA, dayA, hourA, minuteA, secondA);
+
+      int yearB = int.parse(b.chatRoomLastMsgTime.substring(0, 4));
+      int monthB = int.parse(b.chatRoomLastMsgTime.substring(4, 6));
+      int dayB = int.parse(b.chatRoomLastMsgTime.substring(6, 8));
+      int hourB = int.parse(b.chatRoomLastMsgTime.substring(8, 10));
+      int minuteB = int.parse(b.chatRoomLastMsgTime.substring(10, 12));
+      int secondB = int.parse(b.chatRoomLastMsgTime.substring(12, 14));
+      var dateB = DateTime(yearB, monthB, dayB, hourB, minuteB, secondB);
+
+      return dateA.compareTo(dateB);
+    });
+  }
+  static void clearChatRoomInfoList(){
+    _chatRoomInfoList.clear();
   }
 
   //12:신분증  13:개인회생사건조회  1:주민등록등본  2:주민등록초본  3:건강보험자격득실확인서  4:건강보험납부확인서
@@ -143,6 +190,7 @@ class MyData {
         "customerUidForNiceCert:$customerUidForNiceCert\n"
         "accidentInfoList: ${_accidentInfoList.length}\n"
         "loanInfoList: ${_loanInfoList.length}\n"
+        "chatRoomInfoList: ${_chatRoomInfoList.length}\n"
         "prInfoList: ${_prInfoList.length}\n"
         "prDocsInfoList: ${_prDocsInfoList.length}\n"
         "selectedPrInfoData: $selectedPrInfoDataCheck\n"
@@ -171,6 +219,7 @@ class MyData {
     clearLoanInfoList();
     clearPrInfoList();
     clearPrDocsInfoList();
+    clearChatRoomInfoList();
     selectedPrInfoData = null;
     selectedAccidentInfoData = null;
   }

@@ -8,6 +8,7 @@ import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/datas/pr_docs_info_data.dart';
 import 'dart:convert';
 import '../configs/app_config.dart';
+import '../datas/chatroom_info_data.dart';
 import '../datas/pr_info_data.dart';
 import '../utils/common_utils.dart';
 
@@ -211,9 +212,49 @@ class LogfinController {
     }
   }
 
-  static Future<void> getMainOrSearchView(Function(bool isSuccess, AppView? appView) callback) async {
+  static Future<void> getMainViewInfo(Function(bool isSuccess) callback) async {
     try{
       // 1) 유저정보 가져오기
+      getUserInfo((isSuccessToGetUserInfo){
+        if(isSuccessToGetUserInfo){
+          getAccidentInfo((isSuccessToGetAccidentInfo, isAccidentInfoNotEmpty){
+            if(isSuccessToGetAccidentInfo){
+              if(isAccidentInfoNotEmpty){
+                getLoanInfo((isSuccessToGetLoanInfo, isLoanInfoNotEmpty){
+                  if(isSuccessToGetLoanInfo){
+                    if(isLoanInfoNotEmpty){
+                      callback(true);
+                    }else{
+                      // 대출이력 가져오기 실패는 아니나, 데이터 없음.
+                      callback(true);
+                    }
+                  }
+                });
+              }else{
+                // 사건이력 가져오기 실패는 아니나, 데이터 없음.
+                CommonUtils.flutterToast("사건정보가 없습니다.");
+                callback(true);
+              }
+            }else{
+              // 사건이력 가져오기 실패
+              CommonUtils.flutterToast("사건정보 가져오기 실패\n다시 실행 해 주세요.");
+              callback(false);
+            }
+          });
+        }else{
+          // 유저정보 가져오기 실패
+          CommonUtils.flutterToast("유저정보 가져오기 실패\n다시 실행 해 주세요.");
+          callback(false);
+        }
+      });
+    }catch(error){
+      CommonUtils.flutterToast("연결 실패\n다시 실행 해 주세요.");
+      callback(false);
+    }
+  }
+
+  static Future<void> getUserInfo(Function(bool isSuccess) callback) async{
+    try{
       callLogfinApi(LogfinApis.getUserInfo, <String, dynamic>{}, (isSuccessToGetUserInfo, userInfoOutputJson){
         if(isSuccessToGetUserInfo){
           if(userInfoOutputJson != null){
@@ -236,114 +277,148 @@ class LogfinController {
               }
             }
 
-            // 2) 사건정보 조회
-            GetController.to.updateMainDataChangedFlag();
-            callLogfinApi(LogfinApis.getAccidentInfo, <String, dynamic>{}, (isSuccessToGetAccidentInfo, accidentInfoOutputJson){
-              MyData.clearAccidentInfoList();
-              if(isSuccessToGetAccidentInfo){
-                List<dynamic> accidentList = accidentInfoOutputJson!["accidents"];
-                if(accidentList.isEmpty){
-                  // 3-1) 사건정보 없으면 한도금리 조회를 위한 조건 입력 화면으로 이동(한도금리 조회 시, 사건정보 저장)
-                  MyData.printData();
-                  callback(true, AppView.searchAccidentView);
-                }else{
-                  // 3-2) 사건정보 있으면 사건정보 이력화면(메인 뷰)로 이동(저장한걸 보여줌)
-                  String bankInfo = "";
-                  String courtInfo = "";
-                  String lendCountInfo = "";
-                  for(var eachAccident in accidentList){
-                    Map<String, dynamic> dataResult = eachAccident;
-
-                    for(var eachBank in bankList){
-                      if(eachBank.split("@")[0] == dataResult["refund_bank"]){
-                        bankInfo = eachBank;
-                      }
-                    }
-                    for(var eachCourt in courtList){
-                      if(eachCourt.split("@")[0] == dataResult["courtname"]){
-                        courtInfo = eachCourt;
-                      }
-                    }
-                    String lendCount = dataResult["lend_count"].toString() == ""? "0" : dataResult["lend_count"].toString();
-                    int count = int.parse(lendCount);
-                    if(count == 0){
-                      lendCountInfo = preLoanCountList[0];
-                    }else if(count == 1){
-                      lendCountInfo = preLoanCountList[1];
-                    }else{
-                      lendCountInfo = preLoanCountList[2];
-                    }
-
-                    String lendAmount = dataResult["lend_amount"].toString() == ""? "0" : dataResult["lend_amount"].toString();
-                    String wishAmount = dataResult["wish_amount"].toString() == ""? "0" : dataResult["wish_amount"].toString();
-                    String accidentNo = dataResult["issue_no"];
-                    CommonUtils.log("", "accident data ====>\n"
-                        "accidentUid: ${eachAccident["uid"]}\n"
-                        "accidentCaseNo: $accidentNo\n"
-                        "courtInfo: $courtInfo\n"
-                        "bankInfo: $bankInfo\n"
-                        "account: ${dataResult["refund_account"]}\n"
-                        "lendCountInfo: $lendCountInfo\n"
-                        "lend_amount: ${dataResult["lend_amount"]}\n"
-                        "wish_amount: ${dataResult["wish_amount"]}\n");
-                    MyData.addToAccidentInfoList(AccidentInfoData(eachAccident["uid"], accidentNo.substring(0,4), accidentNo.substring(4,6), accidentNo.substring(6),
-                        courtInfo, bankInfo, dataResult["refund_account"].toString(), lendCountInfo, lendAmount, wishAmount));
-                  }
-                  GetController.to.updateMainDataChangedFlag();
-                  callLogfinApi(LogfinApis.getLoansInfo, <String, dynamic>{}, (isSuccessToGetLoansInfo, loansInfoOutputJson){
-                    MyData.clearLoanInfoList();
-                    if(isSuccessToGetLoansInfo){
-                      List<dynamic> loansList = loansInfoOutputJson!["loans"];
-                      if(loansList.isNotEmpty){
-                        CommonUtils.log("i", " loan list in!");
-                        for(var eachLoans in loansList){
-                          CommonUtils.log("", "loan data ====>\n"
-                              "accidentUid: ${eachLoans["accident_uid"]}\n"
-                              "loanUid: ${eachLoans["uid"]}\n"
-                              "lenderPrId: ${eachLoans["lender_pr_id"]}\n"
-                              "submitAmount: ${eachLoans["submit_offer"]["amount"]}\n"
-                              "submitRate: ${eachLoans["submit_offer"]["interest_rate"]}\n"
-                              "companyName: ${eachLoans["lender_pr"]["lender"]["name"]}\n"
-                              "productName: ${eachLoans["lender_pr"]["lender"]["product_name"]}\n"
-                              "contactNo: ${eachLoans["lender_pr"]["lender"]["contact_no"]}\n"
-                              "createdDate: ${eachLoans["submit_offer"]["created_at"]}\n"
-                              "updatedDate: ${eachLoans["submit_offer"]["updated_at"]}\n"
-                              "statueId: ${eachLoans["status_info"]["id"]}\n");
-
-                          MyData.addToLoanInfoList(LoanInfoData(eachLoans["accident_uid"].toString(), eachLoans["uid"].toString(), eachLoans["lender_pr_id"].toString(),
-                              eachLoans["submit_offer"]["amount"].toString(), eachLoans["submit_offer"]["interest_rate"].toString(),
-                              eachLoans["lender_pr"]["lender"]["name"].toString(), eachLoans["lender_pr"]["lender"]["product_name"].toString(), eachLoans["lender_pr"]["lender"]["contact_no"].toString(),
-                              eachLoans["submit_offer"]["created_at"].toString(), eachLoans["submit_offer"]["updated_at"].toString(), eachLoans["status_info"]["id"].toString()));
-                        }
-                      }
-
-                      MyData.printData();
-                      GetController.to.updateMainDataChangedFlag();
-                      callback(true, AppView.mainView);
-                    }else{
-                      CommonUtils.flutterToast(loansInfoOutputJson!["error"]);
-                      callback(false, null);
-                    }
-                  });
-                }
-              }else{
-                CommonUtils.flutterToast(accidentInfoOutputJson!["error"]);
-                callback(false, null);
-              }
-            });
+            MyData.printData();
+            callback(true);
           }else{
-            CommonUtils.flutterToast("유저정보 로딩 실패\n다시 실행 해 주세요.");
-            callback(false, null);
+            callback(false);
           }
         }else{
-          CommonUtils.flutterToast("데이터 로딩 실패\n다시 실행 해 주세요.");
-          callback(false, null);
+          callback(false);
         }
       });
-
     }catch(error){
-      CommonUtils.flutterToast("데이터 로딩 실패\n다시 실행 해 주세요.");
-      callback(false, null);
+      callback(false);
+    }
+  }
+
+  static Future<void> getAccidentInfo(Function(bool isSuccess, bool isNotEmpty) callback) async{
+    try{
+      callLogfinApi(LogfinApis.getAccidentInfo, <String, dynamic>{}, (isSuccessToGetAccidentInfo, accidentInfoOutputJson){
+        if(isSuccessToGetAccidentInfo){
+          if(accidentInfoOutputJson != null){
+            List<dynamic> accidentList = accidentInfoOutputJson["accidents"];
+            if(accidentList.isEmpty){
+              GetController.to.resetMainAccidentDataChangedFlag();
+              callback(true, false);
+            }else {
+              MyData.clearAccidentInfoList();
+              String bankInfo = "";
+              String courtInfo = "";
+              String lendCountInfo = "";
+              for(var eachAccident in accidentList){
+                Map<String, dynamic> dataResult = eachAccident;
+
+                for(var eachBank in bankList){
+                  if(eachBank.split("@")[0] == dataResult["refund_bank"]){
+                    bankInfo = eachBank;
+                  }
+                }
+                for(var eachCourt in courtList){
+                  if(eachCourt.split("@")[0] == dataResult["courtname"]){
+                    courtInfo = eachCourt;
+                  }
+                }
+                String lendCount = dataResult["lend_count"].toString() == ""? "0" : dataResult["lend_count"].toString();
+                int count = int.parse(lendCount);
+                if(count == 0){
+                  lendCountInfo = preLoanCountList[0];
+                }else if(count == 1){
+                  lendCountInfo = preLoanCountList[1];
+                }else{
+                  lendCountInfo = preLoanCountList[2];
+                }
+
+                String lendAmount = dataResult["lend_amount"].toString() == ""? "0" : dataResult["lend_amount"].toString();
+                String wishAmount = dataResult["wish_amount"].toString() == ""? "0" : dataResult["wish_amount"].toString();
+                String accidentNo = dataResult["issue_no"];
+                var resData = jsonDecode(dataResult["res_data"]);
+                CommonUtils.log("", "accident data ====>\n"
+                    "accidentUid: ${eachAccident["uid"]}\n"
+                    "accidentCaseNo: $accidentNo\n"
+                    "courtInfo: $courtInfo\n"
+                    "bankInfo: $bankInfo\n"
+                    "account: ${dataResult["refund_account"]}\n"
+                    "lendCountInfo: $lendCountInfo\n"
+                    "lend_amount: ${dataResult["lend_amount"]}\n"
+                    "wish_amount: ${dataResult["wish_amount"]}\n"
+                    "res_data: ${resData["data"]["resRepaymentList"]}\n");
+                MyData.addToAccidentInfoList(AccidentInfoData(eachAccident["uid"], accidentNo.substring(0,4), accidentNo.substring(4,6), accidentNo.substring(6),
+                    courtInfo, bankInfo, dataResult["refund_account"].toString(), lendCountInfo, lendAmount, wishAmount, resData["data"]));
+              }
+
+              GetController.to.updateMainAccidentDataChangedFlag();
+              callback(true, true);
+            }
+          }else{
+            GetController.to.resetMainAccidentDataChangedFlag();
+            callback(false, false);
+          }
+        }else{
+          GetController.to.resetMainAccidentDataChangedFlag();
+          callback(false, false);
+        }
+      });
+    }catch(error){
+      GetController.to.resetMainAccidentDataChangedFlag();
+      callback(false, false);
+    }
+  }
+
+  static Future<void> getLoanInfo(Function(bool isSuccess, bool isNotEmpty) callback) async{
+    try{
+      callLogfinApi(LogfinApis.getLoansInfo, <String, dynamic>{}, (isSuccessToGetLoansInfo, loansInfoOutputJson){
+        if(isSuccessToGetLoansInfo){
+          if(loansInfoOutputJson != null){
+            List<dynamic> loansList = loansInfoOutputJson["loans"];
+            if(loansList.isEmpty){
+              GetController.to.resetMainLoanDataChangedFlag();
+              callback(true, false);
+            }else{
+              MyData.clearLoanInfoList();
+              for(var eachLoans in loansList){
+                CommonUtils.log("", "loan data ====>\n"
+                    "accidentUid: ${eachLoans["accident_uid"]}\n"
+                    "loanUid: ${eachLoans["uid"]}\n"
+                    "lenderPrId: ${eachLoans["lender_pr_id"]}\n"
+                    "submitAmount: ${eachLoans["submit_offer"]["amount"]}\n"
+                    "submitRate: ${eachLoans["submit_offer"]["interest_rate"]}\n"
+                    "companyName: ${eachLoans["lender_pr"]["lender"]["name"]}\n"
+                    "productName: ${eachLoans["lender_pr"]["lender"]["product_name"]}\n"
+                    "contactNo: ${eachLoans["lender_pr"]["lender"]["contact_no"]}\n"
+                    "createdDate: ${eachLoans["submit_offer"]["created_at"]}\n"
+                    "updatedDate: ${eachLoans["submit_offer"]["updated_at"]}\n"
+                    "statueId: ${eachLoans["status_info"]["id"]}\n");
+
+                String submitAmount = eachLoans["submit_offer"]["amount"].toString().substring(0, eachLoans["submit_offer"]["amount"].toString().length-4);
+                MyData.addToLoanInfoList(LoanInfoData(eachLoans["accident_uid"].toString(), eachLoans["uid"].toString(), eachLoans["lender_pr_id"].toString(),
+                    submitAmount, eachLoans["submit_offer"]["interest_rate"].toString(),
+                    eachLoans["lender_pr"]["lender"]["name"].toString(), "assets/images/temp_bank_logo.png", eachLoans["lender_pr"]["lender"]["product_name"].toString(), eachLoans["lender_pr"]["lender"]["contact_no"].toString(),
+                    eachLoans["submit_offer"]["created_at"].toString(), eachLoans["submit_offer"]["updated_at"].toString(), eachLoans["status_info"]["id"].toString()));
+              }
+              MyData.sortLoanInfoList();
+              _setChatRoomInfoList();
+              GetController.to.updateMainLoanDataChangedFlag();
+              callback(true, true);
+            }
+          }else{
+            GetController.to.resetMainLoanDataChangedFlag();
+            callback(false, false);
+          }
+        }else{
+          GetController.to.resetMainLoanDataChangedFlag();
+          callback(false, false);
+        }
+      });
+    }catch(error){
+      GetController.to.resetMainLoanDataChangedFlag();
+      callback(false, false);
+    }
+  }
+  static void _setChatRoomInfoList(){
+    MyData.clearChatRoomInfoList();
+    for(var eachSortedLoan in MyData.getLoanInfoList()){
+      MyData.addToChatRoomInfoList(ChatRoomInfoData(int.parse(eachSortedLoan.lenderPrId), 1, eachSortedLoan.companyLogo,
+          eachSortedLoan.companyName, eachSortedLoan.productName, "현재 고객님은 2건의 심사 결과를 대기중입니다. 조금더 알아보시렵니까?", "20231008145230", 12));
     }
   }
 

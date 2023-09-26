@@ -7,6 +7,7 @@ class ColorStyles {
   static const Color upFinButtonBlue = Color(0xff3a6cff);
   static const Color upFinTextAndBorderBlue = Color(0xff5681ff);
   static const Color upFinRed = Color(0xffe9603c);
+  static const Color upFinWhiteRed = Color(0xffffe4e1);
   static const Color upFinKakaoYellow = Color(0xffFee500);
   static const Color upFinGray = Color(0xffe3e3e3);
   static const Color upFinWhiteGray = Color(0xffeff2f6);

@@ -13,7 +13,7 @@ class UiUtils {
       builder: (BuildContext context, Orientation orientation, DeviceType deviceType) {
         return MaterialApp(
           theme: ThemeData(useMaterial3: true),
-          initialRoute: AppView.rootView.value,
+          initialRoute: AppView.appRootView.value,
           routes: Config.appRoutes
         );
       },
@@ -86,7 +86,7 @@ class UiUtils {
     return Text(overflow: TextOverflow.ellipsis, text, style: TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor), textScaleFactor: 1.0, textAlign: textAlign, maxLines: textMaxLine);
   }
 
-  static Widget getTextStyledButtonWithFixedScale(String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign? textAlign, int? textMaxLine, Function() onPressedCallback){
+  static Widget getTextButtonWithFixedScale(String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign? textAlign, int? textMaxLine, Function() onPressedCallback){
     return GestureDetector(onTap: onPressedCallback, child : UiUtils.getTextWithFixedScale(text, fontSize, fontWeight, textColor, textAlign, null));
   }
 
@@ -241,12 +241,30 @@ class UiUtils {
               padding: EdgeInsets.only(left: 4.w, right: 4.w, top: 4.w, bottom: 4.w),
               backgroundColor: buttonColor,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
-              side: BorderSide(width: 1.3, color: borderColor),
+              side: BorderSide(width: 1, color: borderColor),
               elevation: 0.0,
               shadowColor: ColorStyles.upFinGray,
             ),
             onPressed: onPressedCallback,
             child: childWidget,
+        )
+    );
+  }
+
+  static SizedBox getBorderButtonBoxWithZeroPadding(double buttonWidth, Color buttonColor, Color borderColor, Widget childWidget, VoidCallback onPressedCallback){
+    return SizedBox(
+        width: buttonWidth,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.zero,
+            backgroundColor: buttonColor,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+            side: BorderSide(width: 1.3, color: borderColor),
+            elevation: 0.0,
+            shadowColor: ColorStyles.upFinGray,
+          ),
+          onPressed: onPressedCallback,
+          child: childWidget,
         )
     );
   }
@@ -260,6 +278,25 @@ class UiUtils {
             padding: EdgeInsets.only(left: 4.w, right: 4.w, top: 4.w, bottom: 4.w),
             backgroundColor: buttonColor,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            side: BorderSide(width: 1.3, color: borderColor),
+            elevation: 0.0,
+            shadowColor: ColorStyles.upFinGray,
+          ),
+          onPressed: onPressedCallback,
+          child: childWidget,
+        )
+    );
+  }
+
+  static SizedBox getTopBannerButtonBox(double buttonWidth, double buttonHeight, Color buttonColor, Color borderColor, Widget childWidget, VoidCallback onPressedCallback){
+    return SizedBox(
+        width: buttonWidth,
+        height: buttonHeight,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.only(left: 4.w, right: 4.w, top: 4.w, bottom: 4.w),
+            backgroundColor: buttonColor,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
             side: BorderSide(width: 1.3, color: borderColor),
             elevation: 0.0,
             shadowColor: ColorStyles.upFinGray,
@@ -373,7 +410,7 @@ class UiUtils {
                       width: 100.w,
                       height: 100.h,
                       color: ColorStyles.upFinDarkGrayWithAlpha,
-                      child: SpinKitCubeGrid(color: ColorStyles.upFinTextAndBorderBlue, size: 25.w)
+                      child: SpinKitWave(color: ColorStyles.upFinTextAndBorderBlue, size: 25.w)
                   );
                 })
           );
@@ -431,7 +468,7 @@ class UiUtils {
 
   static Widget getCustomCircleCheckBox(Key key, double size, bool checkedValue,
       Color activeCheckColor, Color activeFillColor, Color borderColor, Color activeBorderColor, Function(bool?) onChanged){
-    return Transform.scale(scale: size, child: Checkbox(
+    return Transform.scale(scale: size, child: Container(padding: EdgeInsets.zero, child: Checkbox(
         key: key,
         value: checkedValue,
         onChanged: onChanged,
@@ -440,7 +477,7 @@ class UiUtils {
         activeColor: activeFillColor,
         side: MaterialStateBorderSide.resolveWith((states) =>
         !checkedValue? BorderSide(width: 2.0, color: borderColor) : BorderSide(width: 2.0, color: activeBorderColor))
-    ));
+    )));
   }
 
   static void showSlideMenu(BuildContext parentViewContext, SlideType slideType, bool isDismissible,

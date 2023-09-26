@@ -1,6 +1,8 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:upfin/views/app_accident_detail_view.dart';
+import 'package:upfin/views/app_agree_detail_info_view.dart';
 import 'package:upfin/views/app_apply_pr_view.dart';
 import 'package:upfin/views/app_detail_pr_view.dart';
 import 'package:upfin/views/app_main_view.dart';
@@ -32,18 +34,20 @@ class Config{
   static List<Permission> permissionList = [Permission.notification];
 
   static Map<String, WidgetBuilder> appRoutes = {
-    AppView.rootView.value : (context) => AppRootView(),
-    AppView.loginView.value : (context) => AppLoginView(),
-    AppView.certificationView.value : (context) => AppLoginCertificationView(),
-    AppView.webView.value : (context) => AppWebView(),
-    AppView.signupView.value : (context) => AppSignUpView(),
-    AppView.mainView.value : (context) => AppMainView(),
-    AppView.searchAccidentView.value : (context) => AppSearchAccidentView(),
-    AppView.updateAccidentView.value : (context) => AppUpdateAccidentView(),
-    AppView.resultPrView.value : (context) => AppResultPrView(),
-    AppView.detailPrView.value : (context) => AppDetailPrView(),
-    AppView.applyPrView.value : (context) => AppApplyPrView(),
-    AppView.appChatView.value : (context) => AppChatView()
+    AppView.appRootView.value : (context) => AppRootView(),
+    AppView.appLoginView.value : (context) => AppLoginView(),
+    AppView.appCertificationView.value : (context) => AppLoginCertificationView(),
+    AppView.appWebView.value : (context) => AppWebView(),
+    AppView.appSignupView.value : (context) => AppSignUpView(),
+    AppView.appMainView.value : (context) => AppMainView(),
+    AppView.appSearchAccidentView.value : (context) => AppSearchAccidentView(),
+    AppView.appUpdateAccidentView.value : (context) => AppUpdateAccidentView(),
+    AppView.appResultPrView.value : (context) => AppResultPrView(),
+    AppView.appDetailPrView.value : (context) => AppDetailPrView(),
+    AppView.appApplyPrView.value : (context) => AppApplyPrView(),
+    AppView.appChatView.value : (context) => AppChatView(),
+    AppView.appAccidentDetailInfoView.value : (context) => AppAccidentDetailView(),
+    AppView.appAgreeDetailInfoView.value : (context) => AppAgreeDetailInfoView()
   };
 
   static Future<void> initAppState(Function(bool isSuccess) callback) async{
@@ -73,36 +77,41 @@ class Config{
 }
 
 enum AppView {
-  rootView, loginView, certificationView, webView, signupView, mainView, searchAccidentView, updateAccidentView, resultPrView, detailPrView, applyPrView, appChatView
+  appRootView, appLoginView, appCertificationView, appWebView, appSignupView, appMainView, appSearchAccidentView,
+  appUpdateAccidentView, appResultPrView, appDetailPrView, appApplyPrView, appChatView, appAccidentDetailInfoView, appAgreeDetailInfoView
 }
 
 extension SAppViewExtension on AppView {
   String get value {
     switch (this) {
-      case AppView.rootView:
+      case AppView.appRootView:
         return '/rootView';
-      case AppView.loginView:
+      case AppView.appLoginView:
         return '/loginView';
-      case AppView.certificationView:
+      case AppView.appCertificationView:
         return '/certification';
-      case AppView.webView:
+      case AppView.appWebView:
         return '/webView';
-      case AppView.signupView:
+      case AppView.appSignupView:
         return '/signupView';
-      case AppView.mainView:
+      case AppView.appMainView:
         return '/mainView';
-      case AppView.searchAccidentView:
+      case AppView.appSearchAccidentView:
         return '/searchAccidentView';
-      case AppView.updateAccidentView:
+      case AppView.appUpdateAccidentView:
         return '/updateAccidentView';
-      case AppView.resultPrView:
+      case AppView.appResultPrView:
         return '/resultPrView';
-      case AppView.detailPrView:
+      case AppView.appDetailPrView:
         return '/detailPrView';
-      case AppView.applyPrView:
+      case AppView.appApplyPrView:
         return '/applyPrView';
       case AppView.appChatView:
         return '/appChatView';
+      case AppView.appAccidentDetailInfoView:
+        return '/accidentDetailInfoView';
+      case AppView.appAgreeDetailInfoView:
+        return '/agreeDetailInfoView';
     }
   }
 }

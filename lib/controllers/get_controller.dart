@@ -9,7 +9,8 @@ class GetController extends GetxController {
   RxBool isConfirmed = false.obs;
   RxString preLoanPrice = "만원".obs;
   RxString wantLoanPrice = "만원".obs;
-  RxBool isMainDataChanged = false.obs;
+  RxBool isMainAccidentDataChanged = false.obs;
+  RxBool isMainLoanDataChanged = false.obs;
   RxList<LoanInfoData> loanInfoHistDataList = <LoanInfoData>[].obs;
 
   @override
@@ -70,7 +71,7 @@ class GetController extends GetxController {
     wantLoanPrice.value = newValue;
   }
   void resetWantLoanPrice() {
-    preLoanPrice = "만원".obs;
+    wantLoanPrice = "만원".obs;
   }
 
 
@@ -93,11 +94,19 @@ class GetController extends GetxController {
     CommonUtils.log("i", "loanInfoDataList length : ${loanInfoHistDataList.length}");
   }
 
-  void updateMainDataChangedFlag() {
-    isMainDataChanged.value = false;
-    isMainDataChanged.value = true;
+  void updateMainAccidentDataChangedFlag() {
+    isMainAccidentDataChanged.value = false;
+    isMainAccidentDataChanged.value = true;
   }
-  void resetMainDataChangedFlag() {
-    isMainDataChanged = false.obs;
+  void resetMainAccidentDataChangedFlag() {
+    isMainAccidentDataChanged = false.obs;
+  }
+
+  void updateMainLoanDataChangedFlag() {
+    isMainLoanDataChanged.value = false;
+    isMainLoanDataChanged.value = true;
+  }
+  void resetMainLoanDataChangedFlag() {
+    isMainLoanDataChanged = false.obs;
   }
 }
