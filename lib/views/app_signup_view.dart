@@ -395,40 +395,78 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
             ]),
           ])),
           UiUtils.getMarginBox(0, 3.h),
-          item1Agreed!? UiUtils.getTextButtonBox(90.w, "동의하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
-            // 1) 가입 & 로그인
-            Map<String, dynamic> inputJson = {
-              "user" : {
-                "email": _emailTextController.text.trim(),
-                "password": _pwdTextController.text.trim(),
-                "password_confirmation": _pwdConfirmTextController.text.trim(),
-                "name" : _nameTextController.text.trim(),
-                "contact_no" : _phoneNumberTextController.text.trim(),
-                "telecom" : MyData.telecomTypeFromPhoneCert,
-                "birthday" : MyData.birthFromPhoneCert,
-                "gender" : MyData.isMaleFromPhoneCert? "1" : "2",
-              }
+          item1Agreed!? UiUtils.getTextButtonBox(90.w, "동의하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+
+            Map<String, String> inputJsonForCert = {
+              "carrier": "",
+              "name" : _nameTextController.text.trim(),
+              "phone" : _phoneNumberTextController.text.trim()
             };
-            CommonUtils.log("i", "signup input :\n$inputJson");
-            Navigator.pop(thisContext);
-            UiUtils.showLoadingPop(context);
-            LogfinController.callLogfinApi(LogfinApis.signUp, inputJson, (isSuccessToSignup, outputJson) async {
-              if(isSuccessToSignup){
-                CommonUtils.flutterToast("환영합니다!");
-                // 캐시 데이터 저장
-                SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceIdKey, _emailTextController.text.trim());
-                SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferencePwKey, _pwdTextController.text.trim());
-                await LogfinController.getMainViewInfo((isSuccessToGetMainInfo){
-                  UiUtils.closeLoadingPop(context);
-                  if(isSuccessToGetMainInfo){
-                    CommonUtils.moveWithReplacementTo(context, AppView.appMainView.value, null);
-                  }
-                });
-              }else{
-                UiUtils.closeLoadingPop(context);
-                CommonUtils.flutterToast(outputJson!["error"]);
+            var result = await CommonUtils.moveToWithResult(context, AppView.appCertificationView.value, inputJsonForCert);
+            if(result != null){
+              CommonUtils.flutterToast("인증 성공");
+              Map<String, dynamic> resultMap = result as Map<String, dynamic>;
+              for(var each in IamportController.carrierList){
+                if(each.split("@")[0] == resultMap["carrier"]){
+                  MyData.telecomTypeFromPhoneCert = each.split("@")[1];
+                }
               }
-            });
+
+              if(resultMap["gender"] == "male"){
+                MyData.isMaleFromPhoneCert = true;
+              }else{
+                MyData.isMaleFromPhoneCert = false;
+              }
+              MyData.birthFromPhoneCert = (resultMap["birth"] as String).split("-")[0]+(resultMap["birth"] as String).split("-")[1]+(resultMap["birth"] as String).split("-")[2];
+
+              confirmedName = _nameTextController.text.trim();
+              confirmedPhone = _phoneNumberTextController.text.trim();
+
+              // 가입 & 로그인
+              Map<String, dynamic> inputJson = {
+                "user" : {
+                  "email": _emailTextController.text.trim(),
+                  "password": _pwdTextController.text.trim(),
+                  "password_confirmation": _pwdConfirmTextController.text.trim(),
+                  "name" : _nameTextController.text.trim(),
+                  "contact_no" : _phoneNumberTextController.text.trim(),
+                  "telecom" : MyData.telecomTypeFromPhoneCert,
+                  "birthday" : MyData.birthFromPhoneCert,
+                  "gender" : MyData.isMaleFromPhoneCert? "1" : "2",
+                }
+              };
+              CommonUtils.log("i", "signup input :\n$inputJson");
+              if(thisContext.mounted){
+                Navigator.pop(thisContext);
+                if(context.mounted){
+                  UiUtils.showLoadingPop(context);
+                  LogfinController.callLogfinApi(LogfinApis.signUp, inputJson, (isSuccessToSignup, outputJson) async {
+                    if(isSuccessToSignup){
+                      isConfirmed = true;
+                      GetController.to.updateConfirmed(isConfirmed);
+                      CommonUtils.flutterToast("환영합니다!");
+                      // 캐시 데이터 저장
+                      SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceIdKey, _emailTextController.text.trim());
+                      SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferencePwKey, _pwdTextController.text.trim());
+                      await LogfinController.getMainViewInfo((isSuccessToGetMainInfo){
+                        UiUtils.closeLoadingPop(context);
+                        if(isSuccessToGetMainInfo){
+                          CommonUtils.moveWithReplacementTo(context, AppView.appMainView.value, null);
+                        }
+                      });
+                    }else{
+                      isConfirmed = false;
+                      GetController.to.updateConfirmed(isConfirmed);
+                      UiUtils.closeLoadingPop(context);
+                      CommonUtils.flutterToast(outputJson!["error"]);
+                    }
+                  });
+                }
+              }
+            }else{
+              isConfirmed = false;
+              CommonUtils.flutterToast("본인인증에 실패했습니다.");
+            }
           }) : UiUtils.getTextButtonBox(90.w, "동의하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinGray, () {})
         ])
     ));
@@ -438,6 +476,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
     return Form(key: _formKey1, child: UiUtils.getRowColumnWithAlignCenter([
       SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+          CommonUtils.hideKeyBoard();
           Navigator.pop(context);
         }),
       ])),
@@ -507,6 +546,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
     return Form(key: _formKey2, child: UiUtils.getRowColumnWithAlignCenter([
       Obx(()=>!GetController.to.isConfirmed.value? SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+          CommonUtils.hideKeyBoard();
           setState(() {
             viewId = 1;
           });
@@ -535,57 +575,28 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
             }
           }): Container(),
       UiUtils.getExpandedScrollView(Axis.vertical, Container()),
-      Obx(()=>GetController.to.isConfirmed.value?
-      UiUtils.getTextButtonBox(90.w, "가입하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
-        if(_formKey2.currentState!.validate() && isConfirmed){
-          CommonUtils.hideKeyBoard();
-          _unFocusAllNodes();
-          UiUtils.showSlideMenu(context, SlideType.bottomToTop, true, 100.w, 62.h, 0.5, _makeAgreeWidget);
-        }else{
-          CommonUtils.flutterToast("입력하신 정보를\n다시 확인 해 주세요.");
-        }
-      }) : UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinTextAndBorderBlue,
+      UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinTextAndBorderBlue,
           UiUtils.getTextWithFixedScale("본인인증", 12.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, null), () async {
             CommonUtils.hideKeyBoard();
             if(_phoneNumberTextController.text.trim() != ""){
-              Map<String, String> inputJson = {
-                "carrier": "",
-                "name" : _nameTextController.text.trim(),
-                "phone" : _phoneNumberTextController.text.trim()
-              };
-              var result = await CommonUtils.moveToWithResult(context, AppView.appCertificationView.value, inputJson);
-              if(result != null){
-                isConfirmed = true;
-                CommonUtils.flutterToast("인증 성공");
+              UiUtils.showSlideMenu(context, SlideType.bottomToTop, true, 100.w, 62.h, 0.5, _makeAgreeWidget);
 
-                Map<String, dynamic> resultMap = result as Map<String, dynamic>;
-                for(var each in IamportController.carrierList){
-                  if(each.split("@")[0] == resultMap["carrier"]){
-                    MyData.telecomTypeFromPhoneCert = each.split("@")[1];
-                  }
-                }
-
-                if(resultMap["gender"] == "male"){
-                  MyData.isMaleFromPhoneCert = true;
-                }else{
-                  MyData.isMaleFromPhoneCert = false;
-                }
-                MyData.birthFromPhoneCert = (resultMap["birth"] as String).split("-")[0]+(resultMap["birth"] as String).split("-")[1]+(resultMap["birth"] as String).split("-")[2];
-
-                confirmedName = _nameTextController.text.trim();
-                confirmedPhone = _phoneNumberTextController.text.trim();
-              }else{
-                isConfirmed = false;
-                CommonUtils.flutterToast("본인인증에 실패했습니다.");
-              }
-
-              GetController.to.updateConfirmed(isConfirmed);
             }else{
               CommonUtils.flutterToast("휴대전화 번호를 입력하세요.");
             }
           })
-      )
     ]));
+  }
+
+  void back(){
+    CommonUtils.hideKeyBoard();
+    if(viewId == 1){
+      Navigator.pop(context);
+    }else{
+      setState(() {
+        viewId = 1;
+      });
+    }
   }
 
   @override
@@ -594,7 +605,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
         child: viewId == 1 ? _getEmailAndPwInfoView() : _getPhoneValidView()
     );
 
-    return UiUtils.getViewWithScroll(context, view, _scrollController, CommonUtils.onWillPopForPreventBackButton);
+    return UiUtils.getScrollViewWithAllowBackForAndroid(context, view, _scrollController, back);
   }
 
 }

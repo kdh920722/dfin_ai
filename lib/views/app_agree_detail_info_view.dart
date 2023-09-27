@@ -53,6 +53,11 @@ class AppAgreeDetailInfoViewState extends State<AppAgreeDetailInfoView> with Wid
     }
   }
 
+  void back(){
+    CommonUtils.hideKeyBoard();
+    Navigator.pop(context, false);
+  }
+
   @override
   Widget build(BuildContext context) {
     Map<String, dynamic> agreeInfo = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
@@ -83,6 +88,6 @@ class AppAgreeDetailInfoViewState extends State<AppAgreeDetailInfoView> with Wid
       ])
     );
 
-    return UiUtils.getView(context, view, CommonUtils.onWillPopForPreventBackButton);
+    return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
   }
 }

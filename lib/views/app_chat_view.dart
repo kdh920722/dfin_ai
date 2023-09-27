@@ -122,6 +122,11 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   double inputHeight = 8.h;
   double inputMaxHeight = 30.h;
 
+  void back(){
+    CommonUtils.hideKeyBoard();
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -192,7 +197,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
               ]))
         ])
     );
-    return UiUtils.getView(context, view, CommonUtils.onWillPopForPreventBackButton);
+    return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
   }
 
 }

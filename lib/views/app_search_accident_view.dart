@@ -683,7 +683,6 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
   /// job view end
 
   /// finish confirm view
-  bool isSuccessToGetAccident = false;
   Widget _getFinishConfirmView(){
     String birthMonth = MyData.birth.substring(4,6);
     if(birthMonth.substring(0,1) == "0"){
@@ -728,103 +727,171 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
     }
 
     return UiUtils.getRowColumnWithAlignCenter([
-      !isSuccessToGetAccident? SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () {
           backInputView();
         }),
-      ])) : Container(),
-      !isSuccessToGetAccident? UiUtils.getMarginBox(0, 3.h) : UiUtils.getMarginBox(0, 10.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale(!isSuccessToGetAccident? "아래 정보로" : "해당 조건으로", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale(!isSuccessToGetAccident? "사건정보를 추가할까요?" : "대출상품을 찾아볼까요?", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      ])),
+      UiUtils.getMarginBox(0, 3.h),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("해당 조건으로", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출상품을 찾아볼까요?", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: confirmWidgetList)),
       UiUtils.getMarginBox(0, 5.h),
-      !isSuccessToGetAccident? UiUtils.getTextButtonBox(90.w, "사건 추가하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
-        Map<String, dynamic> inputJson = {
-          "court_name": selectedCourtInfo.split("@")[0],
-          "caseNumberYear": selectedAccidentInfo.split("개회")[0],
-          "caseNumberType": "개회",
-          "caseNumberNumber": selectedAccidentInfo.split("개회")[1],
-          "userName": MyData.name,
-          "bankCode": selectedBankCodeInfo.split("@")[1],
-          "account": selectedBankAccountInfo,
-          "birthday": MyData.birth,
-          "job": selectedJobInfo.split("@")[1],
-          "lend_count": selectedPreLoanCountInfo.split("@")[1],
-          "lend_amount": selectedPreLoanPriceInfo,
-          "wish_amount": selectedWantLoanPriceInfo,
-
-        };
-        CommonUtils.log("i", "pr search info:\n$inputJson");
-
-        selectedAccidentInfo = "2023개회1000794";
-        Map<String, dynamic> inputJsonForTest = {
-          "court_name": "서울회생법원",
-          "caseNumberYear": selectedAccidentInfo.split("개회")[0],
-          "caseNumberType": "개회",
-          "caseNumberNumber": selectedAccidentInfo.split("개회")[1],
-          "userName": "정혜경",
-          "bankCode": "004",
-          "account": "40240104",
-          "birthday": "19690710",
-          "job": "2",
-          "lend_count": "1",
-          "lend_amount": "500",
-          "wish_amount": "300",
-        };
-
-        UiUtils.showLoadingPop(context);
-        LogfinController.callLogfinApi(LogfinApis.prSearch, inputJsonForTest, (isSuccess, outputJson){
-          if(isSuccess){
-            // 메인뷰로 이동
-            LogfinController.getAccidentInfo((isSuccessToGetAccidentInfo, isNotEmpty){
-              UiUtils.closeLoadingPop(context);
-              if(isSuccessToGetAccidentInfo){
-                if(isNotEmpty){
-                  setState(() {
-                    isSuccessToGetAccident = true;
-                  });
-                }else{
-                  CommonUtils.flutterToast("사건정보 찾기 실패\n다시 실행해주세요.");
-                }
-              }
-            });
-          }else{
-            // prSearch 실패
-            UiUtils.closeLoadingPop(context);
-            String errorMsg = outputJson!["error"];
-            CommonUtils.flutterToast(errorMsg.replaceAll("+", "").replaceAll("()", "").replaceAll(".", "\n"));
-          }
-        });
-      }) : Row(children: [
+      Row(children: [
         UiUtils.getBorderButtonBox(42.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
             UiUtils.getTextWithFixedScale("네 좋아요!", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
-              for(var each in MyData.getAccidentInfoList()){
-                if(each.accidentCaseNumberYear == selectedAccidentInfo.split("개회")[0] && each.accidentCaseNumberNumber == selectedAccidentInfo.split("개회")[1]){
-                  MyData.selectedAccidentInfoData = each;
-                }
-              }
+              Map<String, dynamic> inputJson = {
+                "court_name": selectedCourtInfo.split("@")[0],
+                "caseNumberYear": selectedAccidentInfo.split("개회")[0],
+                "caseNumberType": "개회",
+                "caseNumberNumber": selectedAccidentInfo.split("개회")[1],
+                "userName": MyData.name,
+                "bankCode": selectedBankCodeInfo.split("@")[1],
+                "account": selectedBankAccountInfo,
+                "birthday": MyData.birth,
+                "job": selectedJobInfo.split("@")[1],
+                "lend_count": selectedPreLoanCountInfo.split("@")[1],
+                "lend_amount": selectedPreLoanPriceInfo,
+                "wish_amount": selectedWantLoanPriceInfo,
 
+              };
+              CommonUtils.log("i", "pr search info:\n$inputJson");
+
+              selectedAccidentInfo = "2023개회1000794";
+              Map<String, dynamic> inputJsonForTest = {
+                "court_name": "서울회생법원",
+                "caseNumberYear": selectedAccidentInfo.split("개회")[0],
+                "caseNumberType": "개회",
+                "caseNumberNumber": selectedAccidentInfo.split("개회")[1],
+                "userName": "정혜경",
+                "bankCode": "004",
+                "account": "40240104",
+                "birthday": "19690710",
+                "job": "2",
+                "lend_count": "1",
+                "lend_amount": "500",
+                "wish_amount": "300",
+              };
               UiUtils.showLoadingPop(context);
-              LogfinController.getPrList("${MyData.selectedAccidentInfoData!.accidentCaseNumberYear}${MyData.selectedAccidentInfoData!.accidentCaseNumberType}${MyData.selectedAccidentInfoData!.accidentCaseNumberNumber}", (isSuccessToGetOffers, _){
-                UiUtils.closeLoadingPop(context);
-                if(isSuccessToGetOffers){
-                  CommonUtils.moveWithReplacementTo(context, AppView.appResultPrView.value, null);
+              LogfinController.callLogfinApi(LogfinApis.prSearch, inputJsonForTest, (isSuccess, outputJson){
+                if(isSuccess){
+                  LogfinController.getUserInfo((isSuccessToGetUserInfo){
+                    if(isSuccessToGetUserInfo){
+                      LogfinController.getAccidentInfo((isSuccessToGetAccidentInfo, isNotEmpty){
+                        if(isSuccessToGetAccidentInfo){
+                          if(isNotEmpty){
+                            for(var each in MyData.getAccidentInfoList()){
+                              if(each.accidentCaseNumberYear == selectedAccidentInfo.split("개회")[0] && each.accidentCaseNumberNumber == selectedAccidentInfo.split("개회")[1]){
+                                MyData.selectedAccidentInfoData = each;
+                              }
+                            }
+                            LogfinController.getPrList("${MyData.selectedAccidentInfoData!.accidentCaseNumberYear}${MyData.selectedAccidentInfoData!.accidentCaseNumberType}${MyData.selectedAccidentInfoData!.accidentCaseNumberNumber}", (isSuccessToGetOffers, _){
+                              UiUtils.closeLoadingPop(context);
+                              if(isSuccessToGetOffers){
+                                CommonUtils.moveWithReplacementTo(context, AppView.appResultPrView.value, null);
+                              }else{
+                                // findUidInAccidentInfoList 실패
+                                CommonUtils.flutterToast("에러가 발생했습니다.\n다시 실행해주세요.");
+                              }
+                            });
+                          }else{
+                            UiUtils.closeLoadingPop(context);
+                            CommonUtils.flutterToast("사건정보 찾기 실패\n다시 실행해주세요.");
+                          }
+                        }else{
+                          UiUtils.closeLoadingPop(context);
+                          CommonUtils.flutterToast("사건정보 찾기 실패\n다시 실행해주세요.");
+                        }
+                      });
+                    }else{
+                      UiUtils.closeLoadingPop(context);
+                      CommonUtils.flutterToast("사건정보 찾기 실패\n다시 실행해주세요.");
+                    }
+                  });
                 }else{
-                  // findUidInAccidentInfoList 실패
-                  CommonUtils.flutterToast("에러가 발생했습니다.");
+                  // prSearch 실패
+                  UiUtils.closeLoadingPop(context);
+                  String errorMsg = outputJson!["error"];
+                  CommonUtils.flutterToast(errorMsg.replaceAll("+", "").replaceAll("()", "").replaceAll(".", "\n"));
                 }
               });
             }),
         UiUtils.getMarginBox(2.w, 0),
         UiUtils.getBorderButtonBox(42.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
-            UiUtils.getTextWithFixedScale("다음에 할게요", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
-              CommonUtils.moveWithUntil(context, AppView.appMainView.value);
+            UiUtils.getTextWithFixedScale("아니오", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
+              Map<String, dynamic> inputJson = {
+                "court_name": selectedCourtInfo.split("@")[0],
+                "caseNumberYear": selectedAccidentInfo.split("개회")[0],
+                "caseNumberType": "개회",
+                "caseNumberNumber": selectedAccidentInfo.split("개회")[1],
+                "userName": MyData.name,
+                "bankCode": selectedBankCodeInfo.split("@")[1],
+                "account": selectedBankAccountInfo,
+                "birthday": MyData.birth,
+                "job": selectedJobInfo.split("@")[1],
+                "lend_count": selectedPreLoanCountInfo.split("@")[1],
+                "lend_amount": selectedPreLoanPriceInfo,
+                "wish_amount": selectedWantLoanPriceInfo,
+
+              };
+              CommonUtils.log("i", "pr search info:\n$inputJson");
+
+              selectedAccidentInfo = "2023개회1000794";
+              Map<String, dynamic> inputJsonForTest = {
+                "court_name": "서울회생법원",
+                "caseNumberYear": selectedAccidentInfo.split("개회")[0],
+                "caseNumberType": "개회",
+                "caseNumberNumber": selectedAccidentInfo.split("개회")[1],
+                "userName": "정혜경",
+                "bankCode": "004",
+                "account": "40240104",
+                "birthday": "19690710",
+                "job": "2",
+                "lend_count": "1",
+                "lend_amount": "500",
+                "wish_amount": "300",
+              };
+              UiUtils.showLoadingPop(context);
+              LogfinController.callLogfinApi(LogfinApis.prSearch, inputJsonForTest, (isSuccess, outputJson){
+                if(isSuccess){
+                  LogfinController.getUserInfo((isSuccessToGetUserInfo){
+                    if(isSuccessToGetUserInfo){
+                      LogfinController.getAccidentInfo((isSuccessToGetAccidentInfo, isNotEmpty){
+                        if(isSuccessToGetAccidentInfo){
+                          if(isNotEmpty){
+                            CommonUtils.moveWithUntil(context, AppView.appMainView.value);
+                          }else{
+                            UiUtils.closeLoadingPop(context);
+                            CommonUtils.flutterToast("사건정보 찾기 실패\n다시 실행해주세요.");
+                          }
+                        }else{
+                          UiUtils.closeLoadingPop(context);
+                          CommonUtils.flutterToast("사건정보 찾기 실패\n다시 실행해주세요.");
+                        }
+                      });
+                    }else{
+                      UiUtils.closeLoadingPop(context);
+                      CommonUtils.flutterToast("사건정보 찾기 실패\n다시 실행해주세요.");
+                    }
+                  });
+                }else{
+                  // prSearch 실패
+                  UiUtils.closeLoadingPop(context);
+                  String errorMsg = outputJson!["error"];
+                  CommonUtils.flutterToast(errorMsg.replaceAll("+", "").replaceAll("()", "").replaceAll(".", "\n"));
+                }
+              });
             })
       ])
     ]);
   }
   /// finish confirm view end
+
+  void back(){
+    CommonUtils.hideKeyBoard();
+    backInputView();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -850,7 +917,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getFinishConfirmView());
     }
 
-    return UiUtils.getView(context, view, CommonUtils.onWillPopForPreventBackButton);
+    return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
   }
 
 }

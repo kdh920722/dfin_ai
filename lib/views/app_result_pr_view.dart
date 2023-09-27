@@ -135,6 +135,10 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
     return UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: prInfoWidgetList));
   }
 
+  void back(){
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget view = Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: EdgeInsets.all(5.w), child: Column(children: [
@@ -165,7 +169,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
       UiUtils.getMarginBox(0, 0.5.h),
       _getPrListView(),
     ]));
-    return UiUtils.getView(context, view, CommonUtils.onWillPopForPreventBackButton);
+    return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
   }
 
 }

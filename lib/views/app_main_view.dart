@@ -99,7 +99,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                 UiUtils.getTextWithFixedScale("사건기록이 없습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.center, null), () { })
           ]);
         }),
-        UiUtils.getMarginBox(0, 4.h),
+        UiUtils.getMarginBox(0, 2.h),
         Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 2.h, bottom: 1.h), child: Row(mainAxisSize: MainAxisSize.max, children: [
           UiUtils.getTextWithFixedScale("접수내역", 15.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, 1),
           const Spacer(flex: 2)
@@ -113,22 +113,9 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
           ]);
         }),
         UiUtils.getMarginBox(0, 4.h),
-        Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 2.h, bottom: 1.h), child: Row(mainAxisSize: MainAxisSize.max, children: [
-          UiUtils.getTextWithFixedScale("서류지갑", 15.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, 1),
-          const Spacer(flex: 2)
-        ])),
-        Column(children: [
-          UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinRealGray,
-              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                UiUtils.getTextWithFixedScale("총", 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.center, null),
-                UiUtils.getTextWithFixedScale("12개", 12.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null),
-                UiUtils.getTextWithFixedScale("의 문서가 존재합니다.", 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.center, null)
-              ]), () { })
-        ]),
-        UiUtils.getMarginBox(0, 4.h),
         Stack(alignment: Alignment.center, children: [
           Positioned(
-              child: UiUtils.getBannerButtonBox(90.w, 50.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
+              child: UiUtils.getBannerButtonBox(90.w, 50.w, ColorStyles.upFinBannerSky, ColorStyles.upFinBannerSky,
                   Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                     SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale("빠르고", 25.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, 1)),
                     UiUtils.getMarginBox(0, 1.h),
@@ -189,7 +176,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
       for(var each in MyData.getChatRoomInfoList()){
         loanChatRoomWidgetList.add(
             Column(children: [
-              UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, each.chatRoomType == 0? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhiteSky,
+              UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
                   Row(mainAxisSize: MainAxisSize.max, children: [
                     Expanded(flex: 3, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -211,7 +198,9 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                       UiUtils.getMarginBox(2.w, 0),
                       UiUtils.getTextWithFixedScale("${each.chatRoomLastMsgTime.substring(2,4)}.${each.chatRoomLastMsgTime.substring(4,6)}.${each.chatRoomLastMsgTime.substring(6,8)}\n${each.chatRoomLastMsgTime.substring(8,10)}시${each.chatRoomLastMsgTime.substring(10,12)}분", 8.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.end, null),
                     ]))
-                  ]), () {})
+                  ]), () {
+                    CommonUtils.moveTo(context, AppView.appChatView.value, null);
+                  })
             ])
         );
         loanChatRoomWidgetList.add(UiUtils.getMarginBox(0, 1.h));
@@ -362,7 +351,8 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                 LogfinController.callLogfinApi(LogfinApis.deleteAccount, inputJson, (isSuccessToLogin, outputJson) async {
                   UiUtils.closeLoadingPop(context);
                   if(isSuccessToLogin){
-                    CommonUtils.flutterToast("회원삭제");
+                    CommonUtils.flutterToast("회원삭제 성공");
+                    _bankToHome(context);
                   }else{
                     CommonUtils.flutterToast(outputJson!["error"]);
                   }
@@ -381,17 +371,17 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             Expanded(child: viewTypeId == 1? _getApplyView() : viewTypeId == 2? _getMyView() : _getSettingView()),
             SizedBox(width: 100.w, height: 7.h, child: Row(mainAxisAlignment: MainAxisAlignment.center, mainAxisSize: MainAxisSize.max, children: [
               GestureDetector(child: Container(width: 30.w, height: 7.h, color: ColorStyles.upFinWhiteSky,
-                  child: Center(child: UiUtils.getTextButtonWithFixedScale("대출", 13.sp, viewTypeId == 1? FontWeight.w800 : FontWeight.w400,
-                      viewTypeId == 1? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, TextAlign.center, 1,(){setState(() {viewTypeId = 1;});}))),onTap: (){
+                  child: Center(child: UiUtils.getTextButtonWithFixedScale("대출", 13.sp, viewTypeId == 1? FontWeight.w800 : FontWeight.w300,
+                      viewTypeId == 1? ColorStyles.upFinButtonBlue : ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1,(){setState(() {viewTypeId = 1;});}))),onTap: (){
                 setState(() {viewTypeId = 1;});
               }),
               GestureDetector(child: Container(width: 40.w, height: 7.h, color: ColorStyles.upFinWhiteSky,
-                  child: Center(child: UiUtils.getTextButtonWithFixedScale("MY", 13.sp, viewTypeId == 2? FontWeight.w800 : FontWeight.w400,
-                      viewTypeId == 2? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, TextAlign.center, 1,(){setState(() {viewTypeId = 2;});}))
+                  child: Center(child: UiUtils.getTextButtonWithFixedScale("MY", 13.sp, viewTypeId == 2? FontWeight.w800 : FontWeight.w300,
+                      viewTypeId == 2? ColorStyles.upFinButtonBlue : ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1,(){setState(() {viewTypeId = 2;});}))
               ), onTap: () {setState(() {viewTypeId = 2;});}),
               GestureDetector(child: Container(width: 30.w, height: 7.h, color: ColorStyles.upFinWhiteSky,
-                  child: Center(child: UiUtils.getTextButtonWithFixedScale("설정", 13.sp, viewTypeId == 3? FontWeight.w800 : FontWeight.w400,
-                      viewTypeId == 3? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, TextAlign.center, 1,(){setState(() {viewTypeId = 3;});}))
+                  child: Center(child: UiUtils.getTextButtonWithFixedScale("설정", 13.sp, viewTypeId == 3? FontWeight.w800 : FontWeight.w300,
+                      viewTypeId == 3? ColorStyles.upFinButtonBlue : ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1,(){setState(() {viewTypeId = 3;});}))
               ), onTap: (){ setState(() {viewTypeId = 3;});}),
             ])),
           ]))

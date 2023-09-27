@@ -628,7 +628,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
               UiUtils.closeLoadingPop(context);
               if(isSuccessToGetAccidentInfo){
                 if(isNotEmpty){
-                  CommonUtils.moveWithUntil(context, AppView.appMainView.value);
+                  Navigator.pop(context, true);
                 }else{
                   CommonUtils.flutterToast("정보 수정에 실패했습니다.\n다시 실행해주세요.");
                 }
@@ -657,6 +657,11 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
     }
   }
 
+  void back(){
+    CommonUtils.hideKeyBoard();
+    Navigator.pop(context, false);
+  }
+
   bool isAutoScrollableForTarget = true;
   @override
   Widget build(BuildContext context) {
@@ -683,7 +688,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
     }else{
       view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getFinishConfirmView());
     }
-    return UiUtils.getView(context, view, CommonUtils.onWillPopForPreventBackButton);
+    return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
   }
 
 }

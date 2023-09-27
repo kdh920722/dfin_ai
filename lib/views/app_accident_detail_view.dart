@@ -23,7 +23,8 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
     CommonUtils.log("i", "AppAccidentDetailView 화면 입장");
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _tabController = TabController(length: 3, vsync: this);
+    MyData.selectedAccidentInfoData = null;
+    _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
@@ -101,11 +102,6 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
                   UiUtils.getImage(10.w, 10.w, Image.asset(each.companyLogo)),
                   UiUtils.getMarginBox(2.w, 0),
                   SizedBox(width: 55.w, child: UiUtils.getTextWithFixedScaleAndOverFlow(each.companyName, 13.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1)),
-                  const Spacer(flex: 2),
-                  UiUtils.getBorderButtonBoxWithZeroPadding(12.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
-                      UiUtils.getTextWithFixedScale("편집", 10.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
-
-                      })
                 ]),
                 UiUtils.getMarginBox(0, 2.h),
                 SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("현재상태", 10.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
@@ -140,7 +136,16 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
                 Row(children: [
                   UiUtils.getImage(10.w, 10.w, Image.asset('assets/images/accident_icon.png')),
                   UiUtils.getMarginBox(2.w, 0),
-                  SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale(each.accidentCaseNumberYear+each.accidentCaseNumberType+each.accidentCaseNumberNumber, 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null))
+                  SizedBox(width: 50.w, child: UiUtils.getTextWithFixedScale(each.accidentCaseNumberYear+each.accidentCaseNumberType+each.accidentCaseNumberNumber, 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
+                  const Spacer(flex: 2),
+                  UiUtils.getBorderButtonBoxWithZeroPadding(12.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
+                      UiUtils.getTextWithFixedScale("편집", 10.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), () async {
+                        MyData.selectedAccidentInfoData = each;
+                        var result = await CommonUtils.moveToWithResult(context, AppView.appUpdateAccidentView.value, null) as bool;
+                        if(result){
+                          setState(() {});
+                        }
+                      })
                 ]),
                 UiUtils.getMarginBox(0, 2.h),
                 SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("법원", 10.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
@@ -173,6 +178,11 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
     return accidentWidgetList;
   }
 
+  void back(){
+    CommonUtils.hideKeyBoard();
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget view = Container(
@@ -195,26 +205,22 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
             dividerColor: ColorStyles.upFinWhite,
             controller: _tabController,
             tabs: const <Widget>[
-              Tab(text: "접수내역"),
               Tab(text: "사건정보"),
-              Tab(text: "서류지갑"),
+              Tab(text: "접수내역"),
             ],
           )),
           SizedBox(width: 95.w, height: 75.h, child: TabBarView(
             controller: _tabController,
             children: <Widget>[
+              Column(children: [
+                UiUtils.getMarginBox(0, 3.h),
+                UiUtils.getExpandedScrollView(Axis.vertical, Column(children: _getAccidentWidgetList()))
+              ]),
               MyData.getLoanInfoList().isNotEmpty ? Column(children: [
                 UiUtils.getMarginBox(0, 3.h),
                 UiUtils.getExpandedScrollView(Axis.vertical, Column(children: _getLoanWidgetList()))
               ]) : Center(
                 child: UiUtils.getTextWithFixedScale("접수이력이 없습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
-              ),
-              Column(children: [
-                UiUtils.getMarginBox(0, 3.h),
-                UiUtils.getExpandedScrollView(Axis.vertical, Column(children: _getAccidentWidgetList()))
-              ]),
-              Center(
-                child: UiUtils.getTextWithFixedScale("서류정보", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
               )
             ],
           )),
@@ -223,7 +229,7 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
       ]),
     );
 
-    return UiUtils.getView(context, view, CommonUtils.onWillPopForPreventBackButton);
+    return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
   }
 }
 

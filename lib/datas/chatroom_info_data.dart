@@ -1,5 +1,5 @@
 class ChatRoomInfoData {
-  int chatRoomId; // uid
+  String chatRoomId; // uid
   int chatRoomType; //0 : upfin chat room  1: other chat room
   String chatRoomIconPath;
   String chatRoomTitle;

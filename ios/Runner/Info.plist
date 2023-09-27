@@ -2,18 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <key>LSApplicationQueriesSchemes</key>
-    <array>
-        <string>kakaotalk</string>
-        <string>naversearchapp</string>
-        <string>supertoss</string>
-        <string>tauthlink</string>
-        <string>ktauthexternalcall</string>
-        <string>upluscorporation</string>
-        <string>https</string>
-        <string>http</string>
-    </array>
-
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
@@ -36,25 +24,19 @@
 	<string>????</string>
 	<key>CFBundleURLTypes</key>
 	<array>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLName</key>
-			<string>ysmeta.upfin.ai</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>upfin</string>
-			</array>
-		</dict>
-		<dict>
-			<key>CFBundleTypeRole</key>
-			<string>Editor</string>
-			<key>CFBundleURLSchemes</key>
-			<array>
-				<string>kakao077c95950e4c99aefd181d2cd069524a</string>
-			</array>
-		</dict>
+	    <key>CFBundleTypeRole</key>
+        <string>Editor</string>
+
+        <key>CFBundleURLName</key>
+        <string>ysmeta.upfin.ai</string>
+
+        <key>CFBundleURLSchemes</key>
+        <array>
+        	<string>upfin</string>
+        	<string>kakao077c95950e4c99aefd181d2cd069524a</string>
+        </array>
 	</array>
+
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>Queried URL Schemes</key>
@@ -72,13 +54,9 @@
 		<true/>
 	</dict>
 	<key>NSCameraUsageDescription</key>
-	<string>Used to demonstrate image picker plugin</string>
 	<string>Camera permission is required.</string>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>We need push notifications to keep you updated.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>Used to capture audio for image picker plugin</string>
-	<string>Microphone permission is required.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Used to demonstrate image picker plugin</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
@@ -102,5 +80,17 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+
+	<key>LSApplicationQueriesSchemes</key>
+    <array>
+        <string>kakaotalk</string>
+        <string>naversearchapp</string>
+        <string>supertoss</string>
+        <string>tauthlink</string>
+        <string>ktauthexternalcall</string>
+        <string>upluscorporation</string>
+        <string>https</string>
+        <string>http</string>
+    </array>
 </dict>
 </plist>

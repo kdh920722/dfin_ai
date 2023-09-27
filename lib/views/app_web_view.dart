@@ -99,10 +99,15 @@ class AppWebViewState extends State<AppWebView> {
     );
   }
 
+  void back(){
+    CommonUtils.hideKeyBoard();
+    Navigator.pop(context, true);
+  }
+
   @override
   Widget build(BuildContext context) {
     Map<String, String> urlInfo = ModalRoute.of(context)?.settings.arguments as Map<String, String>;
     Widget view = _getWebView(context, setState, urlInfo['url']!);
-    return UiUtils.getView(context, view, CommonUtils.onWillPopForAllowBackButton);
+    return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
   }
 }

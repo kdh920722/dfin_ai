@@ -48,7 +48,7 @@ class SnsLoginController{
   }
 
   static Widget getKakaoLoginButton(BuildContext context, double size, Function(bool? isSuccessToLogin) callback){
-    return UiUtils.getRoundImageButton(Image.asset('assets/images/kakao_icon.png', fit: BoxFit.fill), size, ColorStyles.upFinBlack, () async {
+    return UiUtils.getImageButton(Image.asset('assets/images/logo_kakao_circle.png', fit: BoxFit.fill), size, ColorStyles.upFinBlack, () async {
       if(Config.isControllerLoadFinished){
         UiUtils.showLoadingPop(context);
         await SnsLoginController._kakaoLogin((bool isSuccess) async {
@@ -75,7 +75,7 @@ class SnsLoginController{
   }
 
   static Widget getAppleLoginButton(BuildContext context, double size, Function(bool? isSuccessToLogin) callback){
-    return UiUtils.getRoundImageButton(Image.asset('assets/images/apple_icon.png', fit: BoxFit.fill), size, ColorStyles.upFinBlack, () async {
+    return UiUtils.getImageButton(Image.asset('assets/images/logo_apple_circle.png', fit: BoxFit.fill), size, ColorStyles.upFinBlack, () async {
       if(Config.isControllerLoadFinished){
         UiUtils.showLoadingPop(context);
         await SnsLoginController._kakaoLogin((bool isSuccess) async {

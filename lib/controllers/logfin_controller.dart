@@ -232,23 +232,19 @@ class LogfinController {
                 });
               }else{
                 // 사건이력 가져오기 실패는 아니나, 데이터 없음.
-                CommonUtils.flutterToast("사건정보가 없습니다.");
                 callback(true);
               }
             }else{
               // 사건이력 가져오기 실패
-              CommonUtils.flutterToast("사건정보 가져오기 실패\n다시 실행 해 주세요.");
               callback(false);
             }
           });
         }else{
           // 유저정보 가져오기 실패
-          CommonUtils.flutterToast("유저정보 가져오기 실패\n다시 실행 해 주세요.");
           callback(false);
         }
       });
     }catch(error){
-      CommonUtils.flutterToast("연결 실패\n다시 실행 해 주세요.");
       callback(false);
     }
   }
@@ -417,7 +413,7 @@ class LogfinController {
   static void _setChatRoomInfoList(){
     MyData.clearChatRoomInfoList();
     for(var eachSortedLoan in MyData.getLoanInfoList()){
-      MyData.addToChatRoomInfoList(ChatRoomInfoData(int.parse(eachSortedLoan.lenderPrId), 1, eachSortedLoan.companyLogo,
+      MyData.addToChatRoomInfoList(ChatRoomInfoData(eachSortedLoan.loanUid, 1, eachSortedLoan.companyLogo,
           eachSortedLoan.companyName, eachSortedLoan.productName, "현재 고객님은 2건의 심사 결과를 대기중입니다. 조금더 알아보시렵니까?", "20231008145230", 12));
     }
   }

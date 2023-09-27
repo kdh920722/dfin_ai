@@ -285,12 +285,8 @@ class CommonUtils {
     return keyboardVisibilityController;
   }
 
-  static Future<bool> onWillPopForPreventBackButton(BuildContext? context){
+  static Future<bool> onWillPopForPreventBackButton(){
     return Future(() => false);
-  }
-
-  static Future<bool> onWillPopForAllowBackButton(BuildContext? context){
-    return Future(() => true);
   }
 
   static Future<bool> onWillPopForControlFinishApp(BuildContext? context) async {

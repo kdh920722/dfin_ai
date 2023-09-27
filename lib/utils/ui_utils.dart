@@ -20,14 +20,14 @@ class UiUtils {
     );
   }
 
-  static Widget getView(BuildContext context, Widget view, Future<bool> Function(BuildContext? context) callbackBackButtonForView){
+  static Widget getView(BuildContext context, Widget view, Future<bool> Function() callbackBackButtonForView){
     return GestureDetector(
         onTap: () {
           CommonUtils.hideKeyBoard();
         },
         child: SafeArea(
             child: WillPopScope(
-                onWillPop: () => callbackBackButtonForView(context),
+                onWillPop: () => callbackBackButtonForView(),
                 child: Scaffold(
                   backgroundColor: Colors.black,
                   body: view,
@@ -37,7 +37,29 @@ class UiUtils {
     );
   }
 
-  static Widget getViewWithScroll(BuildContext context, Widget view, ScrollController scrollController, Future<bool> Function(BuildContext? context) callbackBackButtonForView){
+  static Widget getViewWithAllowBackForAndroid(BuildContext context, Widget view, Function() callbackBackButtonForView){
+    return GestureDetector(
+        onTap: () {
+          CommonUtils.hideKeyBoard();
+        },
+        child: SafeArea(
+            child: WillPopScope(
+                onWillPop: (){
+                  return Future((){
+                    if(Config.isAndroid) callbackBackButtonForView();
+                    return false;
+                  });
+                },
+                child: Scaffold(
+                  backgroundColor: Colors.black,
+                  body: view,
+                )
+            )
+        )
+    );
+  }
+
+  static Widget getScrollView(BuildContext context, Widget view, ScrollController scrollController, Future<bool> Function() callbackBackButtonForView){
     return GestureDetector(
       onTap: () {
         CommonUtils.hideKeyBoard();
@@ -45,7 +67,7 @@ class UiUtils {
       },
       child: SafeArea(
           child: WillPopScope(
-              onWillPop: () => callbackBackButtonForView(context),
+              onWillPop: () => callbackBackButtonForView(),
               child: Scaffold(
                   backgroundColor: Colors.black,
                   body: ListView(
@@ -57,6 +79,34 @@ class UiUtils {
               )
           )
       )
+    );
+  }
+
+  static Widget getScrollViewWithAllowBackForAndroid(BuildContext context, Widget view, ScrollController scrollController, Function() callbackBackButtonForView){
+    return GestureDetector(
+        onTap: () {
+          CommonUtils.hideKeyBoard();
+          scrollController.jumpTo(0);
+        },
+        child: SafeArea(
+            child: WillPopScope(
+                onWillPop: (){
+                  return Future((){
+                    if(Config.isAndroid) callbackBackButtonForView();
+                    return false;
+                  });
+                },
+                child: Scaffold(
+                    backgroundColor: Colors.black,
+                    body: ListView(
+                        controller: scrollController,
+                        shrinkWrap: true,
+                        physics: const BouncingScrollPhysics(),
+                        children: [view]
+                    )
+                )
+            )
+        )
     );
   }
 

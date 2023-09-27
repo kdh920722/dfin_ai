@@ -90,6 +90,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   String niceName = "나이즈Key 인증";
 
   int lastId = 999;
+  int confirmedId = 1000;
 
   int certType = 1; //1: 카카오 인증, 6:네이버 인증, 5:PASS 인증
   int confirmedCertType = 0; //1: 카카오 인증, 6:네이버 인증, 5:PASS 인증
@@ -251,6 +252,22 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       }
     }
 
+    addedIndexId++;
+    Map<String, dynamic> lastInfo = {
+      "id" : 0,
+      "name" : "",
+      "view_id" : 0,
+      "result" : <String, dynamic>{},
+      "is_confirmed" : false,
+      "is_docs" : false,
+      "docs_type" : ""
+    };
+    lastInfo["id"] = lastId;
+    lastInfo["name"] = "";
+    lastInfo["view_id"] = addedIndexId;
+    lastInfo["is_confirmed"] = false;
+    addedDocsList.add(lastInfo);
+
     if(!isReApply){
       addedIndexId++;
       Map<String, dynamic> niceInfo = {
@@ -270,7 +287,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     }
 
     addedIndexId++;
-    Map<String, dynamic> lastInfo = {
+    Map<String, dynamic> confirmedInfo = {
       "id" : 0,
       "name" : "",
       "view_id" : 0,
@@ -279,11 +296,11 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       "is_docs" : false,
       "docs_type" : ""
     };
-    lastInfo["id"] = lastId;
-    lastInfo["name"] = "";
-    lastInfo["view_id"] = addedIndexId;
-    lastInfo["is_confirmed"] = false;
-    addedDocsList.add(lastInfo);
+    confirmedInfo["id"] = confirmedId;
+    confirmedInfo["name"] = "";
+    confirmedInfo["view_id"] = addedIndexId;
+    confirmedInfo["is_confirmed"] = false;
+    addedDocsList.add(confirmedInfo);
 
     addedDocsList.sort((a,b)=>a["view_id"].compareTo(b["view_id"]));
     for(var each in addedDocsList){
@@ -861,7 +878,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       UiUtils.getMarginBox(0, 3.h),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("신분증을 준비해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 1.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("주민등록증과 운전면허증 중", 12.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("주민등록증 또는 운전면허증 중", 12.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("하나를 촬영 해 주세요.", 12.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 10.h),
       pickedFilePath != "" ? Container(decoration: BoxDecoration(color: ColorStyles.upFinBlack, borderRadius: BorderRadius.circular(10)), child: UiUtils.getImage(80.w, 24.h, Image.file(File(pickedFilePath))))
@@ -1193,7 +1210,17 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         }else{
           CommonUtils.flutterToast("문제가 발생했습니다.\n다시 시도해주세요");
         }
-        setState(() {});
+
+        bool isDocsFinished = true;
+        for(var each in addedDocsList){
+          if(each["is_docs"] && each["docs_type"] != docsType){
+            if(each["view_id"] > currentViewId ){
+              isDocsFinished = false;
+            }
+          }
+        }
+
+        nextInputView();
       }else{
         for(var each in resultApiInfoDataList!){
           _setConfirmedToDocItemByViewId(_getViewIdFromListById(each.apiId), false);
@@ -1220,6 +1247,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, !_isDocsAllConfirmed(docsType)? "인증하기" : "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
         if(!_isDocsAllConfirmed(docsType)){
+
           UiUtils.showSlideMenu(context, SlideType.bottomToTop, true, null, 34.h, 0.5, (context, setState){
             return Column(mainAxisAlignment: MainAxisAlignment.start, children:
             [
@@ -1688,12 +1716,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   /// nice key cert web view
   Widget _getNiceKeyCertView(){
     return UiUtils.getRowColumnWithAlignCenter([
-      SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
-          backInputView();
-        }),
-      ])),
-      UiUtils.getMarginBox(0, 3.h),
+      UiUtils.getMarginBox(0, 10.h),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("마지막으로", 20.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("고객님의 민감한 정보를", 20.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("보호하기 위해", 20.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
@@ -1718,7 +1741,12 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             nextInputView();
           }
         }
-      })
+      }),
+      UiUtils.getMarginBox(0, 0.5.h),
+      UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
+          UiUtils.getTextWithFixedScale("다음에 할게요", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, null), () {
+            nextInputView();
+          })
     ]);
   }
   /// nice key cert web view end
@@ -2016,29 +2044,15 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               LogfinController.callLogfinApi(LogfinApis.applyProduct, applyInputMap, (isSuccess, outputJson){
                 UiUtils.closeLoadingPop(context);
                 if(isSuccess){
-                  UiUtils.showSlideMenu(context, SlideType.bottomToTop, false, null, 22.h, 0.5, (slideContext, setState){
-                    return Column(mainAxisAlignment: MainAxisAlignment.start, children:
-                    [
-                      UiUtils.getMarginBox(0, 3.h),
-                      UiUtils.getStyledTextWithFixedScale("상품신청을 완료했습니다!", TextStyles.upFinBasicTextStyle, TextAlign.center, null),
-                      Column(children: [
-                        UiUtils.getMarginBox(0, 3.h),
-                        UiUtils.getBorderButtonBox(85.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                            UiUtils.getTextWithFixedScale("확인", 15.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
-                              UiUtils.showLoadingPop(context);
-                              LogfinController.getLoanInfo((isSuccessToGetLoanInfo, isNotEmpty){
-                                UiUtils.closeLoadingPop(context);
-                                Navigator.pop(slideContext);
-                                if(isSuccessToGetLoanInfo){
-                                  if(isNotEmpty){
-                                    CommonUtils.moveWithUntil(context, AppView.appMainView.value);
-                                  }else{
-                                    CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
-                                  }
-                                }
-                              });
-                            })
-                      ])]);
+                  LogfinController.getLoanInfo((isSuccessToGetLoanInfo, isNotEmpty){
+                    UiUtils.closeLoadingPop(context);
+                    if(isSuccessToGetLoanInfo){
+                      if(isNotEmpty){
+                        nextInputView();
+                      }else{
+                        CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
+                      }
+                    }
                   });
                 }else{
                   CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
@@ -2056,6 +2070,28 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     ]);
   }
   /// finish view end
+
+  Widget _getConfirmedView(){
+    return Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center, children: [
+      UiUtils.getMarginBox(0, 45.h),
+      UiUtils.getCustomCircleCheckBox(UniqueKey(),3, true, ColorStyles.upFinWhite, ColorStyles.upFinButtonBlue,
+          ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue, (checkedValue){}),
+      UiUtils.getMarginBox(0, 2.h),
+      UiUtils.getTextWithFixedScale("접수가 완료되었습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.center, null),
+      UiUtils.getExpandedScrollView(Axis.vertical, Container()),
+      UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+          UiUtils.getTextWithFixedScale("확인", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
+            CommonUtils.moveWithUntil(context, AppView.appMainView.value);
+          })
+    ]);
+  }
+
+  void back(){
+    CommonUtils.hideKeyBoard();
+    if(_getIdFromListByViewId(currentViewId) != niceId && _getIdFromListByViewId(currentViewId) != lastId){
+      backInputView();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -2083,14 +2119,16 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getNiceKeyCertView());
       }else if(_getIdFromListByViewId(currentViewId) == lastId){
         view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getFinishConfirmView());
+      }else if(_getIdFromListByViewId(currentViewId) == confirmedId){
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getConfirmedView());
       }else if(currentViewId == cameraTakePhotoId){
         view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinBlack, padding: EdgeInsets.zero, child: _takeCustomCamera());
       }else{
-        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinBlack);
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhiteSky);
       }
     }
 
-    return UiUtils.getView(context, view, CommonUtils.onWillPopForPreventBackButton);
+    return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
   }
 
 }

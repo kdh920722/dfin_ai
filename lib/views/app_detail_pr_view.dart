@@ -309,6 +309,10 @@ class AppDetailPrViewState extends State<AppDetailPrView> with WidgetsBindingObs
     ));
   }
 
+  void back(){
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     Widget view = Container(color: ColorStyles.upFinButtonBlue, width: 100.w, height: 100.h, padding: EdgeInsets.all(5.w), child: Column(children: [
@@ -333,7 +337,7 @@ class AppDetailPrViewState extends State<AppDetailPrView> with WidgetsBindingObs
             UiUtils.showSlideMenu(context, SlideType.bottomToTop, true, 100.w, 65.h, 0.5, _makeAgreeWidget);
           })
     ]));
-    return UiUtils.getView(context, view, CommonUtils.onWillPopForPreventBackButton);
+    return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
   }
 
 }

@@ -81,14 +81,19 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     }
   }
 
+  void back(){
+    CommonUtils.hideKeyBoard();
+    Navigator.pop(context);
+  }
+
   @override
   Widget build(BuildContext context) {
-    CommonUtils.hideKeyBoard();
     Widget view = Container(color: ColorStyles.upFinWhite, width: 100.w, height: 95.h, padding: EdgeInsets.all(5.w), child:
     Form(key: _formKey,
         child: UiUtils.getRowColumnWithAlignCenter([
           SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+              CommonUtils.hideKeyBoard();
               Navigator.pop(context);
             }),
           ])),
@@ -160,7 +165,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     )
     );
 
-    return UiUtils.getViewWithScroll(context, view, _scrollController, CommonUtils.onWillPopForPreventBackButton);
+    return UiUtils.getScrollViewWithAllowBackForAndroid(context, view, _scrollController, back);
   }
 
 }
