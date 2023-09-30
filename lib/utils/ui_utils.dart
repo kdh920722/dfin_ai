@@ -178,7 +178,7 @@ class UiUtils {
   }
 
   static Widget getIconButton(IconData icon, double size, Color iconColor, VoidCallback onPressedCallback) {
-    return SizedBox(child: IconButton(onPressed: onPressedCallback, icon: Icon(icon, color: iconColor, size: size)));
+    return SizedBox(width: size, height: size, child: IconButton(padding: EdgeInsets.zero, onPressed: onPressedCallback, icon: Icon(icon, color: iconColor, size: size)));
   }
 
   static Widget getImageButton(Image image, double size, Color iconColor, VoidCallback onPressedCallback) {

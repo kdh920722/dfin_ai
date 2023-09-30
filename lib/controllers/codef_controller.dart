@@ -18,7 +18,8 @@ class CodeFController{
   static final CodeFController _instance = CodeFController._internal();
   factory CodeFController() => _instance;
   CodeFController._internal();
-
+//CF-13000 사업자번호(주민등록번호)가+잘못
+  // 12100 해당+기관+오류
   /// CODEF API ------------------------------------------------------------------------------------------------------------------------ ///
   static HostStatus hostStatus = HostStatus.prod;
   static String token = "";

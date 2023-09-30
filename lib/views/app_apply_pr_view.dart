@@ -92,7 +92,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   int lastId = 999;
   int confirmedId = 1000;
 
-  int certType = 1; //1: 카카오 인증, 6:네이버 인증, 5:PASS 인증
+  bool isCertTypeSelected = false;
+  int certType = 0; //1: 카카오 인증, 6:네이버 인증, 5:PASS 인증
   int confirmedCertType = 0; //1: 카카오 인증, 6:네이버 인증, 5:PASS 인증
   final List<Map<String, dynamic>> addedDocsList = [];
   int gov24Count = 0;
@@ -1205,12 +1206,17 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           }
         }
 
+        setState(() {});
         if(_isDocsAllConfirmed(docsType)){
           CommonUtils.flutterToast("$subTitle에서\n서류를 가져왔습니다");
+          nextInputView();
         }else{
-          CommonUtils.flutterToast("문제가 발생했습니다.\n다시 시도해주세요");
+          certType = 0;
+          isCertTypeSelected = false;
+          CommonUtils.flutterToast("문제가 발생했습니다\n입력하신 정보를 확인해주세요");
         }
 
+        /*
         bool isDocsFinished = true;
         for(var each in addedDocsList){
           if(each["is_docs"] && each["docs_type"] != docsType){
@@ -1219,15 +1225,17 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             }
           }
         }
-
-        nextInputView();
+        */
       }else{
+        certType = 0;
+        isCertTypeSelected = false;
         for(var each in resultApiInfoDataList!){
           _setConfirmedToDocItemByViewId(_getViewIdFromListById(each.apiId), false);
         }
       }
     });
   }
+
 
   Widget _getCertWidget(String docsType, String title1, String title2, String title3, String subTitle, List<Widget> docsWidgetList, bool isErrorResult, VoidCallback onPressedCallback){
     return UiUtils.getRowColumnWithAlignCenter([
@@ -1241,66 +1249,84 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale(title2, 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale(title3, 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 1.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("$subTitle에서 해당 서류들을 가져옵니다.", 12.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
+      _isDocsAllConfirmed(docsType)? Container() : SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("$subTitle에서 해당 서류들을 가져옵니다.", 12.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: docsWidgetList)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, !_isDocsAllConfirmed(docsType)? "인증하기" : "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
         if(!_isDocsAllConfirmed(docsType)){
 
-          UiUtils.showSlideMenu(context, SlideType.bottomToTop, true, null, 34.h, 0.5, (context, setState){
-            return Column(mainAxisAlignment: MainAxisAlignment.start, children:
-            [
-              UiUtils.getMarginBox(0, 3.h),
-              SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("민간 인증서를 선택하세요", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
-              UiUtils.getMarginBox(0, 1.5.h),
-              SizedBox(width: 85.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Column(children: [
-                  Container(padding: EdgeInsets.zero, decoration: BoxDecoration(color: certType == 1? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, borderRadius: BorderRadius.circular(15)),
-                      child: UiUtils.getImageButton(Image.asset('assets/images/kakao_icon.png'), 16.w, ColorStyles.upFinBlack, () async {
-                        setState(() { certType = 1; });
-                      })),
-                  UiUtils.getMarginBox(0, 1.h),
-                  UiUtils.getTextWithFixedScale("카카오톡", 12.sp, FontWeight.w600, certType == 1? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRealGray, TextAlign.start, null)
+          if(certType == 0){
+            UiUtils.showSlideMenu(context, SlideType.bottomToTop, false, null, 35.h, 0.5, (slideContext, setState){
+              return Column(mainAxisAlignment: MainAxisAlignment.start, children:
+              [
+                Row(children: [
+                  const Spacer(flex: 2),
+                  UiUtils.getIconButton(Icons.close, 7.w, ColorStyles.upFinRealGray, () {
+                    certType = 0;
+                    isCertTypeSelected = false;
+                    Navigator.pop(slideContext);
+                  }),
                 ]),
-                UiUtils.getMarginBox(5.w, 0),
-                Column(children: [
-                  Container(padding: EdgeInsets.zero, decoration: BoxDecoration(color: certType == 6? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, borderRadius: BorderRadius.circular(15)),
-                      child: UiUtils.getRoundImageButton(Image.asset('assets/images/naver_icon.png', fit: BoxFit.cover), 16.w, ColorStyles.upFinBlack, () async {
-                        setState(() { certType = 6; });
-                      })),
-                  UiUtils.getMarginBox(0, 1.h),
-                  UiUtils.getTextWithFixedScale("네이버", 12.sp, FontWeight.w600, certType == 6? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRealGray, TextAlign.start, null)
-                ]),
-                UiUtils.getMarginBox(5.w, 0),
-                Column(children: [
-                  Container(padding: EdgeInsets.zero, decoration: BoxDecoration(color: certType == 8? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, borderRadius: BorderRadius.circular(15)),
-                      child: UiUtils.getRoundImageButton(Image.asset('assets/images/toss_icon.png', fit: BoxFit.cover), 16.w, ColorStyles.upFinBlack, () async {
-                        setState(() { certType = 8; });
-                      })),
-                  UiUtils.getMarginBox(0, 1.h),
-                  UiUtils.getTextWithFixedScale("TOSS", 12.sp, FontWeight.w600, certType == 8? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRealGray, TextAlign.start, null)
-                ]),
-                UiUtils.getMarginBox(5.w, 0),
-                Column(children: [
-                  Container(padding: EdgeInsets.zero, decoration: BoxDecoration(color: certType == 5? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, borderRadius: BorderRadius.circular(15)),
-                      child: UiUtils.getRoundImageButton(Image.asset('assets/images/pass_icon.png', fit: BoxFit.cover), 16.w, ColorStyles.upFinBlack, () async {
-                        setState(() { certType = 5; });
-                      })),
-                  UiUtils.getMarginBox(0, 1.h),
-                  UiUtils.getTextWithFixedScale("PASS", 12.sp, FontWeight.w600, certType == 5? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRealGray, TextAlign.start, null)
-                ])
-              ])),
-              UiUtils.getMarginBox(0, 4.h),
-              UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinTextAndBorderBlue,
-                  UiUtils.getTextWithFixedScale(_isDocsAllConfirmed(docsType) ? "인증완료" : !isErrorResult? "간편인증 진행하기" : "서류 다시 가져오기",
-                      11.sp, FontWeight.w500, !isErrorResult? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRed, TextAlign.start, null), onPressedCallback)
-            ]);
-          });
+                UiUtils.getMarginBox(0, 1.5.h),
+                SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("민간 인증서를 선택하세요", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
+                UiUtils.getMarginBox(0, 2.h),
+                SizedBox(width: 85.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                  Column(children: [
+                    Container(padding: EdgeInsets.zero, decoration: BoxDecoration(color: certType == 1? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, borderRadius: BorderRadius.circular(15)),
+                        child: UiUtils.getImageButton(Image.asset('assets/images/kakao_icon.png'), 16.w, ColorStyles.upFinBlack, () async {
+                          setState(() { certType = 1; });
+                        })),
+                    UiUtils.getMarginBox(0, 1.h),
+                    UiUtils.getTextWithFixedScale("카카오톡", 12.sp, FontWeight.w600, certType == 1? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRealGray, TextAlign.start, null)
+                  ]),
+                  UiUtils.getMarginBox(5.w, 0),
+                  Column(children: [
+                    Container(padding: EdgeInsets.zero, decoration: BoxDecoration(color: certType == 6? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, borderRadius: BorderRadius.circular(15)),
+                        child: UiUtils.getRoundImageButton(Image.asset('assets/images/naver_icon.png', fit: BoxFit.cover), 16.w, ColorStyles.upFinBlack, () async {
+                          setState(() { certType = 6; });
+                        })),
+                    UiUtils.getMarginBox(0, 1.h),
+                    UiUtils.getTextWithFixedScale("네이버", 12.sp, FontWeight.w600, certType == 6? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRealGray, TextAlign.start, null)
+                  ]),
+                  UiUtils.getMarginBox(5.w, 0),
+                  Column(children: [
+                    Container(padding: EdgeInsets.zero, decoration: BoxDecoration(color: certType == 8? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, borderRadius: BorderRadius.circular(15)),
+                        child: UiUtils.getRoundImageButton(Image.asset('assets/images/toss_icon.png', fit: BoxFit.cover), 16.w, ColorStyles.upFinBlack, () async {
+                          setState(() { certType = 8; });
+                        })),
+                    UiUtils.getMarginBox(0, 1.h),
+                    UiUtils.getTextWithFixedScale("TOSS", 12.sp, FontWeight.w600, certType == 8? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRealGray, TextAlign.start, null)
+                  ]),
+                  UiUtils.getMarginBox(5.w, 0),
+                  Column(children: [
+                    Container(padding: EdgeInsets.zero, decoration: BoxDecoration(color: certType == 5? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, borderRadius: BorderRadius.circular(15)),
+                        child: UiUtils.getRoundImageButton(Image.asset('assets/images/pass_icon.png', fit: BoxFit.cover), 16.w, ColorStyles.upFinBlack, () async {
+                          setState(() { certType = 5; });
+                        })),
+                    UiUtils.getMarginBox(0, 1.h),
+                    UiUtils.getTextWithFixedScale("PASS", 12.sp, FontWeight.w600, certType == 5? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRealGray, TextAlign.start, null)
+                  ])
+                ])),
+                UiUtils.getMarginBox(0, 4.h),
+                UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinTextAndBorderBlue,
+                    UiUtils.getTextWithFixedScale(_isDocsAllConfirmed(docsType) ? "인증완료" : !isErrorResult? "간편인증 진행하기" : "서류 다시 가져오기",
+                        11.sp, FontWeight.w500, !isErrorResult? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRed, TextAlign.start, null), (){
+                      if(certType != 0){
+                        onPressedCallback();
+                        isCertTypeSelected = true;
+                      }else{
+                        CommonUtils.flutterToast("인증서를 선택해주세요");
+                      }
+                    })
+              ]);
+            });
+          }else{
+            onPressedCallback();
+          }
         }else{
           nextInputView();
         }
-
       }),
       UiUtils.getMarginBox(0, 0.5.h),
       !_isDocsAllConfirmed(docsType)? UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinTextAndBorderBlue,
@@ -1326,6 +1352,11 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           title3 = "다시 한번 인증을 해야해요";
         }
       }
+    }
+    if(_isDocsAllConfirmed("gov24")){
+      title1 = "정부24에서 ";
+      title2 = "서류들을 모두 가져왔어요";
+      title3 = "다음 절차를 진행해주세요";
     }
     List<Widget> docsWidgetList = [];
     for(var each in addedDocsList){
@@ -1448,7 +1479,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             }
           }
         }
-        Navigator.of(context).pop();
+        if(!isCertTypeSelected) Navigator.of(context).pop();
         _showAuth(subTitle, "gov24", apiInfoDataList);
       }
     });
@@ -1471,6 +1502,11 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           title3 = "다시 한번 인증을 해야해요";
         }
       }
+    }
+    if(_isDocsAllConfirmed("nhis")){
+      title1 = "건강보험공단에서 ";
+      title2 = "서류들을 모두 가져왔어요";
+      title3 = "다음 절차를 진행해주세요";
     }
     List<Widget> docsWidgetList = [];
     for(var each in addedDocsList){
@@ -1534,6 +1570,10 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       }
     }
 
+    if(isErrorResult){
+
+    }
+
     return _getCertWidget("nhis", title1, title2, title3, subTitle, docsWidgetList, isErrorResult, () async {
       if(_isDocsAllConfirmed("nhis")){
         CommonUtils.flutterToast("이미 인증을 완료하셨습니다.");
@@ -1567,7 +1607,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             }
           }
         }
-        Navigator.of(context).pop();
+        if(!isCertTypeSelected) Navigator.of(context).pop();
         _showAuth(subTitle, "nhis", apiInfoDataList);
       }
     });
@@ -1590,6 +1630,11 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           title3 = "다시 한번 인증을 해야해요";
         }
       }
+    }
+    if(_isDocsAllConfirmed("nts")){
+      title1 = "국세청에서 ";
+      title2 = "서류들을 모두 가져왔어요";
+      title3 = "다음 절차를 진행해주세요";
     }
     List<Widget> docsWidgetList = [];
     for(var each in addedDocsList){
@@ -1706,7 +1751,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             }
           }
         }
-        Navigator.of(context).pop();
+        if(!isCertTypeSelected) Navigator.of(context).pop();
         _showAuth(subTitle, "nts", apiInfoDataList);
       }
     });
