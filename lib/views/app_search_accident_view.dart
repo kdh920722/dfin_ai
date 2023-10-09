@@ -890,7 +890,12 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
 
   void back(){
     CommonUtils.hideKeyBoard();
-    backInputView();
+    if(currentViewId == courtViewId){
+      Navigator.pop(context);
+    }else{
+      backInputView();
+    }
+
   }
 
   @override
