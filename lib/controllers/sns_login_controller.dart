@@ -281,7 +281,7 @@ class SnsLoginController{
       });
       return isMember;
     }catch(error){
-      CommonUtils.log("e", "$error");
+      CommonUtils.log("error", "$error");
       return false;
     }
   }
