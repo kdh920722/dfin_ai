@@ -527,9 +527,20 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
       isView1Valid? UiUtils.getTextButtonBox(90.w, "가입하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
         if(_formKey1.currentState!.validate()){
           CommonUtils.hideKeyBoard();
-          _unFocusAllNodes();
-          setState(() {
-            viewId = 2;
+          Map<String, dynamic> inputJson = {
+            "email": _emailTextController.text.trim(),
+          };
+          UiUtils.showLoadingPop(context);
+          LogfinController.callLogfinApi(LogfinApis.checkMember, inputJson, (isSuccess, outputJson){
+            UiUtils.closeLoadingPop(context);
+            if(isSuccess){
+              _unFocusAllNodes();
+              setState(() {
+                viewId = 2;
+              });
+            }else{
+              CommonUtils.flutterToast("이미 존재하는 이메일 입니다.");
+            }
           });
         }else{
           if(_pwdTextController.text.trim() == _pwdConfirmTextController.text.trim() && _pwdTextController.text.length <= 6){

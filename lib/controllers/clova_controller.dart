@@ -81,10 +81,12 @@ class CLOVAController{
           if(map.containsKey("dl")){
             final resultMap = resultData['idCard']['result']['dl'];
             resultMap["id_type"] = "dl";
+            resultMap["rois_map"] = resultData['idCard']['result']['rois'];
             callback(true, resultMap);
           }else if(map.containsKey("ic")){
             final resultMap = resultData['idCard']['result']['ic'];
             resultMap["id_type"] = "ic";
+            resultMap["rois_map"] = resultData['idCard']['result']['rois'];
             callback(true, resultMap);
           }else{
             callback(false, null);

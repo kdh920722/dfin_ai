@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -54,7 +56,7 @@ class SnsLoginController{
   static Future<void> initApple(Function(bool) callback) async {
     try {
       final ref = FirebaseDatabase.instance.ref();
-      final snapshot = await ref.child('UPFIN/API/clova').get();
+      final snapshot = await ref.child('UPFIN/API/apple').get();
       if (snapshot.exists) {
         for(var each in snapshot.children){
           switch(each.key){
@@ -86,8 +88,6 @@ class SnsLoginController{
               callback(true);
             }else{
               CommonUtils.flutterToast("회원가입이 필요합니다.");
-              MyData.isSnsLogin = false;
-              loginPlatform = LoginPlatform.none;
               callback(false);
             }
           }else{
@@ -123,7 +123,13 @@ class SnsLoginController{
           );
           MyData.isSnsLogin = true;
           appleToken = credential.identityToken!;
-          appleId = credential.userIdentifier!;
+          List<String> jwt = appleToken.split('.') ?? [];
+          String payload = jwt[1];
+          payload = base64.normalize(payload);
+          final List<int> jsonData = base64.decode(payload);
+          final userInfo = jsonDecode(utf8.decode(jsonData));
+          appleId = userInfo['sub'];
+
           _setUserInfoFromApple(credential);
           if(context.mounted){
             UiUtils.closeLoadingPop(context);
@@ -131,12 +137,11 @@ class SnsLoginController{
               callback(true);
             }else{
               CommonUtils.flutterToast("회원가입이 필요합니다.");
-              MyData.isSnsLogin = false;
-              loginPlatform = LoginPlatform.none;
               callback(false);
             }
           }
-        }catch(e){
+        }catch(error){
+          CommonUtils.log("e", error.toString());
           UiUtils.closeLoadingPop(context);
           MyData.isSnsLogin = false;
           CommonUtils.flutterToast("${SnsLoginController.loginPlatform.value}로그인에 실패했습니다.");
@@ -244,7 +249,17 @@ class SnsLoginController{
     String email = "";
     if(user.email != null){
       email = user.email!;
+    }else{
+      List<String> jwt = appleToken.split('.') ?? [];
+      String payload = jwt[1];
+      payload = base64.normalize(payload);
+
+      final List<int> jsonData = base64.decode(payload);
+      CommonUtils.log("i",utf8.decode(jsonData).toString());
+      final userInfo = jsonDecode(utf8.decode(jsonData));
+      email = userInfo['email'];
     }
+
     MyData.nameFromSns = fName + gName;
     MyData.emailFromSns = email;
     MyData.phoneNumberFromSns = "";

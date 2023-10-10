@@ -397,90 +397,106 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
 
   /// pre loan price view
   Widget _getPreLoanPriceView(){
-    return UiUtils.getRowColumnWithAlignCenter([
-      SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
-          backInputView();
-        }),
-      ])),
-      UiUtils.getMarginBox(0, 3.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("수정하실", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("인가후 대출 총금액을", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("알려주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      UiUtils.getMarginBox(0, 1.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력단위(*만원)", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
-      UiUtils.getMarginBox(0, 5.h),
-      Obx(()=>UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _preLoanPriceFocus, _preLoanPriceTextController, TextInputType.number, false,
-          UiUtils.getInputDecoration("", 0.sp, GetController.to.preLoanPrice.value, 14.sp), (text) {
-            if(text.trim() != ""){
-              final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
-              GetController.to.updatePreLoanPrice(CommonUtils.getPriceFormattedString(number!));
-            }else{
-              GetController.to.updatePreLoanPrice("만원");
+    return Stack(children: [
+      UiUtils.getRowColumnWithAlignCenter([
+        SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+            backInputView();
+          }),
+        ])),
+        UiUtils.getMarginBox(0, 3.h),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("수정하실", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("인가후 대출 총금액을", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("알려주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+        UiUtils.getMarginBox(0, 1.h),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력단위(*만원)", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
+        UiUtils.getMarginBox(0, 5.h),
+        Obx(()=>UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _preLoanPriceFocus, _preLoanPriceTextController, TextInputType.number, false,
+            UiUtils.getInputDecoration("", 0.sp, GetController.to.preLoanPrice.value, 14.sp), (text) {
+              if(text.trim() != ""){
+                final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
+                GetController.to.updatePreLoanPrice(CommonUtils.getPriceFormattedString(number!));
+              }else{
+                GetController.to.updatePreLoanPrice("만원");
+              }
+            }, (value){})
+        ),
+        UiUtils.getMarginBox(0, 5.h),
+        UiUtils.getExpandedScrollView(Axis.vertical, Container()),
+        UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+          if(_preLoanPriceTextController.text.trim() != ""){
+            final number = double.tryParse(_preLoanPriceTextController.text.trim().replaceAll(',', '')); // 콤마 제거 후 숫자 변환
+            String price = number.toString();
+            if(price.contains(".")){
+              price = price.split(".")[0];
             }
-          }, (value){})
-      ),
-      UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getExpandedScrollView(Axis.vertical, Container()),
-      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-        if(_preLoanPriceTextController.text.trim() != ""){
-          final number = double.tryParse(_preLoanPriceTextController.text.trim().replaceAll(',', '')); // 콤마 제거 후 숫자 변환
-          String price = number.toString();
-          if(price.contains(".")){
-            price = price.split(".")[0];
+            selectedPreLoanPriceInfo = price;
+          }else{
+            selectedPreLoanPriceInfo = "0";
           }
-          selectedPreLoanPriceInfo = price;
-        }else{
-          selectedPreLoanPriceInfo = "0";
-        }
-        CommonUtils.log("i", "selectedPreLoanPriceInfo : $selectedPreLoanPriceInfo");
-        nextInputView();
-      })
+          CommonUtils.log("i", "selectedPreLoanPriceInfo : $selectedPreLoanPriceInfo");
+          nextInputView();
+        })
+      ]),
+      Positioned(
+          right: 3.w,
+          child: UiUtils.getRowColumnWithAlignCenter([
+            UiUtils.getMarginBox(0, 28.h),
+            UiUtils.getTextWithFixedScale("만원", 16.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null),
+          ]))
     ]);
   }
   /// pre loan price end
 
   /// want loan price view
   Widget _getWantLoanPriceView(){
-    return UiUtils.getRowColumnWithAlignCenter([
-      SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
-          backInputView();
-        }),
-      ])),
-      UiUtils.getMarginBox(0, 3.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("수정하실", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("희망 대출금액을", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("알려주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      UiUtils.getMarginBox(0, 1.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력단위(*만원)", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
-      UiUtils.getMarginBox(0, 5.h),
-      Obx(()=>UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _wantLoanPriceFocus, _wantLoanPriceTextController, TextInputType.number, false,
-          UiUtils.getInputDecoration("", 0.sp, GetController.to.wantLoanPrice.value, 14.sp), (text) {
-            if(text.trim() != ""){
-              final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
-              GetController.to.updateWantLoanPrice(CommonUtils.getPriceFormattedString(number!));
-            }else{
-              GetController.to.updateWantLoanPrice("만원");
+    return Stack(children: [
+      UiUtils.getRowColumnWithAlignCenter([
+        SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+            backInputView();
+          }),
+        ])),
+        UiUtils.getMarginBox(0, 3.h),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("수정하실", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("희망 대출금액을", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("알려주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+        UiUtils.getMarginBox(0, 1.h),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력단위(*만원)", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
+        UiUtils.getMarginBox(0, 5.h),
+        Obx(()=>UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _wantLoanPriceFocus, _wantLoanPriceTextController, TextInputType.number, false,
+            UiUtils.getInputDecoration("", 0.sp, GetController.to.wantLoanPrice.value, 14.sp), (text) {
+              if(text.trim() != ""){
+                final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
+                GetController.to.updateWantLoanPrice(CommonUtils.getPriceFormattedString(number!));
+              }else{
+                GetController.to.updateWantLoanPrice("만원");
+              }
+            }, (value){})
+        ),
+        UiUtils.getMarginBox(0, 5.h),
+        UiUtils.getExpandedScrollView(Axis.vertical, Container()),
+        UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+          if(_wantLoanPriceTextController.text.trim() != ""){
+            final number = double.tryParse(_wantLoanPriceTextController.text.trim().replaceAll(',', '')); // 콤마 제거 후 숫자 변환
+            String price = number.toString();
+            if(price.contains(".")){
+              price = price.split(".")[0];
             }
-          }, (value){})
-      ),
-      UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getExpandedScrollView(Axis.vertical, Container()),
-      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-        if(_wantLoanPriceTextController.text.trim() != ""){
-          final number = double.tryParse(_wantLoanPriceTextController.text.trim().replaceAll(',', '')); // 콤마 제거 후 숫자 변환
-          String price = number.toString();
-          if(price.contains(".")){
-            price = price.split(".")[0];
+            selectedWantLoanPriceInfo = price;
+          }else{
+            selectedWantLoanPriceInfo = "0";
           }
-          selectedWantLoanPriceInfo = price;
-        }else{
-          selectedWantLoanPriceInfo = "0";
-        }
-        CommonUtils.log("i", "selectedWantLoanPriceInfo : $selectedWantLoanPriceInfo");
-        nextInputView();
-      })
+          CommonUtils.log("i", "selectedWantLoanPriceInfo : $selectedWantLoanPriceInfo");
+          nextInputView();
+        })
+      ]),
+      Positioned(
+          right: 3.w,
+          child: UiUtils.getRowColumnWithAlignCenter([
+            UiUtils.getMarginBox(0, 28.h),
+            UiUtils.getTextWithFixedScale("만원", 16.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null),
+          ]))
     ]);
   }
   /// want loan price end

@@ -178,7 +178,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             Column(children: [
               UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
                   Row(mainAxisSize: MainAxisSize.max, children: [
-                    Expanded(flex: 3, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Expanded(flex: 9, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
                         SizedBox(width: 60.w, child: Row(children: [
                           each.chatRoomType == 0? UiUtils.getIcon(10.w, 10.w, Icons.account_box_rounded, 10.w, ColorStyles.upFinButtonBlue) : UiUtils.getImage(10.w, 10.w, Image.asset(each.chatRoomIconPath)),
@@ -189,15 +189,14 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                             each.chatRoomType != 0? UiUtils.getTextWithFixedScale(each.chatRoomSubTitle, 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null) : Container(),
                           ])
                         ])),
+                        UiUtils.getMarginBox(0, 1.h),
+                        UiUtils.getTextWithFixedScale(_getStatusName(each.chatRoomLoanStatus), 12.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
                         UiUtils.getMarginBox(0, 2.h),
                         UiUtils.getTextWithFixedScaleAndOverFlow(each.chatRoomLastMsg, 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, 1)
                       ])
                     ])),
-                    Expanded(flex: 1, child: Row(mainAxisAlignment: MainAxisAlignment.end, crossAxisAlignment: CrossAxisAlignment.center, children: [
-                      each.chatRoomLastMsgCnt > 0? UiUtils.getCountCircleBox(5.w, each.chatRoomLastMsgCnt, 6.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, 1) : Container(),
-                      UiUtils.getMarginBox(2.w, 0),
-                      UiUtils.getTextWithFixedScale("${each.chatRoomLastMsgTime.substring(2,4)}.${each.chatRoomLastMsgTime.substring(4,6)}.${each.chatRoomLastMsgTime.substring(6,8)}\n${each.chatRoomLastMsgTime.substring(8,10)}시${each.chatRoomLastMsgTime.substring(10,12)}분", 8.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.end, null),
-                    ]))
+                    Expanded(flex: 1, child: each.chatRoomLastMsgCnt > 0? UiUtils.getCountCircleBox(5.w, each.chatRoomLastMsgCnt, 6.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, 1) : Container()),
+                    Expanded(flex: 2, child: UiUtils.getTextWithFixedScale(CommonUtils.getFormattedLastMsgTime(each.chatRoomLastMsgTime), 8.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null))
                   ]), () {
                     CommonUtils.moveTo(context, AppView.appChatView.value, null);
                   })
@@ -208,6 +207,20 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     }
 
     return loanChatRoomWidgetList;
+  }
+  String _getStatusName(String statueId){
+    String status = "";
+    switch(statueId){
+      case "1" : status = "접수 후 심사 대기중";
+      case "2" : status = "심사중";
+      case "3" : status = "가승인 후 승인 대기중";
+      case "4" : status = "승인완료";
+      case "5" : status = "보류";
+      case "6" : status = "부결";
+      case "7" : status = "본인취소";
+    }
+
+    return status;
   }
   void _bankToHome(BuildContext context){
     MyData.resetMyData();
