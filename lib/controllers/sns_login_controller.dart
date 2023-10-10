@@ -125,13 +125,16 @@ class SnsLoginController{
           appleToken = credential.identityToken!;
           appleId = credential.userIdentifier!;
           _setUserInfoFromApple(credential);
-          if(await _isMemberFromSns()){
-            callback(true);
-          }else{
-            CommonUtils.flutterToast("회원가입이 필요합니다.");
-            MyData.isSnsLogin = false;
-            loginPlatform = LoginPlatform.none;
-            callback(false);
+          if(context.mounted){
+            UiUtils.closeLoadingPop(context);
+            if(await _isMemberFromSns()){
+              callback(true);
+            }else{
+              CommonUtils.flutterToast("회원가입이 필요합니다.");
+              MyData.isSnsLogin = false;
+              loginPlatform = LoginPlatform.none;
+              callback(false);
+            }
           }
         }catch(e){
           UiUtils.closeLoadingPop(context);
