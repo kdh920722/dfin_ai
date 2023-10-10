@@ -214,7 +214,8 @@ class CommonUtils {
   }
 
   static void flutterToast(String msgString){
-    Fluttertoast.showToast(msg: msgString, gravity: ToastGravity.BOTTOM, backgroundColor: ColorStyles.upFinDarkGray, fontSize: 20, textColor: Colors.white, toastLength: Toast.LENGTH_SHORT);
+    Fluttertoast.showToast(msg: msgString, gravity: ToastGravity.BOTTOM, backgroundColor: ColorStyles.upFinDarkGray,
+        fontSize: 15, textColor: Colors.white, toastLength: Toast.LENGTH_SHORT);
   }
 
   static Size _getSize(GlobalKey key) {
@@ -500,7 +501,6 @@ class CommonUtils {
   static Future<String> makeMaskingImageAndGetPath(String imagePath, Map<String,dynamic> maskingInfoMap) async {
     try {
       final imglib.Image image = imglib.decodeImage(File(imagePath).readAsBytesSync())!;
-      //boundingPolys
       List<dynamic> listMap = maskingInfoMap['personalNum'][0]['maskingPolys'][0]['vertices'];
       List<int> xPoints = [];
       List<int> yPoints = [];
@@ -522,27 +522,67 @@ class CommonUtils {
       int endXPoint = maxXValue;
       int endYPoint = maxYValue;
 
-      CommonUtils.log("i", "masking info ===========>\n"
+      List<dynamic> listMapForBounding = maskingInfoMap['personalNum'][0]['boundingPolys'][0]['vertices'];
+      List<int> xPointsForBounding = [];
+      List<int> yPointsForBounding = [];
+      for(Map<String,dynamic> each in listMapForBounding){
+        var xPointForBounding = each['x'].toString().split(".")[0];
+        var yPointForBounding = each['y'].toString().split(".")[0];
+        xPointsForBounding.add(int.parse(xPointForBounding));
+        yPointsForBounding.add(int.parse(yPointForBounding));
+      }
+
+      int minXValueForBounding = xPointsForBounding.reduce((min, current) => min < current ? min : current);
+      int maxXValueForBounding = xPointsForBounding.reduce((max, current) => max > current ? max : current);
+      int minYValueForBounding = yPointsForBounding.reduce((min, current) => min < current ? min : current);
+      int maxYValueForBounding = yPointsForBounding.reduce((max, current) => max > current ? max : current);
+      int maskingXSizeForBounding = maxXValueForBounding - minXValueForBounding;
+      int maskingYSizeForBounding = maxYValueForBounding - minYValueForBounding;
+      int startXPointForBounding = minXValueForBounding;
+      int startYPointForBounding = minYValueForBounding;
+
+      bool isError = false;
+      if(maskingXSizeForBounding > maskingYSizeForBounding){
+        //가로모드
+        if(maskingXSizeForBounding*0.6 <= maskingXSize){
+          isError = true;
+        }
+      }else{
+        //세로모드
+        if(maskingYSizeForBounding*0.6 <= maskingYSize){
+          isError = true;
+        }
+      }
+
+      CommonUtils.log("i", "Bounding image info ===========>\n"
+          "maskingXSizeForBounding:$maskingXSizeForBounding maskingYSizeForBounding:$maskingYSizeForBounding\n"
+          "startXPointForBounding:$startXPointForBounding startYPointForBounding: $startYPointForBounding");
+
+      CommonUtils.log("i", "Masking image info ===========>\n"
           "maskingXSize:$maskingXSize maskingYSize:$maskingYSize\n"
           "startXPoint:$startXPoint startYPoint: $startYPoint");
 
-      imglib.fillRect(image, x1: startXPoint, x2 : endXPoint, y1: startYPoint, y2 : endYPoint, color: imglib.ColorRgba8(0, 0, 0, 255));
+      if(isError){
+        CommonUtils.log('e', "masking size error");
+        return "";
+      }else{
+        imglib.fillRect(image, x1: startXPoint, x2 : endXPoint, y1: startYPoint, y2 : endYPoint, color: imglib.ColorRgba8(0, 0, 0, 255));
+        final modifiedImagePath = imagePath.replaceAll('.jpg', '_masked.jpg');
+        File(modifiedImagePath).writeAsBytesSync(imglib.encodeJpg(image));
+        return modifiedImagePath;
+      }
 
-      final modifiedImagePath = imagePath.replaceAll('.jpg', '_masked.jpg');
-      File(modifiedImagePath).writeAsBytesSync(imglib.encodeJpg(image));
 
-      return modifiedImagePath;
     } catch (e) {
       CommonUtils.log('e', e.toString());
       return "";
     }
   }
 
-  static Future<String> makeMaskingImageAndGetPath2(String imagePath, Map<String,dynamic> maskingInfoMap) async {
+  static Future<String> makeCroppedImageAndGetPath(String imagePath, Map<String,dynamic> infoMap) async {
     try {
       final imglib.Image image = imglib.decodeImage(File(imagePath).readAsBytesSync())!;
-      //boundingPolys
-      List<dynamic> listMap = maskingInfoMap['personalNum'][0]['boundingPolys'][0]['vertices'];
+      List<dynamic> listMap = infoMap['rois_map'][0]['vertices'];
       List<int> xPoints = [];
       List<int> yPoints = [];
       for(Map<String,dynamic> each in listMap){
@@ -552,76 +592,49 @@ class CommonUtils {
         yPoints.add(int.parse(yPoint));
       }
 
-      int squareX = 0;   // X-coordinate of the top-left corner
-      int squareY = 0;   // Y-coordinate of the top-left corner
-      int squareXSize = 0; // Size of the square (width and height)
-      int squareYSize = 0;
+      int minXValue = xPoints.reduce((min, current) => min < current ? min : current);
+      int maxXValue = xPoints.reduce((max, current) => max > current ? max : current);
+      int minYValue = yPoints.reduce((min, current) => min < current ? min : current);
+      int maxYValue = yPoints.reduce((max, current) => max > current ? max : current);
+      int maskingXSize = maxXValue - minXValue;
+      int maskingYSize = maxYValue - minYValue;
+      int startXPoint = minXValue;
+      int startYPoint = minYValue;
 
-      if(xPoints[0] > xPoints[2]){
-        squareX = xPoints[2];
-        squareXSize = xPoints[0] - xPoints[2];
-      }else{
-        squareX = xPoints[0];
-        squareXSize = xPoints[2] - xPoints[0];
-      }
-
-      if(yPoints[0] > yPoints[2]){
-        squareY = yPoints[2];
-        squareYSize = yPoints[0] - yPoints[2];
-      }else{
-        squareY = yPoints[0];
-        squareYSize = yPoints[2] - yPoints[0];
-      }
-
-      bool isVerticalImage = false;
-      if(squareYSize > squareXSize) isVerticalImage = true;
-      CommonUtils.log("i", "masking size : \nw:$squareXSize h:$squareYSize");
-
-      //maskingPolys
-      List<dynamic> listMaskingMap = maskingInfoMap['personalNum'][0]['maskingPolys'][0]['vertices'];
-      List<int> xPointsForMasking = [];
-      List<int> yPointsForMasking = [];
-      for(Map<String,dynamic> each in listMaskingMap){
-        var xPointForMasking = each['x'].toString().split(".")[0];
-        var yPointForMasking = each['y'].toString().split(".")[0];
-        xPointsForMasking.add(int.parse(xPointForMasking));
-        yPointsForMasking.add(int.parse(yPointForMasking));
-      }
-
-      int squareXForMasking = 0;   // X-coordinate of the top-left corner
-      int squareYForMasking = 0;   // Y-coordinate of the top-left corner
-      if(xPointsForMasking[0] > xPointsForMasking[2]){
-        squareXForMasking = xPointsForMasking[2];
-      }else{
-        squareXForMasking = xPointsForMasking[0];
-      }
-
-      if(yPointsForMasking[0] > yPointsForMasking[2]){
-        squareYForMasking = yPointsForMasking[2];
-      }else{
-        squareYForMasking = yPointsForMasking[0];
-      }
-
-      if(isVerticalImage){
-        CommonUtils.log("i", "vertical");
-        int verticalHalfMaskingSize = (squareYSize/2).round()+((squareYSize/2)*0.1).round();
-        CommonUtils.log("i", "masking x:$squareXForMasking y:$squareYForMasking maskingSize:$verticalHalfMaskingSize");
-        imglib.fillRect(image, x1: squareX, x2 : squareX + squareXSize, y1: squareYForMasking, y2 : squareYForMasking + verticalHalfMaskingSize, color: imglib.ColorRgba8(0, 0, 0, 255));
-      }else{
-        CommonUtils.log("i", "horizontal");
-        int horizonHalfMaskingSize = (squareXSize/2).round()+((squareXSize/2)*0.1).round();
-        CommonUtils.log("i", "masking x:$squareXForMasking y:$squareYForMasking maskingSize:$horizonHalfMaskingSize");
-        imglib.fillRect(image, x1: squareXForMasking, x2 : squareXForMasking + horizonHalfMaskingSize, y1: squareY, y2 : squareY + squareYSize, color: imglib.ColorRgba8(0, 0, 0, 255));
-      }
-
-      final modifiedImagePath = imagePath.replaceAll('.jpg', '_masked.jpg');
-      File(modifiedImagePath).writeAsBytesSync(imglib.encodeJpg(image));
-
+      final cropped = imglib.copyCrop(image, x: startXPoint, y: startYPoint, width: maskingXSize, height: maskingYSize);
+      final modifiedImagePath = imagePath.replaceAll('.jpg', '_cropped.jpg');
+      File(modifiedImagePath).writeAsBytesSync(imglib.encodeJpg(cropped));
       return modifiedImagePath;
     } catch (e) {
       CommonUtils.log('e', e.toString());
       return "";
     }
+  }
+
+  static String getFormattedLastMsgTime(String timeString){
+    String result = "";
+    DateTime now = CommonUtils.getCurrentLocalTime();
+    String nowYearString = CommonUtils.convertTimeToString(now).substring(0,4);
+    String chatYearString = timeString.substring(0,4);
+    if(chatYearString != nowYearString){
+      result = "${timeString.substring(2,4)}.${timeString.substring(4,6)}.${timeString.substring(6,8)}";
+    }else{
+      DateTime yesterday = DateTime(now.year, now.month, now.day-1);
+      String yesterdayString = CommonUtils.convertTimeToString(yesterday).substring(0,8);
+      String chatDayString = timeString.substring(0,8);
+      if(yesterdayString != chatDayString){
+        String nowDayString = CommonUtils.convertTimeToString(now).substring(0,8);
+        if(nowDayString != chatDayString){
+          result = "${timeString.substring(4,6)}월 ${timeString.substring(6,8)}일";
+        }else{
+          result = "오늘\n${timeString.substring(8,10)}시 ${timeString.substring(10,12)}분";
+        }
+      }else{
+        result = "어제";
+      }
+    }
+
+    return result;
   }
 
   static String getValueFromDeepLink(String link, String parameterKey){

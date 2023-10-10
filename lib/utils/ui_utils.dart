@@ -319,6 +319,24 @@ class UiUtils {
     );
   }
 
+  static SizedBox getBorderButtonBoxForCertAuthDep(double buttonWidth, Color buttonColor, Color borderColor, Widget childWidget, VoidCallback onPressedCallback){
+    return SizedBox(
+        width: buttonWidth,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.only(left: 15, right: 15, top: 0, bottom: 0),
+            backgroundColor: buttonColor,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            side: BorderSide(width: 1.3, color: borderColor),
+            elevation: 0.0,
+            shadowColor: ColorStyles.upFinGray,
+          ),
+          onPressed: onPressedCallback,
+          child: childWidget,
+        )
+    );
+  }
+
   static SizedBox getBannerButtonBox(double buttonWidth, double buttonHeight, Color buttonColor, Color borderColor, Widget childWidget, VoidCallback onPressedCallback){
     return SizedBox(
         width: buttonWidth,
@@ -444,6 +462,25 @@ class UiUtils {
     );
   }
 
+  static InputDecoration getChatInputDecoration(){
+    return InputDecoration(
+        floatingLabelBehavior: FloatingLabelBehavior.never,
+        labelStyle: TextStyle(fontSize: 0.sp),
+        errorStyle: TextStyle(fontSize: 0.sp),
+        counterStyle: TextStyle(fontSize: 0.sp),
+        enabledBorder: UnderlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: ColorStyles.upFinButtonBlue),
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: ColorStyles.upFinButtonBlue),
+        ),
+        filled: true,
+        fillColor: ColorStyles.upFinWhite
+    );
+  }
+
   static bool isLoadingPopOn = false;
   static void showLoadingPop(BuildContext targetContext){
     if(!isLoadingPopOn){
@@ -460,7 +497,7 @@ class UiUtils {
                       width: 100.w,
                       height: 100.h,
                       color: ColorStyles.upFinDarkGrayWithAlpha,
-                      child: SpinKitWave(color: ColorStyles.upFinTextAndBorderBlue, size: 25.w)
+                      child: SpinKitWave(color: ColorStyles.upFinTextAndBorderBlue, size: 15.w)
                   );
                 })
           );

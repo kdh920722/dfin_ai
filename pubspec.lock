@@ -21,10 +21,17 @@ packages:
     dependency: transitive
     description:
       name: archive
+<<<<<<< HEAD
       sha256: d4dc11707abb32ef756ab95678c0d6df54003d98277f7c9aeda14c48e7a38c2f
       url: "https://pub.dev"
     source: hosted
     version: "3.4.3"
+=======
+      sha256: "20071638cbe4e5964a427cfa0e86dce55d060bc7d82d56f3554095d7239a8765"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.4.2"
+>>>>>>> origin/main
   args:
     dependency: transitive
     description:
@@ -77,26 +84,47 @@ packages:
     dependency: "direct main"
     description:
       name: camera
+<<<<<<< HEAD
       sha256: "1f9010f0689774380fbcd7d6b7820a5157e8e97685fa66d619e1d1f58b3fdf93"
       url: "https://pub.dev"
     source: hosted
     version: "0.10.5+5"
+=======
+      sha256: f63f2687fb1795c36f7c57b18a03071880eabb0fd8b5291b0fcd3fb979cb0fb1
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.10.5+4"
+>>>>>>> origin/main
   camera_android:
     dependency: transitive
     description:
       name: camera_android
+<<<<<<< HEAD
       sha256: c978373b41a463c9edda3fea0a06966299f55db63232cd0f0d4efc21a59a0006
       url: "https://pub.dev"
     source: hosted
     version: "0.10.8+12"
+=======
+      sha256: "796438641b13bc26f6d9fe07e183b708e856db21ddeb9ec99de5591286e1910c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.10.8+10"
+>>>>>>> origin/main
   camera_avfoundation:
     dependency: transitive
     description:
       name: camera_avfoundation
+<<<<<<< HEAD
       sha256: "9495e633cda700717bbe299b0979e6c4a08cee45f298945973dc9cf3e4c1cba5"
       url: "https://pub.dev"
     source: hosted
     version: "0.9.13+6"
+=======
+      sha256: dde42d19ad4cdf79287f9e410599db72beaec7e505787dc6abfd0ce5b526e9c0
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.9.13+5"
+>>>>>>> origin/main
   camera_platform_interface:
     dependency: transitive
     description:
@@ -960,6 +988,33 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.3.1"
+<<<<<<< HEAD
+=======
+  sign_in_with_apple:
+    dependency: "direct main"
+    description:
+      name: sign_in_with_apple
+      sha256: "0975c23b9f8b30a80e27d5659a75993a093d4cb5f4eb7d23a9ccc586fea634e0"
+      url: "https://pub.dev"
+    source: hosted
+    version: "5.0.0"
+  sign_in_with_apple_platform_interface:
+    dependency: transitive
+    description:
+      name: sign_in_with_apple_platform_interface
+      sha256: a5883edee09ed6be19de19e7d9f618a617fe41a6fa03f76d082dfb787e9ea18d
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
+  sign_in_with_apple_web:
+    dependency: transitive
+    description:
+      name: sign_in_with_apple_web
+      sha256: "44b66528f576e77847c14999d5e881e17e7223b7b0625a185417829e5306f47a"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.1"
+>>>>>>> origin/main
   sizer:
     dependency: "direct main"
     description:

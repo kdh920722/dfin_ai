@@ -69,6 +69,7 @@ dependencies:
   percent_indicator: ^4.2.3
   camera: ^0.10.5+4
   path_provider: ^2.1.1
+  sign_in_with_apple: ^5.0.0
 
 dev_dependencies:
   flutter_test:

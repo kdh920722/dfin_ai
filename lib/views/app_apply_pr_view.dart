@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sizer/sizer.dart';
 import 'package:upfin/configs/app_config.dart';
@@ -18,6 +20,9 @@ import '../datas/api_info_data.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
 import 'dart:io';
+import 'dart:ui' as ui;
+import 'dart:typed_data';
+import 'package:image/image.dart' as img;
 
 class AppApplyPrView extends StatefulWidget{
   @override
@@ -26,6 +31,7 @@ class AppApplyPrView extends StatefulWidget{
 
 class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObserver{
   CameraController? _cameraController;
+  GlobalKey repaintKey = GlobalKey();
   bool _isCameraReady = false;
 
   bool isReApply = false;
@@ -433,7 +439,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     await _cameraController!.setExposureMode(ExposureMode.auto);
     if(context.mounted){
       if(imageFile.path != ""){
-        _checkValidCertImage(imageFile.path);
+        _checkValidCertImage(imageFile);
       }else{
         if(context.mounted) UiUtils.closeLoadingPop(context);
       }
@@ -676,7 +682,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextField(90.w, TextStyles.upFinTextFormFieldTextStyle, _bankAccountInfoFocus,
-          _bankAccountInfoTextController, TextInputType.number, UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
+          _bankAccountInfoTextController, TextInputType.number, UiUtils.getInputDecoration("계좌번호", 14.sp, "", 0.sp), (value) { }),
       UiUtils.getExpandedScrollView(Axis.vertical, Container()),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
@@ -710,7 +716,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextField(90.w, TextStyles.upFinTextFormFieldTextStyle, _businessNumberInfoFocus,
-          _businessNumberInfoTextController, TextInputType.number, UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
+          _businessNumberInfoTextController, TextInputType.number, UiUtils.getInputDecoration("사업자번호", 14.sp, "", 0.sp), (value) { }),
       UiUtils.getExpandedScrollView(Axis.vertical, Container()),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
@@ -989,7 +995,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       if(image != null){
         String imagePath = await CommonUtils.cropImageAndGetPath(image);
         if(imagePath != ""){
-          _checkValidCertImage(imagePath);
+          _checkValidCertImage(XFile(imagePath));
         }else{
           if(context.mounted) UiUtils.closeLoadingPop(context);
         }
@@ -1002,35 +1008,36 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       CommonUtils.flutterToast("사진을 가져오는 중\n에러가 발생했습니다.");
     }
   }
-  Future<void> _checkValidCertImage(String imagePath) async {
+
+  Future<void> _checkValidCertImage(XFile image) async {
     try{
       CommonUtils.flutterToast("신분증을 인식중입니다.");
-      await CLOVAController.uploadImageToCLOVA(imagePath, (isSuccess, map) async {
+      await CLOVAController.uploadImageToCLOVA(image.path, (isSuccess, map) async {
         if(map != null){
           if(isSuccess){
-            String croppedImagePath = await CommonUtils.makeMaskingImageAndGetPath(imagePath, map);
-            if(croppedImagePath != ""){
-              MyData.idNumber = map['personalNum'][0]["formatted"]["value"];
-              CommonUtils.log("i", "id : ${MyData.idNumber}");
+            String maskedImagePath = await CommonUtils.makeMaskingImageAndGetPath(image.path, map);
+            if(maskedImagePath != ""){
+              String checkId = map['personalNum'][0]["text"];
+              if(checkId != ""){
+                if(checkId.split("-").length == 2){
+                  if(checkId.split("-")[0].length == 6 && checkId.split("-")[1].length == 7){
+                    MyData.idNumber = map['personalNum'][0]["formatted"]["value"];
+                    String croppedImagePath = await CommonUtils.makeCroppedImageAndGetPath(maskedImagePath, map);
 
-              //test
-              _setConfirmedToDocItemByViewId(currentViewId, true);
-              Map<String, dynamic> resultMap = {
-                "resultValue" : croppedImagePath
-              };
-              _setResultToListById(cameraId, resultMap);
-              setState(() {
-                pickedFilePath = croppedImagePath;
-              });
-              if(context.mounted) UiUtils.closeLoadingPop(context);
-              //test
+                    //test
+                    _setConfirmedToDocItemByViewId(currentViewId, true);
+                    Map<String, dynamic> resultMap = {
+                      "resultValue" : croppedImagePath
+                    };
+                    _setResultToListById(cameraId, resultMap);
+                    setState(() {
+                      pickedFilePath = croppedImagePath;
+                    });
+                    if(context.mounted) UiUtils.closeLoadingPop(context);
+                    //test
 
-              /*
-              if(MyData.idNumber != ""){
-                if(MyData.idNumber.split("-").length == 2){
-                  if(MyData.idNumber.split("-")[0].length == 6 && MyData.idNumber.split("-")[1].length == 7){
-                    CommonUtils.flutterToast("신분증 진위확인 중입니다..");
-                    if(map['id_type'] == "dl"){
+                    /* check real id
+                     if(map['id_type'] == "dl"){
                       CommonUtils.log("i", "dl : infos\n${map["code"][0]["formatted"]["value"]}${map["num"][0]["formatted"]["value"]}");
                       String licenseNum = map["num"][0]["formatted"]["value"];
                       Map<String, dynamic> inputJson = {
@@ -1104,17 +1111,9 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                         }
                       });
                     }
-                  }else{
-                    // error
-                    if(context.mounted) UiUtils.closeLoadingPop(context);
-                    _setConfirmedToDocItemByViewId(currentViewId, false);
-                    setState(() {
-                      pickedFilePath = "";
-                    });
-                    CommonUtils.flutterToast("신분증을 인식실패\n다시 시도해주세요");
+                     */
                   }
                 }else{
-                  // error
                   if(context.mounted) UiUtils.closeLoadingPop(context);
                   _setConfirmedToDocItemByViewId(currentViewId, false);
                   setState(() {
@@ -1123,7 +1122,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                   CommonUtils.flutterToast("신분증을 인식실패\n다시 시도해주세요");
                 }
               }else{
-                // error
                 if(context.mounted) UiUtils.closeLoadingPop(context);
                 _setConfirmedToDocItemByViewId(currentViewId, false);
                 setState(() {
@@ -1131,8 +1129,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                 });
                 CommonUtils.flutterToast("신분증을 인식실패\n다시 시도해주세요");
               }
-              */
-
             }else{
               // failed to masking
               if(context.mounted) UiUtils.closeLoadingPop(context);
@@ -1238,8 +1234,17 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
 
   Widget _getCertWidget(String docsType, String title1, String title2, String title3, String subTitle, List<Widget> docsWidgetList, bool isErrorResult, VoidCallback onPressedCallback){
+    subTitle = subTitle.replaceAll("'", "");
+    double depWidth = 0.0;
+    if(docsType == "gov24"){
+      depWidth = 42.w;
+    }else if(docsType == "nhis"){
+      depWidth = 54.w;
+    }else if(docsType == "nts"){
+      depWidth = 41.w;
+    }
     return UiUtils.getRowColumnWithAlignCenter([
-      SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start,children: [
         UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
           backInputView();
         }),
@@ -1249,7 +1254,13 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale(title2, 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale(title3, 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 1.h),
-      _isDocsAllConfirmed(docsType)? Container() : SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("$subTitle에서 해당 서류들을 가져옵니다.", 12.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        UiUtils.getBorderButtonBoxForCertAuthDep(depWidth, ColorStyles.upFinBlack, ColorStyles.upFinBlack,
+            Row(children: [
+              UiUtils.getTextWithFixedScale("제공기관: ", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null),
+              UiUtils.getTextWithFixedScale(subTitle, 14.sp, FontWeight.w500, ColorStyles.upFinKakaoYellow, TextAlign.start, null)
+            ]), () { })
+      ])),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: docsWidgetList)),
       UiUtils.getMarginBox(0, 5.h),
@@ -1329,43 +1340,23 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         }
       }),
       UiUtils.getMarginBox(0, 0.5.h),
-      !_isDocsAllConfirmed(docsType)? UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinTextAndBorderBlue,
-          UiUtils.getTextWithFixedScale(isErrorResult? "실패서류는 다음에 할게요" : "다음에 할게요", 12.sp, FontWeight.w500, isErrorResult? ColorStyles.upFinRed : ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null), () {
+      !_isDocsAllConfirmed(docsType)? UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
+          UiUtils.getTextWithFixedScale(isErrorResult? "실패서류는 다음에 할게요" : "다음에 할게요", 12.sp, FontWeight.w500, isErrorResult? ColorStyles.upFinRed : ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
             nextInputView();
           }) : Container()
     ]);
   }
 
-  /// gov24(id:1,2,15) view
-  Widget _getGov24View(){
-    String subTitle = "'정부24'";
-    String title1 = "간편인증을 통해";
-    String title2 = "비대면 서류 제출이";
-    String title3 = "가능합니다.";
+  List<Widget> _setDocStatus(String docType){
     bool isErrorResult = false;
-
-    for(var each in addedDocsList){
-      if(each["view_id"] < currentViewId){
-        if(each["is_docs"]){
-          title1 = "아직 받지 못한 서류들은";
-          title2 = "정부기관이 달라서";
-          title3 = "다시 한번 인증을 해야해요";
-        }
-      }
-    }
-    if(_isDocsAllConfirmed("gov24")){
-      title1 = "정부24에서 ";
-      title2 = "서류들을 모두 가져왔어요";
-      title3 = "다음 절차를 진행해주세요";
-    }
     List<Widget> docsWidgetList = [];
     for(var each in addedDocsList){
+      Key key = UniqueKey();
+      String name = "";
+      Color textColor = docType == each["docs_type"]? ColorStyles.upFinRealGray : ColorStyles.upFinGray;
+      Color errorTextColor = ColorStyles.upFinRed;
+      Color successTextColor = ColorStyles.upFinTextAndBorderBlue;
       if(each["docs_type"] == "gov24"){
-        Key key = UniqueKey();
-        String name = "";
-        Color textColor = ColorStyles.upFinRealGray;
-        Color errorTextColor = ColorStyles.upFinRed;
-        Color successTextColor = ColorStyles.upFinTextAndBorderBlue;
         if(each["id"] == 1){
           name = "주민등록등본";
           Map<String, dynamic> resultMap = each["result"];
@@ -1434,88 +1425,11 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             SizedBox(width: 90.w,
                 child: Row(children: [
                   UiUtils.getCustomCircleCheckBox(key, 1.5, true, textColor, ColorStyles.upFinWhite, ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-                  UiUtils.getTextButtonWithFixedScale(name, 15.sp, FontWeight.w600,textColor, TextAlign.center, null, (){})
+                  UiUtils.getTextButtonWithFixedScale(name, 15.sp, FontWeight.w600, textColor, TextAlign.center, null, (){})
                 ])
             )
         );
-      }
-    }
-
-    return _getCertWidget("gov24", title1, title2, title3, subTitle, docsWidgetList, isErrorResult, () async {
-      if(_isDocsAllConfirmed("gov24")){
-        CommonUtils.flutterToast("이미 인증을 완료하셨습니다.");
-      }else{
-        String loginCertType = certType.toString();
-        String name = MyData.name;
-        String birth = MyData.birth;
-        String phoneNo = MyData.phoneNumber;
-        String identity = MyData.idNumber.split("-")[0]+MyData.idNumber.split("-")[1];
-        String address = selectedAddressInfo;
-        String telecom = (int.parse(MyData.telecom)-1).toString();
-        if(int.parse(telecom) >= 3){
-          telecom = (int.parse(telecom)-3).toString();
-        }
-
-        CommonUtils.log("i", "$identity\n$telecom\n$phoneNo\n$birth\n$address");
-        String randomKey = gov24Count==1 ? "" : CommonUtils.getRandomKey().toString();
-        List<ApiInfoData> apiInfoDataList = [];
-        for(var each in addedDocsList){
-          if(each["docs_type"] == "gov24"){
-            if(each["id"] == 1){
-              // 등본
-              Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.gov24residentRegistrationCopy,
-                  identity, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
-              apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.gov24residentRegistrationCopy, true));
-            }else if(each["id"] == 2){
-              // 초본
-              Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.gov24residentRegistrationAbstract,
-                  identity, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
-              apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.gov24residentRegistrationAbstract, true));
-            }else if(each["id"] == 15){
-              // 지방세
-              Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.gov24localTaxPaymentCert,
-                  identity, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
-              apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.gov24localTaxPaymentCert, true));
-            }
-          }
-        }
-        if(!isCertTypeSelected) Navigator.of(context).pop();
-        _showAuth(subTitle, "gov24", apiInfoDataList);
-      }
-    });
-  }
-  /// gov24(id:1,2,15) view end
-
-  /// nhis(id:3,4) view
-  Widget _getNhisView(){
-    String subTitle = "'건강보험공단'";
-    String title1 = "간편인증을 통해";
-    String title2 = "비대면 서류 제출이";
-    String title3 = "가능합니다.";
-    bool isErrorResult = false;
-
-    for(var each in addedDocsList){
-      if(each["view_id"] < currentViewId){
-        if(each["is_docs"]){
-          title1 = "아직 받지 못한 서류들은";
-          title2 = "정부기관이 달라서";
-          title3 = "다시 한번 인증을 해야해요";
-        }
-      }
-    }
-    if(_isDocsAllConfirmed("nhis")){
-      title1 = "건강보험공단에서 ";
-      title2 = "서류들을 모두 가져왔어요";
-      title3 = "다음 절차를 진행해주세요";
-    }
-    List<Widget> docsWidgetList = [];
-    for(var each in addedDocsList){
-      if(each["docs_type"] == "nhis"){
-        Key key = UniqueKey();
-        String name = "";
-        Color textColor = ColorStyles.upFinRealGray;
-        Color errorTextColor = ColorStyles.upFinRed;
-        Color successTextColor = ColorStyles.upFinTextAndBorderBlue;
+      }else if(each["docs_type"] == "nhis"){
         if(each["id"] == 3){
           name = "건강보험자격득실확인서";
           Map<String, dynamic> resultMap = each["result"];
@@ -1567,83 +1481,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                 ])
             )
         );
-      }
-    }
-
-    if(isErrorResult){
-
-    }
-
-    return _getCertWidget("nhis", title1, title2, title3, subTitle, docsWidgetList, isErrorResult, () async {
-      if(_isDocsAllConfirmed("nhis")){
-        CommonUtils.flutterToast("이미 인증을 완료하셨습니다.");
-      }else{
-        String loginCertType = certType.toString();
-        String name = MyData.name;
-        String birth = MyData.birth;
-        String phoneNo = MyData.phoneNumber;
-        String identity = MyData.idNumber.split("-")[0]+MyData.idNumber.split("-")[1];
-        String address = selectedAddressInfo;
-        String telecom = (int.parse(MyData.telecom)-1).toString();
-        if(int.parse(telecom) >= 3){
-          telecom = (int.parse(telecom)-3).toString();
-        }
-
-        CommonUtils.log("i", "$identity\n$telecom\n$phoneNo\n$birth\n$address");
-        String randomKey = nhisCount==1 ? "" : CommonUtils.getRandomKey().toString();
-        List<ApiInfoData> apiInfoDataList = [];
-        for(var each in addedDocsList){
-          if(each["docs_type"] == "nhis"){
-            if(each["id"] == 3){
-              // 건강보험자격득실확인서
-              Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.nhisIdentifyConfirmation,
-                  identity, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
-              apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.nhisIdentifyConfirmation, true));
-            }else if(each["id"] == 4){
-              // 건강보험납부확인서
-              Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.nhisConfirmation,
-                  identity, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
-              apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.nhisConfirmation, true));
-            }
-          }
-        }
-        if(!isCertTypeSelected) Navigator.of(context).pop();
-        _showAuth(subTitle, "nhis", apiInfoDataList);
-      }
-    });
-  }
-  /// nhis(id:3,4) view end
-
-  /// nts(id:6,10,11) view 국세청 사업자등록증 소득금액증명 부가세과세표준증명원
-  Widget _getNtsView(){
-    String subTitle = "'국세청'";
-    String title1 = "간편인증을 통해";
-    String title2 = "비대면 서류 제출이";
-    String title3 = "가능합니다.";
-    bool isErrorResult = false;
-
-    for(var each in addedDocsList){
-      if(each["view_id"] < currentViewId){
-        if(each["is_docs"]){
-          title1 = "아직 받지 못한 서류들은";
-          title2 = "정부기관이 달라서";
-          title3 = "다시 한번 인증을 해야해요";
-        }
-      }
-    }
-    if(_isDocsAllConfirmed("nts")){
-      title1 = "국세청에서 ";
-      title2 = "서류들을 모두 가져왔어요";
-      title3 = "다음 절차를 진행해주세요";
-    }
-    List<Widget> docsWidgetList = [];
-    for(var each in addedDocsList){
-      if(each["docs_type"] == "nts"){
-        Key key = UniqueKey();
-        String name = "";
-        Color textColor = ColorStyles.upFinRealGray;
-        Color errorTextColor = ColorStyles.upFinRed;
-        Color successTextColor = ColorStyles.upFinTextAndBorderBlue;
+      } else if(each["docs_type"] == "nts"){
         if(each["id"] == 6){
           name = "사업자등록증";
           Map<String, dynamic> resultMap = each["result"];
@@ -1712,6 +1550,169 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         );
       }
     }
+
+    return docsWidgetList;
+  }
+
+  /// gov24(id:1,2,15) view
+  Widget _getGov24View(){
+    String subTitle = "'정부24'";
+    String title1 = "간편인증을 통해";
+    String title2 = "비대면 서류 제출이";
+    String title3 = "가능합니다.";
+    bool isErrorResult = false;
+
+    for(var each in addedDocsList){
+      if(each["view_id"] < currentViewId){
+        if(each["is_docs"]){
+          title1 = "아직 받지 못한 서류들은";
+          title2 = "정부기관이 달라서";
+          title3 = "다시 한번 인증을 해야해요";
+        }
+      }
+    }
+    if(_isDocsAllConfirmed("gov24")){
+      title1 = "정부24에서 ";
+      title2 = "서류들을 모두 가져왔어요";
+      title3 = "다음 절차를 진행해주세요";
+    }
+
+    List<Widget> docsWidgetList = _setDocStatus("gov24");
+
+    return _getCertWidget("gov24", title1, title2, title3, subTitle, docsWidgetList, isErrorResult, () async {
+      if(_isDocsAllConfirmed("gov24")){
+        CommonUtils.flutterToast("이미 인증을 완료하셨습니다.");
+      }else{
+        String loginCertType = certType.toString();
+        String name = MyData.name;
+        String birth = MyData.birth;
+        String phoneNo = MyData.phoneNumber;
+        String identity = MyData.idNumber.split("-")[0]+MyData.idNumber.split("-")[1];
+        String address = selectedAddressInfo;
+        String telecom = (int.parse(MyData.telecom)-1).toString();
+        if(int.parse(telecom) >= 3){
+          telecom = (int.parse(telecom)-3).toString();
+        }
+
+        CommonUtils.log("i", "$identity\n$telecom\n$phoneNo\n$birth\n$address");
+        String randomKey = gov24Count==1 ? "" : CommonUtils.getRandomKey().toString();
+        List<ApiInfoData> apiInfoDataList = [];
+        for(var each in addedDocsList){
+          if(each["docs_type"] == "gov24"){
+            if(each["id"] == 1){
+              // 등본
+              Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.gov24residentRegistrationCopy,
+                  identity, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
+              apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.gov24residentRegistrationCopy, true));
+            }else if(each["id"] == 2){
+              // 초본
+              Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.gov24residentRegistrationAbstract,
+                  identity, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
+              apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.gov24residentRegistrationAbstract, true));
+            }else if(each["id"] == 15){
+              // 지방세
+              Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.gov24localTaxPaymentCert,
+                  identity, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
+              apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.gov24localTaxPaymentCert, true));
+            }
+          }
+        }
+        if(!isCertTypeSelected) Navigator.of(context).pop();
+        _showAuth(subTitle, "gov24", apiInfoDataList);
+      }
+    });
+  }
+  /// gov24(id:1,2,15) view end
+
+  /// nhis(id:3,4) view
+  Widget _getNhisView(){
+    String subTitle = "'건강보험공단'";
+    String title1 = "간편인증을 통해";
+    String title2 = "비대면 서류 제출이";
+    String title3 = "가능합니다.";
+    bool isErrorResult = false;
+
+    for(var each in addedDocsList){
+      if(each["view_id"] < currentViewId){
+        if(each["is_docs"]){
+          title1 = "아직 받지 못한 서류들은";
+          title2 = "정부기관이 달라서";
+          title3 = "다시 한번 인증을 해야해요";
+        }
+      }
+    }
+    if(_isDocsAllConfirmed("nhis")){
+      title1 = "건강보험공단에서 ";
+      title2 = "서류들을 모두 가져왔어요";
+      title3 = "다음 절차를 진행해주세요";
+    }
+
+    List<Widget> docsWidgetList = _setDocStatus("nhis");
+
+    return _getCertWidget("nhis", title1, title2, title3, subTitle, docsWidgetList, isErrorResult, () async {
+      if(_isDocsAllConfirmed("nhis")){
+        CommonUtils.flutterToast("이미 인증을 완료하셨습니다.");
+      }else{
+        String loginCertType = certType.toString();
+        String name = MyData.name;
+        String birth = MyData.birth;
+        String phoneNo = MyData.phoneNumber;
+        String identity = MyData.idNumber.split("-")[0]+MyData.idNumber.split("-")[1];
+        String address = selectedAddressInfo;
+        String telecom = (int.parse(MyData.telecom)-1).toString();
+        if(int.parse(telecom) >= 3){
+          telecom = (int.parse(telecom)-3).toString();
+        }
+
+        CommonUtils.log("i", "$identity\n$telecom\n$phoneNo\n$birth\n$address");
+        String randomKey = nhisCount==1 ? "" : CommonUtils.getRandomKey().toString();
+        List<ApiInfoData> apiInfoDataList = [];
+        for(var each in addedDocsList){
+          if(each["docs_type"] == "nhis"){
+            if(each["id"] == 3){
+              // 건강보험자격득실확인서
+              Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.nhisIdentifyConfirmation,
+                  identity, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
+              apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.nhisIdentifyConfirmation, true));
+            }else if(each["id"] == 4){
+              // 건강보험납부확인서
+              Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.nhisConfirmation,
+                  identity, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
+              apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.nhisConfirmation, true));
+            }
+          }
+        }
+        if(!isCertTypeSelected) Navigator.of(context).pop();
+        _showAuth(subTitle, "nhis", apiInfoDataList);
+      }
+    });
+  }
+  /// nhis(id:3,4) view end
+
+  /// nts(id:6,10,11) view 국세청 사업자등록증 소득금액증명 부가세과세표준증명원
+  Widget _getNtsView(){
+    String subTitle = "'국세청'";
+    String title1 = "간편인증을 통해";
+    String title2 = "비대면 서류 제출이";
+    String title3 = "가능합니다.";
+    bool isErrorResult = false;
+
+    for(var each in addedDocsList){
+      if(each["view_id"] < currentViewId){
+        if(each["is_docs"]){
+          title1 = "아직 받지 못한 서류들은";
+          title2 = "정부기관이 달라서";
+          title3 = "다시 한번 인증을 해야해요";
+        }
+      }
+    }
+    if(_isDocsAllConfirmed("nts")){
+      title1 = "국세청에서 ";
+      title2 = "서류들을 모두 가져왔어요";
+      title3 = "다음 절차를 진행해주세요";
+    }
+
+    List<Widget> docsWidgetList = _setDocStatus("nts");
 
     return _getCertWidget("nts", title1, title2, title3, subTitle, docsWidgetList, isErrorResult, () async {
       if(_isDocsAllConfirmed("nts")){
@@ -2025,94 +2026,95 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: introWidgetList)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "접수하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-        if(!isReApply){
-          UiUtils.showLoadingPop(context);
-          _uploadCertImageToAwsServer(pickedFilePath, (isSuccessToUpload){
-            if(isSuccessToUpload){
-              List<dynamic> docResultList = [];
-              Map<String, dynamic> eachMap = {
-                "pr_document_id" : "12",
-                "response_data" : awsUploadUrl
-              };
-              docResultList.add(eachMap);
-              for(var each in addedDocsList){
-                if(each["is_docs"] && each["is_confirmed"]){
-                  var resultMap  =  each["result"]["resultValue"]["data"];
-                  if(each["id"] == 3 || each["id"] == 4){
-                    if(resultMap is List<dynamic>){
-                      Map<String, dynamic> eachMap = {
-                        "pr_document_id" : each["id"],
-                        "response_data" : json.encode(resultMap)
-                      };
-                      docResultList.add(eachMap);
-                    }else{
-                      List<dynamic> wrapListMap = [];
-                      wrapListMap.add(resultMap);
-                      Map<String, dynamic> eachMap = {
-                        "pr_document_id" : each["id"],
-                        "response_data" : json.encode(wrapListMap)
-                      };
-                      docResultList.add(eachMap);
-                    }
-                  }else{
-                    if(resultMap is List<dynamic>){
-                      Map<String, dynamic> eachMap = {
-                        "pr_document_id" : each["id"],
-                        "response_data" : json.encode(resultMap)
-                      };
-                      docResultList.add(eachMap);
-                    }else{
-                      Map<String, dynamic> eachMap = {
-                        "pr_document_id" : each["id"],
-                        "response_data" : resultMap
-                      };
-                      docResultList.add(eachMap);
-                    }
-                  }
+        _applyPr();
+      })
+    ]);
+  }
+  void _applyPr(){
+    if(!isReApply){
+      UiUtils.showLoadingPop(context);
+      _uploadCertImageToAwsServer(pickedFilePath, (isSuccessToUpload){
+        if(isSuccessToUpload){
+          List<dynamic> docResultList = [];
+          Map<String, dynamic> eachMap = {
+            "pr_document_id" : "12",
+            "response_data" : awsUploadUrl
+          };
+          docResultList.add(eachMap);
+          for(var each in addedDocsList){
+            if(each["is_docs"] && each["is_confirmed"]){
+              var resultMap  =  each["result"]["resultValue"]["data"];
+              if(each["id"] == 3 || each["id"] == 4){
+                if(resultMap is List<dynamic>){
+                  Map<String, dynamic> eachMap = {
+                    "pr_document_id" : each["id"],
+                    "response_data" : json.encode(resultMap)
+                  };
+                  docResultList.add(eachMap);
+                }else{
+                  List<dynamic> wrapListMap = [];
+                  wrapListMap.add(resultMap);
+                  Map<String, dynamic> eachMap = {
+                    "pr_document_id" : each["id"],
+                    "response_data" : json.encode(wrapListMap)
+                  };
+                  docResultList.add(eachMap);
+                }
+              }else{
+                if(resultMap is List<dynamic>){
+                  Map<String, dynamic> eachMap = {
+                    "pr_document_id" : each["id"],
+                    "response_data" : json.encode(resultMap)
+                  };
+                  docResultList.add(eachMap);
+                }else{
+                  Map<String, dynamic> eachMap = {
+                    "pr_document_id" : each["id"],
+                    "response_data" : resultMap
+                  };
+                  docResultList.add(eachMap);
                 }
               }
-              String address = _getResultFromListById(addressId)["resultValue"];
-              Map<String, dynamic> applyInputMap = {
-                "offer_id": MyData.selectedPrInfoData!.productOfferId,
-                "offer_rid": MyData.selectedPrInfoData!.productOfferRid,
-                "lender_pr_id": MyData.selectedPrInfoData!.productOfferLenderPrId,
-                "address": address,
-                "contact_no1": MyData.phoneNumber.substring(0,3),
-                "contact_no2": MyData.phoneNumber.substring(3,7),
-                "contact_no3": MyData.phoneNumber.substring(7),
-                "jumin_no1": MyData.idNumber.split("-")[0],
-                "jumin_no2": MyData.idNumber.split("-")[1],
-                "memo": '모바일 신청',
-                "documents": docResultList
-              };
+            }
+          }
+          String address = _getResultFromListById(addressId)["resultValue"];
+          Map<String, dynamic> applyInputMap = {
+            "offer_id": MyData.selectedPrInfoData!.productOfferId,
+            "offer_rid": MyData.selectedPrInfoData!.productOfferRid,
+            "lender_pr_id": MyData.selectedPrInfoData!.productOfferLenderPrId,
+            "address": address,
+            "contact_no1": MyData.phoneNumber.substring(0,3),
+            "contact_no2": MyData.phoneNumber.substring(3,7),
+            "contact_no3": MyData.phoneNumber.substring(7),
+            "jumin_no1": MyData.idNumber.split("-")[0],
+            "jumin_no2": MyData.idNumber.split("-")[1],
+            "memo": '모바일 신청',
+            "documents": docResultList
+          };
 
-              LogfinController.callLogfinApi(LogfinApis.applyProduct, applyInputMap, (isSuccess, outputJson){
+          LogfinController.callLogfinApi(LogfinApis.applyProduct, applyInputMap, (isSuccess, outputJson){
+            UiUtils.closeLoadingPop(context);
+            if(isSuccess){
+              LogfinController.getLoanInfo((isSuccessToGetLoanInfo, isNotEmpty){
                 UiUtils.closeLoadingPop(context);
-                if(isSuccess){
-                  LogfinController.getLoanInfo((isSuccessToGetLoanInfo, isNotEmpty){
-                    UiUtils.closeLoadingPop(context);
-                    if(isSuccessToGetLoanInfo){
-                      if(isNotEmpty){
-                        nextInputView();
-                      }else{
-                        CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
-                      }
-                    }
-                  });
-                }else{
-                  CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
+                if(isSuccessToGetLoanInfo){
+                  if(isNotEmpty){
+                    nextInputView();
+                  }else{
+                    CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
+                  }
                 }
               });
             }else{
-              UiUtils.closeLoadingPop(context);
               CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
             }
           });
         }else{
-
+          UiUtils.closeLoadingPop(context);
+          CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
         }
-      })
-    ]);
+      });
+    }
   }
   /// finish view end
 
