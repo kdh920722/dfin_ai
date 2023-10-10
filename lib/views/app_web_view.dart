@@ -49,7 +49,7 @@ class AppWebViewState extends State<AppWebView> {
                 ),
               ),
               onLoadStop: (InAppWebViewController controller, uri) {
-                CommonUtils.log("i", "UPDATED URL CHECK : $uri");
+                CommonUtils.log("i", "UPDATED URL CHECK URL: $uri");
                 setState(() {
                   myUrl = uri!;
                   if(LogfinController.niceSuccessUrl == myUrl.toString()){
