@@ -1,8 +1,9 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
-import 'package:sizer/sizer.dart';
+import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:upfin/datas/my_data.dart';
 import '../configs/app_config.dart';
 import '../styles/ColorStyles.dart';
@@ -33,16 +34,41 @@ class SnsLoginController{
   static const String kakaoKey = "077c95950e4c99aefd181d2cd069524a";
   static String kakaoToken = "";
   static String kakaoId = "";
+  static String appleUrl = "";
+  static String appleServiceId = "";
+  static String appleToken = "";
+  static String appleId = "";
 
   static Future<void> initKakao(Function(bool) callback) async {
     try {
       KakaoSdk.init(nativeAppKey: kakaoKey);
       var key = await KakaoSdk.origin;
       CommonUtils.log("I", "kakao init hash key : $key");
-      loginPlatform = LoginPlatform.kakao;
       callback(true);
     } catch (e) {
       CommonUtils.log("e", "kakao init error : ${e.toString()}");
+      callback(false);
+    }
+  }
+
+  static Future<void> initApple(Function(bool) callback) async {
+    try {
+      final ref = FirebaseDatabase.instance.ref();
+      final snapshot = await ref.child('UPFIN/API/clova').get();
+      if (snapshot.exists) {
+        for(var each in snapshot.children){
+          switch(each.key){
+            case "redirect_url" : appleUrl = each.value.toString();
+            case "service_id" : appleServiceId = each.value.toString();
+          }
+        }
+
+        callback(true);
+      } else {
+        callback(false);
+      }
+    } catch (e) {
+      CommonUtils.log("e", "apple init error : ${e.toString()}");
       callback(false);
     }
   }
@@ -51,6 +77,7 @@ class SnsLoginController{
     return UiUtils.getImageButton(Image.asset('assets/images/logo_kakao_circle.png', fit: BoxFit.fill), size, ColorStyles.upFinBlack, () async {
       if(Config.isControllerLoadFinished){
         UiUtils.showLoadingPop(context);
+        loginPlatform = LoginPlatform.kakao;
         await SnsLoginController._kakaoLogin((bool isSuccess) async {
           UiUtils.closeLoadingPop(context);
           if(isSuccess){
@@ -59,16 +86,20 @@ class SnsLoginController{
               callback(true);
             }else{
               CommonUtils.flutterToast("회원가입이 필요합니다.");
+              MyData.isSnsLogin = false;
+              loginPlatform = LoginPlatform.none;
               callback(false);
             }
           }else{
             MyData.isSnsLogin = false;
             CommonUtils.flutterToast("${SnsLoginController.loginPlatform.value}로그인에 실패했습니다.");
+            loginPlatform = LoginPlatform.none;
             callback(false);
           }
         });
       }else{
         CommonUtils.flutterToast("데이터 로딩 실패\n다시 실행 해 주세요.");
+        loginPlatform = LoginPlatform.none;
         callback(null);
       }
     });
@@ -77,25 +108,42 @@ class SnsLoginController{
   static Widget getAppleLoginButton(BuildContext context, double size, Function(bool? isSuccessToLogin) callback){
     return UiUtils.getImageButton(Image.asset('assets/images/logo_apple_circle.png', fit: BoxFit.fill), size, ColorStyles.upFinBlack, () async {
       if(Config.isControllerLoadFinished){
-        UiUtils.showLoadingPop(context);
-        await SnsLoginController._kakaoLogin((bool isSuccess) async {
-          UiUtils.closeLoadingPop(context);
-          if(isSuccess){
-            MyData.isSnsLogin = true;
-            if(await _isMemberFromSns()){
-              callback(true);
-            }else{
-              CommonUtils.flutterToast("회원가입이 필요합니다.");
-              callback(false);
-            }
+        try{
+          UiUtils.showLoadingPop(context);
+          loginPlatform = LoginPlatform.apple;
+          final AuthorizationCredentialAppleID credential = await SignInWithApple.getAppleIDCredential(
+            scopes: [
+              AppleIDAuthorizationScopes.email,
+              AppleIDAuthorizationScopes.fullName,
+            ],
+            webAuthenticationOptions: WebAuthenticationOptions(
+              clientId: appleServiceId,
+              redirectUri: Uri.parse(appleUrl),
+            ),
+          );
+          MyData.isSnsLogin = true;
+          appleToken = credential.identityToken!;
+          appleId = credential.userIdentifier!;
+          _setUserInfoFromApple(credential);
+          if(await _isMemberFromSns()){
+            callback(true);
           }else{
+            CommonUtils.flutterToast("회원가입이 필요합니다.");
             MyData.isSnsLogin = false;
-            CommonUtils.flutterToast("${SnsLoginController.loginPlatform.value}로그인에 실패했습니다.");
+            loginPlatform = LoginPlatform.none;
             callback(false);
           }
-        });
+        }catch(e){
+          UiUtils.closeLoadingPop(context);
+          MyData.isSnsLogin = false;
+          CommonUtils.flutterToast("${SnsLoginController.loginPlatform.value}로그인에 실패했습니다.");
+          loginPlatform = LoginPlatform.none;
+          callback(false);
+        }
       }else{
         CommonUtils.flutterToast("데이터 로딩 실패\n다시 실행 해 주세요.");
+        MyData.isSnsLogin = false;
+        loginPlatform = LoginPlatform.none;
         callback(null);
       }
     });
@@ -181,6 +229,25 @@ class SnsLoginController{
     }
   }
 
+  static void _setUserInfoFromApple(AuthorizationCredentialAppleID user) async {
+    String fName = "";
+    if(user.familyName != null){
+      fName = user.familyName!;
+    }
+    String gName = "";
+    if(user.givenName != null){
+      gName = user.givenName!;
+    }
+    String email = "";
+    if(user.email != null){
+      email = user.email!;
+    }
+    MyData.nameFromSns = fName + gName;
+    MyData.emailFromSns = email;
+    MyData.phoneNumberFromSns = "";
+  }
+
+
   static void _setUserInfoFromKakao(User user) async {
     MyData.nameFromSns = user.kakaoAccount!.name!;
     MyData.emailFromSns = user.kakaoAccount!.email!;
@@ -197,7 +264,8 @@ class SnsLoginController{
         token = SnsLoginController.kakaoToken;
         id = SnsLoginController.kakaoId;
       }else{
-
+        token = appleToken;
+        id = appleId;
       }
 
       Map<String, String> inputJson = {

@@ -90,9 +90,9 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
     });
   }
 
-  Future<void> _initGPT() async {
+  void _initGPT() {
     // init
-    await GptController.initGPT((bool isSuccess){
+    GptController.initGPT((bool isSuccess){
       if(isSuccess){
         GetController.to.updatePercent(10);
         CommonUtils.log("i", "gpt key : ${GptController.gptApiKey}");
@@ -108,12 +108,12 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
     });
   }
 
-  Future<void> _initCodeF() async {
+  void _initCodeF() {
     // set host : prod or dev
     CodeFController.setHostStatus(HostStatus.prod);
 
     // init
-    await CodeFController.initAccessToken((bool isSuccess){
+    CodeFController.initAccessToken((bool isSuccess){
       if(isSuccess){
         GetController.to.updatePercent(20);
         CommonUtils.log("i", "codef token : ${CodeFController.token}");
@@ -129,9 +129,9 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
     });
   }
 
-  Future<void> _initJuso() async {
+  void _initJuso() {
     // init
-    await JusoController.initJuso((bool isSuccess){
+    JusoController.initJuso((bool isSuccess){
       if(isSuccess){
         GetController.to.updatePercent(10);
         CommonUtils.log("i", "juso token : ${JusoController.confirmKey}");
@@ -147,9 +147,9 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
     });
   }
 
-  Future<void> _initCLOVA() async {
+  void _initCLOVA() {
     // init
-    await CLOVAController.initCLOVA((bool isSuccess){
+    CLOVAController.initCLOVA((bool isSuccess){
       if(isSuccess){
         GetController.to.updatePercent(10);
         CommonUtils.log("i", "clova url : ${CLOVAController.apiURL}\nclova secretKey : ${CLOVAController.secretKey}");
@@ -165,9 +165,9 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
     });
   }
 
-  Future<void> _initAWS() async {
+  void _initAWS() {
     // init
-    await AwsController.initAWS((bool isSuccess){
+    AwsController.initAWS((bool isSuccess){
       if(isSuccess){
         GetController.to.updatePercent(10);
         CommonUtils.log("i", "aws keys : ${AwsController.awsAccessKey}\naws secretKey : ${AwsController.awsSecretKey}");
@@ -183,9 +183,9 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
     });
   }
 
-  Future<void> _initLogfin() async {
+  void _initLogfin() {
     // init
-    await LogfinController.initLogfin((bool isSuccess){
+    LogfinController.initLogfin((bool isSuccess){
       if(isSuccess){
         GetController.to.updatePercent(10);
         CommonUtils.log("i", "logfin url : ${LogfinController.url}");
@@ -204,9 +204,9 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
     });
   }
 
-  Future<void> _initHyphen() async {
+  void _initHyphen() {
     // init
-    await HyphenController.initHyphen((bool isSuccess){
+    HyphenController.initHyphen((bool isSuccess){
       if(isSuccess){
         GetController.to.updatePercent(10);
         CommonUtils.log("i", "hyphen url : ${HyphenController.url}\hyphen hKey : ${HyphenController.hkey}");
@@ -222,9 +222,9 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
     });
   }
 
-  Future<void> _initIamport() async {
+  void _initIamport() {
     // init
-    await IamportController.initIamport((bool isSuccess){
+    IamportController.initIamport((bool isSuccess){
       if(isSuccess){
         GetController.to.updatePercent(10);
         CommonUtils.log("i", "iamport user_code : ${IamportController.iamportUserCode}");
@@ -240,11 +240,11 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
     });
   }
 
-  Future<void> _initKakao() async {
+  void _initSnsLogin() {
     // init
-    await SnsLoginController.initKakao((bool isSuccess){
+    SnsLoginController.initKakao((bool isSuccess){
       if(isSuccess){
-        GetController.to.updatePercent(20);
+        GetController.to.updatePercent(10);
         CommonUtils.log("i", "kakao key : ${SnsLoginController.kakaoKey}");
         CommonUtils.log("i", "percent : ${GetController.to.loadingPercent.value}");
         if(GetController.to.loadingPercent.value == 100){
@@ -253,7 +253,21 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
           });
         }
       }else{
-        CommonUtils.flutterToast("iamport init 에러가 발생했습니다.");
+        CommonUtils.flutterToast("kakao init 에러가 발생했습니다.");
+      }
+    });
+
+    SnsLoginController.initApple((bool isSuccess){
+      if(isSuccess){
+        GetController.to.updatePercent(10);
+        CommonUtils.log("i", "apple url : ${SnsLoginController.appleUrl}");
+        if(GetController.to.loadingPercent.value == 100){
+          setState(() {
+            Config.isControllerLoadFinished = true;
+          });
+        }
+      }else{
+        CommonUtils.flutterToast("apple url init 에러가 발생했습니다.");
       }
     });
   }
@@ -353,7 +367,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
       _initLogfin(); // count aa
       _initHyphen(); // count
       _initIamport(); // count aa
-      _initKakao(); // count aa
+      _initSnsLogin(); // count aa
     }else{
       if(context.mounted){
         UiUtils.showSlideMenu(context, SlideType.bottomToTop, false, 100.w, 30.h, 0.5, (context, setState){

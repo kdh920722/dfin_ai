@@ -214,7 +214,8 @@ class CommonUtils {
   }
 
   static void flutterToast(String msgString){
-    Fluttertoast.showToast(msg: msgString, gravity: ToastGravity.BOTTOM, backgroundColor: ColorStyles.upFinDarkGray, fontSize: 20, textColor: Colors.white, toastLength: Toast.LENGTH_SHORT);
+    Fluttertoast.showToast(msg: msgString, gravity: ToastGravity.BOTTOM, backgroundColor: ColorStyles.upFinDarkGray,
+        fontSize: 15, textColor: Colors.white, toastLength: Toast.LENGTH_SHORT);
   }
 
   static Size _getSize(GlobalKey key) {

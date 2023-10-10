@@ -444,6 +444,25 @@ class UiUtils {
     );
   }
 
+  static InputDecoration getChatInputDecoration(){
+    return InputDecoration(
+        floatingLabelBehavior: FloatingLabelBehavior.never,
+        labelStyle: TextStyle(fontSize: 0.sp),
+        errorStyle: TextStyle(fontSize: 0.sp),
+        counterStyle: TextStyle(fontSize: 0.sp),
+        enabledBorder: UnderlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: ColorStyles.upFinButtonBlue),
+        ),
+        focusedBorder: UnderlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: ColorStyles.upFinButtonBlue),
+        ),
+        filled: true,
+        fillColor: ColorStyles.upFinWhite
+    );
+  }
+
   static bool isLoadingPopOn = false;
   static void showLoadingPop(BuildContext targetContext){
     if(!isLoadingPopOn){

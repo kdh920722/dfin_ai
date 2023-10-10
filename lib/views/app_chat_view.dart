@@ -70,12 +70,12 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
               UiUtils.getImage(10.w, 10.w, Image.asset(fit: BoxFit.fitWidth,'assets/images/chatbot_icon.png')),
               UiUtils.getMarginBox(2.w, 0),
               Column(children: [
-                UiUtils.getMarginBox(0, 2.h),
+                UiUtils.getMarginBox(0, 2.5.h),
                 Container(
                     padding: EdgeInsets.all(3.w),
                     decoration: const BoxDecoration(
                       borderRadius: BorderRadius.only(topRight: Radius.circular(15), bottomRight: Radius.circular(15), bottomLeft: Radius.circular(15)),
-                      color: ColorStyles.upFinSky,
+                      color: ColorStyles.upFinWhiteSky,
                     ),
                     width: 70.w,
                     child: UiUtils.getTextWithFixedScale("테스트 데이터 인풋입니다.테스트 데이터 인풋입니다.테스트 데이터 인풋입니다.테스트 데이터 인풋입니다.테스트 데이터 인풋입니다.테스트 데이터 인풋입니다.테스트 데이터 인풋입니다.테스트 데이터 인풋입니다.테스트 데이터 인풋입니다.",
@@ -93,12 +93,12 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
               UiUtils.getImage(10.w, 10.w, Image.asset(fit: BoxFit.fitWidth,'assets/images/chatbot_icon.png')),
               UiUtils.getMarginBox(2.w, 0),
               Column(children: [
-                UiUtils.getMarginBox(0, 2.h),
+                UiUtils.getMarginBox(0, 2.5.h),
                 Container(
                     padding: EdgeInsets.all(3.w),
                     decoration: const BoxDecoration(
                       borderRadius: BorderRadius.only(topRight: Radius.circular(15), bottomRight: Radius.circular(15), bottomLeft: Radius.circular(15)),
-                      color: ColorStyles.upFinSky,
+                      color: ColorStyles.upFinWhiteSky,
                     ),
                     width: 70.w,
                     child: Column(children: [
@@ -158,43 +158,47 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
           UiUtils.getExpandedScrollViewWithController(Axis.vertical, Column(mainAxisAlignment: MainAxisAlignment.start, children: _getChatList()), _chatScrollController),
 
           AnimatedContainer(
-              duration: const Duration(milliseconds: 400),
+              duration: const Duration(milliseconds:300),
               width: 100.w,
               height: inputHeight,
               constraints: BoxConstraints(
                 minHeight: inputMinHeight,
                 maxHeight: inputMaxHeight,
               ),
-              color: ColorStyles.upFinButtonBlue,
-              child: Column(children: [
-                UiUtils.getMarginBox(0, 0.7.h),
-                Row(mainAxisAlignment:MainAxisAlignment.center, children: [
-                  UiUtils.getMarginBox(2.w, 0),
-                  UiUtils.getChatTextField(84.w, TextStyles.upFinTextFormFieldTextStyle, _chatTextFocus, _chatTextController, TextInputType.multiline,
-                      UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (textValue) {
-                    if(textValue != ""){
-                      final textLinePainter = TextPainter(
-                        text: TextSpan(text: textValue, style: TextStyles.upFinTextFormFieldTextStyle),
-                        maxLines: null,
-                        textDirection: TextDirection.ltr,
-                      )..layout(minWidth: 0, maxWidth: 60.w);
+              color: ColorStyles.upFinSky,
+              child: Column(children: [UiUtils.getExpandedScrollView(Axis.vertical,
+                  Column(children: [
+                    UiUtils.getMarginBox(0, 0.7.h),
+                    Row(mainAxisAlignment:MainAxisAlignment.start, children: [
+                      UiUtils.getMarginBox(2.w, 0),
+                      UiUtils.getChatTextField(86.w, TextStyles.upFinTextFormFieldTextStyle, _chatTextFocus, _chatTextController, TextInputType.multiline,
+                          UiUtils.getChatInputDecoration(), (textValue) {
+                        if(textValue != ""){
+                          final textLinePainter = TextPainter(
+                            text: TextSpan(text: textValue, style: TextStyles.upFinTextFormFieldTextStyle),
+                            maxLines: null,
+                            textDirection: TextDirection.ltr,
+                          )..layout(minWidth: 0, maxWidth: 60.w);
 
-                      if(textLinePainter.width >= 59.w){
-                        final desiredHeight = inputMinHeight*0.7+textLinePainter.height;
-                        final height = desiredHeight.clamp(inputMinHeight, inputMaxHeight);
-                        setState(() {
-                          inputHeight = height;
-                        });
-                      }
-                    }else{
-                      setState(() {
-                        inputHeight = inputMinHeight;
-                      });
-                    }
-                  }),
-                  UiUtils.getIconButton(Icons.send_rounded, 10.w, ColorStyles.upFinWhite, () { })
+                          if(inputHeight <= 20.h){
+                            final desiredHeight = inputMinHeight*0.7+textLinePainter.height;
+                            final height = desiredHeight.clamp(inputMinHeight, inputMaxHeight);
+                            setState(() {
+                              inputHeight = height;
+                            });
+                          }
+                        }else{
+                          setState(() {
+                            inputHeight = inputMinHeight;
+                          });
+                        }
+                      }),
+                      UiUtils.getMarginBox(1.w, 0),
+                      UiUtils.getIconButton(Icons.send, 9.w, ColorStyles.upFinWhite, () { }),
+                      UiUtils.getMarginBox(2.w, 0),
                 ])
-              ]))
+              ]))])
+              )
         ])
     );
     return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
