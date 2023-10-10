@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
@@ -63,6 +64,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     }
   }
 
+  bool isScrolling = false;
   Widget _getMyView(){
     return Column(children: [
       UiUtils.getMarginBox(0, 2.h),
@@ -86,50 +88,72 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               _refreshMyView(context);
             })
           ])),
-      Expanded(child: ListView(shrinkWrap: true,physics: const BouncingScrollPhysics(),children: [
-        Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 2.h, bottom: 1.h), child: Row(mainAxisSize: MainAxisSize.max, children: [
-          UiUtils.getTextWithFixedScale("사건기록", 15.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, 1),
-          const Spacer(flex: 2)
-        ])),
-        Obx((){
-          List<Widget> accidentWidgetList = _getAccidentWidgetList();
-          return accidentWidgetList.isNotEmpty ? Column(children: accidentWidgetList)
-              : Column(children: [
-            UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinRealGray,
-                UiUtils.getTextWithFixedScale("사건기록이 없습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.center, null), () { })
-          ]);
-        }),
-        UiUtils.getMarginBox(0, 2.h),
-        Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 2.h, bottom: 1.h), child: Row(mainAxisSize: MainAxisSize.max, children: [
-          UiUtils.getTextWithFixedScale("접수내역", 15.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, 1),
-          const Spacer(flex: 2)
-        ])),
-        Obx((){
-          List<Widget> loanWidgetList = _getLoanChatWidgetList();
-          return loanWidgetList.isNotEmpty ? Column(children: loanWidgetList)
-              : Column(children: [
-            UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinRealGray,
-                UiUtils.getTextWithFixedScale("접수내역이 없습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.center, null), () { })
-          ]);
-        }),
-        UiUtils.getMarginBox(0, 4.h),
-        Stack(alignment: Alignment.center, children: [
-          Positioned(
-              child: UiUtils.getBannerButtonBox(90.w, 50.w, ColorStyles.upFinBannerSky, ColorStyles.upFinBannerSky,
-                  Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale("빠르고", 25.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, 1)),
-                    UiUtils.getMarginBox(0, 1.h),
-                    SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale("쉽게", 25.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, 1)),
-                    UiUtils.getMarginBox(0, 1.h),
-                    SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale("대출받자!", 25.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, 1)),
-                  ]), () {
-              })),
-          Positioned(
-              right: 1.w,
-              child: UiUtils.getImage(60.w, 60.w, Image.asset(fit: BoxFit.fill,'assets/images/img_woman_sports.png'))),
-        ]),
-        UiUtils.getMarginBox(0, 5.h),
-      ])),
+      Expanded(child: NotificationListener<ScrollNotification>(
+          onNotification: (scrollNotification) {
+            if (scrollNotification is ScrollUpdateNotification) {
+              if(!isScrolling){
+                isScrolling = true;
+                setState(() {
+                  bottomBarHeight = 0;
+                });
+              }
+              print('스크롤 위치: ${scrollNotification.metrics.pixels}');
+            } else if (scrollNotification is ScrollEndNotification) {
+              if(isScrolling){
+                isScrolling = false;
+                setState(() {
+                  bottomBarHeight = 7.h;
+                });
+              }
+              print('스크롤이 멈춤');
+            }
+            return true;
+          },
+          child: ListView(shrinkWrap: true,physics: const BouncingScrollPhysics(),children: [
+            Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 4.h, bottom: 1.h), child: Row(mainAxisSize: MainAxisSize.max, children: [
+              UiUtils.getTextWithFixedScale("사건기록", 15.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, 1),
+              const Spacer(flex: 2)
+            ])),
+            Obx((){
+              List<Widget> accidentWidgetList = _getAccidentWidgetList();
+              return accidentWidgetList.isNotEmpty ? Column(children: accidentWidgetList)
+                  : Column(children: [
+                UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinRealGray,
+                    UiUtils.getTextWithFixedScale("사건기록이 없습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.center, null), () { })
+              ]);
+            }),
+            UiUtils.getMarginBox(0, 2.h),
+            Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 2.h, bottom: 1.h), child: Row(mainAxisSize: MainAxisSize.max, children: [
+              UiUtils.getTextWithFixedScale("접수내역", 15.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, 1),
+              const Spacer(flex: 2)
+            ])),
+            Obx((){
+              List<Widget> loanWidgetList = _getLoanChatWidgetList();
+              return loanWidgetList.isNotEmpty ? Column(children: loanWidgetList)
+                  : Column(children: [
+                UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinRealGray,
+                    UiUtils.getTextWithFixedScale("접수내역이 없습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.center, null), () { })
+              ]);
+            }),
+            UiUtils.getMarginBox(0, 4.h),
+            Stack(alignment: Alignment.center, children: [
+              Positioned(
+                  child: UiUtils.getBannerButtonBox(90.w, 50.w, ColorStyles.upFinBannerSky, ColorStyles.upFinBannerSky,
+                      Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                        SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale("빠르고", 25.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, 1)),
+                        UiUtils.getMarginBox(0, 1.h),
+                        SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale("쉽게", 25.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, 1)),
+                        UiUtils.getMarginBox(0, 1.h),
+                        SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale("대출받자!", 25.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, 1)),
+                      ]), () {
+                      })),
+              Positioned(
+                  right: 1.w,
+                  child: UiUtils.getImage(60.w, 60.w, Image.asset(fit: BoxFit.fill,'assets/images/img_woman_sports.png'))),
+            ]),
+            UiUtils.getMarginBox(0, 5.h),
+          ])
+      )),
 
     ]);
   }
@@ -185,7 +209,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                           UiUtils.getMarginBox(2.w, 0),
                           Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                             UiUtils.getTextWithFixedScale(each.chatRoomTitle, 12.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null),
-                            UiUtils.getMarginBox(0, 0.2.h),
+                            UiUtils.getMarginBox(0, 0.5.h),
                             each.chatRoomType != 0? UiUtils.getTextWithFixedScale(each.chatRoomSubTitle, 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null) : Container(),
                           ])
                         ])),
@@ -375,6 +399,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     );
   }
 
+  double bottomBarHeight = 7.h;
   @override
   Widget build(BuildContext context) {
     Widget view = Stack(
@@ -382,17 +407,18 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
         Positioned(
           child: Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, child: Column(children: [
             Expanded(child: viewTypeId == 1? _getApplyView() : viewTypeId == 2? _getMyView() : _getSettingView()),
-            SizedBox(width: 100.w, height: 7.h, child: Row(mainAxisAlignment: MainAxisAlignment.center, mainAxisSize: MainAxisSize.max, children: [
-              GestureDetector(child: Container(width: 30.w, height: 7.h, color: ColorStyles.upFinWhiteSky,
+            AnimatedContainer(width: 100.w, height: bottomBarHeight, duration: const Duration(milliseconds:100),
+            child: Row(mainAxisAlignment: MainAxisAlignment.center, mainAxisSize: MainAxisSize.max, children: [
+              GestureDetector(child: Container(width: 30.w, color: ColorStyles.upFinWhiteSky,
                   child: Center(child: UiUtils.getTextButtonWithFixedScale("대출", 13.sp, viewTypeId == 1? FontWeight.w800 : FontWeight.w300,
                       viewTypeId == 1? ColorStyles.upFinButtonBlue : ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1,(){setState(() {viewTypeId = 1;});}))),onTap: (){
                 setState(() {viewTypeId = 1;});
               }),
-              GestureDetector(child: Container(width: 40.w, height: 7.h, color: ColorStyles.upFinWhiteSky,
+              GestureDetector(child: Container(width: 40.w, color: ColorStyles.upFinWhiteSky,
                   child: Center(child: UiUtils.getTextButtonWithFixedScale("MY", 13.sp, viewTypeId == 2? FontWeight.w800 : FontWeight.w300,
                       viewTypeId == 2? ColorStyles.upFinButtonBlue : ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1,(){setState(() {viewTypeId = 2;});}))
               ), onTap: () {setState(() {viewTypeId = 2;});}),
-              GestureDetector(child: Container(width: 30.w, height: 7.h, color: ColorStyles.upFinWhiteSky,
+              GestureDetector(child: Container(width: 30.w, color: ColorStyles.upFinWhiteSky,
                   child: Center(child: UiUtils.getTextButtonWithFixedScale("설정", 13.sp, viewTypeId == 3? FontWeight.w800 : FontWeight.w300,
                       viewTypeId == 3? ColorStyles.upFinButtonBlue : ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1,(){setState(() {viewTypeId = 3;});}))
               ), onTap: (){ setState(() {viewTypeId = 3;});}),

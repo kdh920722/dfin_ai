@@ -18,6 +18,18 @@ class AppSearchAccidentView extends StatefulWidget{
 }
 
 class AppSearchAccidentViewState extends State<AppSearchAccidentView> with WidgetsBindingObserver{
+  double scrollScreenHeight = 57.h;
+  double itemHeight1 = 0;
+  double itemHeight2 = 0;
+  double itemFullHeight1 = 0;
+  double itemFullHeight2 = 0;
+  int maxVisibleItemCnt1 = 0;
+  int maxVisibleItemCnt2 = 0;
+  int firstVisibleItem1 = 0;
+  int lastVisibleItem1 = 0;
+  bool isScrolling1 = false;
+  bool isScrolling2= false;
+
   bool isInputValid = true;
 
   final String errorMsg = "정보를 입력해주세요";
@@ -159,9 +171,14 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
     _bankAccountInfoTextController.addListener(_bankAccountInfoTextControllerListener);
     _preLoanPriceTextController.addListener(_preLoanPriceInfoTextControllerListener);
     _wantLoanPriceTextController.addListener(_wantLoanPriceInfoTextControllerListener);
+
     _checkView();
     GetController.to.resetPreLoanPrice();
     GetController.to.resetWantLoanPrice();
+    GetController.to.resetFirstIndex1();
+    GetController.to.resetLastIndex1();
+    GetController.to.resetFirstIndex2();
+    GetController.to.resetLastIndex2();
   }
 
   @override
@@ -226,13 +243,29 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
   Widget _getCourtView(){
     List<Widget> courtList = [];
     Color textColor = ColorStyles.upFinBlack;
-    for(var each in LogfinController.courtList){
-      Key key = Key(each);
-      if(selectedCourtKey == key) {
+    for(int i=0; i<LogfinController.courtList.length ; i++){
+      Key key = Key(LogfinController.courtList[i]);
+      if(selectedCourtKey == key){
         textColor = ColorStyles.upFinTextAndBorderBlue;
-      }
-      else{
+      }else{
         textColor = ColorStyles.upFinBlack;
+        if(GetController.to.firstVisibleItem1.value >= 3){
+          if(GetController.to.firstVisibleItem1.value-2 <= i && i <= GetController.to.firstVisibleItem1.value+1){
+            textColor = Colors.black12;
+            if(GetController.to.firstVisibleItem1.value+1 <= i && i <= GetController.to.firstVisibleItem1.value+1){
+              textColor = Colors.black38;
+            }
+          }
+        }
+
+        if(GetController.to.lastVisibleItem1.value <= LogfinController.courtList.length-3){
+          if(GetController.to.lastVisibleItem1.value-3 <= i && i <= GetController.to.lastVisibleItem1.value-1){
+            textColor = Colors.black12;
+            if(GetController.to.lastVisibleItem1.value-3 <= i && i <= GetController.to.lastVisibleItem1.value-3){
+              textColor = Colors.black38;
+            }
+          }
+        }
       }
       courtList.add(
           SizedBox(width: 90.w,
@@ -243,7 +276,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                     if(checkedValue != null){
                       if(checkedValue) {
                         selectedCourtKey = key;
-                        selectedCourtInfo = each;
+                        selectedCourtInfo = LogfinController.courtList[i];
                       }
                     }
                   });
@@ -253,17 +286,18 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                         if(checkedValue != null){
                           if(!checkedValue) {
                             selectedCourtKey = key;
-                            selectedCourtInfo = each;
+                            selectedCourtInfo = LogfinController.courtList[i];
                           }
                         }
                       });
                     }),
-                UiUtils.getTextButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.center, null, (){
+                UiUtils.getTextButtonWithFixedScale(LogfinController.courtList[i].split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.center, null, (){
                   setState(() {
                     selectedCourtKey = key;
-                    selectedCourtInfo = each;
+                    selectedCourtInfo = LogfinController.courtList[i];
                   });
                 })
+
               ])
           )
       );
@@ -279,7 +313,36 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("개인회생 사건정보", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("법원을 선택해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: courtList)),
+      NotificationListener<ScrollNotification>(
+          onNotification: (scrollNotification) {
+            if (scrollNotification is ScrollUpdateNotification) {
+              if(!isScrolling1){
+                isScrolling1 = true;
+                itemFullHeight1 = scrollNotification.metrics.maxScrollExtent+scrollScreenHeight;
+                itemHeight1 = itemFullHeight1/LogfinController.courtList.length;
+                maxVisibleItemCnt1 = (scrollScreenHeight/itemHeight1).ceil();
+              }
+
+              double scrollPosition = scrollNotification.metrics.pixels.abs();
+              int firstVisibleItem1 = (scrollPosition/itemHeight1).ceil();
+              int lastVisibleItem1 = firstVisibleItem1+maxVisibleItemCnt1;
+              if(firstVisibleItem1 <=0 ) firstVisibleItem1 = 0;
+              if(lastVisibleItem1 >= LogfinController.courtList.length-1) lastVisibleItem1 = LogfinController.courtList.length-1;
+              print('보이는 아이템 ====> ${LogfinController.courtList.length} : $firstVisibleItem1 | $lastVisibleItem1');
+
+              GetController.to.updateFirstIndex1(firstVisibleItem1);
+              GetController.to.updateLastIndex1(lastVisibleItem1);
+            } else if (scrollNotification is ScrollEndNotification) {
+              if(isScrolling1){
+                isScrolling1 = false;
+                itemFullHeight1 = scrollNotification.metrics.maxScrollExtent+scrollScreenHeight;
+                itemHeight1 = scrollNotification.metrics.maxScrollExtent/LogfinController.courtList.length;
+                maxVisibleItemCnt1 = (scrollScreenHeight/itemHeight1).ceil();
+              }
+            }
+            return true;
+          },
+          child: UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: courtList))),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
         CommonUtils.log("i", "court : $selectedCourtInfo");
@@ -346,13 +409,29 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
   Widget _getBankCodeView(){
     List<Widget> bankCodeList = [];
     Color textColor = ColorStyles.upFinBlack;
-    for(var each in LogfinController.bankList){
-      Key key = Key(each);
-      if(selectedBankCodeKey == key) {
+    for(int i=0 ; i<LogfinController.bankList.length ; i++){
+      Key key = Key(LogfinController.bankList[i]);
+      if(selectedBankCodeKey == key){
         textColor = ColorStyles.upFinTextAndBorderBlue;
-      }
-      else{
+      }else{
         textColor = ColorStyles.upFinBlack;
+        if(GetController.to.firstVisibleItem2.value >= 3){
+          if(GetController.to.firstVisibleItem2.value-2 <= i && i <= GetController.to.firstVisibleItem2.value+1){
+            textColor = Colors.black12;
+            if(GetController.to.firstVisibleItem2.value+1 <= i && i <= GetController.to.firstVisibleItem2.value+1){
+              textColor = Colors.black38;
+            }
+          }
+        }
+
+        if(GetController.to.lastVisibleItem2.value <= LogfinController.bankList.length-3){
+          if(GetController.to.lastVisibleItem2.value-3 <= i && i <= GetController.to.lastVisibleItem2.value-1){
+            textColor = Colors.black12;
+            if(GetController.to.lastVisibleItem2.value-3 <= i && i <= GetController.to.lastVisibleItem2.value-3){
+              textColor = Colors.black38;
+            }
+          }
+        }
       }
       bankCodeList.add(
           SizedBox(width: 90.w,
@@ -363,7 +442,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                         if(checkedValue != null){
                           if(checkedValue) {
                             selectedBankCodeKey = key;
-                            selectedBankCodeInfo = each;
+                            selectedBankCodeInfo = LogfinController.bankList[i];
                           }
                         }
                       });
@@ -373,15 +452,15 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                         if(checkedValue != null){
                           if(!checkedValue) {
                             selectedBankCodeKey = key;
-                            selectedBankCodeInfo = each;
+                            selectedBankCodeInfo = LogfinController.bankList[i];
                           }
                         }
                       });
                     }),
-                UiUtils.getTextButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.center, null, (){
+                UiUtils.getTextButtonWithFixedScale(LogfinController.bankList[i].split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.center, null, (){
                   setState(() {
                     selectedBankCodeKey = key;
-                    selectedBankCodeInfo = each;
+                    selectedBankCodeInfo = LogfinController.bankList[i];
                   });
                 })
               ])
@@ -401,7 +480,36 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       UiUtils.getMarginBox(0, 1.h),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("개인회생 신청 시 제출했던 본인의 계좌", 14.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: bankCodeList)),
+      NotificationListener<ScrollNotification>(
+          onNotification: (scrollNotification) {
+            if (scrollNotification is ScrollUpdateNotification) {
+              if(!isScrolling2){
+                isScrolling2 = true;
+                itemFullHeight2 = scrollNotification.metrics.maxScrollExtent+scrollScreenHeight;
+                itemHeight2 = itemFullHeight2/LogfinController.bankList.length;
+                maxVisibleItemCnt2 = (scrollScreenHeight/itemHeight2).ceil();
+              }
+
+              double scrollPosition = scrollNotification.metrics.pixels.abs();
+              int firstVisibleItem2 = (scrollPosition/itemHeight2).ceil();
+              int lastVisibleItem2 = firstVisibleItem2+maxVisibleItemCnt2;
+              if(firstVisibleItem2 <=0 ) firstVisibleItem2 = 0;
+              if(lastVisibleItem2 >= LogfinController.bankList.length-1) lastVisibleItem2 = LogfinController.bankList.length-1;
+              print('보이는 아이템 ====> ${LogfinController.bankList.length} : $firstVisibleItem2 | $lastVisibleItem2');
+
+              GetController.to.updateFirstIndex2(firstVisibleItem2);
+              GetController.to.updateLastIndex2(lastVisibleItem2);
+            } else if (scrollNotification is ScrollEndNotification) {
+              if(isScrolling2){
+                isScrolling2 = false;
+                itemFullHeight2 = scrollNotification.metrics.maxScrollExtent+scrollScreenHeight;
+                itemHeight2 = scrollNotification.metrics.maxScrollExtent/LogfinController.bankList.length;
+                maxVisibleItemCnt2 = (scrollScreenHeight/itemHeight2).ceil();
+              }
+            }
+            return true;
+          },
+          child: UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: bankCodeList))),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
         CommonUtils.log("i", "bank code : $selectedBankCodeInfo");
@@ -922,11 +1030,11 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
     Widget? view;
 
     if(currentViewId == courtViewId){
-      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getCourtView());
+      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: Obx(()=>_getCourtView()));
     }else if(currentViewId == accidentViewId){
       view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getAccidentView());
     }else if(currentViewId == bankCodeViewId){
-      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getBankCodeView());
+      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: Obx(()=>_getBankCodeView()));
     }else if(currentViewId == bankAccountViewId){
       view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getBankAccountView());
     }else if(currentViewId == preLoanCountViewId){
