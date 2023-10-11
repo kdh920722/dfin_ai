@@ -179,6 +179,9 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
     GetController.to.resetLastIndex1();
     GetController.to.resetFirstIndex2();
     GetController.to.resetLastIndex2();
+
+    GetController.to.updateFirstIndex1(0);
+    GetController.to.updateLastIndex1(12);
   }
 
   @override

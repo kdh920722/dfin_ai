@@ -412,7 +412,7 @@ class UiUtils {
           style: ElevatedButton.styleFrom(
             padding: EdgeInsets.only(left: 4.w, right: 4.w, top: 4.w, bottom: 4.w),
             backgroundColor: buttonColor,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
             side: BorderSide(width: 1.3, color: borderColor),
             elevation: 0.0,
             shadowColor: ColorStyles.upFinGray,

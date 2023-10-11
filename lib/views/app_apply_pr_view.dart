@@ -3,16 +3,16 @@ import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sizer/sizer.dart';
 import 'package:upfin/configs/app_config.dart';
-import 'package:upfin/controllers/hyphen_controller.dart';
 import 'package:upfin/controllers/juso_controller.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
+import 'package:upfin/controllers/sharedpreference_controller.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import 'package:upfin/styles/TextStyles.dart';
+import 'package:velocity_x/velocity_x.dart';
 import '../controllers/aws_controller.dart';
 import '../controllers/clova_controller.dart';
 import '../controllers/codef_controller.dart';
@@ -20,9 +20,6 @@ import '../datas/api_info_data.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
 import 'dart:io';
-import 'dart:ui' as ui;
-import 'dart:typed_data';
-import 'package:image/image.dart' as img;
 
 class AppApplyPrView extends StatefulWidget{
   @override
@@ -102,13 +99,25 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   int certType = 0; //1: 카카오 인증, 6:네이버 인증, 5:PASS 인증
   int confirmedCertType = 0; //1: 카카오 인증, 6:네이버 인증, 5:PASS 인증
   final List<Map<String, dynamic>> addedDocsList = [];
+  List<Map<String, dynamic>> savedDocsList = [];
+  List<Map<String, dynamic>> unSavedDocsList = [];
+
   int gov24Count = 0;
   int nhisCount = 0;
   int ntsCount = 0;
 
   void _initDocsList(){
     int addedIndexId = currentViewId;
+
     if(!isReApply){
+      String savedValue = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceApplyPrKey);
+      if(savedValue != ""){
+        savedDocsList = List<Map<String, dynamic>>.from(jsonDecode(savedValue));
+        if(savedDocsList.isNotEmpty){
+          currentViewId = addedDocsInfoIntroViewId;
+        }
+      }
+
       Map<String, dynamic> cameraInfo = {
         "id" : 0,
         "name" : "",
@@ -275,6 +284,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     lastInfo["is_confirmed"] = false;
     addedDocsList.add(lastInfo);
 
+    /*
     if(!isReApply){
       addedIndexId++;
       Map<String, dynamic> niceInfo = {
@@ -292,6 +302,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       niceInfo["is_confirmed"] = false;
       addedDocsList.add(niceInfo);
     }
+     */
 
     addedIndexId++;
     Map<String, dynamic> confirmedInfo = {
@@ -322,6 +333,24 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     if(_isIdHereFromListById(6)) ntsCount++;
     if(_isIdHereFromListById(10)) ntsCount++;
     if(_isIdHereFromListById(11)) ntsCount++;
+
+    for(int addedDocIndex = 0 ; addedDocIndex < addedDocsList.length-1 ; addedDocIndex++){
+      if(addedDocsList[addedDocIndex]["id"] != 999 && addedDocsList[addedDocIndex]["id"] != 1000){
+        bool isSaved = false;
+        for(int savedDocIndex = 0 ; savedDocIndex < savedDocsList.length-1 ; savedDocIndex++){
+          if(addedDocsList[addedDocIndex]["id"] == savedDocsList[savedDocIndex]["id"]){
+            isSaved = true;
+          }
+        }
+
+        if(!isSaved){
+          unSavedDocsList.add(addedDocsList[addedDocIndex]);
+          CommonUtils.log("", "not saved id : ${addedDocsList[addedDocIndex]["id"]}");
+        }else{
+          CommonUtils.log("", "saved id : ${addedDocsList[addedDocIndex]["id"]}");
+        }
+      }
+    }
   }
   bool _isDocsAllConfirmed(String docsType){
     bool allConfirmed = true;
@@ -425,6 +454,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       }
     });
   }
+
 
   Future<void> _onTakePicture(BuildContext context) async {
     UiUtils.showLoadingPop(context);
@@ -549,47 +579,436 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       _unFocusAllNodes();
       CommonUtils.hideKeyBoard();
       await Future.delayed(const Duration(milliseconds: 120), () async {});
-      setState(() {
-        currentViewId++;
-        isInputValid = true;
-      });
+      bool isAllConfirmed = true;
+      for(var each in addedDocsList){
+        if(each["id"] != 999 && each["id"] != 1000 && each["view_id"] > currentViewId){
+          if(!each["is_confirmed"]) isAllConfirmed = false;
+        }
+      }
+      if(isAllConfirmed){
+        setState(() {
+          currentViewId = _getViewIdFromListById(lastId);
+          isInputValid = true;
+        });
+      }else{
+        setState(() {
+          currentViewId++;
+          isInputValid = true;
+        });
+      }
     }
+  }
+
+  bool _isSavedData(int targetId){
+    bool isSaved = true;
+    for(var each in unSavedDocsList){
+      if(each["id"] == targetId){
+        isSaved = false;
+      }
+    }
+
+    return isSaved;
+  }
+
+  String _getSavedData(int targetId){
+    String result = "";
+    for(var each in savedDocsList){
+      if(each["id"] == targetId){
+        result = each["result"]["resultValue"];
+      }
+    }
+
+    return result;
   }
 
   /// added info intro view
   Widget _getIntroView(){
-    List<Map<String, dynamic>> introList = addedDocsList;
+    for(var each in savedDocsList){
+      Map<String, dynamic> resultMap = each["result"];
+      CommonUtils.log("i", "saved check\n"
+          "view_id:${each["view_id"]}\n"
+          "id:${each["id"]}\n"
+          "name:${each["name"]}\n"
+          "is_confirmed:${each["is_confirmed"]}\n"
+          "is_docs:${each["is_docs"]}\n"
+          "docs_type:${each["docs_type"]}\n"
+          "result:${resultMap.isEmpty? "" : each["result"]["resultValue"]}\n"
+      );
+    }
+
+    for(var each in unSavedDocsList){
+      Map<String, dynamic> resultMap = each["result"];
+      CommonUtils.log("i", "unsaved check\n"
+          "view_id:${each["view_id"]}\n"
+          "id:${each["id"]}\n"
+          "name:${each["name"]}\n"
+          "is_confirmed:${each["is_confirmed"]}\n"
+          "is_docs:${each["is_docs"]}\n"
+          "docs_type:${each["docs_type"]}\n"
+          "result:${resultMap.isEmpty? "" : each["result"]["resultValue"]}\n"
+      );
+    }
+
+    for(var each in addedDocsList){
+      Map<String, dynamic> resultMap = each["result"];
+      CommonUtils.log("i", "addedDoc check\n"
+          "view_id:${each["view_id"]}\n"
+          "id:${each["id"]}\n"
+          "name:${each["name"]}\n"
+          "is_confirmed:${each["is_confirmed"]}\n"
+          "is_docs:${each["is_docs"]}\n"
+          "docs_type:${each["docs_type"]}\n"
+          "result:${resultMap.isEmpty? "" : each["result"]["resultValue"]}\n"
+      );
+    }
+
     List<Widget> introWidgetList = [];
-    for(int i = 0 ; i < introList.length-1 ; i++){
-      Key key = UniqueKey();
+
+    introWidgetList.add(
+        UiUtils.getMarginBox(0, 1.h)
+    );
+    introWidgetList.add(
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          SizedBox(width: 90.w, child: Row(children: [
+            UiUtils.getImage(12.w, 12.w, Image.asset(MyData.selectedPrInfoData!.productCompanyLogo)),
+            UiUtils.getMarginBox(3.w, 0),
+            Column(children: [
+              SizedBox(width: 75.w, child: UiUtils.getTextWithFixedScaleAndOverFlow(MyData.selectedPrInfoData!.productCompanyName, 15.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, 1)),
+              UiUtils.getMarginBox(0, 1.h),
+              SizedBox(width: 75.w, child: UiUtils.getTextWithFixedScaleAndOverFlow(MyData.selectedPrInfoData!.productName, 10.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, 1)),
+            ])
+          ])),
+          UiUtils.getMarginBox(0, 3.h),
+          SizedBox(width: 90.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            UiUtils.getBorderButtonBoxWithZeroPadding(42.w, ColorStyles.upFinRealWhite, ColorStyles.upFinGray,
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  UiUtils.getMarginBox(0, 2.h),
+                  SizedBox(width: 30.w, child: UiUtils.getTextWithFixedScale("최저금리", 10.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, 1)),
+                  UiUtils.getMarginBox(0, 1.h),
+                  SizedBox(width: 35.w, child: UiUtils.getTextWithFixedScale("${MyData.selectedPrInfoData!.productLoanMinRates}%", 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1)),
+                  UiUtils.getMarginBox(0, 2.h),
+                ]), () {}),
+            UiUtils.getMarginBox(2.w, 0),
+            UiUtils.getBorderButtonBoxWithZeroPadding(42.w, ColorStyles.upFinRealWhite, ColorStyles.upFinGray,
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  UiUtils.getMarginBox(0, 2.h),
+                  SizedBox(width: 30.w, child: UiUtils.getTextWithFixedScale("최대한도", 10.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, 1)),
+                  UiUtils.getMarginBox(0, 1.h),
+                  SizedBox(width: 35.w, child: UiUtils.getTextWithFixedScale(CommonUtils.getPriceFormattedString(double.parse(MyData.selectedPrInfoData!.productLoanLimit)), 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1)),
+                  UiUtils.getMarginBox(0, 2.h),
+                ]), () {})
+          ]))
+
+        ])
+    );
+
+    introWidgetList.add(
+        UiUtils.getMarginBox(0, 5.h)
+    );
+
+    introWidgetList.add(
+        SizedBox(width: 90.w,
+            child: UiUtils.getTextWithFixedScale("기본정보", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)
+        )
+    );
+    introWidgetList.add(
+        UiUtils.getMarginBox(0, 1.h)
+    );
+    introWidgetList.add(
+        SizedBox(width: 90.w,
+            child: Row(children: [
+              UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                  ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
+              UiUtils.getTextButtonWithFixedScale(MyData.name, 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+            ])
+        )
+    );
+    introWidgetList.add(
+        SizedBox(width: 90.w,
+            child: Row(children: [
+              UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                  ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
+              UiUtils.getTextButtonWithFixedScale("${MyData.phoneNumber.substring(0,3)} ${MyData.phoneNumber.substring(3,7)} ${MyData.phoneNumber.substring(7)}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+            ])
+        )
+    );
+    introWidgetList.add(
+        SizedBox(width: 90.w,
+            child: Row(children: [
+              UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                  ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
+              UiUtils.getTextButtonWithFixedScale("${MyData.idNumber.split("-")[0]}-${MyData.idNumber.split("-")[1].substring(0,1)}******", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+            ])
+        )
+    );
+    introWidgetList.add(
+        SizedBox(width: 90.w,
+            child: Row(children: [
+              UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                  ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
+              UiUtils.getTextButtonWithFixedScale("기대출 ${MyData.selectedAccidentInfoData!.accidentLendCount.split("@")[0]}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+            ])
+        )
+    );
+    if(MyData.selectedAccidentInfoData!.accidentLendAmount != "0"){
       introWidgetList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                UiUtils.getCustomCircleCheckBox(key, 0.1, true, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
+                UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
                     ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-                UiUtils.getTextButtonWithFixedScale(introList[i]["name"], 13.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.center, null, (){})
+                UiUtils.getTextButtonWithFixedScale("인가후대출금액 ${CommonUtils.getPriceCommaFormattedString(double.parse(MyData.selectedAccidentInfoData!.accidentLendAmount))}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+
+              ])
+          )
+      );
+    }else{
+      introWidgetList.add(
+          SizedBox(width: 90.w,
+              child: Row(children: [
+                UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
+                UiUtils.getTextButtonWithFixedScale("인가후대출금액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+
+              ])
+          )
+      );
+    }
+    introWidgetList.add(
+        SizedBox(width: 90.w,
+            child: Row(children: [
+              UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                  ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
+              UiUtils.getTextButtonWithFixedScale("[환급] ${MyData.selectedAccidentInfoData!.accidentBankInfo.split("@")[0]} ${MyData.selectedAccidentInfoData!.accidentBankAccount}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+            ])
+        )
+    );
+    introWidgetList.add(
+        SizedBox(width: 90.w,
+            child: Row(children: [
+              UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                  ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
+              UiUtils.getTextButtonWithFixedScale(MyData.jobInfo.split("@")[0], 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+            ])
+        )
+    );
+
+    if(MyData.jobInfo.split("@")[1] == "1" && _isSavedData(mainBankId) && _isSavedData(mainBankAccountId) && _isSavedData(businessNumberId)){
+      String tempSelectedBankCodeInfo = _getSavedData(mainBankId);
+      String tempSelectedBankAccountInfo = _getSavedData(mainBankAccountId);
+      String tempBusinessNumberIdInfo = _getSavedData(businessNumberId);
+
+      introWidgetList.add(
+          SizedBox(width: 90.w,
+              child: Row(children: [
+                UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
+                UiUtils.getTextButtonWithFixedScale("[주거래 은행] ${tempSelectedBankCodeInfo.split("@")[0]} $tempSelectedBankAccountInfo", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+
+              ])
+          )
+      );
+      introWidgetList.add(
+          SizedBox(width: 90.w,
+              child: Row(children: [
+                UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
+                UiUtils.getTextButtonWithFixedScale("사업자번호 $tempBusinessNumberIdInfo", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+
+              ])
+          )
+      );
+    }
+    if(MyData.selectedAccidentInfoData!.accidentWishAmount != "0"){
+      introWidgetList.add(
+          SizedBox(width: 90.w,
+              child: Row(children: [
+                UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
+                UiUtils.getTextButtonWithFixedScale("대출희망금액 ${CommonUtils.getPriceCommaFormattedString(double.parse(MyData.selectedAccidentInfoData!.accidentWishAmount))}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+
+              ])
+          )
+      );
+    }else{
+      introWidgetList.add(
+          SizedBox(width: 90.w,
+              child: Row(children: [
+                UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
+                UiUtils.getTextButtonWithFixedScale("대출희망금액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+
               ])
           )
       );
     }
 
+    if(unSavedDocsList.isNotEmpty){
+      introWidgetList.add(
+          UiUtils.getMarginBox(0, 5.h)
+      );
+      introWidgetList.add(
+          SizedBox(width: 90.w,
+              child: UiUtils.getTextWithFixedScale("미제출서류", 14.sp, FontWeight.w600, ColorStyles.upFinRed, TextAlign.start, null)
+          )
+      );
+      introWidgetList.add(
+          UiUtils.getMarginBox(0, 1.h)
+      );
+      for(int i = 0 ; i < unSavedDocsList.length-1 ; i++){
+        Key key = UniqueKey();
+        introWidgetList.add(
+            SizedBox(width: 90.w,
+                child: Row(children: [
+                  UiUtils.getCustomCircleCheckBox(key, 1.5, false, ColorStyles.upFinRealGray, ColorStyles.upFinWhite,
+                      ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
+                  UiUtils.getTextButtonWithFixedScale(unSavedDocsList[i]["name"], 13.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.center, null, (){})
+                ])
+            )
+        );
+      }
+    }
+
+    introWidgetList.add(
+        UiUtils.getMarginBox(0, 5.h)
+    );
+    introWidgetList.add(
+        SizedBox(width: 90.w,
+            child: UiUtils.getTextWithFixedScale("제출서류", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)
+        )
+    );
+    introWidgetList.add(
+        UiUtils.getMarginBox(0, 1.h)
+    );
+    for(int i = 0 ; i < addedDocsList.length-1 ; i++){
+      if(addedDocsList[i]["id"] != 999 && addedDocsList[i]["id"] != 1000){
+        bool isSaved = false;
+        for(var each in savedDocsList){
+          if(addedDocsList[i]["id"] == each["id"]){
+            isSaved = true;
+          }
+        }
+
+        if(isSaved){
+          Key key = UniqueKey();
+          introWidgetList.add(
+              SizedBox(width: 90.w,
+                  child: Row(children: [
+                    UiUtils.getCustomCircleCheckBox(key, 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                        ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
+                    UiUtils.getTextButtonWithFixedScale(addedDocsList[i]["name"], 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                  ])
+              )
+          );
+        }
+      }
+    }
+
     return UiUtils.getRowColumnWithAlignCenter([
       SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () {
+        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
           Navigator.pop(context);
         }),
       ])),
       UiUtils.getMarginBox(0, 3.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("${MyData.selectedPrInfoData!.productCompanyName}에", 20.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("접수하기 위해서는", 20.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("추가정보가 필요합니다.", 20.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("이미 접수하신 정보로", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("상품접수를 진행할까요?", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: introWidgetList)),
       UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-        nextInputView();
-      })
+      UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+          UiUtils.getTextWithFixedScale("네 좋아요!", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
+            _setSavedData();
+            if(unSavedDocsList.isEmpty){
+              _applyPr();
+            }else{
+              int targetIdx = 0;
+              for(int i = addedDocsList.length-1 ; i >= 0 ; i--){
+                CommonUtils.log("e","${addedDocsList[i]["name"]} ${addedDocsList[i]["is_confirmed"]}");
+                if(addedDocsList[i]["id"] != 999 && addedDocsList[i]["id"] != 1000){
+                  if(!addedDocsList[i]["is_confirmed"]){
+                    targetIdx = i;
+                    CommonUtils.log("e","$targetIdx");
+                  }
+                }
+              }
+              setState(() {
+                currentViewId = addedDocsList[targetIdx]["view_id"];
+                CommonUtils.log("i","$currentViewId");
+              });
+              CommonUtils.flutterToast("미제출 정보를\n입력해야합니다.");
+            }
+          }),
+      UiUtils.getMarginBox(0, 0.5.h),
+      UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
+          UiUtils.getTextWithFixedScale("아니오", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, null), () {
+            setState(() {
+              currentViewId = _getViewIdFromListById(cameraId);
+            });
+          })
     ]);
+  }
+  void _setSavedData(){
+    for(int eachAddedDocIdx = 0 ; eachAddedDocIdx < addedDocsList.length ; eachAddedDocIdx++){
+      for(var eachSavedDoc in savedDocsList){
+        if(addedDocsList[eachAddedDocIdx]["id"] == eachSavedDoc["id"]){
+          if(addedDocsList[eachAddedDocIdx]["id"] == mainBankId){
+            String bankCode = _getSavedData(mainBankId);
+            if(bankCode != ""){
+              selectedBankCodeInfo = bankCode;
+              selectedBankCodeKey = Key(selectedBankCodeInfo);
+              addedDocsList[eachAddedDocIdx] = eachSavedDoc;
+            }
+          }else if(addedDocsList[eachAddedDocIdx]["id"] == mainBankAccountId){
+            String bankAccount = _getSavedData(mainBankAccountId);
+            if(bankAccount != ""){
+              selectedBankAccountInfo = bankAccount;
+              _bankAccountInfoTextController.text = selectedBankAccountInfo;
+              addedDocsList[eachAddedDocIdx] = eachSavedDoc;
+            }
+          }else if(addedDocsList[eachAddedDocIdx]["id"] == businessNumberId){
+            String businessNumber = _getSavedData(businessNumberId);
+            if(businessNumber != ""){
+              selectedBusinessNumberInfo = businessNumber;
+              _businessNumberInfoTextController.text = selectedBusinessNumberInfo;
+              addedDocsList[eachAddedDocIdx] = eachSavedDoc;
+            }
+          }else if(addedDocsList[eachAddedDocIdx]["id"] == cameraId){
+            String imgFilePath = _getSavedData(cameraId);
+            if(imgFilePath != ""){
+              pickedFilePath = imgFilePath;
+              addedDocsList[eachAddedDocIdx] = eachSavedDoc;
+            }
+          }else if(addedDocsList[eachAddedDocIdx]["id"] == addressId){
+            String addressInfo = _getSavedData(addressId);
+            if(addressInfo != ""){
+              selectedAddressInfo = addressInfo;
+              _addressInfoTextController.text = selectedAddressInfo;
+              addedDocsList[eachAddedDocIdx] = eachSavedDoc;
+            }
+          }
+          //gov24 : 1:주민등록등본           2:주민등록초본        15:지방세납세증명서
+          //nhis  : 3:건강보험자격득실확인서    4:건강보험납부확인서
+          //nts   : 6:사업자등록증(*테스트불가) 10:소득금액증명       11:부가세과세표준증명원(*테스트불가)
+          else if(addedDocsList[eachAddedDocIdx]["id"] == 1 || addedDocsList[eachAddedDocIdx]["id"] == 2 || addedDocsList[eachAddedDocIdx]["id"] == 15 ||
+              addedDocsList[eachAddedDocIdx]["id"] == 3 || addedDocsList[eachAddedDocIdx]["id"] == 4 || addedDocsList[eachAddedDocIdx]["id"] == 10){
+            addedDocsList[eachAddedDocIdx] = eachSavedDoc;
+          }
+        }
+      }
+    }
+
+    for(var each in addedDocsList){
+      Map<String, dynamic> resultMap = each["result"];
+      CommonUtils.log("i", "addedDoc check\n"
+          "view_id:${each["view_id"]}\n"
+          "id:${each["id"]}\n"
+          "name:${each["name"]}\n"
+          "is_confirmed:${each["is_confirmed"]}\n"
+          "is_docs:${each["is_docs"]}\n"
+          "docs_type:${each["docs_type"]}\n"
+          "result:${resultMap.isEmpty? "" : each["result"]["resultValue"]}\n"
+      );
+    }
   }
   /// added info intro view end
 
@@ -893,8 +1312,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       UiUtils.getMarginBox(0, 1.h),
       SizedBox(width: 82.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
         UiUtils.getBorderButtonBox(80.w, ColorStyles.upFinWhite, ColorStyles.upFinTextAndBorderBlue,
-            UiUtils.getTextWithFixedScale("촬영하기", 11.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
-                () {
+            UiUtils.getTextWithFixedScale("촬영하기", 11.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null), () {
                   setState(() { currentViewId = cameraTakePhotoId; });
                 }),
       ])),
@@ -2099,6 +2517,13 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                 UiUtils.closeLoadingPop(context);
                 if(isSuccessToGetLoanInfo){
                   if(isNotEmpty){
+                    List<Map<String, dynamic>> addedDocsListForSave = [];
+                    for(var each in addedDocsList){
+                      if(each["is_confirmed"]){
+                        addedDocsListForSave.add(each);
+                      }
+                    }
+                    SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceApplyPrKey, jsonEncode(addedDocsListForSave));
                     nextInputView();
                   }else{
                     CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");

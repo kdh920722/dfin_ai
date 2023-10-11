@@ -404,7 +404,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
                   CommonUtils.moveTo(context, AppView.appLoginView.value, null);
                 }),
             UiUtils.getMarginBox(0, 0.5.h),
-            UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinButtonBlue,
+            UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
                 UiUtils.getTextWithFixedScale("회원가입", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
                   CommonUtils.moveTo(context, AppView.appSignupView.value, null);
                 }),

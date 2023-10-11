@@ -20,7 +20,7 @@ class AppSignOutView extends StatefulWidget{
 }
 
 class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObserver{
-
+  final ScrollController _scrollController = ScrollController();
   final _pwdTextController = TextEditingController();
   final _pwdTextFocus = FocusNode();
 
@@ -30,6 +30,14 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
 
   void _disposeAllTextControllers(){
     _pwdTextController.dispose();
+  }
+
+  KeyboardVisibilityController? _keyboardVisibilityController;
+  void _functionForKeyboardHide(){
+    CommonUtils.hideKeyBoard();
+    _scrollController.jumpTo(0);
+  }
+  void _functionForKeyboardShow(){
   }
 
   @override
@@ -80,7 +88,7 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
     Widget view = Container(
         color: ColorStyles.upFinWhite,
         width: 100.w,
-        height: 100.h,
+        height: 95.h,
         padding: EdgeInsets.all(5.w),
         child: UiUtils.getRowColumnWithAlignCenter([
           SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -105,8 +113,8 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
           UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
           UiUtils.getMarginBox(0, 2.h),
           UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
-              UiUtils.getTextWithFixedScale("탈퇴하기", 14.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.center, null), () {
-                UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, 100.w, 40.h, 0.5, (slideContext, slideSetState){
+              UiUtils.getTextWithFixedScale("탈퇴하기", 12.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.center, null), () {
+                UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, 100.w, 65.h, 0.5, (slideContext, slideSetState){
                   Widget slideWidget = Scaffold(
                       backgroundColor: ColorStyles.upFinWhite,
                       body: Container(
@@ -116,10 +124,10 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
                                 UiUtils.getTextWithFixedScale("탈퇴", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null),
                                 UiUtils.getMarginBox(0, 1.h),
                                 UiUtils.getTextWithFixedScale("비밀번호 입력 후 회원탈퇴가 가능합니다.", 14.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null),
-                                UiUtils.getMarginBox(0, 1.h),
+                                UiUtils.getMarginBox(0, 4.h),
                                 UiUtils.getTextField(90.w, TextStyles.upFinTextFormFieldTextStyle, _pwdTextFocus, _pwdTextController, TextInputType.text,
                                     UiUtils.getInputDecoration("비밀번호", 12.sp, "", 0.sp), (value) { }),
-                                UiUtils.getMarginBox(0, 12.h),
+                                UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
                                 UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
                                     UiUtils.getTextWithFixedScale("진행", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
                                       Map<String, dynamic> inputJson = {
@@ -136,7 +144,12 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
                                           CommonUtils.flutterToast("회원삭제 성공");
                                           CommonUtils.backToHome(context);
                                         }else{
-                                          CommonUtils.flutterToast(outputJson!["error"]);
+                                          if(outputJson!["error"] == "Invalid email or password"){
+                                            CommonUtils.flutterToast("비밀번호가 일치하지 않습니다.");
+                                          }else{
+                                            CommonUtils.flutterToast("회원탈퇴중 에러가 발생했습니다.");
+                                          }
+
                                         }
                                       });
                                     })
@@ -151,7 +164,7 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
     );
 
 
-    return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
+    return UiUtils.getScrollViewWithAllowBackForAndroid(context, view, _scrollController, back);
   }
 
 }

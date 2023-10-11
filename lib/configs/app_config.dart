@@ -33,6 +33,7 @@ class Config{
   static bool isAndroid = Platform.isAndroid;
   static String deppLinkInfo = "";
   static List<Permission> permissionList = [Permission.notification];
+  static String appVersion = "";
 
   static Map<String, WidgetBuilder> appRoutes = {
     AppView.appRootView.value : (context) => AppRootView(),
@@ -59,13 +60,19 @@ class Config{
       if (snapshot.exists) {
         int androidState = 99;
         int iosState = 99;
+        String androidVersion = "";
+        String iosVersion = "";
         for(var each in snapshot.children){
           switch(each.key){
             case "android_open_state" : androidState = int.parse(each.value.toString());
             case "ios_open_state" : iosState = int.parse(each.value.toString());
+            case "android_app_version" : androidVersion = each.value.toString();
+            case "ios_app_version" : iosVersion = each.value.toString();
           }
         }
+
         appState = isAndroid? androidState : iosState;
+        appVersion = isAndroid? androidVersion : iosVersion;
 
         callback(true);
       } else {

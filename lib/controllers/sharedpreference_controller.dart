@@ -8,6 +8,7 @@ class SharedPreferenceController {
 
   static String sharedPreferenceIdKey = "KEY_ID";
   static String sharedPreferencePwKey = "KEY_PW";
+  static String sharedPreferenceApplyPrKey = "KEY_APPLY_PR";
   static String sharedPreferenceValidDateKey = "VALID_DATE";
   static SharedPreferences? sharedPreferences;
 

@@ -18,6 +18,9 @@ class AppUpdateAccidentView extends StatefulWidget{
 }
 
 class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with WidgetsBindingObserver{
+  static int startViewId = 0;
+  static int endViewId = 0;
+
   double scrollScreenHeight = 57.h;
   double itemHeight2 = 0;
   double itemFullHeight2 = 0;
@@ -30,12 +33,12 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
   final String errorMsg = "정보를 입력해주세요";
   int currentViewId = 1;
 
-  final int bankCodeViewId = 1;
+  static const int bankCodeViewId = 1;
   Key? selectedBankCodeKey;
   final ScrollController _bankScrollController = ScrollController();
   String selectedBankCodeInfo = "";
 
-  final int bankAccountViewId = 2;
+  static const int bankAccountViewId = 2;
   String selectedBankAccountInfo = "";
   final _bankAccountInfoFocus = FocusNode();
   final _bankAccountInfoTextController = TextEditingController();
@@ -45,11 +48,11 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
     }
   }
 
-  final int preLoanCountViewId = 3;
+  static const  int preLoanCountViewId = 3;
   Key? selectedPreLoanCountKey;
   String selectedPreLoanCountInfo = "";
 
-  final int preLoanPriceViewId = 4;
+  static const  int preLoanPriceViewId = 4;
   String selectedPreLoanPriceInfo = "";
   final _preLoanPriceFocus = FocusNode();
   final _preLoanPriceTextController = TextEditingController();
@@ -68,7 +71,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
     }
   }
 
-  final int wantLoanPriceViewId = 5;
+  static const  int wantLoanPriceViewId = 5;
   String selectedWantLoanPriceInfo = "";
   final _wantLoanPriceFocus = FocusNode();
   final _wantLoanPriceTextController = TextEditingController();
@@ -87,11 +90,11 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
     }
   }
 
-  final int jobViewId = 6;
+  static const  int jobViewId = 6;
   Key? selectedJobKey;
   String selectedJobInfo = "";
 
-  final int finishedViewId = 7;
+  static const  int finishedViewId = 7;
   bool finishedConfirmed = false;
 
   void _unFocusAllNodes(){
@@ -158,6 +161,9 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
 
     selectedJobInfo = MyData.jobInfo;
     selectedJobKey = Key(MyData.jobInfo);
+
+    GetController.to.updateFirstIndex1_2(0);
+    GetController.to.updateLastIndex1_2(12);
   }
 
   @override
@@ -168,6 +174,8 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
     _disposeAllTextControllers();
     GetController.to.resetPreLoanPrice();
     GetController.to.resetWantLoanPrice();
+    startViewId = 0;
+    endViewId = 0;
     super.dispose();
   }
 
@@ -202,8 +210,8 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
       _unFocusAllNodes();
       CommonUtils.hideKeyBoard();
       await Future.delayed(const Duration(milliseconds: 120), () async {});
-      if(currentViewId-1 == 0){
-        if(context.mounted) Navigator.pop(context);
+      if(currentViewId == startViewId){
+        if(context.mounted) Navigator.pop(context, false);
       }else{
         setState(() {
           isInputValid = true;
@@ -219,10 +227,14 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
       _unFocusAllNodes();
       CommonUtils.hideKeyBoard();
       await Future.delayed(const Duration(milliseconds: 120), () async {});
-      setState(() {
-        isInputValid = true;
-        currentViewId++;
-      });
+      if(currentViewId == endViewId){
+        _updateData();
+      }else{
+        setState(() {
+          isInputValid = true;
+          currentViewId++;
+        });
+      }
     }
   }
 
@@ -676,41 +688,45 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: confirmWidgetList)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "네 좋아요!", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
-        Map<String, dynamic> inputJson = {
-          "bankCode": selectedBankCodeInfo.split("@")[1],
-          "account": selectedBankAccountInfo,
-          "job": selectedJobInfo.split("@")[1],
-          "lend_count": selectedPreLoanCountInfo.split("@")[1],
-          "lend_amount": selectedPreLoanPriceInfo,
-          "wish_amount": selectedWantLoanPriceInfo,
-          "uid": MyData.selectedAccidentInfoData!.accidentUid,
-          "court_name": MyData.selectedAccidentInfoData!.accidentCourtInfo.split("@")[0],
-          "accident_no": MyData.selectedAccidentInfoData!.accidentCaseNumberYear+MyData.selectedAccidentInfoData!.accidentCaseNumberType+MyData.selectedAccidentInfoData!.accidentCaseNumberNumber,
-        };
-        CommonUtils.log("i", "pr search info:\n$inputJson");
-        UiUtils.showLoadingPop(context);
-        LogfinController.callLogfinApi(LogfinApis.prUpdateInfo, inputJson, (isSuccessToUpdate, outputJson){
-          if(isSuccessToUpdate){
-            CommonUtils.flutterToast("수정 완료했습니다.");
-            LogfinController.getAccidentInfo((isSuccessToGetAccidentInfo, isNotEmpty){
-              UiUtils.closeLoadingPop(context);
-              if(isSuccessToGetAccidentInfo){
-                if(isNotEmpty){
-                  Navigator.pop(context, true);
-                }else{
-                  CommonUtils.flutterToast("정보 수정에 실패했습니다.\n다시 실행해주세요.");
-                }
-              }
-            });
-          }else{
-            UiUtils.closeLoadingPop(context);
-            CommonUtils.flutterToast("정보 수정에 실패했습니다.\n다시 실행해주세요.");
-          }
-        });
+        _updateData();
       })
     ]);
   }
   /// finish confirm view end
+
+  void _updateData(){
+    Map<String, dynamic> inputJson = {
+      "bankCode": selectedBankCodeInfo.split("@")[1],
+      "account": selectedBankAccountInfo,
+      "job": selectedJobInfo.split("@")[1],
+      "lend_count": selectedPreLoanCountInfo.split("@")[1],
+      "lend_amount": selectedPreLoanPriceInfo,
+      "wish_amount": selectedWantLoanPriceInfo,
+      "uid": MyData.selectedAccidentInfoData!.accidentUid,
+      "court_name": MyData.selectedAccidentInfoData!.accidentCourtInfo.split("@")[0],
+      "accident_no": MyData.selectedAccidentInfoData!.accidentCaseNumberYear+MyData.selectedAccidentInfoData!.accidentCaseNumberType+MyData.selectedAccidentInfoData!.accidentCaseNumberNumber,
+    };
+    CommonUtils.log("i", "pr search info:\n$inputJson");
+    UiUtils.showLoadingPop(context);
+    LogfinController.callLogfinApi(LogfinApis.prUpdateInfo, inputJson, (isSuccessToUpdate, outputJson){
+      if(isSuccessToUpdate){
+        CommonUtils.flutterToast("수정 완료했습니다.");
+        LogfinController.getAccidentInfo((isSuccessToGetAccidentInfo, isNotEmpty){
+          UiUtils.closeLoadingPop(context);
+          if(isSuccessToGetAccidentInfo){
+            if(isNotEmpty){
+              Navigator.pop(context, true);
+            }else{
+              CommonUtils.flutterToast("정보 수정에 실패했습니다.\n다시 실행해주세요.");
+            }
+          }
+        });
+      }else{
+        UiUtils.closeLoadingPop(context);
+        CommonUtils.flutterToast("정보 수정에 실패했습니다.\n다시 실행해주세요.");
+      }
+    });
+  }
 
   void _scrollBankCode(){
     double scrollSize = _bankScrollController.position.maxScrollExtent;
@@ -727,7 +743,11 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
 
   void back(){
     CommonUtils.hideKeyBoard();
-    Navigator.pop(context, false);
+    if(currentViewId == startViewId){
+      Navigator.pop(context, false);
+    }else{
+      backInputView();
+    }
   }
 
   bool isAutoScrollableForTarget = true;
