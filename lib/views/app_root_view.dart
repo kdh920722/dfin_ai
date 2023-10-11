@@ -325,7 +325,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
         }
 
         await Future.delayed(const Duration(milliseconds: 1500), () async {
-          UiUtils.showSlideMenu(context, SlideType.bottomToTop, false, null, 18.h, 0.5, (slideContext, setState) =>
+          UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, 18.h, 0.5, (slideContext, setState) =>
               Column(mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     UiUtils.getStyledTextWithFixedScale("[$deniedPermissionsString] 권한이 필요합니다. ", TextStyles.upFinBasicTextStyle, TextAlign.center, null),
@@ -370,7 +370,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
       _initSnsLogin(); // count aa
     }else{
       if(context.mounted){
-        UiUtils.showSlideMenu(context, SlideType.bottomToTop, false, 100.w, 30.h, 0.5, (context, setState){
+        UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, 30.h, 0.5, (context, setState){
           return Center(child: UiUtils.getTextWithFixedScale("시스템 점검중입니다.", 20.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, null));
         });
       }

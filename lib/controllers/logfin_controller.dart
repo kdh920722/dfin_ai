@@ -414,7 +414,8 @@ class LogfinController {
     MyData.clearChatRoomInfoList();
     for(var eachSortedLoan in MyData.getLoanInfoList()){
       MyData.addToChatRoomInfoList(ChatRoomInfoData(eachSortedLoan.loanUid, 1, eachSortedLoan.companyLogo,
-          eachSortedLoan.companyName, eachSortedLoan.productName, "현재 고객님은 2건의 심사 결과를 대기중입니다. 조금더 알아보시렵니까?", "20231005145230", 12, eachSortedLoan.statueId));
+          eachSortedLoan.companyName, eachSortedLoan.productName, "현재 고객님은 2건의 심사 결과를 대기중입니다. 조금더 알아보시렵니까?", "20231005145230", 12,
+          eachSortedLoan.statueId, "${eachSortedLoan.submitRate}%", CommonUtils.getPriceFormattedString(double.parse(eachSortedLoan.submitAmount))));
     }
   }
 

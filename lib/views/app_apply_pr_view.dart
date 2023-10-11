@@ -1255,7 +1255,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale(title3, 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 1.h),
       SizedBox(width: 85.w, child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getBorderButtonBoxForCertAuthDep(depWidth, ColorStyles.upFinBlack, ColorStyles.upFinBlack,
+        UiUtils.getBorderButtonBoxForRound(depWidth, ColorStyles.upFinBlack, ColorStyles.upFinBlack,
             Row(children: [
               UiUtils.getTextWithFixedScale("제공기관: ", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null),
               UiUtils.getTextWithFixedScale(subTitle, 14.sp, FontWeight.w500, ColorStyles.upFinKakaoYellow, TextAlign.start, null)
@@ -1268,7 +1268,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         if(!_isDocsAllConfirmed(docsType)){
 
           if(certType == 0){
-            UiUtils.showSlideMenu(context, SlideType.bottomToTop, false, null, 35.h, 0.5, (slideContext, setState){
+            UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, 35.h, 0.5, (slideContext, setState){
               return Column(mainAxisAlignment: MainAxisAlignment.start, children:
               [
                 Row(children: [

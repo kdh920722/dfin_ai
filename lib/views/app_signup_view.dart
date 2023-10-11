@@ -590,7 +590,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
           UiUtils.getTextWithFixedScale("본인인증", 12.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, null), () async {
             CommonUtils.hideKeyBoard();
             if(_phoneNumberTextController.text.trim() != ""){
-              UiUtils.showSlideMenu(context, SlideType.bottomToTop, true, 100.w, 62.h, 0.5, _makeAgreeWidget);
+              UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, 100.w, 62.h, 0.5, _makeAgreeWidget);
 
             }else{
               CommonUtils.flutterToast("휴대전화 번호를 입력하세요.");

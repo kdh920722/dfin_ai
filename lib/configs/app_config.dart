@@ -9,6 +9,7 @@ import 'package:upfin/views/app_main_view.dart';
 import 'package:upfin/views/app_result_pr_view.dart';
 import 'package:upfin/views/app_root_view.dart';
 import 'package:upfin/views/app_search_accident_view.dart';
+import 'package:upfin/views/app_signout_view.dart';
 import 'package:upfin/views/app_signup_view.dart';
 import 'package:upfin/views/app_update_accident_view.dart';
 import 'package:upfin/views/app_web_view.dart';
@@ -47,7 +48,8 @@ class Config{
     AppView.appApplyPrView.value : (context) => AppApplyPrView(),
     AppView.appChatView.value : (context) => AppChatView(),
     AppView.appAccidentDetailInfoView.value : (context) => AppAccidentDetailView(),
-    AppView.appAgreeDetailInfoView.value : (context) => AppAgreeDetailInfoView()
+    AppView.appAgreeDetailInfoView.value : (context) => AppAgreeDetailInfoView(),
+    AppView.appSignOutView.value : (context) => AppSignOutView()
   };
 
   static Future<void> initAppState(Function(bool isSuccess) callback) async{
@@ -77,7 +79,7 @@ class Config{
 }
 
 enum AppView {
-  appRootView, appLoginView, appCertificationView, appWebView, appSignupView, appMainView, appSearchAccidentView,
+  appRootView, appLoginView, appCertificationView, appWebView, appSignupView, appMainView, appSearchAccidentView, appSignOutView,
   appUpdateAccidentView, appResultPrView, appDetailPrView, appApplyPrView, appChatView, appAccidentDetailInfoView, appAgreeDetailInfoView
 }
 
@@ -112,24 +114,26 @@ extension SAppViewExtension on AppView {
         return '/accidentDetailInfoView';
       case AppView.appAgreeDetailInfoView:
         return '/agreeDetailInfoView';
+      case AppView.appSignOutView:
+        return '/appSignOutView';
     }
   }
 }
 
-enum SlideType {
+enum SlideMenuMoveType {
   rightToLeft, leftToRight, bottomToTop, topToBottom
 }
 
-extension SlideTypeExtension on SlideType {
+extension SlideTypeExtension on SlideMenuMoveType {
   String get value {
     switch (this) {
-      case SlideType.rightToLeft:
+      case SlideMenuMoveType.rightToLeft:
         return 'LEFT';
-      case SlideType.leftToRight:
+      case SlideMenuMoveType.leftToRight:
         return 'RIGHT';
-      case SlideType.bottomToTop:
+      case SlideMenuMoveType.bottomToTop:
         return 'TOP';
-      case SlideType.topToBottom:
+      case SlideMenuMoveType.topToBottom:
         return 'BOTTOM';
       default:
         throw Exception('Unknown SlideType value');

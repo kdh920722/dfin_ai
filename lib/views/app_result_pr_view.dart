@@ -146,7 +146,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                 ]), () {
                   if(each.isPossible) {
                     MyData.selectedPrInfoData = each;
-                    UiUtils.showSlideMenu(context, SlideType.bottomToTop, true, 100.w, 65.h, 0.5, _makeAgreeWidget);
+                    UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, 100.w, 65.h, 0.5, _makeAgreeWidget);
                   }
                 })
         );

@@ -12,6 +12,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:transition/transition.dart';
 import 'package:upfin/controllers/sharedpreference_controller.dart';
 import '../configs/app_config.dart';
+import '../datas/my_data.dart';
 import '../styles/ColorStyles.dart';
 import '../styles/TextStyles.dart';
 import 'package:image/image.dart' as imglib;
@@ -577,6 +578,11 @@ class CommonUtils {
       CommonUtils.log('e', e.toString());
       return "";
     }
+  }
+
+  static void backToHome(BuildContext context){
+    MyData.resetMyData();
+    CommonUtils.moveWithUntil(context, AppView.appRootView.value);
   }
 
   static Future<String> makeCroppedImageAndGetPath(String imagePath, Map<String,dynamic> infoMap) async {

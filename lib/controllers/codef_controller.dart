@@ -475,7 +475,7 @@ class CodeFController{
       certName = "PASS앱에서 $certName";
     }
 
-    UiUtils.showSlideMenu(context, SlideType.bottomToTop, false, null, 50.h, 0.0, (context, setState){
+    UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, 50.h, 0.0, (context, setState){
       return Obx(()=>
           Column(mainAxisAlignment: MainAxisAlignment.start, children:
           [

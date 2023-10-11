@@ -304,7 +304,7 @@ class AppDetailPrViewState extends State<AppDetailPrView> with WidgetsBindingObs
       UiUtils.getMarginBox(0, 1.h),
       UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
           UiUtils.getTextWithFixedScale("다이렉트 접수하기", 12.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, null), () {
-            UiUtils.showSlideMenu(context, SlideType.bottomToTop, true, 100.w, 65.h, 0.5, _makeAgreeWidget);
+            UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, 100.w, 65.h, 0.5, _makeAgreeWidget);
           })
     ]));
     return UiUtils.getViewWithAllowBackForAndroid(context, view, back);

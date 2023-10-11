@@ -8,9 +8,11 @@ class ChatRoomInfoData {
   String chatRoomLastMsgTime;
   int chatRoomLastMsgCnt;
   String chatRoomLoanStatus;
+  String loanMinRate;
+  String loanMaxLimit;
 
   ChatRoomInfoData(this.chatRoomId, this.chatRoomType, this.chatRoomIconPath, this.chatRoomTitle, this.chatRoomSubTitle,
-      this.chatRoomLastMsg, this.chatRoomLastMsgTime, this.chatRoomLastMsgCnt, this.chatRoomLoanStatus);
+      this.chatRoomLastMsg, this.chatRoomLastMsgTime, this.chatRoomLastMsgCnt, this.chatRoomLoanStatus, this.loanMinRate, this.loanMaxLimit);
   String printAiChatRoomInfoData(){
     return "chatRoomId: $chatRoomId\nchatRoomType: $chatRoomType\chatRoomIconPath: $chatRoomIconPath\n"
         "chatRoomAdditionalTitle: $chatRoomTitle\nchatRoomAdditionalContents: $chatRoomSubTitle"

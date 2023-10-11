@@ -157,6 +157,14 @@ class UiUtils {
     child: Padding(padding: EdgeInsets.only(left: 2.w, right: 2.w, bottom: 1.w, top: 1.w), child: Text(text, style: TextStyle(fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor)))));
   }
 
+  static Widget getRoundBoxTextWithFixedScale(String text, double fontSize, FontWeight fontWeight, TextAlign? textAlign, Color boxColor, Color textColor){
+    return Container(decoration: BoxDecoration(
+      color: boxColor, // 배경색 설정
+      borderRadius: BorderRadius.circular(20.0), // 모서리를 둥글게 하는 부분
+    ),child: FittedBox(fit: BoxFit.contain, alignment: Alignment.center,
+        child: Padding(padding: EdgeInsets.only(left: 2.w, right: 2.w, bottom: 1.w, top: 1.w), child: Text(text, style: TextStyle(fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor)))));
+  }
+
   static SelectableText getSelectableTextWithFixedScale(String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign? textAlign, int? textMaxLine){
     return SelectableText(text, style: TextStyle(decoration: TextDecoration.none, height: 1, fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor), textScaleFactor: 1.0, textAlign: textAlign, maxLines: textMaxLine);
   }
@@ -174,7 +182,11 @@ class UiUtils {
   }
 
   static SizedBox getMarginBox(double marginWidth, double marginHeight){
-    return SizedBox(width: marginWidth, height: marginHeight,);
+    return SizedBox(width: marginWidth, height: marginHeight);
+  }
+
+  static SizedBox getMarginColoredBox(double marginWidth, double marginHeight, Color backColor){
+    return SizedBox(width: marginWidth, height: marginHeight, child: Container(color: backColor));
   }
 
   static Widget getIconButton(IconData icon, double size, Color iconColor, VoidCallback onPressedCallback) {
@@ -301,6 +313,42 @@ class UiUtils {
     );
   }
 
+  static SizedBox getLoanListBorderButtonBox(double buttonWidth, Color buttonColor, Color borderColor, Widget childWidget, VoidCallback onPressedCallback){
+    return SizedBox(
+        width: buttonWidth,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.only(left: 4.w, right: 4.w, top: 4.w, bottom: 4.w),
+            backgroundColor: buttonColor,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            side: BorderSide(width: 1, color: borderColor),
+            elevation: 0.0,
+            shadowColor: ColorStyles.upFinGray,
+          ),
+          onPressed: onPressedCallback,
+          child: childWidget,
+        )
+    );
+  }
+
+  static SizedBox getAccidentBorderButtonBox(double buttonWidth, Color buttonColor, Color borderColor, Widget childWidget, VoidCallback onPressedCallback){
+    return SizedBox(
+        width: buttonWidth,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.only(left: 2.w, right: 2.w, top: 2.w, bottom: 2.w),
+            backgroundColor: buttonColor,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+            side: BorderSide(width: 1, color: borderColor),
+            elevation: 0.0,
+            shadowColor: ColorStyles.upFinGray,
+          ),
+          onPressed: onPressedCallback,
+          child: childWidget,
+        )
+    );
+  }
+
   static SizedBox getBorderButtonBoxWithZeroPadding(double buttonWidth, Color buttonColor, Color borderColor, Widget childWidget, VoidCallback onPressedCallback){
     return SizedBox(
         width: buttonWidth,
@@ -319,7 +367,7 @@ class UiUtils {
     );
   }
 
-  static SizedBox getBorderButtonBoxForCertAuthDep(double buttonWidth, Color buttonColor, Color borderColor, Widget childWidget, VoidCallback onPressedCallback){
+  static SizedBox getBorderButtonBoxForRound(double buttonWidth, Color buttonColor, Color borderColor, Widget childWidget, VoidCallback onPressedCallback){
     return SizedBox(
         width: buttonWidth,
         child: ElevatedButton(
@@ -462,6 +510,28 @@ class UiUtils {
     );
   }
 
+  static InputDecoration getDisabledInputDecoration(String labelText, double labelTextSize, String counterText, double counterTextSize){
+    return InputDecoration(
+        labelText: labelText,
+        floatingLabelBehavior: FloatingLabelBehavior.auto,
+        labelStyle: TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "SpoqaHanSansNeo", color: ColorStyles.upFinRealGray, fontSize: labelTextSize, fontWeight: FontWeight.w500),
+        hintText: "",
+        counterText: counterText,
+        errorStyle: TextStyle(fontSize: 0.sp),
+        counterStyle: TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "SpoqaHanSansNeo", color: ColorStyles.upFinRealGray, fontSize: counterTextSize, fontWeight: FontWeight.w500),
+        enabledBorder: const UnderlineInputBorder(
+            borderSide: BorderSide(color: ColorStyles.upFinRealGray)),
+
+        focusedBorder: UnderlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: ColorStyles.upFinRealGray),
+        ),
+        errorBorder: const UnderlineInputBorder(borderSide: BorderSide(color: ColorStyles.upFinRealGray)),
+        filled: true,
+        fillColor: ColorStyles.upFinWhite
+    );
+  }
+
   static InputDecoration getChatInputDecoration(){
     return InputDecoration(
         floatingLabelBehavior: FloatingLabelBehavior.never,
@@ -567,7 +637,7 @@ class UiUtils {
     )));
   }
 
-  static void showSlideMenu(BuildContext parentViewContext, SlideType slideType, bool isDismissible,
+  static void showSlideMenu(BuildContext parentViewContext, SlideMenuMoveType slideType, bool isDismissible,
       double? width, double? height, double opacity, Widget Function(BuildContext context, StateSetter setState) createWidgetMethod){
     double popWidth = 0.0;
     double popHeight = 0.0;
@@ -593,22 +663,22 @@ class UiUtils {
       context: parentViewContext,
       pageBuilder: (context, anim1, anim2) {
         switch (slideType) {
-          case SlideType.leftToRight:
+          case SlideMenuMoveType.leftToRight:
             popHeight = 100.h;
             alignment = Alignment.centerLeft;
             borderRadius = const BorderRadius.only(topRight: Radius.circular(30), bottomRight: Radius.circular(30));
             break;
-          case SlideType.rightToLeft:
+          case SlideMenuMoveType.rightToLeft:
             popHeight = 100.h;
             alignment = Alignment.centerRight;
             borderRadius = const BorderRadius.only(topLeft: Radius.circular(30), bottomLeft: Radius.circular(30));
             break;
-          case SlideType.bottomToTop:
+          case SlideMenuMoveType.bottomToTop:
             popWidth = 100.w;
             alignment = Alignment.bottomCenter;
             borderRadius = const BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30));
             break;
-          case SlideType.topToBottom:
+          case SlideMenuMoveType.topToBottom:
             popWidth = 100.w;
             alignment = Alignment.topCenter;
             borderRadius = const BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30));
@@ -644,22 +714,22 @@ class UiUtils {
       },
       transitionBuilder: (context, anim1, anim2, child) {
         switch (slideType) {
-          case SlideType.rightToLeft:
+          case SlideMenuMoveType.rightToLeft:
             return SlideTransition(
               position: Tween(begin: const Offset(1, 0), end: const Offset(0,0)).animate(anim1),
               child: child,
             );
-          case SlideType.leftToRight:
+          case SlideMenuMoveType.leftToRight:
             return SlideTransition(
               position: Tween(begin: const Offset(-1, 0), end: const Offset(0,0)).animate(anim1),
               child: child,
             );
-          case SlideType.bottomToTop:
+          case SlideMenuMoveType.bottomToTop:
             return SlideTransition(
               position: Tween(begin: const Offset(0, 1), end: const Offset(0,0)).animate(anim1),
               child: child,
             );
-          case SlideType.topToBottom:
+          case SlideMenuMoveType.topToBottom:
             return SlideTransition(
               position: Tween(begin: const Offset(0, -1), end: const Offset(0,0)).animate(anim1),
               child: child,
