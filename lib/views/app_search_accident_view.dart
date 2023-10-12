@@ -182,6 +182,9 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
 
     GetController.to.updateFirstIndex1(0);
     GetController.to.updateLastIndex1(12);
+
+    GetController.to.updateFirstIndex2(0);
+    GetController.to.updateLastIndex2(10);
   }
 
   @override
@@ -824,35 +827,31 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       birthDay = birthDay.substring(1);
     }
     List<String> confirmDataList = [];
-    confirmDataList.add(MyData.name);
-    confirmDataList.add("${MyData.birth.substring(0,4)}년 $birthMonth월 $birthDay일");
-    confirmDataList.add("[환급]  ${selectedBankCodeInfo.split("@")[0]} $selectedBankAccountInfo");
-    confirmDataList.add("기대출  ${selectedPreLoanCountInfo.split("@")[0]}");
+    confirmDataList.add("• ${MyData.name}");
+    confirmDataList.add("• ${MyData.birth.substring(0,4)}년 $birthMonth월 $birthDay일");
+    confirmDataList.add("• [환급]  ${selectedBankCodeInfo.split("@")[0]} $selectedBankAccountInfo");
+    confirmDataList.add("• 기대출  ${selectedPreLoanCountInfo.split("@")[0]}");
     if(selectedPreLoanPriceInfo != "0"){
-      confirmDataList.add("인가후 대출금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedPreLoanPriceInfo))}");
+      confirmDataList.add("• 인가후 대출금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedPreLoanPriceInfo))}");
     }else{
-      confirmDataList.add("인가후 대출금액  0원");
+      confirmDataList.add("• 인가후 대출금액  0원");
     }
     if(selectedWantLoanPriceInfo != "0"){
-      confirmDataList.add("희망 대출금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedWantLoanPriceInfo))}");
+      confirmDataList.add("• 희망 대출금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedWantLoanPriceInfo))}");
     }else{
-      confirmDataList.add("희망 대출금액  0원");
+      confirmDataList.add("• 희망 대출금액  0원");
     }
-    confirmDataList.add(selectedJobInfo.split("@")[0]);
+    confirmDataList.add("• ${selectedJobInfo.split("@")[0]}");
 
     List<Widget> confirmWidgetList = [];
     Color textColor = ColorStyles.upFinBlack;
     for(var each in confirmDataList){
-      Key key = UniqueKey();
       textColor = ColorStyles.upFinBlack;
       confirmWidgetList.add(
-          SizedBox(width: 90.w,
-              child: Row(children: [
-                UiUtils.getCustomCircleCheckBox(key, 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
-                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-                UiUtils.getTextButtonWithFixedScale(each, 13.sp, FontWeight.w800, textColor, TextAlign.center, null, (){})
-              ])
-          )
+          SizedBox(width: 80.w, child: UiUtils.getTextButtonWithFixedScale(each, 16.sp, FontWeight.w800, textColor, TextAlign.start, null, (){})),
+      );
+      confirmWidgetList.add(
+        UiUtils.getMarginBox(0, 3.h),
       );
     }
 

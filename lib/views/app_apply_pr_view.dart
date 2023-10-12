@@ -3,6 +3,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
+import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:sizer/sizer.dart';
 import 'package:upfin/configs/app_config.dart';
@@ -12,10 +13,10 @@ import 'package:upfin/controllers/sharedpreference_controller.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import 'package:upfin/styles/TextStyles.dart';
-import 'package:velocity_x/velocity_x.dart';
 import '../controllers/aws_controller.dart';
 import '../controllers/clova_controller.dart';
 import '../controllers/codef_controller.dart';
+import '../controllers/get_controller.dart';
 import '../datas/api_info_data.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
@@ -27,11 +28,20 @@ class AppApplyPrView extends StatefulWidget{
 }
 
 class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObserver{
+  double scrollScreenHeight = 57.h;
+  double itemHeight2 = 0;
+  double itemFullHeight2 = 0;
+  int maxVisibleItemCnt2 = 0;
+  int lastVisibleItem1 = 0;
+  bool isScrolling2= false;
+  final ScrollController _bankScrollController = ScrollController();
+
+  int reUseTargetViewId = -1;
+
   CameraController? _cameraController;
   GlobalKey repaintKey = GlobalKey();
   bool _isCameraReady = false;
 
-  bool isReApply = false;
   final String errorMsg = "정보를 입력해주세요";
   bool isInputValid = true;
 
@@ -98,27 +108,79 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   bool isCertTypeSelected = false;
   int certType = 0; //1: 카카오 인증, 6:네이버 인증, 5:PASS 인증
   int confirmedCertType = 0; //1: 카카오 인증, 6:네이버 인증, 5:PASS 인증
+
   final List<Map<String, dynamic>> addedDocsList = [];
   List<Map<String, dynamic>> savedDocsList = [];
   List<Map<String, dynamic>> unSavedDocsList = [];
-
   int gov24Count = 0;
   int nhisCount = 0;
   int ntsCount = 0;
 
+  void _setImagePreLoad(){
+    precacheImage(const AssetImage('assets/images/img_id_card.png'), context);
+    precacheImage(const AssetImage('assets/images/kakao_icon.png'), context);
+    precacheImage(const AssetImage('assets/images/naver_icon.png'), context);
+    precacheImage(const AssetImage('assets/images/pass_icon.png'), context);
+    precacheImage(const AssetImage('assets/images/toss_icon.png'), context);
+    precacheImage(const AssetImage('assets/images/logo_nice_square.png'), context);
+    precacheImage(const AssetImage('assets/images/temp_bank_logo.png'), context);
+  }
+
   void _initDocsList(){
+    currentViewId = 1;
+    addedDocsList.clear();
+    savedDocsList.clear();
+    unSavedDocsList.clear();
     int addedIndexId = currentViewId;
+    gov24Count = 0;
+    nhisCount = 0;
+    ntsCount = 0;
 
-    if(!isReApply){
-      String savedValue = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceApplyPrKey);
-      if(savedValue != ""){
-        savedDocsList = List<Map<String, dynamic>>.from(jsonDecode(savedValue));
-        if(savedDocsList.isNotEmpty){
-          currentViewId = addedDocsInfoIntroViewId;
-        }
+    String savedValue = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceApplyPrKey);
+    if(savedValue != ""){
+      savedDocsList = List<Map<String, dynamic>>.from(jsonDecode(savedValue));
+      if(savedDocsList.isNotEmpty){
+        currentViewId = addedDocsInfoIntroViewId;
       }
+    }
 
-      Map<String, dynamic> cameraInfo = {
+    Map<String, dynamic> cameraInfo = {
+      "id" : 0,
+      "name" : "",
+      "view_id" : 0,
+      "result" : <String, dynamic>{},
+      "is_confirmed" : false,
+      "is_docs" : false,
+      "docs_type" : ""
+    };
+    cameraInfo["id"] = cameraId;
+    cameraInfo["name"] = cameraName;
+    cameraInfo["view_id"] = addedIndexId;
+    cameraInfo["is_confirmed"] = false;
+    addedDocsList.add(cameraInfo);
+
+    addedIndexId++;
+    Map<String, dynamic> addressInfo = {
+      "id" : 0,
+      "name" : "",
+      "view_id" : 0,
+      "result" : <String, dynamic>{},
+      "is_confirmed" : false,
+      "is_docs" : false,
+      "docs_type" : ""
+    };
+    addressInfo["id"] = addressId;
+    addressInfo["name"] = addressName;
+    addressInfo["view_id"] = addedIndexId;
+    addressInfo["is_confirmed"] = false;
+    addedDocsList.add(addressInfo);
+
+    bool isJobType1 = true;
+    if(MyData.jobInfo.split("@")[1] == "1") isJobType1 = true;
+
+    if(isJobType1){
+      addedIndexId++;
+      Map<String, dynamic> mainBankInfo = {
         "id" : 0,
         "name" : "",
         "view_id" : 0,
@@ -127,14 +189,14 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         "is_docs" : false,
         "docs_type" : ""
       };
-      cameraInfo["id"] = cameraId;
-      cameraInfo["name"] = cameraName;
-      cameraInfo["view_id"] = addedIndexId;
-      cameraInfo["is_confirmed"] = false;
-      addedDocsList.add(cameraInfo);
+      mainBankInfo["id"] = mainBankId;
+      mainBankInfo["name"] = mainBankName;
+      mainBankInfo["view_id"] = addedIndexId;
+      mainBankInfo["is_confirmed"] = false;
+      addedDocsList.add(mainBankInfo);
 
       addedIndexId++;
-      Map<String, dynamic> addressInfo = {
+      Map<String, dynamic> mainBankAccountInfo = {
         "id" : 0,
         "name" : "",
         "view_id" : 0,
@@ -143,64 +205,27 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         "is_docs" : false,
         "docs_type" : ""
       };
-      addressInfo["id"] = addressId;
-      addressInfo["name"] = addressName;
-      addressInfo["view_id"] = addedIndexId;
-      addressInfo["is_confirmed"] = false;
-      addedDocsList.add(addressInfo);
+      mainBankAccountInfo["id"] = mainBankAccountId;
+      mainBankAccountInfo["name"] = mainBankAccountName;
+      mainBankAccountInfo["view_id"] = addedIndexId;
+      mainBankAccountInfo["is_confirmed"] = false;
+      addedDocsList.add(mainBankAccountInfo);
 
-      bool isJobType1 = false;
-      if(MyData.jobInfo.split("@")[1] == "1") isJobType1 = true;
-
-      if(isJobType1){
-        addedIndexId++;
-        Map<String, dynamic> mainBankInfo = {
-          "id" : 0,
-          "name" : "",
-          "view_id" : 0,
-          "result" : <String, dynamic>{},
-          "is_confirmed" : false,
-          "is_docs" : false,
-          "docs_type" : ""
-        };
-        mainBankInfo["id"] = mainBankId;
-        mainBankInfo["name"] = mainBankName;
-        mainBankInfo["view_id"] = addedIndexId;
-        mainBankInfo["is_confirmed"] = false;
-        addedDocsList.add(mainBankInfo);
-
-        addedIndexId++;
-        Map<String, dynamic> mainBankAccountInfo = {
-          "id" : 0,
-          "name" : "",
-          "view_id" : 0,
-          "result" : <String, dynamic>{},
-          "is_confirmed" : false,
-          "is_docs" : false,
-          "docs_type" : ""
-        };
-        mainBankAccountInfo["id"] = mainBankAccountId;
-        mainBankAccountInfo["name"] = mainBankAccountName;
-        mainBankAccountInfo["view_id"] = addedIndexId;
-        mainBankAccountInfo["is_confirmed"] = false;
-        addedDocsList.add(mainBankAccountInfo);
-
-        addedIndexId++;
-        Map<String, dynamic> businessNumberInfo = {
-          "id" : 0,
-          "name" : "",
-          "view_id" : 0,
-          "result" : <String, dynamic>{},
-          "is_confirmed" : false,
-          "is_docs" : false,
-          "docs_type" : ""
-        };
-        businessNumberInfo["id"] = businessNumberId;
-        businessNumberInfo["name"] = businessNumberName;
-        businessNumberInfo["view_id"] = addedIndexId;
-        businessNumberInfo["is_confirmed"] = false;
-        addedDocsList.add(businessNumberInfo);
-      }
+      addedIndexId++;
+      Map<String, dynamic> businessNumberInfo = {
+        "id" : 0,
+        "name" : "",
+        "view_id" : 0,
+        "result" : <String, dynamic>{},
+        "is_confirmed" : false,
+        "is_docs" : false,
+        "docs_type" : ""
+      };
+      businessNumberInfo["id"] = businessNumberId;
+      businessNumberInfo["name"] = businessNumberName;
+      businessNumberInfo["view_id"] = addedIndexId;
+      businessNumberInfo["is_confirmed"] = false;
+      addedDocsList.add(businessNumberInfo);
     }
 
     //gov24 : 1:주민등록등본           2:주민등록초본        15:지방세납세증명서
@@ -334,10 +359,24 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     if(_isIdHereFromListById(10)) ntsCount++;
     if(_isIdHereFromListById(11)) ntsCount++;
 
-    for(int addedDocIndex = 0 ; addedDocIndex < addedDocsList.length-1 ; addedDocIndex++){
+    CommonUtils.log("", "savedDocsList l: ${savedDocsList.length} ");
+    for(var each in savedDocsList){
+      Map<String, dynamic> resultMap = each["result"];
+      CommonUtils.log("i", "!!!!saved check\n"
+          "view_id:${each["view_id"]}\n"
+          "id:${each["id"]}\n"
+          "name:${each["name"]}\n"
+          "is_confirmed:${each["is_confirmed"]}\n"
+          "is_docs:${each["is_docs"]}\n"
+          "docs_type:${each["docs_type"]}\n"
+          "result:${resultMap.isEmpty? "" : each["result"]["resultValue"]}\n"
+      );
+    }
+
+    for(int addedDocIndex = 0 ; addedDocIndex < addedDocsList.length ; addedDocIndex++){
       if(addedDocsList[addedDocIndex]["id"] != 999 && addedDocsList[addedDocIndex]["id"] != 1000){
         bool isSaved = false;
-        for(int savedDocIndex = 0 ; savedDocIndex < savedDocsList.length-1 ; savedDocIndex++){
+        for(int savedDocIndex = 0 ; savedDocIndex < savedDocsList.length ; savedDocIndex++){
           if(addedDocsList[addedDocIndex]["id"] == savedDocsList[savedDocIndex]["id"]){
             isSaved = true;
           }
@@ -345,9 +384,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
         if(!isSaved){
           unSavedDocsList.add(addedDocsList[addedDocIndex]);
-          CommonUtils.log("", "not saved id : ${addedDocsList[addedDocIndex]["id"]}");
-        }else{
-          CommonUtils.log("", "saved id : ${addedDocsList[addedDocIndex]["id"]}");
         }
       }
     }
@@ -436,7 +472,9 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     _addressInfoTextController.addListener(_addressTextControllerListener);
     _bankAccountInfoTextController.addListener(_bankAccountInfoTextControllerListener);
     _businessNumberInfoTextController.addListener(_businessNumberTextControllerListener);
-
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _setImagePreLoad();
+    });
     availableCameras().then((cameras) {
       if (cameras.isNotEmpty && _cameraController == null) {
         _cameraController = CameraController(
@@ -453,6 +491,9 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         });
       }
     });
+
+    GetController.to.updateFirstIndex2_3(0);
+    GetController.to.updateLastIndex2_3(12);
   }
 
 
@@ -482,6 +523,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     WidgetsBinding.instance.removeObserver(this);
     _unFocusAllNodes();
     _disposeAllTextControllers();
+    _bankScrollController.dispose();
     super.dispose();
   }
 
@@ -525,35 +567,79 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       String prevDocsType = "";
       int prevDocsCount = 0;
       int prevId = _getIdFromListByViewId(currentViewId-1);
-      for(var each in addedDocsList){
-        if(each["id"] == prevId && each["is_docs"]){
-          CommonUtils.log("i", " is prev");
-          isPrevDocs = true;
-          prevDocsType = each["docs_type"];
-          if(prevDocsType == "gov24") prevDocsCount = gov24Count;
-          if(prevDocsType == "nhis") prevDocsCount = nhisCount;
-          if(prevDocsType == "nts") prevDocsCount = ntsCount;
+      CommonUtils.log("i", "prev id : ${prevId}");
 
-          if(prevId == 1 || prevId == 2 || prevId == 15 || prevId == 3 || prevId == 4 || prevId == 6 || prevId == 10 || prevId == 11 ){
-            if(isPrevDocs){
-              currentViewId = currentViewId-prevDocsCount+1;
+      if(reUseTargetViewId != -1){
+        if(currentViewId == reUseTargetViewId){
+          CommonUtils.hideKeyBoard();
+          setState(() {
+            _resetSavedData();
+            _initDocsList();
+            currentViewId = addedDocsInfoIntroViewId;
+          });
+        }else{
+          for(var each in addedDocsList){
+            if(each["id"] == prevId && each["is_docs"]){
+              CommonUtils.log("i", " is prev");
+              isPrevDocs = true;
+              prevDocsType = each["docs_type"];
+              if(prevDocsType == "gov24") prevDocsCount = gov24Count;
+              if(prevDocsType == "nhis") prevDocsCount = nhisCount;
+              if(prevDocsType == "nts") prevDocsCount = ntsCount;
+
+              if(prevId == 1 || prevId == 2 || prevId == 15 || prevId == 3 || prevId == 4 || prevId == 6 || prevId == 10 || prevId == 11 ){
+                if(isPrevDocs){
+                  currentViewId = currentViewId-prevDocsCount+1;
+                }
+              }
+            }
+          }
+
+          CommonUtils.log("i", "prev id : ${currentViewId-1}");
+          isInputValid = false;
+          _unFocusAllNodes();
+          CommonUtils.hideKeyBoard();
+          if(currentViewId-1 == 0){
+            Navigator.pop(context);
+          }else{
+            await Future.delayed(const Duration(milliseconds: 120), () async {});
+            setState(() {
+              currentViewId--;
+              isInputValid = true;
+            });
+          }
+        }
+      }else{
+        for(var each in addedDocsList){
+          if(each["id"] == prevId && each["is_docs"]){
+            CommonUtils.log("i", " is prev");
+            isPrevDocs = true;
+            prevDocsType = each["docs_type"];
+            if(prevDocsType == "gov24") prevDocsCount = gov24Count;
+            if(prevDocsType == "nhis") prevDocsCount = nhisCount;
+            if(prevDocsType == "nts") prevDocsCount = ntsCount;
+
+            if(prevId == 1 || prevId == 2 || prevId == 15 || prevId == 3 || prevId == 4 || prevId == 6 || prevId == 10 || prevId == 11 ){
+              if(isPrevDocs){
+                currentViewId = currentViewId-prevDocsCount+1;
+              }
             }
           }
         }
-      }
 
-      CommonUtils.log("i", "prev id : ${currentViewId-1}");
-      isInputValid = false;
-      _unFocusAllNodes();
-      CommonUtils.hideKeyBoard();
-      if(currentViewId-1 == 0){
-        Navigator.pop(context);
-      }else{
-        await Future.delayed(const Duration(milliseconds: 120), () async {});
-        setState(() {
-          currentViewId--;
-          isInputValid = true;
-        });
+        CommonUtils.log("i", "prev id : ${currentViewId-1}");
+        isInputValid = false;
+        _unFocusAllNodes();
+        CommonUtils.hideKeyBoard();
+        if(currentViewId-1 == 0){
+          Navigator.pop(context);
+        }else{
+          await Future.delayed(const Duration(milliseconds: 120), () async {});
+          setState(() {
+            currentViewId--;
+            isInputValid = true;
+          });
+        }
       }
     }
   }
@@ -578,19 +664,28 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       isInputValid = false;
       _unFocusAllNodes();
       CommonUtils.hideKeyBoard();
-      await Future.delayed(const Duration(milliseconds: 120), () async {});
-      bool isAllConfirmed = true;
-      for(var each in addedDocsList){
-        if(each["id"] != 999 && each["id"] != 1000 && each["view_id"] > currentViewId){
-          if(!each["is_confirmed"]) isAllConfirmed = false;
+      if(_getIdFromListByViewId(currentViewId+1) != confirmedId){
+        bool isAllConfirmed = true;
+        for(var each in addedDocsList){
+          if(each["id"] != 999 && each["id"] != 1000 && each["view_id"] > currentViewId){
+            if(!each["is_confirmed"]) isAllConfirmed = false;
+          }
         }
-      }
-      if(isAllConfirmed){
-        setState(() {
-          currentViewId = _getViewIdFromListById(lastId);
-          isInputValid = true;
-        });
+
+        if(isAllConfirmed){
+          setState(() {
+            currentViewId = _getViewIdFromListById(lastId);
+            isInputValid = true;
+          });
+        }else{
+          await Future.delayed(const Duration(milliseconds: 120), () async {});
+          setState(() {
+            currentViewId++;
+            isInputValid = true;
+          });
+        }
       }else{
+        await Future.delayed(const Duration(milliseconds: 120), () async {});
         setState(() {
           currentViewId++;
           isInputValid = true;
@@ -702,6 +797,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         ])
     );
 
+
     introWidgetList.add(
         UiUtils.getMarginBox(0, 5.h)
     );
@@ -712,51 +808,60 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         )
     );
     introWidgetList.add(
-        UiUtils.getMarginBox(0, 1.h)
+        UiUtils.getMarginBox(0, 3.h)
     );
     introWidgetList.add(
         SizedBox(width: 90.w,
             child: Row(children: [
-              UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
-                  ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-              UiUtils.getTextButtonWithFixedScale(MyData.name, 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+              UiUtils.getMarginBox(3.w, 0),
+              UiUtils.getTextButtonWithFixedScale("• ${MyData.name}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
             ])
         )
     );
     introWidgetList.add(
-        SizedBox(width: 90.w,
-            child: Row(children: [
-              UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
-                  ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-              UiUtils.getTextButtonWithFixedScale("${MyData.phoneNumber.substring(0,3)} ${MyData.phoneNumber.substring(3,7)} ${MyData.phoneNumber.substring(7)}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
-            ])
-        )
+        UiUtils.getMarginBox(0, 3.h)
     );
     introWidgetList.add(
         SizedBox(width: 90.w,
             child: Row(children: [
-              UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
-                  ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-              UiUtils.getTextButtonWithFixedScale("${MyData.idNumber.split("-")[0]}-${MyData.idNumber.split("-")[1].substring(0,1)}******", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+              UiUtils.getMarginBox(3.w, 0),
+              UiUtils.getTextButtonWithFixedScale("• ${MyData.phoneNumber.substring(0,3)} ${MyData.phoneNumber.substring(3,7)} ${MyData.phoneNumber.substring(7)}",
+                  13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
             ])
         )
     );
     introWidgetList.add(
+        UiUtils.getMarginBox(0, 3.h)
+    );
+    introWidgetList.add(
         SizedBox(width: 90.w,
             child: Row(children: [
-              UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
-                  ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-              UiUtils.getTextButtonWithFixedScale("기대출 ${MyData.selectedAccidentInfoData!.accidentLendCount.split("@")[0]}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+              UiUtils.getMarginBox(3.w, 0),
+              UiUtils.getTextButtonWithFixedScale("• ${MyData.idNumber.split("-")[0]}-${MyData.idNumber.split("-")[1].substring(0,1)}******", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
             ])
         )
+    );
+    introWidgetList.add(
+        UiUtils.getMarginBox(0, 3.h)
+    );
+    introWidgetList.add(
+        SizedBox(width: 90.w,
+            child: Row(children: [
+              UiUtils.getMarginBox(3.w, 0),
+              UiUtils.getTextButtonWithFixedScale("• 기대출 ${MyData.selectedAccidentInfoData!.accidentLendCount.split("@")[0]}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+            ])
+        )
+    );
+    introWidgetList.add(
+        UiUtils.getMarginBox(0, 3.h)
     );
     if(MyData.selectedAccidentInfoData!.accidentLendAmount != "0"){
       introWidgetList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
-                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-                UiUtils.getTextButtonWithFixedScale("인가후대출금액 ${CommonUtils.getPriceCommaFormattedString(double.parse(MyData.selectedAccidentInfoData!.accidentLendAmount))}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                UiUtils.getMarginBox(3.w, 0),
+                UiUtils.getTextButtonWithFixedScale("• 인가후대출금액 ${CommonUtils.getPriceCommaFormattedString(double.parse(MyData.selectedAccidentInfoData!.accidentLendAmount))}",
+                    13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
               ])
           )
@@ -765,29 +870,33 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       introWidgetList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
-                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-                UiUtils.getTextButtonWithFixedScale("인가후대출금액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                UiUtils.getMarginBox(3.w, 0),
+                UiUtils.getTextButtonWithFixedScale("• 인가후대출금액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
               ])
           )
       );
     }
     introWidgetList.add(
-        SizedBox(width: 90.w,
-            child: Row(children: [
-              UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
-                  ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-              UiUtils.getTextButtonWithFixedScale("[환급] ${MyData.selectedAccidentInfoData!.accidentBankInfo.split("@")[0]} ${MyData.selectedAccidentInfoData!.accidentBankAccount}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
-            ])
-        )
+        UiUtils.getMarginBox(0, 3.h)
     );
     introWidgetList.add(
         SizedBox(width: 90.w,
             child: Row(children: [
-              UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
-                  ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-              UiUtils.getTextButtonWithFixedScale(MyData.jobInfo.split("@")[0], 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+              UiUtils.getMarginBox(3.w, 0),
+              UiUtils.getTextButtonWithFixedScale("• [환급] ${MyData.selectedAccidentInfoData!.accidentBankInfo.split("@")[0]} ${MyData.selectedAccidentInfoData!.accidentBankAccount}",
+                  13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+            ])
+        )
+    );
+    introWidgetList.add(
+        UiUtils.getMarginBox(0, 3.h)
+    );
+    introWidgetList.add(
+        SizedBox(width: 90.w,
+            child: Row(children: [
+              UiUtils.getMarginBox(3.w, 0),
+              UiUtils.getTextButtonWithFixedScale("• ${MyData.jobInfo.split("@")[0]}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
             ])
         )
     );
@@ -798,33 +907,40 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       String tempBusinessNumberIdInfo = _getSavedData(businessNumberId);
 
       introWidgetList.add(
+          UiUtils.getMarginBox(0, 3.h)
+      );
+      introWidgetList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
-                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-                UiUtils.getTextButtonWithFixedScale("[주거래 은행] ${tempSelectedBankCodeInfo.split("@")[0]} $tempSelectedBankAccountInfo", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                UiUtils.getMarginBox(3.w, 0),
+                UiUtils.getTextButtonWithFixedScale("• [주거래 은행] ${tempSelectedBankCodeInfo.split("@")[0]} $tempSelectedBankAccountInfo", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
               ])
           )
       );
       introWidgetList.add(
+          UiUtils.getMarginBox(0, 3.h)
+      );
+      introWidgetList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
-                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-                UiUtils.getTextButtonWithFixedScale("사업자번호 $tempBusinessNumberIdInfo", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                UiUtils.getMarginBox(3.w, 0),
+                UiUtils.getTextButtonWithFixedScale("• 사업자번호 $tempBusinessNumberIdInfo", 16.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
               ])
           )
       );
     }
+    introWidgetList.add(
+        UiUtils.getMarginBox(0, 3.h)
+    );
     if(MyData.selectedAccidentInfoData!.accidentWishAmount != "0"){
       introWidgetList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
-                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-                UiUtils.getTextButtonWithFixedScale("대출희망금액 ${CommonUtils.getPriceCommaFormattedString(double.parse(MyData.selectedAccidentInfoData!.accidentWishAmount))}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                UiUtils.getMarginBox(3.w, 0),
+                UiUtils.getTextButtonWithFixedScale("• 대출희망금액 ${CommonUtils.getPriceCommaFormattedString(double.parse(MyData.selectedAccidentInfoData!.accidentWishAmount))}",
+                    13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
               ])
           )
@@ -833,9 +949,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       introWidgetList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
-                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-                UiUtils.getTextButtonWithFixedScale("대출희망금액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                UiUtils.getMarginBox(3.w, 0),
+                UiUtils.getTextButtonWithFixedScale("• 대출희망금액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
               ])
           )
@@ -848,19 +963,19 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       );
       introWidgetList.add(
           SizedBox(width: 90.w,
-              child: UiUtils.getTextWithFixedScale("미제출서류", 14.sp, FontWeight.w600, ColorStyles.upFinRed, TextAlign.start, null)
+              child: UiUtils.getTextWithFixedScale("미제출정보", 14.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)
           )
       );
       introWidgetList.add(
           UiUtils.getMarginBox(0, 1.h)
       );
-      for(int i = 0 ; i < unSavedDocsList.length-1 ; i++){
+      for(int i = 0 ; i < unSavedDocsList.length ; i++){
         Key key = UniqueKey();
         introWidgetList.add(
             SizedBox(width: 90.w,
                 child: Row(children: [
-                  UiUtils.getCustomCircleCheckBox(key, 1.5, false, ColorStyles.upFinRealGray, ColorStyles.upFinWhite,
-                      ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
+                  UiUtils.getCustomCircleCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
+                      ColorStyles.upFinGray,  ColorStyles.upFinWhite, (checkedValue){}),
                   UiUtils.getTextButtonWithFixedScale(unSavedDocsList[i]["name"], 13.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.center, null, (){})
                 ])
             )
@@ -873,13 +988,14 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     );
     introWidgetList.add(
         SizedBox(width: 90.w,
-            child: UiUtils.getTextWithFixedScale("제출서류", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)
+            child: UiUtils.getTextWithFixedScale("제출정보", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)
         )
     );
     introWidgetList.add(
         UiUtils.getMarginBox(0, 1.h)
     );
-    for(int i = 0 ; i < addedDocsList.length-1 ; i++){
+    for(int i = 0 ; i < addedDocsList.length ; i++){
+      // 95~99
       if(addedDocsList[i]["id"] != 999 && addedDocsList[i]["id"] != 1000){
         bool isSaved = false;
         for(var each in savedDocsList){
@@ -910,7 +1026,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         }),
       ])),
       UiUtils.getMarginBox(0, 3.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("이미 접수하신 정보로", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("기존에 제출하셨던 정보로", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("상품접수를 진행할까요?", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: introWidgetList)),
@@ -921,21 +1037,12 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             if(unSavedDocsList.isEmpty){
               _applyPr();
             }else{
-              int targetIdx = 0;
-              for(int i = addedDocsList.length-1 ; i >= 0 ; i--){
-                CommonUtils.log("e","${addedDocsList[i]["name"]} ${addedDocsList[i]["is_confirmed"]}");
-                if(addedDocsList[i]["id"] != 999 && addedDocsList[i]["id"] != 1000){
-                  if(!addedDocsList[i]["is_confirmed"]){
-                    targetIdx = i;
-                    CommonUtils.log("e","$targetIdx");
-                  }
-                }
-              }
               setState(() {
-                currentViewId = addedDocsList[targetIdx]["view_id"];
-                CommonUtils.log("i","$currentViewId");
+                reUseTargetViewId = unSavedDocsList[0]["view_id"];
+                currentViewId = reUseTargetViewId;
               });
               CommonUtils.flutterToast("미제출 정보를\n입력해야합니다.");
+
             }
           }),
       UiUtils.getMarginBox(0, 0.5.h),
@@ -956,34 +1063,39 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             if(bankCode != ""){
               selectedBankCodeInfo = bankCode;
               selectedBankCodeKey = Key(selectedBankCodeInfo);
-              addedDocsList[eachAddedDocIdx] = eachSavedDoc;
+              addedDocsList[eachAddedDocIdx]["is_confirmed"] = true;
+              addedDocsList[eachAddedDocIdx]["result"] = eachSavedDoc["result"];
             }
           }else if(addedDocsList[eachAddedDocIdx]["id"] == mainBankAccountId){
             String bankAccount = _getSavedData(mainBankAccountId);
             if(bankAccount != ""){
               selectedBankAccountInfo = bankAccount;
               _bankAccountInfoTextController.text = selectedBankAccountInfo;
-              addedDocsList[eachAddedDocIdx] = eachSavedDoc;
+              addedDocsList[eachAddedDocIdx]["is_confirmed"] = true;
+              addedDocsList[eachAddedDocIdx]["result"] = eachSavedDoc["result"];
             }
           }else if(addedDocsList[eachAddedDocIdx]["id"] == businessNumberId){
             String businessNumber = _getSavedData(businessNumberId);
             if(businessNumber != ""){
               selectedBusinessNumberInfo = businessNumber;
               _businessNumberInfoTextController.text = selectedBusinessNumberInfo;
-              addedDocsList[eachAddedDocIdx] = eachSavedDoc;
+              addedDocsList[eachAddedDocIdx]["is_confirmed"] = true;
+              addedDocsList[eachAddedDocIdx]["result"] = eachSavedDoc["result"];
             }
           }else if(addedDocsList[eachAddedDocIdx]["id"] == cameraId){
             String imgFilePath = _getSavedData(cameraId);
             if(imgFilePath != ""){
               pickedFilePath = imgFilePath;
-              addedDocsList[eachAddedDocIdx] = eachSavedDoc;
+              addedDocsList[eachAddedDocIdx]["is_confirmed"] = true;
+              addedDocsList[eachAddedDocIdx]["result"] = eachSavedDoc["result"];
             }
           }else if(addedDocsList[eachAddedDocIdx]["id"] == addressId){
             String addressInfo = _getSavedData(addressId);
             if(addressInfo != ""){
               selectedAddressInfo = addressInfo;
               _addressInfoTextController.text = selectedAddressInfo;
-              addedDocsList[eachAddedDocIdx] = eachSavedDoc;
+              addedDocsList[eachAddedDocIdx]["is_confirmed"] = true;
+              addedDocsList[eachAddedDocIdx]["result"] = eachSavedDoc["result"];
             }
           }
           //gov24 : 1:주민등록등본           2:주민등록초본        15:지방세납세증명서
@@ -991,7 +1103,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           //nts   : 6:사업자등록증(*테스트불가) 10:소득금액증명       11:부가세과세표준증명원(*테스트불가)
           else if(addedDocsList[eachAddedDocIdx]["id"] == 1 || addedDocsList[eachAddedDocIdx]["id"] == 2 || addedDocsList[eachAddedDocIdx]["id"] == 15 ||
               addedDocsList[eachAddedDocIdx]["id"] == 3 || addedDocsList[eachAddedDocIdx]["id"] == 4 || addedDocsList[eachAddedDocIdx]["id"] == 10){
-            addedDocsList[eachAddedDocIdx] = eachSavedDoc;
+            addedDocsList[eachAddedDocIdx]["is_confirmed"] = true;
+            addedDocsList[eachAddedDocIdx]["result"] = eachSavedDoc["result"];
           }
         }
       }
@@ -999,7 +1112,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
     for(var each in addedDocsList){
       Map<String, dynamic> resultMap = each["result"];
-      CommonUtils.log("i", "addedDoc check\n"
+      CommonUtils.log("i", "set addedDoc check\n"
           "view_id:${each["view_id"]}\n"
           "id:${each["id"]}\n"
           "name:${each["name"]}\n"
@@ -1010,19 +1123,47 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       );
     }
   }
+  void _resetSavedData(){
+    selectedBankCodeInfo = "";
+    selectedBankCodeKey = Key("");
+    selectedBankAccountInfo = "";
+    _bankAccountInfoTextController.text = "";
+    selectedBusinessNumberInfo = "";
+    _businessNumberInfoTextController.text = "";
+    pickedFilePath = "";
+    selectedAddressInfo = "";
+    _addressInfoTextController.text = "";
+  }
   /// added info intro view end
 
   /// bank code view
   Widget _getBankCodeView(){
     List<Widget> bankCodeList = [];
     Color textColor = ColorStyles.upFinBlack;
-    for(var each in LogfinController.bankList){
-      Key key = Key(each);
+    for(int i=0 ; i<LogfinController.bankList.length ; i++){
+      Key key = Key(LogfinController.bankList[i]);
       if(selectedBankCodeKey == key) {
         textColor = ColorStyles.upFinTextAndBorderBlue;
       }
       else{
         textColor = ColorStyles.upFinBlack;
+        if(GetController.to.firstVisibleItem2_3.value >= 3){
+          if(GetController.to.firstVisibleItem2_3.value-2 <= i && i <= GetController.to.firstVisibleItem2_3.value+1){
+            textColor = Colors.black12;
+            if(GetController.to.firstVisibleItem2_3.value+1 <= i && i <= GetController.to.firstVisibleItem2_3.value+1){
+              textColor = Colors.black38;
+            }
+          }
+        }
+
+        if(GetController.to.lastVisibleItem2_3.value <= LogfinController.bankList.length-3){
+          if(GetController.to.lastVisibleItem2_3.value-3 <= i && i <= GetController.to.lastVisibleItem2_3.value-1){
+            textColor = Colors.black12;
+            if(GetController.to.lastVisibleItem2_3.value-3 <= i && i <= GetController.to.lastVisibleItem2_3.value-3){
+              textColor = Colors.black38;
+            }
+          }
+        }
       }
       bankCodeList.add(
           SizedBox(width: 90.w,
@@ -1034,7 +1175,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                         if(checkedValue != null){
                           if(checkedValue) {
                             selectedBankCodeKey = key;
-                            selectedBankCodeInfo = each;
+                            selectedBankCodeInfo = LogfinController.bankList[i];
                           }
                         }
                       });
@@ -1044,15 +1185,15 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                         if(checkedValue != null){
                           if(!checkedValue) {
                             selectedBankCodeKey = key;
-                            selectedBankCodeInfo = each;
+                            selectedBankCodeInfo = LogfinController.bankList[i];
                           }
                         }
                       });
                     }),
-                UiUtils.getTextButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.center, null, (){
+                UiUtils.getTextButtonWithFixedScale(LogfinController.bankList[i].split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.center, null, (){
                   setState(() {
                     selectedBankCodeKey = key;
-                    selectedBankCodeInfo = each;
+                    selectedBankCodeInfo = LogfinController.bankList[i];
                   });
                 })
               ])
@@ -1071,7 +1212,37 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("주거래 은행정보가", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("필요해요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: bankCodeList)),
+      NotificationListener<ScrollNotification>(
+          onNotification: (scrollNotification) {
+            if (scrollNotification is ScrollUpdateNotification) {
+              if(!isScrolling2){
+                isScrolling2 = true;
+                itemFullHeight2 = scrollNotification.metrics.maxScrollExtent+scrollScreenHeight;
+                itemHeight2 = itemFullHeight2/LogfinController.bankList.length;
+                maxVisibleItemCnt2 = (scrollScreenHeight/itemHeight2).ceil();
+              }
+
+              double scrollPosition = scrollNotification.metrics.pixels.abs();
+              int firstVisibleItem2 = (scrollPosition/itemHeight2).ceil();
+              int lastVisibleItem2 = firstVisibleItem2+maxVisibleItemCnt2;
+              if(firstVisibleItem2 <=0 ) firstVisibleItem2 = 0;
+              if(lastVisibleItem2 >= LogfinController.bankList.length-1) lastVisibleItem2 = LogfinController.bankList.length-1;
+              print('보이는 아이템 ====> ${LogfinController.bankList.length} : $firstVisibleItem2 | $lastVisibleItem2');
+
+              GetController.to.updateFirstIndex2_3(firstVisibleItem2);
+              GetController.to.updateLastIndex2_3(lastVisibleItem2);
+            } else if (scrollNotification is ScrollEndNotification) {
+              if(isScrolling2){
+                isScrolling2 = false;
+                itemFullHeight2 = scrollNotification.metrics.maxScrollExtent+scrollScreenHeight;
+                itemHeight2 = scrollNotification.metrics.maxScrollExtent/LogfinController.bankList.length;
+                maxVisibleItemCnt2 = (scrollScreenHeight/itemHeight2).ceil();
+              }
+            }
+            return true;
+          },
+          child: UiUtils.getExpandedScrollViewWithController(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: bankCodeList), _bankScrollController)
+      ),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
         CommonUtils.log("i", "bank code : $selectedBankCodeInfo");
@@ -1225,21 +1396,48 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       addressWidgetList.add(UiUtils.getMarginBox(0, 3.h));
     }
 
-    return UiUtils.getRowColumnWithAlignCenter([
-      SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
-          backInputView();
-        }),
-      ])),
-      UiUtils.getMarginBox(0, 3.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("등본상 주소를", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getTextField(85.w, TextStyles.upFinSmallTextFormFieldTextStyle, _addressInfoFocus,
-          _addressInfoTextController, TextInputType.text, UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
-      UiUtils.getMarginBox(0, 1.h),
-      UiUtils.getBorderButtonBox(85.w, ColorStyles.upFinWhite, ColorStyles.upFinTextAndBorderBlue,
-          UiUtils.getTextWithFixedScale("주소 찾기", 12.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null), () {
+    return Stack(children: [
+      UiUtils.getRowColumnWithAlignCenter([
+        SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+            backInputView();
+          }),
+        ])),
+        UiUtils.getMarginBox(0, 3.h),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("등본상 주소를", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+        UiUtils.getMarginBox(0, 5.h),
+        UiUtils.getTextField(85.w, TextStyles.upFinSmallTextFormFieldTextStyle, _addressInfoFocus,
+            _addressInfoTextController, TextInputType.text, UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
+        UiUtils.getMarginBox(0, 2.h),
+        UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: addressWidgetList)),
+        UiUtils.getMarginBox(0, 3.h),
+        selectedAddressKey != null ?
+        UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+          _setConfirmedToDocItemByViewId(currentViewId, true);
+          if(selectedSearchCertAddressInfo != "" && selectedSearchCertAddressInfo != selectedAddressInfo){
+            for(var each in addedDocsList){
+              if(each["is_docs"]){
+                each["is_confirmed"] = false;
+                Map<String, dynamic> resultMap = each["result"];
+                resultMap.clear();
+                each["result"] = resultMap;
+                each["result"] = <String, dynamic>{};
+              }
+            }
+          }
+          Map<String, dynamic> resultMap = {
+            "resultValue" : selectedAddressInfo
+          };
+          _setResultToListById(addressId, resultMap);
+          nextInputView();
+        }) : Container()
+      ]),
+      Positioned(
+          right: 5.w,
+          child: UiUtils.getRowColumnWithAlignCenter([
+            UiUtils.getMarginBox(0, 24.h),
+            UiUtils.getIconButton(Icons.search, 8.w, ColorStyles.upFinButtonBlue, () {
               if(_addressInfoTextController.text.trim() != ""){
                 CommonUtils.hideKeyBoard();
                 selectedAddressKey = null;
@@ -1265,30 +1463,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               }else{
                 CommonUtils.flutterToast("주소를 입력해주세요.");
               }
-          }),
-      UiUtils.getMarginBox(0, 2.h),
-      UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: addressWidgetList)),
-      UiUtils.getMarginBox(0, 3.h),
-      selectedAddressKey != null ?
-      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-        _setConfirmedToDocItemByViewId(currentViewId, true);
-        if(selectedSearchCertAddressInfo != "" && selectedSearchCertAddressInfo != selectedAddressInfo){
-          for(var each in addedDocsList){
-            if(each["is_docs"]){
-              each["is_confirmed"] = false;
-              Map<String, dynamic> resultMap = each["result"];
-              resultMap.clear();
-              each["result"] = resultMap;
-              each["result"] = <String, dynamic>{};
-            }
-          }
-        }
-        Map<String, dynamic> resultMap = {
-          "resultValue" : selectedAddressInfo
-        };
-        _setResultToListById(addressId, resultMap);
-        nextInputView();
-      }) : Container()
+            }),
+          ]))
     ]);
   }
   /// address view end
@@ -1394,9 +1570,9 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             ),
         ),
         Positioned(
-            top: 61.h,
+            top: 80.h,
             child: UiUtils.getBorderButtonBox(85.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                UiUtils.getTextWithFixedScale("찰칵", 15.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
+                UiUtils.getTextWithFixedScale("촬영", 15.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
                   if(_cameraController != null){
                     _onTakePicture(context);
                   }
@@ -1686,7 +1862,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         if(!_isDocsAllConfirmed(docsType)){
 
           if(certType == 0){
-            UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, 35.h, 0.5, (slideContext, setState){
+            UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, 40.h, 0.5, (slideContext, setState){
               return Column(mainAxisAlignment: MainAxisAlignment.start, children:
               [
                 Row(children: [
@@ -1737,7 +1913,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                     UiUtils.getTextWithFixedScale("PASS", 12.sp, FontWeight.w600, certType == 5? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRealGray, TextAlign.start, null)
                   ])
                 ])),
-                UiUtils.getMarginBox(0, 4.h),
+                UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
                 UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinTextAndBorderBlue,
                     UiUtils.getTextWithFixedScale(_isDocsAllConfirmed(docsType) ? "인증완료" : !isErrorResult? "간편인증 진행하기" : "서류 다시 가져오기",
                         11.sp, FontWeight.w500, !isErrorResult? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRed, TextAlign.start, null), (){
@@ -1771,7 +1947,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     for(var each in addedDocsList){
       Key key = UniqueKey();
       String name = "";
-      Color textColor = docType == each["docs_type"]? ColorStyles.upFinRealGray : ColorStyles.upFinGray;
+      Color textColor = ColorStyles.upFinRealGray;
       Color errorTextColor = ColorStyles.upFinRed;
       Color successTextColor = ColorStyles.upFinTextAndBorderBlue;
       if(each["docs_type"] == "gov24"){
@@ -2267,51 +2443,58 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         )
     );
     introWidgetList.add(
-        UiUtils.getMarginBox(0, 1.h)
+        UiUtils.getMarginBox(0, 3.h)
     );
     introWidgetList.add(
         SizedBox(width: 90.w,
             child: Row(children: [
-              UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
-                  ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-              UiUtils.getTextButtonWithFixedScale(MyData.name, 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+              UiUtils.getMarginBox(3.w, 0),
+              UiUtils.getTextButtonWithFixedScale("• ${MyData.name}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
             ])
         )
     );
     introWidgetList.add(
-        SizedBox(width: 90.w,
-            child: Row(children: [
-              UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
-                  ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-              UiUtils.getTextButtonWithFixedScale("${MyData.phoneNumber.substring(0,3)} ${MyData.phoneNumber.substring(3,7)} ${MyData.phoneNumber.substring(7)}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
-            ])
-        )
+        UiUtils.getMarginBox(0, 3.h)
     );
     introWidgetList.add(
         SizedBox(width: 90.w,
             child: Row(children: [
-              UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
-                  ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-              UiUtils.getTextButtonWithFixedScale("${MyData.idNumber.split("-")[0]}-${MyData.idNumber.split("-")[1].substring(0,1)}******", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+              UiUtils.getMarginBox(3.w, 0),
+              UiUtils.getTextButtonWithFixedScale("• ${MyData.phoneNumber.substring(0,3)} ${MyData.phoneNumber.substring(3,7)} ${MyData.phoneNumber.substring(7)}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
             ])
         )
     );
     introWidgetList.add(
+        UiUtils.getMarginBox(0, 3.h)
+    );
+    introWidgetList.add(
         SizedBox(width: 90.w,
             child: Row(children: [
-              UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
-                  ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-              UiUtils.getTextButtonWithFixedScale("기대출 ${MyData.selectedAccidentInfoData!.accidentLendCount.split("@")[0]}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+              UiUtils.getMarginBox(3.w, 0),
+              UiUtils.getTextButtonWithFixedScale("• ${MyData.idNumber.split("-")[0]}-${MyData.idNumber.split("-")[1].substring(0,1)}******", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
             ])
         )
+    );
+    introWidgetList.add(
+        UiUtils.getMarginBox(0, 3.h)
+    );
+    introWidgetList.add(
+        SizedBox(width: 90.w,
+            child: Row(children: [
+              UiUtils.getMarginBox(3.w, 0),
+              UiUtils.getTextButtonWithFixedScale("• 기대출 ${MyData.selectedAccidentInfoData!.accidentLendCount.split("@")[0]}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+            ])
+        )
+    );
+    introWidgetList.add(
+        UiUtils.getMarginBox(0, 3.h)
     );
     if(MyData.selectedAccidentInfoData!.accidentLendAmount != "0"){
       introWidgetList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
-                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-                UiUtils.getTextButtonWithFixedScale("인가후대출금액 ${CommonUtils.getPriceCommaFormattedString(double.parse(MyData.selectedAccidentInfoData!.accidentLendAmount))}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                UiUtils.getMarginBox(3.w, 0),
+                UiUtils.getTextButtonWithFixedScale("• 인가후대출금액 ${CommonUtils.getPriceCommaFormattedString(double.parse(MyData.selectedAccidentInfoData!.accidentLendAmount))}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
               ])
           )
@@ -2320,61 +2503,70 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       introWidgetList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
-                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-                UiUtils.getTextButtonWithFixedScale("인가후대출금액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                UiUtils.getMarginBox(3.w, 0),
+                UiUtils.getTextButtonWithFixedScale("• 인가후대출금액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
               ])
           )
       );
     }
     introWidgetList.add(
-        SizedBox(width: 90.w,
-            child: Row(children: [
-              UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
-                  ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-              UiUtils.getTextButtonWithFixedScale("[환급] ${MyData.selectedAccidentInfoData!.accidentBankInfo.split("@")[0]} ${MyData.selectedAccidentInfoData!.accidentBankAccount}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
-            ])
-        )
+        UiUtils.getMarginBox(0, 3.h)
     );
     introWidgetList.add(
         SizedBox(width: 90.w,
             child: Row(children: [
-              UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
-                  ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-              UiUtils.getTextButtonWithFixedScale(MyData.jobInfo.split("@")[0], 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+              UiUtils.getMarginBox(3.w, 0),
+              UiUtils.getTextButtonWithFixedScale("• [환급] ${MyData.selectedAccidentInfoData!.accidentBankInfo.split("@")[0]} ${MyData.selectedAccidentInfoData!.accidentBankAccount}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+            ])
+        )
+    );
+    introWidgetList.add(
+        UiUtils.getMarginBox(0, 3.h)
+    );
+    introWidgetList.add(
+        SizedBox(width: 90.w,
+            child: Row(children: [
+              UiUtils.getMarginBox(3.w, 0),
+              UiUtils.getTextButtonWithFixedScale("• ${MyData.jobInfo.split("@")[0]}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
             ])
         )
     );
     if(MyData.jobInfo.split("@")[1] == "1"){
       introWidgetList.add(
+          UiUtils.getMarginBox(0, 3.h)
+      );
+      introWidgetList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
-                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-                UiUtils.getTextButtonWithFixedScale("[주거래 은행] ${selectedBankCodeInfo.split("@")[0]} $selectedBankAccountInfo", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                UiUtils.getMarginBox(3.w, 0),
+                UiUtils.getTextButtonWithFixedScale("• [주거래 은행] ${selectedBankCodeInfo.split("@")[0]} $selectedBankAccountInfo", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
               ])
           )
       );
       introWidgetList.add(
+          UiUtils.getMarginBox(0, 3.h)
+      );
+      introWidgetList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
-                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-                UiUtils.getTextButtonWithFixedScale("사업자번호 $selectedBusinessNumberInfo", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                UiUtils.getMarginBox(3.w, 0),
+                UiUtils.getTextButtonWithFixedScale("• 사업자번호 $selectedBusinessNumberInfo", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
               ])
           )
       );
     }
+    introWidgetList.add(
+        UiUtils.getMarginBox(0, 3.h)
+    );
     if(MyData.selectedAccidentInfoData!.accidentWishAmount != "0"){
       introWidgetList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
-                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-                UiUtils.getTextButtonWithFixedScale("대출희망금액 ${CommonUtils.getPriceCommaFormattedString(double.parse(MyData.selectedAccidentInfoData!.accidentWishAmount))}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                UiUtils.getMarginBox(3.w, 0),
+                UiUtils.getTextButtonWithFixedScale("• 대출희망금액 ${CommonUtils.getPriceCommaFormattedString(double.parse(MyData.selectedAccidentInfoData!.accidentWishAmount))}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
               ])
           )
@@ -2383,9 +2575,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       introWidgetList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                UiUtils.getCustomCircleCheckBox(UniqueKey(), 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
-                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-                UiUtils.getTextButtonWithFixedScale("대출희망금액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                UiUtils.getMarginBox(3.w, 0),
+                UiUtils.getTextButtonWithFixedScale("• 대출희망금액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
               ])
           )
@@ -2410,14 +2601,14 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     }
     introWidgetList.add(
         SizedBox(width: 90.w,
-            child: UiUtils.getTextWithFixedScale("제출서류", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)
+            child: UiUtils.getTextWithFixedScale("제출정보", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)
         )
     );
     introWidgetList.add(
         UiUtils.getMarginBox(0, 1.h)
     );
-    for(int i = 0 ; i < addedDocsList.length-1 ; i++){
-      if(addedDocsList[i]["is_confirmed"]){
+    for(int i = 0 ; i < addedDocsList.length ; i++){
+      if(addedDocsList[i]["is_confirmed"] && addedDocsList[i]["id"] != 999 && addedDocsList[i]["id"] != 1000){
         Key key = UniqueKey();
         introWidgetList.add(
             SizedBox(width: 90.w,
@@ -2449,103 +2640,107 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     ]);
   }
   void _applyPr(){
-    if(!isReApply){
-      UiUtils.showLoadingPop(context);
-      _uploadCertImageToAwsServer(pickedFilePath, (isSuccessToUpload){
-        if(isSuccessToUpload){
-          List<dynamic> docResultList = [];
-          Map<String, dynamic> eachMap = {
-            "pr_document_id" : "12",
-            "response_data" : awsUploadUrl
-          };
-          docResultList.add(eachMap);
-          for(var each in addedDocsList){
-            if(each["is_docs"] && each["is_confirmed"]){
-              var resultMap  =  each["result"]["resultValue"]["data"];
-              if(each["id"] == 3 || each["id"] == 4){
-                if(resultMap is List<dynamic>){
-                  Map<String, dynamic> eachMap = {
-                    "pr_document_id" : each["id"],
-                    "response_data" : json.encode(resultMap)
-                  };
-                  docResultList.add(eachMap);
-                }else{
-                  List<dynamic> wrapListMap = [];
-                  wrapListMap.add(resultMap);
-                  Map<String, dynamic> eachMap = {
-                    "pr_document_id" : each["id"],
-                    "response_data" : json.encode(wrapListMap)
-                  };
-                  docResultList.add(eachMap);
-                }
+    UiUtils.showLoadingPop(context);
+    _uploadCertImageToAwsServer(pickedFilePath, (isSuccessToUpload){
+      if(isSuccessToUpload){
+        List<dynamic> docResultList = [];
+        Map<String, dynamic> eachMap = {
+          "pr_document_id" : "12",
+          "response_data" : awsUploadUrl
+        };
+        docResultList.add(eachMap);
+        for(var each in addedDocsList){
+          if(each["is_docs"] && each["is_confirmed"]){
+            var resultMap  =  each["result"]["resultValue"]["data"];
+            if(each["id"] == 3 || each["id"] == 4){
+              if(resultMap is List<dynamic>){
+                Map<String, dynamic> eachMap = {
+                  "pr_document_id" : each["id"],
+                  "response_data" : json.encode(resultMap)
+                };
+                docResultList.add(eachMap);
               }else{
-                if(resultMap is List<dynamic>){
-                  Map<String, dynamic> eachMap = {
-                    "pr_document_id" : each["id"],
-                    "response_data" : json.encode(resultMap)
-                  };
-                  docResultList.add(eachMap);
-                }else{
-                  Map<String, dynamic> eachMap = {
-                    "pr_document_id" : each["id"],
-                    "response_data" : resultMap
-                  };
-                  docResultList.add(eachMap);
-                }
+                List<dynamic> wrapListMap = [];
+                wrapListMap.add(resultMap);
+                Map<String, dynamic> eachMap = {
+                  "pr_document_id" : each["id"],
+                  "response_data" : json.encode(wrapListMap)
+                };
+                docResultList.add(eachMap);
+              }
+            }else{
+              if(resultMap is List<dynamic>){
+                Map<String, dynamic> eachMap = {
+                  "pr_document_id" : each["id"],
+                  "response_data" : json.encode(resultMap)
+                };
+                docResultList.add(eachMap);
+              }else{
+                Map<String, dynamic> eachMap = {
+                  "pr_document_id" : each["id"],
+                  "response_data" : resultMap
+                };
+                docResultList.add(eachMap);
               }
             }
           }
-          String address = _getResultFromListById(addressId)["resultValue"];
-          Map<String, dynamic> applyInputMap = {
-            "offer_id": MyData.selectedPrInfoData!.productOfferId,
-            "offer_rid": MyData.selectedPrInfoData!.productOfferRid,
-            "lender_pr_id": MyData.selectedPrInfoData!.productOfferLenderPrId,
-            "address": address,
-            "contact_no1": MyData.phoneNumber.substring(0,3),
-            "contact_no2": MyData.phoneNumber.substring(3,7),
-            "contact_no3": MyData.phoneNumber.substring(7),
-            "jumin_no1": MyData.idNumber.split("-")[0],
-            "jumin_no2": MyData.idNumber.split("-")[1],
-            "memo": '모바일 신청',
-            "documents": docResultList
-          };
-
-          LogfinController.callLogfinApi(LogfinApis.applyProduct, applyInputMap, (isSuccess, outputJson){
-            UiUtils.closeLoadingPop(context);
-            if(isSuccess){
-              LogfinController.getLoanInfo((isSuccessToGetLoanInfo, isNotEmpty){
-                UiUtils.closeLoadingPop(context);
-                if(isSuccessToGetLoanInfo){
-                  if(isNotEmpty){
-                    List<Map<String, dynamic>> addedDocsListForSave = [];
-                    for(var each in addedDocsList){
-                      if(each["is_confirmed"]){
-                        addedDocsListForSave.add(each);
-                      }
-                    }
-                    SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceApplyPrKey, jsonEncode(addedDocsListForSave));
-                    nextInputView();
-                  }else{
-                    CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
-                  }
-                }
-              });
-            }else{
-              CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
-            }
-          });
-        }else{
-          UiUtils.closeLoadingPop(context);
-          CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
         }
-      });
-    }
+        String address = _getResultFromListById(addressId)["resultValue"];
+        Map<String, dynamic> applyInputMap = {
+          "offer_id": MyData.selectedPrInfoData!.productOfferId,
+          "offer_rid": MyData.selectedPrInfoData!.productOfferRid,
+          "lender_pr_id": MyData.selectedPrInfoData!.productOfferLenderPrId,
+          "address": address,
+          "contact_no1": MyData.phoneNumber.substring(0,3),
+          "contact_no2": MyData.phoneNumber.substring(3,7),
+          "contact_no3": MyData.phoneNumber.substring(7),
+          "jumin_no1": MyData.idNumber.split("-")[0],
+          "jumin_no2": MyData.idNumber.split("-")[1],
+          "memo": '모바일 신청',
+          "documents": docResultList
+        };
+
+        LogfinController.callLogfinApi(LogfinApis.applyProduct, applyInputMap, (isSuccess, outputJson){
+          if(isSuccess){
+            LogfinController.getLoanInfo((isSuccessToGetLoanInfo, isNotEmpty){
+              if(isSuccessToGetLoanInfo){
+                if(isNotEmpty){
+                  List<Map<String, dynamic>> addedDocsListForSave = [];
+                  for(var each in addedDocsList){
+                    if(each["is_confirmed"]){
+                      addedDocsListForSave.add(each);
+                    }
+                  }
+                  SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceApplyPrKey, jsonEncode(addedDocsListForSave));
+                  UiUtils.closeLoadingPop(context);
+                  setState(() {
+                    currentViewId = _getViewIdFromListById(confirmedId);
+                  });
+                }else{
+                  UiUtils.closeLoadingPop(context);
+                  CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
+                }
+              }else{
+                UiUtils.closeLoadingPop(context);
+                CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
+              }
+            });
+          }else{
+            UiUtils.closeLoadingPop(context);
+            CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
+          }
+        });
+      }else{
+        UiUtils.closeLoadingPop(context);
+        CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
+      }
+    });
   }
   /// finish view end
 
   Widget _getConfirmedView(){
     return Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center, children: [
-      UiUtils.getMarginBox(0, 45.h),
+      UiUtils.getMarginBox(0, 40.h),
       UiUtils.getCustomCircleCheckBox(UniqueKey(),3, true, ColorStyles.upFinWhite, ColorStyles.upFinButtonBlue,
           ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue, (checkedValue){}),
       UiUtils.getMarginBox(0, 2.h),
@@ -2572,7 +2767,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getIntroView());
     }else {
       if(_getIdFromListByViewId(currentViewId) == mainBankId){
-        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getBankCodeView());
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: Obx(()=>_getBankCodeView()));
       }else if(_getIdFromListByViewId(currentViewId) == mainBankAccountId){
         view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getBankAccountView());
       }else if(_getIdFromListByViewId(currentViewId) == businessNumberId){

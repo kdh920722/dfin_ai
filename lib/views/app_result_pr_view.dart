@@ -28,6 +28,10 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
   bool? item1SubAgreed2 = false;
   bool? item2SubAgreed1 = false;
   bool? item2SubAgreed2 = false;
+  int selectedTabIndex = 0 ;
+  int selectedTabCount = 0 ;
+  int possiblePrCount = 0 ;
+  int impossiblePrbCount = 0 ;
   @override
   void initState(){
     CommonUtils.log("i", "AppResultPrView 화면 입장");
@@ -36,6 +40,28 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
     setPrCnt();
     MyData.selectedPrInfoData = null;
     _tabController = TabController(length: 2, vsync: this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _setImagePreLoad();
+    });
+
+    for(var each in MyData.getPrInfoList()){
+      if(each.isPossible){
+        possiblePrCount++;
+      }else{
+        impossiblePrbCount++;
+      }
+    }
+    selectedTabCount = possiblePrCount;
+    _tabController.addListener(() {
+      selectedTabIndex = _tabController.index;
+      setState(() {
+        if(selectedTabIndex == 0){
+          selectedTabCount = possiblePrCount;
+        }else{
+          selectedTabCount = impossiblePrbCount;
+        }
+      });
+    });
   }
 
   @override
@@ -90,6 +116,10 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
     }
   }
 
+  void _setImagePreLoad(){
+    precacheImage(const AssetImage('assets/images/temp_bank_logo.png'), context);
+  }
+
   Widget _getPrListView(bool isPossible){
     List<Widget> prInfoWidgetList = [];
     for(var each in MyData.getPrInfoList()){
@@ -123,7 +153,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                       UiUtils.getTextWithFixedScale(each.productCompanyName, 15.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null),
                     ])),
                     UiUtils.getMarginBox(0, 1.h),
-                    UiUtils.getTextWithFixedScale(each.productName, 10.sp, FontWeight.w300, ColorStyles.upFinBlack, TextAlign.start, null),
+                    UiUtils.getTextWithFixedScaleAndOverFlow(each.productName, 10.sp, FontWeight.w300, ColorStyles.upFinBlack, TextAlign.start, null),
                     UiUtils.getMarginBox(0, 2.h),
                     SizedBox(width: 80.w, child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       SizedBox(width: 20.w, child: UiUtils.getTextWithFixedScale("최저금리", 10.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, 1)),
@@ -136,17 +166,25 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                       SizedBox(width: 45.w, child: UiUtils.getTextWithFixedScale(CommonUtils.getPriceFormattedString(double.parse(each.productLoanLimit)), 18.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1))
                     ])),
                     UiUtils.getMarginBox(0, 2.h),
-                    each.isPossible? UiUtils.getTextWithFixedScale("신청 가능", 12.sp, FontWeight.w600, ColorStyles.upFinTextAndBorderBlue, TextAlign.end, 1)
-                        : UiUtils.getTextWithFixedScale("신청 불가능", 12.sp, FontWeight.w600, ColorStyles.upFinRed, TextAlign.end, 1),
-                    UiUtils.getMarginBox(0, 0.5.h),
                     each.isPossible? Container()
                         : UiUtils.getTextWithFixedScale(msg, 10.sp, FontWeight.w500, ColorStyles.upFinRed, TextAlign.start, null),
                   ])),
                   Expanded(flex: 1, child: each.isPossible? Icon(Icons.arrow_forward_ios_rounded, color: ColorStyles.upFinButtonBlue, size: 5.5.w) : Container()),
                 ]), () {
                   if(each.isPossible) {
-                    MyData.selectedPrInfoData = each;
-                    UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, 100.w, 65.h, 0.5, _makeAgreeWidget);
+                    CommonUtils.log("i","${each.productOfferLenderPrId} ${each.productOfferRid} ${each.productOfferId}");
+                    bool isDuplicate = false;
+                    for(var eachLoan in MyData.getLoanInfoList()){
+                      if(eachLoan.lenderPrId == each.productOfferLenderPrId){
+                        isDuplicate = true;
+                      }
+                    }
+                    if(isDuplicate){
+                      CommonUtils.flutterToast("이미 신청하신 상품입니다.");
+                    }else{
+                      MyData.selectedPrInfoData = each;
+                      UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, 100.w, 65.h, 0.5, _makeAgreeWidget);
+                    }
                   }
                 })
         );
@@ -395,44 +433,47 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
   @override
   Widget build(BuildContext context) {
     Widget view = Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: EdgeInsets.all(5.w), child: Column(children: [
-      SizedBox(width: 95.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () {
+      Row(children: [
+        const Spacer(flex: 2),
+        UiUtils.getIconButtonWithHeight(3.h, Icons.close, 20.sp, ColorStyles.upFinDarkGray, () {
           MyData.selectedAccidentInfoData = null;
           MyData.selectedPrInfoData = null;
           Navigator.pop(context);
-        }),
-      ])),
+        })
+      ]),
       UiUtils.getMarginBox(0, 3.h),
       SizedBox(width: 95.w, child : UiUtils.getTextWithFixedScale("대출상품", 24.sp, FontWeight.w800, ColorStyles.upFinButtonBlue, TextAlign.start, 1)),
-      UiUtils.getMarginBox(0, 1.h),
-      SizedBox(height: 6.h, child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-        UiUtils.getTextWithFixedScale("전체상품 ", 14.sp, FontWeight.w400, ColorStyles.upFinBlack, TextAlign.center, 1),
-        UiUtils.getTextWithFixedScale("${MyData.getPrInfoList().length}개", 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, 1),
-        const Spacer(flex: 2),
-        UiUtils.getCustomTextButtonBox(23.w, "금리순", 10.sp, FontWeight.w600, isOrderByLimit? ColorStyles.upFinWhiteSky : ColorStyles.upFinButtonBlue,
-            isOrderByLimit? ColorStyles.upFinButtonBlue : ColorStyles.upFinWhiteSky, () {
-              _reOrderList(false);
-        }),
-        UiUtils.getMarginBox(1.w, 0),
-        UiUtils.getCustomTextButtonBox(23.w, "한도순", 10.sp, FontWeight.w600, isOrderByLimit? ColorStyles.upFinButtonBlue : ColorStyles.upFinWhiteSky,
-            isOrderByLimit? ColorStyles.upFinWhiteSky : ColorStyles.upFinButtonBlue, () {
-              _reOrderList(true);
-        })
-      ])),
       UiUtils.getMarginBox(0, 1.h),
       SizedBox(width: 95.w, height: 5.h, child: TabBar(
         unselectedLabelStyle: TextStyles.upFinUnselectedTabTextInButtonStyle,
         unselectedLabelColor: ColorStyles.upFinRealGray,
         labelStyle: TextStyles.upFinSelectedTabTextInButtonStyle,
         labelColor: ColorStyles.upFinBlack,
+        indicatorSize: TabBarIndicatorSize.tab,
         indicator: MyPrTabIndicator(),
-        dividerColor: ColorStyles.upFinWhite,
+        indicatorColor: ColorStyles.upFinButtonBlue,
+        dividerColor: ColorStyles.upFinWhiteSky,
         controller: _tabController,
         tabs: const <Widget>[
           Tab(text: "신청 가능"),
           Tab(text: "신청 불가능"),
         ],
       )),
+      UiUtils.getMarginBox(0, 1.h),
+      SizedBox(height: 6.h, child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+        UiUtils.getTextWithFixedScale("상품 ", 14.sp, FontWeight.w400, ColorStyles.upFinBlack, TextAlign.center, 1),
+        UiUtils.getTextWithFixedScale("$selectedTabCount개", 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, 1),
+        const Spacer(flex: 2),
+        UiUtils.getCustomTextButtonBox(23.w, "금리순", 10.sp, FontWeight.w600, isOrderByLimit? ColorStyles.upFinWhiteSky : ColorStyles.upFinButtonBlue,
+            isOrderByLimit? ColorStyles.upFinButtonBlue : ColorStyles.upFinWhiteSky, () {
+              _reOrderList(false);
+            }),
+        UiUtils.getMarginBox(1.w, 0),
+        UiUtils.getCustomTextButtonBox(23.w, "한도순", 10.sp, FontWeight.w600, isOrderByLimit? ColorStyles.upFinButtonBlue : ColorStyles.upFinWhiteSky,
+            isOrderByLimit? ColorStyles.upFinWhiteSky : ColorStyles.upFinButtonBlue, () {
+              _reOrderList(true);
+            })
+      ])),
       SizedBox(width: 95.w, height: 60.h, child: TabBarView(
         controller: _tabController,
         children: <Widget>[
@@ -474,14 +515,11 @@ class _MyPrTabIndicatorPainter extends BoxPainter {
     final Paint paint = Paint();
     paint.color = ColorStyles.upFinBlack; // 인디케이터 색상
     paint.style = PaintingStyle.fill;
-    final double indicatorWidth = rect.width*1.7; // 탭의 중간 길이
-    final double indicatorHeight = 0.3.h; // 인디케이터 높이
     paint.strokeCap = StrokeCap.round; // 둥글게 된 모서리
 
-    final Rect indicatorRect = Rect.fromCenter(
-      center: rect.bottomCenter,
-      width: indicatorWidth,
-      height: indicatorHeight,
+    final indicatorRect = Rect.fromPoints(
+      Offset(rect.left, rect.bottom - 1), // 네모 모서리 높이 조절
+      Offset(rect.right, rect.bottom), // 네모 모서리 높이 조절
     );
 
     canvas.drawRect(indicatorRect, paint);

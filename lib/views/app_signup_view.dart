@@ -23,6 +23,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
   int viewId = 1;
   bool isPwShowValid = false;
   bool isPhoneShowValid = false;
+  bool isButtonValid = false;
   bool isView1Valid = false;
 
   final ScrollController _scrollController = ScrollController();
@@ -178,6 +179,16 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
     }else{
       isConfirmed = true;
       GetController.to.updateConfirmed(isConfirmed);
+    }
+
+    if(_phoneNumberTextController.text.trim().length > 8){
+      setState(() {
+        isButtonValid = true;
+      });
+    }else{
+      setState(() {
+        isButtonValid = false;
+      });
     }
   }
 
@@ -475,13 +486,13 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
   Widget _getEmailAndPwInfoView(){
     return Form(key: _formKey1, child: UiUtils.getRowColumnWithAlignCenter([
       SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+        UiUtils.getIconButtonWithHeight(5.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
           CommonUtils.hideKeyBoard();
           Navigator.pop(context);
         }),
       ])),
       SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getMarginBox(0, 5.h),
+        UiUtils.getMarginBox(0, 3.h),
         UiUtils.getTextWithFixedScale("회원가입", 26.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
         UiUtils.getMarginBox(0, 3.h)
       ])),
@@ -556,7 +567,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
   Widget _getPhoneValidView(){
     return Form(key: _formKey2, child: UiUtils.getRowColumnWithAlignCenter([
       Obx(()=>!GetController.to.isConfirmed.value? SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+        UiUtils.getIconButtonWithHeight(5.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
           CommonUtils.hideKeyBoard();
           setState(() {
             viewId = 1;
@@ -564,7 +575,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
         }),
       ])) : UiUtils.getMarginBox(0, 7.h)),
       SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getMarginBox(0, 5.h),
+        UiUtils.getMarginBox(0, 3.h),
         UiUtils.getTextWithFixedScale("회원가입", 26.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
         UiUtils.getMarginBox(0, 3.h)
       ])),
@@ -585,17 +596,16 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
               return null;
             }
           }): Container(),
-      UiUtils.getExpandedScrollView(Axis.vertical, Container()),
-      UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinTextAndBorderBlue,
-          UiUtils.getTextWithFixedScale("본인인증", 12.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, null), () async {
+      UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
+      isButtonValid? UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+          UiUtils.getTextWithFixedScale("본인인증", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () async {
             CommonUtils.hideKeyBoard();
             if(_phoneNumberTextController.text.trim() != ""){
               UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, 100.w, 62.h, 0.5, _makeAgreeWidget);
-
             }else{
               CommonUtils.flutterToast("휴대전화 번호를 입력하세요.");
             }
-          })
+          }) : Container()
     ]));
   }
 
@@ -612,11 +622,11 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
 
   @override
   Widget build(BuildContext context) {
-    Widget view = Container(width: 100.w, height: 95.h, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w),
+    Widget view = Container(width: 100.w, height: 100.h, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w),
         child: viewId == 1 ? _getEmailAndPwInfoView() : _getPhoneValidView()
     );
 
-    return UiUtils.getScrollViewWithAllowBackForAndroid(context, view, _scrollController, back);
+    return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
   }
 
 }

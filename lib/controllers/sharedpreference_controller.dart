@@ -48,4 +48,26 @@ class SharedPreferenceController {
     }
   }
 
+  static void deleteAllData(){
+    try{
+      if(sharedPreferences!.containsKey(sharedPreferenceIdKey)){
+        sharedPreferences!.remove(sharedPreferenceIdKey);
+      }
+
+      if(sharedPreferences!.containsKey(sharedPreferencePwKey)){
+        sharedPreferences!.remove(sharedPreferencePwKey);
+      }
+
+      if(sharedPreferences!.containsKey(sharedPreferenceApplyPrKey)){
+        sharedPreferences!.remove(sharedPreferenceApplyPrKey);
+      }
+
+      if(sharedPreferences!.containsKey(sharedPreferenceValidDateKey)){
+        sharedPreferences!.remove(sharedPreferenceValidDateKey);
+      }
+    }catch(e){
+      CommonUtils.log('e', e.toString());
+    }
+  }
+
 }

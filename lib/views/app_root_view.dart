@@ -37,6 +37,10 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
     WidgetsBinding.instance.addObserver(this);
     MyData.resetMyData();
     _initDeepLinkHandling();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _setImagePreLoad();
+    });
+
   }
 
   @override
@@ -66,6 +70,12 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
       default:
         break;
     }
+  }
+
+  void _setImagePreLoad(){
+    precacheImage(const AssetImage('assets/images/img_man_searcher.png'), context);
+    precacheImage(const AssetImage('assets/images/logo_kakao_circle.png'), context);
+    precacheImage(const AssetImage('assets/images/logo_apple_circle.png'), context);
   }
 
   Future<void> _initFirebase() async {

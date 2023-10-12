@@ -220,8 +220,10 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
             unselectedLabelColor: ColorStyles.upFinRealGray,
             labelStyle: TextStyles.upFinSelectedTabTextInButtonStyle,
             labelColor: ColorStyles.upFinButtonBlue,
+            indicatorSize: TabBarIndicatorSize.tab,
             indicator: MyTabIndicator(),
-            dividerColor: ColorStyles.upFinWhite,
+            indicatorColor: ColorStyles.upFinButtonBlue,
+            dividerColor: ColorStyles.upFinWhiteSky,
             controller: _tabController,
             tabs: const <Widget>[
               Tab(text: "사건정보"),
@@ -267,15 +269,13 @@ class _MyTabIndicatorPainter extends BoxPainter {
     final Paint paint = Paint();
     paint.color = ColorStyles.upFinButtonBlue; // 인디케이터 색상
     paint.style = PaintingStyle.fill;
-    final double indicatorWidth = rect.width*0.65.w; // 탭의 중간 길이
-    final double indicatorHeight = 0.3.h; // 인디케이터 높이
     paint.strokeCap = StrokeCap.round; // 둥글게 된 모서리
 
-    final Rect indicatorRect = Rect.fromCenter(
-      center: rect.bottomCenter,
-      width: indicatorWidth,
-      height: indicatorHeight,
+    final indicatorRect = Rect.fromPoints(
+      Offset(rect.left, rect.bottom - 1), // 네모 모서리 높이 조절
+      Offset(rect.right, rect.bottom), // 네모 모서리 높이 조절
     );
+
 
     canvas.drawRect(indicatorRect, paint);
   }

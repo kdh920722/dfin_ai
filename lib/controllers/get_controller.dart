@@ -21,6 +21,8 @@ class GetController extends GetxController {
   RxInt lastVisibleItem1_2 = 0.obs;
   RxInt firstVisibleItem2_2= 0.obs;
   RxInt lastVisibleItem2_2 = 0.obs;
+  RxInt firstVisibleItem2_3= 0.obs;
+  RxInt lastVisibleItem2_3 = 0.obs;
 
   @override
   void onInit() {
@@ -169,5 +171,18 @@ class GetController extends GetxController {
   }
   void resetLastIndex2_2() {
     lastVisibleItem2_2 = 0.obs;
+  }
+
+  void updateFirstIndex2_3(int newValue) {
+    firstVisibleItem2_3.value = newValue;
+  }
+  void resetFirstIndex2_3() {
+    firstVisibleItem2_3 = 0.obs;
+  }
+  void updateLastIndex2_3(int newValue) {
+    lastVisibleItem2_3.value = newValue;
+  }
+  void resetLastIndex2_3() {
+    lastVisibleItem2_3 = 0.obs;
   }
 }

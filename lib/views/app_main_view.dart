@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:upfin/configs/app_config.dart';
+import 'package:upfin/configs/string_config.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/datas/chatroom_info_data.dart';
 import 'package:upfin/datas/loan_info_data.dart';
@@ -37,6 +38,10 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     }else{
       doCheckToSearchAccident = false;
     }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _setImagePreLoad();
+    });
   }
 
   @override
@@ -67,13 +72,24 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     }
   }
 
+  void _setImagePreLoad(){
+    precacheImage(const AssetImage('assets/images/img_man_banner.png'), context);
+    precacheImage(const AssetImage('assets/images/img_man_welcome.png'), context);
+    precacheImage(const AssetImage('assets/images/img_man_searcher.png'), context);
+    precacheImage(const AssetImage('assets/images/img_woman_searcher.png'), context);
+    precacheImage(const AssetImage('assets/images/img_woman_coffee.png'), context);
+    precacheImage(const AssetImage('assets/images/img_woman_sports.png'), context);
+    precacheImage(const AssetImage('assets/images/accident_icon.png'), context);
+    precacheImage(const AssetImage('assets/images/temp_bank_logo.png'), context);
+  }
+
   bool isScrolling = false;
   Widget _getMyView(){
     return Column(children: [
       UiUtils.getMarginBox(0, 2.h),
-      SizedBox(width: 95.w, height: 15.h, child:Stack(alignment: Alignment.center, children: [
+      SizedBox(width: 95.w, height: 14.h, child:Stack(alignment: Alignment.center, children: [
         Positioned(
-            child: UiUtils.getTopBannerButtonBox(90.w, 7.h, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinTextAndBorderBlue,
+            child: UiUtils.getTopBannerButtonBox(90.w, 7.h, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
                 UiUtils.getTextWithFixedScale("업핀! 다이렉트 대출의시작!", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, 1), () {
 
             })),
@@ -81,47 +97,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             left: 0.5.w,
             child: UiUtils.getImage(25.w, 15.h, Image.asset(fit: BoxFit.fitHeight,'assets/images/img_man_banner.png'))),
       ])),
-      Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 0.h, bottom: 1.h), child: Row(mainAxisSize: MainAxisSize.max, children: [
-        UiUtils.getTextWithFixedScale("사건기록", 15.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, 1),
-        const Spacer(flex: 2),
-        UiUtils.getBorderButtonBoxWithZeroPadding(15.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
-            UiUtils.getTextWithFixedScale("새로고침", 10.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.end, 1), () {
-              _refreshMyView(context);
-            })
-      ])),
-      SizedBox(width: 90.w, height: 18.h, child: Obx((){
-        List<Widget> accidentWidgetList = _getAccidentWidgetList();
-        return accidentWidgetList.isNotEmpty ?  Column(
-          children: <Widget>[
-            // PageView
-            SizedBox(width: 90.w, height: 13.h,
-              child: PageView(
-                controller: _pageController,
-                children: accidentWidgetList,
-              ),
-            ),
-            UiUtils.getMarginBox(0, 3.h),
-            accidentWidgetList.length>1? SmoothPageIndicator(
-              controller: _pageController,
-              count: accidentWidgetList.length, // 페이지 수
-              effect: WormEffect(dotWidth: 2.2.w, dotHeight: 2.2.w, dotColor: ColorStyles.upFinWhiteSky, activeDotColor: ColorStyles.upFinTextAndBorderBlue), // 페이지 인디케이터 스타일
-            ):Container(),
-          ],
-        ) : Column(children: [
-          UiUtils.getBorderButtonBoxWithZeroPadding(100.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
-              Row(children: [
-                UiUtils.getTextWithFixedScale("현재 등록된 사건이없습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.center, null),
-                const Spacer(flex: 2),
-                UiUtils.getBorderButtonBox(25.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
-                    UiUtils.getTextWithFixedScale("등록하기", 12.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, null), () {
-                      CommonUtils.moveTo(context, AppView.appSearchAccidentView.value, null);
-                    })
-              ]), () { })
-        ]);
-      })),
-      UiUtils.getMarginBox(100.w, 2.h),
-      UiUtils.getMarginColoredBox(100.w, 2.h, ColorStyles.upFinWhiteGray),
-      UiUtils.getMarginBox(100.w, 2.h),
       Expanded(child: NotificationListener<ScrollNotification>(
           onNotification: (scrollNotification) {
             if (scrollNotification is ScrollUpdateNotification) {
@@ -131,7 +106,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                   bottomBarHeight = 0;
                 });
               }
-              print('스크롤 위치: ${scrollNotification.metrics.pixels}');
             } else if (scrollNotification is ScrollEndNotification) {
               if(isScrolling){
                 isScrolling = false;
@@ -139,15 +113,63 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                   bottomBarHeight = 7.h;
                 });
               }
-              print('스크롤이 멈춤');
             }
             return true;
           },
           child: ListView(shrinkWrap: true,physics: const BouncingScrollPhysics(),children: [
-            Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 2.h, bottom: 1.h), child: Row(mainAxisSize: MainAxisSize.max, children: [
-              UiUtils.getTextWithFixedScale("접수내역", 15.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, 1),
-              const Spacer(flex: 2)
+            Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 0.h, bottom: 1.h), child: Row(mainAxisSize: MainAxisSize.max, children: [
+              UiUtils.getTextWithFixedScale("사건기록", 15.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, 1),
+              const Spacer(flex: 2),
+              UiUtils.getBorderButtonBoxWithZeroPadding(15.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
+                  UiUtils.getTextWithFixedScale("새로고침", 10.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.end, 1), () {
+                    _refreshMyView(context);
+                  })
             ])),
+            SizedBox(width: 90.w, height: 21.h, child: Obx((){
+              List<Widget> accidentWidgetList = _getAccidentWidgetList();
+              return accidentWidgetList.isNotEmpty ?  Column(
+                children: <Widget>[
+                  // PageView
+                  SizedBox(width: 90.w, height: 15.h,
+                    child: PageView(
+                      controller: _pageController,
+                      children: accidentWidgetList,
+                    ),
+                  ),
+                  UiUtils.getMarginBox(0, 3.h),
+                  accidentWidgetList.length>1? SmoothPageIndicator(
+                    controller: _pageController,
+                    count: accidentWidgetList.length, // 페이지 수
+                    effect: WormEffect(dotWidth: 1.h, dotHeight: 1.h, dotColor: ColorStyles.upFinWhiteSky, activeDotColor: ColorStyles.upFinTextAndBorderBlue), // 페이지 인디케이터 스타일
+                  ):Container(),
+                ],
+              ) : Column(children: [
+                UiUtils.getBorderButtonBoxWithZeroPadding(100.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
+                    Row(children: [
+                      UiUtils.getTextWithFixedScale("현재 등록된 사건이없습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.center, null),
+                      const Spacer(flex: 2),
+                      UiUtils.getBorderButtonBox(25.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
+                          UiUtils.getTextWithFixedScale("등록하기", 12.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, null), () {
+                            CommonUtils.moveTo(context, AppView.appSearchAccidentView.value, null);
+                          })
+                    ]), () { })
+              ]);
+            })),
+            UiUtils.getMarginBox(100.w, 2.h),
+            UiUtils.getMarginColoredBox(100.w, 2.h, ColorStyles.upFinWhiteGray),
+            UiUtils.getMarginBox(100.w, 2.h),
+
+            Obx((){
+              int size = 0;
+              if(GetController.to.isMainLoanDataChanged.value){
+                size = MyData.getChatRoomInfoList().length;
+              }
+
+              return Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 2.h, bottom: 1.h), child: Row(mainAxisSize: MainAxisSize.max, children: [
+                UiUtils.getTextWithFixedScale("접수내역", 15.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, 1),
+                const Spacer(flex: 2)
+              ]));
+            }),
             Obx((){
               List<Widget> loanWidgetList = _getLoanChatWidgetList();
               return loanWidgetList.isNotEmpty ? Column(children: loanWidgetList)
@@ -163,18 +185,17 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               Positioned(
                   child: UiUtils.getBannerButtonBox(90.w, 50.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
                       Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                        SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale("빠르고", 25.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, 1)),
-                        UiUtils.getMarginBox(0, 1.h),
-                        SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale("쉽게", 25.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, 1)),
-                        UiUtils.getMarginBox(0, 1.h),
-                        SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale("대출받자!", 25.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, 1)),
-                      ]), () {
-                      })),
+                        SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale("위기 기회다!", 25.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, 1)),
+                        UiUtils.getMarginBox(0, 10.h)
+                      ]), () {})),
               Positioned(
                   right: 1.w,
-                  child: UiUtils.getImage(55.w, 55.w, Image.asset(fit: BoxFit.fill,'assets/images/img_man_welcome.png'))),
+                  child: UiUtils.getImage(55.w, 55.w, Image.asset(fit: BoxFit.fill,'assets/images/img_woman_sports.png'))),
             ]),
-            UiUtils.getMarginBox(0, 5.h),
+            UiUtils.getMarginBox(0, 3.h),
+            Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 0.h, bottom: 1.h),
+                child: UiUtils.getTextWithFixedScale(StringConfig.bannerTextForTest, 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
+            UiUtils.getMarginBox(0, 10.h),
           ])
       )),
 
@@ -260,8 +281,9 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               UiUtils.getMarginBox(0, 2.h),
               UiUtils.getBorderButtonBoxWithZeroPadding(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
                   Row(mainAxisSize: MainAxisSize.max, children: [
-                    Expanded(flex: 3, child: each.chatRoomType == 0? UiUtils.getIcon(12.w, 12.w, Icons.account_box_rounded, 12.w, ColorStyles.upFinButtonBlue) : UiUtils.getImage(12.w, 12.w, Image.asset(each.chatRoomIconPath))),
-                    Expanded(flex: 7, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Expanded(flex: 2, child: each.chatRoomType == 0? UiUtils.getIcon(12.w, 12.w, Icons.account_box_rounded, 12.w, ColorStyles.upFinButtonBlue) : UiUtils.getImage(12.w, 12.w, Image.asset(each.chatRoomIconPath))),
+                    UiUtils.getMarginBox(1.w, 0),
+                    Expanded(flex: 8, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
                         UiUtils.getMarginBox(0, 1.h),
                         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -277,8 +299,11 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                         UiUtils.getTextWithFixedScaleAndOverFlow(each.chatRoomLastMsg, 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, 1)
                       ])
                     ])),
-                    Expanded(flex: 1, child: each.chatRoomLastMsgCnt > 0? UiUtils.getCountCircleBox(5.w, each.chatRoomLastMsgCnt, 6.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, 1) : Container()),
-                    Expanded(flex: 2, child: UiUtils.getTextWithFixedScale(CommonUtils.getFormattedLastMsgTime(each.chatRoomLastMsgTime), 7.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null))
+                    Expanded(flex: 2, child: Column(children: [
+                      UiUtils.getTextWithFixedScale(CommonUtils.getFormattedLastMsgTime(each.chatRoomLastMsgTime), 7.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null),
+                      UiUtils.getMarginBox(0,0.5.h),
+                      each.chatRoomLastMsgCnt > 0? UiUtils.getCountCircleBox(5.w, each.chatRoomLastMsgCnt, 6.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, 1) : Container()
+                    ]))
                   ]), () {
                     CommonUtils.moveTo(context, AppView.appChatView.value, null);
                   }),
@@ -333,7 +358,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                 UiUtils.getTextWithFixedScale("대출상품 검색하기", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, 1) :
                 UiUtils.getTextWithFixedScale("사건 등록하기", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, 1), () async {
                   if(MyData.getAccidentInfoList().isNotEmpty){
-                    UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, 100.w, 40.h, 0.5, (slideContext, slideSetState){
+                    UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, 100.w, 45.h, 0.5, (slideContext, slideSetState){
                       List<Widget> accidentWidgetList = [];
                       for(var each in MyData.getAccidentInfoList()){
                         accidentWidgetList.add(
@@ -429,10 +454,10 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                         UiUtils.getMarginBox(0, 3.h),
                         UiUtils.getTextWithFixedScale("사건정보를 선택해주세요.", 16.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.center, 1),
                         UiUtils.getMarginBox(0, 3.h),
-                        SizedBox(width: 90.w, height: 18.h, child: Column(
+                        SizedBox(width: 90.w, height: 21.h, child: Column(
                           children: <Widget>[
                             // PageView
-                            SizedBox(width: 90.w, height: 13.h,
+                            SizedBox(width: 90.w, height: 16.h,
                               child: PageView(
                                 controller: _pageControllerForPop,
                                 children: accidentWidgetList,
@@ -446,7 +471,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                             ):Container(),
                           ],
                         )),
-                        UiUtils.getMarginBox(0, 2.5.h),
+                        UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
                         UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
                             UiUtils.getTextWithFixedScale("사건 추가하기", 12.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.center, 1), () {
                               Navigator.pop(slideContext);
@@ -465,9 +490,9 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                   }
                 }),
             UiUtils.getMarginBox(0, 0.5.h),
-            MyData.getAccidentInfoList().isNotEmpty ?
-            Align(alignment: Alignment.bottomCenter, child: Image.asset(fit: BoxFit.fill,'assets/images/img_man_searcher.png')) :
-            Align(alignment: Alignment.bottomCenter, child: Image.asset(fit: BoxFit.fill,'assets/images/img_woman_searcher.png'))
+            UiUtils.getExpandedScrollView(Axis.vertical, MyData.getAccidentInfoList().isNotEmpty ?
+            Align(alignment: Alignment.bottomCenter, child: Image.asset(fit: BoxFit.fitHeight,'assets/images/img_man_searcher.png')) :
+            Align(alignment: Alignment.bottomCenter, child: Image.asset(fit: BoxFit.fitHeight,'assets/images/img_woman_searcher.png'))),
           ])
       ),
     ]);

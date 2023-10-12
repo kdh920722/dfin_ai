@@ -641,33 +641,29 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
     String court = MyData.selectedAccidentInfoData!.accidentCourtInfo.split("@")[0];
     String accidentNo = "${MyData.selectedAccidentInfoData!.accidentCaseNumberYear}${MyData.selectedAccidentInfoData!.accidentCaseNumberType}${MyData.selectedAccidentInfoData!.accidentCaseNumberNumber}";
     List<String> confirmDataList = [];
-    confirmDataList.add("[환급]  ${selectedBankCodeInfo.split("@")[0]} $selectedBankAccountInfo");
-    confirmDataList.add("기대출  ${selectedPreLoanCountInfo.split("@")[0]}");
+    confirmDataList.add("• [환급]  ${selectedBankCodeInfo.split("@")[0]} $selectedBankAccountInfo");
+    confirmDataList.add("• 기대출  ${selectedPreLoanCountInfo.split("@")[0]}");
     if(selectedPreLoanPriceInfo != "0"){
-      confirmDataList.add("인가후 대출금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedPreLoanPriceInfo))}");
+      confirmDataList.add("• 인가후 대출금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedPreLoanPriceInfo))}");
     }else{
-      confirmDataList.add("인가후 대출금액  0원");
+      confirmDataList.add("• 인가후 대출금액  0원");
     }
     if(selectedWantLoanPriceInfo != "0"){
-      confirmDataList.add("희망 대출금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedWantLoanPriceInfo))}");
+      confirmDataList.add("• 희망 대출금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedWantLoanPriceInfo))}");
     }else{
-      confirmDataList.add("희망 대출금액  0원");
+      confirmDataList.add("• 희망 대출금액  0원");
     }
-    confirmDataList.add(selectedJobInfo.split("@")[0]);
+    confirmDataList.add("• ${selectedJobInfo.split("@")[0]}");
 
     List<Widget> confirmWidgetList = [];
     Color textColor = ColorStyles.upFinBlack;
     for(var each in confirmDataList){
-      Key key = UniqueKey();
       textColor = ColorStyles.upFinBlack;
       confirmWidgetList.add(
-          SizedBox(width: 90.w,
-              child: Row(children: [
-                UiUtils.getCustomCircleCheckBox(key, 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
-                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-                UiUtils.getTextButtonWithFixedScale(each, 13.sp, FontWeight.w800, textColor, TextAlign.center, null, (){})
-              ])
-          )
+        SizedBox(width: 80.w, child: UiUtils.getTextButtonWithFixedScale(each, 16.sp, FontWeight.w800, textColor, TextAlign.start, null, (){})),
+      );
+      confirmWidgetList.add(
+        UiUtils.getMarginBox(0, 3.h),
       );
     }
 
