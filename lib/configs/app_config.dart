@@ -9,6 +9,7 @@ import 'package:upfin/views/app_main_view.dart';
 import 'package:upfin/views/app_result_pr_view.dart';
 import 'package:upfin/views/app_root_view.dart';
 import 'package:upfin/views/app_search_accident_view.dart';
+import 'package:upfin/views/app_signout_view.dart';
 import 'package:upfin/views/app_signup_view.dart';
 import 'package:upfin/views/app_update_accident_view.dart';
 import 'package:upfin/views/app_web_view.dart';
@@ -32,6 +33,7 @@ class Config{
   static bool isAndroid = Platform.isAndroid;
   static String deppLinkInfo = "";
   static List<Permission> permissionList = [Permission.notification];
+  static String appVersion = "";
 
   static Map<String, WidgetBuilder> appRoutes = {
     AppView.appRootView.value : (context) => AppRootView(),
@@ -47,7 +49,8 @@ class Config{
     AppView.appApplyPrView.value : (context) => AppApplyPrView(),
     AppView.appChatView.value : (context) => AppChatView(),
     AppView.appAccidentDetailInfoView.value : (context) => AppAccidentDetailView(),
-    AppView.appAgreeDetailInfoView.value : (context) => AppAgreeDetailInfoView()
+    AppView.appAgreeDetailInfoView.value : (context) => AppAgreeDetailInfoView(),
+    AppView.appSignOutView.value : (context) => AppSignOutView()
   };
 
   static Future<void> initAppState(Function(bool isSuccess) callback) async{
@@ -57,13 +60,19 @@ class Config{
       if (snapshot.exists) {
         int androidState = 99;
         int iosState = 99;
+        String androidVersion = "";
+        String iosVersion = "";
         for(var each in snapshot.children){
           switch(each.key){
             case "android_open_state" : androidState = int.parse(each.value.toString());
             case "ios_open_state" : iosState = int.parse(each.value.toString());
+            case "android_app_version" : androidVersion = each.value.toString();
+            case "ios_app_version" : iosVersion = each.value.toString();
           }
         }
+
         appState = isAndroid? androidState : iosState;
+        appVersion = isAndroid? androidVersion : iosVersion;
 
         callback(true);
       } else {
@@ -77,7 +86,7 @@ class Config{
 }
 
 enum AppView {
-  appRootView, appLoginView, appCertificationView, appWebView, appSignupView, appMainView, appSearchAccidentView,
+  appRootView, appLoginView, appCertificationView, appWebView, appSignupView, appMainView, appSearchAccidentView, appSignOutView,
   appUpdateAccidentView, appResultPrView, appDetailPrView, appApplyPrView, appChatView, appAccidentDetailInfoView, appAgreeDetailInfoView
 }
 
@@ -112,24 +121,26 @@ extension SAppViewExtension on AppView {
         return '/accidentDetailInfoView';
       case AppView.appAgreeDetailInfoView:
         return '/agreeDetailInfoView';
+      case AppView.appSignOutView:
+        return '/appSignOutView';
     }
   }
 }
 
-enum SlideType {
+enum SlideMenuMoveType {
   rightToLeft, leftToRight, bottomToTop, topToBottom
 }
 
-extension SlideTypeExtension on SlideType {
+extension SlideTypeExtension on SlideMenuMoveType {
   String get value {
     switch (this) {
-      case SlideType.rightToLeft:
+      case SlideMenuMoveType.rightToLeft:
         return 'LEFT';
-      case SlideType.leftToRight:
+      case SlideMenuMoveType.leftToRight:
         return 'RIGHT';
-      case SlideType.bottomToTop:
+      case SlideMenuMoveType.bottomToTop:
         return 'TOP';
-      case SlideType.topToBottom:
+      case SlideMenuMoveType.topToBottom:
         return 'BOTTOM';
       default:
         throw Exception('Unknown SlideType value');

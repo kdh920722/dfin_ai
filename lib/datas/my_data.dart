@@ -74,7 +74,7 @@ class MyData {
     }
   }
   static void sortLoanInfoList(){
-    _loanInfoList.sort((a,b) => DateTime.parse(a.createdDate).compareTo(DateTime.parse(b.createdDate)));
+    _loanInfoList.sort((a,b) => DateTime.parse(b.createdDate).compareTo(DateTime.parse(a.createdDate)));
   }
   static void clearLoanInfoList(){
     _loanInfoList.clear();

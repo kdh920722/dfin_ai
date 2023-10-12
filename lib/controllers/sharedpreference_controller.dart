@@ -8,6 +8,7 @@ class SharedPreferenceController {
 
   static String sharedPreferenceIdKey = "KEY_ID";
   static String sharedPreferencePwKey = "KEY_PW";
+  static String sharedPreferenceApplyPrKey = "KEY_APPLY_PR";
   static String sharedPreferenceValidDateKey = "VALID_DATE";
   static SharedPreferences? sharedPreferences;
 
@@ -44,6 +45,28 @@ class SharedPreferenceController {
     }catch(e){
       CommonUtils.log('e', e.toString());
       return "";
+    }
+  }
+
+  static void deleteAllData(){
+    try{
+      if(sharedPreferences!.containsKey(sharedPreferenceIdKey)){
+        sharedPreferences!.remove(sharedPreferenceIdKey);
+      }
+
+      if(sharedPreferences!.containsKey(sharedPreferencePwKey)){
+        sharedPreferences!.remove(sharedPreferencePwKey);
+      }
+
+      if(sharedPreferences!.containsKey(sharedPreferenceApplyPrKey)){
+        sharedPreferences!.remove(sharedPreferenceApplyPrKey);
+      }
+
+      if(sharedPreferences!.containsKey(sharedPreferenceValidDateKey)){
+        sharedPreferences!.remove(sharedPreferenceValidDateKey);
+      }
+    }catch(e){
+      CommonUtils.log('e', e.toString());
     }
   }
 

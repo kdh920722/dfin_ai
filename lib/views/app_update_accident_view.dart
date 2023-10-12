@@ -18,17 +18,27 @@ class AppUpdateAccidentView extends StatefulWidget{
 }
 
 class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with WidgetsBindingObserver{
+  static int startViewId = 0;
+  static int endViewId = 0;
+
+  double scrollScreenHeight = 57.h;
+  double itemHeight2 = 0;
+  double itemFullHeight2 = 0;
+  int maxVisibleItemCnt2 = 0;
+  int lastVisibleItem1 = 0;
+  bool isScrolling2= false;
+
   bool isInputValid = true;
 
   final String errorMsg = "정보를 입력해주세요";
   int currentViewId = 1;
 
-  final int bankCodeViewId = 1;
+  static const int bankCodeViewId = 1;
   Key? selectedBankCodeKey;
   final ScrollController _bankScrollController = ScrollController();
   String selectedBankCodeInfo = "";
 
-  final int bankAccountViewId = 2;
+  static const int bankAccountViewId = 2;
   String selectedBankAccountInfo = "";
   final _bankAccountInfoFocus = FocusNode();
   final _bankAccountInfoTextController = TextEditingController();
@@ -38,11 +48,11 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
     }
   }
 
-  final int preLoanCountViewId = 3;
+  static const  int preLoanCountViewId = 3;
   Key? selectedPreLoanCountKey;
   String selectedPreLoanCountInfo = "";
 
-  final int preLoanPriceViewId = 4;
+  static const  int preLoanPriceViewId = 4;
   String selectedPreLoanPriceInfo = "";
   final _preLoanPriceFocus = FocusNode();
   final _preLoanPriceTextController = TextEditingController();
@@ -61,7 +71,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
     }
   }
 
-  final int wantLoanPriceViewId = 5;
+  static const  int wantLoanPriceViewId = 5;
   String selectedWantLoanPriceInfo = "";
   final _wantLoanPriceFocus = FocusNode();
   final _wantLoanPriceTextController = TextEditingController();
@@ -80,11 +90,11 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
     }
   }
 
-  final int jobViewId = 6;
+  static const  int jobViewId = 6;
   Key? selectedJobKey;
   String selectedJobInfo = "";
 
-  final int finishedViewId = 7;
+  static const  int finishedViewId = 7;
   bool finishedConfirmed = false;
 
   void _unFocusAllNodes(){
@@ -151,6 +161,9 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
 
     selectedJobInfo = MyData.jobInfo;
     selectedJobKey = Key(MyData.jobInfo);
+
+    GetController.to.updateFirstIndex1_2(0);
+    GetController.to.updateLastIndex1_2(12);
   }
 
   @override
@@ -161,6 +174,8 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
     _disposeAllTextControllers();
     GetController.to.resetPreLoanPrice();
     GetController.to.resetWantLoanPrice();
+    startViewId = 0;
+    endViewId = 0;
     super.dispose();
   }
 
@@ -195,8 +210,8 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
       _unFocusAllNodes();
       CommonUtils.hideKeyBoard();
       await Future.delayed(const Duration(milliseconds: 120), () async {});
-      if(currentViewId-1 == 0){
-        if(context.mounted) Navigator.pop(context);
+      if(currentViewId == startViewId){
+        if(context.mounted) Navigator.pop(context, false);
       }else{
         setState(() {
           isInputValid = true;
@@ -212,10 +227,14 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
       _unFocusAllNodes();
       CommonUtils.hideKeyBoard();
       await Future.delayed(const Duration(milliseconds: 120), () async {});
-      setState(() {
-        isInputValid = true;
-        currentViewId++;
-      });
+      if(currentViewId == endViewId){
+        _updateData();
+      }else{
+        setState(() {
+          isInputValid = true;
+          currentViewId++;
+        });
+      }
     }
   }
 
@@ -223,13 +242,29 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
   Widget _getBankCodeView(){
     List<Widget> bankCodeList = [];
     Color textColor = ColorStyles.upFinBlack;
-    for(var each in LogfinController.bankList){
-      Key key = Key(each);
-      if(selectedBankCodeKey == key) {
+    for(int i=0 ; i<LogfinController.bankList.length ; i++){
+      Key key = Key(LogfinController.bankList[i]);
+      if(selectedBankCodeKey == key){
         textColor = ColorStyles.upFinTextAndBorderBlue;
-      }
-      else{
+      }else{
         textColor = ColorStyles.upFinBlack;
+        if(GetController.to.firstVisibleItem2_2.value >= 3){
+          if(GetController.to.firstVisibleItem2_2.value-2 <= i && i <= GetController.to.firstVisibleItem2_2.value+1){
+            textColor = Colors.black12;
+            if(GetController.to.firstVisibleItem2_2.value+1 <= i && i <= GetController.to.firstVisibleItem2_2.value+1){
+              textColor = Colors.black38;
+            }
+          }
+        }
+
+        if(GetController.to.lastVisibleItem2_2.value <= LogfinController.bankList.length-3){
+          if(GetController.to.lastVisibleItem2_2.value-3 <= i && i <= GetController.to.lastVisibleItem2_2.value-1){
+            textColor = Colors.black12;
+            if(GetController.to.lastVisibleItem2_2.value-3 <= i && i <= GetController.to.lastVisibleItem2_2.value-3){
+              textColor = Colors.black38;
+            }
+          }
+        }
       }
       bankCodeList.add(
           SizedBox(width: 90.w,
@@ -240,7 +275,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
                         if(checkedValue != null){
                           if(checkedValue) {
                             selectedBankCodeKey = key;
-                            selectedBankCodeInfo = each;
+                            selectedBankCodeInfo = LogfinController.bankList[i];
                           }
                         }
                       });
@@ -250,15 +285,15 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
                         if(checkedValue != null){
                           if(!checkedValue) {
                             selectedBankCodeKey = key;
-                            selectedBankCodeInfo = each;
+                            selectedBankCodeInfo = LogfinController.bankList[i];
                           }
                         }
                       });
                     }),
-                UiUtils.getTextButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.center, null, (){
+                UiUtils.getTextButtonWithFixedScale(LogfinController.bankList[i].split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.center, null, (){
                   setState(() {
                     selectedBankCodeKey = key;
-                    selectedBankCodeInfo = each;
+                    selectedBankCodeInfo = LogfinController.bankList[i];
                   });
                 })
               ])
@@ -279,7 +314,36 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
       UiUtils.getMarginBox(0, 1.h),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("개인회생 신청 시 제출했던 본인의 계좌", 14.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getExpandedScrollViewWithController(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: bankCodeList), _bankScrollController),
+      NotificationListener<ScrollNotification>(
+          onNotification: (scrollNotification) {
+            if (scrollNotification is ScrollUpdateNotification) {
+              if(!isScrolling2){
+                isScrolling2 = true;
+                itemFullHeight2 = scrollNotification.metrics.maxScrollExtent+scrollScreenHeight;
+                itemHeight2 = itemFullHeight2/LogfinController.bankList.length;
+                maxVisibleItemCnt2 = (scrollScreenHeight/itemHeight2).ceil();
+              }
+
+              double scrollPosition = scrollNotification.metrics.pixels.abs();
+              int firstVisibleItem2 = (scrollPosition/itemHeight2).ceil();
+              int lastVisibleItem2 = firstVisibleItem2+maxVisibleItemCnt2;
+              if(firstVisibleItem2 <=0 ) firstVisibleItem2 = 0;
+              if(lastVisibleItem2 >= LogfinController.bankList.length-1) lastVisibleItem2 = LogfinController.bankList.length-1;
+              print('보이는 아이템 ====> ${LogfinController.bankList.length} : $firstVisibleItem2 | $lastVisibleItem2');
+
+              GetController.to.updateFirstIndex2_2(firstVisibleItem2);
+              GetController.to.updateLastIndex2_2(lastVisibleItem2);
+            } else if (scrollNotification is ScrollEndNotification) {
+              if(isScrolling2){
+                isScrolling2 = false;
+                itemFullHeight2 = scrollNotification.metrics.maxScrollExtent+scrollScreenHeight;
+                itemHeight2 = scrollNotification.metrics.maxScrollExtent/LogfinController.bankList.length;
+                maxVisibleItemCnt2 = (scrollScreenHeight/itemHeight2).ceil();
+              }
+            }
+            return true;
+          },
+        child: UiUtils.getExpandedScrollViewWithController(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: bankCodeList), _bankScrollController)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
         CommonUtils.log("i", "bank code : $selectedBankCodeInfo");
@@ -397,90 +461,106 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
 
   /// pre loan price view
   Widget _getPreLoanPriceView(){
-    return UiUtils.getRowColumnWithAlignCenter([
-      SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
-          backInputView();
-        }),
-      ])),
-      UiUtils.getMarginBox(0, 3.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("수정하실", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("인가후 대출 총금액을", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("알려주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      UiUtils.getMarginBox(0, 1.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력단위(*만원)", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
-      UiUtils.getMarginBox(0, 5.h),
-      Obx(()=>UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _preLoanPriceFocus, _preLoanPriceTextController, TextInputType.number, false,
-          UiUtils.getInputDecoration("", 0.sp, GetController.to.preLoanPrice.value, 14.sp), (text) {
-            if(text.trim() != ""){
-              final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
-              GetController.to.updatePreLoanPrice(CommonUtils.getPriceFormattedString(number!));
-            }else{
-              GetController.to.updatePreLoanPrice("만원");
+    return Stack(children: [
+      UiUtils.getRowColumnWithAlignCenter([
+        SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+            backInputView();
+          }),
+        ])),
+        UiUtils.getMarginBox(0, 3.h),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("수정하실", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("인가후 대출 총금액을", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("알려주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+        UiUtils.getMarginBox(0, 1.h),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력단위(*만원)", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
+        UiUtils.getMarginBox(0, 5.h),
+        Obx(()=>UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _preLoanPriceFocus, _preLoanPriceTextController, TextInputType.number, false,
+            UiUtils.getInputDecoration("", 0.sp, GetController.to.preLoanPrice.value, 14.sp), (text) {
+              if(text.trim() != ""){
+                final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
+                GetController.to.updatePreLoanPrice(CommonUtils.getPriceFormattedString(number!));
+              }else{
+                GetController.to.updatePreLoanPrice("만원");
+              }
+            }, (value){})
+        ),
+        UiUtils.getMarginBox(0, 5.h),
+        UiUtils.getExpandedScrollView(Axis.vertical, Container()),
+        UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+          if(_preLoanPriceTextController.text.trim() != ""){
+            final number = double.tryParse(_preLoanPriceTextController.text.trim().replaceAll(',', '')); // 콤마 제거 후 숫자 변환
+            String price = number.toString();
+            if(price.contains(".")){
+              price = price.split(".")[0];
             }
-          }, (value){})
-      ),
-      UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getExpandedScrollView(Axis.vertical, Container()),
-      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-        if(_preLoanPriceTextController.text.trim() != ""){
-          final number = double.tryParse(_preLoanPriceTextController.text.trim().replaceAll(',', '')); // 콤마 제거 후 숫자 변환
-          String price = number.toString();
-          if(price.contains(".")){
-            price = price.split(".")[0];
+            selectedPreLoanPriceInfo = price;
+          }else{
+            selectedPreLoanPriceInfo = "0";
           }
-          selectedPreLoanPriceInfo = price;
-        }else{
-          selectedPreLoanPriceInfo = "0";
-        }
-        CommonUtils.log("i", "selectedPreLoanPriceInfo : $selectedPreLoanPriceInfo");
-        nextInputView();
-      })
+          CommonUtils.log("i", "selectedPreLoanPriceInfo : $selectedPreLoanPriceInfo");
+          nextInputView();
+        })
+      ]),
+      Positioned(
+          right: 3.w,
+          child: UiUtils.getRowColumnWithAlignCenter([
+            UiUtils.getMarginBox(0, 28.h),
+            UiUtils.getTextWithFixedScale("만원", 16.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null),
+          ]))
     ]);
   }
   /// pre loan price end
 
   /// want loan price view
   Widget _getWantLoanPriceView(){
-    return UiUtils.getRowColumnWithAlignCenter([
-      SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
-          backInputView();
-        }),
-      ])),
-      UiUtils.getMarginBox(0, 3.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("수정하실", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("희망 대출금액을", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("알려주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      UiUtils.getMarginBox(0, 1.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력단위(*만원)", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
-      UiUtils.getMarginBox(0, 5.h),
-      Obx(()=>UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _wantLoanPriceFocus, _wantLoanPriceTextController, TextInputType.number, false,
-          UiUtils.getInputDecoration("", 0.sp, GetController.to.wantLoanPrice.value, 14.sp), (text) {
-            if(text.trim() != ""){
-              final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
-              GetController.to.updateWantLoanPrice(CommonUtils.getPriceFormattedString(number!));
-            }else{
-              GetController.to.updateWantLoanPrice("만원");
+    return Stack(children: [
+      UiUtils.getRowColumnWithAlignCenter([
+        SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+            backInputView();
+          }),
+        ])),
+        UiUtils.getMarginBox(0, 3.h),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("수정하실", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("희망 대출금액을", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("알려주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+        UiUtils.getMarginBox(0, 1.h),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력단위(*만원)", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
+        UiUtils.getMarginBox(0, 5.h),
+        Obx(()=>UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _wantLoanPriceFocus, _wantLoanPriceTextController, TextInputType.number, false,
+            UiUtils.getInputDecoration("", 0.sp, GetController.to.wantLoanPrice.value, 14.sp), (text) {
+              if(text.trim() != ""){
+                final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
+                GetController.to.updateWantLoanPrice(CommonUtils.getPriceFormattedString(number!));
+              }else{
+                GetController.to.updateWantLoanPrice("만원");
+              }
+            }, (value){})
+        ),
+        UiUtils.getMarginBox(0, 5.h),
+        UiUtils.getExpandedScrollView(Axis.vertical, Container()),
+        UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+          if(_wantLoanPriceTextController.text.trim() != ""){
+            final number = double.tryParse(_wantLoanPriceTextController.text.trim().replaceAll(',', '')); // 콤마 제거 후 숫자 변환
+            String price = number.toString();
+            if(price.contains(".")){
+              price = price.split(".")[0];
             }
-          }, (value){})
-      ),
-      UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getExpandedScrollView(Axis.vertical, Container()),
-      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-        if(_wantLoanPriceTextController.text.trim() != ""){
-          final number = double.tryParse(_wantLoanPriceTextController.text.trim().replaceAll(',', '')); // 콤마 제거 후 숫자 변환
-          String price = number.toString();
-          if(price.contains(".")){
-            price = price.split(".")[0];
+            selectedWantLoanPriceInfo = price;
+          }else{
+            selectedWantLoanPriceInfo = "0";
           }
-          selectedWantLoanPriceInfo = price;
-        }else{
-          selectedWantLoanPriceInfo = "0";
-        }
-        CommonUtils.log("i", "selectedWantLoanPriceInfo : $selectedWantLoanPriceInfo");
-        nextInputView();
-      })
+          CommonUtils.log("i", "selectedWantLoanPriceInfo : $selectedWantLoanPriceInfo");
+          nextInputView();
+        })
+      ]),
+      Positioned(
+          right: 3.w,
+          child: UiUtils.getRowColumnWithAlignCenter([
+            UiUtils.getMarginBox(0, 28.h),
+            UiUtils.getTextWithFixedScale("만원", 16.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null),
+          ]))
     ]);
   }
   /// want loan price end
@@ -561,33 +641,29 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
     String court = MyData.selectedAccidentInfoData!.accidentCourtInfo.split("@")[0];
     String accidentNo = "${MyData.selectedAccidentInfoData!.accidentCaseNumberYear}${MyData.selectedAccidentInfoData!.accidentCaseNumberType}${MyData.selectedAccidentInfoData!.accidentCaseNumberNumber}";
     List<String> confirmDataList = [];
-    confirmDataList.add("[환급]  ${selectedBankCodeInfo.split("@")[0]} $selectedBankAccountInfo");
-    confirmDataList.add("기대출  ${selectedPreLoanCountInfo.split("@")[0]}");
+    confirmDataList.add("• [환급]  ${selectedBankCodeInfo.split("@")[0]} $selectedBankAccountInfo");
+    confirmDataList.add("• 기대출  ${selectedPreLoanCountInfo.split("@")[0]}");
     if(selectedPreLoanPriceInfo != "0"){
-      confirmDataList.add("인가후 대출금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedPreLoanPriceInfo))}");
+      confirmDataList.add("• 인가후 대출금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedPreLoanPriceInfo))}");
     }else{
-      confirmDataList.add("인가후 대출금액  0원");
+      confirmDataList.add("• 인가후 대출금액  0원");
     }
     if(selectedWantLoanPriceInfo != "0"){
-      confirmDataList.add("희망 대출금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedWantLoanPriceInfo))}");
+      confirmDataList.add("• 희망 대출금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedWantLoanPriceInfo))}");
     }else{
-      confirmDataList.add("희망 대출금액  0원");
+      confirmDataList.add("• 희망 대출금액  0원");
     }
-    confirmDataList.add(selectedJobInfo.split("@")[0]);
+    confirmDataList.add("• ${selectedJobInfo.split("@")[0]}");
 
     List<Widget> confirmWidgetList = [];
     Color textColor = ColorStyles.upFinBlack;
     for(var each in confirmDataList){
-      Key key = UniqueKey();
       textColor = ColorStyles.upFinBlack;
       confirmWidgetList.add(
-          SizedBox(width: 90.w,
-              child: Row(children: [
-                UiUtils.getCustomCircleCheckBox(key, 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
-                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-                UiUtils.getTextButtonWithFixedScale(each, 13.sp, FontWeight.w800, textColor, TextAlign.center, null, (){})
-              ])
-          )
+        SizedBox(width: 80.w, child: UiUtils.getTextButtonWithFixedScale(each, 16.sp, FontWeight.w800, textColor, TextAlign.start, null, (){})),
+      );
+      confirmWidgetList.add(
+        UiUtils.getMarginBox(0, 3.h),
       );
     }
 
@@ -608,41 +684,45 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: confirmWidgetList)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "네 좋아요!", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
-        Map<String, dynamic> inputJson = {
-          "bankCode": selectedBankCodeInfo.split("@")[1],
-          "account": selectedBankAccountInfo,
-          "job": selectedJobInfo.split("@")[1],
-          "lend_count": selectedPreLoanCountInfo.split("@")[1],
-          "lend_amount": selectedPreLoanPriceInfo,
-          "wish_amount": selectedWantLoanPriceInfo,
-          "uid": MyData.selectedAccidentInfoData!.accidentUid,
-          "court_name": MyData.selectedAccidentInfoData!.accidentCourtInfo.split("@")[0],
-          "accident_no": MyData.selectedAccidentInfoData!.accidentCaseNumberYear+MyData.selectedAccidentInfoData!.accidentCaseNumberType+MyData.selectedAccidentInfoData!.accidentCaseNumberNumber,
-        };
-        CommonUtils.log("i", "pr search info:\n$inputJson");
-        UiUtils.showLoadingPop(context);
-        LogfinController.callLogfinApi(LogfinApis.prUpdateInfo, inputJson, (isSuccessToUpdate, outputJson){
-          if(isSuccessToUpdate){
-            CommonUtils.flutterToast("수정 완료했습니다.");
-            LogfinController.getAccidentInfo((isSuccessToGetAccidentInfo, isNotEmpty){
-              UiUtils.closeLoadingPop(context);
-              if(isSuccessToGetAccidentInfo){
-                if(isNotEmpty){
-                  Navigator.pop(context, true);
-                }else{
-                  CommonUtils.flutterToast("정보 수정에 실패했습니다.\n다시 실행해주세요.");
-                }
-              }
-            });
-          }else{
-            UiUtils.closeLoadingPop(context);
-            CommonUtils.flutterToast("정보 수정에 실패했습니다.\n다시 실행해주세요.");
-          }
-        });
+        _updateData();
       })
     ]);
   }
   /// finish confirm view end
+
+  void _updateData(){
+    Map<String, dynamic> inputJson = {
+      "bankCode": selectedBankCodeInfo.split("@")[1],
+      "account": selectedBankAccountInfo,
+      "job": selectedJobInfo.split("@")[1],
+      "lend_count": selectedPreLoanCountInfo.split("@")[1],
+      "lend_amount": selectedPreLoanPriceInfo,
+      "wish_amount": selectedWantLoanPriceInfo,
+      "uid": MyData.selectedAccidentInfoData!.accidentUid,
+      "court_name": MyData.selectedAccidentInfoData!.accidentCourtInfo.split("@")[0],
+      "accident_no": MyData.selectedAccidentInfoData!.accidentCaseNumberYear+MyData.selectedAccidentInfoData!.accidentCaseNumberType+MyData.selectedAccidentInfoData!.accidentCaseNumberNumber,
+    };
+    CommonUtils.log("i", "pr search info:\n$inputJson");
+    UiUtils.showLoadingPop(context);
+    LogfinController.callLogfinApi(LogfinApis.prUpdateInfo, inputJson, (isSuccessToUpdate, outputJson){
+      if(isSuccessToUpdate){
+        CommonUtils.flutterToast("수정 완료했습니다.");
+        LogfinController.getAccidentInfo((isSuccessToGetAccidentInfo, isNotEmpty){
+          UiUtils.closeLoadingPop(context);
+          if(isSuccessToGetAccidentInfo){
+            if(isNotEmpty){
+              Navigator.pop(context, true);
+            }else{
+              CommonUtils.flutterToast("정보 수정에 실패했습니다.\n다시 실행해주세요.");
+            }
+          }
+        });
+      }else{
+        UiUtils.closeLoadingPop(context);
+        CommonUtils.flutterToast("정보 수정에 실패했습니다.\n다시 실행해주세요.");
+      }
+    });
+  }
 
   void _scrollBankCode(){
     double scrollSize = _bankScrollController.position.maxScrollExtent;
@@ -659,7 +739,11 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
 
   void back(){
     CommonUtils.hideKeyBoard();
-    Navigator.pop(context, false);
+    if(currentViewId == startViewId){
+      Navigator.pop(context, false);
+    }else{
+      backInputView();
+    }
   }
 
   bool isAutoScrollableForTarget = true;
@@ -674,7 +758,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
           _scrollBankCode();
         }
       });
-      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getBankCodeView());
+      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: Obx(()=>_getBankCodeView()));
     }else if(currentViewId == bankAccountViewId){
       view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getBankAccountView());
     }else if(currentViewId == preLoanCountViewId){

@@ -151,7 +151,7 @@ class LogfinController {
       inputJson['fcm_token'] = FireBaseController.fcmToken;
     }
 
-    if(api != LogfinApis.signIn && api != LogfinApis.signUp && api != LogfinApis.socialLogin && api != LogfinApis.deleteAccount){
+    if(api != LogfinApis.signIn && api != LogfinApis.signUp && api != LogfinApis.socialLogin && api != LogfinApis.deleteAccount && api != LogfinApis.checkMember){
       if(userToken != ""){
         inputJson['api_token'] = userToken;
       }else{
@@ -414,7 +414,8 @@ class LogfinController {
     MyData.clearChatRoomInfoList();
     for(var eachSortedLoan in MyData.getLoanInfoList()){
       MyData.addToChatRoomInfoList(ChatRoomInfoData(eachSortedLoan.loanUid, 1, eachSortedLoan.companyLogo,
-          eachSortedLoan.companyName, eachSortedLoan.productName, "현재 고객님은 2건의 심사 결과를 대기중입니다. 조금더 알아보시렵니까?", "20231008145230", 12));
+          eachSortedLoan.companyName, eachSortedLoan.productName, "현재 고객님은 2건의 심사 결과를 대기중입니다. 조금더 알아보시렵니까?", "20231005145230", 12,
+          eachSortedLoan.statueId, "${eachSortedLoan.submitRate}%", CommonUtils.getPriceFormattedString(double.parse(eachSortedLoan.submitAmount))));
     }
   }
 
@@ -431,7 +432,6 @@ class LogfinController {
             String offerId = outputJsonForGetOffers!["offer_id"].toString();
             List<dynamic> offerPrList = outputJsonForGetOffers["data"];
             for(var each in offerPrList){
-              CommonUtils.log("i", "$each");
               MyData.addToPrInfoList(PrInfoData(accidentUid, offerId, each["rid"], each["lender_pr_id"].toString(), each["lender_name"], each["lender_id"].toString(),
                   each["product_name"], each["rid"], each["min_rate"].toString(), each["max_rate"].toString(),
                   each["limit"].toString(), "assets/images/temp_bank_logo.png", each["result"] as bool, each["msg"]));
@@ -487,7 +487,7 @@ class LogfinController {
 }
 
 enum LogfinApis {
-  signUp, signIn, socialLogin, deleteAccount, prUpdateInfo,
+  signUp, signIn, socialLogin, deleteAccount, prUpdateInfo, checkMember,
   getUserInfo, prSearch, getOffers,
   applyProductDocSearch, applyProduct,
   getAccidentInfo, getOffersInfo,
@@ -525,6 +525,8 @@ extension LogfinApisExtension on LogfinApis {
         return '/get_offers.json';
       case LogfinApis.prUpdateInfo:
         return '/pr_edit_complete.json';
+      case LogfinApis.checkMember:
+        return '/check_member.json';
     }
   }
 }

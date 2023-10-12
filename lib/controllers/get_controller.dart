@@ -12,6 +12,17 @@ class GetController extends GetxController {
   RxBool isMainAccidentDataChanged = false.obs;
   RxBool isMainLoanDataChanged = false.obs;
   RxList<LoanInfoData> loanInfoHistDataList = <LoanInfoData>[].obs;
+  RxInt firstVisibleItem1 = 0.obs;
+  RxInt lastVisibleItem1 = 0.obs;
+  RxInt firstVisibleItem2 = 0.obs;
+  RxInt lastVisibleItem2 = 0.obs;
+
+  RxInt firstVisibleItem1_2 = 0.obs;
+  RxInt lastVisibleItem1_2 = 0.obs;
+  RxInt firstVisibleItem2_2= 0.obs;
+  RxInt lastVisibleItem2_2 = 0.obs;
+  RxInt firstVisibleItem2_3= 0.obs;
+  RxInt lastVisibleItem2_3 = 0.obs;
 
   @override
   void onInit() {
@@ -108,5 +119,70 @@ class GetController extends GetxController {
   }
   void resetMainLoanDataChangedFlag() {
     isMainLoanDataChanged = false.obs;
+  }
+
+  void updateFirstIndex1(int newValue) {
+    firstVisibleItem1.value = newValue;
+  }
+  void resetFirstIndex1() {
+    firstVisibleItem1 = 0.obs;
+  }
+  void updateLastIndex1(int newValue) {
+    lastVisibleItem1.value = newValue;
+  }
+  void resetLastIndex1() {
+    lastVisibleItem1 = 0.obs;
+  }
+
+  void updateFirstIndex2(int newValue) {
+    firstVisibleItem2.value = newValue;
+  }
+  void resetFirstIndex2() {
+    firstVisibleItem2 = 0.obs;
+  }
+  void updateLastIndex2(int newValue) {
+    lastVisibleItem2.value = newValue;
+  }
+  void resetLastIndex2() {
+    lastVisibleItem2 = 0.obs;
+  }
+
+  void updateFirstIndex1_2(int newValue) {
+    firstVisibleItem1_2.value = newValue;
+  }
+  void resetFirstIndex1_2() {
+    firstVisibleItem1_2 = 0.obs;
+  }
+  void updateLastIndex1_2(int newValue) {
+    lastVisibleItem1_2.value = newValue;
+  }
+  void resetLastIndex1_2() {
+    lastVisibleItem1_2 = 0.obs;
+  }
+
+  void updateFirstIndex2_2(int newValue) {
+    firstVisibleItem2_2.value = newValue;
+  }
+  void resetFirstIndex2_2() {
+    firstVisibleItem2_2 = 0.obs;
+  }
+  void updateLastIndex2_2(int newValue) {
+    lastVisibleItem2_2.value = newValue;
+  }
+  void resetLastIndex2_2() {
+    lastVisibleItem2_2 = 0.obs;
+  }
+
+  void updateFirstIndex2_3(int newValue) {
+    firstVisibleItem2_3.value = newValue;
+  }
+  void resetFirstIndex2_3() {
+    firstVisibleItem2_3 = 0.obs;
+  }
+  void updateLastIndex2_3(int newValue) {
+    lastVisibleItem2_3.value = newValue;
+  }
+  void resetLastIndex2_3() {
+    lastVisibleItem2_3 = 0.obs;
   }
 }

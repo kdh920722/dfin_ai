@@ -57,36 +57,6 @@ class AppDetailPrViewState extends State<AppDetailPrView> with WidgetsBindingObs
     }
   }
 
-  bool _isAllChecked(){
-    bool isAllAgree = true;
-    List<bool?> itemList = [];
-    itemList.add(item1Agreed);
-    itemList.add(item2Agreed);
-    for(var each in itemList){
-      if(each != null){
-        if(!each){
-          isAllAgree = false;
-        }
-      }else{
-        isAllAgree = false;
-      }
-    }
-
-    return isAllAgree;
-  }
-
-  void _setAllChecked(){
-    allAgreed = true;
-    item1Agreed = true;
-    item2Agreed = true;
-  }
-
-  void _setAllUnChecked(){
-    allAgreed = false;
-    item1Agreed = false;
-    item2Agreed = false;
-  }
-
   void _getSmallAgree1Sub1Act(bool checkedValue){
     item1SubAgreed1 = checkedValue;
     if(item1SubAgreed1!){
@@ -334,7 +304,7 @@ class AppDetailPrViewState extends State<AppDetailPrView> with WidgetsBindingObs
       UiUtils.getMarginBox(0, 1.h),
       UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
           UiUtils.getTextWithFixedScale("다이렉트 접수하기", 12.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, null), () {
-            UiUtils.showSlideMenu(context, SlideType.bottomToTop, true, 100.w, 65.h, 0.5, _makeAgreeWidget);
+            UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, 100.w, 65.h, 0.5, _makeAgreeWidget);
           })
     ]));
     return UiUtils.getViewWithAllowBackForAndroid(context, view, back);

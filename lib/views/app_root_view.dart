@@ -37,6 +37,10 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
     WidgetsBinding.instance.addObserver(this);
     MyData.resetMyData();
     _initDeepLinkHandling();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _setImagePreLoad();
+    });
+
   }
 
   @override
@@ -66,6 +70,12 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
       default:
         break;
     }
+  }
+
+  void _setImagePreLoad(){
+    precacheImage(const AssetImage('assets/images/img_man_searcher.png'), context);
+    precacheImage(const AssetImage('assets/images/logo_kakao_circle.png'), context);
+    precacheImage(const AssetImage('assets/images/logo_apple_circle.png'), context);
   }
 
   Future<void> _initFirebase() async {
@@ -325,13 +335,13 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
         }
 
         await Future.delayed(const Duration(milliseconds: 1500), () async {
-          UiUtils.showSlideMenu(context, SlideType.bottomToTop, false, null, 18.h, 0.5, (slideContext, setState) =>
+          UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, 18.h, 0.5, (slideContext, setState) =>
               Column(mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     UiUtils.getStyledTextWithFixedScale("[$deniedPermissionsString] 권한이 필요합니다. ", TextStyles.upFinBasicTextStyle, TextAlign.center, null),
                     UiUtils.getMarginBox(100.w, 2.h),
-                    UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinTextAndBorderBlue,
-                        UiUtils.getTextWithFixedScale("설정 바로가기", 12.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null), () {
+                    UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinTextAndBorderBlue,
+                        UiUtils.getTextWithFixedScale("설정 바로가기", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
                           openAppSettings();
                           Navigator.of(slideContext).pop();
                         })
@@ -370,7 +380,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
       _initSnsLogin(); // count aa
     }else{
       if(context.mounted){
-        UiUtils.showSlideMenu(context, SlideType.bottomToTop, false, 100.w, 30.h, 0.5, (context, setState){
+        UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, 30.h, 0.5, (context, setState){
           return Center(child: UiUtils.getTextWithFixedScale("시스템 점검중입니다.", 20.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, null));
         });
       }
@@ -404,7 +414,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
                   CommonUtils.moveTo(context, AppView.appLoginView.value, null);
                 }),
             UiUtils.getMarginBox(0, 0.5.h),
-            UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinButtonBlue,
+            UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
                 UiUtils.getTextWithFixedScale("회원가입", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
                   CommonUtils.moveTo(context, AppView.appSignupView.value, null);
                 }),

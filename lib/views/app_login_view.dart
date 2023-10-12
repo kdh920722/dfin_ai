@@ -88,17 +88,17 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
 
   @override
   Widget build(BuildContext context) {
-    Widget view = Container(color: ColorStyles.upFinWhite, width: 100.w, height: 95.h, padding: EdgeInsets.all(5.w), child:
+    Widget view = Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: EdgeInsets.all(5.w), child:
     Form(key: _formKey,
         child: UiUtils.getRowColumnWithAlignCenter([
           SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+            UiUtils.getIconButtonWithHeight(5.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
               CommonUtils.hideKeyBoard();
               Navigator.pop(context);
             }),
           ])),
           SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            UiUtils.getMarginBox(0, 5.h),
+            UiUtils.getMarginBox(0, 3.h),
             UiUtils.getTextWithFixedScale("로그인", 26.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
             UiUtils.getMarginBox(0, 3.h)
           ])),
@@ -120,7 +120,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
                 }
               }),
           UiUtils.getMarginBox(0, 5.h),
-          UiUtils.getExpandedScrollView(Axis.vertical, Container()),
+          UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
           UiUtils.getTextButtonBox(90.w, "로그인", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
             if(_formKey.currentState!.validate() && Config.isControllerLoadFinished){
               CommonUtils.log("i", "OK");
@@ -165,7 +165,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     )
     );
 
-    return UiUtils.getScrollViewWithAllowBackForAndroid(context, view, _scrollController, back);
+    return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
   }
 
 }
