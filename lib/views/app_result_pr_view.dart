@@ -181,6 +181,8 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                     }
                     if(isDuplicate){
                       CommonUtils.flutterToast("이미 신청하신 상품입니다.");
+                      MyData.selectedPrInfoData = each;
+                      UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, 100.w, 65.h, 0.5, _makeAgreeWidget);
                     }else{
                       MyData.selectedPrInfoData = each;
                       UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, 100.w, 65.h, 0.5, _makeAgreeWidget);
@@ -474,7 +476,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
               _reOrderList(true);
             })
       ])),
-      SizedBox(width: 95.w, height: 60.h, child: TabBarView(
+      SizedBox(width: 95.w, height: 65.h, child: TabBarView(
         controller: _tabController,
         children: <Widget>[
           possiblePrCnt>0 ? Column(children: [
