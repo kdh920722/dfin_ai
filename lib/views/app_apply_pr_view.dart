@@ -1,10 +1,7 @@
 import 'dart:convert';
 import 'package:camera/camera.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:sizer/sizer.dart';
 import 'package:upfin/configs/app_config.dart';
 import 'package:upfin/controllers/juso_controller.dart';

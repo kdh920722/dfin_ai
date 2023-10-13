@@ -1,9 +1,5 @@
-import 'package:upfin/configs/string_config.dart';
-import 'package:upfin/controllers/get_controller.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
-import 'package:upfin/controllers/iamport_controller.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';

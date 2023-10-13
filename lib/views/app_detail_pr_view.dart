@@ -6,7 +6,6 @@ import 'package:upfin/styles/ColorStyles.dart';
 import 'package:upfin/styles/TextStyles.dart';
 import '../configs/string_config.dart';
 import '../utils/common_utils.dart';
-import '../utils/pop_result.dart';
 import '../utils/ui_utils.dart';
 
 class AppDetailPrView extends StatefulWidget{

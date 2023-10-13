@@ -3,12 +3,10 @@ import 'package:sizer/sizer.dart';
 import 'package:upfin/configs/app_config.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/datas/my_data.dart';
-import 'package:upfin/datas/pr_info_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import '../configs/string_config.dart';
 import '../styles/TextStyles.dart';
 import '../utils/common_utils.dart';
-import '../utils/pop_result.dart';
 import '../utils/ui_utils.dart';
 
 class AppResultPrView extends StatefulWidget{

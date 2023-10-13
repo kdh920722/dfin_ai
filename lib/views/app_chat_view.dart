@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
-import 'package:upfin/configs/app_config.dart';
-import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import 'package:upfin/styles/TextStyles.dart';
 import '../utils/common_utils.dart';
-import '../utils/pop_result.dart';
 import '../utils/ui_utils.dart';
 
 class AppChatView extends StatefulWidget{
