@@ -813,7 +813,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         SizedBox(width: 90.w,
             child: Row(children: [
               UiUtils.getMarginBox(3.w, 0),
-              UiUtils.getTextButtonWithFixedScale("• ${MyData.name}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+              UiUtils.getTextButtonWithFixedScale("•  ${MyData.name}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
             ])
         )
     );
@@ -824,7 +824,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         SizedBox(width: 90.w,
             child: Row(children: [
               UiUtils.getMarginBox(3.w, 0),
-              UiUtils.getTextButtonWithFixedScale("• ${MyData.phoneNumber.substring(0,3)} ${MyData.phoneNumber.substring(3,7)} ${MyData.phoneNumber.substring(7)}",
+              UiUtils.getTextButtonWithFixedScale("•  ${MyData.phoneNumber.substring(0,3)} ${MyData.phoneNumber.substring(3,7)} ${MyData.phoneNumber.substring(7)}",
                   13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
             ])
         )
@@ -836,7 +836,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         SizedBox(width: 90.w,
             child: Row(children: [
               UiUtils.getMarginBox(3.w, 0),
-              UiUtils.getTextButtonWithFixedScale("• ${MyData.idNumber.split("-")[0]}-${MyData.idNumber.split("-")[1].substring(0,1)}******", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+              UiUtils.getTextButtonWithFixedScale("•  ${MyData.idNumber.split("-")[0]}-${MyData.idNumber.split("-")[1].substring(0,1)}******", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
             ])
         )
     );
@@ -847,7 +847,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         SizedBox(width: 90.w,
             child: Row(children: [
               UiUtils.getMarginBox(3.w, 0),
-              UiUtils.getTextButtonWithFixedScale("• 기대출 ${MyData.selectedAccidentInfoData!.accidentLendCount.split("@")[0]}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+              UiUtils.getTextButtonWithFixedScale("•  기대출 ${MyData.selectedAccidentInfoData!.accidentLendCount.split("@")[0]}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
             ])
         )
     );
@@ -859,7 +859,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           SizedBox(width: 90.w,
               child: Row(children: [
                 UiUtils.getMarginBox(3.w, 0),
-                UiUtils.getTextButtonWithFixedScale("• 인가후대출금액 ${CommonUtils.getPriceCommaFormattedString(double.parse(MyData.selectedAccidentInfoData!.accidentLendAmount))}",
+                UiUtils.getTextButtonWithFixedScale("•  인가후대출금액 ${CommonUtils.getPriceCommaFormattedString(double.parse(MyData.selectedAccidentInfoData!.accidentLendAmount))}",
                     13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
               ])
@@ -870,7 +870,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           SizedBox(width: 90.w,
               child: Row(children: [
                 UiUtils.getMarginBox(3.w, 0),
-                UiUtils.getTextButtonWithFixedScale("• 인가후대출금액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                UiUtils.getTextButtonWithFixedScale("•  인가후대출금액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
               ])
           )
@@ -883,7 +883,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         SizedBox(width: 90.w,
             child: Row(children: [
               UiUtils.getMarginBox(3.w, 0),
-              UiUtils.getTextButtonWithFixedScale("• [환급] ${MyData.selectedAccidentInfoData!.accidentBankInfo.split("@")[0]} ${MyData.selectedAccidentInfoData!.accidentBankAccount}",
+              UiUtils.getTextButtonWithFixedScale("•  [환급] ${MyData.selectedAccidentInfoData!.accidentBankInfo.split("@")[0]} ${MyData.selectedAccidentInfoData!.accidentBankAccount}",
                   13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
             ])
         )
@@ -895,7 +895,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         SizedBox(width: 90.w,
             child: Row(children: [
               UiUtils.getMarginBox(3.w, 0),
-              UiUtils.getTextButtonWithFixedScale("• ${MyData.jobInfo.split("@")[0]}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+              UiUtils.getTextButtonWithFixedScale("•  ${MyData.jobInfo.split("@")[0]}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
             ])
         )
     );
@@ -912,7 +912,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           SizedBox(width: 90.w,
               child: Row(children: [
                 UiUtils.getMarginBox(3.w, 0),
-                UiUtils.getTextButtonWithFixedScale("• [주거래 은행] ${tempSelectedBankCodeInfo.split("@")[0]} $tempSelectedBankAccountInfo", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                UiUtils.getTextButtonWithFixedScale("•  [주거래 은행] ${tempSelectedBankCodeInfo.split("@")[0]} $tempSelectedBankAccountInfo", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
               ])
           )
@@ -924,7 +924,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           SizedBox(width: 90.w,
               child: Row(children: [
                 UiUtils.getMarginBox(3.w, 0),
-                UiUtils.getTextButtonWithFixedScale("• 사업자번호 $tempBusinessNumberIdInfo", 16.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                UiUtils.getTextButtonWithFixedScale("•  사업자번호 $tempBusinessNumberIdInfo", 16.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
               ])
           )
@@ -938,7 +938,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           SizedBox(width: 90.w,
               child: Row(children: [
                 UiUtils.getMarginBox(3.w, 0),
-                UiUtils.getTextButtonWithFixedScale("• 대출희망금액 ${CommonUtils.getPriceCommaFormattedString(double.parse(MyData.selectedAccidentInfoData!.accidentWishAmount))}",
+                UiUtils.getTextButtonWithFixedScale("•  대출희망금액 ${CommonUtils.getPriceCommaFormattedString(double.parse(MyData.selectedAccidentInfoData!.accidentWishAmount))}",
                     13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
               ])
@@ -949,7 +949,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           SizedBox(width: 90.w,
               child: Row(children: [
                 UiUtils.getMarginBox(3.w, 0),
-                UiUtils.getTextButtonWithFixedScale("• 대출희망금액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                UiUtils.getTextButtonWithFixedScale("•  대출희망금액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
               ])
           )
@@ -973,7 +973,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         introWidgetList.add(
             SizedBox(width: 90.w,
                 child: Row(children: [
-                  UiUtils.getCustomCircleCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
+                  UiUtils.getCustomCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
                       ColorStyles.upFinGray,  ColorStyles.upFinWhite, (checkedValue){}),
                   UiUtils.getTextButtonWithFixedScale(unSavedDocsList[i]["name"], 13.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.center, null, (){})
                 ])
@@ -1008,7 +1008,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           introWidgetList.add(
               SizedBox(width: 90.w,
                   child: Row(children: [
-                    UiUtils.getCustomCircleCheckBox(key, 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                    UiUtils.getCustomCheckBox(key, 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
                         ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
                     UiUtils.getTextButtonWithFixedScale(addedDocsList[i]["name"], 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
                   ])
@@ -1019,8 +1019,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     }
 
     return UiUtils.getRowColumnWithAlignCenter([
-      SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+      SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        UiUtils.getBackButton(() async {
           Navigator.pop(context);
         }),
       ])),
@@ -1168,7 +1168,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           SizedBox(width: 90.w,
               child: Row(children: [
                 selectedBankCodeKey == key?
-                UiUtils.getCustomCircleCheckBox(key, 1.5, selectedBankCodeKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                UiUtils.getCustomCheckBox(key, 1.5, selectedBankCodeKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
                     ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
@@ -1178,7 +1178,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                           }
                         }
                       });
-                    }) : UiUtils.getCustomCircleCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
+                    }) : UiUtils.getCustomCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
                     ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
@@ -1189,20 +1189,20 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                         }
                       });
                     }),
-                UiUtils.getTextButtonWithFixedScale(LogfinController.bankList[i].split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.center, null, (){
+                Expanded(child: UiUtils.getTextButtonWithFixedScale(LogfinController.bankList[i].split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.start, null, (){
                   setState(() {
                     selectedBankCodeKey = key;
                     selectedBankCodeInfo = LogfinController.bankList[i];
                   });
-                })
+                }))
               ])
           )
       );
     }
 
     return UiUtils.getRowColumnWithAlignCenter([
-      SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+      SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        UiUtils.getBackButton(() async {
           backInputView();
         }),
       ])),
@@ -1261,8 +1261,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   /// bank account view
   Widget _getBankAccountView(){
     return UiUtils.getRowColumnWithAlignCenter([
-      SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+      SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        UiUtils.getBackButton(() async {
           backInputView();
         }),
       ])),
@@ -1296,8 +1296,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   /// business number view
   Widget _getBusinessNumberView(){
     return UiUtils.getRowColumnWithAlignCenter([
-      SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+      SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        UiUtils.getBackButton(() async {
           backInputView();
         }),
       ])),
@@ -1349,7 +1349,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           SizedBox(width: 85.w,
               child: Row(mainAxisSize : MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
                 SizedBox(width: 5.w, child:
-                selectedAddressKey == key? UiUtils.getCustomCircleCheckBox(key, 1.2, selectedAddressKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                selectedAddressKey == key? UiUtils.getCustomCheckBox(key, 1.2, selectedAddressKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
                     ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
@@ -1363,7 +1363,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                           }
                         }
                       });
-                    }) : UiUtils.getCustomCircleCheckBox(key, 1.2, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
+                    }) : UiUtils.getCustomCheckBox(key, 1.2, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
                     ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
@@ -1401,17 +1401,48 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
     return Stack(children: [
       UiUtils.getRowColumnWithAlignCenter([
-        SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+        SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          UiUtils.getBackButton(() async {
             backInputView();
           }),
         ])),
         UiUtils.getMarginBox(0, 3.h),
         SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("주소를 입력해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
         // SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-        UiUtils.getMarginBox(0, 5.h),
-        UiUtils.getTextField(85.w, TextStyles.upFinSmallTextFormFieldTextStyle, _addressInfoFocus,
-            _addressInfoTextController, TextInputType.text, UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
+        UiUtils.getMarginBox(0, 3.h),
+        SizedBox(width: 85.w, height: 10.h,
+            child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+              UiUtils.getTextField(75.w, TextStyles.upFinSmallTextFormFieldTextStyle, _addressInfoFocus,
+                  _addressInfoTextController, TextInputType.text, UiUtils.getInputDecoration("등본상 주소", 12.sp, "", 0.sp), (value) { }),
+              UiUtils.getMarginBox(1.w, 0),
+              Padding(padding: EdgeInsets.only(bottom: 1.h), child: UiUtils.getIconButton(Icons.search, 8.w, ColorStyles.upFinButtonBlue, () {
+                if(_addressInfoTextController.text.trim() != ""){
+                  CommonUtils.hideKeyBoard();
+                  selectedAddressKey = null;
+                  selectedAddressInfo = "";
+                  addressList.clear();
+                  UiUtils.showLoadingPop(context);
+                  JusoController.getAddressFromJuso(_addressInfoTextController.text,(bool isSuccess, outputList){
+                    UiUtils.closeLoadingPop(context);
+                    if(isSuccess){
+                      if(outputList!.isNotEmpty){
+                        for(var eachAddress in outputList){
+                          addressList.add(<String, String>
+                          {"jibunAddr" : eachAddress["jibunAddr"],
+                            "roadAddr" : eachAddress["roadAddr"],
+                            "roadAddrPart1" : eachAddress["roadAddrPart1"]});
+                        }
+                        setState(() {});
+                      }else{
+                        CommonUtils.flutterToast("검색 결과가 없습니다.");
+                      }
+                    }
+                  });
+                }else{
+                  CommonUtils.flutterToast("주소를 입력해주세요.");
+                }
+              }))
+            ])),
         UiUtils.getMarginBox(0, 2.h),
         UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: addressWidgetList)),
         UiUtils.getMarginBox(0, 3.h),
@@ -1435,39 +1466,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               _setResultToListById(addressId, resultMap);
               nextInputView();
             }) : Container()
-      ]),
-      Positioned(
-          right: 5.w,
-          child: UiUtils.getRowColumnWithAlignCenter([
-            UiUtils.getMarginBox(0, 24.h),
-            UiUtils.getIconButton(Icons.search, 8.w, ColorStyles.upFinButtonBlue, () {
-              if(_addressInfoTextController.text.trim() != ""){
-                CommonUtils.hideKeyBoard();
-                selectedAddressKey = null;
-                selectedAddressInfo = "";
-                addressList.clear();
-                UiUtils.showLoadingPop(context);
-                JusoController.getAddressFromJuso(_addressInfoTextController.text,(bool isSuccess, outputList){
-                  UiUtils.closeLoadingPop(context);
-                  if(isSuccess){
-                    if(outputList!.isNotEmpty){
-                      for(var eachAddress in outputList){
-                        addressList.add(<String, String>
-                        {"jibunAddr" : eachAddress["jibunAddr"],
-                          "roadAddr" : eachAddress["roadAddr"],
-                          "roadAddrPart1" : eachAddress["roadAddrPart1"]});
-                      }
-                      setState(() {});
-                    }else{
-                      CommonUtils.flutterToast("검색 결과가 없습니다.");
-                    }
-                  }
-                });
-              }else{
-                CommonUtils.flutterToast("주소를 입력해주세요.");
-              }
-            }),
-          ]))
+      ])
     ]);
   }
   /// address view end
@@ -1475,8 +1474,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   /// camera for id check view
   Widget _getCameraForIdCheckView(){
     return UiUtils.getRowColumnWithAlignCenter([
-      SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+      SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        UiUtils.getBackButton(() async {
           backInputView();
         }),
       ])),
@@ -1823,8 +1822,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       depWidth = 41.w;
     }
     return UiUtils.getRowColumnWithAlignCenter([
-      SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start,children: [
-        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+      SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start,children: [
+        UiUtils.getBackButton(() async {
           backInputView();
         }),
       ])),
@@ -1996,7 +1995,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         docsWidgetList.add(
             SizedBox(width: 90.w,
                 child: Row(children: [
-                  UiUtils.getCustomCircleCheckBox(key, 1.5, true, textColor, ColorStyles.upFinWhite, ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
+                  UiUtils.getCustomCheckBox(key, 1.5, true, textColor, ColorStyles.upFinWhite, ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
                   UiUtils.getTextButtonWithFixedScale(name, 15.sp, FontWeight.w600, textColor, TextAlign.center, null, (){})
                 ])
             )
@@ -2044,7 +2043,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         docsWidgetList.add(
             SizedBox(width: 90.w,
                 child: Row(children: [
-                  UiUtils.getCustomCircleCheckBox(key, 1.5, true, textColor, ColorStyles.upFinWhite, ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
+                  UiUtils.getCustomCheckBox(key, 1.5, true, textColor, ColorStyles.upFinWhite, ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
                   UiUtils.getTextButtonWithFixedScale(name, 15.sp, FontWeight.w600,textColor, TextAlign.center, null, (){})
                 ])
             )
@@ -2106,7 +2105,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         docsWidgetList.add(
             SizedBox(width: 90.w,
                 child: Row(children: [
-                  UiUtils.getCustomCircleCheckBox(key, 1.5, true, textColor, ColorStyles.upFinWhite, ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
+                  UiUtils.getCustomCheckBox(key, 1.5, true, textColor, ColorStyles.upFinWhite, ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
                   UiUtils.getTextButtonWithFixedScale(name, 15.sp, FontWeight.w600,textColor, TextAlign.center, null, (){})
                 ])
             )
@@ -2418,7 +2417,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         SizedBox(width: 90.w,
             child: Row(children: [
               UiUtils.getMarginBox(3.w, 0),
-              UiUtils.getTextButtonWithFixedScale("• ${MyData.name}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+              UiUtils.getTextButtonWithFixedScale("•  ${MyData.name}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
             ])
         )
     );
@@ -2429,7 +2428,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         SizedBox(width: 90.w,
             child: Row(children: [
               UiUtils.getMarginBox(3.w, 0),
-              UiUtils.getTextButtonWithFixedScale("• ${MyData.phoneNumber.substring(0,3)} ${MyData.phoneNumber.substring(3,7)} ${MyData.phoneNumber.substring(7)}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+              UiUtils.getTextButtonWithFixedScale("•  ${MyData.phoneNumber.substring(0,3)} ${MyData.phoneNumber.substring(3,7)} ${MyData.phoneNumber.substring(7)}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
             ])
         )
     );
@@ -2440,7 +2439,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         SizedBox(width: 90.w,
             child: Row(children: [
               UiUtils.getMarginBox(3.w, 0),
-              UiUtils.getTextButtonWithFixedScale("• ${MyData.idNumber.split("-")[0]}-${MyData.idNumber.split("-")[1].substring(0,1)}******", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+              UiUtils.getTextButtonWithFixedScale("•  ${MyData.idNumber.split("-")[0]}-${MyData.idNumber.split("-")[1].substring(0,1)}******", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
             ])
         )
     );
@@ -2451,7 +2450,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         SizedBox(width: 90.w,
             child: Row(children: [
               UiUtils.getMarginBox(3.w, 0),
-              UiUtils.getTextButtonWithFixedScale("• 기대출 ${MyData.selectedAccidentInfoData!.accidentLendCount.split("@")[0]}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+              UiUtils.getTextButtonWithFixedScale("•  기대출 ${MyData.selectedAccidentInfoData!.accidentLendCount.split("@")[0]}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
             ])
         )
     );
@@ -2463,7 +2462,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           SizedBox(width: 90.w,
               child: Row(children: [
                 UiUtils.getMarginBox(3.w, 0),
-                UiUtils.getTextButtonWithFixedScale("• 인가후대출금액 ${CommonUtils.getPriceCommaFormattedString(double.parse(MyData.selectedAccidentInfoData!.accidentLendAmount))}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                UiUtils.getTextButtonWithFixedScale("•  인가후대출금액 ${CommonUtils.getPriceCommaFormattedString(double.parse(MyData.selectedAccidentInfoData!.accidentLendAmount))}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
               ])
           )
@@ -2473,7 +2472,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           SizedBox(width: 90.w,
               child: Row(children: [
                 UiUtils.getMarginBox(3.w, 0),
-                UiUtils.getTextButtonWithFixedScale("• 인가후대출금액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                UiUtils.getTextButtonWithFixedScale("•  인가후대출금액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
               ])
           )
@@ -2486,7 +2485,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         SizedBox(width: 90.w,
             child: Row(children: [
               UiUtils.getMarginBox(3.w, 0),
-              UiUtils.getTextButtonWithFixedScale("• [환급] ${MyData.selectedAccidentInfoData!.accidentBankInfo.split("@")[0]} ${MyData.selectedAccidentInfoData!.accidentBankAccount}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+              UiUtils.getTextButtonWithFixedScale("•  [환급] ${MyData.selectedAccidentInfoData!.accidentBankInfo.split("@")[0]} ${MyData.selectedAccidentInfoData!.accidentBankAccount}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
             ])
         )
     );
@@ -2497,7 +2496,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         SizedBox(width: 90.w,
             child: Row(children: [
               UiUtils.getMarginBox(3.w, 0),
-              UiUtils.getTextButtonWithFixedScale("• ${MyData.jobInfo.split("@")[0]}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+              UiUtils.getTextButtonWithFixedScale("•  ${MyData.jobInfo.split("@")[0]}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
             ])
         )
     );
@@ -2509,7 +2508,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           SizedBox(width: 90.w,
               child: Row(children: [
                 UiUtils.getMarginBox(3.w, 0),
-                UiUtils.getTextButtonWithFixedScale("• [주거래 은행] ${selectedBankCodeInfo.split("@")[0]} $selectedBankAccountInfo", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                UiUtils.getTextButtonWithFixedScale("•  [주거래 은행] ${selectedBankCodeInfo.split("@")[0]} $selectedBankAccountInfo", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
               ])
           )
@@ -2521,7 +2520,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           SizedBox(width: 90.w,
               child: Row(children: [
                 UiUtils.getMarginBox(3.w, 0),
-                UiUtils.getTextButtonWithFixedScale("• 사업자번호 $selectedBusinessNumberInfo", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                UiUtils.getTextButtonWithFixedScale("•  사업자번호 $selectedBusinessNumberInfo", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
               ])
           )
@@ -2535,7 +2534,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           SizedBox(width: 90.w,
               child: Row(children: [
                 UiUtils.getMarginBox(3.w, 0),
-                UiUtils.getTextButtonWithFixedScale("• 대출희망금액 ${CommonUtils.getPriceCommaFormattedString(double.parse(MyData.selectedAccidentInfoData!.accidentWishAmount))}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                UiUtils.getTextButtonWithFixedScale("•  대출희망금액 ${CommonUtils.getPriceCommaFormattedString(double.parse(MyData.selectedAccidentInfoData!.accidentWishAmount))}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
               ])
           )
@@ -2545,7 +2544,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           SizedBox(width: 90.w,
               child: Row(children: [
                 UiUtils.getMarginBox(3.w, 0),
-                UiUtils.getTextButtonWithFixedScale("• 대출희망금액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                UiUtils.getTextButtonWithFixedScale("•  대출희망금액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
               ])
           )
@@ -2582,7 +2581,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         introWidgetList.add(
             SizedBox(width: 90.w,
                 child: Row(children: [
-                  UiUtils.getCustomCircleCheckBox(key, 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                  UiUtils.getCustomCheckBox(key, 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
                       ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
                   UiUtils.getTextButtonWithFixedScale(addedDocsList[i]["name"], 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
                 ])
@@ -2592,8 +2591,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     }
 
     return UiUtils.getRowColumnWithAlignCenter([
-      SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+      SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        UiUtils.getBackButton( () async {
           backInputView();
         }),
       ])),

@@ -91,8 +91,8 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     Widget view = Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: EdgeInsets.all(5.w), child:
     Form(key: _formKey,
         child: UiUtils.getRowColumnWithAlignCenter([
-          SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            UiUtils.getIconButtonWithHeight(5.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+          SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            UiUtils.getBackButton(() async {
               CommonUtils.hideKeyBoard();
               Navigator.pop(context);
             }),
@@ -134,7 +134,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
               UiUtils.showLoadingPop(context);
               LogfinController.callLogfinApi(LogfinApis.signIn, inputJson, (isSuccessToLogin, outputJson) async {
                 if(isSuccessToLogin){
-                  CommonUtils.flutterToast("!");
+                  CommonUtils.flutterToast("환영합니다!");
                   // 캐시 데이터 저장
                   SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceIdKey, _emailTextController.text.trim());
                   SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferencePwKey, _pwdTextController.text.trim());

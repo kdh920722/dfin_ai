@@ -132,14 +132,14 @@ class AppDetailPrViewState extends State<AppDetailPrView> with WidgetsBindingObs
     return SizedBox(width: 100.w, height: 4.h, child: Row(children: [
       UiUtils.getMarginBox(10.w, 0),
       UiUtils.getBorderButtonBoxWithZeroPadding(80.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite, Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-        isAgreeCheck? UiUtils.getCustomCircleCheckBox(UniqueKey(), 1, isAgreeCheck, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+        isAgreeCheck? UiUtils.getCustomCheckBox(UniqueKey(), 1, isAgreeCheck, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
             ColorStyles.upFinWhite, ColorStyles.upFinWhite, (checkedValue){
               thisSetState(() {
                 if(checkedValue != null){
                   callAct(checkedValue);
                 }
               });
-            }) : UiUtils.getCustomCircleCheckBox(UniqueKey(), 1, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
+            }) : UiUtils.getCustomCheckBox(UniqueKey(), 1, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
             ColorStyles.upFinWhite, ColorStyles.upFinWhite, (checkedValue){
               thisSetState(() {
                 if(checkedValue != null){
@@ -189,7 +189,7 @@ class AppDetailPrViewState extends State<AppDetailPrView> with WidgetsBindingObs
           UiUtils.getMarginBox(0, 3.h),
           GestureDetector(child: Container(color: ColorStyles.upFinWhiteGray, child: Row(
             children: [
-              UiUtils.getCircleCheckBox(1.4, allAgreed!, (isChanged) {
+              UiUtils.getCheckBox(1.4, allAgreed!, (isChanged) {
                 thisSetState(() {
                   allAgreed = isChanged;
                   item1Agreed = isChanged;
@@ -228,7 +228,7 @@ class AppDetailPrViewState extends State<AppDetailPrView> with WidgetsBindingObs
             Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
               Container(padding: EdgeInsets.only(left: 2.w), height: 3.h, child: Row(
                 children: [
-                  UiUtils.getCircleCheckBox(1, item1Agreed!, (isChanged) {
+                  UiUtils.getCheckBox(1, item1Agreed!, (isChanged) {
                     thisSetState(() {
                       item1Agreed = isChanged;
                       item1SubAgreed1 = isChanged;
@@ -250,7 +250,7 @@ class AppDetailPrViewState extends State<AppDetailPrView> with WidgetsBindingObs
             Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
               Container(padding: EdgeInsets.only(left: 2.w), height: 3.h, child: Row(
                 children: [
-                  UiUtils.getCircleCheckBox(1, item2Agreed!, (isChanged) {
+                  UiUtils.getCheckBox(1, item2Agreed!, (isChanged) {
                     thisSetState(() {
                       item2Agreed = isChanged;
                       item2SubAgreed1 = isChanged;
@@ -285,8 +285,8 @@ class AppDetailPrViewState extends State<AppDetailPrView> with WidgetsBindingObs
   @override
   Widget build(BuildContext context) {
     Widget view = Container(color: ColorStyles.upFinButtonBlue, width: 100.w, height: 100.h, padding: EdgeInsets.all(5.w), child: Column(children: [
-      SizedBox(width: 95.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getIconButtonWithHeight(3.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinWhite, () {
+      SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        UiUtils.getBackButton(() {
           Navigator.pop(context);
         }),
       ])),

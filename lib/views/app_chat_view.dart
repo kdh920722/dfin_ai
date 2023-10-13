@@ -138,9 +138,9 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         height: 100.h,
         child: Column(children: [
           UiUtils.getMarginBox(0, 2.h),
-          SizedBox(width: 100.w, height: 12.h, child: Row(children: [
+          SizedBox(width: 90.w, height: 12.h, child: Row(children: [
             UiUtils.getMarginBox(3.w, 0),
-            UiUtils.getIconButtonWithHeight(5.h, Icons.arrow_back_ios_new_sharp, 6.w, ColorStyles.upFinDarkGray, () {
+            UiUtils.getBackButton(() {
               Navigator.pop(context);
             }),
             UiUtils.getMarginBox(24.w, 0),

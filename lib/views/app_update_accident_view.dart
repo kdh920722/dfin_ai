@@ -154,6 +154,9 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
       GetController.to.updateWantLoanPrice(CommonUtils.getPriceFormattedString(number!));
     }
 
+    selectedBankAccountInfo = MyData.selectedAccidentInfoData!.accidentBankAccount;
+    selectedPreLoanPriceInfo = MyData.selectedAccidentInfoData!.accidentLendAmount;
+    selectedWantLoanPriceInfo = MyData.selectedAccidentInfoData!.accidentWishAmount;
     selectedPreLoanCountInfo = MyData.selectedAccidentInfoData!.accidentLendCount;
     selectedPreLoanCountKey = Key(MyData.selectedAccidentInfoData!.accidentLendCount);
 
@@ -162,6 +165,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
 
     GetController.to.updateFirstIndex1_2(0);
     GetController.to.updateLastIndex1_2(12);
+    currentViewId = startViewId;
   }
 
   @override
@@ -267,7 +271,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
       bankCodeList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                selectedBankCodeKey == key? UiUtils.getCustomCircleCheckBox(key, 1.5, selectedBankCodeKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                selectedBankCodeKey == key? UiUtils.getCustomCheckBox(key, 1.5, selectedBankCodeKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
                     ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
@@ -277,7 +281,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
                           }
                         }
                       });
-                    }) : UiUtils.getCustomCircleCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
+                    }) : UiUtils.getCustomCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
                     ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
@@ -288,20 +292,20 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
                         }
                       });
                     }),
-                UiUtils.getTextButtonWithFixedScale(LogfinController.bankList[i].split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.center, null, (){
+                Expanded(child: UiUtils.getTextButtonWithFixedScale(LogfinController.bankList[i].split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.start, null, (){
                   setState(() {
                     selectedBankCodeKey = key;
                     selectedBankCodeInfo = LogfinController.bankList[i];
                   });
-                })
+                }))
               ])
           )
       );
     }
 
     return UiUtils.getRowColumnWithAlignCenter([
-      SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+      SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        UiUtils.getBackButton(() async {
           backInputView();
         }),
       ])),
@@ -359,8 +363,8 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
   /// bank account view
   Widget _getBankAccountView(){
     return UiUtils.getRowColumnWithAlignCenter([
-      SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+      SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        UiUtils.getBackButton(() async {
           backInputView();
         }),
       ])),
@@ -373,7 +377,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
           UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
       UiUtils.getExpandedScrollView(Axis.vertical, Container()),
       UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+      UiUtils.getTextButtonBox(90.w, currentViewId == endViewId ? "수정하기" : "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
         selectedBankAccountInfo = _bankAccountInfoTextController.text.trim();
         CommonUtils.log("i", "selectedBankAccountInfo : $selectedBankAccountInfo");
         if(selectedBankAccountInfo.isNotEmpty){
@@ -401,7 +405,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
       loanCountList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                selectedPreLoanCountKey == key? UiUtils.getCustomCircleCheckBox(key, 1.5, selectedPreLoanCountKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                selectedPreLoanCountKey == key? UiUtils.getCustomCheckBox(key, 1.5, selectedPreLoanCountKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
                     ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
@@ -411,7 +415,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
                           }
                         }
                       });
-                    }) : UiUtils.getCustomCircleCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
+                    }) : UiUtils.getCustomCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
                     ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
@@ -422,20 +426,20 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
                         }
                       });
                     }),
-                UiUtils.getTextButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.start, null, (){
+                Expanded(child: UiUtils.getTextButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.start, null, (){
                   setState(() {
                     selectedPreLoanCountKey = key;
                     selectedPreLoanCountInfo = each;
                   });
-                })
+                }))
               ])
           )
       );
     }
 
     return UiUtils.getRowColumnWithAlignCenter([
-      SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+      SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        UiUtils.getBackButton(() async {
           backInputView();
         }),
       ])),
@@ -445,7 +449,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: loanCountList)),
       UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+      UiUtils.getTextButtonBox(90.w, currentViewId == endViewId ? "수정하기" : "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
         CommonUtils.log("i", "loan count : $selectedPreLoanCountInfo");
         if(selectedPreLoanCountInfo.isNotEmpty){
           nextInputView();
@@ -461,8 +465,8 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
   Widget _getPreLoanPriceView(){
     return Stack(children: [
       UiUtils.getRowColumnWithAlignCenter([
-        SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+        SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          UiUtils.getBackButton(() async {
             backInputView();
           }),
         ])),
@@ -474,7 +478,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
         SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력단위(*만원)", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
         UiUtils.getMarginBox(0, 5.h),
         Obx(()=>UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _preLoanPriceFocus, _preLoanPriceTextController, TextInputType.number, false,
-            UiUtils.getInputDecoration("", 0.sp, GetController.to.preLoanPrice.value, 14.sp), (text) {
+            UiUtils.getInputDecorationForPrice("", 0.sp, GetController.to.preLoanPrice.value, 14.sp), (text) {
               if(text.trim() != ""){
                 final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
                 GetController.to.updatePreLoanPrice(CommonUtils.getPriceFormattedString(number!));
@@ -485,7 +489,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
         ),
         UiUtils.getMarginBox(0, 5.h),
         UiUtils.getExpandedScrollView(Axis.vertical, Container()),
-        UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+        UiUtils.getTextButtonBox(90.w, currentViewId == endViewId ? "수정하기" : "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
           if(_preLoanPriceTextController.text.trim() != ""){
             final number = double.tryParse(_preLoanPriceTextController.text.trim().replaceAll(',', '')); // 콤마 제거 후 숫자 변환
             String price = number.toString();
@@ -499,13 +503,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
           CommonUtils.log("i", "selectedPreLoanPriceInfo : $selectedPreLoanPriceInfo");
           nextInputView();
         })
-      ]),
-      Positioned(
-          right: 3.w,
-          child: UiUtils.getRowColumnWithAlignCenter([
-            UiUtils.getMarginBox(0, 28.h),
-            UiUtils.getTextWithFixedScale("만원", 16.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null),
-          ]))
+      ])
     ]);
   }
   /// pre loan price end
@@ -514,8 +512,8 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
   Widget _getWantLoanPriceView(){
     return Stack(children: [
       UiUtils.getRowColumnWithAlignCenter([
-        SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+        SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          UiUtils.getBackButton(() async {
             backInputView();
           }),
         ])),
@@ -527,7 +525,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
         SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력단위(*만원)", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
         UiUtils.getMarginBox(0, 5.h),
         Obx(()=>UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _wantLoanPriceFocus, _wantLoanPriceTextController, TextInputType.number, false,
-            UiUtils.getInputDecoration("", 0.sp, GetController.to.wantLoanPrice.value, 14.sp), (text) {
+            UiUtils.getInputDecorationForPrice("", 0.sp, GetController.to.wantLoanPrice.value, 14.sp), (text) {
               if(text.trim() != ""){
                 final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
                 GetController.to.updateWantLoanPrice(CommonUtils.getPriceFormattedString(number!));
@@ -538,7 +536,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
         ),
         UiUtils.getMarginBox(0, 5.h),
         UiUtils.getExpandedScrollView(Axis.vertical, Container()),
-        UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+        UiUtils.getTextButtonBox(90.w, currentViewId == endViewId ? "수정하기" : "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
           if(_wantLoanPriceTextController.text.trim() != ""){
             final number = double.tryParse(_wantLoanPriceTextController.text.trim().replaceAll(',', '')); // 콤마 제거 후 숫자 변환
             String price = number.toString();
@@ -552,13 +550,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
           CommonUtils.log("i", "selectedWantLoanPriceInfo : $selectedWantLoanPriceInfo");
           nextInputView();
         })
-      ]),
-      Positioned(
-          right: 3.w,
-          child: UiUtils.getRowColumnWithAlignCenter([
-            UiUtils.getMarginBox(0, 28.h),
-            UiUtils.getTextWithFixedScale("만원", 16.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null),
-          ]))
+      ])
     ]);
   }
   /// want loan price end
@@ -578,7 +570,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
       jobList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                selectedJobKey == key? UiUtils.getCustomCircleCheckBox(key, 1.5, selectedJobKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                selectedJobKey == key? UiUtils.getCustomCheckBox(key, 1.5, selectedJobKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
                     ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
@@ -588,7 +580,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
                           }
                         }
                       });
-                    }) : UiUtils.getCustomCircleCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
+                    }) : UiUtils.getCustomCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
                     ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
@@ -599,20 +591,20 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
                         }
                       });
                     }),
-                UiUtils.getTextButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.center, null, (){
+                Expanded(child: UiUtils.getTextButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.start, null, (){
                   setState(() {
                     selectedJobKey = key;
                     selectedJobInfo = each;
                   });
-                })
+                }))
               ])
           )
       );
     }
 
     return UiUtils.getRowColumnWithAlignCenter([
-      SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+      SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        UiUtils.getBackButton(() async {
           backInputView();
         }),
       ])),
@@ -622,7 +614,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: jobList)),
       UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+      UiUtils.getTextButtonBox(90.w, currentViewId == endViewId ? "수정하기" : "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
         CommonUtils.log("i", "selectedJobInfo : $selectedJobInfo");
         if(selectedJobInfo.isNotEmpty){
           nextInputView();
@@ -639,19 +631,19 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
     String court = MyData.selectedAccidentInfoData!.accidentCourtInfo.split("@")[0];
     String accidentNo = "${MyData.selectedAccidentInfoData!.accidentCaseNumberYear}${MyData.selectedAccidentInfoData!.accidentCaseNumberType}${MyData.selectedAccidentInfoData!.accidentCaseNumberNumber}";
     List<String> confirmDataList = [];
-    confirmDataList.add("• [환급]  ${selectedBankCodeInfo.split("@")[0]} $selectedBankAccountInfo");
-    confirmDataList.add("• 기대출  ${selectedPreLoanCountInfo.split("@")[0]}");
+    confirmDataList.add("•  [환급]  ${selectedBankCodeInfo.split("@")[0]} $selectedBankAccountInfo");
+    confirmDataList.add("•  기대출  ${selectedPreLoanCountInfo.split("@")[0]}");
     if(selectedPreLoanPriceInfo != "0"){
-      confirmDataList.add("• 인가후 대출금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedPreLoanPriceInfo))}");
+      confirmDataList.add("•  인가후 대출금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedPreLoanPriceInfo))}");
     }else{
-      confirmDataList.add("• 인가후 대출금액  0원");
+      confirmDataList.add("•  인가후 대출금액  0원");
     }
     if(selectedWantLoanPriceInfo != "0"){
-      confirmDataList.add("• 희망 대출금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedWantLoanPriceInfo))}");
+      confirmDataList.add("•  희망 대출금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedWantLoanPriceInfo))}");
     }else{
-      confirmDataList.add("• 희망 대출금액  0원");
+      confirmDataList.add("•  희망 대출금액  0원");
     }
-    confirmDataList.add("• ${selectedJobInfo.split("@")[0]}");
+    confirmDataList.add("•  ${selectedJobInfo.split("@")[0]}");
 
     List<Widget> confirmWidgetList = [];
     Color textColor = ColorStyles.upFinBlack;
@@ -666,8 +658,8 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
     }
 
     return UiUtils.getRowColumnWithAlignCenter([
-      SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () {
+      SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        UiUtils.getBackButton(() {
           backInputView();
         }),
       ])),
@@ -711,13 +703,15 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
             if(isNotEmpty){
               Navigator.pop(context, true);
             }else{
-              CommonUtils.flutterToast("정보 수정에 실패했습니다.\n다시 실행해주세요.");
+              Navigator.pop(context, false);
+              CommonUtils.flutterToast("수정된정보 불러오기에\n실패했습니다.");
             }
           }
         });
       }else{
         UiUtils.closeLoadingPop(context);
-        CommonUtils.flutterToast("정보 수정에 실패했습니다.\n다시 실행해주세요.");
+        Navigator.pop(context, false);
+        CommonUtils.flutterToast("정보 수정에 실패했습니다.\n입력정보를 확인해주세요.");
       }
     });
   }

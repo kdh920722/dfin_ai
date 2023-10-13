@@ -3,6 +3,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
 import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:sizer/sizer.dart';
+import 'package:upfin/styles/TextStyles.dart';
 import '../styles/ColorStyles.dart';
 import '../configs/app_config.dart';
 import 'common_utils.dart';
@@ -211,11 +212,15 @@ class UiUtils {
   }
 
   static Widget getIconButtonWithHeight(double height, IconData icon, double size, Color iconColor, VoidCallback onPressedCallback) {
-    return SizedBox(height: height,child: IconButton(onPressed: onPressedCallback, icon: Icon(icon, color: iconColor, size: size)));
+    return SizedBox(height: height,
+        child: IconButton(constraints: const BoxConstraints(), padding: EdgeInsets.only(right: 5.w), onPressed: onPressedCallback, icon: Icon(icon, color: iconColor, size: size)));
   }
 
-  static Widget getIconButtonWithBoxSize(Color backgroundColor, double width, double height, IconData icon, double size, Color iconColor, VoidCallback onPressedCallback) {
-    return Container(color: backgroundColor, width: width, height: height,child: IconButton(onPressed: onPressedCallback, icon: Icon(icon, color: iconColor, size: size)));
+  static Widget getBackButton(VoidCallback onPressedCallback) {
+    return SizedBox(
+        width : 10.w,
+        child: IconButton(constraints: const BoxConstraints(), padding: EdgeInsets.only(right: 5.w),
+            onPressed: onPressedCallback, icon: Icon(Icons.arrow_back_ios_new_sharp, color: ColorStyles.upFinDarkGray, size: 6.w)));
   }
 
   static Widget getIconButtonBox(double buttonWidth, Color buttonColor, IconData icon, double size, Color iconColor, VoidCallback onPressedCallback) {
@@ -510,6 +515,31 @@ class UiUtils {
     );
   }
 
+  static InputDecoration getInputDecorationForPrice(String labelText, double labelTextSize, String counterText, double counterTextSize){
+    return InputDecoration(
+        labelText: labelText,
+        floatingLabelBehavior: FloatingLabelBehavior.auto,
+        labelStyle: TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "SpoqaHanSansNeo", color: ColorStyles.upFinTextAndBorderBlue, fontSize: labelTextSize, fontWeight: FontWeight.w500),
+        hintText: "",
+        counterText: counterText,
+        isDense: true,
+        suffixIcon: Text("만원  ", style: TextStyles.upFinDisabledTextFormFieldTextStyle),
+        suffixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
+        errorStyle: TextStyle(fontSize: 0.sp),
+        counterStyle: TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "SpoqaHanSansNeo", color: ColorStyles.upFinTextAndBorderBlue, fontSize: counterTextSize, fontWeight: FontWeight.w500),
+        enabledBorder: const UnderlineInputBorder(
+            borderSide: BorderSide(color: ColorStyles.upFinButtonBlue)),
+
+        focusedBorder: UnderlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: ColorStyles.upFinButtonBlue),
+        ),
+        errorBorder: const UnderlineInputBorder(borderSide: BorderSide(color: ColorStyles.upFinRed)),
+        filled: true,
+        fillColor: ColorStyles.upFinWhite
+    );
+  }
+
   static InputDecoration getDisabledInputDecoration(String labelText, double labelTextSize, String counterText, double counterTextSize){
     return InputDecoration(
         labelText: labelText,
@@ -611,16 +641,30 @@ class UiUtils {
         children: [Column(crossAxisAlignment: CrossAxisAlignment.center, children: viewList)]);
   }
 
-  static Widget getCircleCheckBox(double size, bool checkedValue, Function(bool?) onChanged){
+  static Widget getCheckBox(double size, bool checkedValue, Function(bool?) onChanged){
     return Transform.scale(scale: size, child: Checkbox(
         value: checkedValue,
         onChanged: onChanged,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)),
         checkColor: ColorStyles.upFinWhite,
         activeColor: ColorStyles.upFinSky,
         side: MaterialStateBorderSide.resolveWith((states) =>
          !checkedValue? const BorderSide(width: 2.0, color: ColorStyles.upFinGray) : const BorderSide(width: 2.0, color: ColorStyles.upFinSky))
     ));
+  }
+
+  static Widget getCustomCheckBox(Key key, double size, bool checkedValue,
+      Color activeCheckColor, Color activeFillColor, Color borderColor, Color activeBorderColor, Function(bool?) onChanged){
+    return Transform.scale(scale: size, child: Container(padding: EdgeInsets.zero, child: Checkbox(
+        key: key,
+        value: checkedValue,
+        onChanged: onChanged,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)),
+        checkColor: activeCheckColor,
+        activeColor: activeFillColor,
+        side: MaterialStateBorderSide.resolveWith((states) =>
+        !checkedValue? BorderSide(width: 2.0, color: borderColor) : BorderSide(width: 2.0, color: activeBorderColor))
+    )));
   }
 
   static Widget getCustomCircleCheckBox(Key key, double size, bool checkedValue,

@@ -275,7 +275,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       courtList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                selectedCourtKey == key? UiUtils.getCustomCircleCheckBox(key, 1.5, selectedCourtKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                selectedCourtKey == key? UiUtils.getCustomCheckBox(key, 1.5, selectedCourtKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
                     ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
                   setState(() {
                     if(checkedValue != null){
@@ -285,7 +285,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                       }
                     }
                   });
-                }) : UiUtils.getCustomCircleCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
+                }) : UiUtils.getCustomCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
                     ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
@@ -296,21 +296,20 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                         }
                       });
                     }),
-                UiUtils.getTextButtonWithFixedScale(LogfinController.courtList[i].split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.center, null, (){
+                Expanded(child: UiUtils.getTextButtonWithFixedScale(LogfinController.courtList[i].split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.start, null, (){
                   setState(() {
                     selectedCourtKey = key;
                     selectedCourtInfo = LogfinController.courtList[i];
                   });
-                })
-
+                }))
               ])
           )
       );
     }
 
     return UiUtils.getRowColumnWithAlignCenter([
-      SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () {
+      SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        UiUtils.getBackButton(() {
           Navigator.pop(context, "back");
         }),
       ])),
@@ -365,8 +364,8 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
   /// accident view
   Widget _getAccidentView(){
     return UiUtils.getRowColumnWithAlignCenter([
-      SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+      SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        UiUtils.getBackButton(() async {
           backInputView();
         }),
       ])),
@@ -379,9 +378,8 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
           SizedBox(width: 85.w, child: Row(children: [
             UiUtils.getTextField(20.w, TextStyles.upFinTextFormFieldTextStyle, _accidentInfoFocus1, _accidentInfoTextController1, TextInputType.number,
                 UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
-            UiUtils.getDisabledTextField(18.w, "개회", TextStyles.upFinDisabledTextFormFieldTextStyle,
-                UiUtils.getInputDecoration("", 0.sp, "", 0.sp)),
-            UiUtils.getTextField(28.w, TextStyles.upFinTextFormFieldTextStyle, _accidentInfoFocus2, _accidentInfoTextController2, TextInputType.number,
+            UiUtils.getTextWithFixedScale("개회", 18.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.center, null),
+            UiUtils.getTextField(32.w, TextStyles.upFinTextFormFieldTextStyle, _accidentInfoFocus2, _accidentInfoTextController2, TextInputType.number,
                 UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
           ]))
       ),
@@ -442,7 +440,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       bankCodeList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                selectedBankCodeKey == key? UiUtils.getCustomCircleCheckBox(key, 1.5, selectedBankCodeKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                selectedBankCodeKey == key? UiUtils.getCustomCheckBox(key, 1.5, selectedBankCodeKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
                     ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
@@ -452,7 +450,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                           }
                         }
                       });
-                    }) : UiUtils.getCustomCircleCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
+                    }) : UiUtils.getCustomCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
                     ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
@@ -463,20 +461,20 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                         }
                       });
                     }),
-                UiUtils.getTextButtonWithFixedScale(LogfinController.bankList[i].split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.center, null, (){
+                Expanded(child: UiUtils.getTextButtonWithFixedScale(LogfinController.bankList[i].split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.start, null, (){
                   setState(() {
                     selectedBankCodeKey = key;
                     selectedBankCodeInfo = LogfinController.bankList[i];
                   });
-                })
+                }))
               ])
           )
       );
     }
 
     return UiUtils.getRowColumnWithAlignCenter([
-      SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+      SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        UiUtils.getBackButton(() async {
           backInputView();
         }),
       ])),
@@ -532,8 +530,8 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
   /// bank account view
   Widget _getBankAccountView(){
     return UiUtils.getRowColumnWithAlignCenter([
-      SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+      SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        UiUtils.getBackButton(() async {
           backInputView();
         }),
       ])),
@@ -573,7 +571,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       loanCountList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                selectedPreLoanCountKey == key? UiUtils.getCustomCircleCheckBox(key, 1.5, selectedPreLoanCountKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                selectedPreLoanCountKey == key? UiUtils.getCustomCheckBox(key, 1.5, selectedPreLoanCountKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
                     ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
@@ -583,7 +581,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                           }
                         }
                       });
-                    }) : UiUtils.getCustomCircleCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
+                    }) : UiUtils.getCustomCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
                     ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
@@ -594,20 +592,20 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                         }
                       });
                     }),
-                UiUtils.getTextButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.start, null, (){
+                Expanded(child: UiUtils.getTextButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.start, null, (){
                   setState(() {
                     selectedPreLoanCountKey = key;
                     selectedPreLoanCountInfo = each;
                   });
-                })
+                }))
               ])
           )
       );
     }
 
     return UiUtils.getRowColumnWithAlignCenter([
-      SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+      SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        UiUtils.getBackButton(() async {
           backInputView();
         }),
       ])),
@@ -639,8 +637,8 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
   Widget _getPreLoanPriceView(){
     return Stack(children: [
       UiUtils.getRowColumnWithAlignCenter([
-        SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+        SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          UiUtils.getBackButton(() async {
             backInputView();
           }),
         ])),
@@ -651,15 +649,17 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력단위(*만원)", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
         UiUtils.getMarginBox(0, 5.h),
         Obx(()=>
-            UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _preLoanPriceFocus, _preLoanPriceTextController, TextInputType.number, false,
-                UiUtils.getInputDecoration("", 0.sp, GetController.to.preLoanPrice.value, 14.sp), (text) {
-                  if(text.trim() != ""){
-                    final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
-                    GetController.to.updatePreLoanPrice(CommonUtils.getPriceFormattedString(number!));
-                  }else{
-                    GetController.to.updatePreLoanPrice("만원");
-                  }
-                }, (value){})
+            Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+              UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _preLoanPriceFocus, _preLoanPriceTextController, TextInputType.number, false,
+                  UiUtils.getInputDecorationForPrice("", 0.sp, GetController.to.preLoanPrice.value, 14.sp), (text) {
+                    if(text.trim() != ""){
+                      final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
+                      GetController.to.updatePreLoanPrice(CommonUtils.getPriceFormattedString(number!));
+                    }else{
+                      GetController.to.updatePreLoanPrice("만원");
+                    }
+                  }, (value){})
+            ])
         ),
         UiUtils.getMarginBox(0, 5.h),
         UiUtils.getExpandedScrollView(Axis.vertical, Container()),
@@ -677,13 +677,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
           CommonUtils.log("i", "selectedPreLoanPriceInfo : $selectedPreLoanPriceInfo");
           nextInputView();
         })
-      ]),
-      Positioned(
-          right: 3.w,
-          child: UiUtils.getRowColumnWithAlignCenter([
-            UiUtils.getMarginBox(0, 28.h),
-            UiUtils.getTextWithFixedScale("만원", 16.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null),
-          ]))
+      ])
     ]);
   }
   /// pre loan price end
@@ -692,8 +686,8 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
   Widget _getWantLoanPriceView(){
     return Stack(children: [
       UiUtils.getRowColumnWithAlignCenter([
-        SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+        SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          UiUtils.getBackButton(() async {
             if(selectedPreLoanCountInfo.split("@")[1] == "0"){
               currentViewId--;
               backInputView();
@@ -709,7 +703,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력단위(*만원)", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
         UiUtils.getMarginBox(0, 5.h),
         Obx(()=>UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _wantLoanPriceFocus, _wantLoanPriceTextController, TextInputType.number, false,
-            UiUtils.getInputDecoration("", 0.sp, GetController.to.wantLoanPrice.value, 14.sp), (text) {
+            UiUtils.getInputDecorationForPrice("", 0.sp, GetController.to.wantLoanPrice.value, 14.sp), (text) {
               if(text.trim() != ""){
                 final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
                 GetController.to.updateWantLoanPrice(CommonUtils.getPriceFormattedString(number!));
@@ -734,13 +728,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
           CommonUtils.log("i", "selectedWantLoanPriceInfo : $selectedWantLoanPriceInfo");
           nextInputView();
         })
-      ]),
-      Positioned(
-          right: 3.w,
-          child: UiUtils.getRowColumnWithAlignCenter([
-            UiUtils.getMarginBox(0, 28.h),
-            UiUtils.getTextWithFixedScale("만원", 16.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null),
-          ]))
+      ])
     ]);
   }
   /// want loan price end
@@ -760,7 +748,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       jobList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                selectedJobKey == key? UiUtils.getCustomCircleCheckBox(key, 1.5, selectedJobKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                selectedJobKey == key? UiUtils.getCustomCheckBox(key, 1.5, selectedJobKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
                     ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
@@ -770,7 +758,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                           }
                         }
                       });
-                    }) : UiUtils.getCustomCircleCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
+                    }) : UiUtils.getCustomCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
                     ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
@@ -781,20 +769,20 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                         }
                       });
                     }),
-                UiUtils.getTextButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.center, null, (){
+                Expanded(child: UiUtils.getTextButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.start, null, (){
                   setState(() {
                     selectedJobKey = key;
                     selectedJobInfo = each;
                   });
-                })
+                }))
               ])
           )
       );
     }
 
     return UiUtils.getRowColumnWithAlignCenter([
-      SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () async {
+      SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        UiUtils.getBackButton(() async {
           backInputView();
         }),
       ])),
@@ -827,28 +815,28 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       birthDay = birthDay.substring(1);
     }
     List<String> confirmDataList = [];
-    confirmDataList.add("• ${MyData.name}");
-    confirmDataList.add("• ${MyData.birth.substring(0,4)}년 $birthMonth월 $birthDay일");
-    confirmDataList.add("• [환급]  ${selectedBankCodeInfo.split("@")[0]} $selectedBankAccountInfo");
-    confirmDataList.add("• 기대출  ${selectedPreLoanCountInfo.split("@")[0]}");
+    confirmDataList.add("•  ${MyData.name}");
+    confirmDataList.add("•  ${MyData.birth.substring(0,4)}년 $birthMonth월 $birthDay일");
+    confirmDataList.add("•  [환급]  ${selectedBankCodeInfo.split("@")[0]} $selectedBankAccountInfo");
+    confirmDataList.add("•  기대출  ${selectedPreLoanCountInfo.split("@")[0]}");
     if(selectedPreLoanPriceInfo != "0"){
-      confirmDataList.add("• 인가후 대출금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedPreLoanPriceInfo))}");
+      confirmDataList.add("•  인가후 대출금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedPreLoanPriceInfo))}");
     }else{
-      confirmDataList.add("• 인가후 대출금액  0원");
+      confirmDataList.add("•  인가후 대출금액  0원");
     }
     if(selectedWantLoanPriceInfo != "0"){
-      confirmDataList.add("• 희망 대출금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedWantLoanPriceInfo))}");
+      confirmDataList.add("•  희망 대출금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedWantLoanPriceInfo))}");
     }else{
-      confirmDataList.add("• 희망 대출금액  0원");
+      confirmDataList.add("•  희망 대출금액  0원");
     }
-    confirmDataList.add("• ${selectedJobInfo.split("@")[0]}");
+    confirmDataList.add("•  ${selectedJobInfo.split("@")[0]}");
 
     List<Widget> confirmWidgetList = [];
     Color textColor = ColorStyles.upFinBlack;
     for(var each in confirmDataList){
       textColor = ColorStyles.upFinBlack;
       confirmWidgetList.add(
-          SizedBox(width: 80.w, child: UiUtils.getTextButtonWithFixedScale(each, 16.sp, FontWeight.w800, textColor, TextAlign.start, null, (){})),
+          SizedBox(width: 80.w, child: UiUtils.getTextButtonWithFixedScale(each, 16.sp, FontWeight.w500, textColor, TextAlign.start, null, (){})),
       );
       confirmWidgetList.add(
         UiUtils.getMarginBox(0, 3.h),
@@ -856,8 +844,8 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
     }
 
     return UiUtils.getRowColumnWithAlignCenter([
-      SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getIconButtonWithHeight(7.h, Icons.arrow_back_ios_new_sharp, 20.sp, ColorStyles.upFinDarkGray, () {
+      SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        UiUtils.getBackButton(() {
           backInputView();
         }),
       ])),

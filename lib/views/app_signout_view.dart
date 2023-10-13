@@ -88,7 +88,7 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
         padding: EdgeInsets.all(5.w),
         child: UiUtils.getRowColumnWithAlignCenter([
           SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            UiUtils.getIconButtonWithHeight(5.h, Icons.arrow_back_ios_new_sharp, 18.sp, ColorStyles.upFinDarkGray, () async {
+            UiUtils.getBackButton(() async {
               CommonUtils.hideKeyBoard();
               Navigator.pop(context);
             }),
