@@ -555,13 +555,13 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               color: ColorStyles.upFinButtonBlue,
               padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 15.h, bottom: 0),
               child: Column(mainAxisSize: MainAxisSize.max, mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.center, children: [
-                SizedBox(width: 80.w, child: UiUtils.getTextWithFixedScale("환영합니다", 22.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, null)),
+                SizedBox(width: 80.w, child: UiUtils.getTextWithFixedScale("환영합니다! ", 22.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, null)),
                 UiUtils.getMarginBox(0, 1.h),
-                SizedBox(width: 80.w, child: UiUtils.getTextWithFixedScale("고객님께 딱 알맞는", 22.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, null)),
+                SizedBox(width: 80.w, child: UiUtils.getTextWithFixedScale("가입이 완료되었네요.", 22.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, null)),
                 UiUtils.getMarginBox(0, 1.h),
-                SizedBox(width: 80.w, child: UiUtils.getTextWithFixedScale("개인회생 대출상품을", 22.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, null)),
+                SizedBox(width: 80.w, child: UiUtils.getTextWithFixedScale("이제 개인회생 대출상품을", 22.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, null)),
                 UiUtils.getMarginBox(0, 1.h),
-                SizedBox(width: 80.w, child: UiUtils.getTextWithFixedScale("이제 찾으실 수 있습니다!", 22.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, null)),
+                SizedBox(width: 80.w, child: UiUtils.getTextWithFixedScale("찾으실 수 있어요~ ", 22.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, null)),
                 UiUtils.getMarginBox(0, 3.h),
                 UiUtils.getBorderButtonBox(80.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
                     UiUtils.getTextWithFixedScale("시작하기", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, null), () {

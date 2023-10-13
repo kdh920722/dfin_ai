@@ -134,7 +134,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
               UiUtils.showLoadingPop(context);
               LogfinController.callLogfinApi(LogfinApis.signIn, inputJson, (isSuccessToLogin, outputJson) async {
                 if(isSuccessToLogin){
-                  CommonUtils.flutterToast("환영합니다!");
+                  CommonUtils.flutterToast("!");
                   // 캐시 데이터 저장
                   SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceIdKey, _emailTextController.text.trim());
                   SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferencePwKey, _pwdTextController.text.trim());

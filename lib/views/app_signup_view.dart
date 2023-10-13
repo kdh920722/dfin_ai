@@ -535,7 +535,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
             }
           }) : Container(),
       UiUtils.getExpandedScrollView(Axis.vertical, Container()),
-      isView1Valid? UiUtils.getTextButtonBox(90.w, "가입하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
+      isView1Valid? UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
         if(_formKey1.currentState!.validate()){
           CommonUtils.hideKeyBoard();
           Map<String, dynamic> inputJson = {
@@ -576,7 +576,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
       ])) : UiUtils.getMarginBox(0, 7.h)),
       SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         UiUtils.getMarginBox(0, 3.h),
-        UiUtils.getTextWithFixedScale("회원가입", 26.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
+        UiUtils.getTextWithFixedScale("본인인증", 26.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
         UiUtils.getMarginBox(0, 3.h)
       ])),
       UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _nameTextFocus, _nameTextController, TextInputType.text, false,
@@ -598,7 +598,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
           }): Container(),
       UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
       isButtonValid? UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-          UiUtils.getTextWithFixedScale("본인인증", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () async {
+          UiUtils.getTextWithFixedScale("다음", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () async {
             CommonUtils.hideKeyBoard();
             if(_phoneNumberTextController.text.trim() != ""){
               UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, 100.w, 62.h, 0.5, _makeAgreeWidget);
