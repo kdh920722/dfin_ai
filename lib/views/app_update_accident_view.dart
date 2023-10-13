@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/scheduler.dart';
 import 'package:upfin/controllers/get_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,7 +6,6 @@ import 'package:sizer/sizer.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
-import '../configs/app_config.dart';
 import '../styles/TextStyles.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';

@@ -1,8 +1,5 @@
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:upfin/controllers/logfin_controller.dart';
-import 'package:upfin/controllers/sharedpreference_controller.dart';
 import 'package:sizer/sizer.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';

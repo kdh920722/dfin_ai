@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
-import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:upfin/configs/app_config.dart';
 import 'package:upfin/configs/string_config.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
-import 'package:upfin/datas/chatroom_info_data.dart';
-import 'package:upfin/datas/loan_info_data.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import '../controllers/get_controller.dart';
 import '../utils/common_utils.dart';
-import '../utils/pop_result.dart';
 import '../utils/ui_utils.dart';
 
 class AppMainView extends StatefulWidget{

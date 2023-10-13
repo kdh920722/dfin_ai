@@ -1,10 +1,7 @@
 import 'dart:convert';
 import 'package:camera/camera.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:sizer/sizer.dart';
 import 'package:upfin/configs/app_config.dart';
 import 'package:upfin/controllers/juso_controller.dart';
@@ -493,7 +490,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     });
 
     GetController.to.updateFirstIndex2_3(0);
-    GetController.to.updateLastIndex2_3(12);
+    GetController.to.updateLastIndex2_3(10);
   }
 
 
@@ -759,6 +756,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
     List<Widget> introWidgetList = [];
 
+    /*
     introWidgetList.add(
         UiUtils.getMarginBox(0, 1.h)
     );
@@ -796,10 +794,10 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
         ])
     );
-
+    */
 
     introWidgetList.add(
-        UiUtils.getMarginBox(0, 5.h)
+        UiUtils.getMarginBox(0, 1.h)
     );
 
     introWidgetList.add(
@@ -1275,20 +1273,21 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           _bankAccountInfoTextController, TextInputType.number, UiUtils.getInputDecoration("계좌번호", 14.sp, "", 0.sp), (value) { }),
       UiUtils.getExpandedScrollView(Axis.vertical, Container()),
       UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-        selectedBankAccountInfo = _bankAccountInfoTextController.text.trim();
-        CommonUtils.log("i", "selectedBankAccountInfo : $selectedBankAccountInfo");
-        if(selectedBankAccountInfo.isNotEmpty){
-          _setConfirmedToDocItemByViewId(currentViewId, true);
-          Map<String, dynamic> resultMap = {
-            "resultValue" : selectedBankAccountInfo
-          };
-          _setResultToListById(mainBankAccountId, resultMap);
-          nextInputView();
-        }else{
-          CommonUtils.flutterToast(errorMsg);
-        }
-      })
+      UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+          UiUtils.getTextWithFixedScale("다음", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
+            selectedBankAccountInfo = _bankAccountInfoTextController.text.trim();
+            CommonUtils.log("i", "selectedBankAccountInfo : $selectedBankAccountInfo");
+            if(selectedBankAccountInfo.isNotEmpty){
+              _setConfirmedToDocItemByViewId(currentViewId, true);
+              Map<String, dynamic> resultMap = {
+                "resultValue" : selectedBankAccountInfo
+              };
+              _setResultToListById(mainBankAccountId, resultMap);
+              nextInputView();
+            }else{
+              CommonUtils.flutterToast(errorMsg);
+            }
+          })
     ]);
   }
   /// bank account view end
@@ -1309,20 +1308,21 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           _businessNumberInfoTextController, TextInputType.number, UiUtils.getInputDecoration("사업자번호", 14.sp, "", 0.sp), (value) { }),
       UiUtils.getExpandedScrollView(Axis.vertical, Container()),
       UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-        selectedBusinessNumberInfo = _businessNumberInfoTextController.text.trim();
-        CommonUtils.log("i", "selectedBusinessNumberInfo : $selectedBusinessNumberInfo");
-        if(selectedBusinessNumberInfo.isNotEmpty){
-          _setConfirmedToDocItemByViewId(currentViewId, true);
-          Map<String, dynamic> resultMap = {
-            "resultValue" : selectedBusinessNumberInfo
-          };
-          _setResultToListById(businessNumberId, resultMap);
-          nextInputView();
-        }else{
-          CommonUtils.flutterToast(errorMsg);
-        }
-      })
+      UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+          UiUtils.getTextWithFixedScale("다음", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
+            selectedBusinessNumberInfo = _businessNumberInfoTextController.text.trim();
+            CommonUtils.log("i", "selectedBusinessNumberInfo : $selectedBusinessNumberInfo");
+            if(selectedBusinessNumberInfo.isNotEmpty){
+              _setConfirmedToDocItemByViewId(currentViewId, true);
+              Map<String, dynamic> resultMap = {
+                "resultValue" : selectedBusinessNumberInfo
+              };
+              _setResultToListById(businessNumberId, resultMap);
+              nextInputView();
+            }else{
+              CommonUtils.flutterToast(errorMsg);
+            }
+          })
     ]);
   }
   /// business number view end
@@ -1412,26 +1412,26 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         UiUtils.getMarginBox(0, 2.h),
         UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: addressWidgetList)),
         UiUtils.getMarginBox(0, 3.h),
-        selectedAddressKey != null ?
-        UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-          _setConfirmedToDocItemByViewId(currentViewId, true);
-          if(selectedSearchCertAddressInfo != "" && selectedSearchCertAddressInfo != selectedAddressInfo){
-            for(var each in addedDocsList){
-              if(each["is_docs"]){
-                each["is_confirmed"] = false;
-                Map<String, dynamic> resultMap = each["result"];
-                resultMap.clear();
-                each["result"] = resultMap;
-                each["result"] = <String, dynamic>{};
+        selectedAddressKey != null ? UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+            UiUtils.getTextWithFixedScale("다음", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
+              _setConfirmedToDocItemByViewId(currentViewId, true);
+              if(selectedSearchCertAddressInfo != "" && selectedSearchCertAddressInfo != selectedAddressInfo){
+                for(var each in addedDocsList){
+                  if(each["is_docs"]){
+                    each["is_confirmed"] = false;
+                    Map<String, dynamic> resultMap = each["result"];
+                    resultMap.clear();
+                    each["result"] = resultMap;
+                    each["result"] = <String, dynamic>{};
+                  }
+                }
               }
-            }
-          }
-          Map<String, dynamic> resultMap = {
-            "resultValue" : selectedAddressInfo
-          };
-          _setResultToListById(addressId, resultMap);
-          nextInputView();
-        }) : Container()
+              Map<String, dynamic> resultMap = {
+                "resultValue" : selectedAddressInfo
+              };
+              _setResultToListById(addressId, resultMap);
+              nextInputView();
+            }) : Container()
       ]),
       Positioned(
           right: 5.w,
@@ -1485,20 +1485,23 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       UiUtils.getMarginBox(0, 10.h),
       pickedFilePath != "" ? Container(decoration: BoxDecoration(color: ColorStyles.upFinBlack, borderRadius: BorderRadius.circular(10)), child: UiUtils.getImage(80.w, 24.h, Image.file(File(pickedFilePath))))
           : UiUtils.getImage(85.w, 24.h, Image.asset(fit: BoxFit.fitHeight,'assets/images/img_id_card.png')),
-      UiUtils.getMarginBox(0, 1.h),
-      SizedBox(width: 82.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-        UiUtils.getBorderButtonBox(80.w, ColorStyles.upFinWhite, ColorStyles.upFinTextAndBorderBlue,
-            UiUtils.getTextWithFixedScale("촬영하기", 11.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null), () {
-                  setState(() { currentViewId = cameraTakePhotoId; });
-                }),
-      ])),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getExpandedScrollView(Axis.vertical, Container()),
-      pickedFilePath != "" ? UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-        if(_isDocItemConfirmedByViewId(currentViewId)){
-          nextInputView();
-        }
-      }) : Container()
+      pickedFilePath != "" ? SizedBox(width: 90.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+            UiUtils.getTextWithFixedScale("다음", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
+              if(_isDocItemConfirmedByViewId(currentViewId)){
+                nextInputView();
+              }
+            }),
+      ])) : Container(),
+      UiUtils.getMarginBox(0, 0.5.h),
+      SizedBox(width: 90.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
+            UiUtils.getTextWithFixedScale(pickedFilePath != "" ? "다시 촬영하기" : "촬영하기", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
+              setState(() { currentViewId = cameraTakePhotoId; });
+            }),
+      ])),
     ]);
   }
   Widget _takeCustomCamera() {
@@ -1580,27 +1583,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         ),
       ],
     );
-  }
-  Future<void> _takeImage(bool isGetImageFromCamera) async {
-    try{
-      UiUtils.showLoadingPop(context);
-      XFile? image = isGetImageFromCamera? await CommonUtils.getCameraImage() : await CommonUtils.getGalleryImage();
-
-      if(image != null){
-        String imagePath = await CommonUtils.cropImageAndGetPath(image);
-        if(imagePath != ""){
-          _checkValidCertImage(XFile(imagePath));
-        }else{
-          if(context.mounted) UiUtils.closeLoadingPop(context);
-        }
-      }else{
-        if(context.mounted) UiUtils.closeLoadingPop(context);
-      }
-    }catch(error){
-      UiUtils.closeLoadingPop(context);
-      CommonUtils.log("i", "tage image error : $error");
-      CommonUtils.flutterToast("사진을 가져오는 중\n에러가 발생했습니다.");
-    }
   }
 
   Future<void> _checkValidCertImage(XFile image) async {
@@ -1858,81 +1840,81 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: docsWidgetList)),
       UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getTextButtonBox(90.w, !_isDocsAllConfirmed(docsType)? "인증하기" : "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-        if(!_isDocsAllConfirmed(docsType)){
-
-          if(certType == 0){
-            UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, 40.h, 0.5, (slideContext, setState){
-              return Column(mainAxisAlignment: MainAxisAlignment.start, children:
-              [
-                Row(children: [
-                  const Spacer(flex: 2),
-                  UiUtils.getIconButton(Icons.close, 7.w, ColorStyles.upFinRealGray, () {
-                    certType = 0;
-                    isCertTypeSelected = false;
-                    Navigator.pop(slideContext);
-                  }),
-                ]),
-                UiUtils.getMarginBox(0, 1.5.h),
-                SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("민간 인증서를 선택하세요", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
-                UiUtils.getMarginBox(0, 2.h),
-                SizedBox(width: 85.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  Column(children: [
-                    Container(padding: EdgeInsets.zero, decoration: BoxDecoration(color: certType == 1? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, borderRadius: BorderRadius.circular(15)),
-                        child: UiUtils.getImageButton(Image.asset('assets/images/kakao_icon.png'), 16.w, ColorStyles.upFinBlack, () async {
-                          setState(() { certType = 1; });
-                        })),
-                    UiUtils.getMarginBox(0, 1.h),
-                    UiUtils.getTextWithFixedScale("카카오톡", 12.sp, FontWeight.w600, certType == 1? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRealGray, TextAlign.start, null)
-                  ]),
-                  UiUtils.getMarginBox(5.w, 0),
-                  Column(children: [
-                    Container(padding: EdgeInsets.zero, decoration: BoxDecoration(color: certType == 6? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, borderRadius: BorderRadius.circular(15)),
-                        child: UiUtils.getRoundImageButton(Image.asset('assets/images/naver_icon.png', fit: BoxFit.cover), 16.w, ColorStyles.upFinBlack, () async {
-                          setState(() { certType = 6; });
-                        })),
-                    UiUtils.getMarginBox(0, 1.h),
-                    UiUtils.getTextWithFixedScale("네이버", 12.sp, FontWeight.w600, certType == 6? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRealGray, TextAlign.start, null)
-                  ]),
-                  UiUtils.getMarginBox(5.w, 0),
-                  Column(children: [
-                    Container(padding: EdgeInsets.zero, decoration: BoxDecoration(color: certType == 8? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, borderRadius: BorderRadius.circular(15)),
-                        child: UiUtils.getRoundImageButton(Image.asset('assets/images/toss_icon.png', fit: BoxFit.cover), 16.w, ColorStyles.upFinBlack, () async {
-                          setState(() { certType = 8; });
-                        })),
-                    UiUtils.getMarginBox(0, 1.h),
-                    UiUtils.getTextWithFixedScale("TOSS", 12.sp, FontWeight.w600, certType == 8? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRealGray, TextAlign.start, null)
-                  ]),
-                  UiUtils.getMarginBox(5.w, 0),
-                  Column(children: [
-                    Container(padding: EdgeInsets.zero, decoration: BoxDecoration(color: certType == 5? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, borderRadius: BorderRadius.circular(15)),
-                        child: UiUtils.getRoundImageButton(Image.asset('assets/images/pass_icon.png', fit: BoxFit.cover), 16.w, ColorStyles.upFinBlack, () async {
-                          setState(() { certType = 5; });
-                        })),
-                    UiUtils.getMarginBox(0, 1.h),
-                    UiUtils.getTextWithFixedScale("PASS", 12.sp, FontWeight.w600, certType == 5? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRealGray, TextAlign.start, null)
-                  ])
-                ])),
-                UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
-                UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinTextAndBorderBlue,
-                    UiUtils.getTextWithFixedScale(_isDocsAllConfirmed(docsType) ? "인증완료" : !isErrorResult? "간편인증 진행하기" : "서류 다시 가져오기",
-                        11.sp, FontWeight.w500, !isErrorResult? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRed, TextAlign.start, null), (){
-                      if(certType != 0){
-                        onPressedCallback();
-                        isCertTypeSelected = true;
-                      }else{
-                        CommonUtils.flutterToast("인증서를 선택해주세요");
-                      }
-                    })
-              ]);
-            });
-          }else{
-            onPressedCallback();
-          }
-        }else{
-          nextInputView();
-        }
-      }),
+      UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+          UiUtils.getTextWithFixedScale(!_isDocsAllConfirmed(docsType)? "인증하기" : "다음", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
+            if(!_isDocsAllConfirmed(docsType)){
+              if(certType == 0){
+                UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, 40.h, 0.5, (slideContext, setState){
+                  return Column(mainAxisAlignment: MainAxisAlignment.start, children:
+                  [
+                    Row(children: [
+                      const Spacer(flex: 2),
+                      UiUtils.getIconButton(Icons.close, 7.w, ColorStyles.upFinRealGray, () {
+                        certType = 0;
+                        isCertTypeSelected = false;
+                        Navigator.pop(slideContext);
+                      }),
+                    ]),
+                    UiUtils.getMarginBox(0, 1.5.h),
+                    SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("민간 인증서를 선택하세요", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
+                    UiUtils.getMarginBox(0, 2.h),
+                    SizedBox(width: 85.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                      Column(children: [
+                        Container(padding: EdgeInsets.zero, decoration: BoxDecoration(color: certType == 1? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, borderRadius: BorderRadius.circular(15)),
+                            child: UiUtils.getImageButton(Image.asset('assets/images/kakao_icon.png'), 16.w, ColorStyles.upFinBlack, () async {
+                              setState(() { certType = 1; });
+                            })),
+                        UiUtils.getMarginBox(0, 1.h),
+                        UiUtils.getTextWithFixedScale("카카오톡", 12.sp, FontWeight.w600, certType == 1? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRealGray, TextAlign.start, null)
+                      ]),
+                      UiUtils.getMarginBox(5.w, 0),
+                      Column(children: [
+                        Container(padding: EdgeInsets.zero, decoration: BoxDecoration(color: certType == 6? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, borderRadius: BorderRadius.circular(15)),
+                            child: UiUtils.getRoundImageButton(Image.asset('assets/images/naver_icon.png', fit: BoxFit.cover), 16.w, ColorStyles.upFinBlack, () async {
+                              setState(() { certType = 6; });
+                            })),
+                        UiUtils.getMarginBox(0, 1.h),
+                        UiUtils.getTextWithFixedScale("네이버", 12.sp, FontWeight.w600, certType == 6? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRealGray, TextAlign.start, null)
+                      ]),
+                      UiUtils.getMarginBox(5.w, 0),
+                      Column(children: [
+                        Container(padding: EdgeInsets.zero, decoration: BoxDecoration(color: certType == 8? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, borderRadius: BorderRadius.circular(15)),
+                            child: UiUtils.getRoundImageButton(Image.asset('assets/images/toss_icon.png', fit: BoxFit.cover), 16.w, ColorStyles.upFinBlack, () async {
+                              setState(() { certType = 8; });
+                            })),
+                        UiUtils.getMarginBox(0, 1.h),
+                        UiUtils.getTextWithFixedScale("TOSS", 12.sp, FontWeight.w600, certType == 8? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRealGray, TextAlign.start, null)
+                      ]),
+                      UiUtils.getMarginBox(5.w, 0),
+                      Column(children: [
+                        Container(padding: EdgeInsets.zero, decoration: BoxDecoration(color: certType == 5? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, borderRadius: BorderRadius.circular(15)),
+                            child: UiUtils.getRoundImageButton(Image.asset('assets/images/pass_icon.png', fit: BoxFit.cover), 16.w, ColorStyles.upFinBlack, () async {
+                              setState(() { certType = 5; });
+                            })),
+                        UiUtils.getMarginBox(0, 1.h),
+                        UiUtils.getTextWithFixedScale("PASS", 12.sp, FontWeight.w600, certType == 5? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRealGray, TextAlign.start, null)
+                      ])
+                    ])),
+                    UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
+                    UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinTextAndBorderBlue,
+                        UiUtils.getTextWithFixedScale(_isDocsAllConfirmed(docsType) ? "인증완료" : !isErrorResult? "간편인증 진행하기" : "서류 다시 가져오기",
+                            11.sp, FontWeight.w500, !isErrorResult? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRed, TextAlign.start, null), (){
+                          if(certType != 0){
+                            onPressedCallback();
+                            isCertTypeSelected = true;
+                          }else{
+                            CommonUtils.flutterToast("인증서를 선택해주세요");
+                          }
+                        })
+                  ]);
+                });
+              }else{
+                onPressedCallback();
+              }
+            }else{
+              nextInputView();
+            }
+          }),
       UiUtils.getMarginBox(0, 0.5.h),
       !_isDocsAllConfirmed(docsType)? UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
           UiUtils.getTextWithFixedScale(isErrorResult? "실패서류는 다음에 할게요" : "다음에 할게요", 12.sp, FontWeight.w500, isErrorResult? ColorStyles.upFinRed : ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
@@ -1942,7 +1924,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   }
 
   List<Widget> _setDocStatus(String docType){
-    bool isErrorResult = false;
     List<Widget> docsWidgetList = [];
     for(var each in addedDocsList){
       Key key = UniqueKey();
@@ -1960,12 +1941,10 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             if(dataMap.isEmpty){
               textColor = errorTextColor;
               name += " 실패";
-              isErrorResult = true;
             }else{
               if(each["result"]["resultValue"]["result"]["code"] == "CF-03002"){
                 textColor = errorTextColor;
                 name += " 실패";
-                isErrorResult = true;
               }else{
                 textColor = successTextColor;
               }
@@ -1981,12 +1960,10 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             if(dataMap.isEmpty){
               textColor = errorTextColor;
               name += " 실패";
-              isErrorResult = true;
             }else{
               if(each["result"]["resultValue"]["result"]["code"] == "CF-03002"){
                 textColor = errorTextColor;
                 name += " 실패";
-                isErrorResult = true;
               }else{
                 textColor = successTextColor;
               }
@@ -2002,12 +1979,10 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             if(dataMap.isEmpty){
               textColor = errorTextColor;
               name += " 실패";
-              isErrorResult = true;
             }else{
               if(each["result"]["resultValue"]["result"]["code"] == "CF-03002"){
                 textColor = errorTextColor;
                 name += " 실패";
-                isErrorResult = true;
               }else{
                 textColor = successTextColor;
               }
@@ -2033,12 +2008,10 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             if(dataMap.isEmpty){
               textColor = errorTextColor;
               name += " 실패";
-              isErrorResult = true;
             }else{
               if(each["result"]["resultValue"]["result"]["code"] == "CF-03002"){
                 textColor = errorTextColor;
                 name += " 실패";
-                isErrorResult = true;
               }else{
                 textColor = successTextColor;
               }
@@ -2054,12 +2027,10 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             if(dataMap.isEmpty){
               textColor = errorTextColor;
               name += " 실패";
-              isErrorResult = true;
             }else{
               if(each["result"]["resultValue"]["result"]["code"] == "CF-03002"){
                 textColor = errorTextColor;
                 name += " 실패";
-                isErrorResult = true;
               }else{
                 textColor = successTextColor;
               }
@@ -2085,12 +2056,10 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             if(dataMap.isEmpty){
               textColor = errorTextColor;
               name += " 실패";
-              isErrorResult = true;
             }else{
               if(each["result"]["resultValue"]["result"]["code"] == "CF-03002"){
                 textColor = errorTextColor;
                 name += " 실패";
-                isErrorResult = true;
               }else{
                 textColor = successTextColor;
               }
@@ -2106,12 +2075,10 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             if(dataMap.isEmpty){
               textColor = errorTextColor;
               name += " 실패";
-              isErrorResult = true;
             }else{
               if(each["result"]["resultValue"]["result"]["code"] == "CF-03002"){
                 textColor = errorTextColor;
                 name += " 실패";
-                isErrorResult = true;
               }else{
                 textColor = successTextColor;
               }
@@ -2127,7 +2094,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             if(dataMap.isEmpty){
               textColor = errorTextColor;
               name += " 실패";
-              isErrorResult = true;
             }else{
               textColor = successTextColor;
             }

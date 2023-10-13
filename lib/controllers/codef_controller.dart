@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:upfin/controllers/get_controller.dart';
 import 'package:upfin/datas/api_info_data.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:http/http.dart' as http;
 import 'package:sizer/sizer.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -476,100 +475,99 @@ class CodeFController{
     }
 
     UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, 50.h, 0.0, (context, setState){
-      return Obx(()=>
-          Column(mainAxisAlignment: MainAxisAlignment.start, children:
-          [
-            UiUtils.getMarginBox(0, 3.h),
-            GetController.to.isWait.value ? Column(children: [
-              UiUtils.getMarginBox(0, 13.h),
-              UiUtils.getImage(22.w, 22.w,  Image.asset(fit: BoxFit.fill,'assets/images/doc_move.gif')),
-              UiUtils.getMarginBox(0, 2.h),
-              UiUtils.getStyledTextWithFixedScale("서류를 가지고 오는중입니다.", TextStyles.upFinBasicTextStyle, TextAlign.center, null)
-            ]) :
-            UiUtils.getStyledTextWithFixedScale("", TextStyles.upFinBasicTextStyle, TextAlign.center, null),
-            GetController.to.isWait.value ? Container() : Column(children: [
-              UiUtils.getMarginBox(0, 13.h),
-              UiUtils.getStyledTextWithFixedScale(certName, TextStyles.upFinBasicTextStyle, TextAlign.center, null),
-              UiUtils.getMarginBox(0, 0.5.h),
-              UiUtils.getStyledTextWithFixedScale("간편인증 후 확인 버튼을 눌러주세요.", TextStyles.upFinBasicTextStyle, TextAlign.center, null),
-              UiUtils.getMarginBox(0, 15.h),
-              UiUtils.getBorderButtonBox(85.w, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinTextAndBorderBlue,
-                  UiUtils.getTextWithFixedScale("확인", 15.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
-                    GetController.to.updateWait(true);
-                    CodeFController._getDataFromApi(apiInfo, resultInputMap, (isSuccess, _, map, listMap, fullMap){
-                      if(isSuccess){
-                        if(map != null){
-                          if(map['result_code'] == "CF-03002"){
-                            CommonUtils.flutterToast("인증을 진행해주세요.");
-                            GetController.to.updateWait(false);
-                          }else if(fullMap!['result']['code'] == "CF-12872"){
-                            CommonUtils.log("i","cancel");
-                            CommonUtils.flutterToast("인증에 실패했습니다.\n다시 시도해주세요.");
-                            GetController.to.updateWait(false);
-                            callback(false, null, null, null);
-                          }else if(fullMap['result']['code'] == "CF-12835"){
-                            CommonUtils.log("i","cancel");
-                            CommonUtils.flutterToast("인증서 정보가 없습니다.");
-                            GetController.to.updateWait(false);
-                            callback(false, null, null, null);
-                          }else if(fullMap['result']['code'] == "CF-01004"){
-                            CommonUtils.log("i","cancel");
-                            CommonUtils.flutterToast("응답 대기시간이 초과되었습니다.");
-                            GetController.to.updateWait(false);
-                            callback(false, null, null, null);
-                          }else if(fullMap['result']['code'] == "CF-13000"){
-                            CommonUtils.log("i","cancel");
-                            CommonUtils.flutterToast("주민.사업자등록번호 오류입니다.");
-                            GetController.to.updateWait(false);
-                            callback(false, null, null, null);
-                          }else if(fullMap['result']['code'] == "CF-12100"){
-                            CommonUtils.log("i","cancel");
-                            CommonUtils.flutterToast("해당 기관 연결 오류입니다.");
-                            GetController.to.updateWait(false);
-                            callback(false, null, null, null);
-                          }else{
-                            CommonUtils.log("i","no cancel");
-                            callback(true, map, null, fullMap);
-                          }
-                        }else{
-                          if(listMap?[0]['result_code'] == "CF-03002"){
-                            CommonUtils.flutterToast("인증을 진행해주세요.");
-                            GetController.to.updateWait(false);
-                          }else if(fullMap!['result']['code'] == "CF-12872"){
-                            CommonUtils.log("i","cancel");
-                            CommonUtils.flutterToast("인증에 실패했습니다.\n다시 시도해주세요.");
-                            GetController.to.updateWait(false);
-                            callback(false, null, null, null);
-                          }else if(fullMap['result']['code'] == "CF-12835"){
-                            CommonUtils.log("i","cancel");
-                            CommonUtils.flutterToast("인증서 정보가 없습니다.");
-                            GetController.to.updateWait(false);
-                            callback(false, null, null, null);
-                          }else if(fullMap['result']['code'] == "CF-01004"){
-                            CommonUtils.log("i","cancel");
-                            CommonUtils.flutterToast("응답 대기시간이 초과되었습니다.");
-                            GetController.to.updateWait(false);
-                            callback(false, null, null, null);
-                          }else if(fullMap['result']['code'] == "CF-13000"){
-                            CommonUtils.log("i","cancel");
-                            CommonUtils.flutterToast("주민.사업자등록번호 오류입니다.");
-                            GetController.to.updateWait(false);
-                            callback(false, null, null, null);
-                          }else if(fullMap['result']['code'] == "CF-12100"){
-                            CommonUtils.log("i","cancel");
-                            CommonUtils.flutterToast("해당 기관 연결 오류입니다.");
-                            GetController.to.updateWait(false);
-                            callback(false, null, null, null);
-                          }else{
-                            CommonUtils.log("i","no cancel");
-                            callback(true, null, listMap, fullMap);
-                          }
-                        }
+      if(GetController.to.isWait.value){
+        return Column(mainAxisAlignment: MainAxisAlignment.start, children:[
+          UiUtils.getMarginBox(0, 3.h),
+          UiUtils.getMarginBox(0, 13.h),
+          UiUtils.getImage(22.w, 22.w,  Image.asset(fit: BoxFit.fill,'assets/images/doc_move.gif')),
+          UiUtils.getMarginBox(0, 2.h),
+          UiUtils.getStyledTextWithFixedScale("서류를 가지고 오는중입니다.", TextStyles.upFinBasicTextStyle, TextAlign.center, null),
+        ]);
+      }else{
+        return Column(mainAxisAlignment: MainAxisAlignment.start, children:[
+          UiUtils.getMarginBox(0, 3.h),
+          UiUtils.getMarginBox(0, 13.h),
+          UiUtils.getStyledTextWithFixedScale(certName, TextStyles.upFinBasicTextStyle, TextAlign.center, null),
+          UiUtils.getMarginBox(0, 0.5.h),
+          UiUtils.getStyledTextWithFixedScale("간편인증 후 확인 버튼을 눌러주세요.", TextStyles.upFinBasicTextStyle, TextAlign.center, null),
+          UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
+          UiUtils.getBorderButtonBox(85.w, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinTextAndBorderBlue,
+              UiUtils.getTextWithFixedScale("확인", 15.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
+                GetController.to.updateWait(true);
+                CodeFController._getDataFromApi(apiInfo, resultInputMap, (isSuccess, _, map, listMap, fullMap){
+                  if(isSuccess){
+                    if(map != null){
+                      if(map['result_code'] == "CF-03002"){
+                        CommonUtils.flutterToast("인증을 진행해주세요.");
+                        GetController.to.updateWait(false);
+                      }else if(fullMap!['result']['code'] == "CF-12872"){
+                        CommonUtils.log("i","cancel");
+                        CommonUtils.flutterToast("인증에 실패했습니다.\n다시 시도해주세요.");
+                        GetController.to.updateWait(false);
+                        callback(false, null, null, null);
+                      }else if(fullMap['result']['code'] == "CF-12835"){
+                        CommonUtils.log("i","cancel");
+                        CommonUtils.flutterToast("인증서 정보가 없습니다.");
+                        GetController.to.updateWait(false);
+                        callback(false, null, null, null);
+                      }else if(fullMap['result']['code'] == "CF-01004"){
+                        CommonUtils.log("i","cancel");
+                        CommonUtils.flutterToast("응답 대기시간이 초과되었습니다.");
+                        GetController.to.updateWait(false);
+                        callback(false, null, null, null);
+                      }else if(fullMap['result']['code'] == "CF-13000"){
+                        CommonUtils.log("i","cancel");
+                        CommonUtils.flutterToast("주민.사업자등록번호 오류입니다.");
+                        GetController.to.updateWait(false);
+                        callback(false, null, null, null);
+                      }else if(fullMap['result']['code'] == "CF-12100"){
+                        CommonUtils.log("i","cancel");
+                        CommonUtils.flutterToast("해당 기관 연결 오류입니다.");
+                        GetController.to.updateWait(false);
+                        callback(false, null, null, null);
+                      }else{
+                        CommonUtils.log("i","no cancel");
+                        callback(true, map, null, fullMap);
                       }
-                    });
-                  })
-            ])])
-      );
+                    }else{
+                      if(listMap?[0]['result_code'] == "CF-03002"){
+                        CommonUtils.flutterToast("인증을 진행해주세요.");
+                        GetController.to.updateWait(false);
+                      }else if(fullMap!['result']['code'] == "CF-12872"){
+                        CommonUtils.log("i","cancel");
+                        CommonUtils.flutterToast("인증에 실패했습니다.\n다시 시도해주세요.");
+                        GetController.to.updateWait(false);
+                        callback(false, null, null, null);
+                      }else if(fullMap['result']['code'] == "CF-12835"){
+                        CommonUtils.log("i","cancel");
+                        CommonUtils.flutterToast("인증서 정보가 없습니다.");
+                        GetController.to.updateWait(false);
+                        callback(false, null, null, null);
+                      }else if(fullMap['result']['code'] == "CF-01004"){
+                        CommonUtils.log("i","cancel");
+                        CommonUtils.flutterToast("응답 대기시간이 초과되었습니다.");
+                        GetController.to.updateWait(false);
+                        callback(false, null, null, null);
+                      }else if(fullMap['result']['code'] == "CF-13000"){
+                        CommonUtils.log("i","cancel");
+                        CommonUtils.flutterToast("주민.사업자등록번호 오류입니다.");
+                        GetController.to.updateWait(false);
+                        callback(false, null, null, null);
+                      }else if(fullMap['result']['code'] == "CF-12100"){
+                        CommonUtils.log("i","cancel");
+                        CommonUtils.flutterToast("해당 기관 연결 오류입니다.");
+                        GetController.to.updateWait(false);
+                        callback(false, null, null, null);
+                      }else{
+                        CommonUtils.log("i","no cancel");
+                        callback(true, null, listMap, fullMap);
+                      }
+                    }
+                  }
+                });
+              })
+        ]);
+      }
     });
   }
 
