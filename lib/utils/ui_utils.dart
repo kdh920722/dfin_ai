@@ -435,7 +435,7 @@ class UiUtils {
           ),
         ),
         // 안읽은 메시지 숫자 텍스트
-        getTextWithFixedScale(messageCount.toString(), fontSize, fontWeight, textColor, textAlign, textMaxLine)
+        getTextWithFixedScale(messageCount > 99 ? "99+" : "$messageCount", fontSize, fontWeight, textColor, textAlign, textMaxLine)
       ],
     );
   }
