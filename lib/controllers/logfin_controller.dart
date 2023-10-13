@@ -388,7 +388,9 @@ class LogfinController {
                 String submitAmount = eachLoans["submit_offer"]["amount"].toString().substring(0, eachLoans["submit_offer"]["amount"].toString().length-4);
                 MyData.addToLoanInfoList(LoanInfoData(eachLoans["accident_uid"].toString(), eachLoans["uid"].toString(), eachLoans["lender_pr_id"].toString(),
                     submitAmount, eachLoans["submit_offer"]["interest_rate"].toString(),
-                    eachLoans["lender_pr"]["lender"]["name"].toString(), "assets/images/temp_bank_logo.png", eachLoans["lender_pr"]["lender"]["product_name"].toString(), eachLoans["lender_pr"]["lender"]["contact_no"].toString(),
+                    eachLoans["lender_pr"]["lender"]["name"].toString(),
+                    eachLoans["lender_pr"]["lender"]["name"].toString() == "(주)안전대부"? "assets/images/bank_logo_safe.png" : "assets/images/bank_logo_default.png",
+                    eachLoans["lender_pr"]["lender"]["product_name"].toString(), eachLoans["lender_pr"]["lender"]["contact_no"].toString(),
                     eachLoans["submit_offer"]["created_at"].toString(), eachLoans["submit_offer"]["updated_at"].toString(), eachLoans["status_info"]["id"].toString()));
               }
               MyData.sortLoanInfoList();
@@ -413,8 +415,11 @@ class LogfinController {
   static void _setChatRoomInfoList(){
     MyData.clearChatRoomInfoList();
     for(var eachSortedLoan in MyData.getLoanInfoList()){
+      String lastMsg = "현재 고객님은 2건의 심사 결과를 대기중입니다. 조금더 알아보시겠나요?";
+      String lastDateString = "20231005145230";
+      int cnt = 12;
       MyData.addToChatRoomInfoList(ChatRoomInfoData(eachSortedLoan.loanUid, 1, eachSortedLoan.companyLogo,
-          eachSortedLoan.companyName, eachSortedLoan.productName, "현재 고객님은 2건의 심사 결과를 대기중입니다. 조금더 알아보시렵니까?", "20231005145230", 12,
+          eachSortedLoan.companyName, eachSortedLoan.productName, lastMsg, lastDateString, cnt,
           eachSortedLoan.statueId, "${eachSortedLoan.submitRate}%", CommonUtils.getPriceFormattedString(double.parse(eachSortedLoan.submitAmount))));
     }
   }
@@ -434,7 +439,9 @@ class LogfinController {
             for(var each in offerPrList){
               MyData.addToPrInfoList(PrInfoData(accidentUid, offerId, each["rid"], each["lender_pr_id"].toString(), each["lender_name"], each["lender_id"].toString(),
                   each["product_name"], each["rid"], each["min_rate"].toString(), each["max_rate"].toString(),
-                  each["limit"].toString(), "assets/images/temp_bank_logo.png", each["result"] as bool, each["msg"]));
+                  each["limit"].toString(),
+                  each["lender_name"] == "(주)안전대부"? "assets/images/bank_logo_safe.png" : "assets/images/bank_logo_default.png",
+                  each["result"] as bool, each["msg"]));
             }
 
             if(MyData.getPrInfoList().isNotEmpty){

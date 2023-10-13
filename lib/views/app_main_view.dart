@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:sizer/sizer.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -76,7 +75,8 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     precacheImage(const AssetImage('assets/images/img_woman_coffee.png'), context);
     precacheImage(const AssetImage('assets/images/img_woman_sports.png'), context);
     precacheImage(const AssetImage('assets/images/accident_icon.png'), context);
-    precacheImage(const AssetImage('assets/images/temp_bank_logo.png'), context);
+    precacheImage(const AssetImage('assets/images/bank_logo_default.png'), context);
+    precacheImage(const AssetImage('assets/images/bank_logo_safe.png'), context);
   }
 
   bool isScrolling = false;
@@ -121,36 +121,38 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                     _refreshMyView(context);
                   })
             ])),
-            SizedBox(width: 90.w, height: 21.h, child: Obx((){
+            Obx((){
               List<Widget> accidentWidgetList = _getAccidentWidgetList();
-              return accidentWidgetList.isNotEmpty ?  Column(
-                children: <Widget>[
-                  // PageView
-                  SizedBox(width: 90.w, height: 15.h,
-                    child: PageView(
-                      controller: _pageController,
-                      children: accidentWidgetList,
-                    ),
-                  ),
-                  UiUtils.getMarginBox(0, 3.h),
-                  accidentWidgetList.length>1? SmoothPageIndicator(
-                    controller: _pageController,
-                    count: accidentWidgetList.length, // 페이지 수
-                    effect: WormEffect(dotWidth: 1.h, dotHeight: 1.h, dotColor: ColorStyles.upFinWhiteSky, activeDotColor: ColorStyles.upFinTextAndBorderBlue), // 페이지 인디케이터 스타일
-                  ):Container(),
-                ],
-              ) : Column(children: [
-                UiUtils.getBorderButtonBoxWithZeroPadding(100.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
-                    Row(children: [
-                      UiUtils.getTextWithFixedScale("현재 등록된 사건이없습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.center, null),
-                      const Spacer(flex: 2),
-                      UiUtils.getBorderButtonBox(25.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
-                          UiUtils.getTextWithFixedScale("등록하기", 12.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, null), () {
-                            CommonUtils.moveTo(context, AppView.appSearchAccidentView.value, null);
-                          })
-                    ]), () { })
-              ]);
-            })),
+              return SizedBox(width: 90.w, height: accidentWidgetList.isEmpty ? 8.h : accidentWidgetList.length > 1 ? 21.h : 18.h,
+                  child: accidentWidgetList.isNotEmpty ? Column(
+                    children: <Widget>[
+                      // PageView
+                      SizedBox(width: 90.w, height: 15.h,
+                        child: PageView(
+                          controller: _pageController,
+                          children: accidentWidgetList,
+                        ),
+                      ),
+                      UiUtils.getMarginBox(0, 3.h),
+                      accidentWidgetList.length>1? SmoothPageIndicator(
+                        controller: _pageController,
+                        count: accidentWidgetList.length, // 페이지 수
+                        effect: WormEffect(dotWidth: 1.h, dotHeight: 1.h, dotColor: ColorStyles.upFinWhiteSky, activeDotColor: ColorStyles.upFinTextAndBorderBlue), // 페이지 인디케이터 스타일
+                      ):Container(),
+                    ],
+                  ) : Column(children: [
+                    UiUtils.getBorderButtonBoxWithZeroPadding(100.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
+                        Row(children: [
+                          UiUtils.getMarginBox(5.w, 0),
+                          UiUtils.getTextWithFixedScale("현재 등록된 사건이없습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.center, null),
+                          const Spacer(flex: 2),
+                          UiUtils.getBorderButtonBox(27.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
+                              UiUtils.getTextWithFixedScale("등록하기", 12.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.end, null), () {
+                                CommonUtils.moveTo(context, AppView.appSearchAccidentView.value, null);
+                              })
+                        ]), () { })
+                  ]));
+            }),
             UiUtils.getMarginBox(100.w, 2.h),
             UiUtils.getMarginColoredBox(100.w, 2.h, ColorStyles.upFinWhiteGray),
             UiUtils.getMarginBox(100.w, 2.h),
@@ -170,7 +172,8 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               List<Widget> loanWidgetList = _getLoanChatWidgetList();
               return loanWidgetList.isNotEmpty ? Column(children: loanWidgetList)
                   : Column(children: [
-                UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinRealGray,
+                    UiUtils.getMarginBox(0, 1.h),
+                UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinGray,
                     UiUtils.getTextWithFixedScale("접수내역이 없습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.center, null), () { })
               ]);
             }),
@@ -202,37 +205,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     if(GetController.to.isMainAccidentDataChanged.value){
       CommonUtils.log("", "accident view redraw!");
       for(var each in MyData.getAccidentInfoList()){
-        accidentWidgetList.add(
-            UiUtils.getAccidentBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinGray,
-                Column(children: [
-                  Row(children: [
-                    Expanded(flex: 15, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Row(children: [
-                        UiUtils.getMarginBox(1.w, 0),
-                        UiUtils.getBoxTextWithFixedScale("개인회생", 8.sp, FontWeight.w500, TextAlign.center, ColorStyles.upFinButtonBlue, ColorStyles.upFinWhite),
-                      ]),
-                      UiUtils.getMarginBox(0, 0.4.h),
-                      Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                        UiUtils.getImage(16.w, 16.w, Image.asset('assets/images/accident_icon.png', fit: BoxFit.fill)),
-                        UiUtils.getMarginBox(0.2.w, 0),
-                        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          UiUtils.getTextWithFixedScale(each.accidentCourtInfo.split("@")[0], 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.center, 1),
-                          UiUtils.getMarginBox(0, 0.5.h),
-                          UiUtils.getTextWithFixedScale("${each.accidentCaseNumberYear}${each.accidentCaseNumberType}${each.accidentCaseNumberNumber}", 18.sp,
-                              FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null),
-                        ])
-                      ]),
-                      //UiUtils.getTextWithFixedScale("${each.accidentBankInfo.split("@")[0]} ${each.accidentBankAccount} / ${each.resData["resRepaymentList"][0]["resRoundNo2"]}회 납부", 10.sp, FontWeight.w600, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, 1),
-                    ])),
-                    Expanded(flex: 1, child: Icon(Icons.arrow_forward_ios_rounded, color: ColorStyles.upFinDarkGray, size: 5.5.w))
-                  ]),
-                ]), () {
-                  MyData.selectedAccidentInfoData = each;
-                  CommonUtils.moveTo(context, AppView.appAccidentDetailInfoView.value, null);
-                })
-        );
-
-        //test
         accidentWidgetList.add(
             UiUtils.getAccidentBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinGray,
                 Column(children: [
@@ -296,9 +268,9 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                       ])
                     ])),
                     Expanded(flex: 2, child: Column(children: [
-                      UiUtils.getTextWithFixedScale(CommonUtils.getFormattedLastMsgTime(each.chatRoomLastMsgTime), 7.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null),
+                      UiUtils.getTextWithFixedScale(CommonUtils.getFormattedLastMsgTime(each.chatRoomLastMsgTime), 8.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null),
                       UiUtils.getMarginBox(0,0.5.h),
-                      each.chatRoomLastMsgCnt > 0? UiUtils.getCountCircleBox(5.w, each.chatRoomLastMsgCnt, 6.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, 1) : Container()
+                      each.chatRoomLastMsgCnt > 0? UiUtils.getCountCircleBox(6.w, each.chatRoomLastMsgCnt, 7.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.center, 1) : Container()
                     ]))
                   ]), () {
                     CommonUtils.moveTo(context, AppView.appChatView.value, null);
@@ -397,51 +369,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                                       CommonUtils.flutterToast("에러가 발생했습니다.");
                                     }
                                   });
-                                })
-                        );
-
-                        //test
-                        accidentWidgetList.add(
-                            UiUtils.getAccidentBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinGray,
-                                Column(children: [
-                                  Row(children: [
-                                    Expanded(flex: 15, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                      Row(children: [
-                                        UiUtils.getMarginBox(1.w, 0),
-                                        UiUtils.getBoxTextWithFixedScale("개인회생", 8.sp, FontWeight.w500, TextAlign.center, ColorStyles.upFinButtonBlue, ColorStyles.upFinWhite),
-                                      ]),
-                                      UiUtils.getMarginBox(0, 0.4.h),
-                                      Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                                        UiUtils.getImage(16.w, 16.w, Image.asset('assets/images/accident_icon.png', fit: BoxFit.fill)),
-                                        UiUtils.getMarginBox(0.2.w, 0),
-                                        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                          UiUtils.getTextWithFixedScale(each.accidentCourtInfo.split("@")[0], 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.center, 1),
-                                          UiUtils.getMarginBox(0, 0.5.h),
-                                          UiUtils.getTextWithFixedScale("${each.accidentCaseNumberYear}${each.accidentCaseNumberType}${each.accidentCaseNumberNumber}", 18.sp,
-                                              FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null),
-                                        ])
-                                      ]),
-                                      //UiUtils.getTextWithFixedScale("${each.accidentBankInfo.split("@")[0]} ${each.accidentBankAccount} / ${each.resData["resRepaymentList"][0]["resRoundNo2"]}회 납부", 10.sp, FontWeight.w600, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, 1),
-                                    ])),
-                                    Expanded(flex: 1, child: Icon(Icons.arrow_forward_ios_rounded, color: ColorStyles.upFinDarkGray, size: 5.5.w))
-                                  ]),
-                                ]), () {
-                                  Navigator.pop(slideContext);
-                                  UiUtils.showLoadingPop(context);
-                                  LogfinController.getPrList("${each.accidentCaseNumberYear}${each.accidentCaseNumberType}${each.accidentCaseNumberNumber}", (isSuccessToGetOffers, _){
-                                    UiUtils.closeLoadingPop(context);
-                                    if(isSuccessToGetOffers){
-                                      MyData.selectedAccidentInfoData = each;
-                                      setState(() {
-                                        viewTypeId = 2;
-                                      });
-                                      CommonUtils.moveTo(context, AppView.appResultPrView.value, null);
-                                    }else{
-                                      // findUidInAccidentInfoList 실패
-                                      CommonUtils.flutterToast("에러가 발생했습니다.");
-                                    }
-                                  });
-
                                 })
                         );
                       }

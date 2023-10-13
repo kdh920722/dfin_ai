@@ -115,7 +115,8 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
   }
 
   void _setImagePreLoad(){
-    precacheImage(const AssetImage('assets/images/temp_bank_logo.png'), context);
+    precacheImage(const AssetImage('assets/images/bank_logo_default.png'), context);
+    precacheImage(const AssetImage('assets/images/bank_logo_safe.png'), context);
   }
 
   Widget _getPrListView(bool isPossible){
@@ -435,7 +436,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
     Widget view = Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: EdgeInsets.all(5.w), child: Column(children: [
       Row(children: [
         const Spacer(flex: 2),
-        UiUtils.getIconButtonWithHeight(3.h, Icons.close, 20.sp, ColorStyles.upFinDarkGray, () {
+        UiUtils.getIconButtonWithHeight(3.h, Icons.close, 25.sp, ColorStyles.upFinDarkGray, () {
           MyData.selectedAccidentInfoData = null;
           MyData.selectedPrInfoData = null;
           Navigator.pop(context);

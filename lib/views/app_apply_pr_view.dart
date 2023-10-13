@@ -120,7 +120,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     precacheImage(const AssetImage('assets/images/pass_icon.png'), context);
     precacheImage(const AssetImage('assets/images/toss_icon.png'), context);
     precacheImage(const AssetImage('assets/images/logo_nice_square.png'), context);
-    precacheImage(const AssetImage('assets/images/temp_bank_logo.png'), context);
+    precacheImage(const AssetImage('assets/images/bank_logo_default.png'), context);
+    precacheImage(const AssetImage('assets/images/bank_logo_safe.png'), context);
   }
 
   void _initDocsList(){
@@ -1497,8 +1498,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       ])) : Container(),
       UiUtils.getMarginBox(0, 0.5.h),
       SizedBox(width: 90.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-        UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
-            UiUtils.getTextWithFixedScale(pickedFilePath != "" ? "다시 촬영하기" : "촬영하기", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
+        UiUtils.getBorderButtonBox(90.w, pickedFilePath != "" ? ColorStyles.upFinWhiteSky : ColorStyles.upFinButtonBlue, pickedFilePath != "" ? ColorStyles.upFinWhiteSky : ColorStyles.upFinButtonBlue,
+            UiUtils.getTextWithFixedScale(pickedFilePath != "" ? "다시 촬영하기" : "촬영하기", 14.sp, FontWeight.w500, pickedFilePath != "" ? ColorStyles.upFinButtonBlue : ColorStyles.upFinWhite, TextAlign.start, null), () {
               setState(() { currentViewId = cameraTakePhotoId; });
             }),
       ])),
@@ -1573,9 +1574,9 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             ),
         ),
         Positioned(
-            top: 80.h,
-            child: UiUtils.getBorderButtonBox(85.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                UiUtils.getTextWithFixedScale("촬영", 15.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
+            top: 87.5.h,
+            child: UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+                UiUtils.getTextWithFixedScale("촬영", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
                   if(_cameraController != null){
                     _onTakePicture(context);
                   }
