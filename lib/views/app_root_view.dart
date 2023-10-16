@@ -403,19 +403,19 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
             UiUtils.getMarginBox(0, 15.h),
             UiUtils.getTitleWithFixedScale("upfin", 75.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
             UiUtils.getMarginBox(0, 10.h),
-            UiUtils.getTextWithFixedScale("나에게 꼭 맞는", 30.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
+            UiUtils.getTextWithFixedScale("나에게 꼭 맞는", 28.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
             UiUtils.getMarginBox(0, 0.5.h),
-            UiUtils.getTextWithFixedScale("다이렉트 대출신청!", 30.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
+            UiUtils.getTextWithFixedScale("다이렉트 대출신는청!", 28.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
             UiUtils.getMarginBox(0, 8.h)
           ])),
           UiUtils.getExpandedScrollView(Axis.vertical, SizedBox(width: 100.w, child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
             UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                UiUtils.getTextWithFixedScale("로그인", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
+                UiUtils.getTextWithFixedScale("로그인", 16.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
                   CommonUtils.moveTo(context, AppView.appLoginView.value, null);
                 }),
-            UiUtils.getMarginBox(0, 0.5.h),
+            UiUtils.getMarginBox(0, 1.5.h),
             UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
-                UiUtils.getTextWithFixedScale("회원가입", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
+                UiUtils.getTextWithFixedScale("회원가입 ", 16.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
                   CommonUtils.moveTo(context, AppView.appSignupView.value, null);
                 }),
             UiUtils.getMarginBox(0, 4.h),

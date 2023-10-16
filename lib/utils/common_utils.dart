@@ -205,10 +205,10 @@ class CommonUtils {
       if(backValue == ""){
         resultString = "${getPriceCommaFormattedString(double.parse(frontValue))}억원";
       }else{
-        resultString = "${getPriceCommaFormattedString(double.parse(frontValue))}억 ${getPriceCommaFormattedString(double.parse(backValue))}만원";
+        resultString = "${getPriceCommaFormattedString(double.parse(frontValue))}억 ${getPriceCommaFormattedString(double.parse(backValue))} 만원";
       }
     }else{
-      resultString = "${getPriceCommaFormattedString(double.parse(backValue))}만원";
+      resultString = "${getPriceCommaFormattedString(double.parse(backValue))} 만원";
     }
 
     return resultString;

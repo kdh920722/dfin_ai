@@ -292,7 +292,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
                         }
                       });
                     }),
-                Expanded(child: UiUtils.getTextButtonWithFixedScale(LogfinController.bankList[i].split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.start, null, (){
+                Expanded(child: UiUtils.getTextButtonWithFixedScale(LogfinController.bankList[i].split("@")[0], 15.sp, FontWeight.w500, textColor, TextAlign.start, null, (){
                   setState(() {
                     selectedBankCodeKey = key;
                     selectedBankCodeInfo = LogfinController.bankList[i];
@@ -300,6 +300,9 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
                 }))
               ])
           )
+      );
+      bankCodeList.add(
+          UiUtils.getMarginBox(0, 0.8.h)
       );
     }
 
@@ -426,7 +429,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
                         }
                       });
                     }),
-                Expanded(child: UiUtils.getTextButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.start, null, (){
+                Expanded(child: UiUtils.getTextButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w500, textColor, TextAlign.start, null, (){
                   setState(() {
                     selectedPreLoanCountKey = key;
                     selectedPreLoanCountInfo = each;
@@ -434,6 +437,9 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
                 }))
               ])
           )
+      );
+      loanCountList.add(
+          UiUtils.getMarginBox(0, 0.8.h)
       );
     }
 
@@ -478,7 +484,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
         SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력단위(*만원)", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
         UiUtils.getMarginBox(0, 5.h),
         Obx(()=>UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _preLoanPriceFocus, _preLoanPriceTextController, TextInputType.number, false,
-            UiUtils.getInputDecorationForPrice("", 0.sp, GetController.to.preLoanPrice.value, 14.sp), (text) {
+            UiUtils.getInputDecorationForPrice("", 0.sp, GetController.to.preLoanPrice.value, 11.sp), (text) {
               if(text.trim() != ""){
                 final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
                 GetController.to.updatePreLoanPrice(CommonUtils.getPriceFormattedString(number!));
@@ -525,7 +531,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
         SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력단위(*만원)", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
         UiUtils.getMarginBox(0, 5.h),
         Obx(()=>UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _wantLoanPriceFocus, _wantLoanPriceTextController, TextInputType.number, false,
-            UiUtils.getInputDecorationForPrice("", 0.sp, GetController.to.wantLoanPrice.value, 14.sp), (text) {
+            UiUtils.getInputDecorationForPrice("", 0.sp, GetController.to.wantLoanPrice.value, 11.sp), (text) {
               if(text.trim() != ""){
                 final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
                 GetController.to.updateWantLoanPrice(CommonUtils.getPriceFormattedString(number!));
@@ -591,7 +597,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
                         }
                       });
                     }),
-                Expanded(child: UiUtils.getTextButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.start, null, (){
+                Expanded(child: UiUtils.getTextButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w500, textColor, TextAlign.start, null, (){
                   setState(() {
                     selectedJobKey = key;
                     selectedJobInfo = each;
@@ -599,6 +605,9 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
                 }))
               ])
           )
+      );
+      jobList.add(
+          UiUtils.getMarginBox(0, 0.8.h)
       );
     }
 

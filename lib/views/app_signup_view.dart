@@ -294,6 +294,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
             callAct(isAgree);
           });
         }),
+        const Spacer(flex: 2),
         UiUtils.getIconButton(Icons.arrow_forward_ios_rounded, 4.w, ColorStyles.upFinRealGray, () async {
           Widget contentsWidget = Column(children: [
             SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(contentsString, 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null))
@@ -457,6 +458,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                       GetController.to.updateConfirmed(isConfirmed);
                       CommonUtils.flutterToast("환영합니다!");
                       // 캐시 데이터 저장
+                      SharedPreferenceController.deleteAllData();
                       SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceIdKey, _emailTextController.text.trim());
                       SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferencePwKey, _pwdTextController.text.trim());
                       await LogfinController.getMainViewInfo((isSuccessToGetMainInfo){
@@ -476,7 +478,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
               }
             }else{
               isConfirmed = false;
-              CommonUtils.flutterToast("본인인증에 실패했습니다.");
+              CommonUtils.flutterToast("에 실패했습니다.");
             }
           }) : UiUtils.getTextButtonBox(90.w, "동의하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinGray, () {})
         ])

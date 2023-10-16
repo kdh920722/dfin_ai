@@ -136,6 +136,10 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
                 if(isSuccessToLogin){
                   CommonUtils.flutterToast("환영합니다!");
                   // 캐시 데이터 저장
+                  if(SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceIdKey) == "" ||
+                      SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceIdKey) != _emailTextController.text.trim()){
+                    SharedPreferenceController.deleteAllData();
+                  }
                   SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceIdKey, _emailTextController.text.trim());
                   SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferencePwKey, _pwdTextController.text.trim());
 

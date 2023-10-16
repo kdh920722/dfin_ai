@@ -184,7 +184,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               Positioned(
                   child: UiUtils.getBannerButtonBox(90.w, 50.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
                       Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                        SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale("위기 기회다!", 25.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, 1)),
+                        SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale("위기는 기회다!", 25.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, 1)),
                         UiUtils.getMarginBox(0, 10.h)
                       ]), () {})),
               Positioned(
@@ -267,10 +267,11 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                         UiUtils.getTextWithFixedScaleAndOverFlow(each.chatRoomLastMsg, 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, 1)
                       ])
                     ])),
-                    Expanded(flex: 2, child: Column(children: [
+                    Expanded(flex: 2, child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
                       UiUtils.getTextWithFixedScale(CommonUtils.getFormattedLastMsgTime(each.chatRoomLastMsgTime), 8.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null),
                       UiUtils.getMarginBox(0,0.5.h),
-                      each.chatRoomLastMsgCnt > 0? UiUtils.getCountCircleBox(6.w, each.chatRoomLastMsgCnt, 7.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.center, 1) : Container()
+                      each.chatRoomLastMsgCnt > 0? Row(mainAxisSize: MainAxisSize.min, children: [
+                        UiUtils.getCountCircleBox(6.w, each.chatRoomLastMsgCnt, 7.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.center, 1), UiUtils.getMarginBox(0.3.w, 0)]) : Container()
                     ]))
                   ]), () {
                     CommonUtils.moveTo(context, AppView.appChatView.value, null);
@@ -497,7 +498,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                       });
                       CommonUtils.moveTo(context, AppView.appSearchAccidentView.value, null);
                     }),
-                UiUtils.getMarginBox(0, 2.h),
+                UiUtils.getMarginBox(0, 2.5.h),
                 SizedBox(width: 80.w, child: UiUtils.getTextButtonWithFixedScale("넘어가기", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null, (){
                   setState(() {
                     doCheckToSearchAccident = false;

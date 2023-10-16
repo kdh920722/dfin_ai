@@ -296,7 +296,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                         }
                       });
                     }),
-                Expanded(child: UiUtils.getTextButtonWithFixedScale(LogfinController.courtList[i].split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.start, null, (){
+                Expanded(child: UiUtils.getTextButtonWithFixedScale(LogfinController.courtList[i].split("@")[0], 15.sp, FontWeight.w500, textColor, TextAlign.start, null, (){
                   setState(() {
                     selectedCourtKey = key;
                     selectedCourtInfo = LogfinController.courtList[i];
@@ -304,6 +304,9 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                 }))
               ])
           )
+      );
+      courtList.add(
+          UiUtils.getMarginBox(0, 0.8.h),
       );
     }
 
@@ -316,7 +319,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       UiUtils.getMarginBox(0, 3.h),
       SizedBox(width: 85.w,  height: 5.h,child: UiUtils.getTextWithFixedScale("우선 ", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       SizedBox(width: 85.w,  height: 5.h,child: UiUtils.getTextWithFixedScale("사건정보가 필요합니다.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("해당 법원 선택해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("해당 법원을 선택해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
       NotificationListener<ScrollNotification>(
           onNotification: (scrollNotification) {
@@ -378,7 +381,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
           SizedBox(width: 85.w, child: Row(children: [
             UiUtils.getTextField(20.w, TextStyles.upFinTextFormFieldTextStyle, _accidentInfoFocus1, _accidentInfoTextController1, TextInputType.number,
                 UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
-            UiUtils.getTextWithFixedScale("개회", 18.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.center, null),
+            UiUtils.getTextWithFixedScale("개회", 16.sp, FontWeight.w400, ColorStyles.upFinRealGray, TextAlign.center, null),
             UiUtils.getTextField(32.w, TextStyles.upFinTextFormFieldTextStyle, _accidentInfoFocus2, _accidentInfoTextController2, TextInputType.number,
                 UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
           ]))
@@ -461,7 +464,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                         }
                       });
                     }),
-                Expanded(child: UiUtils.getTextButtonWithFixedScale(LogfinController.bankList[i].split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.start, null, (){
+                Expanded(child: UiUtils.getTextButtonWithFixedScale(LogfinController.bankList[i].split("@")[0], 15.sp, FontWeight.w500, textColor, TextAlign.start, null, (){
                   setState(() {
                     selectedBankCodeKey = key;
                     selectedBankCodeInfo = LogfinController.bankList[i];
@@ -469,6 +472,9 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                 }))
               ])
           )
+      );
+      bankCodeList.add(
+          UiUtils.getMarginBox(0, 0.8.h)
       );
     }
 
@@ -482,7 +488,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("환급계좌 은행 ", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       // SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("선택해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 1.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("개인회생 신청 시 제출했던 본인의 계좌", 14.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("개인회생 신청시 제출했던 본인의 계좌", 14.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
       NotificationListener<ScrollNotification>(
           onNotification: (scrollNotification) {
@@ -540,7 +546,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       // SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextField(90.w, TextStyles.upFinTextFormFieldTextStyle, _bankAccountInfoFocus, _bankAccountInfoTextController, TextInputType.number,
-          UiUtils.getInputDecoration("계좌번호", 14.sp, "", 0.sp), (value) { }),
+          UiUtils.getInputDecoration("계좌번호 8자리", 14.sp, "", 0.sp), (value) { }),
       UiUtils.getExpandedScrollView(Axis.vertical, Container()),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
@@ -592,7 +598,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                         }
                       });
                     }),
-                Expanded(child: UiUtils.getTextButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.start, null, (){
+                Expanded(child: UiUtils.getTextButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w500, textColor, TextAlign.start, null, (){
                   setState(() {
                     selectedPreLoanCountKey = key;
                     selectedPreLoanCountInfo = each;
@@ -600,6 +606,9 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                 }))
               ])
           )
+      );
+      loanCountList.add(
+          UiUtils.getMarginBox(0, 0.8.h)
       );
     }
 
@@ -610,7 +619,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         }),
       ])),
       UiUtils.getMarginBox(0, 3.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("이미 받고 있는", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, height: 4.5.h , child: UiUtils.getTextWithFixedScale("이미 받고 있는", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출 횟수를 알려주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: loanCountList)),
@@ -645,13 +654,13 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         UiUtils.getMarginBox(0, 3.h),
         SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("인가후 대출 총금액", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
         // SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("알려주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-        UiUtils.getMarginBox(0, 1.h),
-        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력단위(*만원)", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
+        // UiUtils.getMarginBox(0, 1.h),
+        // SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력단위(*만원)", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
         UiUtils.getMarginBox(0, 5.h),
         Obx(()=>
             Row(mainAxisAlignment: MainAxisAlignment.start, children: [
               UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _preLoanPriceFocus, _preLoanPriceTextController, TextInputType.number, false,
-                  UiUtils.getInputDecorationForPrice("", 0.sp, GetController.to.preLoanPrice.value, 14.sp), (text) {
+                  UiUtils.getInputDecorationForPrice("", 0.sp, GetController.to.preLoanPrice.value, 11.sp), (text) {
                     if(text.trim() != ""){
                       final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
                       GetController.to.updatePreLoanPrice(CommonUtils.getPriceFormattedString(number!));
@@ -699,11 +708,11 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         UiUtils.getMarginBox(0, 3.h),
         SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("희망대출 금액", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
         // SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("알려주세요.", 2출2.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-        UiUtils.getMarginBox(0, 1.h),
-        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력단위(*만원)", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
+        // UiUtils.getMarginBox(0, 1.h),
+        // SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력단위(*만원)", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
         UiUtils.getMarginBox(0, 5.h),
         Obx(()=>UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _wantLoanPriceFocus, _wantLoanPriceTextController, TextInputType.number, false,
-            UiUtils.getInputDecorationForPrice("", 0.sp, GetController.to.wantLoanPrice.value, 14.sp), (text) {
+            UiUtils.getInputDecorationForPrice("", 0.sp, GetController.to.wantLoanPrice.value, 11.sp), (text) {
               if(text.trim() != ""){
                 final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
                 GetController.to.updateWantLoanPrice(CommonUtils.getPriceFormattedString(number!));
@@ -769,7 +778,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                         }
                       });
                     }),
-                Expanded(child: UiUtils.getTextButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w600, textColor, TextAlign.start, null, (){
+                Expanded(child: UiUtils.getTextButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w500, textColor, TextAlign.start, null, (){
                   setState(() {
                     selectedJobKey = key;
                     selectedJobInfo = each;
@@ -777,6 +786,9 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                 }))
               ])
           )
+      );
+      jobList.add(
+          UiUtils.getMarginBox(0, 0.8.h)
       );
     }
 
@@ -850,7 +862,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         }),
       ])),
       UiUtils.getMarginBox(0, 3.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("해당 정보로", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, height: 4.5.h , child: UiUtils.getTextWithFixedScale("해당 정보로 ", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출상품을 찾아볼까요?", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: confirmWidgetList)),

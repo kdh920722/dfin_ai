@@ -143,11 +143,11 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
         }
 
         prInfoWidgetList.add(
-            UiUtils.getBorderButtonBox(90.w, each.isPossible? ColorStyles.upFinRealWhite : ColorStyles.upFinWhiteRed, each.isPossible? ColorStyles.upFinGray : ColorStyles.upFinWhiteRed,
+            UiUtils.getBorderButtonBox(90.w, each.isPossible? ColorStyles.upFinRealWhite : ColorStyles.upFinRealWhite, each.isPossible? ColorStyles.upFinGray : ColorStyles.upFinGray,
                 Row(mainAxisSize: MainAxisSize.max, children: [
                   Expanded(flex: 15, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
                     SizedBox(width: 90.w, child: Row(children: [
-                      UiUtils.getImage(9.w, 9.w, Image.asset(each.productCompanyLogo)),
+                      UiUtils.getImage(7.w, 7.w, Image.asset(each.productCompanyLogo)),
                       UiUtils.getMarginBox(1.5.w, 0),
                       UiUtils.getTextWithFixedScale(each.productCompanyName, 15.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null),
                     ])),
@@ -155,18 +155,22 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                     UiUtils.getTextWithFixedScaleAndOverFlow(each.productName, 10.sp, FontWeight.w300, ColorStyles.upFinBlack, TextAlign.start, null),
                     UiUtils.getMarginBox(0, 2.h),
                     SizedBox(width: 80.w, child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      SizedBox(width: 20.w, child: UiUtils.getTextWithFixedScale("최저금리", 10.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, 1)),
+                      SizedBox(width: 20.w,height: 2.5.h , child: UiUtils.getTextWithFixedScale("금리", 10.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, 1)),
                       UiUtils.getMarginBox(5.w, 0),
-                      SizedBox(width: 45.w, child: UiUtils.getTextWithFixedScale("최대한도", 10.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, 1))
+                      SizedBox(width: 45.w,height: 2.5.h , child: UiUtils.getTextWithFixedScale("한도", 10.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, 1))
                     ])),
                     SizedBox(width: 80.w, child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       SizedBox(width: 20.w, child: UiUtils.getTextWithFixedScale("${each.productLoanMinRates}%", 18.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1)),
                       UiUtils.getMarginBox(5.w, 0),
                       SizedBox(width: 45.w, child: UiUtils.getTextWithFixedScale(CommonUtils.getPriceFormattedString(double.parse(each.productLoanLimit)), 18.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1))
                     ])),
-                    UiUtils.getMarginBox(0, 2.h),
+                    // UiUtils.getMarginBox(0, 2.h),
+
                     each.isPossible? Container()
-                        : UiUtils.getTextWithFixedScale(msg, 10.sp, FontWeight.w500, ColorStyles.upFinRed, TextAlign.start, null),
+                        : UiUtils.getMarginBox(0, 1.h),
+                    each.isPossible? Container()
+                        : UiUtils.getBoxTextAndIconWithFixedScale(msg, 10.sp, FontWeight.w500, TextAlign.start, ColorStyles.upFinWhiteRed, ColorStyles.upFinRed,
+                        Icons.warning_rounded, ColorStyles.upFinRed, 5.w),
                   ])),
                   Expanded(flex: 1, child: each.isPossible? Icon(Icons.arrow_forward_ios_rounded, color: ColorStyles.upFinButtonBlue, size: 5.5.w) : Container()),
                 ]), () {
@@ -186,6 +190,8 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                       MyData.selectedPrInfoData = each;
                       UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, 100.w, 65.h, 0.5, _makeAgreeWidget);
                     }
+                  }else{
+                    CommonUtils.flutterToast("신청 불가능한 상풉입니다.");
                   }
                 })
         );
@@ -298,6 +304,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
             callAct(isAgree);
           });
         }),
+        const Spacer(flex: 2),
         UiUtils.getIconButton(Icons.arrow_forward_ios_rounded, 4.w, ColorStyles.upFinRealGray, () async {
           Widget contentsWidget = Column(children: [
             SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(contentsString, 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null))
@@ -443,7 +450,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
         })
       ]),
       UiUtils.getMarginBox(0, 3.h),
-      SizedBox(width: 95.w, child : UiUtils.getTextWithFixedScale("대출상품", 24.sp, FontWeight.w800, ColorStyles.upFinButtonBlue, TextAlign.start, 1)),
+      SizedBox(width: 95.w, height: 5.h , child : UiUtils.getTextWithFixedScale("대출상품", 24.sp, FontWeight.w800, ColorStyles.upFinButtonBlue, TextAlign.start, 1)),
       UiUtils.getMarginBox(0, 1.h),
       SizedBox(width: 95.w, height: 5.h, child: TabBar(
         unselectedLabelStyle: TextStyles.upFinUnselectedTabTextInButtonStyle,
@@ -460,17 +467,17 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
           Tab(text: "신청 불가능"),
         ],
       )),
-      UiUtils.getMarginBox(0, 1.h),
+      UiUtils.getMarginBox(0, 2.h),
       SizedBox(height: 6.h, child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
         UiUtils.getTextWithFixedScale("상품 ", 14.sp, FontWeight.w400, ColorStyles.upFinBlack, TextAlign.center, 1),
         UiUtils.getTextWithFixedScale("$selectedTabCount개", 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, 1),
         const Spacer(flex: 2),
-        UiUtils.getCustomTextButtonBox(23.w, "금리순", 10.sp, FontWeight.w600, isOrderByLimit? ColorStyles.upFinWhiteSky : ColorStyles.upFinButtonBlue,
+        UiUtils.getCustomTextButtonBox(20.w, "금리순", 9.sp, FontWeight.w600, isOrderByLimit? ColorStyles.upFinWhiteSky : ColorStyles.upFinButtonBlue,
             isOrderByLimit? ColorStyles.upFinButtonBlue : ColorStyles.upFinWhiteSky, () {
               _reOrderList(false);
             }),
-        UiUtils.getMarginBox(1.w, 0),
-        UiUtils.getCustomTextButtonBox(23.w, "한도순", 10.sp, FontWeight.w600, isOrderByLimit? ColorStyles.upFinButtonBlue : ColorStyles.upFinWhiteSky,
+        UiUtils.getMarginBox(1.5.w, 0),
+        UiUtils.getCustomTextButtonBox(20.w, "한도순", 9.sp, FontWeight.w600, isOrderByLimit? ColorStyles.upFinButtonBlue : ColorStyles.upFinWhiteSky,
             isOrderByLimit? ColorStyles.upFinWhiteSky : ColorStyles.upFinButtonBlue, () {
               _reOrderList(true);
             })
@@ -504,6 +511,8 @@ class MyPrTabIndicator extends Decoration {
     return _MyPrTabIndicatorPainter(this, onChanged);
   }
 }
+
+
 
 class _MyPrTabIndicatorPainter extends BoxPainter {
   final MyPrTabIndicator decoration;
