@@ -175,7 +175,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     addressInfo["is_confirmed"] = false;
     addedDocsList.add(addressInfo);
 
-    bool isJobType1 = true;
+    bool isJobType1 = false;
     if(MyData.jobInfo.split("@")[1] == "1") isJobType1 = true;
 
     if(isJobType1){
@@ -235,7 +235,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       CommonUtils.log("i", "each docs : ${each.productDocsId}  ${each.productDocsName}");
       if(each.productDocsId == 1 || each.productDocsId == 2 || each.productDocsId == 15
           || each.productDocsId == 3 || each.productDocsId == 4
-          || each.productDocsId == 10){
+          || each.productDocsId == 6 || each.productDocsId == 10 || each.productDocsId == 11){
         String docsType = "";
         if(each.productDocsId == 1 || each.productDocsId == 2 || each.productDocsId == 15){
           docsType = "gov24";
@@ -1941,6 +1941,46 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     ]);
   }
 
+  int _setDocResultText(Map<String, dynamic> resultMap){
+    //0 : no result
+    //1 : success result
+    //2 : fail result
+    int resultType = 0;
+    if(resultMap.containsKey("resultValue")){
+      if(resultMap["resultValue"].isNotEmpty){
+        CommonUtils.log("i", "result ==> ${resultMap["resultValue"]}");
+        Map<String, dynamic> resultDataMap = resultMap["resultValue"];
+        if(resultDataMap.isNotEmpty){
+          if(resultDataMap.containsKey("result") && resultDataMap.containsKey("data")){
+            Map<String, dynamic> resultDataMapForResult = resultMap["resultValue"]["result"];
+            var resultDataMapForData = resultMap["resultValue"]["data"];
+            if(resultDataMapForResult.isNotEmpty && resultDataMapForData.isNotEmpty){
+              if(resultDataMapForResult.containsKey("code")){
+                if(resultDataMapForResult["code"] != "CF-03002"){
+                  resultType = 1;
+                }else{
+                  resultType = 2;
+                }
+              }else{
+                resultType = 2;
+              }
+            }else{
+              resultType = 2;
+            }
+          }else{
+            resultType = 2;
+          }
+        }else{
+          resultType = 2;
+        }
+      }else{
+        resultType = 2;
+      }
+    }
+
+    return resultType;
+  }
+
   List<Widget> _setDocStatus(String docType){
     List<Widget> docsWidgetList = [];
     for(var each in addedDocsList){
@@ -1953,69 +1993,21 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       if(each["docs_type"] == "gov24"){
         if(each["id"] == 1){
           name = "주민등록등본";
-          Map<String, dynamic> resultMap = each["result"];
-          if(resultMap.containsKey("resultValue")){
-            CommonUtils.log("i", "result ==> ${each["result"]["resultValue"]}");
-            Map<String, dynamic> resultDataMap = each["result"]["resultValue"];
-            if(!resultDataMap.containsKey("data") || !resultDataMap.containsKey("code")){
-              textColor = errorTextColor;
-              checkColor = errorTextColor;
-              name += " 실패";
-            }else{
-              if(resultDataMap["code"] == "CF-03002"){
-                textColor = errorTextColor;
-                checkColor = errorTextColor;
-                name += " 실패";
-              }else{
-                textColor = successTextColor;
-                checkColor = successTextColor;
-              }
-            }
-          }
         }
         if(each["id"] == 2){
           name = "주민등록초본";
-          Map<String, dynamic> resultMap = each["result"];
-          if(resultMap.containsKey("resultValue")){
-            CommonUtils.log("i", "result ==> ${each["result"]["resultValue"]}");
-            Map<String, dynamic> resultDataMap = each["result"]["resultValue"];
-            if(!resultDataMap.containsKey("data") || !resultDataMap.containsKey("code")){
-              textColor = errorTextColor;
-              checkColor = errorTextColor;
-              name += " 실패";
-            }else{
-              if(resultDataMap["code"] == "CF-03002"){
-                textColor = errorTextColor;
-                checkColor = errorTextColor;
-                name += " 실패";
-              }else{
-                textColor = successTextColor;
-                checkColor = successTextColor;
-              }
-            }
-          }
         }
         if(each["id"] == 15){
           name = "지방세납세증명서";
-          Map<String, dynamic> resultMap = each["result"];
-          if(resultMap.containsKey("resultValue")){
-            CommonUtils.log("i", "result ==> ${each["result"]["resultValue"]}");
-            Map<String, dynamic> resultDataMap = each["result"]["resultValue"];
-            if(!resultDataMap.containsKey("data") || !resultDataMap.containsKey("code")){
-              textColor = errorTextColor;
-              checkColor = errorTextColor;
-              name += " 실패";
-            }else{
-              if(resultDataMap["code"] == "CF-03002"){
-                textColor = errorTextColor;
-                checkColor = errorTextColor;
-                name += " 실패";
-              }else{
-                textColor = successTextColor;
-                checkColor = successTextColor;
-              }
-            }
-          }
+        }
+
+        if(_setDocResultText(each["result"]) == 1){
+          textColor = successTextColor;
+          checkColor = successTextColor;
+        }else if(_setDocResultText(each["result"]) == 2){
+          textColor = errorTextColor;
+          checkColor = errorTextColor;
+          name += " 실패";
         }
 
         docsWidgetList.add(
@@ -2029,47 +2021,18 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       }else if(each["docs_type"] == "nhis"){
         if(each["id"] == 3){
           name = "건강보험자격득실확인서";
-          Map<String, dynamic> resultMap = each["result"];
-          if(resultMap.containsKey("resultValue")){
-            CommonUtils.log("i", "result ==> ${each["result"]["resultValue"]}");
-            Map<String, dynamic> resultDataMap = each["result"]["resultValue"];
-            if(!resultDataMap.containsKey("data") || !resultDataMap.containsKey("code")){
-              textColor = errorTextColor;
-              checkColor = errorTextColor;
-              name += " 실패";
-            }else{
-              if(resultDataMap["code"] == "CF-03002"){
-                textColor = errorTextColor;
-                checkColor = errorTextColor;
-                name += " 실패";
-              }else{
-                textColor = successTextColor;
-                checkColor = successTextColor;
-              }
-            }
-          }
         }
         if(each["id"] == 4){
           name = "건강보험납부확인서";
-          Map<String, dynamic> resultMap = each["result"];
-          if(resultMap.containsKey("resultValue")){
-            CommonUtils.log("i", "result ==> ${each["result"]["resultValue"]}");
-            Map<String, dynamic> resultDataMap = each["result"]["resultValue"];
-            if(!resultDataMap.containsKey("data") || !resultDataMap.containsKey("code")){
-              textColor = errorTextColor;
-              checkColor = errorTextColor;
-              name += " 실패";
-            }else{
-              if(resultDataMap["code"] == "CF-03002"){
-                textColor = errorTextColor;
-                checkColor = errorTextColor;
-                name += " 실패";
-              }else{
-                textColor = successTextColor;
-                checkColor = successTextColor;
-              }
-            }
-          }
+        }
+
+        if(_setDocResultText(each["result"]) == 1){
+          textColor = successTextColor;
+          checkColor = successTextColor;
+        }else if(_setDocResultText(each["result"]) == 2){
+          textColor = errorTextColor;
+          checkColor = errorTextColor;
+          name += " 실패";
         }
 
         docsWidgetList.add(
@@ -2083,69 +2046,21 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       } else if(each["docs_type"] == "nts"){
         if(each["id"] == 6){
           name = "사업자등록증";
-          Map<String, dynamic> resultMap = each["result"];
-          if(resultMap.containsKey("resultValue")){
-            CommonUtils.log("i", "result ==> ${each["result"]["resultValue"]}");
-            Map<String, dynamic> resultDataMap = each["result"]["resultValue"];
-            if(!resultDataMap.containsKey("data") || !resultDataMap.containsKey("code")){
-              textColor = errorTextColor;
-              checkColor = errorTextColor;
-              name += " 실패";
-            }else{
-              if(resultDataMap["code"] == "CF-03002"){
-                textColor = errorTextColor;
-                checkColor = errorTextColor;
-                name += " 실패";
-              }else{
-                textColor = successTextColor;
-                checkColor = successTextColor;
-              }
-            }
-          }
         }
         if(each["id"] == 10){
           name = "소득금액증명";
-          Map<String, dynamic> resultMap = each["result"];
-          if(resultMap.containsKey("resultValue")){
-            CommonUtils.log("i", "result ==> ${each["result"]["resultValue"]}");
-            Map<String, dynamic> resultDataMap = each["result"]["resultValue"];
-            if(!resultDataMap.containsKey("data") || !resultDataMap.containsKey("code")){
-              textColor = errorTextColor;
-              checkColor = errorTextColor;
-              name += " 실패";
-            }else{
-              if(resultDataMap["code"] == "CF-03002"){
-                textColor = errorTextColor;
-                checkColor = errorTextColor;
-                name += " 실패";
-              }else{
-                textColor = successTextColor;
-                checkColor = successTextColor;
-              }
-            }
-          }
         }
         if(each["id"] == 11){
           name = "부가세과세표준증명원";
-          Map<String, dynamic> resultMap = each["result"];
-          if(resultMap.containsKey("resultValue")){
-            CommonUtils.log("i", "result ==> ${each["result"]["resultValue"]}");
-            Map<String, dynamic> resultDataMap = each["result"]["resultValue"];
-            if(!resultDataMap.containsKey("data") || !resultDataMap.containsKey("code")){
-              textColor = errorTextColor;
-              checkColor = errorTextColor;
-              name += " 실패";
-            }else{
-              if(resultDataMap["code"] == "CF-03002"){
-                textColor = errorTextColor;
-                checkColor = errorTextColor;
-                name += " 실패";
-              }else{
-                textColor = successTextColor;
-                checkColor = successTextColor;
-              }
-            }
-          }
+        }
+
+        if(_setDocResultText(each["result"]) == 1){
+          textColor = successTextColor;
+          checkColor = successTextColor;
+        }else if(_setDocResultText(each["result"]) == 2){
+          textColor = errorTextColor;
+          checkColor = errorTextColor;
+          name += " 실패";
         }
 
         docsWidgetList.add(

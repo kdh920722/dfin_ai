@@ -478,7 +478,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
               }
             }else{
               isConfirmed = false;
-              CommonUtils.flutterToast("에 실패했습니다.");
+              CommonUtils.flutterToast("본인인증에 실패했습니다.");
             }
           }) : UiUtils.getTextButtonBox(90.w, "동의하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinGray, () {})
         ])
@@ -502,6 +502,10 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
           UiUtils.getInputDecoration("이메일", 12.sp, "", 0.sp), (text) { }, (value){
             if(value != null && value.trim().isEmpty){
               return "이메일을 입력하세요.";
+            }else if((value != null && value.trim().isNotEmpty && value.trim().length <4)
+                || (value != null && value.trim().isNotEmpty && !value.trim().contains("@"))
+                || (value != null && value.trim().isNotEmpty && !value.trim().contains("."))){
+              return "이메일 형식이 잘못되었습니다.";
             }else{
               return null;
             }

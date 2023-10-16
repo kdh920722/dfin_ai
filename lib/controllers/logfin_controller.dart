@@ -294,7 +294,7 @@ class LogfinController {
           if(accidentInfoOutputJson != null){
             List<dynamic> accidentList = accidentInfoOutputJson["accidents"];
             if(accidentList.isEmpty){
-              GetController.to.resetMainAccidentDataChangedFlag();
+              GetController.to.resetAccdientInfoList();
               callback(true, false);
             }else {
               MyData.clearAccidentInfoList();
@@ -342,20 +342,20 @@ class LogfinController {
                     courtInfo, bankInfo, dataResult["refund_account"].toString(), lendCountInfo, lendAmount, wishAmount, resData["data"]));
               }
 
-              GetController.to.updateMainAccidentDataChangedFlag();
+              GetController.to.updateAccidentInfoList(MyData.getAccidentInfoList());
               callback(true, true);
             }
           }else{
-            GetController.to.resetMainAccidentDataChangedFlag();
+            GetController.to.resetAccdientInfoList();
             callback(false, false);
           }
         }else{
-          GetController.to.resetMainAccidentDataChangedFlag();
+          GetController.to.resetAccdientInfoList();
           callback(false, false);
         }
       });
     }catch(error){
-      GetController.to.resetMainAccidentDataChangedFlag();
+      GetController.to.resetAccdientInfoList();
       callback(false, false);
     }
   }
@@ -367,7 +367,7 @@ class LogfinController {
           if(loansInfoOutputJson != null){
             List<dynamic> loansList = loansInfoOutputJson["loans"];
             if(loansList.isEmpty){
-              GetController.to.resetMainLoanDataChangedFlag();
+              GetController.to.resetChatLoanInfoList();
               callback(true, false);
             }else{
               MyData.clearLoanInfoList();
@@ -395,20 +395,20 @@ class LogfinController {
               }
               MyData.sortLoanInfoList();
               _setChatRoomInfoList();
-              GetController.to.updateMainLoanDataChangedFlag();
+              GetController.to.updateChatLoanInfoList(MyData.getChatRoomInfoList());
               callback(true, true);
             }
           }else{
-            GetController.to.resetMainLoanDataChangedFlag();
+            GetController.to.resetChatLoanInfoList();
             callback(false, false);
           }
         }else{
-          GetController.to.resetMainLoanDataChangedFlag();
+          GetController.to.resetChatLoanInfoList();
           callback(false, false);
         }
       });
     }catch(error){
-      GetController.to.resetMainLoanDataChangedFlag();
+      GetController.to.resetChatLoanInfoList();
       callback(false, false);
     }
   }

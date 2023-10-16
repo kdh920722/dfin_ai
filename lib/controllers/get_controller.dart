@@ -1,3 +1,6 @@
+import 'package:upfin/datas/accident_info_data.dart';
+import 'package:upfin/datas/chatroom_info_data.dart';
+
 import '../datas/loan_info_data.dart';
 import '../utils/common_utils.dart';
 import 'package:get/get.dart';
@@ -9,9 +12,9 @@ class GetController extends GetxController {
   RxBool isConfirmed = false.obs;
   RxString preLoanPrice = "만원".obs;
   RxString wantLoanPrice = "만원".obs;
-  RxBool isMainAccidentDataChanged = false.obs;
-  RxBool isMainLoanDataChanged = false.obs;
-  RxList<LoanInfoData> loanInfoHistDataList = <LoanInfoData>[].obs;
+
+  RxList<AccidentInfoData> accidentInfoDataList = <AccidentInfoData>[].obs;
+  RxList<ChatRoomInfoData> chatLoanInfoDataList = <ChatRoomInfoData>[].obs;
   RxInt firstVisibleItem1 = 0.obs;
   RxInt lastVisibleItem1 = 0.obs;
   RxInt firstVisibleItem2 = 0.obs;
@@ -93,32 +96,28 @@ class GetController extends GetxController {
     preLoanPrice = "만원".obs;
   }
 
-  void updateLoanHistInfoList(List<LoanInfoData> newList) {
-    loanInfoHistDataList.clear();
-    loanInfoHistDataList.assignAll(newList);
-    CommonUtils.log("i", "loanInfoDataList length : ${loanInfoHistDataList.length}");
+  void updateChatLoanInfoList(List<ChatRoomInfoData> newList) {
+    chatLoanInfoDataList.clear();
+    chatLoanInfoDataList.assignAll(newList);
+    CommonUtils.log("i", "loanInfoDataList length : ${chatLoanInfoDataList.length}");
   }
-  void resetLoanHistInfoList() {
-    List<LoanInfoData> emptyList = [];
-    loanInfoHistDataList.clear();
-    loanInfoHistDataList.assignAll(emptyList);
-    CommonUtils.log("i", "loanInfoDataList length : ${loanInfoHistDataList.length}");
-  }
-
-  void updateMainAccidentDataChangedFlag() {
-    isMainAccidentDataChanged.value = false;
-    isMainAccidentDataChanged.value = true;
-  }
-  void resetMainAccidentDataChangedFlag() {
-    isMainAccidentDataChanged = false.obs;
+  void resetChatLoanInfoList() {
+    List<ChatRoomInfoData> emptyList = [];
+    chatLoanInfoDataList.clear();
+    chatLoanInfoDataList.assignAll(emptyList);
+    CommonUtils.log("i", "loanInfoDataList length : ${chatLoanInfoDataList.length}");
   }
 
-  void updateMainLoanDataChangedFlag() {
-    isMainLoanDataChanged.value = false;
-    isMainLoanDataChanged.value = true;
+  void updateAccidentInfoList(List<AccidentInfoData> newList) {
+    accidentInfoDataList.clear();
+    accidentInfoDataList.assignAll(newList);
+    CommonUtils.log("i", "accidentInfoDataList length : ${accidentInfoDataList.length}");
   }
-  void resetMainLoanDataChangedFlag() {
-    isMainLoanDataChanged = false.obs;
+  void resetAccdientInfoList() {
+    List<AccidentInfoData> emptyList = [];
+    accidentInfoDataList.clear();
+    accidentInfoDataList.assignAll(emptyList);
+    CommonUtils.log("i", "accidentInfoDataList length : ${accidentInfoDataList.length}");
   }
 
   void updateFirstIndex1(int newValue) {

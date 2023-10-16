@@ -894,13 +894,13 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                 "caseNumberType": "개회",
                 "caseNumberNumber": selectedAccidentInfo.split("개회")[1],
                 "userName": "정혜경",
-                "bankCode": "004",
-                "account": "40240104",
-                "birthday": "19690710",
-                "job": "2",
-                "lend_count": "1",
-                "lend_amount": "500",
-                "wish_amount": "300",
+                "bankCode": selectedBankCodeInfo.split("@")[1],
+                "account": selectedBankAccountInfo,
+                "birthday": MyData.birth,
+                "job": selectedJobInfo.split("@")[1],
+                "lend_count": selectedPreLoanCountInfo.split("@")[1],
+                "lend_amount": selectedPreLoanPriceInfo,
+                "wish_amount": selectedWantLoanPriceInfo,
               };
               UiUtils.showLoadingPop(context);
               LogfinController.callLogfinApi(LogfinApis.prSearch, inputJsonForTest, (isSuccess, outputJson){

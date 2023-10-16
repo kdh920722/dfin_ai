@@ -10,6 +10,7 @@ import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:transition/transition.dart';
+import 'package:upfin/controllers/get_controller.dart';
 import 'package:upfin/controllers/sharedpreference_controller.dart';
 import '../configs/app_config.dart';
 import '../datas/my_data.dart';
@@ -582,6 +583,8 @@ class CommonUtils {
 
   static void backToHome(BuildContext context){
     MyData.resetMyData();
+    GetController.to.resetAccdientInfoList();
+    GetController.to.resetChatLoanInfoList();
     CommonUtils.moveWithUntil(context, AppView.appRootView.value);
   }
 

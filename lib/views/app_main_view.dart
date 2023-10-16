@@ -156,18 +156,10 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             UiUtils.getMarginBox(100.w, 2.h),
             UiUtils.getMarginColoredBox(100.w, 2.h, ColorStyles.upFinWhiteGray),
             UiUtils.getMarginBox(100.w, 2.h),
-
-            Obx((){
-              int size = 0;
-              if(GetController.to.isMainLoanDataChanged.value){
-                size = MyData.getChatRoomInfoList().length;
-              }
-
-              return Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 2.h, bottom: 1.h), child: Row(mainAxisSize: MainAxisSize.max, children: [
-                UiUtils.getTextWithFixedScale("접수내역", 15.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, 1),
-                const Spacer(flex: 2)
-              ]));
-            }),
+            Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 2.h, bottom: 1.h), child: Row(mainAxisSize: MainAxisSize.max, children: [
+              UiUtils.getTextWithFixedScale("접수내역", 15.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, 1),
+              const Spacer(flex: 2)
+            ])),
             Obx((){
               List<Widget> loanWidgetList = _getLoanChatWidgetList();
               return loanWidgetList.isNotEmpty ? Column(children: loanWidgetList)
@@ -202,86 +194,82 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   }
   List<Widget> _getAccidentWidgetList(){
     List<Widget> accidentWidgetList = [];
-    if(GetController.to.isMainAccidentDataChanged.value){
-      CommonUtils.log("", "accident view redraw!");
-      for(var each in MyData.getAccidentInfoList()){
-        accidentWidgetList.add(
-            UiUtils.getAccidentBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinGray,
-                Column(children: [
-                  Row(children: [
-                    Expanded(flex: 15, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Row(children: [
-                        UiUtils.getMarginBox(1.w, 0),
-                        UiUtils.getBoxTextWithFixedScale("개인회생", 8.sp, FontWeight.w500, TextAlign.center, ColorStyles.upFinButtonBlue, ColorStyles.upFinWhite),
-                      ]),
-                      UiUtils.getMarginBox(0, 0.4.h),
-                      Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                        UiUtils.getImage(16.w, 16.w, Image.asset('assets/images/accident_icon.png', fit: BoxFit.fill)),
-                        UiUtils.getMarginBox(0.2.w, 0),
-                        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          UiUtils.getTextWithFixedScale(each.accidentCourtInfo.split("@")[0], 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.center, 1),
-                          UiUtils.getMarginBox(0, 0.5.h),
-                          UiUtils.getTextWithFixedScale("${each.accidentCaseNumberYear}${each.accidentCaseNumberType}${each.accidentCaseNumberNumber}", 18.sp,
-                              FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null),
-                        ])
-                      ]),
-                      //UiUtils.getTextWithFixedScale("${each.accidentBankInfo.split("@")[0]} ${each.accidentBankAccount} / ${each.resData["resRepaymentList"][0]["resRoundNo2"]}회 납부", 10.sp, FontWeight.w600, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, 1),
-                    ])),
-                    Expanded(flex: 1, child: Icon(Icons.arrow_forward_ios_rounded, color: ColorStyles.upFinDarkGray, size: 5.5.w))
-                  ]),
-                ]), () {
-                  MyData.selectedAccidentInfoData = each;
-                  CommonUtils.moveTo(context, AppView.appAccidentDetailInfoView.value, null);
-                })
-        );
-      }
+    CommonUtils.log("", "accident view redraw!");
+    for(var each in GetController.to.accidentInfoDataList){
+      accidentWidgetList.add(
+          UiUtils.getAccidentBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinGray,
+              Column(children: [
+                Row(children: [
+                  Expanded(flex: 15, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Row(children: [
+                      UiUtils.getMarginBox(1.w, 0),
+                      UiUtils.getBoxTextWithFixedScale("개인회생", 8.sp, FontWeight.w500, TextAlign.center, ColorStyles.upFinButtonBlue, ColorStyles.upFinWhite),
+                    ]),
+                    UiUtils.getMarginBox(0, 0.4.h),
+                    Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                      UiUtils.getImage(16.w, 16.w, Image.asset('assets/images/accident_icon.png', fit: BoxFit.fill)),
+                      UiUtils.getMarginBox(0.2.w, 0),
+                      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        UiUtils.getTextWithFixedScale(each.accidentCourtInfo.split("@")[0], 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.center, 1),
+                        UiUtils.getMarginBox(0, 0.5.h),
+                        UiUtils.getTextWithFixedScale("${each.accidentCaseNumberYear}${each.accidentCaseNumberType}${each.accidentCaseNumberNumber}", 18.sp,
+                            FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null),
+                      ])
+                    ]),
+                    //UiUtils.getTextWithFixedScale("${each.accidentBankInfo.split("@")[0]} ${each.accidentBankAccount} / ${each.resData["resRepaymentList"][0]["resRoundNo2"]}회 납부", 10.sp, FontWeight.w600, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, 1),
+                  ])),
+                  Expanded(flex: 1, child: Icon(Icons.arrow_forward_ios_rounded, color: ColorStyles.upFinDarkGray, size: 5.5.w))
+                ]),
+              ]), () {
+                MyData.selectedAccidentInfoData = each;
+                CommonUtils.moveTo(context, AppView.appAccidentDetailInfoView.value, null);
+              })
+      );
     }
 
     return accidentWidgetList;
   }
   List<Widget> _getLoanChatWidgetList(){
     List<Widget> loanChatRoomWidgetList = [];
-    if(GetController.to.isMainLoanDataChanged.value){
-      CommonUtils.log("", "loan view redraw!");
-      for(var each in MyData.getChatRoomInfoList()){
-        loanChatRoomWidgetList.add(
-            Column(children: [
-              UiUtils.getMarginBox(0, 2.h),
-              UiUtils.getBorderButtonBoxWithZeroPadding(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
-                  Row(mainAxisSize: MainAxisSize.max, children: [
-                    Expanded(flex: 2, child: each.chatRoomType == 0? UiUtils.getIcon(12.w, 12.w, Icons.account_box_rounded, 12.w, ColorStyles.upFinButtonBlue) : UiUtils.getImage(12.w, 12.w, Image.asset(each.chatRoomIconPath))),
-                    UiUtils.getMarginBox(1.w, 0),
-                    Expanded(flex: 8, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+    CommonUtils.log("", "loan view redraw!");
+    for(var each in GetController.to.chatLoanInfoDataList){
+      loanChatRoomWidgetList.add(
+          Column(children: [
+            UiUtils.getMarginBox(0, 2.h),
+            UiUtils.getBorderButtonBoxWithZeroPadding(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
+                Row(mainAxisSize: MainAxisSize.max, children: [
+                  Expanded(flex: 2, child: each.chatRoomType == 0? UiUtils.getIcon(12.w, 12.w, Icons.account_box_rounded, 12.w, ColorStyles.upFinButtonBlue) : UiUtils.getImage(12.w, 12.w, Image.asset(each.chatRoomIconPath))),
+                  UiUtils.getMarginBox(1.w, 0),
+                  Expanded(flex: 8, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      UiUtils.getMarginBox(0, 1.h),
+                      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        UiUtils.getTextWithFixedScale(each.chatRoomTitle, 16.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null),
                         UiUtils.getMarginBox(0, 1.h),
-                        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          UiUtils.getTextWithFixedScale(each.chatRoomTitle, 16.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null),
-                          UiUtils.getMarginBox(0, 1.h),
-                          Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                            UiUtils.getRoundBoxTextWithFixedScale(_getStatusName(each.chatRoomLoanStatus), 8.sp, FontWeight.w600, TextAlign.center,  ColorStyles.upFinWhiteSky, ColorStyles.upFinButtonBlue),
-                            UiUtils.getMarginBox(2.w, 0),
-                            each.chatRoomType != 0? UiUtils.getTextWithFixedScale("${each.loanMinRate}  ${each.loanMaxLimit}", 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null) : Container()
-                          ]),
+                        Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                          UiUtils.getRoundBoxTextWithFixedScale(_getStatusName(each.chatRoomLoanStatus), 8.sp, FontWeight.w600, TextAlign.center,  ColorStyles.upFinWhiteSky, ColorStyles.upFinButtonBlue),
+                          UiUtils.getMarginBox(2.w, 0),
+                          each.chatRoomType != 0? UiUtils.getTextWithFixedScale("${each.loanMinRate}  ${each.loanMaxLimit}", 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null) : Container()
                         ]),
-                        UiUtils.getMarginBox(0, 1.h),
-                        UiUtils.getTextWithFixedScaleAndOverFlow(each.chatRoomLastMsg, 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, 1)
-                      ])
-                    ])),
-                    Expanded(flex: 2, child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                      UiUtils.getTextWithFixedScale(CommonUtils.getFormattedLastMsgTime(each.chatRoomLastMsgTime), 8.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null),
-                      UiUtils.getMarginBox(0,0.5.h),
-                      each.chatRoomLastMsgCnt > 0? Row(mainAxisSize: MainAxisSize.min, children: [
-                        UiUtils.getCountCircleBox(6.w, each.chatRoomLastMsgCnt, 7.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.center, 1), UiUtils.getMarginBox(0.3.w, 0)]) : Container()
-                    ]))
-                  ]), () {
-                    CommonUtils.moveTo(context, AppView.appChatView.value, null);
-                  }),
-              UiUtils.getMarginBox(0, 2.h),
-              UiUtils.getMarginColoredBox(90.w, 0.15.h, ColorStyles.upFinWhiteGray)
-            ])
-        );
-        loanChatRoomWidgetList.add(UiUtils.getMarginBox(0, 1.h));
-      }
+                      ]),
+                      UiUtils.getMarginBox(0, 1.h),
+                      UiUtils.getTextWithFixedScaleAndOverFlow(each.chatRoomLastMsg, 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, 1)
+                    ])
+                  ])),
+                  Expanded(flex: 2, child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                    UiUtils.getTextWithFixedScale(CommonUtils.getFormattedLastMsgTime(each.chatRoomLastMsgTime), 8.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null),
+                    UiUtils.getMarginBox(0,0.5.h),
+                    each.chatRoomLastMsgCnt > 0? Row(mainAxisSize: MainAxisSize.min, children: [
+                      UiUtils.getCountCircleBox(6.w, each.chatRoomLastMsgCnt, 7.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.center, 1), UiUtils.getMarginBox(0.3.w, 0)]) : Container()
+                  ]))
+                ]), () {
+                  CommonUtils.moveTo(context, AppView.appChatView.value, null);
+                }),
+            UiUtils.getMarginBox(0, 2.h),
+            UiUtils.getMarginColoredBox(90.w, 0.15.h, ColorStyles.upFinWhiteGray)
+          ])
+      );
+      loanChatRoomWidgetList.add(UiUtils.getMarginBox(0, 1.h));
     }
 
     return loanChatRoomWidgetList;

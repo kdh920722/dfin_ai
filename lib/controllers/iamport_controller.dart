@@ -1,6 +1,9 @@
 import 'dart:convert';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
+import 'package:upfin/styles/ColorStyles.dart';
+import 'package:upfin/utils/ui_utils.dart';
 import '../configs/app_config.dart';
 import '../utils/common_utils.dart';
 import 'package:iamport_flutter/iamport_certification.dart';
@@ -134,43 +137,52 @@ class IamportController {
     String phone = inputJson['phone'];
     CommonUtils.log("i", "\ncarrier : $carrier\nname : $name\nphone : $phone");
 
-    return IamportCertification(
-      /* 웹뷰 로딩 컴포넌트 */
-      initialChild: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Image.asset('assets/images/iamport_logo.png'),
-            const Padding(padding: EdgeInsets.symmetric(vertical: 15)),
-            const Text('잠시만 기다려주세요...', style: TextStyle(fontSize: 20)),
-          ],
+    return Scaffold(
+      appBar: AppBar(
+        title: UiUtils.getTextWithFixedScale("휴대폰 본인인증", 14.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.center, null),
+        backgroundColor: ColorStyles.upFinWhite,
+        leading: UiUtils.getBackButton(() {
+          Navigator.pop(parentViewContext);
+        })
+      ),
+      body: IamportCertification(
+        /* 웹뷰 로딩 컴포넌트 */
+        initialChild: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Image.asset('assets/images/iamport_logo.png'),
+              const Padding(padding: EdgeInsets.symmetric(vertical: 15)),
+              const Text('잠시만 기다려주세요...', style: TextStyle(fontSize: 20)),
+            ],
+          ),
         ),
+        userCode: iamportUserCode,
+        data: CertificationData(
+          merchantUid: 'mid_${DateTime.now().millisecondsSinceEpoch}',
+          pg: "danal",
+          company: 'ysmeta',
+          carrier: carrier,
+          name: name,
+          phone: phone,
+        ),
+        callback: (Map<String, String> result) {
+          CommonUtils.log('i', 'result : ${result.toString()}');
+          bool isSuccess = IamportController.isCertificationResultSuccess(result);
+          if(isSuccess){
+            _callDetailedInfo(result["imp_uid"]!, (isSuccessToGetDetailedInfo, outputJson){
+              CommonUtils.log('i', 'cert detailed result : $outputJson');
+              if(isSuccessToGetDetailedInfo){
+                Navigator.pop(parentViewContext, outputJson);
+              }else{
+                Navigator.pop(parentViewContext, null);
+              }
+            });
+          }else{
+            Navigator.pop(parentViewContext, null);
+          }
+        },
       ),
-      userCode: iamportUserCode,
-      data: CertificationData(
-        merchantUid: 'mid_${DateTime.now().millisecondsSinceEpoch}',
-        pg: "danal",
-        company: 'ysmeta',
-        carrier: carrier,
-        name: name,
-        phone: phone,
-      ),
-      callback: (Map<String, String> result) {
-        CommonUtils.log('i', 'result : ${result.toString()}');
-        bool isSuccess = IamportController.isCertificationResultSuccess(result);
-        if(isSuccess){
-          _callDetailedInfo(result["imp_uid"]!, (isSuccessToGetDetailedInfo, outputJson){
-            CommonUtils.log('i', 'cert detailed result : $outputJson');
-            if(isSuccessToGetDetailedInfo){
-              Navigator.pop(parentViewContext, outputJson);
-            }else{
-              Navigator.pop(parentViewContext, null);
-            }
-          });
-        }else{
-          Navigator.pop(parentViewContext, null);
-        }
-      },
     );
   }
 }
