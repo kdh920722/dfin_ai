@@ -136,10 +136,22 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
   }
 
   Widget _getAccidentWidgetList(){
-    bool isSuccessToGetDetailInfo = false;
+
+    bool isSuccessToGetDetailInfo = true;
     if(MyData.selectedAccidentInfoData!.resData.isNotEmpty && MyData.selectedAccidentInfoData!.resData.containsKey("resRepaymentList")){
-      isSuccessToGetDetailInfo = true;
+      if(MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resAmount"] == ""
+          || MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resRoundNo"] == ""
+          || MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resUnpaidAmt"] == ""
+          || MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resRoundNo2"] == ""
+          || MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resRoundNo1"] == ""
+          || MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resTotalAmt"] == ""
+          || MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resRepaymentCycle"] == ""){
+        isSuccessToGetDetailInfo = false;
+        CommonUtils.flutterToast("환급계좌정보가 잘못되었습니다.\n수정해주세요.");
+      }
     }
+
+    CommonUtils.log("i", MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resAmount"]);
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       UiUtils.getMarginBox(0, 4.h),
 
@@ -171,7 +183,7 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
       ]) : Container(),
       Row(children: [
         Column(children: [
-          SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale("환급계좌", 10.sp, FontWeight.w600, ColorStyles.upFinSky, TextAlign.start, null)),
+          SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale(isSuccessToGetDetailInfo ? "환급계좌" : "환급계좌 오류", 10.sp, FontWeight.w600, isSuccessToGetDetailInfo ? ColorStyles.upFinSky : ColorStyles.upFinRed, TextAlign.start, null)),
           UiUtils.getMarginBox(0, 1.h),
           SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale("${MyData.selectedAccidentInfoData!.accidentBankInfo.split("@")[0]} / ${MyData.selectedAccidentInfoData!.accidentBankAccount}", 12.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
         ]),

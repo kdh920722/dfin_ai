@@ -179,6 +179,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     if(MyData.jobInfo.split("@")[1] == "1") isJobType1 = true;
 
     if(isJobType1){
+      /*
       addedIndexId++;
       Map<String, dynamic> mainBankInfo = {
         "id" : 0,
@@ -210,6 +211,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       mainBankAccountInfo["view_id"] = addedIndexId;
       mainBankAccountInfo["is_confirmed"] = false;
       addedDocsList.add(mainBankAccountInfo);
+      */
 
       addedIndexId++;
       Map<String, dynamic> businessNumberInfo = {
@@ -759,46 +761,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
     List<Widget> introWidgetList = [];
 
-    /*
-    introWidgetList.add(
-        UiUtils.getMarginBox(0, 1.h)
-    );
-    introWidgetList.add(
-        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          SizedBox(width: 90.w, child: Row(children: [
-            UiUtils.getImage(12.w, 12.w, Image.asset(MyData.selectedPrInfoData!.productCompanyLogo)),
-            UiUtils.getMarginBox(3.w, 0),
-            Column(children: [
-              SizedBox(width: 75.w, child: UiUtils.getTextWithFixedScaleAndOverFlow(MyData.selectedPrInfoData!.productCompanyName, 15.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, 1)),
-              UiUtils.getMarginBox(0, 1.h),
-              SizedBox(width: 75.w, child: UiUtils.getTextWithFixedScaleAndOverFlow(MyData.selectedPrInfoData!.productName, 10.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, 1)),
-            ])
-          ])),
-          UiUtils.getMarginBox(0, 3.h),
-          SizedBox(width: 90.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            UiUtils.getBorderButtonBoxWithZeroPadding(42.w, ColorStyles.upFinRealWhite, ColorStyles.upFinGray,
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  UiUtils.getMarginBox(0, 2.h),
-                  SizedBox(width: 30.w, child: UiUtils.getTextWithFixedScale("최저금리", 10.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, 1)),
-                  UiUtils.getMarginBox(0, 1.h),
-                  SizedBox(width: 35.w, child: UiUtils.getTextWithFixedScale("${MyData.selectedPrInfoData!.productLoanMinRates}%", 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1)),
-                  UiUtils.getMarginBox(0, 2.h),
-                ]), () {}),
-            UiUtils.getMarginBox(2.w, 0),
-            UiUtils.getBorderButtonBoxWithZeroPadding(42.w, ColorStyles.upFinRealWhite, ColorStyles.upFinGray,
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  UiUtils.getMarginBox(0, 2.h),
-                  SizedBox(width: 30.w, child: UiUtils.getTextWithFixedScale("최대한도", 10.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, 1)),
-                  UiUtils.getMarginBox(0, 1.h),
-                  SizedBox(width: 35.w, child: UiUtils.getTextWithFixedScale(CommonUtils.getPriceFormattedString(double.parse(MyData.selectedPrInfoData!.productLoanLimit)), 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1)),
-                  UiUtils.getMarginBox(0, 2.h),
-                ]), () {})
-          ]))
-
-        ])
-    );
-    */
-
     introWidgetList.add(
         UiUtils.getMarginBox(0, 1.h)
     );
@@ -902,11 +864,9 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         )
     );
 
-    if(MyData.jobInfo.split("@")[1] == "1" && _isSavedData(mainBankId) && _isSavedData(mainBankAccountId) && _isSavedData(businessNumberId)){
-      String tempSelectedBankCodeInfo = _getSavedData(mainBankId);
-      String tempSelectedBankAccountInfo = _getSavedData(mainBankAccountId);
+    if(MyData.jobInfo.split("@")[1] == "1" && _isSavedData(businessNumberId)){
       String tempBusinessNumberIdInfo = _getSavedData(businessNumberId);
-
+      /*
       introWidgetList.add(
           UiUtils.getMarginBox(0, 3.h)
       );
@@ -919,6 +879,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               ])
           )
       );
+      */
       introWidgetList.add(
           UiUtils.getMarginBox(0, 3.h)
       );
@@ -926,7 +887,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           SizedBox(width: 90.w,
               child: Row(children: [
                 UiUtils.getMarginBox(3.w, 0),
-                UiUtils.getTextButtonWithFixedScale("•  사업자번호 $tempBusinessNumberIdInfo", 16.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                UiUtils.getTextButtonWithFixedScale("•  사업자번호 $tempBusinessNumberIdInfo", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
               ])
           )
@@ -940,7 +901,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           SizedBox(width: 90.w,
               child: Row(children: [
                 UiUtils.getMarginBox(3.w, 0),
-                UiUtils.getTextButtonWithFixedScale("•  대출희망금액 ${CommonUtils.getPriceCommaFormattedString(double.parse(MyData.selectedAccidentInfoData!.accidentWishAmount))}",
+                UiUtils.getTextButtonWithFixedScale("•  대출희망금액 ${CommonUtils.getPriceFormattedString(double.parse(MyData.selectedAccidentInfoData!.accidentWishAmount))}",
                     13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
               ])
@@ -1039,7 +1000,31 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               _applyPr();
             }else{
               setState(() {
-                reUseTargetViewId = unSavedDocsList[0]["view_id"];
+                var targetDoc = unSavedDocsList[0];
+                if(targetDoc["is_docs"]){
+                  if(targetDoc["docs_type"] == "gov24"){
+                    for(int i = addedDocsList.length-1 ; i >= 0 ; i--){
+                      if(addedDocsList[i]["docs_type"] == "gov24"){
+                        reUseTargetViewId = addedDocsList[i]["view_id"];
+                      }
+                    }
+                  }else if(targetDoc["docs_type"] == "nhis"){
+                    for(int i = addedDocsList.length-1 ; i >= 0 ; i--){
+                      if(addedDocsList[i]["docs_type"] == "nhis"){
+                        reUseTargetViewId = addedDocsList[i]["view_id"];
+                      }
+                    }
+                  }else{
+                    for(int i = addedDocsList.length-1 ; i >= 0 ; i--){
+                      if(addedDocsList[i]["docs_type"] == "nts"){
+                        reUseTargetViewId = addedDocsList[i]["view_id"];
+                      }
+                    }
+                  }
+                }else{
+                  reUseTargetViewId = targetDoc["view_id"];
+                }
+
                 currentViewId = reUseTargetViewId;
               });
               CommonUtils.flutterToast("미제출 정보를\n입력해야합니다.");
@@ -1855,9 +1840,9 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               UiUtils.getTextWithFixedScale(subTitle, 14.sp, FontWeight.w500, ColorStyles.upFinKakaoYellow, TextAlign.start, null)
             ]), () { })
       ])),
-      UiUtils.getMarginBox(0, 5.h),
+      UiUtils.getMarginBox(0, 2.h),
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: docsWidgetList)),
-      UiUtils.getMarginBox(0, 5.h),
+      UiUtils.getMarginBox(0, 2.h),
       UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
           UiUtils.getTextWithFixedScale(!_isDocsAllConfirmed(docsType)? "인증하기" : "다음", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
             if(!_isDocsAllConfirmed(docsType)){
@@ -1981,13 +1966,14 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     return resultType;
   }
 
-  List<Widget> _setDocStatus(String docType){
+  void _setDocStatus(String docType, Function(bool isSuccess, List<Widget> widgetList) callback){
+    bool isError = false;
     List<Widget> docsWidgetList = [];
     for(var each in addedDocsList){
       Key key = UniqueKey();
       String name = "";
       Color checkColor = ColorStyles.upFinGray;
-      Color textColor = ColorStyles.upFinBlack;
+      Color textColor = ColorStyles.upFinGray;
       Color errorTextColor = ColorStyles.upFinRed;
       Color successTextColor = ColorStyles.upFinTextAndBorderBlue;
       if(each["docs_type"] == "gov24"){
@@ -2001,6 +1987,11 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           name = "지방세납세증명서";
         }
 
+        if(docType == "gov24"){
+          checkColor = ColorStyles.upFinGray;
+          textColor = ColorStyles.upFinBlack;
+        }
+
         if(_setDocResultText(each["result"]) == 1){
           textColor = successTextColor;
           checkColor = successTextColor;
@@ -2008,6 +1999,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           textColor = errorTextColor;
           checkColor = errorTextColor;
           name += " 실패";
+          isError = true;
         }
 
         docsWidgetList.add(
@@ -2026,6 +2018,11 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           name = "건강보험납부확인서";
         }
 
+        if(docType == "nhis"){
+          checkColor = ColorStyles.upFinGray;
+          textColor = ColorStyles.upFinBlack;
+        }
+
         if(_setDocResultText(each["result"]) == 1){
           textColor = successTextColor;
           checkColor = successTextColor;
@@ -2033,6 +2030,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           textColor = errorTextColor;
           checkColor = errorTextColor;
           name += " 실패";
+          isError = true;
         }
 
         docsWidgetList.add(
@@ -2054,6 +2052,11 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           name = "부가세과세표준증명원";
         }
 
+        if(docType == "nts"){
+          checkColor = ColorStyles.upFinGray;
+          textColor = ColorStyles.upFinBlack;
+        }
+
         if(_setDocResultText(each["result"]) == 1){
           textColor = successTextColor;
           checkColor = successTextColor;
@@ -2061,6 +2064,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           textColor = errorTextColor;
           checkColor = errorTextColor;
           name += " 실패";
+          isError = true;
         }
 
         docsWidgetList.add(
@@ -2074,7 +2078,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       }
     }
 
-    return docsWidgetList;
+    callback(isError, docsWidgetList);
   }
 
   /// gov24(id:1,2,15) view
@@ -2100,7 +2104,11 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       title3 = "다음 절차를 진행해주세요";
     }
 
-    List<Widget> docsWidgetList = _setDocStatus("gov24");
+    List<Widget> docsWidgetList = [];
+    _setDocStatus("gov24", (isError, resultDocsWidgetList){
+      isErrorResult = isError;
+      docsWidgetList = resultDocsWidgetList;
+    });
 
     return _getCertWidget("gov24", title1, title2, title3, subTitle, docsWidgetList, isErrorResult, () async {
       if(_isDocsAllConfirmed("gov24")){
@@ -2125,17 +2133,17 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             if(each["id"] == 1){
               // 등본
               Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.gov24residentRegistrationCopy,
-                  identity, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
+                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
               apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.gov24residentRegistrationCopy, true));
             }else if(each["id"] == 2){
               // 초본
               Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.gov24residentRegistrationAbstract,
-                  identity, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
+                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
               apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.gov24residentRegistrationAbstract, true));
             }else if(each["id"] == 15){
               // 지방세
               Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.gov24localTaxPaymentCert,
-                  identity, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
+                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
               apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.gov24localTaxPaymentCert, true));
             }
           }
@@ -2170,7 +2178,11 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       title3 = "다음 절차를 진행해주세요";
     }
 
-    List<Widget> docsWidgetList = _setDocStatus("nhis");
+    List<Widget> docsWidgetList = [];
+    _setDocStatus("nhis", (isError, resultDocsWidgetList){
+      isErrorResult = isError;
+      docsWidgetList = resultDocsWidgetList;
+    });
 
     return _getCertWidget("nhis", title1, title2, title3, subTitle, docsWidgetList, isErrorResult, () async {
       if(_isDocsAllConfirmed("nhis")){
@@ -2195,12 +2207,12 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             if(each["id"] == 3){
               // 건강보험자격득실확인서
               Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.nhisIdentifyConfirmation,
-                  identity, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
+                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
               apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.nhisIdentifyConfirmation, true));
             }else if(each["id"] == 4){
               // 건강보험납부확인서
               Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.nhisConfirmation,
-                  identity, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
+                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
               apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.nhisConfirmation, true));
             }
           }
@@ -2235,7 +2247,11 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       title3 = "다음 절차를 진행해주세요";
     }
 
-    List<Widget> docsWidgetList = _setDocStatus("nts");
+    List<Widget> docsWidgetList = [];
+    _setDocStatus("nts", (isError, resultDocsWidgetList){
+      isErrorResult = isError;
+      docsWidgetList = resultDocsWidgetList;
+    });
 
     return _getCertWidget("nts", title1, title2, title3, subTitle, docsWidgetList, isErrorResult, () async {
       if(_isDocsAllConfirmed("nts")){
@@ -2260,17 +2276,17 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             if(each["id"] == 6){
               // 사업자등록증
               Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.ntsProofCorporateRegistration,
-                  identity, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
+                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
               apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.ntsProofCorporateRegistration, true));
             }else if(each["id"] == 10){
               // 소득금액증명
               Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.ntsProofIssue,
-                  identity, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
+                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
               apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.ntsProofIssue, true));
             }else if(each["id"] == 11){
               // 부가세과세표준증명원
               Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.ntsProofAdditionalTasStandard,
-                  identity, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
+                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
               apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.ntsProofAdditionalTasStandard, true));
             }
           }
@@ -2684,8 +2700,12 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
   void back(){
     CommonUtils.hideKeyBoard();
-    if(_getIdFromListByViewId(currentViewId) != niceId && _getIdFromListByViewId(currentViewId) != lastId){
-      backInputView();
+    if(currentViewId == addedDocsInfoIntroViewId){
+      Navigator.pop(context);
+    }else{
+      if(_getIdFromListByViewId(currentViewId) != niceId && _getIdFromListByViewId(currentViewId) != lastId){
+        backInputView();
+      }
     }
   }
 

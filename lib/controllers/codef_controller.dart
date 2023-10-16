@@ -21,6 +21,7 @@ class CodeFController{
   // CF-13000 사업자번호(주민등록번호)가+잘못
   // CF-12100 해당+기관+오류
   // CF-01004 응답대기시간 초과
+  // CF-12872 강제종료
   /// CODEF API ------------------------------------------------------------------------------------------------------------------------ ///
   static HostStatus hostStatus = HostStatus.prod;
   static String token = "";
@@ -183,7 +184,7 @@ class CodeFController{
               if(resultMap != null){
                 if(resultMap["result_code"] == errorCodeKey){
                   each.isResultSuccess = false;
-                  CommonUtils.log("e", "error api : ${each.api.value}");
+                  CommonUtils.log("e", "error api 1: ${each.api.value}");
                   String errorMsg = resultMap["result_msg"];
                   if(errorMsg == "성공"){
                     errorMsg = "조회결과가 없습니다.";
@@ -193,12 +194,14 @@ class CodeFController{
                   //CommonUtils.flutterToast(errorMsg.replaceAll("+", " "));
                 }else{
                   if(fullMap == null){
+                    CommonUtils.log("e", "error api 2: ${each.api.value}");
                     each.isResultSuccess = false;
                     resultMap["result_msg"] = "조회에 실패했습니다.";
                     each.resultMap = null;
                     each.resultFullMap = fullMap;
                   }else{
                     if(fullMap["result"]["code"] == "CF-03002"){
+                      CommonUtils.log("e", "error api 3: ${each.api.value}");
                       resultMap["result_msg"] = "인증에 실패했습니다.";
                       each.isResultSuccess = false;
                       each.resultMap = null;
@@ -244,7 +247,7 @@ class CodeFController{
               if(resultMap != null){
                 if(resultMap["result_code"] == errorCodeKey){
                   each.isResultSuccess = false;
-                  CommonUtils.log("e", "error api : ${each.api.value}");
+                  CommonUtils.log("e", "error api 1: ${each.api.value}");
                   String errorMsg = resultMap["result_msg"];
                   if(errorMsg == "성공"){
                     errorMsg = "조회결과가 없습니다.";
@@ -254,12 +257,14 @@ class CodeFController{
                   //CommonUtils.flutterToast(errorMsg.replaceAll("+", " "));
                 }else{
                   if(fullMap == null){
+                    CommonUtils.log("e", "error api 2: ${each.api.value}");
                     each.isResultSuccess = false;
                     resultMap["result_msg"] = "조회에 실패했습니다.";
                     each.resultMap = null;
                     each.resultFullMap = fullMap;
                   }else{
                     if(fullMap["result"]["code"] == "CF-03002"){
+                      CommonUtils.log("e", "error api 3: ${each.api.value}");
                       resultMap["result_msg"] = "인증에 실패했습니다.";
                       each.isResultSuccess = false;
                       each.resultMap = null;
@@ -361,7 +366,7 @@ class CodeFController{
                 }
               }else if(certType == 6){
                 if(await canLaunchUrl(Uri.parse("naversearchapp://default?version=1"))){
-                  launchUrl(Uri.parse("naversearchapp://default?version=1"));
+                  launchUrl(Uri.parse("market://details?id=com.nhn.android.search"));
                 }else{
                   Config.isAndroid ? launchUrl(Uri.parse("market://details?id=com.nhn.android.search"))
                       : launchUrl(Uri.parse("https://apps.apple.com/kr/app/%EB%84%A4%EC%9D%B4%EB%B2%84-naver/id393499958"));
@@ -405,6 +410,7 @@ class CodeFController{
               }
               isSetAuthPopOn = true;
               if(context.mounted){
+                CommonUtils.log("e", "error f1");
                 _setAuthPop(context, representApi, certType, resultMap,(isAuthSuccess, authMap, authListMap, fullMap) async {
                   if(isAuthSuccess){
                     if(authMap != null){
@@ -418,6 +424,8 @@ class CodeFController{
                 });
               }
               setState(() {});
+            }else{
+              CommonUtils.log("e", "error f2");
             }
           }else{
             callback(true, map, null, fullResultMap);
@@ -563,13 +571,13 @@ class CodeFController{
     });
   }
 
-  static Map<String, dynamic> makeInputJsonForCertApis(Apis api, String identity, String birth, String name, String phoneNo, String telecom,
+  static Map<String, dynamic> makeInputJsonForCertApis(Apis api, String loginIdentity, String identity, String birth, String name, String phoneNo, String telecom,
       String address, String loginCertType, String randomKey){
     if(api == Apis.gov24residentRegistrationAbstract){
       Map<String, dynamic> inputJsonForAbstract = {
         "organization": "0001",
         "loginType": "6",
-        "identity": identity,
+        "identity": loginIdentity,
         "timeout": "120",
         "addrSido": address.split(" ")[0],
         "addrSiGunGu": address.split(" ")[1],
@@ -592,7 +600,7 @@ class CodeFController{
       Map<String, dynamic> inputJsonForCopy = {
         "organization": "0001",
         "loginType": "6",
-        "identity": identity,
+        "identity": loginIdentity,
         "timeout": "120",
         "addrSido": address.split(" ")[0],
         "addrSiGunGu": address.split(" ")[1],
@@ -617,7 +625,7 @@ class CodeFController{
         "organization": "0001",
         "loginType": "6",
         "userName": name,
-        "identity": identity,
+        "identity": loginIdentity,
         "id": randomKey,
         "loginTypeLevel": loginCertType,
         "phoneNo": phoneNo,
@@ -692,7 +700,7 @@ class CodeFController{
       Map<String, dynamic> inputJsonForNtsPoorfCorporateRegistration = {
         "organization": "0001",
         "loginType": "6",
-        "loginIdentity": identity,
+        "loginIdentity": loginIdentity,
         "userName": name,
         "id": randomKey,
         "usePurposes": "01",
@@ -700,7 +708,7 @@ class CodeFController{
         "isIdentityViewYN": "0",
         "originDataYN": "0",
         "applicationType": "01",
-        "identity": "",
+        "identity": identity,
         "loginTypeLevel": loginCertType,
         "phoneNo": phoneNo,
         "telecom": telecom
@@ -722,7 +730,7 @@ class CodeFController{
         "organization": "0001",
         "loginType": "6",
         "loginTypeLevel": loginCertType,
-        "loginIdentity": identity,
+        "loginIdentity": loginIdentity,
         "userName": name,
         "phoneNo": phoneNo,
         "birthDate": "",
@@ -736,7 +744,7 @@ class CodeFController{
         "originDataYN": "0",
         "applicationType": "",
         "clientTypeLevel": "",
-        "identity": "",
+        "identity": identity,
         "sourceIncomeYN": "",
         "telecom": telecom
       };
@@ -759,7 +767,7 @@ class CodeFController{
         "organization": "0001",
         "loginType": "6",
         "loginTypeLevel": loginCertType,
-        "loginIdentity": identity,
+        "loginIdentity": loginIdentity,
         "userName": name,
         "phoneNo": phoneNo,
         "manageNo": "",
@@ -770,7 +778,7 @@ class CodeFController{
         "isIdentityViewYN": "0",
         "usePurposes": "04",
         "submitTargets": "01",
-        "identity": "*************",
+        "identity": identity,
         "applicationType": "01",
         "originDataYN": "0",
         "telecom": telecom

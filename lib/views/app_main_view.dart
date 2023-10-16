@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:redis/redis.dart';
 import 'package:sizer/sizer.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:upfin/configs/app_config.dart';
@@ -117,8 +118,17 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               UiUtils.getTextWithFixedScale("사건기록", 15.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, 1),
               const Spacer(flex: 2),
               UiUtils.getBorderButtonBoxWithZeroPadding(15.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
-                  UiUtils.getTextWithFixedScale("새로고침", 10.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.end, 1), () {
-                    _refreshMyView(context);
+                  UiUtils.getTextWithFixedScale("새로고침", 10.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.end, 1), () async {
+                    //_refreshMyView(context);
+                    Command cmd = await RedisConnection().connect('upfin-ro.dwggrr.ng.0001.apn2.cache.amazonaws.com', 6379);
+
+                    final pubsub = PubSub(cmd);
+                    pubsub.subscribe(["loan_channel"]);
+                    final stream = pubsub.getStream();
+                    var streamWithoutErrors = stream.handleError((e) => CommonUtils.log("i", "error $e"));
+                    await for (final msg in streamWithoutErrors) {
+                      CommonUtils.log("i", "received non-message ${msg.toString()}");
+                    }
                   })
             ])),
             Obx((){
