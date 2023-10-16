@@ -1956,13 +1956,13 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           Map<String, dynamic> resultMap = each["result"];
           if(resultMap.containsKey("resultValue")){
             CommonUtils.log("i", "result ==> ${each["result"]["resultValue"]}");
-            var dataMap = each["result"]["resultValue"]["data"];
-            if(dataMap.isEmpty){
+            Map<String, dynamic> resultDataMap = each["result"]["resultValue"];
+            if(!resultDataMap.containsKey("data") || !resultDataMap.containsKey("code")){
               textColor = errorTextColor;
               checkColor = errorTextColor;
               name += " 실패";
             }else{
-              if(each["result"]["resultValue"]["result"]["code"] == "CF-03002"){
+              if(resultDataMap["code"] == "CF-03002"){
                 textColor = errorTextColor;
                 checkColor = errorTextColor;
                 name += " 실패";
@@ -1978,13 +1978,13 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           Map<String, dynamic> resultMap = each["result"];
           if(resultMap.containsKey("resultValue")){
             CommonUtils.log("i", "result ==> ${each["result"]["resultValue"]}");
-            var dataMap = each["result"]["resultValue"]["data"];
-            if(dataMap.isEmpty){
+            Map<String, dynamic> resultDataMap = each["result"]["resultValue"];
+            if(!resultDataMap.containsKey("data") || !resultDataMap.containsKey("code")){
               textColor = errorTextColor;
               checkColor = errorTextColor;
               name += " 실패";
             }else{
-              if(each["result"]["resultValue"]["result"]["code"] == "CF-03002"){
+              if(resultDataMap["code"] == "CF-03002"){
                 textColor = errorTextColor;
                 checkColor = errorTextColor;
                 name += " 실패";
@@ -2000,13 +2000,13 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           Map<String, dynamic> resultMap = each["result"];
           if(resultMap.containsKey("resultValue")){
             CommonUtils.log("i", "result ==> ${each["result"]["resultValue"]}");
-            var dataMap = each["result"]["resultValue"]["data"];
-            if(dataMap.isEmpty){
+            Map<String, dynamic> resultDataMap = each["result"]["resultValue"];
+            if(!resultDataMap.containsKey("data") || !resultDataMap.containsKey("code")){
               textColor = errorTextColor;
               checkColor = errorTextColor;
               name += " 실패";
             }else{
-              if(each["result"]["resultValue"]["result"]["code"] == "CF-03002"){
+              if(resultDataMap["code"] == "CF-03002"){
                 textColor = errorTextColor;
                 checkColor = errorTextColor;
                 name += " 실패";
@@ -2032,13 +2032,13 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           Map<String, dynamic> resultMap = each["result"];
           if(resultMap.containsKey("resultValue")){
             CommonUtils.log("i", "result ==> ${each["result"]["resultValue"]}");
-            var dataMap = each["result"]["resultValue"]["data"];
-            if(dataMap.isEmpty){
+            Map<String, dynamic> resultDataMap = each["result"]["resultValue"];
+            if(!resultDataMap.containsKey("data") || !resultDataMap.containsKey("code")){
               textColor = errorTextColor;
               checkColor = errorTextColor;
               name += " 실패";
             }else{
-              if(each["result"]["resultValue"]["result"]["code"] == "CF-03002"){
+              if(resultDataMap["code"] == "CF-03002"){
                 textColor = errorTextColor;
                 checkColor = errorTextColor;
                 name += " 실패";
@@ -2054,13 +2054,13 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           Map<String, dynamic> resultMap = each["result"];
           if(resultMap.containsKey("resultValue")){
             CommonUtils.log("i", "result ==> ${each["result"]["resultValue"]}");
-            var dataMap = each["result"]["resultValue"]["data"];
-            if(dataMap.isEmpty){
+            Map<String, dynamic> resultDataMap = each["result"]["resultValue"];
+            if(!resultDataMap.containsKey("data") || !resultDataMap.containsKey("code")){
               textColor = errorTextColor;
               checkColor = errorTextColor;
               name += " 실패";
             }else{
-              if(each["result"]["resultValue"]["result"]["code"] == "CF-03002"){
+              if(resultDataMap["code"] == "CF-03002"){
                 textColor = errorTextColor;
                 checkColor = errorTextColor;
                 name += " 실패";
@@ -2086,13 +2086,13 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           Map<String, dynamic> resultMap = each["result"];
           if(resultMap.containsKey("resultValue")){
             CommonUtils.log("i", "result ==> ${each["result"]["resultValue"]}");
-            var dataMap = each["result"]["resultValue"]["data"];
-            if(dataMap.isEmpty){
+            Map<String, dynamic> resultDataMap = each["result"]["resultValue"];
+            if(!resultDataMap.containsKey("data") || !resultDataMap.containsKey("code")){
               textColor = errorTextColor;
               checkColor = errorTextColor;
               name += " 실패";
             }else{
-              if(each["result"]["resultValue"]["result"]["code"] == "CF-03002"){
+              if(resultDataMap["code"] == "CF-03002"){
                 textColor = errorTextColor;
                 checkColor = errorTextColor;
                 name += " 실패";
@@ -2108,13 +2108,13 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           Map<String, dynamic> resultMap = each["result"];
           if(resultMap.containsKey("resultValue")){
             CommonUtils.log("i", "result ==> ${each["result"]["resultValue"]}");
-            var dataMap = each["result"]["resultValue"]["data"];
-            if(dataMap.isEmpty){
+            Map<String, dynamic> resultDataMap = each["result"]["resultValue"];
+            if(!resultDataMap.containsKey("data") || !resultDataMap.containsKey("code")){
               textColor = errorTextColor;
               checkColor = errorTextColor;
               name += " 실패";
             }else{
-              if(each["result"]["resultValue"]["result"]["code"] == "CF-03002"){
+              if(resultDataMap["code"] == "CF-03002"){
                 textColor = errorTextColor;
                 checkColor = errorTextColor;
                 name += " 실패";
@@ -2130,18 +2130,20 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           Map<String, dynamic> resultMap = each["result"];
           if(resultMap.containsKey("resultValue")){
             CommonUtils.log("i", "result ==> ${each["result"]["resultValue"]}");
-            var dataMap = each["result"]["resultValue"]["data"];
-            if(dataMap.isEmpty){
-              textColor = errorTextColor;
-              checkColor = errorTextColor;
-              name += " 실패";
-            }if(each["result"]["resultValue"]["result"]["code"] == "CF-03002"){
+            Map<String, dynamic> resultDataMap = each["result"]["resultValue"];
+            if(!resultDataMap.containsKey("data") || !resultDataMap.containsKey("code")){
               textColor = errorTextColor;
               checkColor = errorTextColor;
               name += " 실패";
             }else{
-              textColor = successTextColor;
-              checkColor = successTextColor;
+              if(resultDataMap["code"] == "CF-03002"){
+                textColor = errorTextColor;
+                checkColor = errorTextColor;
+                name += " 실패";
+              }else{
+                textColor = successTextColor;
+                checkColor = successTextColor;
+              }
             }
           }
         }
