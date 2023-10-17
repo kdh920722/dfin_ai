@@ -18,10 +18,11 @@ class CodeFController{
   static final CodeFController _instance = CodeFController._internal();
   factory CodeFController() => _instance;
   CodeFController._internal();
-  // CF-13000 사업자번호(주민등록번호)가+잘못
-  // CF-12100 해당+기관+오류
+  // CF-13000 사업자번호(주민등록번호)오류
+  // CF-12100 해당기관오류
   // CF-01004 응답대기시간 초과
   // CF-12872 강제종료
+  // CF-12835 인증서정보 없음
   /// CODEF API ------------------------------------------------------------------------------------------------------------------------ ///
   static HostStatus hostStatus = HostStatus.prod;
   static String token = "";
@@ -523,7 +524,7 @@ class CodeFController{
                       callback(false, null, null, null);
                     }else if(fullMap['result']['code'] == "CF-12100"){
                       CommonUtils.log("i","cancel");
-                      CommonUtils.flutterToast("해당 기관 연결 오류입니다.");
+                      CommonUtils.flutterToast("입력하신 정보를\n확인해주세요.");
                       GetController.to.updateWait(false);
                       callback(false, null, null, null);
                     }else{
@@ -556,7 +557,7 @@ class CodeFController{
                       callback(false, null, null, null);
                     }else if(fullMap['result']['code'] == "CF-12100"){
                       CommonUtils.log("i","cancel");
-                      CommonUtils.flutterToast("해당 기관 연결 오류입니다.");
+                      CommonUtils.flutterToast("입력하신 정보를\n확인해주세요.");
                       GetController.to.updateWait(false);
                       callback(false, null, null, null);
                     }else{

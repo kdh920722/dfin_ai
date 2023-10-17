@@ -53,34 +53,40 @@ class AppAgreeDetailInfoViewState extends State<AppAgreeDetailInfoView> with Wid
 
   @override
   Widget build(BuildContext context) {
-    Map<String, dynamic> agreeInfo = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
-    String title = agreeInfo["title"].toString();
-    Widget subContents = agreeInfo["contents"] as Widget;
+    if(CommonUtils.isValidStateByAPiExpiredDate()){
+      Map<String, dynamic> agreeInfo = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
+      String title = agreeInfo["title"].toString();
+      Widget subContents = agreeInfo["contents"] as Widget;
 
-    Widget view = Container(
-      color: ColorStyles.upFinWhite,
-      width: 100.w,
-      height: 100.h,
-      padding: EdgeInsets.all(5.w),
-      child: Column(children: [
-        Row(children: [
-          const Spacer(flex: 2),
-          UiUtils.getIconButtonWithHeight(5.h, Icons.close, 20.sp, ColorStyles.upFinRealGray, () async {
-            Navigator.pop(context, false);
-          })
-        ]),
-        UiUtils.getMarginBox(0, 3.h),
-        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(title, 22.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
-        UiUtils.getMarginBox(0, 5.h),
-        UiUtils.getExpandedScrollView(Axis.vertical, subContents),
-        UiUtils.getMarginBox(0, 3.h),
-        UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-            UiUtils.getTextWithFixedScale("확인", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
-              Navigator.pop(context, true);
-            })
-      ])
-    );
+      Widget view = Container(
+          color: ColorStyles.upFinWhite,
+          width: 100.w,
+          height: 100.h,
+          padding: EdgeInsets.all(5.w),
+          child: Column(children: [
+            Row(children: [
+              const Spacer(flex: 2),
+              UiUtils.getIconButtonWithHeight(5.h, Icons.close, 20.sp, ColorStyles.upFinRealGray, () async {
+                Navigator.pop(context, false);
+              })
+            ]),
+            UiUtils.getMarginBox(0, 3.h),
+            SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(title, 22.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
+            UiUtils.getMarginBox(0, 5.h),
+            UiUtils.getExpandedScrollView(Axis.vertical, subContents),
+            UiUtils.getMarginBox(0, 3.h),
+            UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+                UiUtils.getTextWithFixedScale("확인", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
+                  Navigator.pop(context, true);
+                })
+          ])
+      );
 
-    return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
+      return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
+    }else{
+      CommonUtils.flutterToast("접속시간이 만료되었습니다.\n재로그인 해주세요");
+      CommonUtils.backToHome(context);
+      return Container();
+    }
   }
 }

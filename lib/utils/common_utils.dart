@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:math';
+import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter/material.dart';
@@ -9,14 +10,16 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:transition/transition.dart';
+import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:upfin/controllers/get_controller.dart';
 import 'package:upfin/controllers/sharedpreference_controller.dart';
+import 'package:upfin/controllers/websocket_controller.dart';
 import '../configs/app_config.dart';
 import '../datas/my_data.dart';
 import '../styles/ColorStyles.dart';
 import '../styles/TextStyles.dart';
 import 'package:image/image.dart' as imglib;
+
 class CommonUtils {
 
   static void logcat(){
@@ -25,6 +28,14 @@ class CommonUtils {
 
   static const int logMaxSize = 600;
   static void log(String logType, String logMessage){
+    if(FireBaseController.fcmToken != ""){
+      if(logType.toLowerCase() == "e"){
+        FireBaseController.writeLog("error", FireBaseController.fcmToken, logMessage);
+      }else if(logType.toLowerCase() == ""){
+        FireBaseController.writeLog("info", FireBaseController.fcmToken, logMessage);
+      }
+    }
+
     var logger = Logger();
     if(logMessage.length > logMaxSize){
       switch(logType.toLowerCase()){
@@ -328,7 +339,7 @@ class CommonUtils {
     }
 
     int year = int.parse(formattedInput.substring(0, 4));
-    int month = int.parse(formattedInput.substring(4, 6)) - 1;
+    int month = int.parse(formattedInput.substring(4, 6));
     int day = int.parse(formattedInput.substring(6, 8));
     int hour = int.parse(formattedInput.substring(8, 10));
     int minute = int.parse(formattedInput.substring(10, 12));
@@ -343,8 +354,22 @@ class CommonUtils {
     return formattedDateTime;
   }
 
+  static DateTime addTimeToTargetTime(DateTime targetDateTime) {
+    DateTime thirtyMinLater = DateTime(
+      targetDateTime.year,
+      targetDateTime.month,
+      targetDateTime.day,
+      targetDateTime.hour,
+      targetDateTime.minute+30,
+      targetDateTime.second,
+    );
+
+    CommonUtils.log("i", "thirrrrrrrr:${thirtyMinLater}");
+    return thirtyMinLater;
+  }
+
   static DateTime getCurrentLocalTime() {
-    DateTime now = DateTime.now();
+    DateTime now = convertStringToTime(convertTimeToString(DateTime.now()));
     return now;
   }
 
@@ -585,7 +610,20 @@ class CommonUtils {
     MyData.resetMyData();
     GetController.to.resetAccdientInfoList();
     GetController.to.resetChatLoanInfoList();
+    WebSocketController.disposeSocket();
     CommonUtils.moveWithUntil(context, AppView.appRootView.value);
+  }
+
+  static void goToMain(BuildContext context, String? email, String? password){
+    DateTime thirtyMinutesLater = CommonUtils.addTimeToTargetTime(CommonUtils.getCurrentLocalTime());
+    SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceValidDateKey, CommonUtils.convertTimeToString(thirtyMinutesLater));
+    if(email != null && password != null){
+      SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceIdKey, email);
+      SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferencePwKey, password);
+      CommonUtils.moveWithReplacementTo(context, AppView.appMainView.value, null);
+    }else{
+      CommonUtils.moveTo(context, AppView.appMainView.value, null);
+    }
   }
 
   static Future<String> makeCroppedImageAndGetPath(String imagePath, Map<String,dynamic> infoMap) async {
@@ -686,11 +724,80 @@ class CommonUtils {
     }
   }
 
+  static String encryptData(String data) {
+    try {
+      if (data != "") {
+        final keyBytes = _getEnCodeKey();
+        final key = encrypt.Key(Uint8List.fromList(keyBytes));
+        var ivText = removeSpecialCharacters(FireBaseController.fcmToken).substring(0,16);
+        final ivBytes = ivText.codeUnits;
+        final iv = encrypt.IV(Uint8List.fromList(ivBytes));
+        final encrypter = encrypt.Encrypter(encrypt.AES(key));
+        final encrypted = encrypter.encrypt(data, iv: iv);
+        final encodedData = encrypt.Encrypted.fromBase64(encrypted.base64);
+        final decrypted = encrypter.decrypt(encodedData, iv: iv);
+        CommonUtils.log("i", "${iv.base64} || Encrypted : $decrypted");
+        return encrypted.base64;
+      } else {
+        CommonUtils.log("i", "encode error: Encrypted data is null");
+        return "";
+      }
+    } catch (error) {
+      CommonUtils.log("i", "encode error: $error");
+      return "";
+    }
+  }
+
+  static String decryptData(String resultString) {
+    try {
+      if (resultString != "") {
+        final keyBytes = _getEnCodeKey();
+        final key = encrypt.Key(Uint8List.fromList(keyBytes));
+        var ivText = removeSpecialCharacters(FireBaseController.fcmToken).substring(0,16);
+        final ivBytes = ivText.codeUnits;
+        final iv = encrypt.IV(Uint8List.fromList(ivBytes));
+        final encrypter = encrypt.Encrypter(encrypt.AES(key));
+        final encodedData = encrypt.Encrypted.fromBase64(resultString);
+        final decrypted = encrypter.decrypt(encodedData, iv: iv);
+        return decrypted;
+      } else {
+        CommonUtils.log("i", "decode error: Decrypted data is null");
+        return "";
+      }
+    } catch (error) {
+      CommonUtils.log("i", "decode error: $error");
+      return "";
+    }
+  }
+
+  static Uint8List _getEnCodeKey(){
+    final keyBytes = Uint8List(16); // 16바이트 배열 생성
+    final inputBytes = Uint8List.fromList(removeSpecialCharacters(FireBaseController.fcmToken).codeUnits);
+    final inputLength = inputBytes.length;
+
+    for (int i = 0; i < 16; i++) {
+      if (i < inputLength) {
+        keyBytes[i] = inputBytes[i];
+      } else {
+        keyBytes[i] = 'a'.codeUnitAt(0);
+      }
+    }
+
+    return keyBytes;
+  }
+
+  static String removeSpecialCharacters(String text) {
+    // 정규 표현식으로 특수 문자를 찾아 제거
+    final regex = RegExp(r'[!@#%^&*(),.?":{}|<>]'); // 여기에 제거하고 싶은 특수 문자를 추가
+    return text.replaceAll(regex, '');
+  }
 
   static bool isValidStateByAPiExpiredDate(){
     bool result = false;
     String thirtyMinutesLaterString = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceValidDateKey);
     if(thirtyMinutesLaterString != ""){
+      CommonUtils.log("i", "\ncurr:${CommonUtils.getCurrentLocalTime()}\nthir:${CommonUtils.convertStringToTime(thirtyMinutesLaterString)}");
+      CommonUtils.log("i", "isBefore : ${CommonUtils.getCurrentLocalTime().isBefore(CommonUtils.convertStringToTime(thirtyMinutesLaterString))}");
       result = CommonUtils.getCurrentLocalTime().isBefore(CommonUtils.convertStringToTime(thirtyMinutesLaterString));
     } else{
       result = false;

@@ -139,7 +139,7 @@ class IamportController {
 
     return Scaffold(
       appBar: AppBar(
-        title: UiUtils.getTextWithFixedScale("휴대폰 본인인증", 14.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.center, null),
+        title: SizedBox(width: 67.w, child: UiUtils.getTextWithFixedScale("휴대폰 본인인증", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
         backgroundColor: ColorStyles.upFinWhite,
         leading: UiUtils.getBackButton(() {
           Navigator.pop(parentViewContext);

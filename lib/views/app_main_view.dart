@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
-import 'package:redis/redis.dart';
 import 'package:sizer/sizer.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:upfin/configs/app_config.dart';
 import 'package:upfin/configs/string_config.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
+import 'package:upfin/controllers/websocket_controller.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import '../controllers/get_controller.dart';
@@ -119,16 +119,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               const Spacer(flex: 2),
               UiUtils.getBorderButtonBoxWithZeroPadding(15.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
                   UiUtils.getTextWithFixedScale("새로고침", 10.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.end, 1), () async {
-                    //_refreshMyView(context);
-                    Command cmd = await RedisConnection().connect('upfin-ro.dwggrr.ng.0001.apn2.cache.amazonaws.com', 6379);
-
-                    final pubsub = PubSub(cmd);
-                    pubsub.subscribe(["loan_channel"]);
-                    final stream = pubsub.getStream();
-                    var streamWithoutErrors = stream.handleError((e) => CommonUtils.log("i", "error $e"));
-                    await for (final msg in streamWithoutErrors) {
-                      CommonUtils.log("i", "received non-message ${msg.toString()}");
-                    }
+                    _refreshMyView(context);
                   })
             ])),
             Obx((){
@@ -204,7 +195,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   }
   List<Widget> _getAccidentWidgetList(){
     List<Widget> accidentWidgetList = [];
-    CommonUtils.log("", "accident view redraw!");
+    CommonUtils.log("i", "accident view redraw!");
     for(var each in GetController.to.accidentInfoDataList){
       accidentWidgetList.add(
           UiUtils.getAccidentBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinGray,
@@ -239,9 +230,26 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
 
     return accidentWidgetList;
   }
+
+  void _subscribeChatroom(){
+    WebSocketController.disconnectSubscribe((isSuccessToResetSub){
+      if(isSuccessToResetSub){
+        WebSocketController.connectSubscribe((isSuccessToSubscribe){
+          if(!isSuccessToSubscribe){
+            CommonUtils.flutterToast("채팅방연결에 실패했습니다.\n다시 시작해주세요.");
+            //CommonUtils.backToHome(context);
+          }
+        });
+      }else{
+        CommonUtils.flutterToast("채팅방해제에 실패했습니다.\n다시 시작해주세요.");
+        //CommonUtils.backToHome(context);
+      }
+    });
+  }
+
   List<Widget> _getLoanChatWidgetList(){
     List<Widget> loanChatRoomWidgetList = [];
-    CommonUtils.log("", "loan view redraw!");
+    CommonUtils.log("i", "loan view redraw!");
     for(var each in GetController.to.chatLoanInfoDataList){
       loanChatRoomWidgetList.add(
           Column(children: [
@@ -450,68 +458,76 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   double bottomBarHeight = 7.h;
   @override
   Widget build(BuildContext context) {
-    Widget view = Stack(
-      children: [
-        Positioned(
-          child: Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, child: Column(children: [
-            Expanded(child: viewTypeId == 1? _getApplyView() : viewTypeId == 2? _getMyView() : _getSettingView()),
-            AnimatedContainer(width: 100.w, height: bottomBarHeight, duration: const Duration(milliseconds:100),
-            child: Row(mainAxisAlignment: MainAxisAlignment.center, mainAxisSize: MainAxisSize.max, children: [
-              GestureDetector(child: Container(width: 30.w, color: ColorStyles.upFinWhiteSky,
-                  child: Center(child: UiUtils.getTextButtonWithFixedScale("대출", 13.sp, viewTypeId == 1? FontWeight.w800 : FontWeight.w300,
-                      viewTypeId == 1? ColorStyles.upFinButtonBlue : ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1,(){setState(() {viewTypeId = 1;});}))),onTap: (){
-                setState(() {viewTypeId = 1;});
-              }),
-              GestureDetector(child: Container(width: 40.w, color: ColorStyles.upFinWhiteSky,
-                  child: Center(child: UiUtils.getTextButtonWithFixedScale("MY", 13.sp, viewTypeId == 2? FontWeight.w800 : FontWeight.w300,
-                      viewTypeId == 2? ColorStyles.upFinButtonBlue : ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1,(){setState(() {viewTypeId = 2;});}))
-              ), onTap: () {setState(() {viewTypeId = 2;});}),
-              GestureDetector(child: Container(width: 30.w, color: ColorStyles.upFinWhiteSky,
-                  child: Center(child: UiUtils.getTextButtonWithFixedScale("설정", 13.sp, viewTypeId == 3? FontWeight.w800 : FontWeight.w300,
-                      viewTypeId == 3? ColorStyles.upFinButtonBlue : ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1,(){setState(() {viewTypeId = 3;});}))
-              ), onTap: (){ setState(() {viewTypeId = 3;});}),
-            ])),
-          ]))
-        ),
-        Positioned(
-          child: doCheckToSearchAccident? Stack(alignment: Alignment.center, children: [
-            Positioned(child: Container(
-              width: 100.w,
-              height: 100.h,
-              color: ColorStyles.upFinButtonBlue,
-              padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 15.h, bottom: 0),
-              child: Column(mainAxisSize: MainAxisSize.max, mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.center, children: [
-                SizedBox(width: 80.w, child: UiUtils.getTextWithFixedScale("환영합니다! ", 22.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, null)),
-                UiUtils.getMarginBox(0, 1.h),
-                SizedBox(width: 80.w, child: UiUtils.getTextWithFixedScale("가입이 완료되었네요.", 22.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, null)),
-                UiUtils.getMarginBox(0, 1.h),
-                SizedBox(width: 80.w, child: UiUtils.getTextWithFixedScale("이제 개인회생 대출상품을", 22.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, null)),
-                UiUtils.getMarginBox(0, 1.h),
-                SizedBox(width: 80.w, child: UiUtils.getTextWithFixedScale("찾으실 수 있어요~ ", 22.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, null)),
-                UiUtils.getMarginBox(0, 3.h),
-                UiUtils.getBorderButtonBox(80.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
-                    UiUtils.getTextWithFixedScale("시작하기", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, null), () {
+    if(CommonUtils.isValidStateByAPiExpiredDate()){
+      _subscribeChatroom();
+      Widget view = Stack(
+        children: [
+          Positioned(
+              child: Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, child: Column(children: [
+                Expanded(child: viewTypeId == 1? _getApplyView() : viewTypeId == 2? _getMyView() : _getSettingView()),
+                AnimatedContainer(width: 100.w, height: bottomBarHeight, duration: const Duration(milliseconds:100),
+                    child: Row(mainAxisAlignment: MainAxisAlignment.center, mainAxisSize: MainAxisSize.max, children: [
+                      GestureDetector(child: Container(width: 30.w, color: ColorStyles.upFinWhiteSky,
+                          child: Center(child: UiUtils.getTextButtonWithFixedScale("대출", 13.sp, viewTypeId == 1? FontWeight.w800 : FontWeight.w300,
+                              viewTypeId == 1? ColorStyles.upFinButtonBlue : ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1,(){setState(() {viewTypeId = 1;});}))),onTap: (){
+                        setState(() {viewTypeId = 1;});
+                      }),
+                      GestureDetector(child: Container(width: 40.w, color: ColorStyles.upFinWhiteSky,
+                          child: Center(child: UiUtils.getTextButtonWithFixedScale("MY", 13.sp, viewTypeId == 2? FontWeight.w800 : FontWeight.w300,
+                              viewTypeId == 2? ColorStyles.upFinButtonBlue : ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1,(){setState(() {viewTypeId = 2;});}))
+                      ), onTap: () {setState(() {viewTypeId = 2;});}),
+                      GestureDetector(child: Container(width: 30.w, color: ColorStyles.upFinWhiteSky,
+                          child: Center(child: UiUtils.getTextButtonWithFixedScale("설정", 13.sp, viewTypeId == 3? FontWeight.w800 : FontWeight.w300,
+                              viewTypeId == 3? ColorStyles.upFinButtonBlue : ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1,(){setState(() {viewTypeId = 3;});}))
+                      ), onTap: (){ setState(() {viewTypeId = 3;});}),
+                    ])),
+              ]))
+          ),
+          Positioned(
+              child: doCheckToSearchAccident? Stack(alignment: Alignment.center, children: [
+                Positioned(child: Container(
+                  width: 100.w,
+                  height: 100.h,
+                  color: ColorStyles.upFinButtonBlue,
+                  padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 15.h, bottom: 0),
+                  child: Column(mainAxisSize: MainAxisSize.max, mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.center, children: [
+                    SizedBox(width: 80.w, child: UiUtils.getTextWithFixedScale("환영합니다! ", 22.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, null)),
+                    UiUtils.getMarginBox(0, 1.h),
+                    SizedBox(width: 80.w, child: UiUtils.getTextWithFixedScale("가입이 완료되었네요.", 22.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, null)),
+                    UiUtils.getMarginBox(0, 1.h),
+                    SizedBox(width: 80.w, child: UiUtils.getTextWithFixedScale("이제 개인회생 대출상품을", 22.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, null)),
+                    UiUtils.getMarginBox(0, 1.h),
+                    SizedBox(width: 80.w, child: UiUtils.getTextWithFixedScale("찾으실 수 있어요~ ", 22.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, null)),
+                    UiUtils.getMarginBox(0, 3.h),
+                    UiUtils.getBorderButtonBox(80.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
+                        UiUtils.getTextWithFixedScale("시작하기", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, null), () {
+                          setState(() {
+                            doCheckToSearchAccident = false;
+                          });
+                          CommonUtils.moveTo(context, AppView.appSearchAccidentView.value, null);
+                        }),
+                    UiUtils.getMarginBox(0, 2.5.h),
+                    SizedBox(width: 80.w, child: UiUtils.getTextButtonWithFixedScale("넘어가기", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null, (){
                       setState(() {
                         doCheckToSearchAccident = false;
                       });
-                      CommonUtils.moveTo(context, AppView.appSearchAccidentView.value, null);
-                    }),
-                UiUtils.getMarginBox(0, 2.5.h),
-                SizedBox(width: 80.w, child: UiUtils.getTextButtonWithFixedScale("넘어가기", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null, (){
-                  setState(() {
-                    doCheckToSearchAccident = false;
-                  });
-                })),
-              ]),
-            )),
-            Positioned(
-                top: 50.h,
-                child: UiUtils.getImage(150.w, 150.w, Image.asset(fit: BoxFit.fitWidth,'assets/images/img_woman_coffee.png')))
-          ]) : Container()
-        ),
-      ],
-    );
-    return UiUtils.getView(context, view, CommonUtils.onWillPopForPreventBackButton);
+                    })),
+                  ]),
+                )),
+                Positioned(
+                    top: 50.h,
+                    child: UiUtils.getImage(150.w, 150.w, Image.asset(fit: BoxFit.fitWidth,'assets/images/img_woman_coffee.png')))
+              ]) : Container()
+          ),
+        ],
+      );
+      return UiUtils.getView(context, view, CommonUtils.onWillPopForPreventBackButton);
+    }else{
+      CommonUtils.flutterToast("접속시간이 만료되었습니다.\n재로그인 해주세요");
+      CommonUtils.backToHome(context);
+      return Container();
+    }
+
   }
 
 }

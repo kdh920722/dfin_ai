@@ -1,4 +1,3 @@
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter/material.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/controllers/sharedpreference_controller.dart';
@@ -15,7 +14,6 @@ class AppLoginView extends StatefulWidget{
 }
 
 class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
-  final ScrollController _scrollController = ScrollController();
   final _formKey = GlobalKey<FormState>();
   final _emailTextController = TextEditingController();
   final _pwdTextController = TextEditingController();
@@ -30,15 +28,6 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
   void _disposeAllTextControllers(){
     _emailTextController.dispose();
     _pwdTextController.dispose();
-    _keyboardVisibilityController = null;
-  }
-
-  KeyboardVisibilityController? _keyboardVisibilityController;
-  void _functionForKeyboardHide(){
-    CommonUtils.hideKeyBoard();
-    _scrollController.jumpTo(0);
-  }
-  void _functionForKeyboardShow(){
   }
 
   @override
@@ -46,7 +35,6 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     CommonUtils.log("i", "AppLoginView 화면 입장");
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _keyboardVisibilityController = CommonUtils.getKeyboardViewController(_functionForKeyboardShow, _functionForKeyboardHide);
     _emailTextController.text = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceIdKey);
     _pwdTextController.text = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferencePwKey);
   }
@@ -135,18 +123,15 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
               LogfinController.callLogfinApi(LogfinApis.signIn, inputJson, (isSuccessToLogin, outputJson) async {
                 if(isSuccessToLogin){
                   CommonUtils.flutterToast("환영합니다!");
-                  // 캐시 데이터 저장
-                  if(SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceIdKey) == "" ||
-                      SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceIdKey) != _emailTextController.text.trim()){
-                    SharedPreferenceController.deleteAllData();
-                  }
-                  SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceIdKey, _emailTextController.text.trim());
-                  SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferencePwKey, _pwdTextController.text.trim());
-
                   await LogfinController.getMainViewInfo((isSuccessToGetMainInfo){
                     UiUtils.closeLoadingPop(context);
                     if(isSuccessToGetMainInfo){
-                      CommonUtils.moveWithReplacementTo(context, AppView.appMainView.value, null);
+                      // 캐시 데이터 저장
+                      if(SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceIdKey) == "" ||
+                          SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceIdKey) != _emailTextController.text.trim()){
+                        SharedPreferenceController.deleteAllData();
+                      }
+                      CommonUtils.goToMain(context, _emailTextController.text.trim(), _pwdTextController.text.trim());
                     }
                   });
                 }else{

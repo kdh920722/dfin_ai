@@ -30,7 +30,7 @@ class UiUtils {
             child: WillPopScope(
                 onWillPop: () => callbackBackButtonForView(),
                 child: Scaffold(
-                  backgroundColor: Colors.black,
+                  backgroundColor: ColorStyles.upFinWhite,
                   body: view,
                 )
             )
@@ -52,7 +52,7 @@ class UiUtils {
                   });
                 },
                 child: Scaffold(
-                  backgroundColor: Colors.black,
+                  backgroundColor: ColorStyles.upFinWhite,
                   body: view,
                 )
             )
@@ -70,7 +70,7 @@ class UiUtils {
           child: WillPopScope(
               onWillPop: () => callbackBackButtonForView(),
               child: Scaffold(
-                  backgroundColor: Colors.black,
+                  backgroundColor: ColorStyles.upFinWhite,
                   body: ListView(
                       controller: scrollController,
                       shrinkWrap: true,
@@ -98,7 +98,7 @@ class UiUtils {
                   });
                 },
                 child: Scaffold(
-                    backgroundColor: Colors.black,
+                    backgroundColor: ColorStyles.upFinWhite,
                     body: ListView(
                         controller: scrollController,
                         shrinkWrap: true,

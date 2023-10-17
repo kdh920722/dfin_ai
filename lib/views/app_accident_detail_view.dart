@@ -320,50 +320,56 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
 
   @override
   Widget build(BuildContext context) {
-    Widget view = Container(
-      color: ColorStyles.upFinWhite,
-      width: 100.w,
-      height: 100.h,
-      padding: EdgeInsets.all(5.w),
-      child: Column(children: [
-        SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          UiUtils.getBackButton(() {
-            Navigator.pop(context);
-          }),
-          UiUtils.getMarginBox(0, 2.h),
-          SizedBox(width: 95.w, height: 5.h, child: TabBar(
-            unselectedLabelStyle: TextStyles.upFinUnselectedTabTextInButtonStyle,
-            unselectedLabelColor: ColorStyles.upFinRealGray,
-            labelStyle: TextStyles.upFinSelectedTabTextInButtonStyle,
-            labelColor: ColorStyles.upFinButtonBlue,
-            indicatorSize: TabBarIndicatorSize.tab,
-            indicator: MyTabIndicator(),
-            indicatorColor: ColorStyles.upFinButtonBlue,
-            dividerColor: ColorStyles.upFinWhiteSky,
-            controller: _tabController,
-            tabs: const <Widget>[
-              Tab(text: "사건정보"),
-              Tab(text: "접수내역"),
-            ],
-          )),
-          SizedBox(width: 95.w, height: 75.h, child: TabBarView(
-            controller: _tabController,
-            children: <Widget>[
-              Column(children: [UiUtils.getExpandedScrollView(Axis.vertical, _getAccidentWidgetList())]),
-              MyData.getLoanInfoList().isNotEmpty ? Column(children: [
-                UiUtils.getMarginBox(0, 3.h),
-                UiUtils.getExpandedScrollView(Axis.vertical, Column(children: _getLoanWidgetList()))
-              ]) : Center(
-                child: UiUtils.getTextWithFixedScale("접수이력이 없습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
-              )
-            ],
-          )),
-        ])),
+    if(CommonUtils.isValidStateByAPiExpiredDate()){
+      Widget view = Container(
+        color: ColorStyles.upFinWhite,
+        width: 100.w,
+        height: 100.h,
+        padding: EdgeInsets.all(5.w),
+        child: Column(children: [
+          SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            UiUtils.getBackButton(() {
+              Navigator.pop(context);
+            }),
+            UiUtils.getMarginBox(0, 2.h),
+            SizedBox(width: 95.w, height: 5.h, child: TabBar(
+              unselectedLabelStyle: TextStyles.upFinUnselectedTabTextInButtonStyle,
+              unselectedLabelColor: ColorStyles.upFinRealGray,
+              labelStyle: TextStyles.upFinSelectedTabTextInButtonStyle,
+              labelColor: ColorStyles.upFinButtonBlue,
+              indicatorSize: TabBarIndicatorSize.tab,
+              indicator: MyTabIndicator(),
+              indicatorColor: ColorStyles.upFinButtonBlue,
+              dividerColor: ColorStyles.upFinWhiteSky,
+              controller: _tabController,
+              tabs: const <Widget>[
+                Tab(text: "사건정보"),
+                Tab(text: "접수내역"),
+              ],
+            )),
+            SizedBox(width: 95.w, height: 75.h, child: TabBarView(
+              controller: _tabController,
+              children: <Widget>[
+                Column(children: [UiUtils.getExpandedScrollView(Axis.vertical, _getAccidentWidgetList())]),
+                MyData.getLoanInfoList().isNotEmpty ? Column(children: [
+                  UiUtils.getMarginBox(0, 3.h),
+                  UiUtils.getExpandedScrollView(Axis.vertical, Column(children: _getLoanWidgetList()))
+                ]) : Center(
+                  child: UiUtils.getTextWithFixedScale("접수이력이 없습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
+                )
+              ],
+            )),
+          ])),
 
-      ]),
-    );
+        ]),
+      );
 
-    return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
+      return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
+    }else{
+      CommonUtils.flutterToast("접속시간이 만료되었습니다.\n재로그인 해주세요");
+      CommonUtils.backToHome(context);
+      return Container();
+    }
   }
 }
 

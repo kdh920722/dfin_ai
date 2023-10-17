@@ -14,6 +14,7 @@ import 'package:sizer/sizer.dart';
 import 'package:upfin/controllers/gpt_controller.dart';
 import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:upfin/controllers/sns_login_controller.dart';
+import 'package:upfin/controllers/websocket_controller.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import 'package:uni_links/uni_links.dart';
 import '../controllers/codef_controller.dart';
@@ -48,6 +49,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
     CommonUtils.log("i", "AppRootView 화면 파괴");
     WidgetsBinding.instance.removeObserver(this);
     GetController.to.resetPercent();
+    WebSocketController.disposeSocket();
     super.dispose();
   }
 
@@ -200,9 +202,6 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
         GetController.to.updatePercent(10);
         CommonUtils.log("i", "logfin url : ${LogfinController.url}");
         CommonUtils.log("i", "percent : ${GetController.to.loadingPercent.value}");
-
-        DateTime thirtyMinutesLater = CommonUtils.getCurrentLocalTime().add(const Duration(minutes: 30));
-        SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceValidDateKey, CommonUtils.convertTimeToString(thirtyMinutesLater));
         if(GetController.to.loadingPercent.value == 100){
           setState(() {
             Config.isControllerLoadFinished = true;
@@ -250,11 +249,29 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
     });
   }
 
+  void _initWebSocketForChat() {
+    // init
+    WebSocketController.initWebSocket((bool isSuccess){
+      if(isSuccess){
+        GetController.to.updatePercent(5);
+        CommonUtils.log("i", "ws url : ${WebSocketController.wsUrl}");
+        CommonUtils.log("i", "ws origin url : ${WebSocketController.wsOriginUrl}");
+        if(GetController.to.loadingPercent.value == 100){
+          setState(() {
+            Config.isControllerLoadFinished = true;
+          });
+        }
+      }else{
+        CommonUtils.flutterToast("webSocket init 에러가 발생했습니다.");
+      }
+    });
+  }
+
   void _initSnsLogin() {
     // init
     SnsLoginController.initKakao((bool isSuccess){
       if(isSuccess){
-        GetController.to.updatePercent(10);
+        GetController.to.updatePercent(5);
         CommonUtils.log("i", "kakao key : ${SnsLoginController.kakaoKey}");
         CommonUtils.log("i", "percent : ${GetController.to.loadingPercent.value}");
         if(GetController.to.loadingPercent.value == 100){
@@ -369,15 +386,17 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
       });
       await _requestPermissions();
       await _initSharedPreference();
-      //_initGPT(); // count
-      _initCodeF(); // count aa
-      _initJuso(); // count aa
-      _initCLOVA(); // count aa
-      _initAWS(); // count aa
-      _initLogfin(); // count aa
-      _initHyphen(); // count
-      _initIamport(); // count aa
-      _initSnsLogin(); // count aa
+      // count..
+      //_initGPT();
+      _initCodeF();
+      _initJuso();
+      _initCLOVA();
+      _initAWS();
+      _initLogfin();
+      _initHyphen();
+      _initIamport();
+      _initSnsLogin();
+      _initWebSocketForChat();
     }else{
       if(context.mounted){
         UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, 30.h, 0.5, (context, setState){
@@ -430,7 +449,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
                     await LogfinController.getMainViewInfo((isSuccessToGetMainInfo){
                       UiUtils.closeLoadingPop(context);
                       if(isSuccessToGetMainInfo){
-                        CommonUtils.moveTo(context, AppView.appMainView.value, null);
+                        CommonUtils.goToMain(context, null, null);
                       }
                     });
                   }else{
@@ -449,7 +468,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
                     await LogfinController.getMainViewInfo((isSuccessToGetMainInfo){
                       UiUtils.closeLoadingPop(context);
                       if(isSuccessToGetMainInfo){
-                        CommonUtils.moveTo(context, AppView.appMainView.value, null);
+                        CommonUtils.goToMain(context, null, null);
                       }
                     });
                   }else{

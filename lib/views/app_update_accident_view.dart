@@ -691,30 +691,38 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
 
   void _updateData(){
     Map<String, dynamic> inputJson = {
-      "bankCode": selectedBankCodeInfo.split("@")[1],
-      "account": selectedBankAccountInfo,
       "job": selectedJobInfo.split("@")[1],
       "lend_count": selectedPreLoanCountInfo.split("@")[1],
       "lend_amount": selectedPreLoanPriceInfo,
       "wish_amount": selectedWantLoanPriceInfo,
-      "uid": MyData.selectedAccidentInfoData!.accidentUid,
-      "court_name": MyData.selectedAccidentInfoData!.accidentCourtInfo.split("@")[0],
-      "accident_no": MyData.selectedAccidentInfoData!.accidentCaseNumberYear+MyData.selectedAccidentInfoData!.accidentCaseNumberType+MyData.selectedAccidentInfoData!.accidentCaseNumberNumber,
+      "accident_uid": MyData.selectedAccidentInfoData!.accidentUid,
     };
-    CommonUtils.log("i", "pr search info:\n$inputJson");
+    CommonUtils.log("i", "customer update input info:\n$inputJson");
     UiUtils.showLoadingPop(context);
-    LogfinController.callLogfinApi(LogfinApis.prUpdateInfo, inputJson, (isSuccessToUpdate, outputJson){
+    LogfinController.callLogfinApi(LogfinApis.customerUpdateInfo, inputJson, (isSuccessToUpdate, outputJson){
       if(isSuccessToUpdate){
-        CommonUtils.flutterToast("수정 완료했습니다.");
         LogfinController.getAccidentInfo((isSuccessToGetAccidentInfo, isNotEmpty){
-          UiUtils.closeLoadingPop(context);
           if(isSuccessToGetAccidentInfo){
             if(isNotEmpty){
-              Navigator.pop(context, true);
+              LogfinController.getUserInfo((isSuccessToGetUserInfo){
+                UiUtils.closeLoadingPop(context);
+                if(isSuccessToGetUserInfo){
+                  CommonUtils.flutterToast("수정 완료했습니다.");
+                  Navigator.pop(context, true);
+                }else{
+                  Navigator.pop(context, false);
+                  CommonUtils.flutterToast("수정된정보 불러오기에\n실패했습니다.");
+                }
+              });
             }else{
+              UiUtils.closeLoadingPop(context);
               Navigator.pop(context, false);
               CommonUtils.flutterToast("수정된정보 불러오기에\n실패했습니다.");
             }
+          }else{
+            UiUtils.closeLoadingPop(context);
+            Navigator.pop(context, false);
+            CommonUtils.flutterToast("정보 수정에 실패했습니다.\n입력정보를 확인해주세요.");
           }
         });
       }else{
@@ -750,30 +758,36 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
   bool isAutoScrollableForTarget = true;
   @override
   Widget build(BuildContext context) {
-    Widget? view;
 
-    if(currentViewId == bankCodeViewId){
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if(isAutoScrollableForTarget) {
-          isAutoScrollableForTarget = false;
-          _scrollBankCode();
-        }
-      });
-      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: Obx(()=>_getBankCodeView()));
-    }else if(currentViewId == bankAccountViewId){
-      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getBankAccountView());
-    }else if(currentViewId == preLoanCountViewId){
-      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getPreLoanCountView());
-    }else if(currentViewId == preLoanPriceViewId){
-      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getPreLoanPriceView());
-    }else if(currentViewId == wantLoanPriceViewId){
-      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getWantLoanPriceView());
-    }else if(currentViewId == jobViewId){
-      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getJobView());
+    if(CommonUtils.isValidStateByAPiExpiredDate()){
+      Widget? view;
+      if(currentViewId == bankCodeViewId){
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if(isAutoScrollableForTarget) {
+            isAutoScrollableForTarget = false;
+            _scrollBankCode();
+          }
+        });
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: Obx(()=>_getBankCodeView()));
+      }else if(currentViewId == bankAccountViewId){
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getBankAccountView());
+      }else if(currentViewId == preLoanCountViewId){
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getPreLoanCountView());
+      }else if(currentViewId == preLoanPriceViewId){
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getPreLoanPriceView());
+      }else if(currentViewId == wantLoanPriceViewId){
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getWantLoanPriceView());
+      }else if(currentViewId == jobViewId){
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getJobView());
+      }else{
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getFinishConfirmView());
+      }
+      return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
     }else{
-      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getFinishConfirmView());
+      CommonUtils.flutterToast("접속시간이 만료되었습니다.\n재로그인 해주세요");
+      CommonUtils.backToHome(context);
+      return Container();
     }
-    return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
   }
 
 }

@@ -2,6 +2,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:http/http.dart' as http;
 import 'package:upfin/controllers/get_controller.dart';
+import 'package:upfin/controllers/websocket_controller.dart';
 import 'package:upfin/datas/accident_info_data.dart';
 import 'package:upfin/datas/loan_info_data.dart';
 import 'package:upfin/datas/my_data.dart';
@@ -189,7 +190,7 @@ class LogfinController {
           }else if(api == LogfinApis.signIn){
             LogfinController.userToken = resultData["data"]['api_token'];
             CommonUtils.log('i', "userToken : ${LogfinController.userToken}");
-          }else if(api == LogfinApis.getOffers){
+          }else if(api == LogfinApis.getOffers || api == LogfinApis.getMessage){
             callback(true, resultData);
             return;
           }
@@ -362,7 +363,7 @@ class LogfinController {
 
   static Future<void> getLoanInfo(Function(bool isSuccess, bool isNotEmpty) callback) async{
     try{
-      callLogfinApi(LogfinApis.getLoansInfo, <String, dynamic>{}, (isSuccessToGetLoansInfo, loansInfoOutputJson){
+      callLogfinApi(LogfinApis.getLoansInfo, <String, dynamic>{}, (isSuccessToGetLoansInfo, loansInfoOutputJson) async {
         if(isSuccessToGetLoansInfo){
           if(loansInfoOutputJson != null){
             List<dynamic> loansList = loansInfoOutputJson["loans"];
@@ -371,8 +372,9 @@ class LogfinController {
               callback(true, false);
             }else{
               MyData.clearLoanInfoList();
+              bool isMessageGetSuccess = true;
               for(var eachLoans in loansList){
-                CommonUtils.log("", "loan data ====>\n"
+                CommonUtils.log("i", "loan data ====>\n"
                     "accidentUid: ${eachLoans["accident_uid"]}\n"
                     "loanUid: ${eachLoans["uid"]}\n"
                     "lenderPrId: ${eachLoans["lender_pr_id"]}\n"
@@ -383,20 +385,49 @@ class LogfinController {
                     "contactNo: ${eachLoans["lender_pr"]["lender"]["contact_no"]}\n"
                     "createdDate: ${eachLoans["submit_offer"]["created_at"]}\n"
                     "updatedDate: ${eachLoans["submit_offer"]["updated_at"]}\n"
-                    "statueId: ${eachLoans["status_info"]["id"]}\n");
+                    "statueId: ${eachLoans["status_info"]["id"]}\n"
+                    "roomId: ${eachLoans["pr_room"]["id"]}\n");
 
-                String submitAmount = eachLoans["submit_offer"]["amount"].toString().substring(0, eachLoans["submit_offer"]["amount"].toString().length-4);
-                MyData.addToLoanInfoList(LoanInfoData(eachLoans["accident_uid"].toString(), eachLoans["uid"].toString(), eachLoans["lender_pr_id"].toString(),
-                    submitAmount, eachLoans["submit_offer"]["interest_rate"].toString(),
-                    eachLoans["lender_pr"]["lender"]["name"].toString(),
-                    eachLoans["lender_pr"]["lender"]["name"].toString() == "(주)안전대부"? "assets/images/bank_logo_safe.png" : "assets/images/bank_logo_default.png",
-                    eachLoans["lender_pr"]["lender"]["product_name"].toString(), eachLoans["lender_pr"]["lender"]["contact_no"].toString(),
-                    eachLoans["submit_offer"]["created_at"].toString(), eachLoans["submit_offer"]["updated_at"].toString(), eachLoans["status_info"]["id"].toString()));
+                var inputJson = {
+                  "loan_uid" : eachLoans["uid"],
+                  "last_message_id" : 0,
+                  "length" : 0
+                };
+                await callLogfinApi(LogfinApis.getMessage, inputJson, (isSuccessToGetLoanMessageInfo, loanMessageInfoOutputJson){
+                  if(isSuccessToGetLoanMessageInfo){
+                    String submitAmount = eachLoans["submit_offer"]["amount"].toString().substring(0, eachLoans["submit_offer"]["amount"].toString().length-4);
+                    loanMessageInfoOutputJson!["last_read_message_id"] = eachLoans["pr_room"]["last_read_message_id"].toString();
+                    CommonUtils.log("i", "loanMessageInfoOutputJson data ====>\n$loanMessageInfoOutputJson");
+                    MyData.addToLoanInfoList(
+                        LoanInfoData(eachLoans["accident_uid"].toString(), eachLoans["uid"].toString(), eachLoans["lender_pr_id"].toString(),
+                      submitAmount, eachLoans["submit_offer"]["interest_rate"].toString(),
+                      eachLoans["lender_pr"]["lender"]["name"].toString(),
+                      eachLoans["lender_pr"]["lender"]["name"].toString() == "(주)안전대부"? "assets/images/bank_logo_safe.png" : "assets/images/bank_logo_default.png",
+                      eachLoans["lender_pr"]["lender"]["product_name"].toString(), eachLoans["lender_pr"]["lender"]["contact_no"].toString(),
+                      eachLoans["submit_offer"]["created_at"].toString(), eachLoans["submit_offer"]["updated_at"].toString(),
+                        eachLoans["status_info"]["id"].toString(), eachLoans["pr_room"]["id"].toString(), jsonEncode(loanMessageInfoOutputJson)));
+                  }else{
+                    isMessageGetSuccess = false;
+                  }
+                });
               }
-              MyData.sortLoanInfoList();
-              _setChatRoomInfoList();
-              GetController.to.updateChatLoanInfoList(MyData.getChatRoomInfoList());
-              callback(true, true);
+
+              if(isMessageGetSuccess){
+                WebSocketController.disconnectSubscribe((isSuccessToResetSub){
+                  if(isSuccessToResetSub){
+                    MyData.sortLoanInfoList();
+                    _setChatRoomInfoList();
+                    GetController.to.updateChatLoanInfoList(MyData.getChatRoomInfoList());
+                    callback(true, true);
+                  }else{
+                    GetController.to.resetChatLoanInfoList();
+                    callback(false, false);
+                  }
+                });
+              }else{
+                GetController.to.resetChatLoanInfoList();
+                callback(false, false);
+              }
             }
           }else{
             GetController.to.resetChatLoanInfoList();
@@ -415,12 +446,34 @@ class LogfinController {
   static void _setChatRoomInfoList(){
     MyData.clearChatRoomInfoList();
     for(var eachSortedLoan in MyData.getLoanInfoList()){
-      String lastMsg = "현재 고객님은 2건의 심사 결과를 대기중입니다. 조금더 알아보시겠나요?";
-      String lastDateString = "20231005145230";
-      int cnt = 12;
-      MyData.addToChatRoomInfoList(ChatRoomInfoData(eachSortedLoan.loanUid, 1, eachSortedLoan.companyLogo,
-          eachSortedLoan.companyName, eachSortedLoan.productName, lastMsg, lastDateString, cnt,
-          eachSortedLoan.statueId, "${eachSortedLoan.submitRate}%", CommonUtils.getPriceFormattedString(double.parse(eachSortedLoan.submitAmount))));
+      String jsonString = eachSortedLoan.chatRoomMsg;
+      CommonUtils.log("i", "msg: ${jsonString}");
+      dynamic jsonData;
+      try {
+        jsonData = jsonDecode(jsonString);
+        if (jsonData != null && jsonData is Map<String, dynamic>) {
+          // JSON 객체로 파싱된 경우
+          Map<String, dynamic> msg = jsonData;
+          // 이제 msg를 사용할 수 있음
+          CommonUtils.log("i", "msg: $msg");
+          List<dynamic> listMsg = msg["data"];
+          CommonUtils.log("i", "listMsg: $listMsg");
+          listMsg.sort((a,b) => DateTime.parse(a["created_at"]).compareTo(DateTime.parse(b["created_at"])));
+
+          String lastMsg = listMsg[listMsg.length-1]["message"].toString();
+          if(lastMsg.contains(" / ")){
+            lastMsg = lastMsg.split(" / ")[1];
+          }
+          String lastDateString = CommonUtils.convertTimeToString(DateTime.parse(listMsg[listMsg.length-1]["created_at"]));
+          int cnt = int.parse(msg["last_read_message_id"].toString());
+          MyData.addToChatRoomInfoList(ChatRoomInfoData(eachSortedLoan.chatRoomId, eachSortedLoan.loanUid, 1, eachSortedLoan.companyLogo,
+              eachSortedLoan.companyName, eachSortedLoan.productName, eachSortedLoan.chatRoomMsg, lastMsg, lastDateString, cnt,
+              eachSortedLoan.statueId, "${eachSortedLoan.submitRate}%", CommonUtils.getPriceFormattedString(double.parse(eachSortedLoan.submitAmount))));
+
+        }
+      } catch (error) {
+        CommonUtils.log("e", "parsing error : ${error.toString()}");
+      }
     }
   }
 
@@ -494,11 +547,12 @@ class LogfinController {
 }
 
 enum LogfinApis {
-  signUp, signIn, socialLogin, deleteAccount, prUpdateInfo, checkMember,
+  signUp, signIn, socialLogin, deleteAccount, prUpdateInfo, checkMember, customerUpdateInfo,
   getUserInfo, prSearch, getOffers,
   applyProductDocSearch, applyProduct,
   getAccidentInfo, getOffersInfo,
-  getLoansInfo, getLoansDetailInfo
+  getLoansInfo, getLoansDetailInfo,
+  sendMessage, getMessage
 }
 
 extension LogfinApisExtension on LogfinApis {
@@ -532,8 +586,14 @@ extension LogfinApisExtension on LogfinApis {
         return '/get_offers.json';
       case LogfinApis.prUpdateInfo:
         return '/pr_edit_complete.json';
+      case LogfinApis.customerUpdateInfo:
+        return '/edit_customer_info.json';
       case LogfinApis.checkMember:
         return '/check_member.json';
+      case LogfinApis.sendMessage:
+        return '/create_message.json';
+      case LogfinApis.getMessage:
+        return '/get_messages.json';
     }
   }
 }

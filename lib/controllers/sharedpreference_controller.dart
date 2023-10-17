@@ -1,3 +1,4 @@
+import 'package:encrypt/encrypt.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/common_utils.dart';
 
@@ -24,9 +25,15 @@ class SharedPreferenceController {
   }
 
   static Future<void> saveSharedPreference(String key, String value) async {
+    CommonUtils.log("i", "[s]: save origin value: $value");
+    if(key == sharedPreferenceIdKey || key == sharedPreferencePwKey || key == sharedPreferenceApplyPrKey){
+      value = CommonUtils.encryptData(value);
+      CommonUtils.log("i", "[s]: save encoded value: $value");
+    }
+
     await sharedPreferences!.setString(key, value);
     String returnValue = sharedPreferences!.getString(key)!;
-    CommonUtils.log('i', "sharedPreference saved value : $returnValue");
+    CommonUtils.log("i", "[s]: saved value: $returnValue");
   }
 
   static String getSharedPreferenceValue(String key){
@@ -34,7 +41,9 @@ class SharedPreferenceController {
       if(sharedPreferences!.containsKey(key)){
         String? returnValue = sharedPreferences!.getString(key);
         if(returnValue != null){
-          CommonUtils.log('i', "sharedPreference get value : $returnValue");
+          if(key == sharedPreferenceIdKey || key == sharedPreferencePwKey || key == sharedPreferenceApplyPrKey){
+            returnValue = CommonUtils.decryptData(returnValue);
+          }
           return returnValue;
         }else{
           return "";

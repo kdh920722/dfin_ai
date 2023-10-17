@@ -295,27 +295,36 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                 }
               });
             }),
-        UiUtils.getTextButtonWithFixedScale(titleString, 10.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null, () async {
-          Widget contentsWidget = Column(children: [
-            SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(contentsString, 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null))
-          ]);
-          bool isAgree = await CommonUtils.moveToWithResult(context, AppView.appAgreeDetailInfoView.value, {"title": titleString, "contents" : contentsWidget}) as bool;
-          thisSetState(() {
-            callAct(isAgree);
+        UiUtils.getTextButtonWithFixedScale(titleString, 10.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null, () {
+          _smallAgreePressEvent(titleString, contentsString, (agreeResult){
+            thisSetState(() {
+              callAct(agreeResult);
+            });
           });
         }),
         const Spacer(flex: 2),
-        UiUtils.getIconButton(Icons.arrow_forward_ios_rounded, 4.w, ColorStyles.upFinRealGray, () async {
-          Widget contentsWidget = Column(children: [
-            SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(contentsString, 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null))
-          ]);
-          bool isAgree = await CommonUtils.moveToWithResult(context, AppView.appAgreeDetailInfoView.value, {"title": titleString, "contents" : contentsWidget}) as bool;
-          thisSetState(() {
-            callAct(isAgree);
+        UiUtils.getIconButton(Icons.arrow_forward_ios_rounded, 4.w, ColorStyles.upFinRealGray, () {
+          _smallAgreePressEvent(titleString, contentsString, (agreeResult){
+            thisSetState(() {
+              callAct(agreeResult);
+            });
           });
         })
-      ]), () async {})
+      ]), () {
+        _smallAgreePressEvent(titleString, contentsString, (agreeResult){
+          thisSetState(() {
+            callAct(agreeResult);
+          });
+        });
+      })
     ]));
+  }
+  Future<void> _smallAgreePressEvent(String titleString, String contentsString, Function(bool agreeResult) callback) async {
+    Widget contentsWidget = Column(children: [
+      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(contentsString, 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null))
+    ]);
+    bool isAgree = await CommonUtils.moveToWithResult(context, AppView.appAgreeDetailInfoView.value, {"title": titleString, "contents" : contentsWidget}) as bool;
+    callback(isAgree);
   }
   Widget _makeAgreeWidget(BuildContext thisContext, StateSetter thisSetState, ){
     return Material(child: Container(color: ColorStyles.upFinWhite,
@@ -440,67 +449,73 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
 
   @override
   Widget build(BuildContext context) {
-    Widget view = Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: EdgeInsets.all(5.w), child: Column(children: [
-      Row(children: [
-        const Spacer(flex: 2),
-        UiUtils.getIconButtonWithHeight(3.h, Icons.close, 25.sp, ColorStyles.upFinDarkGray, () {
-          MyData.selectedAccidentInfoData = null;
-          MyData.selectedPrInfoData = null;
-          Navigator.pop(context);
-        })
-      ]),
-      UiUtils.getMarginBox(0, 3.h),
-      SizedBox(width: 95.w, height: 5.h , child : UiUtils.getTextWithFixedScale("대출상품", 24.sp, FontWeight.w800, ColorStyles.upFinButtonBlue, TextAlign.start, 1)),
-      UiUtils.getMarginBox(0, 1.h),
-      SizedBox(width: 95.w, height: 5.h, child: TabBar(
-        unselectedLabelStyle: TextStyles.upFinUnselectedTabTextInButtonStyle,
-        unselectedLabelColor: ColorStyles.upFinRealGray,
-        labelStyle: TextStyles.upFinSelectedTabTextInButtonStyle,
-        labelColor: ColorStyles.upFinBlack,
-        indicatorSize: TabBarIndicatorSize.tab,
-        indicator: MyPrTabIndicator(),
-        indicatorColor: ColorStyles.upFinButtonBlue,
-        dividerColor: ColorStyles.upFinWhiteSky,
-        controller: _tabController,
-        tabs: const <Widget>[
-          Tab(text: "신청 가능"),
-          Tab(text: "신청 불가능"),
-        ],
-      )),
-      UiUtils.getMarginBox(0, 2.h),
-      SizedBox(height: 6.h, child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-        UiUtils.getTextWithFixedScale("상품 ", 14.sp, FontWeight.w400, ColorStyles.upFinBlack, TextAlign.center, 1),
-        UiUtils.getTextWithFixedScale("$selectedTabCount개", 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, 1),
-        const Spacer(flex: 2),
-        UiUtils.getCustomTextButtonBox(20.w, "금리순", 9.sp, FontWeight.w600, isOrderByLimit? ColorStyles.upFinWhiteSky : ColorStyles.upFinButtonBlue,
-            isOrderByLimit? ColorStyles.upFinButtonBlue : ColorStyles.upFinWhiteSky, () {
-              _reOrderList(false);
-            }),
-        UiUtils.getMarginBox(1.5.w, 0),
-        UiUtils.getCustomTextButtonBox(20.w, "한도순", 9.sp, FontWeight.w600, isOrderByLimit? ColorStyles.upFinButtonBlue : ColorStyles.upFinWhiteSky,
-            isOrderByLimit? ColorStyles.upFinWhiteSky : ColorStyles.upFinButtonBlue, () {
-              _reOrderList(true);
-            })
-      ])),
-      SizedBox(width: 95.w, height: 65.h, child: TabBarView(
-        controller: _tabController,
-        children: <Widget>[
-          possiblePrCnt>0 ? Column(children: [
-            UiUtils.getMarginBox(0, 3.h),
-            _getPrListView(true)
-          ]) : Center(
-            child: UiUtils.getTextWithFixedScale("접수 가능한 상품이 없습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
-          ),
-          impossiblePrCnt>0 ? Column(children: [
-            UiUtils.getMarginBox(0, 3.h),
-            _getPrListView(false)
-          ]) : Center(
-            child: UiUtils.getTextWithFixedScale("접수 불가능한 상품이 없습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
-          )
-        ],
-      ))
-    ]));
-    return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
+    if(CommonUtils.isValidStateByAPiExpiredDate()){
+      Widget view = Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: EdgeInsets.all(5.w), child: Column(children: [
+        Row(children: [
+          const Spacer(flex: 2),
+          UiUtils.getIconButtonWithHeight(3.h, Icons.close, 25.sp, ColorStyles.upFinDarkGray, () {
+            MyData.selectedAccidentInfoData = null;
+            MyData.selectedPrInfoData = null;
+            Navigator.pop(context);
+          })
+        ]),
+        UiUtils.getMarginBox(0, 3.h),
+        SizedBox(width: 95.w, height: 5.h , child : UiUtils.getTextWithFixedScale("대출상품", 24.sp, FontWeight.w800, ColorStyles.upFinButtonBlue, TextAlign.start, 1)),
+        UiUtils.getMarginBox(0, 1.h),
+        SizedBox(width: 95.w, height: 5.h, child: TabBar(
+          unselectedLabelStyle: TextStyles.upFinUnselectedTabTextInButtonStyle,
+          unselectedLabelColor: ColorStyles.upFinRealGray,
+          labelStyle: TextStyles.upFinSelectedTabTextInButtonStyle,
+          labelColor: ColorStyles.upFinBlack,
+          indicatorSize: TabBarIndicatorSize.tab,
+          indicator: MyPrTabIndicator(),
+          indicatorColor: ColorStyles.upFinButtonBlue,
+          dividerColor: ColorStyles.upFinWhiteSky,
+          controller: _tabController,
+          tabs: const <Widget>[
+            Tab(text: "신청 가능"),
+            Tab(text: "신청 불가능"),
+          ],
+        )),
+        UiUtils.getMarginBox(0, 2.h),
+        SizedBox(height: 6.h, child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+          UiUtils.getTextWithFixedScale("상품 ", 14.sp, FontWeight.w400, ColorStyles.upFinBlack, TextAlign.center, 1),
+          UiUtils.getTextWithFixedScale("$selectedTabCount개", 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, 1),
+          const Spacer(flex: 2),
+          UiUtils.getCustomTextButtonBox(20.w, "금리순", 9.sp, FontWeight.w600, isOrderByLimit? ColorStyles.upFinWhiteSky : ColorStyles.upFinButtonBlue,
+              isOrderByLimit? ColorStyles.upFinButtonBlue : ColorStyles.upFinWhiteSky, () {
+                _reOrderList(false);
+              }),
+          UiUtils.getMarginBox(1.5.w, 0),
+          UiUtils.getCustomTextButtonBox(20.w, "한도순", 9.sp, FontWeight.w600, isOrderByLimit? ColorStyles.upFinButtonBlue : ColorStyles.upFinWhiteSky,
+              isOrderByLimit? ColorStyles.upFinWhiteSky : ColorStyles.upFinButtonBlue, () {
+                _reOrderList(true);
+              })
+        ])),
+        SizedBox(width: 95.w, height: 65.h, child: TabBarView(
+          controller: _tabController,
+          children: <Widget>[
+            possiblePrCnt>0 ? Column(children: [
+              UiUtils.getMarginBox(0, 3.h),
+              _getPrListView(true)
+            ]) : Center(
+              child: UiUtils.getTextWithFixedScale("접수 가능한 상품이 없습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
+            ),
+            impossiblePrCnt>0 ? Column(children: [
+              UiUtils.getMarginBox(0, 3.h),
+              _getPrListView(false)
+            ]) : Center(
+              child: UiUtils.getTextWithFixedScale("접수 불가능한 상품이 없습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
+            )
+          ],
+        ))
+      ]));
+      return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
+    }else{
+      CommonUtils.flutterToast("접속시간이 만료되었습니다.\n재로그인 해주세요");
+      CommonUtils.backToHome(context);
+      return Container();
+    }
   }
 
 }

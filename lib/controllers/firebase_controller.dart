@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:upfin/configs/app_config.dart';
@@ -23,6 +24,52 @@ class FireBaseController{
     } on FirebaseAuthException catch (e) {
       CommonUtils.log("e", "firebase init error : ${e.code} : ${e.toString()}");
       callback(false);
+    }
+  }
+
+  static Future<void> writeLog(String type, String id, String msg) async {
+    try{
+      String dbPath = "";
+      if(type == "error"){
+        dbPath = "UPFIN/LOG/error/";
+      }else{
+        dbPath = "UPFIN/LOG/info";
+      }
+
+      final snapshot = await FirebaseDatabase.instance.ref().child("$dbPath/$fcmToken").get();
+      if (snapshot.exists) {
+        final saveRef = FirebaseDatabase.instance.ref().child("$dbPath/$fcmToken");
+        final data = {
+          CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime()) : {
+            'id': CommonUtils.encryptData(id),
+            'msg': CommonUtils.encryptData(msg),
+            'time' : CommonUtils.encryptData(CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime()))
+          }
+        };
+        saveRef.update(data).then((_) {
+          CommonUtils.log("i", 'Data has been written successfully.');
+        }).catchError((error) {
+          CommonUtils.log("i", 'Failed to write data: $error');
+        });
+      }else{
+        final saveRef = FirebaseDatabase.instance.ref().child(dbPath);
+        final data = {
+          fcmToken : {
+            CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime()) : {
+              'id': CommonUtils.encryptData(id),
+              'msg': CommonUtils.encryptData(msg),
+              'time' : CommonUtils.encryptData(CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime()))
+            }
+          }
+        };
+        saveRef.set(data).then((_) {
+          CommonUtils.log("i", 'Data has been written successfully.');
+        }).catchError((error) {
+          CommonUtils.log("i", 'Failed to write data: $error');
+        });
+      }
+    }catch(error){
+      CommonUtils.log("i", "write log error : ${error.toString()}");
     }
   }
 

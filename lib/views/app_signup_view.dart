@@ -72,7 +72,6 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
   KeyboardVisibilityController? _keyboardVisibilityController;
   void _functionForKeyboardHide(){
     CommonUtils.hideKeyBoard();
-    _scrollController.jumpTo(0);
   }
   void _functionForKeyboardShow(){
   }
@@ -285,27 +284,37 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                 }
               });
             }),
-        UiUtils.getTextButtonWithFixedScale(titleString, 10.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null, () async {
-          Widget contentsWidget = Column(children: [
-            SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(contentsString, 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null))
-          ]);
-          bool isAgree = await CommonUtils.moveToWithResult(context, AppView.appAgreeDetailInfoView.value, {"title": titleString, "contents" : contentsWidget}) as bool;
-          thisSetState(() {
-            callAct(isAgree);
+        UiUtils.getTextButtonWithFixedScale(titleString, 10.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null, () {
+          _smallAgreePressEvent(titleString, contentsString, (agreeResult){
+            thisSetState(() {
+              callAct(agreeResult);
+            });
           });
         }),
         const Spacer(flex: 2),
-        UiUtils.getIconButton(Icons.arrow_forward_ios_rounded, 4.w, ColorStyles.upFinRealGray, () async {
-          Widget contentsWidget = Column(children: [
-            SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(contentsString, 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null))
-          ]);
-          bool isAgree = await CommonUtils.moveToWithResult(context, AppView.appAgreeDetailInfoView.value, {"title": titleString, "contents" : contentsWidget}) as bool;
-          thisSetState(() {
-            callAct(isAgree);
+        UiUtils.getIconButton(Icons.arrow_forward_ios_rounded, 4.w, ColorStyles.upFinRealGray, () {
+          _smallAgreePressEvent(titleString, contentsString, (agreeResult){
+            thisSetState(() {
+              callAct(agreeResult);
+            });
           });
         })
-      ]), () async {})
+      ]), () {
+        _smallAgreePressEvent(titleString, contentsString, (agreeResult){
+          thisSetState(() {
+            callAct(agreeResult);
+          });
+        });
+      })
     ]));
+  }
+
+  Future<void> _smallAgreePressEvent(String titleString, String contentsString, Function(bool agreeResult) callback) async {
+    Widget contentsWidget = Column(children: [
+      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(contentsString, 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null))
+    ]);
+    bool isAgree = await CommonUtils.moveToWithResult(context, AppView.appAgreeDetailInfoView.value, {"title": titleString, "contents" : contentsWidget}) as bool;
+    callback(isAgree);
   }
 
   Widget _makeAgreeWidget(BuildContext thisContext, StateSetter thisSetState){
@@ -458,13 +467,11 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                       GetController.to.updateConfirmed(isConfirmed);
                       CommonUtils.flutterToast("환영합니다!");
                       // 캐시 데이터 저장
-                      SharedPreferenceController.deleteAllData();
-                      SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceIdKey, _emailTextController.text.trim());
-                      SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferencePwKey, _pwdTextController.text.trim());
                       await LogfinController.getMainViewInfo((isSuccessToGetMainInfo){
                         UiUtils.closeLoadingPop(context);
                         if(isSuccessToGetMainInfo){
-                          CommonUtils.moveWithReplacementTo(context, AppView.appMainView.value, null);
+                          SharedPreferenceController.deleteAllData();
+                          CommonUtils.goToMain(context, _emailTextController.text.trim(), _pwdTextController.text.trim());
                         }
                       });
                     }else{
