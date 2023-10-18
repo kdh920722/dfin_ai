@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
+import '../configs/app_config.dart';
 import '../styles/TextStyles.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
@@ -166,6 +167,8 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
     GetController.to.updateFirstIndex1_2(0);
     GetController.to.updateLastIndex1_2(12);
     currentViewId = startViewId;
+
+    Config.contextForEmergencyBack = context;
   }
 
   @override
@@ -178,6 +181,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
     GetController.to.resetWantLoanPrice();
     startViewId = 0;
     endViewId = 0;
+    Config.contextForEmergencyBack = null;
     super.dispose();
   }
 

@@ -184,6 +184,8 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
 
     GetController.to.updateFirstIndex2(0);
     GetController.to.updateLastIndex2(10);
+
+    Config.contextForEmergencyBack = context;
   }
 
   @override
@@ -194,6 +196,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
     _disposeAllTextControllers();
     GetController.to.resetPreLoanPrice();
     GetController.to.resetWantLoanPrice();
+    Config.contextForEmergencyBack = null;
     super.dispose();
   }
 

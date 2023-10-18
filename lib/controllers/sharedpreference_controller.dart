@@ -1,4 +1,3 @@
-import 'package:encrypt/encrypt.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/common_utils.dart';
 

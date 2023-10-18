@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:sizer/sizer.dart';
@@ -6,6 +8,7 @@ import 'package:upfin/configs/app_config.dart';
 import 'package:upfin/configs/string_config.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/controllers/websocket_controller.dart';
+import 'package:upfin/datas/chat_message_info_data.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import '../controllers/get_controller.dart';
@@ -38,12 +41,16 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _setImagePreLoad();
     });
+
+    WebSocketController.subscribeChatroom();
+    Config.contextForEmergencyBack = context;
   }
 
   @override
   void dispose(){
     CommonUtils.log("i", "AppMainView 화면 파괴");
     WidgetsBinding.instance.removeObserver(this);
+    Config.contextForEmergencyBack = null;
     super.dispose();
   }
 
@@ -78,6 +85,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     precacheImage(const AssetImage('assets/images/accident_icon.png'), context);
     precacheImage(const AssetImage('assets/images/bank_logo_default.png'), context);
     precacheImage(const AssetImage('assets/images/bank_logo_safe.png'), context);
+    precacheImage(const AssetImage('assets/images/ani_man_search.gif'), context);
   }
 
   bool isScrolling = false;
@@ -186,7 +194,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             ]),
             UiUtils.getMarginBox(0, 3.h),
             Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 0.h, bottom: 1.h),
-                child: UiUtils.getTextWithFixedScale(StringConfig.bannerTextForTest, 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
+                child: StringConfig.getAgreeContents(StringConfig.testAgreeText)),
             UiUtils.getMarginBox(0, 10.h),
           ])
       )),
@@ -231,26 +239,28 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     return accidentWidgetList;
   }
 
-  void _subscribeChatroom(){
-    WebSocketController.disconnectSubscribe((isSuccessToResetSub){
-      if(isSuccessToResetSub){
-        WebSocketController.connectSubscribe((isSuccessToSubscribe){
-          if(!isSuccessToSubscribe){
-            CommonUtils.flutterToast("채팅방연결에 실패했습니다.\n다시 시작해주세요.");
-            //CommonUtils.backToHome(context);
-          }
-        });
-      }else{
-        CommonUtils.flutterToast("채팅방해제에 실패했습니다.\n다시 시작해주세요.");
-        //CommonUtils.backToHome(context);
-      }
-    });
-  }
-
   List<Widget> _getLoanChatWidgetList(){
     List<Widget> loanChatRoomWidgetList = [];
     CommonUtils.log("i", "loan view redraw!");
     for(var each in GetController.to.chatLoanInfoDataList){
+      var jsonData = jsonDecode(each.chatRoomMsgInfo);
+      Map<String, dynamic> msg = jsonData;
+      List<dynamic> listMsg = msg["data"];
+      CommonUtils.log("i", "each msg info : \nmsg: $msg\nlistMsg: $listMsg");
+      listMsg.sort((a,b) => DateTime.parse(a["created_at"]).compareTo(DateTime.parse(b["created_at"])));
+      String lastMsg = listMsg[listMsg.length-1]["message"].toString();
+      if(lastMsg.contains(" / ")){
+        lastMsg = lastMsg.split(" / ")[1];
+      }
+      String lastDateString = CommonUtils.convertTimeToString(CommonUtils.parseToLocalTime(listMsg[listMsg.length-1]["created_at"]));
+      int lastReadId = int.parse(msg["last_read_message_id"].toString());
+      int cnt = 0;
+      for(Map<String, dynamic> eachMsg in listMsg){
+        if(int.parse(eachMsg["id"].toString()) > lastReadId){
+          cnt++;
+        }
+      }
+
       loanChatRoomWidgetList.add(
           Column(children: [
             UiUtils.getMarginBox(0, 2.h),
@@ -271,17 +281,41 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                         ]),
                       ]),
                       UiUtils.getMarginBox(0, 1.h),
-                      UiUtils.getTextWithFixedScaleAndOverFlow(each.chatRoomLastMsg, 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, 1)
+                      UiUtils.getTextWithFixedScaleAndOverFlow(lastMsg, 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, 1)
                     ])
                   ])),
                   Expanded(flex: 2, child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                    UiUtils.getTextWithFixedScale(CommonUtils.getFormattedLastMsgTime(each.chatRoomLastMsgTime), 8.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null),
+                    UiUtils.getTextWithFixedScale(CommonUtils.getFormattedLastMsgTime(lastDateString), 8.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null),
                     UiUtils.getMarginBox(0,0.5.h),
-                    each.chatRoomLastMsgCnt > 0? Row(mainAxisSize: MainAxisSize.min, children: [
-                      UiUtils.getCountCircleBox(6.w, each.chatRoomLastMsgCnt, 7.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.center, 1), UiUtils.getMarginBox(0.3.w, 0)]) : Container()
+                    cnt > 0? Row(mainAxisSize: MainAxisSize.min, children: [
+                      UiUtils.getCountCircleBox(6.w, cnt, 7.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.center, 1), UiUtils.getMarginBox(0.3.w, 0)]) : Container()
                   ]))
-                ]), () {
-                  CommonUtils.moveTo(context, AppView.appChatView.value, null);
+                ]), () async {
+                  GetController.to.resetChatMessageInfoList();
+                  for(Map<String, dynamic> eachMsg in listMsg){
+                    var messageItem = ChatMessageInfoData(eachMsg["id"].toString(), eachMsg["pr_room_id"].toString(), eachMsg["message"].toString(),
+                        CommonUtils.convertTimeToString(CommonUtils.parseToLocalTime(eachMsg["created_at"])),
+                        eachMsg["message_type"].toString(), eachMsg["username"].toString(), jsonEncode(eachMsg));
+                    GetController.to.addChatMessageInfoList(messageItem);
+                  }
+                  await CommonUtils.moveToWithResult(context, AppView.appChatView.value, null);
+                  if(context.mounted){
+                    listMsg.clear();
+                    for(var eachMessage in GetController.to.chatMessageInfoDataList){
+                      listMsg.add(jsonDecode(eachMessage.messageInfo));
+                    }
+                    listMsg.sort((a,b) => DateTime.parse(a["created_at"]).compareTo(DateTime.parse(b["created_at"])));
+                    for(int i = 0 ; i < MyData.getChatRoomInfoList().length ; i++){
+                      if(MyData.getChatRoomInfoList()[i].chatRoomId == each.chatRoomId){
+                        Map<String, dynamic> msgInfo = jsonDecode(MyData.getChatRoomInfoList()[i].chatRoomMsgInfo);
+                        msgInfo.remove("data");
+                        msgInfo["data"] = listMsg;
+                        msgInfo["last_read_message_id"] = listMsg[listMsg.length-1]["id"];
+                        MyData.getChatRoomInfoList()[i].chatRoomMsgInfo = jsonEncode(msgInfo);
+                      }
+                    }
+                    GetController.to.updateChatLoanInfoList(MyData.getChatRoomInfoList());
+                  }
                 }),
             UiUtils.getMarginBox(0, 2.h),
             UiUtils.getMarginColoredBox(90.w, 0.15.h, ColorStyles.upFinWhiteGray)
@@ -419,9 +453,9 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                     CommonUtils.moveTo(context, AppView.appSearchAccidentView.value, null);
                   }
                 }),
-            UiUtils.getMarginBox(0, 0.5.h),
+            UiUtils.getMarginBox(0, 0.6.h),
             UiUtils.getExpandedScrollView(Axis.vertical, MyData.getAccidentInfoList().isNotEmpty ?
-            Align(alignment: Alignment.bottomCenter, child: Image.asset(fit: BoxFit.fitHeight,'assets/images/img_man_searcher.png')) :
+            Align(alignment: Alignment.bottomCenter, child: Image.asset(fit: BoxFit.fitHeight,'assets/images/ani_man_search.gif')) :
             Align(alignment: Alignment.bottomCenter, child: Image.asset(fit: BoxFit.fitHeight,'assets/images/img_woman_searcher.png'))),
           ])
       ),
@@ -459,7 +493,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   @override
   Widget build(BuildContext context) {
     if(CommonUtils.isValidStateByAPiExpiredDate()){
-      _subscribeChatroom();
       Widget view = Stack(
         children: [
           Positioned(
@@ -467,18 +500,17 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                 Expanded(child: viewTypeId == 1? _getApplyView() : viewTypeId == 2? _getMyView() : _getSettingView()),
                 AnimatedContainer(width: 100.w, height: bottomBarHeight, duration: const Duration(milliseconds:100),
                     child: Row(mainAxisAlignment: MainAxisAlignment.center, mainAxisSize: MainAxisSize.max, children: [
-                      GestureDetector(child: Container(width: 30.w, color: ColorStyles.upFinWhiteSky,
-                          child: Center(child: UiUtils.getTextButtonWithFixedScale("대출", 13.sp, viewTypeId == 1? FontWeight.w800 : FontWeight.w300,
-                              viewTypeId == 1? ColorStyles.upFinButtonBlue : ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1,(){setState(() {viewTypeId = 1;});}))),onTap: (){
-                        setState(() {viewTypeId = 1;});
-                      }),
-                      GestureDetector(child: Container(width: 40.w, color: ColorStyles.upFinWhiteSky,
-                          child: Center(child: UiUtils.getTextButtonWithFixedScale("MY", 13.sp, viewTypeId == 2? FontWeight.w800 : FontWeight.w300,
-                              viewTypeId == 2? ColorStyles.upFinButtonBlue : ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1,(){setState(() {viewTypeId = 2;});}))
+                      GestureDetector(child: Container(width: 30.w, color: ColorStyles.upFinWhiteGray, padding: EdgeInsets.only(left: 0, right: 0, top: 0.1.h, bottom: 0),
+                          child: Container(color: ColorStyles.upFinWhite, child: Center(child: UiUtils.getTextButtonWithFixedScale("대출", 13.sp, viewTypeId == 1? FontWeight.w800 : FontWeight.w300,
+                              viewTypeId == 1? ColorStyles.upFinButtonBlue : ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1,(){setState(() {viewTypeId = 1;});})))
+                      ),onTap: (){ setState(() {viewTypeId = 1;});}),
+                      GestureDetector(child: Container(width: 40.w, color: ColorStyles.upFinWhiteGray, padding: EdgeInsets.only(left: 0, right: 0, top: 0.1.h, bottom: 0),
+                          child: Container(color: ColorStyles.upFinWhite, child: Center(child: UiUtils.getTextButtonWithFixedScale("MY", 13.sp, viewTypeId == 2? FontWeight.w800 : FontWeight.w300,
+                              viewTypeId == 2? ColorStyles.upFinButtonBlue : ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1,(){setState(() {viewTypeId = 2;});})))
                       ), onTap: () {setState(() {viewTypeId = 2;});}),
-                      GestureDetector(child: Container(width: 30.w, color: ColorStyles.upFinWhiteSky,
-                          child: Center(child: UiUtils.getTextButtonWithFixedScale("설정", 13.sp, viewTypeId == 3? FontWeight.w800 : FontWeight.w300,
-                              viewTypeId == 3? ColorStyles.upFinButtonBlue : ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1,(){setState(() {viewTypeId = 3;});}))
+                      GestureDetector(child: Container(width: 30.w, color: ColorStyles.upFinWhiteGray, padding: EdgeInsets.only(left: 0, right: 0, top: 0.1.h, bottom: 0),
+                          child: Container(color: ColorStyles.upFinWhite, child: Center(child: UiUtils.getTextButtonWithFixedScale("설정", 13.sp, viewTypeId == 3? FontWeight.w800 : FontWeight.w300,
+                              viewTypeId == 3? ColorStyles.upFinButtonBlue : ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1,(){setState(() {viewTypeId = 3;});})))
                       ), onTap: (){ setState(() {viewTypeId = 3;});}),
                     ])),
               ]))

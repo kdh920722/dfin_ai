@@ -329,7 +329,7 @@ class LogfinController {
                 String wishAmount = dataResult["wish_amount"].toString() == ""? "0" : dataResult["wish_amount"].toString();
                 String accidentNo = dataResult["issue_no"];
                 var resData = jsonDecode(dataResult["res_data"]);
-                CommonUtils.log("", "accident data ====>\n"
+                CommonUtils.log("i", "accident data ====>\n"
                     "accidentUid: ${eachAccident["uid"]}\n"
                     "accidentCaseNo: $accidentNo\n"
                     "courtInfo: $courtInfo\n"
@@ -417,7 +417,6 @@ class LogfinController {
                   if(isSuccessToResetSub){
                     MyData.sortLoanInfoList();
                     _setChatRoomInfoList();
-                    GetController.to.updateChatLoanInfoList(MyData.getChatRoomInfoList());
                     callback(true, true);
                   }else{
                     GetController.to.resetChatLoanInfoList();
@@ -446,35 +445,12 @@ class LogfinController {
   static void _setChatRoomInfoList(){
     MyData.clearChatRoomInfoList();
     for(var eachSortedLoan in MyData.getLoanInfoList()){
-      String jsonString = eachSortedLoan.chatRoomMsg;
-      CommonUtils.log("i", "msg: ${jsonString}");
-      dynamic jsonData;
-      try {
-        jsonData = jsonDecode(jsonString);
-        if (jsonData != null && jsonData is Map<String, dynamic>) {
-          // JSON 객체로 파싱된 경우
-          Map<String, dynamic> msg = jsonData;
-          // 이제 msg를 사용할 수 있음
-          CommonUtils.log("i", "msg: $msg");
-          List<dynamic> listMsg = msg["data"];
-          CommonUtils.log("i", "listMsg: $listMsg");
-          listMsg.sort((a,b) => DateTime.parse(a["created_at"]).compareTo(DateTime.parse(b["created_at"])));
-
-          String lastMsg = listMsg[listMsg.length-1]["message"].toString();
-          if(lastMsg.contains(" / ")){
-            lastMsg = lastMsg.split(" / ")[1];
-          }
-          String lastDateString = CommonUtils.convertTimeToString(DateTime.parse(listMsg[listMsg.length-1]["created_at"]));
-          int cnt = int.parse(msg["last_read_message_id"].toString());
-          MyData.addToChatRoomInfoList(ChatRoomInfoData(eachSortedLoan.chatRoomId, eachSortedLoan.loanUid, 1, eachSortedLoan.companyLogo,
-              eachSortedLoan.companyName, eachSortedLoan.productName, eachSortedLoan.chatRoomMsg, lastMsg, lastDateString, cnt,
-              eachSortedLoan.statueId, "${eachSortedLoan.submitRate}%", CommonUtils.getPriceFormattedString(double.parse(eachSortedLoan.submitAmount))));
-
-        }
-      } catch (error) {
-        CommonUtils.log("e", "parsing error : ${error.toString()}");
-      }
+      MyData.addToChatRoomInfoList(ChatRoomInfoData(eachSortedLoan.chatRoomId, eachSortedLoan.loanUid, 1, eachSortedLoan.companyLogo,
+          eachSortedLoan.companyName, eachSortedLoan.productName, eachSortedLoan.chatRoomMsg,
+          eachSortedLoan.statueId, "${eachSortedLoan.submitRate}%",
+          CommonUtils.getPriceFormattedString(double.parse(eachSortedLoan.submitAmount))));
     }
+    GetController.to.updateChatLoanInfoList(MyData.getChatRoomInfoList());
   }
 
   static Future<void> getPrList(String accidentCase, Function(bool isSuccess, Map<String, dynamic>? outputJson) callback) async {
@@ -552,7 +528,7 @@ enum LogfinApis {
   applyProductDocSearch, applyProduct,
   getAccidentInfo, getOffersInfo,
   getLoansInfo, getLoansDetailInfo,
-  sendMessage, getMessage
+  sendMessage, getMessage, checkMessage
 }
 
 extension LogfinApisExtension on LogfinApis {
@@ -594,6 +570,8 @@ extension LogfinApisExtension on LogfinApis {
         return '/create_message.json';
       case LogfinApis.getMessage:
         return '/get_messages.json';
+      case LogfinApis.checkMessage:
+        return '/checked_messages.json';
     }
   }
 }

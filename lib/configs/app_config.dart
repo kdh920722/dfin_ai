@@ -34,6 +34,7 @@ class Config{
   static String deppLinkInfo = "";
   static List<Permission> permissionList = [Permission.notification];
   static String appVersion = "";
+  static BuildContext? contextForEmergencyBack;
 
   static Map<String, WidgetBuilder> appRoutes = {
     AppView.appRootView.value : (context) => AppRootView(),

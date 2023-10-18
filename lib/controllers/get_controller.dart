@@ -1,7 +1,6 @@
 import 'package:upfin/datas/accident_info_data.dart';
+import 'package:upfin/datas/chat_message_info_data.dart';
 import 'package:upfin/datas/chatroom_info_data.dart';
-
-import '../datas/loan_info_data.dart';
 import '../utils/common_utils.dart';
 import 'package:get/get.dart';
 
@@ -15,6 +14,8 @@ class GetController extends GetxController {
 
   RxList<AccidentInfoData> accidentInfoDataList = <AccidentInfoData>[].obs;
   RxList<ChatRoomInfoData> chatLoanInfoDataList = <ChatRoomInfoData>[].obs;
+  RxList<ChatMessageInfoData> chatMessageInfoDataList = <ChatMessageInfoData>[].obs;
+
   RxInt firstVisibleItem1 = 0.obs;
   RxInt lastVisibleItem1 = 0.obs;
   RxInt firstVisibleItem2 = 0.obs;
@@ -30,24 +31,6 @@ class GetController extends GetxController {
   @override
   void onInit() {
     CommonUtils.log("i", 'get 컨트롤러가 생성됩니다.');
-    once(loadingPercent, (_) {
-      print('once : $_이 처음으로 변경되었습니다.');
-    });
-    ever(loadingPercent, (_) {
-      print('ever : $_이 변경되었습니다.');
-    });
-    debounce(
-      loadingPercent, (_) {
-      print('debounce : $_가 마지막으로 변경된 이후, 1초간 변경이 없습니다.');
-    },
-      time: const Duration(seconds: 1),
-    );
-    interval(
-      loadingPercent, (_) {
-      print('interval $_가 변경되는 중입니다.(1초마다 호출)');
-    },
-      time: const Duration(seconds: 1),
-    );
     super.onInit();
   }
 
@@ -96,6 +79,18 @@ class GetController extends GetxController {
     preLoanPrice = "만원".obs;
   }
 
+  void updateAccidentInfoList(List<AccidentInfoData> newList) {
+    accidentInfoDataList.clear();
+    accidentInfoDataList.assignAll(newList);
+    CommonUtils.log("i", "accidentInfoDataList length : ${accidentInfoDataList.length}");
+  }
+  void resetAccdientInfoList() {
+    List<AccidentInfoData> emptyList = [];
+    accidentInfoDataList.clear();
+    accidentInfoDataList.assignAll(emptyList);
+    CommonUtils.log("i", "accidentInfoDataList length : ${accidentInfoDataList.length}");
+  }
+
   void updateChatLoanInfoList(List<ChatRoomInfoData> newList) {
     chatLoanInfoDataList.clear();
     chatLoanInfoDataList.assignAll(newList);
@@ -108,16 +103,15 @@ class GetController extends GetxController {
     CommonUtils.log("i", "loanInfoDataList length : ${chatLoanInfoDataList.length}");
   }
 
-  void updateAccidentInfoList(List<AccidentInfoData> newList) {
-    accidentInfoDataList.clear();
-    accidentInfoDataList.assignAll(newList);
-    CommonUtils.log("i", "accidentInfoDataList length : ${accidentInfoDataList.length}");
+  void addChatMessageInfoList(ChatMessageInfoData newItem) {
+    chatMessageInfoDataList.add(newItem);
+    CommonUtils.log("i", "chatMessageInfoDataList length : ${chatLoanInfoDataList.length}");
   }
-  void resetAccdientInfoList() {
-    List<AccidentInfoData> emptyList = [];
-    accidentInfoDataList.clear();
-    accidentInfoDataList.assignAll(emptyList);
-    CommonUtils.log("i", "accidentInfoDataList length : ${accidentInfoDataList.length}");
+  void resetChatMessageInfoList() {
+    List<ChatMessageInfoData> emptyList = [];
+    chatMessageInfoDataList.clear();
+    chatMessageInfoDataList.assignAll(emptyList);
+    CommonUtils.log("i", "chatMessageInfoDataList length : ${chatMessageInfoDataList.length}");
   }
 
   void updateFirstIndex1(int newValue) {

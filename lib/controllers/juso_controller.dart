@@ -1,17 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:upfin/controllers/get_controller.dart';
-import 'package:upfin/datas/api_info_data.dart';
-import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:http/http.dart' as http;
-import 'package:sizer/sizer.dart';
 import '../configs/app_config.dart';
-import '../styles/ColorStyles.dart';
-import '../styles/TextStyles.dart';
 import '../utils/common_utils.dart';
-import '../utils/ui_utils.dart';
 
 class JusoController{
 

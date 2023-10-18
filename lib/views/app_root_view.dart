@@ -256,6 +256,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
         GetController.to.updatePercent(5);
         CommonUtils.log("i", "ws url : ${WebSocketController.wsUrl}");
         CommonUtils.log("i", "ws origin url : ${WebSocketController.wsOriginUrl}");
+        CommonUtils.log("i", "ws channel name : ${WebSocketController.channelName}");
         if(GetController.to.loadingPercent.value == 100){
           setState(() {
             Config.isControllerLoadFinished = true;

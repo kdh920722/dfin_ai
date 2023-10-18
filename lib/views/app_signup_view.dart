@@ -12,7 +12,6 @@ import '../styles/TextStyles.dart';
 import '../configs/app_config.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
-import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 
 class AppSignUpView extends StatefulWidget{
   @override
@@ -66,14 +65,6 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
     _emailTextController.dispose();
     _pwdTextController.dispose();
     _pwdConfirmTextController.dispose();
-    _keyboardVisibilityController = null;
-  }
-
-  KeyboardVisibilityController? _keyboardVisibilityController;
-  void _functionForKeyboardHide(){
-    CommonUtils.hideKeyBoard();
-  }
-  void _functionForKeyboardShow(){
   }
 
   @override
@@ -87,7 +78,6 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
     _pwdConfirmTextController.addListener(_pwListener);
     _nameTextController.addListener(_nameListener);
     _phoneNumberTextController.addListener(_phoneListener);
-    _keyboardVisibilityController = CommonUtils.getKeyboardViewController(_functionForKeyboardShow, _functionForKeyboardHide);
     if(MyData.isSnsLogin){
       _nameTextController.text = MyData.nameFromSns;
       _emailTextController.text = MyData.emailFromSns;

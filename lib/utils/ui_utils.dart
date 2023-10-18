@@ -1,7 +1,5 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
-import 'package:percent_indicator/circular_percent_indicator.dart';
 import 'package:sizer/sizer.dart';
 import 'package:upfin/styles/TextStyles.dart';
 import '../styles/ColorStyles.dart';
@@ -586,12 +584,12 @@ class UiUtils {
         errorStyle: TextStyle(fontSize: 0.sp),
         counterStyle: TextStyle(fontSize: 0.sp),
         enabledBorder: UnderlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: ColorStyles.upFinButtonBlue),
+          borderRadius: BorderRadius.circular(1),
+          borderSide: const BorderSide(color: ColorStyles.upFinWhite),
         ),
         focusedBorder: UnderlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: ColorStyles.upFinButtonBlue),
+          borderRadius: BorderRadius.circular(1),
+          borderSide: const BorderSide(color: ColorStyles.upFinWhite),
         ),
         filled: true,
         fillColor: ColorStyles.upFinWhite
@@ -802,6 +800,60 @@ class UiUtils {
             );
         }
       },
+    );
+  }
+
+  static void showPopMenu(BuildContext parentViewContext, bool isDismissible, double? width, double? height, double opacity, double radius,
+      Widget Function(BuildContext context, StateSetter setState) createWidgetMethod){
+    double popWidth = 0.0;
+    double popHeight = 0.0;
+    if(width == null) {
+      popWidth = 66.w;
+    }else{
+      popWidth = width;
+    }
+    if(height == null) {
+      popHeight = 33.w;
+    }else{
+      popHeight = height;
+    }
+
+    Alignment alignment = Alignment.bottomCenter;
+    BorderRadius borderRadius = BorderRadius.circular(radius);
+
+    showGeneralDialog(
+      barrierLabel: "",
+      barrierDismissible: isDismissible,
+      barrierColor: Colors.black.withOpacity(opacity),
+      transitionDuration: const Duration(milliseconds: 50),
+      context: parentViewContext,
+      pageBuilder: (context, anim1, anim2) {
+        return WillPopScope(
+            onWillPop: () async => isDismissible,
+            child: Align(
+              alignment: alignment,
+              child: SafeArea(child:Container(
+                width: popWidth,
+                height: popHeight,
+                decoration: BoxDecoration(
+                  color: ColorStyles.upFinWhite,
+                  borderRadius: borderRadius,
+                ),
+                child: SizedBox.expand(
+                    child: StatefulBuilder(
+                        builder: (_, StateSetter popViewSetState){
+                          Widget contentsWidget = createWidgetMethod(parentViewContext, popViewSetState);
+                          return Padding(padding: EdgeInsets.all(5.w), child: Scaffold(
+                              backgroundColor: ColorStyles.upFinWhite,
+                              body:contentsWidget
+                          ));
+                        }
+                    )
+                ),
+              ))
+            )
+        );
+      }
     );
   }
 

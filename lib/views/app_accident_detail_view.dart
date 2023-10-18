@@ -22,6 +22,7 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _tabController = TabController(length: 2, vsync: this);
+    Config.contextForEmergencyBack = context;
   }
 
   @override
@@ -30,6 +31,7 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
     WidgetsBinding.instance.removeObserver(this);
     MyData.selectedAccidentInfoData = null;
     _tabController.dispose();
+    Config.contextForEmergencyBack = null;
     super.dispose();
   }
 
@@ -75,6 +77,7 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
     // 대한민국 시간대로 설정
     dateTime = dateTime.toLocal();
 
+    /*
     // 오전과 오후를 구분하여 표시
     String period = dateTime.hour < 12 ? '오전' : '오후';
 
@@ -85,6 +88,7 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
     // 날짜와 시간을 원하는 형식으로 포맷팅
     //var formatter = DateFormat('yyyy년 M월 d일 $period$formattedHour시 $formattedMinute분', 'ko_KR');
     //var formatter = DateFormat('yyyy년 M월 d일', 'ko_KR');
+     */
     var formatter = DateFormat('yyyy.MM.dd', 'ko_KR');
     String formattedDate = formatter.format(dateTime);
 

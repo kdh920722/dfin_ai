@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -123,7 +122,7 @@ class SnsLoginController{
           );
           MyData.isSnsLogin = true;
           appleToken = credential.identityToken!;
-          List<String> jwt = appleToken.split('.') ?? [];
+          List<String> jwt = appleToken.split('.');
           String payload = jwt[1];
           payload = base64.normalize(payload);
           final List<int> jsonData = base64.decode(payload);
@@ -250,7 +249,7 @@ class SnsLoginController{
     if(user.email != null){
       email = user.email!;
     }else{
-      List<String> jwt = appleToken.split('.') ?? [];
+      List<String> jwt = appleToken.split('.');
       String payload = jwt[1];
       payload = base64.normalize(payload);
 

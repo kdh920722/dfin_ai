@@ -19,6 +19,8 @@ import '../datas/my_data.dart';
 import '../styles/ColorStyles.dart';
 import '../styles/TextStyles.dart';
 import 'package:image/image.dart' as imglib;
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 class CommonUtils {
 
@@ -324,7 +326,7 @@ class CommonUtils {
       },
     );
     // Return false to prevent the action, or true to allow it
-    return confirm ?? false;
+    return confirm;
   }
 
   static void finishApp(){
@@ -354,17 +356,24 @@ class CommonUtils {
     return formattedDateTime;
   }
 
+  static DateTime parseToLocalTime(String targetDate){
+    tz.initializeTimeZones(); // 타임존 초기화
+    final location = tz.getLocation('Asia/Seoul'); // 원하는 타임존 설정
+    DateTime parsedDateTime = DateTime.parse(targetDate);
+    tz.TZDateTime parsedDateTimeWithTimeZone = tz.TZDateTime.from(parsedDateTime, location);
+    return parsedDateTimeWithTimeZone;
+  }
+
   static DateTime addTimeToTargetTime(DateTime targetDateTime) {
     DateTime thirtyMinLater = DateTime(
       targetDateTime.year,
       targetDateTime.month,
       targetDateTime.day,
-      targetDateTime.hour,
-      targetDateTime.minute+30,
+      targetDateTime.hour+1,
+      targetDateTime.minute,
       targetDateTime.second,
     );
 
-    CommonUtils.log("i", "thirrrrrrrr:${thirtyMinLater}");
     return thirtyMinLater;
   }
 
@@ -476,7 +485,6 @@ class CommonUtils {
   static Future<void> printFileSize(File file) async {
     int sizeInBytes = await file.length();
     double sizeInKB = sizeInBytes / 1024; // Convert bytes to kilobytes
-    double sizeInMB = sizeInKB / 1024;    // Convert kilobytes to megabytes
     CommonUtils.log('i','File Size \nKB : $sizeInKB kb');
   }
 
@@ -614,6 +622,16 @@ class CommonUtils {
     CommonUtils.moveWithUntil(context, AppView.appRootView.value);
   }
 
+  static void emergencyBackToHome(){
+    if(Config.contextForEmergencyBack != null){
+      MyData.resetMyData();
+      GetController.to.resetAccdientInfoList();
+      GetController.to.resetChatLoanInfoList();
+      WebSocketController.disposeSocket();
+      CommonUtils.moveWithUntil(Config.contextForEmergencyBack!, AppView.appRootView.value);
+    }
+  }
+
   static void goToMain(BuildContext context, String? email, String? password){
     DateTime thirtyMinutesLater = CommonUtils.addTimeToTargetTime(CommonUtils.getCurrentLocalTime());
     SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceValidDateKey, CommonUtils.convertTimeToString(thirtyMinutesLater));
@@ -674,7 +692,7 @@ class CommonUtils {
         if(nowDayString != chatDayString){
           result = "${timeString.substring(4,6)}월 ${timeString.substring(6,8)}일";
         }else{
-          result = "오늘\n${timeString.substring(8,10)}시 ${timeString.substring(10,12)}분";
+          result = "${timeString.substring(8,10)}시 ${timeString.substring(10,12)}분";
         }
       }else{
         result = "어제";

@@ -60,6 +60,8 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
         }
       });
     });
+
+    Config.contextForEmergencyBack = context;
   }
 
   @override
@@ -67,6 +69,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
     CommonUtils.log("i", "AppResultPrView 화면 파괴");
     WidgetsBinding.instance.removeObserver(this);
     _tabController.dispose();
+    Config.contextForEmergencyBack = null;
     super.dispose();
   }
 

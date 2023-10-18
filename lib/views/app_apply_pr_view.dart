@@ -496,27 +496,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
     GetController.to.updateFirstIndex2_3(0);
     GetController.to.updateLastIndex2_3(10);
-  }
-
-
-  Future<void> _onTakePicture(BuildContext context) async {
-    UiUtils.showLoadingPop(context);
-    _cameraController!.setFlashMode(FlashMode.off);
-    await _cameraController!.setFocusMode(FocusMode.locked);
-    await _cameraController!.setExposureMode(ExposureMode.locked);
-    final imageFile = await _cameraController!.takePicture();
-    setState(() {
-      currentViewId = _getViewIdFromListById(cameraId);
-    });
-    await _cameraController!.setFocusMode(FocusMode.auto);
-    await _cameraController!.setExposureMode(ExposureMode.auto);
-    if(context.mounted){
-      if(imageFile.path != ""){
-        _checkValidCertImage(imageFile);
-      }else{
-        if(context.mounted) UiUtils.closeLoadingPop(context);
-      }
-    }
+    Config.contextForEmergencyBack = context;
   }
 
   @override
@@ -526,6 +506,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     _unFocusAllNodes();
     _disposeAllTextControllers();
     _bankScrollController.dispose();
+    Config.contextForEmergencyBack = null;
     super.dispose();
   }
 
@@ -1584,6 +1565,26 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         ),
       ],
     );
+  }
+
+  Future<void> _onTakePicture(BuildContext context) async {
+    UiUtils.showLoadingPop(context);
+    _cameraController!.setFlashMode(FlashMode.off);
+    await _cameraController!.setFocusMode(FocusMode.locked);
+    await _cameraController!.setExposureMode(ExposureMode.locked);
+    final imageFile = await _cameraController!.takePicture();
+    setState(() {
+      currentViewId = _getViewIdFromListById(cameraId);
+    });
+    await _cameraController!.setFocusMode(FocusMode.auto);
+    await _cameraController!.setExposureMode(ExposureMode.auto);
+    if(context.mounted){
+      if(imageFile.path != ""){
+        _checkValidCertImage(imageFile);
+      }else{
+        if(context.mounted) UiUtils.closeLoadingPop(context);
+      }
+    }
   }
 
   Future<void> _checkValidCertImage(XFile image) async {
