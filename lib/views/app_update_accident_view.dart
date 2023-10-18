@@ -169,6 +169,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
     currentViewId = startViewId;
 
     Config.contextForEmergencyBack = context;
+    Config.isEmergencyRoot = false;
   }
 
   @override

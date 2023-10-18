@@ -45,6 +45,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
       }
     }
     Config.contextForEmergencyBack = context;
+    Config.isEmergencyRoot = false;
     _keyboardVisibilityController = CommonUtils.getKeyboardViewController(_functionForKeyboardShow, _functionForKeyboardHide);
   }
 

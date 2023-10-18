@@ -186,6 +186,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
     GetController.to.updateLastIndex2(10);
 
     Config.contextForEmergencyBack = context;
+    Config.isEmergencyRoot = false;
   }
 
   @override

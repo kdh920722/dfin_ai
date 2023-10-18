@@ -41,7 +41,8 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _setImagePreLoad();
     });
-
+    Config.contextForEmergencyBack = context;
+    Config.isEmergencyRoot = true;
   }
 
   @override
@@ -50,6 +51,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
     WidgetsBinding.instance.removeObserver(this);
     GetController.to.resetPercent();
     WebSocketController.disposeSocket();
+    Config.contextForEmergencyBack = null;
     super.dispose();
   }
 

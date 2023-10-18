@@ -627,8 +627,13 @@ class CommonUtils {
       MyData.resetMyData();
       GetController.to.resetAccdientInfoList();
       GetController.to.resetChatLoanInfoList();
+      GetController.to.resetChatMessageInfoList();
       WebSocketController.disposeSocket();
-      CommonUtils.moveWithUntil(Config.contextForEmergencyBack!, AppView.appRootView.value);
+      if(Config.isEmergencyRoot){
+        CommonUtils.moveWithReplacementTo(Config.contextForEmergencyBack!, AppView.appRootView.value, null);
+      }else{
+        CommonUtils.moveWithUntil(Config.contextForEmergencyBack!, AppView.appRootView.value);
+      }
     }
   }
 

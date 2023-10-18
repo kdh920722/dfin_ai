@@ -35,6 +35,7 @@ class Config{
   static List<Permission> permissionList = [Permission.notification];
   static String appVersion = "";
   static BuildContext? contextForEmergencyBack;
+  static bool isEmergencyRoot = false;
 
   static Map<String, WidgetBuilder> appRoutes = {
     AppView.appRootView.value : (context) => AppRootView(),

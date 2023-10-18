@@ -62,6 +62,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
     });
 
     Config.contextForEmergencyBack = context;
+    Config.isEmergencyRoot = false;
   }
 
   @override

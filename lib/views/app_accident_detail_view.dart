@@ -23,6 +23,7 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
     WidgetsBinding.instance.addObserver(this);
     _tabController = TabController(length: 2, vsync: this);
     Config.contextForEmergencyBack = context;
+    Config.isEmergencyRoot = false;
   }
 
   @override

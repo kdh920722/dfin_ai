@@ -42,8 +42,8 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
       _setImagePreLoad();
     });
 
-    WebSocketController.subscribeChatroom();
     Config.contextForEmergencyBack = context;
+    Config.isEmergencyRoot = false;
   }
 
   @override

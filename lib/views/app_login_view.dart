@@ -37,6 +37,8 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     WidgetsBinding.instance.addObserver(this);
     _emailTextController.text = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceIdKey);
     _pwdTextController.text = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferencePwKey);
+    Config.contextForEmergencyBack = context;
+    Config.isEmergencyRoot = true;
   }
 
   @override
@@ -45,6 +47,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     WidgetsBinding.instance.removeObserver(this);
     _unFocusAllNodes();
     _disposeAllTextControllers();
+    Config.contextForEmergencyBack = null;
     super.dispose();
   }
 

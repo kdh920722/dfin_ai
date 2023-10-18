@@ -497,6 +497,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     GetController.to.updateFirstIndex2_3(0);
     GetController.to.updateLastIndex2_3(10);
     Config.contextForEmergencyBack = context;
+    Config.isEmergencyRoot = false;
   }
 
   @override

@@ -31,6 +31,8 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
     CommonUtils.log("i", "AppSignOutViewState 화면 입장");
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    Config.contextForEmergencyBack = context;
+    Config.isEmergencyRoot = false;
   }
 
   @override
@@ -39,6 +41,7 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
     WidgetsBinding.instance.removeObserver(this);
     _unFocusAllNodes();
     _disposeAllTextControllers();
+    Config.contextForEmergencyBack =null;
     super.dispose();
   }
 

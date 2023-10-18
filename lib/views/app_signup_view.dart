@@ -85,6 +85,8 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
     }
     isConfirmed = false;
     GetController.to.resetConfirmed();
+    Config.contextForEmergencyBack = context;
+    Config.isEmergencyRoot = true;
   }
 
   @override
@@ -94,6 +96,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
     _unFocusAllNodes();
     _disposeAllTextControllers();
     GetController.to.resetConfirmed();
+    Config.contextForEmergencyBack = null;
     super.dispose();
   }
 
