@@ -4,6 +4,7 @@ import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:sizer/sizer.dart';
 import 'package:upfin/controllers/get_controller.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
+import 'package:upfin/datas/loan_info_data.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import 'package:upfin/styles/TextStyles.dart';
@@ -41,7 +42,13 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         currentCompany = each.companyName;
         currentCompanyLogo = each.companyLogo;
         currentStatus = each.statueId;
-        _ticks = 2;
+        if(LoanInfoData.getStatusName(currentStatus) == "접수"){
+          _ticks = 1;
+        }else if(LoanInfoData.getStatusName(currentStatus) == "심사"){
+          _ticks = 2;
+        }else if(LoanInfoData.getStatusName(currentStatus) == "통보"){
+          _ticks = 3;
+        }
       }
     }
     Config.contextForEmergencyBack = context;
@@ -230,7 +237,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   }
 
   Widget _getTimelineWidget(){
-    return Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center,
+    return Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
         _stepTick1(),
         _ticks>1? _stepLine(true) : _stepLine(false),
@@ -251,11 +258,13 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     }
 
     return Column(children: [
-      UiUtils.getMarginBox(0, 3.h),
       isChecked? UiUtils.getIcon(4.w, 4.w, Icons.check_circle_rounded, 4.w, ColorStyles.upFinButtonBlue) :
         UiUtils.getIcon(4.w, 4.w, Icons.check_circle_outline_rounded, 4.w, ColorStyles.upFinWhiteSky),
       UiUtils.getMarginBox(0, 1.5.h),
-      UiUtils.getTextWithFixedScale(typeString, 9.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.center, null)
+      UiUtils.getTextWithFixedScale(typeString, 9.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.center, null),
+      isChecked? UiUtils.getMarginBox(0, 0.5.h) : UiUtils.getMarginBox(0, 0.5.h),
+      isChecked? UiUtils.getTextWithFixedScale(LoanInfoData.getDetailStatusName(currentStatus), 9.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.center, null)
+          : UiUtils.getTextWithFixedScale("본인취소", 9.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null),
     ]);
   }
 
@@ -270,11 +279,14 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   }
 
   Widget _stepLine(bool isReached) {
-    return Container(
-      color: isReached? ColorStyles.upFinButtonBlue : ColorStyles.upFinWhiteSky,
-      height: 0.15.h,
-      width: 36.w,
-    );
+    return Column(children: [
+      UiUtils.getMarginBox(0, 0.8.h),
+      Container(
+        color: isReached? ColorStyles.upFinButtonBlue : ColorStyles.upFinWhiteSky,
+        height: 0.15.h,
+        width: 30.w,
+      )
+    ]);
   }
 
   double inputMinHeight = 9.2.h;

@@ -82,6 +82,7 @@ class GetController extends GetxController {
   void updateAccidentInfoList(List<AccidentInfoData> newList) {
     accidentInfoDataList.clear();
     accidentInfoDataList.assignAll(newList);
+    accidentInfoDataList.sort((a,b) => int.parse(b.id).compareTo(int.parse(a.id)));
     CommonUtils.log("i", "accidentInfoDataList length : ${accidentInfoDataList.length}");
   }
   void resetAccdientInfoList() {

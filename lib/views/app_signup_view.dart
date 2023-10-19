@@ -47,9 +47,9 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
   bool? item1Agreed = false;
   bool? item1SubAgreed1 = false;
   bool? item1SubAgreed2 = false;
+  bool? item1SubAgreed3 = false;
   bool? item2Agreed = false;
   bool? item2SubAgreed1 = false;
-  bool? item2SubAgreed2 = false;
 
   void _unFocusAllNodes(){
     _nameTextFocus.unfocus();
@@ -187,7 +187,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
   void _getSmallAgree1Sub1Act(bool checkedValue){
     item1SubAgreed1 = checkedValue;
     if(item1SubAgreed1!){
-      if(item1SubAgreed1! == item1SubAgreed2!){
+      if(item1SubAgreed1! == item1SubAgreed2! && item1SubAgreed2! == item1SubAgreed3!){
         item1Agreed = true;
         if(item1Agreed == item2Agreed){
           allAgreed = true;
@@ -197,15 +197,13 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
       }
     }else{
       item1Agreed = false;
-      if(item1Agreed == item2Agreed){
-        allAgreed = false;
-      }
+      allAgreed = false;
     }
   }
   void _getSmallAgree1Sub2Act(bool checkedValue){
     item1SubAgreed2 = checkedValue;
     if(item1SubAgreed2!){
-      if(item1SubAgreed2! == item1SubAgreed1!){
+      if(item1SubAgreed1! == item1SubAgreed2! && item1SubAgreed2! == item1SubAgreed3!){
         item1Agreed = true;
         if(item1Agreed == item2Agreed){
           allAgreed = true;
@@ -215,50 +213,38 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
       }
     }else{
       item1Agreed = false;
-      if(item1Agreed == item2Agreed){
-        allAgreed = false;
+      allAgreed = false;
+    }
+  }
+  void _getSmallAgree1Sub3Act(bool checkedValue){
+    item1SubAgreed3 = checkedValue;
+    if(item1SubAgreed3!){
+      if(item1SubAgreed1! == item1SubAgreed2! && item1SubAgreed2! == item1SubAgreed3!){
+        item1Agreed = true;
+        if(item1Agreed == item2Agreed){
+          allAgreed = true;
+        }else{
+          allAgreed = false;
+        }
       }
+    }else{
+      item1Agreed = false;
+      allAgreed = false;
     }
   }
   void _getSmallAgree2Sub1Act(bool checkedValue){
     item2SubAgreed1 = checkedValue;
     if(item2SubAgreed1!){
-      if(item2SubAgreed1! == item2SubAgreed2!){
-        item2Agreed = true;
-        if(item2Agreed == item1Agreed){
-          allAgreed = true;
-        }else{
-          allAgreed = false;
-        }
-      }
+      item2Agreed = true;
+      allAgreed = true;
     }else{
       item2Agreed = false;
-      if(item2Agreed == item1Agreed){
-        allAgreed = false;
-      }
-    }
-  }
-  void _getSmallAgree2Sub2Act(bool checkedValue){
-    item2SubAgreed2 = checkedValue;
-    if(item2SubAgreed2!){
-      if(item2SubAgreed2! == item2SubAgreed1!){
-        item2Agreed = true;
-        if(item2Agreed == item1Agreed){
-          allAgreed = true;
-        }else{
-          allAgreed = false;
-        }
-      }
-    }else{
-      item2Agreed = false;
-      if(item2Agreed == item1Agreed){
-        allAgreed = false;
-      }
+      allAgreed = false;
     }
   }
   Widget _getSmallAgreeInfoWidget(StateSetter thisSetState, String titleString, String contentsString, bool isAgreeCheck, Function(bool isCheck) callAct){
     return SizedBox(width: 100.w, height: 4.h, child: Row(children: [
-      UiUtils.getMarginBox(10.w, 0),
+      UiUtils.getMarginBox(5.w, 0),
       UiUtils.getBorderButtonBoxWithZeroPadding(80.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite, Row(mainAxisAlignment: MainAxisAlignment.start, children: [
         isAgreeCheck? UiUtils.getCustomCheckBox(UniqueKey(), 1, isAgreeCheck, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
             ColorStyles.upFinWhite, ColorStyles.upFinWhite, (checkedValue){
@@ -335,8 +321,8 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                   item2Agreed = isChanged;
                   item1SubAgreed1 = isChanged;
                   item1SubAgreed2 = isChanged;
+                  item1SubAgreed3 = isChanged;
                   item2SubAgreed1 = isChanged;
-                  item2SubAgreed2 = isChanged;
                 });
               }),
               UiUtils.getTextWithFixedScale("전체동의", 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null)
@@ -348,17 +334,17 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                 item1Agreed = false;
                 item1SubAgreed1 = false;
                 item1SubAgreed2 = false;
+                item1SubAgreed3 = false;
                 item2Agreed = false;
                 item2SubAgreed1 = false;
-                item2SubAgreed2 = false;
               }else{
                 allAgreed = true;
                 item1Agreed = true;
                 item1SubAgreed1 = true;
                 item1SubAgreed2 = true;
+                item1SubAgreed3 = true;
                 item2Agreed = true;
                 item2SubAgreed1 = true;
-                item2SubAgreed2 = true;
               }
             });
           }),
@@ -372,6 +358,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                       item1Agreed = isChanged;
                       item1SubAgreed1 = isChanged;
                       item1SubAgreed2 = isChanged;
+                      item1SubAgreed3 = isChanged;
                       if(item1Agreed == item2Agreed){
                         allAgreed = isChanged;
                       }else{
@@ -382,8 +369,9 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                   UiUtils.getTextWithFixedScale("(필수)전체 동의하기", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null)
                 ],
               )),
-              _getSmallAgreeInfoWidget(thisSetState, "업핀 서비스 이용약관", StringConfig.agreeContents1, item1SubAgreed1!, _getSmallAgree1Sub1Act),
-              _getSmallAgreeInfoWidget(thisSetState, "개인(신용)정보 수집 이용 제공 동의서", StringConfig.agreeContents1, item1SubAgreed2!, _getSmallAgree1Sub2Act),
+              _getSmallAgreeInfoWidget(thisSetState, "1.업핀 서비스 이용약관", StringConfig.agreeContents1, item1SubAgreed1!, _getSmallAgree1Sub1Act),
+              _getSmallAgreeInfoWidget(thisSetState, "2.개인(신용)정보 수집 이용 제공 동의서", StringConfig.agreeContents1, item1SubAgreed2!, _getSmallAgree1Sub2Act),
+              _getSmallAgreeInfoWidget(thisSetState, "3.개인(신용)정보 수집 이용 제공 동의서", StringConfig.agreeContents1, item1SubAgreed3!, _getSmallAgree1Sub3Act),
             ]),
             UiUtils.getMarginBox(0, 2.h),
             Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
@@ -393,7 +381,6 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                     thisSetState(() {
                       item2Agreed = isChanged;
                       item2SubAgreed1 = isChanged;
-                      item2SubAgreed2 = isChanged;
                       if(item1Agreed == item2Agreed){
                         allAgreed = isChanged;
                       }else{
@@ -404,8 +391,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                   UiUtils.getTextWithFixedScale("(선택)전체 동의하기", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null)
                 ],
               )),
-              _getSmallAgreeInfoWidget(thisSetState, "마케팅 정보 수신 동의", StringConfig.agreeContents1, item2SubAgreed1!, _getSmallAgree2Sub1Act),
-              _getSmallAgreeInfoWidget(thisSetState, "야간 마케팅 정보 수신 동의", StringConfig.agreeContents1, item2SubAgreed2!, _getSmallAgree2Sub2Act)
+              _getSmallAgreeInfoWidget(thisSetState, "1.마케팅 정보 수신 동의", StringConfig.agreeContents1, item2SubAgreed1!, _getSmallAgree2Sub1Act)
             ]),
           ])),
           UiUtils.getMarginBox(0, 3.h),

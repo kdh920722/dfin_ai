@@ -229,7 +229,7 @@ class UiUtils {
 
   static Widget getIconButtonWithHeight(double height, IconData icon, double size, Color iconColor, VoidCallback onPressedCallback) {
     return SizedBox(height: height,
-        child: IconButton(constraints: const BoxConstraints(), padding: EdgeInsets.only(right: 5.w), onPressed: onPressedCallback, icon: Icon(icon, color: iconColor, size: size)));
+        child: IconButton(constraints: const BoxConstraints(), padding: EdgeInsets.zero, onPressed: onPressedCallback, icon: Icon(icon, color: iconColor, size: size)));
   }
 
   static Widget getBackButton(VoidCallback onPressedCallback) {

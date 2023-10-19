@@ -8,12 +8,15 @@ import 'package:upfin/configs/app_config.dart';
 import 'package:upfin/configs/string_config.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/controllers/websocket_controller.dart';
+import 'package:upfin/datas/accident_info_data.dart';
 import 'package:upfin/datas/chat_message_info_data.dart';
+import 'package:upfin/datas/loan_info_data.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import '../controllers/get_controller.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
+import 'app_update_accident_view.dart';
 
 class AppMainView extends StatefulWidget{
   @override
@@ -91,17 +94,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   bool isScrolling = false;
   Widget _getMyView(){
     return Column(children: [
-      UiUtils.getMarginBox(0, 2.h),
-      SizedBox(width: 95.w, height: 14.h, child:Stack(alignment: Alignment.center, children: [
-        Positioned(
-            child: UiUtils.getTopBannerButtonBox(90.w, 7.h, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                UiUtils.getTextWithFixedScale("업핀! 다이렉트 대출의시작!", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, 1), () {
-
-            })),
-        Positioned(
-            left: 0.5.w,
-            child: UiUtils.getImage(25.w, 15.h, Image.asset(fit: BoxFit.fitHeight,'assets/images/img_man_banner.png'))),
-      ])),
       Expanded(child: NotificationListener<ScrollNotification>(
           onNotification: (scrollNotification) {
             if (scrollNotification is ScrollUpdateNotification) {
@@ -115,34 +107,58 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               if(isScrolling){
                 isScrolling = false;
                 setState(() {
-                  bottomBarHeight = 7.h;
+                  bottomBarHeight = 0;
                 });
               }
             }
             return true;
           },
           child: ListView(shrinkWrap: true,physics: const BouncingScrollPhysics(),children: [
+            SizedBox(width: 100.w, height: 16.h, child:Stack(alignment: Alignment.topCenter, children: [
+              Positioned(
+                  child: Column(children: [
+                    UiUtils.getMarginBox(0, 3.h),
+                    UiUtils.getTopBannerButtonBox(90.w, 6.5.h, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+                        UiUtils.getTextWithFixedScale("업핀! 다이렉트 대출의시작!", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, 1), () {
+
+                        })
+                  ])),
+              Positioned(
+                  left: 1.w,
+                  child: UiUtils.getImage(25.w, 15.h, Image.asset(fit: BoxFit.fitHeight,'assets/images/img_man_banner.png'))),
+              Positioned(
+                  top: 11.h,
+                  right: 5.w,
+                  child: SizedBox(width: 90.w, child: Row(children: [
+                    const Spacer(flex: 2),
+                    UiUtils.getIconButton(Icons.refresh_rounded, 8.w, ColorStyles.upFinTextAndBorderBlue, () {
+                      _refreshMyView(context);
+                    }),
+                    UiUtils.getMarginBox(2.w, 0),
+                    UiUtils.getIconButton(Icons.settings, 8.w, ColorStyles.upFinGray, () {
+                      setState(() {viewTypeId = 3;});
+                    })
+                  ]))
+              ),
+            ])),
+            UiUtils.getMarginBox(0, 1.h),
             Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 0.h, bottom: 1.h), child: Row(mainAxisSize: MainAxisSize.max, children: [
               UiUtils.getTextWithFixedScale("사건기록", 15.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, 1),
-              const Spacer(flex: 2),
-              UiUtils.getBorderButtonBoxWithZeroPadding(15.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
-                  UiUtils.getTextWithFixedScale("새로고침", 10.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.end, 1), () async {
-                    _refreshMyView(context);
-                  })
+              const Spacer(flex: 2)
             ])),
             Obx((){
               List<Widget> accidentWidgetList = _getAccidentWidgetList();
-              return SizedBox(width: 90.w, height: accidentWidgetList.isEmpty ? 8.h : accidentWidgetList.length > 1 ? 21.h : 18.h,
+              return SizedBox(width: 90.w, height: accidentWidgetList.isEmpty ? 8.h : accidentWidgetList.length > 1 ? 27.h : 21.h,
                   child: accidentWidgetList.isNotEmpty ? Column(
                     children: <Widget>[
                       // PageView
-                      SizedBox(width: 90.w, height: 15.h,
+                      SizedBox(width: 90.w, height: 20.h,
                         child: PageView(
                           controller: _pageController,
                           children: accidentWidgetList,
                         ),
                       ),
-                      UiUtils.getMarginBox(0, 3.h),
+                      accidentWidgetList.length>1? UiUtils.getMarginBox(0, 3.h) : Container(),
                       accidentWidgetList.length>1? SmoothPageIndicator(
                         controller: _pageController,
                         count: accidentWidgetList.length, // 페이지 수
@@ -185,17 +201,15 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               Positioned(
                   child: UiUtils.getBannerButtonBox(90.w, 50.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
                       Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                        SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale("위기는 기회다!", 25.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, 1)),
+                        SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale("위기는", 25.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, 1)),
+                        SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale("기회다!", 25.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, 1)),
                         UiUtils.getMarginBox(0, 10.h)
                       ]), () {})),
               Positioned(
                   right: 1.w,
-                  child: UiUtils.getImage(55.w, 55.w, Image.asset(fit: BoxFit.fill,'assets/images/img_woman_sports.png'))),
+                  child: UiUtils.getImage(55.w, 55.w, Image.asset(fit: BoxFit.fill,'assets/images/ani_man_search.gif'))),
             ]),
-            UiUtils.getMarginBox(0, 3.h),
-            Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 0.h, bottom: 1.h),
-                child: StringConfig.getAgreeContents(StringConfig.testAgreeText)),
-            UiUtils.getMarginBox(0, 10.h),
+            UiUtils.getMarginBox(0, 1.h),
           ])
       )),
 
@@ -204,7 +218,46 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   List<Widget> _getAccidentWidgetList(){
     List<Widget> accidentWidgetList = [];
     CommonUtils.log("i", "accident view redraw!");
+    List<String> accidentList = [];
+    List<String> accidentIdList = [];
+    List<AccidentInfoData> accidentInfoList = [];
     for(var each in GetController.to.accidentInfoDataList){
+      String eachAccidentNum = each.accidentCaseNumberYear+each.accidentCaseNumberType+each.accidentCaseNumberNumber;
+      for(var each2 in GetController.to.accidentInfoDataList){
+        String each2AccidentNum = each2.accidentCaseNumberYear+each2.accidentCaseNumberType+each2.accidentCaseNumberNumber;
+        if(eachAccidentNum == each2AccidentNum){
+          bool isHere = false;
+          for(var eachTemp in accidentList){
+            if(eachTemp == eachAccidentNum) isHere = true;
+          }
+          if(!isHere) accidentList.add(eachAccidentNum);
+        }
+      }
+    }
+
+    for(var eachTemp in accidentList){
+      int maxId = -1;
+      for(var each in GetController.to.accidentInfoDataList){
+        String eachAccidentNum = each.accidentCaseNumberYear+each.accidentCaseNumberType+each.accidentCaseNumberNumber;
+        if(eachTemp == eachAccidentNum){
+          int eachId = int.parse(each.id);
+          if(eachId > maxId) maxId = eachId;
+        }
+      }
+      accidentIdList.add("$eachTemp@$maxId");
+    }
+
+    for(var eachIdTemp in accidentIdList){
+      String accidentNum = eachIdTemp.split("@")[0];
+      String id = eachIdTemp.split("@")[1];
+      for(var each in GetController.to.accidentInfoDataList){
+        String eachAccidentNum = each.accidentCaseNumberYear+each.accidentCaseNumberType+each.accidentCaseNumberNumber;
+        if(accidentNum == eachAccidentNum && id == each.id) accidentInfoList.add(each);
+      }
+    }
+
+    for(var each in accidentInfoList){
+      CommonUtils.log("i", "accdient uid@@@@ : ${each.accidentUid}");
       accidentWidgetList.add(
           UiUtils.getAccidentBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinGray,
               Column(children: [
@@ -213,6 +266,8 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                     Row(children: [
                       UiUtils.getMarginBox(1.w, 0),
                       UiUtils.getBoxTextWithFixedScale("개인회생", 8.sp, FontWeight.w500, TextAlign.center, ColorStyles.upFinButtonBlue, ColorStyles.upFinWhite),
+                      UiUtils.getMarginBox(2.w, 0),
+                      !MyData.isPossibleAccidentInfo(each)? UiUtils.getTextWithFixedScale("*환급계좌정보 오류", 9.sp, FontWeight.w600, ColorStyles.upFinRed, TextAlign.start, null) : Container()
                     ]),
                     UiUtils.getMarginBox(0, 0.4.h),
                     Row(mainAxisAlignment: MainAxisAlignment.start, children: [
@@ -229,7 +284,18 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                   ])),
                   Expanded(flex: 1, child: Icon(Icons.arrow_forward_ios_rounded, color: ColorStyles.upFinDarkGray, size: 5.5.w))
                 ]),
+
+                UiUtils.getMarginBox(0, 1.h),
+                UiUtils.getBorderButtonBox(80.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+                    UiUtils.getTextWithFixedScale("대출상품 찾기", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
+                      MyData.selectedAccidentInfoData = each;
+                      AppUpdateAccidentViewState.isAccountEditMode = false;
+                      AppUpdateAccidentViewState.startViewId = AppUpdateAccidentViewState.confirmedViewId;
+                      AppUpdateAccidentViewState.endViewId = AppUpdateAccidentViewState.jobViewId;
+                      CommonUtils.moveTo(context, AppView.appUpdateAccidentView.value, null);
+                    })
               ]), () {
+                CommonUtils.log("i", "accdient uid : ${each.accidentUid}"); // be  :m-PYw9Qm5gvLonWRrCUAbQ  af : 5L5zVL98TsNC-1uz4xednA
                 MyData.selectedAccidentInfoData = each;
                 CommonUtils.moveTo(context, AppView.appAccidentDetailInfoView.value, null);
               })
@@ -275,9 +341,9 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                         UiUtils.getTextWithFixedScale(each.chatRoomTitle, 16.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null),
                         UiUtils.getMarginBox(0, 1.h),
                         Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                          UiUtils.getRoundBoxTextWithFixedScale(_getStatusName(each.chatRoomLoanStatus), 8.sp, FontWeight.w600, TextAlign.center,  ColorStyles.upFinWhiteSky, ColorStyles.upFinButtonBlue),
+                          UiUtils.getRoundBoxTextWithFixedScale(LoanInfoData.getDetailStatusName(each.chatRoomLoanStatus), 8.sp, FontWeight.w600, TextAlign.center,  ColorStyles.upFinWhiteSky, ColorStyles.upFinButtonBlue),
                           UiUtils.getMarginBox(2.w, 0),
-                          each.chatRoomType != 0? UiUtils.getTextWithFixedScale("${each.loanMinRate}  ${each.loanMaxLimit}", 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null) : Container()
+                          //each.chatRoomType != 0? UiUtils.getTextWithFixedScale("${each.loanMinRate}  ${each.loanMaxLimit}", 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null) : Container()
                         ]),
                       ]),
                       UiUtils.getMarginBox(0, 1.h),
@@ -325,20 +391,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     }
 
     return loanChatRoomWidgetList;
-  }
-  String _getStatusName(String statueId){
-    String status = "";
-    switch(statueId){
-      case "1" : status = "접수중";
-      case "2" : status = "심사중";
-      case "3" : status = "대기중";
-      case "4" : status = "승인완료";
-      case "5" : status = "보류";
-      case "6" : status = "부결";
-      case "7" : status = "본인취소";
-    }
-
-    return status;
   }
 
   void _refreshMyView(BuildContext context){
@@ -461,11 +513,18 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
       ),
     ]);
   }
-
+  void _back(){
+    if(viewTypeId != 2){
+      setState(() {viewTypeId = 2;});
+    }
+  }
   Widget _getSettingView(){
     return Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: EdgeInsets.all(5.w),
-        child: Column(children: [
-          UiUtils.getMarginBox(0, 5.h),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          UiUtils.getBackButton(() async {
+            _back();
+          }),
+          UiUtils.getMarginBox(0, 3.h),
           UiUtils.getBorderButtonBoxWithZeroPadding(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
               Row(children: [UiUtils.getTextWithFixedScale("설정", 22.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null)]), () {}),
           UiUtils.getMarginBox(0, 5.h),
@@ -489,7 +548,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     );
   }
 
-  double bottomBarHeight = 7.h;
+  double bottomBarHeight = 0;
   @override
   Widget build(BuildContext context) {
     if(CommonUtils.isValidStateByAPiExpiredDate()){
@@ -553,7 +612,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
           ),
         ],
       );
-      return UiUtils.getView(context, view, CommonUtils.onWillPopForPreventBackButton);
+      return UiUtils.getViewWithAllowBackForAndroid(context, view, _back);
     }else{
       CommonUtils.flutterToast("접속시간이 만료되었습니다.\n재로그인 해주세요");
       CommonUtils.backToHome(context);

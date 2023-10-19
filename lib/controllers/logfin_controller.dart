@@ -298,7 +298,7 @@ class LogfinController {
               GetController.to.resetAccdientInfoList();
               callback(true, false);
             }else {
-              MyData.clearAccidentInfoList();
+              //MyData.clearAccidentInfoList();
               String bankInfo = "";
               String courtInfo = "";
               String lendCountInfo = "";
@@ -330,7 +330,8 @@ class LogfinController {
                 String accidentNo = dataResult["issue_no"];
                 var resData = jsonDecode(dataResult["res_data"]);
                 CommonUtils.log("i", "accident data ====>\n"
-                    "accidentUid: ${eachAccident["uid"]}\n"
+                    "accidentUid: ${dataResult["id"]}\n"
+                    "accidentUid: ${dataResult["uid"]}\n"
                     "accidentCaseNo: $accidentNo\n"
                     "courtInfo: $courtInfo\n"
                     "bankInfo: $bankInfo\n"
@@ -339,7 +340,7 @@ class LogfinController {
                     "lend_amount: ${dataResult["lend_amount"]}\n"
                     "wish_amount: ${dataResult["wish_amount"]}\n"
                     "res_data: ${resData["data"]["resRepaymentList"]}\n");
-                MyData.addToAccidentInfoList(AccidentInfoData(eachAccident["uid"], accidentNo.substring(0,4), accidentNo.substring(4,6), accidentNo.substring(6),
+                MyData.addToAccidentInfoList(AccidentInfoData(dataResult["id"].toString(), dataResult["uid"], accidentNo.substring(0,4), accidentNo.substring(4,6), accidentNo.substring(6),
                     courtInfo, bankInfo, dataResult["refund_account"].toString(), lendCountInfo, lendAmount, wishAmount, resData["data"]));
               }
 
@@ -463,32 +464,38 @@ class LogfinController {
     if(WebSocketController.tempMsgList.isEmpty){
       callback(true);
     }else{
-      bool isSuccessToPut = false;
-      for(var each in WebSocketController.tempMsgList){
-        Map<String,dynamic> resultMap = jsonDecode(each);
-        for(int i = 0 ; i < MyData.getChatRoomInfoList().length ; i++){
-          if(MyData.getChatRoomInfoList()[i].chatRoomId == resultMap["pr_room_id"]){
-            isSuccessToPut = true;
-            Map<String, dynamic> msgInfo = jsonDecode(MyData.getChatRoomInfoList()[i].chatRoomMsgInfo);
-            List<dynamic> msgList = msgInfo["data"];
-            bool isNeedToPut = true;
-            for(var eachMsgList in msgList){
-              if(eachMsgList["id"] == resultMap["id"]) isNeedToPut = false;
-            }
-            if(isNeedToPut){
-              msgList.add(resultMap);
-              msgList.sort((a,b) => DateTime.parse(a["created_at"]).compareTo(DateTime.parse(b["created_at"])));
-              msgInfo.remove("data");
-              msgInfo["data"] = msgList;
-              MyData.getChatRoomInfoList()[i].chatRoomMsgInfo = jsonEncode(msgInfo);
+      try{
+        bool isSuccessToPut = false;
+        for(var each in WebSocketController.tempMsgList){
+          CommonUtils.log("i", "temp msg here");
+          Map<String,dynamic> resultMap = jsonDecode(each);
+          for(int i = 0 ; i < MyData.getChatRoomInfoList().length ; i++){
+            if(MyData.getChatRoomInfoList()[i].chatRoomId == resultMap["pr_room_id"]){
+              isSuccessToPut = true;
+              Map<String, dynamic> msgInfo = jsonDecode(MyData.getChatRoomInfoList()[i].chatRoomMsgInfo);
+              List<dynamic> msgList = msgInfo["data"];
+              bool isNeedToPut = true;
+              for(var eachMsgList in msgList){
+                if(eachMsgList["id"] == resultMap["id"]) isNeedToPut = false;
+              }
+              if(isNeedToPut){
+                msgList.add(resultMap);
+                msgList.sort((a,b) => DateTime.parse(a["created_at"]).compareTo(DateTime.parse(b["created_at"])));
+                msgInfo.remove("data");
+                msgInfo["data"] = msgList;
+                MyData.getChatRoomInfoList()[i].chatRoomMsgInfo = jsonEncode(msgInfo);
+              }
             }
           }
         }
-      }
 
-      if(isSuccessToPut){
-        callback(true);
-      }else{
+        if(isSuccessToPut){
+          callback(true);
+        }else{
+          callback(false);
+        }
+      }catch(error){
+        CommonUtils.log("i", "temp msg error : $error");
         callback(false);
       }
     }
@@ -564,7 +571,7 @@ class LogfinController {
 }
 
 enum LogfinApis {
-  signUp, signIn, socialLogin, deleteAccount, prUpdateInfo, checkMember, customerUpdateInfo,
+  signUp, signIn, socialLogin, deleteAccount, bankUpdateInfo, checkMember, customerUpdateInfo,
   getUserInfo, prSearch, getOffers,
   applyProductDocSearch, applyProduct,
   getAccidentInfo, getOffersInfo,
@@ -601,7 +608,7 @@ extension LogfinApisExtension on LogfinApis {
         return '/get_loan.json';
       case LogfinApis.getOffers:
         return '/get_offers.json';
-      case LogfinApis.prUpdateInfo:
+      case LogfinApis.bankUpdateInfo:
         return '/pr_edit_complete.json';
       case LogfinApis.customerUpdateInfo:
         return '/edit_customer_info.json';

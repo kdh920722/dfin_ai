@@ -30,23 +30,26 @@ class MyData {
     return _accidentInfoList;
   }
   static void addToAccidentInfoList(AccidentInfoData accidentInfoData){
-    bool isAdded = false;
+    bool isHere = false;
     for(var each in _accidentInfoList){
-      if("${each.accidentCaseNumberYear}${each.accidentCaseNumberType}${each.accidentCaseNumberNumber}" ==
-          "${accidentInfoData.accidentCaseNumberYear}${accidentInfoData.accidentCaseNumberType}${accidentInfoData.accidentCaseNumberNumber}"){
-        isAdded = true;
+      if(accidentInfoData.accidentUid == each.accidentUid){
+        isHere = true;
       }
     }
-
-    if(!isAdded){
+    if(!isHere){
       _accidentInfoList.add(accidentInfoData);
     }
   }
   static String findUidInAccidentInfoList(String targetAccidentCaseNumber){
     String resultUid = "";
+
+    int maxId = -1;
     for(var each in _accidentInfoList){
       if(targetAccidentCaseNumber == "${each.accidentCaseNumberYear}${each.accidentCaseNumberType}${each.accidentCaseNumberNumber}"){
-        resultUid = each.accidentUid;
+        if(maxId < int.parse(each.id)){
+          maxId = int.parse(each.id);
+          resultUid = each.accidentUid;
+        }
       }
     }
 
@@ -54,6 +57,24 @@ class MyData {
   }
   static void clearAccidentInfoList(){
     _accidentInfoList.clear();
+  }
+  static bool isPossibleAccidentInfo(AccidentInfoData selectedInfo){
+    bool isSuccessToGetDetailInfo = true;
+    if(selectedInfo.resData.isNotEmpty && selectedInfo.resData.containsKey("resRepaymentList")){
+      if(selectedInfo.resData["resRepaymentList"][0]["resAmount"] == ""
+          || selectedInfo.resData["resRepaymentList"][0]["resRoundNo"] == ""
+          || selectedInfo.resData["resRepaymentList"][0]["resUnpaidAmt"] == ""
+          || selectedInfo.resData["resRepaymentList"][0]["resRoundNo2"] == ""
+          || selectedInfo.resData["resRepaymentList"][0]["resRoundNo1"] == ""
+          || selectedInfo.resData["resRepaymentList"][0]["resTotalAmt"] == ""
+          || selectedInfo.resData["resRepaymentList"][0]["resRepaymentCycle"] == ""){
+        isSuccessToGetDetailInfo = false;
+      }
+    }else{
+      isSuccessToGetDetailInfo = false;
+    }
+
+    return isSuccessToGetDetailInfo;
   }
 
   // loan data

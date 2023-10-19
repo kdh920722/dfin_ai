@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:sizer/sizer.dart';
 import 'package:upfin/configs/app_config.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
@@ -21,11 +22,14 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
   bool isOrderByLimit = false;
   bool? allAgreed = false;
   bool? item1Agreed = false;
-  bool? item2Agreed = false;
+
   bool? item1SubAgreed1 = false;
   bool? item1SubAgreed2 = false;
-  bool? item2SubAgreed1 = false;
-  bool? item2SubAgreed2 = false;
+  bool? item1SubAgreed3 = false;
+  bool? item1SubAgreed4 = false;
+  bool? item1SubAgreed5 = false;
+  bool? item1SubAgreed6 = false;
+
   int selectedTabIndex = 0 ;
   int selectedTabCount = 0 ;
   int possiblePrCount = 0 ;
@@ -209,78 +213,84 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
   void _getSmallAgree1Sub1Act(bool checkedValue){
     item1SubAgreed1 = checkedValue;
     if(item1SubAgreed1!){
-      if(item1SubAgreed1! == item1SubAgreed2!){
+      if(item1SubAgreed1! == item1SubAgreed2! && item1SubAgreed2! == item1SubAgreed3!
+          && item1SubAgreed3! == item1SubAgreed4! && item1SubAgreed4! == item1SubAgreed5! && item1SubAgreed5! == item1SubAgreed6!){
         item1Agreed = true;
-        if(item1Agreed == item2Agreed){
-          allAgreed = true;
-        }else{
-          allAgreed = false;
-        }
+        allAgreed = true;
       }
     }else{
       item1Agreed = false;
-      if(item1Agreed == item2Agreed){
-        allAgreed = false;
-      }
+      allAgreed = false;
     }
   }
   void _getSmallAgree1Sub2Act(bool checkedValue){
     item1SubAgreed2 = checkedValue;
     if(item1SubAgreed2!){
-      if(item1SubAgreed2! == item1SubAgreed1!){
+      if(item1SubAgreed1! == item1SubAgreed2! && item1SubAgreed2! == item1SubAgreed3!
+          && item1SubAgreed3! == item1SubAgreed4! && item1SubAgreed4! == item1SubAgreed5! && item1SubAgreed5! == item1SubAgreed6!){
         item1Agreed = true;
-        if(item1Agreed == item2Agreed){
-          allAgreed = true;
-        }else{
-          allAgreed = false;
-        }
+        allAgreed = true;
       }
     }else{
       item1Agreed = false;
-      if(item1Agreed == item2Agreed){
-        allAgreed = false;
-      }
+      allAgreed = false;
     }
   }
-  void _getSmallAgree2Sub1Act(bool checkedValue){
-    item2SubAgreed1 = checkedValue;
-    if(item2SubAgreed1!){
-      if(item2SubAgreed1! == item2SubAgreed2!){
-        item2Agreed = true;
-        if(item2Agreed == item1Agreed){
-          allAgreed = true;
-        }else{
-          allAgreed = false;
-        }
+  void _getSmallAgree1Sub3Act(bool checkedValue){
+    item1SubAgreed3 = checkedValue;
+    if(item1SubAgreed3!){
+      if(item1SubAgreed1! == item1SubAgreed2! && item1SubAgreed2! == item1SubAgreed3!
+          && item1SubAgreed3! == item1SubAgreed4! && item1SubAgreed4! == item1SubAgreed5! && item1SubAgreed5! == item1SubAgreed6!){
+        item1Agreed = true;
+        allAgreed = true;
       }
     }else{
-      item2Agreed = false;
-      if(item2Agreed == item1Agreed){
-        allAgreed = false;
-      }
+      item1Agreed = false;
+      allAgreed = false;
     }
   }
-  void _getSmallAgree2Sub2Act(bool checkedValue){
-    item2SubAgreed2 = checkedValue;
-    if(item2SubAgreed2!){
-      if(item2SubAgreed2! == item2SubAgreed1!){
-        item2Agreed = true;
-        if(item2Agreed == item1Agreed){
-          allAgreed = true;
-        }else{
-          allAgreed = false;
-        }
+  void _getSmallAgree1Sub4Act(bool checkedValue){
+    item1SubAgreed4 = checkedValue;
+    if(item1SubAgreed4!){
+      if(item1SubAgreed1! == item1SubAgreed2! && item1SubAgreed2! == item1SubAgreed3!
+          && item1SubAgreed3! == item1SubAgreed4! && item1SubAgreed4! == item1SubAgreed5! && item1SubAgreed5! == item1SubAgreed6!){
+        item1Agreed = true;
+        allAgreed = true;
       }
     }else{
-      item2Agreed = false;
-      if(item2Agreed == item1Agreed){
-        allAgreed = false;
+      item1Agreed = false;
+      allAgreed = false;
+    }
+  }
+  void _getSmallAgree1Sub5Act(bool checkedValue){
+    item1SubAgreed5 = checkedValue;
+    if(item1SubAgreed5!){
+      if(item1SubAgreed1! == item1SubAgreed2! && item1SubAgreed2! == item1SubAgreed3!
+          && item1SubAgreed3! == item1SubAgreed4! && item1SubAgreed4! == item1SubAgreed5! && item1SubAgreed5! == item1SubAgreed6!){
+        item1Agreed = true;
+        allAgreed = true;
       }
+    }else{
+      item1Agreed = false;
+      allAgreed = false;
+    }
+  }
+  void _getSmallAgree1Sub6Act(bool checkedValue){
+    item1SubAgreed6 = checkedValue;
+    if(item1SubAgreed6!){
+      if(item1SubAgreed1! == item1SubAgreed2! && item1SubAgreed2! == item1SubAgreed3!
+          && item1SubAgreed3! == item1SubAgreed4! && item1SubAgreed4! == item1SubAgreed5! && item1SubAgreed5! == item1SubAgreed6!){
+        item1Agreed = true;
+        allAgreed = true;
+      }
+    }else{
+      item1Agreed = false;
+      allAgreed = false;
     }
   }
   Widget _getSmallAgreeInfoWidget(StateSetter thisSetState, String titleString, String contentsString, bool isAgreeCheck, Function(bool isCheck) callAct){
     return SizedBox(width: 100.w, height: 4.h, child: Row(children: [
-      UiUtils.getMarginBox(10.w, 0),
+      UiUtils.getMarginBox(5.w, 0),
       UiUtils.getBorderButtonBoxWithZeroPadding(80.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite, Row(mainAxisAlignment: MainAxisAlignment.start, children: [
         isAgreeCheck? UiUtils.getCustomCheckBox(UniqueKey(), 1, isAgreeCheck, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
             ColorStyles.upFinWhite, ColorStyles.upFinWhite, (checkedValue){
@@ -327,7 +337,62 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
     Widget contentsWidget = Column(children: [
       SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(contentsString, 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null))
     ]);
-    bool isAgree = await CommonUtils.moveToWithResult(context, AppView.appAgreeDetailInfoView.value, {"title": titleString, "contents" : contentsWidget}) as bool;
+    String htmlTest = """ 
+    <h2>큰제목타이틀</h2> 
+    <h3>부제목타이틀</h3> 
+    <div id='type1'>(본문1)type1: 업핀을 찾아주셔서 너무너무감사하네요~ 하하하깔깔깔 한번 잘 사용해보세요~~부자되세요~본문내용 여기에 들어갑니다</div>
+    <br> 
+    <div id='type2'>(본문2)type2: 업핀을 찾아주셔서 너무너무감사하네요~ 하하하깔깔깔 한번 잘 사용해보세요~~부자되세요~본문내용 여기에 들어갑니다</div>
+    <br>
+    <div id='type3'>(본문3)type3: 업핀을 찾아주셔서 너무너무감사하네요~ 하하하깔깔깔 한번 잘 사용해보세요~~부자되세요~본문내용 여기에 들어갑니다</div>
+    """;
+
+    Widget htmlWidget = Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+      HtmlWidget(
+        StringConfig.htmlTest2,
+        customStylesBuilder: (element) {
+          if (element.id.contains('type1')) {
+            return {
+              "color" : "black",
+              "font-size": "12px",
+              "line-height" : "120%",
+              "font-weight": "normal"
+            };
+          }else if (element.id.contains('type2')) {
+            return {
+              "color" : "gray",
+              "font-size": "14px",
+              "line-height" : "150%",
+              "font-weight": "bold"
+            };
+          }else if (element.id.contains('type3')) {
+            return {
+              "color" : "black",
+              "font-size": "16px",
+              "line-height" : "200%",
+              "font-weight": "bold"
+            };
+          }
+
+          return null;
+        },
+        onTapUrl: (url) async {
+          print('tapped ${url.split("/").last.split("?").first}');
+          UiUtils.showLoadingPop(context);
+          Map<String, String> urlInfoMap = {
+            "url" : "${LogfinController.niceUrl}/${url.split("/").last.split("?").first}?checklist=1"
+          };
+          bool isSuccess = false;
+          var result = await CommonUtils.moveToWithResult(context, AppView.appWebView.value, urlInfoMap);
+          if(context.mounted) UiUtils.closeLoadingPop(context);
+          return true;
+          },
+        renderMode: RenderMode.column,
+        textStyle: TextStyles.upFinHtmlTextStyle,
+      )
+    ]);
+
+    bool isAgree = await CommonUtils.moveToWithResult(context, AppView.appAgreeDetailInfoView.value, {"title": titleString, "contents" : htmlWidget}) as bool;
     callback(isAgree);
   }
   Widget _makeAgreeWidget(BuildContext thisContext, StateSetter thisSetState, ){
@@ -352,11 +417,12 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                 thisSetState(() {
                   allAgreed = isChanged;
                   item1Agreed = isChanged;
-                  item2Agreed = isChanged;
                   item1SubAgreed1 = isChanged;
                   item1SubAgreed2 = isChanged;
-                  item2SubAgreed1 = isChanged;
-                  item2SubAgreed2 = isChanged;
+                  item1SubAgreed3 = isChanged;
+                  item1SubAgreed4 = isChanged;
+                  item1SubAgreed5 = isChanged;
+                  item1SubAgreed6 = isChanged;
                 });
               }),
               UiUtils.getTextWithFixedScale("전체동의", 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null)
@@ -368,17 +434,19 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                 item1Agreed = false;
                 item1SubAgreed1 = false;
                 item1SubAgreed2 = false;
-                item2Agreed = false;
-                item2SubAgreed1 = false;
-                item2SubAgreed2 = false;
+                item1SubAgreed3 = false;
+                item1SubAgreed4 = false;
+                item1SubAgreed5 = false;
+                item1SubAgreed6 = false;
               }else{
                 allAgreed = true;
                 item1Agreed = true;
                 item1SubAgreed1 = true;
                 item1SubAgreed2 = true;
-                item2Agreed = true;
-                item2SubAgreed1 = true;
-                item2SubAgreed2 = true;
+                item1SubAgreed3 = true;
+                item1SubAgreed4 = true;
+                item1SubAgreed5 = true;
+                item1SubAgreed6 = true;
               }
             });
           }),
@@ -392,8 +460,12 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                       item1Agreed = isChanged;
                       item1SubAgreed1 = isChanged;
                       item1SubAgreed2 = isChanged;
-                      if(item1Agreed == item2Agreed){
-                        allAgreed = isChanged;
+                      item1SubAgreed3 = isChanged;
+                      item1SubAgreed4 = isChanged;
+                      item1SubAgreed5 = isChanged;
+                      item1SubAgreed6 = isChanged;
+                      if(item1Agreed!){
+                        allAgreed = true;
                       }else{
                         allAgreed = false;
                       }
@@ -402,30 +474,12 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                   UiUtils.getTextWithFixedScale("(필수)전체 동의하기", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null)
                 ],
               )),
-              _getSmallAgreeInfoWidget(thisSetState, "업핀 서비스 이용약관", StringConfig.agreeContents1, item1SubAgreed1!, _getSmallAgree1Sub1Act),
-              _getSmallAgreeInfoWidget(thisSetState, "개인(신용)정보 수집 이용 제공 동의서", StringConfig.agreeContents1, item1SubAgreed2!, _getSmallAgree1Sub2Act),
-            ]),
-            UiUtils.getMarginBox(0, 2.h),
-            Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
-              Container(padding: EdgeInsets.zero, height: 3.h, child: Row(
-                children: [
-                  UiUtils.getCheckBox(1.2, item2Agreed!, (isChanged) {
-                    thisSetState(() {
-                      item2Agreed = isChanged;
-                      item2SubAgreed1 = isChanged;
-                      item2SubAgreed2 = isChanged;
-                      if(item1Agreed == item2Agreed){
-                        allAgreed = isChanged;
-                      }else{
-                        allAgreed = false;
-                      }
-                    });
-                  }),
-                  UiUtils.getTextWithFixedScale("(선택)전체 동의하기", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null)
-                ],
-              )),
-              _getSmallAgreeInfoWidget(thisSetState, "마케팅 정보 수신 동의", StringConfig.agreeContents1, item2SubAgreed1!, _getSmallAgree2Sub1Act),
-              _getSmallAgreeInfoWidget(thisSetState, "야간 마케팅 정보 수신 동의", StringConfig.agreeContents1, item2SubAgreed2!, _getSmallAgree2Sub2Act)
+              _getSmallAgreeInfoWidget(thisSetState, "1.업핀 서비스 이용약관", StringConfig.htmlTest, item1SubAgreed1!, _getSmallAgree1Sub1Act),
+              _getSmallAgreeInfoWidget(thisSetState, "2.개인(신용)정보 수집 이용 제공 동의서", StringConfig.agreeContents1, item1SubAgreed2!, _getSmallAgree1Sub2Act),
+              _getSmallAgreeInfoWidget(thisSetState, "3.업핀 서비스 이용약관", StringConfig.htmlTest, item1SubAgreed3!, _getSmallAgree1Sub3Act),
+              _getSmallAgreeInfoWidget(thisSetState, "4.개인(신용)정보 수집 이용 제공 동의서", StringConfig.agreeContents1, item1SubAgreed4!, _getSmallAgree1Sub4Act),
+              _getSmallAgreeInfoWidget(thisSetState, "5.업핀 서비스 이용약관", StringConfig.htmlTest, item1SubAgreed5!, _getSmallAgree1Sub5Act),
+              _getSmallAgreeInfoWidget(thisSetState, "6.개인(신용)정보 수집 이용 제공 동의서", StringConfig.agreeContents1, item1SubAgreed6!, _getSmallAgree1Sub6Act),
             ]),
           ])),
           UiUtils.getMarginBox(0, 3.h),

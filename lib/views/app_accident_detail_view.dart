@@ -98,8 +98,17 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
 
   List<Widget> _getLoanWidgetList(){
     List<Widget> loanWidgetList = [];
+    CommonUtils.log("i", "MyData.getLoanInfoList size : ${MyData.getLoanInfoList().length}");
     for(var each in MyData.getLoanInfoList()){
-      if(each.accidentUid == MyData.selectedAccidentInfoData!.accidentUid){
+      CommonUtils.log("i", "accdient uid in loan : ${each.accidentUid}");
+      String eachAccidentNum = "";
+      for(var eachAccident in MyData.getAccidentInfoList()){
+        if(eachAccident.accidentUid == each.accidentUid) eachAccidentNum = eachAccident.accidentCaseNumberYear+eachAccident.accidentCaseNumberType+eachAccident.accidentCaseNumberNumber;
+      }
+      String selectedAccidentNum = MyData.selectedAccidentInfoData!.accidentCaseNumberYear+MyData.selectedAccidentInfoData!.accidentCaseNumberType+MyData.selectedAccidentInfoData!.accidentCaseNumberNumber;
+
+      if(eachAccidentNum == selectedAccidentNum){
+        CommonUtils.log("i", "@@@");
         loanWidgetList.add(
             UiUtils.getLoanListBorderButtonBox(90.w, ColorStyles.upFinWhiteGray, ColorStyles.upFinWhiteGray,
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -141,19 +150,9 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
   }
 
   Widget _getAccidentWidgetList(){
-
-    bool isSuccessToGetDetailInfo = true;
-    if(MyData.selectedAccidentInfoData!.resData.isNotEmpty && MyData.selectedAccidentInfoData!.resData.containsKey("resRepaymentList")){
-      if(MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resAmount"] == ""
-          || MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resRoundNo"] == ""
-          || MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resUnpaidAmt"] == ""
-          || MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resRoundNo2"] == ""
-          || MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resRoundNo1"] == ""
-          || MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resTotalAmt"] == ""
-          || MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resRepaymentCycle"] == ""){
-        isSuccessToGetDetailInfo = false;
-        CommonUtils.flutterToast("환급계좌정보가 잘못되었습니다.\n수정해주세요.");
-      }
+    bool isSuccessToGetDetailInfo = MyData.isPossibleAccidentInfo(MyData.selectedAccidentInfoData!);
+    if(!isSuccessToGetDetailInfo){
+      CommonUtils.flutterToast("환급계좌정보가 잘못되었습니다.\n수정해주세요.");
     }
 
     CommonUtils.log("i", MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resAmount"]);
@@ -195,6 +194,7 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
         const Spacer(flex: 2),
         UiUtils.getBorderButtonBoxWithZeroPadding(18.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
             UiUtils.getTextWithFixedScale("변경", 10.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null), () async {
+              AppUpdateAccidentViewState.isAccountEditMode = true;
               AppUpdateAccidentViewState.startViewId = AppUpdateAccidentViewState.bankCodeViewId;
               AppUpdateAccidentViewState.endViewId = AppUpdateAccidentViewState.bankAccountViewId;
               var result = await CommonUtils.moveToWithResult(context, AppView.appUpdateAccidentView.value, null) as bool;
@@ -209,111 +209,7 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
               }
             }),
         UiUtils.getMarginBox(2.w, 0),
-      ]),
-      UiUtils.getMarginBox(0, 4.h),
-      Row(children: [
-        Column(children: [
-          SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale("기대출 횟수", 10.sp, FontWeight.w600, ColorStyles.upFinSky, TextAlign.start, null)),
-          UiUtils.getMarginBox(0, 1.h),
-          SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale(
-              MyData.selectedAccidentInfoData!.accidentLendCount.split("@")[0], 12.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
-        ]),
-        const Spacer(flex: 2),
-        UiUtils.getBorderButtonBoxWithZeroPadding(18.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
-            UiUtils.getTextWithFixedScale("변경", 10.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null), () async {
-              AppUpdateAccidentViewState.startViewId = AppUpdateAccidentViewState.preLoanCountViewId;
-              AppUpdateAccidentViewState.endViewId = AppUpdateAccidentViewState.preLoanCountViewId;
-              var result = await CommonUtils.moveToWithResult(context, AppView.appUpdateAccidentView.value, null) as bool;
-              if(result){
-                for(var each in MyData.getAccidentInfoList()){
-                  if(each.accidentCaseNumberYear+each.accidentCaseNumberType+each.accidentCaseNumberNumber ==
-                      MyData.selectedAccidentInfoData!.accidentCaseNumberYear+MyData.selectedAccidentInfoData!.accidentCaseNumberType+MyData.selectedAccidentInfoData!.accidentCaseNumberNumber){
-                    MyData.selectedAccidentInfoData = each;
-                  }
-                }
-                setState(() {});
-              }
-            }),
-        UiUtils.getMarginBox(2.w, 0),
-      ]),
-      MyData.selectedAccidentInfoData!.accidentLendCount.split("@")[1] != "0"? UiUtils.getMarginBox(0, 4.h) : Container(),
-      MyData.selectedAccidentInfoData!.accidentLendCount.split("@")[1] != "0"? Row(children: [
-        Column(children: [
-          SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale("인가후 대출금액", 10.sp, FontWeight.w600, ColorStyles.upFinSky, TextAlign.start, null)),
-          UiUtils.getMarginBox(0, 1.h),
-          SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale(
-              CommonUtils.getPriceFormattedString(double.parse(MyData.selectedAccidentInfoData!.accidentLendAmount)), 12.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
-        ]),
-        const Spacer(flex: 2),
-        UiUtils.getBorderButtonBoxWithZeroPadding(18.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
-            UiUtils.getTextWithFixedScale("변경", 10.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null), () async {
-              AppUpdateAccidentViewState.startViewId = AppUpdateAccidentViewState.preLoanPriceViewId;
-              AppUpdateAccidentViewState.endViewId = AppUpdateAccidentViewState.preLoanPriceViewId;
-              var result = await CommonUtils.moveToWithResult(context, AppView.appUpdateAccidentView.value, null) as bool;
-              if(result){
-                for(var each in MyData.getAccidentInfoList()){
-                  if(each.accidentCaseNumberYear+each.accidentCaseNumberType+each.accidentCaseNumberNumber ==
-                      MyData.selectedAccidentInfoData!.accidentCaseNumberYear+MyData.selectedAccidentInfoData!.accidentCaseNumberType+MyData.selectedAccidentInfoData!.accidentCaseNumberNumber){
-                    MyData.selectedAccidentInfoData = each;
-                  }
-                }
-                setState(() {});
-              }
-            }),
-        UiUtils.getMarginBox(2.w, 0),
-      ]) : Container(),
-      UiUtils.getMarginBox(0, 4.h),
-      Row(children: [
-        Column(children: [
-          SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale("희망 대출금액", 10.sp, FontWeight.w600, ColorStyles.upFinSky, TextAlign.start, null)),
-          UiUtils.getMarginBox(0, 1.h),
-          SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale(
-              CommonUtils.getPriceFormattedString(double.parse(MyData.selectedAccidentInfoData!.accidentWishAmount)), 12.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
-        ]),
-        const Spacer(flex: 2),
-        UiUtils.getBorderButtonBoxWithZeroPadding(18.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
-            UiUtils.getTextWithFixedScale("변경", 10.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null), () async {
-              AppUpdateAccidentViewState.startViewId = AppUpdateAccidentViewState.wantLoanPriceViewId;
-              AppUpdateAccidentViewState.endViewId = AppUpdateAccidentViewState.wantLoanPriceViewId;
-              var result = await CommonUtils.moveToWithResult(context, AppView.appUpdateAccidentView.value, null) as bool;
-              if(result){
-                for(var each in MyData.getAccidentInfoList()){
-                  if(each.accidentCaseNumberYear+each.accidentCaseNumberType+each.accidentCaseNumberNumber ==
-                      MyData.selectedAccidentInfoData!.accidentCaseNumberYear+MyData.selectedAccidentInfoData!.accidentCaseNumberType+MyData.selectedAccidentInfoData!.accidentCaseNumberNumber){
-                    MyData.selectedAccidentInfoData = each;
-                  }
-                }
-                setState(() {});
-              }
-            }),
-        UiUtils.getMarginBox(2.w, 0),
-      ]),
-      UiUtils.getMarginBox(0, 4.h),
-      Row(children: [
-        Column(children: [
-          SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale("직장정보", 10.sp, FontWeight.w600, ColorStyles.upFinSky, TextAlign.start, null)),
-          UiUtils.getMarginBox(0, 1.h),
-          SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale(
-              MyData.jobInfo.split("@")[0], 12.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
-        ]),
-        const Spacer(flex: 2),
-        UiUtils.getBorderButtonBoxWithZeroPadding(18.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
-            UiUtils.getTextWithFixedScale("변경", 10.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null), () async {
-              AppUpdateAccidentViewState.startViewId = AppUpdateAccidentViewState.jobViewId;
-              AppUpdateAccidentViewState.endViewId = AppUpdateAccidentViewState.jobViewId;
-              var result = await CommonUtils.moveToWithResult(context, AppView.appUpdateAccidentView.value, null) as bool;
-              if(result){
-                for(var each in MyData.getAccidentInfoList()){
-                  if(each.accidentCaseNumberYear+each.accidentCaseNumberType+each.accidentCaseNumberNumber ==
-                      MyData.selectedAccidentInfoData!.accidentCaseNumberYear+MyData.selectedAccidentInfoData!.accidentCaseNumberType+MyData.selectedAccidentInfoData!.accidentCaseNumberNumber){
-                    MyData.selectedAccidentInfoData = each;
-                  }
-                }
-                setState(() {});
-              }
-            }),
-        UiUtils.getMarginBox(2.w, 0),
-      ]),
+      ])
     ]);
   }
 
