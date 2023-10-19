@@ -20,6 +20,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
   static bool isAccountEditMode = true;
   static int startViewId = 0;
   static int endViewId = 0;
+  bool isPassToSearch = true;
 
   double scrollScreenHeight = 57.h;
   double itemHeight2 = 0;
@@ -694,11 +695,13 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
       Row(children: [
         UiUtils.getBorderButtonBox(42.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
             UiUtils.getTextWithFixedScale("네 좋아요!", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
+              isPassToSearch = true;
               _updateData();
             }),
         UiUtils.getMarginBox(2.w, 0),
         UiUtils.getBorderButtonBox(42.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
             UiUtils.getTextWithFixedScale("아니오", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
+              isPassToSearch = false;
               nextInputView();
             })
       ])
@@ -752,31 +755,43 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
         "wish_amount": selectedWantLoanPriceInfo,
       };
       UiUtils.showLoadingPop(context);
-      LogfinController.callLogfinApi(LogfinApis.prSearch, inputJsonForTest, (isSuccess, outputJson){
-        if(isSuccess){
-          _setAccidentAndUserInfo((isSuccessToUpdate){
-            if(isSuccessToUpdate){
-              LogfinController.getPrList("${MyData.selectedAccidentInfoData!.accidentCaseNumberYear}${MyData.selectedAccidentInfoData!.accidentCaseNumberType}${MyData.selectedAccidentInfoData!.accidentCaseNumberNumber}", (isSuccessToGetOffers, _){
-                UiUtils.closeLoadingPop(context);
-                if(isSuccessToGetOffers){
-                  CommonUtils.moveWithReplacementTo(context, AppView.appResultPrView.value, null);
-                }else{
-                  CommonUtils.flutterToast("에러가 발생했습니다.\n다시 실행해주세요.");
-                  Navigator.pop(context);
-                }
-              });
-            }else{
-              UiUtils.closeLoadingPop(context);
-              CommonUtils.flutterToast("에러가 발생했습니다.\n다시 실행해주세요.");
-              Navigator.pop(context);
-            }
-          });
-        }else{
+      if(isPassToSearch){
+        LogfinController.getPrList("${MyData.selectedAccidentInfoData!.accidentCaseNumberYear}${MyData.selectedAccidentInfoData!.accidentCaseNumberType}${MyData.selectedAccidentInfoData!.accidentCaseNumberNumber}", (isSuccessToGetOffers, _){
           UiUtils.closeLoadingPop(context);
-          CommonUtils.flutterToast("에러가 발생했습니다.\n다시 실행해주세요.");
-          Navigator.pop(context);
-        }
-      });
+          if(isSuccessToGetOffers){
+            CommonUtils.moveWithReplacementTo(context, AppView.appResultPrView.value, null);
+          }else{
+            CommonUtils.flutterToast("에러가 발생했습니다.\n다시 실행해주세요.");
+            Navigator.pop(context);
+          }
+        });
+      }else{
+        LogfinController.callLogfinApi(LogfinApis.prSearch, inputJsonForTest, (isSuccess, outputJson){
+          if(isSuccess){
+            _setAccidentAndUserInfo((isSuccessToUpdate){
+              if(isSuccessToUpdate){
+                LogfinController.getPrList("${MyData.selectedAccidentInfoData!.accidentCaseNumberYear}${MyData.selectedAccidentInfoData!.accidentCaseNumberType}${MyData.selectedAccidentInfoData!.accidentCaseNumberNumber}", (isSuccessToGetOffers, _){
+                  UiUtils.closeLoadingPop(context);
+                  if(isSuccessToGetOffers){
+                    CommonUtils.moveWithReplacementTo(context, AppView.appResultPrView.value, null);
+                  }else{
+                    CommonUtils.flutterToast("에러가 발생했습니다.\n다시 실행해주세요.");
+                    Navigator.pop(context);
+                  }
+                });
+              }else{
+                UiUtils.closeLoadingPop(context);
+                CommonUtils.flutterToast("에러가 발생했습니다.\n다시 실행해주세요.");
+                Navigator.pop(context);
+              }
+            });
+          }else{
+            UiUtils.closeLoadingPop(context);
+            CommonUtils.flutterToast("에러가 발생했습니다.\n다시 실행해주세요.");
+            Navigator.pop(context);
+          }
+        });
+      }
     }
   }
 

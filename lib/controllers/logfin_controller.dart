@@ -127,11 +127,56 @@ class LogfinController {
       }
       CommonUtils.log("i", "niceUrl : $niceUrl");
 
+      final agreeASnapshot = await ref.child('UPFIN/API/logfin/list_data/agree/agreeA').get();
+      List<String> docTypeTempList = [];
+      if (agreeASnapshot.exists) {
+        for (var each in agreeASnapshot.children) {
+          docTypeTempList.add(each.value.toString());
+        }
+      } else {
+        failCount++;
+      }
+      final agreeBSnapshot = await ref.child('UPFIN/API/logfin/list_data/agree/agreeB').get();
+      if (agreeBSnapshot.exists) {
+        for (var each in agreeBSnapshot.children) {
+          docTypeTempList.add(each.value.toString());
+        }
+      } else {
+        failCount++;
+      }
+
       if(failCount > 0){
         callback(false);
       }else{
         callback(true);
       }
+
+      /*
+      int cnt = 0;
+      for(var each in docTypeTempList){
+        String searchType = each.split("@")[0];
+        var inputJson = {
+          "type" : searchType
+        };
+        cnt++;
+        callLogfinApi(LogfinApis.getAgreeDocuments, inputJson, (isSuccessToGetAgreeInfo, outputJsonForGetAgreeInfo){
+          if(isSuccessToGetAgreeInfo){
+            MyData.agreeDocsList.add({"type" : searchType, "result" : outputJsonForGetAgreeInfo});
+          }else{
+            failCount++;
+          }
+
+          if(cnt == docTypeTempList.length){
+            if(failCount > 0){
+              callback(false);
+            }else{
+              callback(true);
+            }
+          }
+        });
+      }
+      */
+
     } catch (e) {
       CommonUtils.log("e", "logfin other data init error : ${e.toString()}");
       callback(false);
@@ -571,12 +616,13 @@ class LogfinController {
 }
 
 enum LogfinApis {
-  signUp, signIn, socialLogin, deleteAccount, bankUpdateInfo, checkMember, customerUpdateInfo,
+  signUp, signIn, socialLogin, deleteAccount,
+  bankUpdateInfo, checkMember, customerUpdateInfo,
   getUserInfo, prSearch, getOffers,
   applyProductDocSearch, applyProduct,
   getAccidentInfo, getOffersInfo,
   getLoansInfo, getLoansDetailInfo,
-  sendMessage, getMessage, checkMessage
+  sendMessage, getMessage, checkMessage, getAgreeDocuments
 }
 
 extension LogfinApisExtension on LogfinApis {
@@ -620,6 +666,8 @@ extension LogfinApisExtension on LogfinApis {
         return '/get_messages.json';
       case LogfinApis.checkMessage:
         return '/checked_messages.json';
+      case LogfinApis.getAgreeDocuments:
+        return '/get_documents.json';
     }
   }
 }

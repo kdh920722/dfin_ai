@@ -23,6 +23,7 @@ class MyData {
   static String nameFromSns = "";
   static String emailFromSns = "";
   static String phoneNumberFromSns = "";
+  static List<Map<String,dynamic>> agreeDocsList = [];
 
   // accident data
   static final List<AccidentInfoData> _accidentInfoList = [];
@@ -246,5 +247,6 @@ class MyData {
     clearChatRoomInfoList();
     selectedPrInfoData = null;
     selectedAccidentInfoData = null;
+    agreeDocsList.clear();
   }
 }

@@ -148,11 +148,11 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             ])),
             Obx((){
               List<Widget> accidentWidgetList = _getAccidentWidgetList();
-              return SizedBox(width: 90.w, height: accidentWidgetList.isEmpty ? 8.h : accidentWidgetList.length > 1 ? 27.h : 21.h,
+              return SizedBox(width: 90.w, height: accidentWidgetList.isEmpty ? 8.h : accidentWidgetList.length > 1 ? 27.h : 22.h,
                   child: accidentWidgetList.isNotEmpty ? Column(
                     children: <Widget>[
                       // PageView
-                      SizedBox(width: 90.w, height: 20.h,
+                      SizedBox(width: 90.w, height: 21.h,
                         child: PageView(
                           controller: _pageController,
                           children: accidentWidgetList,
