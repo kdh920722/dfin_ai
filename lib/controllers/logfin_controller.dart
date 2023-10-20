@@ -151,7 +151,6 @@ class LogfinController {
         callback(true);
       }
 
-      /*
       int cnt = 0;
       for(var each in docTypeTempList){
         String searchType = each.split("@")[0];
@@ -175,7 +174,6 @@ class LogfinController {
           }
         });
       }
-      */
 
     } catch (e) {
       CommonUtils.log("e", "logfin other data init error : ${e.toString()}");
@@ -197,7 +195,8 @@ class LogfinController {
       inputJson['fcm_token'] = FireBaseController.fcmToken;
     }
 
-    if(api != LogfinApis.signIn && api != LogfinApis.signUp && api != LogfinApis.socialLogin && api != LogfinApis.deleteAccount && api != LogfinApis.checkMember){
+    if(api != LogfinApis.signIn && api != LogfinApis.signUp && api != LogfinApis.socialLogin
+        && api != LogfinApis.deleteAccount && api != LogfinApis.checkMember && api != LogfinApis.getAgreeDocuments){
       if(userToken != ""){
         inputJson['api_token'] = userToken;
       }else{

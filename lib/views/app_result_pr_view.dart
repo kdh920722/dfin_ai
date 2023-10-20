@@ -345,11 +345,18 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
     <div id='type2'>(본문2)type2: 업핀을 찾아주셔서 너무너무감사하네요~ 하하하깔깔깔 한번 잘 사용해보세요~~부자되세요~본문내용 여기에 들어갑니다</div>
     <br>
     <div id='type3'>(본문3)type3: 업핀을 찾아주셔서 너무너무감사하네요~ 하하하깔깔깔 한번 잘 사용해보세요~~부자되세요~본문내용 여기에 들어갑니다</div>
+    
+    <div id='type3'>(본문3)type3: 업핀을 찾아주셔서 너무너무감사하네요~ 하하하깔깔깔 한번 잘 사용해보세요~~부자되세요~본문내용 여기에 들어갑니다</div>
+    
+    <a href="https://www.naver.com"><button>예제 링크</button></a>
+ 
+    <br>
+    <a href='/mycredit/cXfOR99PRmMZyaORJKl3-w?checklist=1'>  나이스신용인증 바로가기  </a>
     """;
 
     Widget htmlWidget = Column(mainAxisAlignment: MainAxisAlignment.start, children: [
       HtmlWidget(
-        StringConfig.htmlTest2,
+        htmlTest,
         customStylesBuilder: (element) {
           if (element.id.contains('type1')) {
             return {
@@ -372,15 +379,28 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
               "line-height" : "200%",
               "font-weight": "bold"
             };
+          }else if (element.localName == 'button') {
+            return {
+              //"cursor": "pointer",
+              //"display":"inlne-block",
+              "text-align":"center",
+              "background-color":"#3a6cff",
+              "color" : "white",
+              "font-size": "14px",
+              "line-height" : "250%",
+              "font-weight": "normal",
+              "border-radius":"0.1em",
+              "padding":"5px 20px"
+            };
           }
 
           return null;
         },
+
         onTapUrl: (url) async {
-          print('tapped ${url.split("/").last.split("?").first}');
           UiUtils.showLoadingPop(context);
           Map<String, String> urlInfoMap = {
-            "url" : "${LogfinController.niceUrl}/${url.split("/").last.split("?").first}?checklist=1"
+            "url" : url
           };
           bool isSuccess = false;
           var result = await CommonUtils.moveToWithResult(context, AppView.appWebView.value, urlInfoMap);
