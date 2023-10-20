@@ -368,7 +368,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                   UiUtils.getTextWithFixedScale("(필수)전체 동의하기", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null)
                 ],
               )),
-              UiUtils.getMarginBox(0, 1.5.h),
+              UiUtils.getMarginBox(0, 1.5.h), //MyData.getAgreeContents("A1");
               _getSmallAgreeInfoWidget(thisSetState, "업핀 서비스 이용약관", StringConfig.agreeContents1, item1SubAgreed1!, _getSmallAgree1Sub1Act),
               _getSmallAgreeInfoWidget(thisSetState, "개인(신용)정보 수집 이용 제공 동의서", StringConfig.agreeContents1, item1SubAgreed2!, _getSmallAgree1Sub2Act),
               _getSmallAgreeInfoWidget(thisSetState, "개인(신용)정보 수집 이용 제공 동의서", StringConfig.agreeContents1, item1SubAgreed3!, _getSmallAgree1Sub3Act),

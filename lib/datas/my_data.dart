@@ -194,6 +194,15 @@ class MyData {
   static PrInfoData? selectedPrInfoData;
   static AccidentInfoData? selectedAccidentInfoData;
 
+  static String getAgreeContents(String type){
+    String result = "";
+    for(var each in agreeDocsList){
+      if(each["type"] == type) result = each["data"];
+    }
+
+    return result;
+  }
+
   static void printData(){
     String selectedPrInfoDataCheck = "";
     if(selectedPrInfoData != null){
