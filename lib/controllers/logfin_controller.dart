@@ -145,12 +145,6 @@ class LogfinController {
         failCount++;
       }
 
-      if(failCount > 0){
-        callback(false);
-      }else{
-        callback(true);
-      }
-
       int cnt = 0;
       for(var each in docTypeTempList){
         String searchType = each.split("@")[0];
@@ -235,6 +229,9 @@ class LogfinController {
             LogfinController.userToken = resultData["data"]['api_token'];
             CommonUtils.log('i', "userToken : ${LogfinController.userToken}");
           }else if(api == LogfinApis.getOffers || api == LogfinApis.getMessage){
+            callback(true, resultData);
+            return;
+          }else if(api == LogfinApis.getAgreeDocuments){
             callback(true, resultData);
             return;
           }
@@ -342,7 +339,7 @@ class LogfinController {
               GetController.to.resetAccdientInfoList();
               callback(true, false);
             }else {
-              //MyData.clearAccidentInfoList();
+              MyData.clearAccidentInfoList();
               String bankInfo = "";
               String courtInfo = "";
               String lendCountInfo = "";
@@ -373,7 +370,11 @@ class LogfinController {
                 String wishAmount = dataResult["wish_amount"].toString() == ""? "0" : dataResult["wish_amount"].toString();
                 String accidentNo = dataResult["issue_no"];
                 var resData = jsonDecode(dataResult["res_data"]);
+                String date = dataResult["created_at"].toString();
+
+                //created_at: 2023-10-20T13:21:19.000+09:00, updated_at:
                 CommonUtils.log("i", "accident data ====>\n"
+                    "date: ${dataResult["created_at"]} || ${dataResult["updated_at"]}\n"
                     "accidentUid: ${dataResult["id"]}\n"
                     "accidentUid: ${dataResult["uid"]}\n"
                     "accidentCaseNo: $accidentNo\n"
@@ -385,7 +386,7 @@ class LogfinController {
                     "wish_amount: ${dataResult["wish_amount"]}\n"
                     "res_data: ${resData["data"]["resRepaymentList"]}\n");
                 MyData.addToAccidentInfoList(AccidentInfoData(dataResult["id"].toString(), dataResult["uid"], accidentNo.substring(0,4), accidentNo.substring(4,6), accidentNo.substring(6),
-                    courtInfo, bankInfo, dataResult["refund_account"].toString(), lendCountInfo, lendAmount, wishAmount, resData["data"]));
+                    courtInfo, bankInfo, dataResult["refund_account"].toString(), lendCountInfo, lendAmount, wishAmount, date, resData["data"]));
               }
 
               GetController.to.updateAccidentInfoList(MyData.getAccidentInfoList());

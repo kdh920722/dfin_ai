@@ -179,11 +179,25 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
     GetController.to.resetFirstIndex2();
     GetController.to.resetLastIndex2();
 
-    GetController.to.updateFirstIndex1(0);
-    GetController.to.updateLastIndex1(12);
+    itemFullHeight1 = scrollScreenHeight*2;
+    itemHeight1 = itemFullHeight1/LogfinController.courtList.length;
+    maxVisibleItemCnt1 = (scrollScreenHeight/itemHeight1).ceil();
+    int firstVisibleItem1 = 0;
+    int lastVisibleItem1 = firstVisibleItem1+maxVisibleItemCnt1;
+    if(firstVisibleItem1 <=0 ) firstVisibleItem1 = 0;
+    if(lastVisibleItem1 >= LogfinController.courtList.length-1) lastVisibleItem1 = LogfinController.courtList.length-1;
+    GetController.to.updateFirstIndex1(firstVisibleItem1);
+    GetController.to.updateLastIndex1(lastVisibleItem1);
 
-    GetController.to.updateFirstIndex2(0);
-    GetController.to.updateLastIndex2(10);
+    itemFullHeight2 = scrollScreenHeight*2;
+    itemHeight2 = itemFullHeight2/LogfinController.bankList.length;
+    maxVisibleItemCnt2 = (scrollScreenHeight/itemHeight2).ceil();
+    int firstVisibleItem2 = 0;
+    int lastVisibleItem2 = firstVisibleItem2+maxVisibleItemCnt2;
+    if(firstVisibleItem2 <=0 ) firstVisibleItem2 = 0;
+    if(lastVisibleItem2 >= LogfinController.bankList.length-1) lastVisibleItem2 = LogfinController.bankList.length-1;
+    GetController.to.updateFirstIndex2(firstVisibleItem2);
+    GetController.to.updateLastIndex2(lastVisibleItem2);
 
     Config.contextForEmergencyBack = context;
     Config.isEmergencyRoot = false;
@@ -252,12 +266,15 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
   Widget _getCourtView(){
     List<Widget> courtList = [];
     Color textColor = ColorStyles.upFinBlack;
+    FontWeight fontWeight = FontWeight.w500;
     for(int i=0; i<LogfinController.courtList.length ; i++){
       Key key = Key(LogfinController.courtList[i]);
       if(selectedCourtKey == key){
-        textColor = ColorStyles.upFinTextAndBorderBlue;
+        textColor = ColorStyles.upFinBlack;
+        fontWeight = FontWeight.w600;
       }else{
         textColor = ColorStyles.upFinBlack;
+        fontWeight = FontWeight.w500;
         if(GetController.to.firstVisibleItem1.value >= 3){
           if(GetController.to.firstVisibleItem1.value-2 <= i && i <= GetController.to.firstVisibleItem1.value+1){
             textColor = Colors.black12;
@@ -279,7 +296,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       courtList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                selectedCourtKey == key? UiUtils.getCustomCheckBox(key, 1.5, selectedCourtKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                selectedCourtKey == key? UiUtils.getCustomCheckBox(key, 1.5, selectedCourtKey == key, ColorStyles.upFinButtonBlue, ColorStyles.upFinWhite,
                     ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
                   setState(() {
                     if(checkedValue != null){
@@ -300,7 +317,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                         }
                       });
                     }),
-                Expanded(child: UiUtils.getTextButtonWithFixedScale(LogfinController.courtList[i].split("@")[0], 15.sp, FontWeight.w500, textColor, TextAlign.start, null, (){
+                Expanded(child: UiUtils.getTextButtonWithFixedScale(LogfinController.courtList[i].split("@")[0], 15.sp, fontWeight, textColor, TextAlign.start, null, (){
                   setState(() {
                     selectedCourtKey = key;
                     selectedCourtInfo = LogfinController.courtList[i];
@@ -320,7 +337,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
           Navigator.pop(context, "back");
         }),
       ])),
-      UiUtils.getMarginBox(0, 3.h),
+      UiUtils.getMarginBox(0, 3.w),
       SizedBox(width: 85.w,  height: 5.h,child: UiUtils.getTextWithFixedScale("우선 ", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       SizedBox(width: 85.w,  height: 5.h,child: UiUtils.getTextWithFixedScale("사건정보가 필요합니다.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("해당 법원을 선택해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
@@ -420,12 +437,15 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
   Widget _getBankCodeView(){
     List<Widget> bankCodeList = [];
     Color textColor = ColorStyles.upFinBlack;
+    FontWeight fontWeight = FontWeight.w500;
     for(int i=0 ; i<LogfinController.bankList.length ; i++){
       Key key = Key(LogfinController.bankList[i]);
       if(selectedBankCodeKey == key){
-        textColor = ColorStyles.upFinTextAndBorderBlue;
+        textColor = ColorStyles.upFinBlack;
+        fontWeight = FontWeight.w600;
       }else{
         textColor = ColorStyles.upFinBlack;
+        fontWeight = FontWeight.w500;
         if(GetController.to.firstVisibleItem2.value >= 3){
           if(GetController.to.firstVisibleItem2.value-2 <= i && i <= GetController.to.firstVisibleItem2.value+1){
             textColor = Colors.black12;
@@ -447,7 +467,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       bankCodeList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                selectedBankCodeKey == key? UiUtils.getCustomCheckBox(key, 1.5, selectedBankCodeKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                selectedBankCodeKey == key? UiUtils.getCustomCheckBox(key, 1.5, selectedBankCodeKey == key, ColorStyles.upFinButtonBlue, ColorStyles.upFinWhite,
                     ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
@@ -468,7 +488,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                         }
                       });
                     }),
-                Expanded(child: UiUtils.getTextButtonWithFixedScale(LogfinController.bankList[i].split("@")[0], 15.sp, FontWeight.w500, textColor, TextAlign.start, null, (){
+                Expanded(child: UiUtils.getTextButtonWithFixedScale(LogfinController.bankList[i].split("@")[0], 15.sp, fontWeight, textColor, TextAlign.start, null, (){
                   setState(() {
                     selectedBankCodeKey = key;
                     selectedBankCodeInfo = LogfinController.bankList[i];
@@ -570,18 +590,21 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
   Widget _getPreLoanCountView(){
     List<Widget> loanCountList = [];
     Color textColor = ColorStyles.upFinBlack;
+    FontWeight fontWeight = FontWeight.w500;
     for(var each in LogfinController.preLoanCountList){
       Key key = Key(each);
       if(selectedPreLoanCountKey == key) {
-        textColor = ColorStyles.upFinTextAndBorderBlue;
+        textColor = ColorStyles.upFinBlack;
+        fontWeight = FontWeight.w600;
       }
       else{
+        fontWeight = FontWeight.w500;
         textColor = ColorStyles.upFinBlack;
       }
       loanCountList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                selectedPreLoanCountKey == key? UiUtils.getCustomCheckBox(key, 1.5, selectedPreLoanCountKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                selectedPreLoanCountKey == key? UiUtils.getCustomCheckBox(key, 1.5, selectedPreLoanCountKey == key, ColorStyles.upFinButtonBlue, ColorStyles.upFinWhite,
                     ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
@@ -602,7 +625,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                         }
                       });
                     }),
-                Expanded(child: UiUtils.getTextButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w500, textColor, TextAlign.start, null, (){
+                Expanded(child: UiUtils.getTextButtonWithFixedScale(each.split("@")[0], 15.sp, fontWeight, textColor, TextAlign.start, null, (){
                   setState(() {
                     selectedPreLoanCountKey = key;
                     selectedPreLoanCountInfo = each;
@@ -664,7 +687,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         Obx(()=>
             Row(mainAxisAlignment: MainAxisAlignment.start, children: [
               UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _preLoanPriceFocus, _preLoanPriceTextController, TextInputType.number, false,
-                  UiUtils.getInputDecorationForPrice("", 0.sp, GetController.to.preLoanPrice.value, 11.sp), (text) {
+                  UiUtils.getInputDecorationForPrice("", 0.sp, GetController.to.preLoanPrice.value), (text) {
                     if(text.trim() != ""){
                       final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
                       GetController.to.updatePreLoanPrice(CommonUtils.getPriceFormattedString(number!));
@@ -716,7 +739,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         // SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력단위(*만원)", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
         UiUtils.getMarginBox(0, 5.h),
         Obx(()=>UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _wantLoanPriceFocus, _wantLoanPriceTextController, TextInputType.number, false,
-            UiUtils.getInputDecorationForPrice("", 0.sp, GetController.to.wantLoanPrice.value, 11.sp), (text) {
+            UiUtils.getInputDecorationForPrice("", 0.sp, GetController.to.wantLoanPrice.value), (text) {
               if(text.trim() != ""){
                 final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
                 GetController.to.updateWantLoanPrice(CommonUtils.getPriceFormattedString(number!));
@@ -750,18 +773,21 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
   Widget _getJobView(){
     List<Widget> jobList = [];
     Color textColor = ColorStyles.upFinBlack;
+    FontWeight fontWeight = FontWeight.w500;
     for(var each in LogfinController.jobList){
       Key key = Key(each);
       if(selectedJobKey == key) {
-        textColor = ColorStyles.upFinTextAndBorderBlue;
+        textColor = ColorStyles.upFinBlack;
+        fontWeight = FontWeight.w600;
       }
       else{
         textColor = ColorStyles.upFinBlack;
+        fontWeight = FontWeight.w500;
       }
       jobList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                selectedJobKey == key? UiUtils.getCustomCheckBox(key, 1.5, selectedJobKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                selectedJobKey == key? UiUtils.getCustomCheckBox(key, 1.5, selectedJobKey == key, ColorStyles.upFinButtonBlue, ColorStyles.upFinWhite,
                     ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
@@ -782,7 +808,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                         }
                       });
                     }),
-                Expanded(child: UiUtils.getTextButtonWithFixedScale(each.split("@")[0], 15.sp, FontWeight.w500, textColor, TextAlign.start, null, (){
+                Expanded(child: UiUtils.getTextButtonWithFixedScale(each.split("@")[0], 15.sp, fontWeight, textColor, TextAlign.start, null, (){
                   setState(() {
                     selectedJobKey = key;
                     selectedJobInfo = each;
@@ -914,8 +940,11 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                       LogfinController.getAccidentInfo((isSuccessToGetAccidentInfo, isNotEmpty){
                         if(isSuccessToGetAccidentInfo){
                           if(isNotEmpty){
+                            String thisAccidentNum = selectedAccidentInfo;
+                            String updatedAccidentUid = MyData.findUidInAccidentInfoList(thisAccidentNum);
+                            CommonUtils.log("i", "updatedAccidentUid $updatedAccidentUid");
                             for(var each in MyData.getAccidentInfoList()){
-                              if(each.accidentCaseNumberYear == selectedAccidentInfo.split("개회")[0] && each.accidentCaseNumberNumber == selectedAccidentInfo.split("개회")[1]){
+                              if(each.accidentUid == updatedAccidentUid){
                                 MyData.selectedAccidentInfoData = each;
                               }
                             }
@@ -1036,23 +1065,23 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
     if(CommonUtils.isValidStateByAPiExpiredDate()){
       Widget? view;
       if(currentViewId == courtViewId){
-        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: Obx(()=>_getCourtView()));
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: Obx(()=>_getCourtView()));
       }else if(currentViewId == accidentViewId){
-        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getAccidentView());
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getAccidentView());
       }else if(currentViewId == bankCodeViewId){
-        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: Obx(()=>_getBankCodeView()));
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: Obx(()=>_getBankCodeView()));
       }else if(currentViewId == bankAccountViewId){
-        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getBankAccountView());
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getBankAccountView());
       }else if(currentViewId == preLoanCountViewId){
-        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getPreLoanCountView());
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getPreLoanCountView());
       }else if(currentViewId == preLoanPriceViewId){
-        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getPreLoanPriceView());
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getPreLoanPriceView());
       }else if(currentViewId == wantLoanPriceViewId){
-        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getWantLoanPriceView());
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getWantLoanPriceView());
       }else if(currentViewId == jobViewId){
-        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getJobView());
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getJobView());
       }else{
-        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w), child: _getFinishConfirmView());
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getFinishConfirmView());
       }
 
       return UiUtils.getViewWithAllowBackForAndroid(context, view, back);

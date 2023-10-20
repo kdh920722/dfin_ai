@@ -10,9 +10,10 @@ class AccidentInfoData {
   String accidentLendCount;
   String accidentLendAmount;
   String accidentWishAmount;
+  String date;
   Map<String, dynamic> resData;
 
   AccidentInfoData(this.id, this.accidentUid, this.accidentCaseNumberYear, this.accidentCaseNumberType, this.accidentCaseNumberNumber,
       this.accidentCourtInfo, this.accidentBankInfo, this.accidentBankAccount,
-      this.accidentLendCount, this.accidentLendAmount, this.accidentWishAmount, this.resData);
+      this.accidentLendCount, this.accidentLendAmount, this.accidentWishAmount, this.date, this.resData);
 }

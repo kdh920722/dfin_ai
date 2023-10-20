@@ -74,22 +74,23 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
 
   void back(){
     CommonUtils.hideKeyBoard();
-    Navigator.pop(context);
+    Future.delayed(const Duration(milliseconds: 400), () async {
+      Navigator.pop(context);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    Widget view = Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: EdgeInsets.all(5.w), child:
+    Widget view = Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child:
     Form(key: _formKey,
         child: UiUtils.getRowColumnWithAlignCenter([
           SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             UiUtils.getBackButton(() async {
-              CommonUtils.hideKeyBoard();
-              Navigator.pop(context);
+              back();
             }),
           ])),
           SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            UiUtils.getMarginBox(0, 3.h),
+            UiUtils.getMarginBox(0, 3.w),
             UiUtils.getTextWithFixedScale("로그인", 26.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
             UiUtils.getMarginBox(0, 3.h)
           ])),

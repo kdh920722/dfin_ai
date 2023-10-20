@@ -244,8 +244,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
   }
   Widget _getSmallAgreeInfoWidget(StateSetter thisSetState, String titleString, String contentsString, bool isAgreeCheck, Function(bool isCheck) callAct){
     return SizedBox(width: 100.w, height: 4.h, child: Row(children: [
-      UiUtils.getMarginBox(5.w, 0),
-      UiUtils.getBorderButtonBoxWithZeroPadding(80.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite, Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+      UiUtils.getBorderButtonBoxWithZeroPadding(87.5.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite, Row(mainAxisAlignment: MainAxisAlignment.start, children: [
         isAgreeCheck? UiUtils.getCustomCheckBox(UniqueKey(), 1, isAgreeCheck, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
             ColorStyles.upFinWhite, ColorStyles.upFinWhite, (checkedValue){
               thisSetState(() {
@@ -309,7 +308,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
           ]),
           UiUtils.getMarginBox(0, 1.5.h),
           Wrap(children: [
-            UiUtils.getTextWithFixedScale("서비스를 이용하기 위해 고객님의 서비스 이용약관에 동의가 필요합니다.", 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)
+            UiUtils.getTextWithFixedScaleForAgreeSubTitle("서비스를 이용하기 위해 고객님의 서비스 이용약관에 동의가 필요합니다.", 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)
           ]),
           UiUtils.getMarginBox(0, 3.h),
           GestureDetector(child: Container(color: ColorStyles.upFinWhiteGray, child: Row(
@@ -369,11 +368,12 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                   UiUtils.getTextWithFixedScale("(필수)전체 동의하기", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null)
                 ],
               )),
-              _getSmallAgreeInfoWidget(thisSetState, "1.업핀 서비스 이용약관", StringConfig.agreeContents1, item1SubAgreed1!, _getSmallAgree1Sub1Act),
-              _getSmallAgreeInfoWidget(thisSetState, "2.개인(신용)정보 수집 이용 제공 동의서", StringConfig.agreeContents1, item1SubAgreed2!, _getSmallAgree1Sub2Act),
-              _getSmallAgreeInfoWidget(thisSetState, "3.개인(신용)정보 수집 이용 제공 동의서", StringConfig.agreeContents1, item1SubAgreed3!, _getSmallAgree1Sub3Act),
+              UiUtils.getMarginBox(0, 1.5.h),
+              _getSmallAgreeInfoWidget(thisSetState, "업핀 서비스 이용약관", StringConfig.agreeContents1, item1SubAgreed1!, _getSmallAgree1Sub1Act),
+              _getSmallAgreeInfoWidget(thisSetState, "개인(신용)정보 수집 이용 제공 동의서", StringConfig.agreeContents1, item1SubAgreed2!, _getSmallAgree1Sub2Act),
+              _getSmallAgreeInfoWidget(thisSetState, "개인(신용)정보 수집 이용 제공 동의서", StringConfig.agreeContents1, item1SubAgreed3!, _getSmallAgree1Sub3Act),
             ]),
-            UiUtils.getMarginBox(0, 2.h),
+            UiUtils.getMarginBox(0, 1.5.h),
             Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
               Container(padding: EdgeInsets.zero, height: 3.h, child: Row(
                 children: [
@@ -391,7 +391,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                   UiUtils.getTextWithFixedScale("(선택)전체 동의하기", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null)
                 ],
               )),
-              _getSmallAgreeInfoWidget(thisSetState, "1.마케팅 정보 수신 동의", StringConfig.agreeContents1, item2SubAgreed1!, _getSmallAgree2Sub1Act)
+              _getSmallAgreeInfoWidget(thisSetState, "마케팅 정보 수신 동의", StringConfig.agreeContents1, item2SubAgreed1!, _getSmallAgree2Sub1Act)
             ]),
           ])),
           UiUtils.getMarginBox(0, 3.h),
@@ -475,12 +475,11 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
     return Form(key: _formKey1, child: UiUtils.getRowColumnWithAlignCenter([
       SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         UiUtils.getBackButton(() {
-          CommonUtils.hideKeyBoard();
-          Navigator.pop(context);
+          back();
         })
       ])),
       SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getMarginBox(0, 3.h),
+        UiUtils.getMarginBox(0, 3.w),
         UiUtils.getTextWithFixedScale("회원가입", 26.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
         UiUtils.getMarginBox(0, 3.h)
       ])),
@@ -560,14 +559,11 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
     return Form(key: _formKey2, child: UiUtils.getRowColumnWithAlignCenter([
       Obx(()=>!GetController.to.isConfirmed.value? SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         UiUtils.getBackButton(() async {
-          CommonUtils.hideKeyBoard();
-          setState(() {
-            viewId = 1;
-          });
+          back();
         }),
       ])) : UiUtils.getMarginBox(0, 7.h)),
       SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getMarginBox(0, 3.h),
+        UiUtils.getMarginBox(0, 3.w),
         UiUtils.getTextWithFixedScale("본인인증", 26.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
         UiUtils.getMarginBox(0, 3.h)
       ])),
@@ -604,7 +600,9 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
   void back(){
     CommonUtils.hideKeyBoard();
     if(viewId == 1){
-      Navigator.pop(context);
+      Future.delayed(const Duration(milliseconds: 400), () async {
+        Navigator.pop(context);
+      });
     }else{
       setState(() {
         viewId = 1;
@@ -614,7 +612,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
 
   @override
   Widget build(BuildContext context) {
-    Widget view = Container(width: 100.w, height: 95.h, color: ColorStyles.upFinWhite, padding: EdgeInsets.all(5.w),
+    Widget view = Container(width: 100.w, height: 95.h, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w),
         child: viewId == 1 ? _getEmailAndPwInfoView() : _getPhoneValidView()
     );
 

@@ -240,7 +240,7 @@ class CodeFController{
               callback(false, apiInfoDataList);
             }
           });
-          await Future.delayed(const Duration(milliseconds: 500), () async {});
+          await Future.delayed(const Duration(milliseconds: 1000), () async {});
           isFirstCalledOnCert = true;
         }else{
           _callApiWithOutCert(context, each.api, each.inputJson, (isSuccess, resultMap, resultListMap, fullMap){
@@ -484,12 +484,14 @@ class CodeFController{
       certName = "PASS앱에서 $certName";
     }
 
-    UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, 50.h, 0.0, (context, setState){
+    UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, 40.h, 0.0, (context, setState){
       return Obx(()=>Column(mainAxisAlignment: MainAxisAlignment.start, children:[
-        UiUtils.getMarginBox(0, 3.h),
         UiUtils.getMarginBox(0, 13.h),
-        GetController.to.isWait.value? UiUtils.getImage(22.w, 22.w,  Image.asset(fit: BoxFit.fill,'assets/images/doc_move.gif')) : UiUtils.getStyledTextWithFixedScale(certName, TextStyles.upFinBasicTextStyle, TextAlign.center, null),
-        GetController.to.isWait.value? UiUtils.getMarginBox(0, 2.h) : UiUtils.getMarginBox(0, 0.5.h),
+        GetController.to.isWait.value? UiUtils.getImage(20.w, 20.w,  Image.asset(fit: BoxFit.fill,'assets/images/doc_move.gif'))
+            : Column(children: [
+              UiUtils.getMarginBox(0, 0.5.h),
+              UiUtils.getStyledTextWithFixedScale(certName, TextStyles.upFinBasicTextStyle, TextAlign.center, null)]),
+        GetController.to.isWait.value? UiUtils.getMarginBox(0, 3.h) : UiUtils.getMarginBox(0, 0.5.h),
         GetController.to.isWait.value? UiUtils.getStyledTextWithFixedScale("서류를 가지고 오는중입니다.", TextStyles.upFinBasicTextStyle, TextAlign.center, null) : Container(),
         GetController.to.isWait.value? Container() : UiUtils.getStyledTextWithFixedScale("간편인증 후 확인 버튼을 눌러주세요.", TextStyles.upFinBasicTextStyle, TextAlign.center, null),
         GetController.to.isWait.value? Container() : UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),

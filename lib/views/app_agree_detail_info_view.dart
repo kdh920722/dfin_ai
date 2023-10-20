@@ -66,14 +66,13 @@ class AppAgreeDetailInfoViewState extends State<AppAgreeDetailInfoView> with Wid
           color: ColorStyles.upFinWhite,
           width: 100.w,
           height: 100.h,
-          padding: EdgeInsets.all(5.w),
+          padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w),
           child: Column(children: [
-            Row(children: [
-              const Spacer(flex: 2),
-              UiUtils.getIconButtonWithHeight(5.h, Icons.close, 20.sp, ColorStyles.upFinRealGray, () async {
+            SizedBox(width: 90.w, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+              UiUtils.getCloseButton(ColorStyles.upFinDarkGray, () {
                 Navigator.pop(context, false);
               })
-            ]),
+            ])),
             //UiUtils.getMarginBox(0, 3.h),
             //SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(title, 22.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
             UiUtils.getMarginBox(0, 2.h),

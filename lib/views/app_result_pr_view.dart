@@ -75,6 +75,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
     WidgetsBinding.instance.removeObserver(this);
     _tabController.dispose();
     Config.contextForEmergencyBack = null;
+    MyData.selectedAccidentInfoData = null;
     super.dispose();
   }
 
@@ -127,6 +128,17 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
     precacheImage(const AssetImage('assets/images/bank_logo_safe.png'), context);
   }
 
+  List<Widget> _getMsgListIWidget(List<String> msgList){
+    List<Widget> widgetList = [];
+    for(var eachMsg in msgList){
+      widgetList.add(UiUtils.getBoxTextAndIconWithFixedScale(eachMsg, 8.sp, FontWeight.w500, TextAlign.start, ColorStyles.upFinWhiteRed, ColorStyles.upFinRed,
+          Icons.warning_rounded, ColorStyles.upFinRed, 5.w));
+
+      widgetList.add(UiUtils.getMarginBox(0, 0.5.h));
+    }
+    return widgetList;
+  }
+
   Widget _getPrListView(bool isPossible){
     List<Widget> prInfoWidgetList = [];
     for(var each in MyData.getPrInfoList()){
@@ -134,6 +146,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
         //CommonUtils.log("i", "${each.productLoanMinRates} ${CommonUtils.getPriceFormattedString(double.parse(each.productLoanLimit))}");
         String msg = "";
         String eachMsg = "";
+        List<String> msgList = [];
         for(int i = 0 ; i < each.failReason.length ; i++){
           if(each.failReason[i].contains("잔여한도")){
             String frontMsg = each.failReason[i].split("잔여한도")[0].replaceAll(",", "");
@@ -142,6 +155,8 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
           }else{
             eachMsg = each.failReason[i];
           }
+
+          msgList.add(eachMsg);
 
           if(i == each.failReason.length-1){
             msg+=eachMsg;
@@ -177,8 +192,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                     each.isPossible? Container()
                         : UiUtils.getMarginBox(0, 1.h),
                     each.isPossible? Container()
-                        : UiUtils.getBoxTextAndIconWithFixedScale(msg, 10.sp, FontWeight.w500, TextAlign.start, ColorStyles.upFinWhiteRed, ColorStyles.upFinRed,
-                        Icons.warning_rounded, ColorStyles.upFinRed, 5.w),
+                        : Column(crossAxisAlignment: CrossAxisAlignment.start, children: _getMsgListIWidget(msgList)),
                   ])),
                   Expanded(flex: 1, child: each.isPossible? Icon(Icons.arrow_forward_ios_rounded, color: ColorStyles.upFinButtonBlue, size: 5.5.w) : Container()),
                 ]), () {
@@ -290,8 +304,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
   }
   Widget _getSmallAgreeInfoWidget(StateSetter thisSetState, String titleString, String contentsString, bool isAgreeCheck, Function(bool isCheck) callAct){
     return SizedBox(width: 100.w, height: 4.h, child: Row(children: [
-      UiUtils.getMarginBox(5.w, 0),
-      UiUtils.getBorderButtonBoxWithZeroPadding(80.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite, Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+      UiUtils.getBorderButtonBoxWithZeroPadding(87.5.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite, Row(mainAxisAlignment: MainAxisAlignment.start, children: [
         isAgreeCheck? UiUtils.getCustomCheckBox(UniqueKey(), 1, isAgreeCheck, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
             ColorStyles.upFinWhite, ColorStyles.upFinWhite, (checkedValue){
               thisSetState(() {
@@ -428,7 +441,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
           ]),
           UiUtils.getMarginBox(0, 1.5.h),
           Wrap(children: [
-            UiUtils.getTextWithFixedScale("서비스를 이용하기 위해 고객님의 서비스 이용약관에 동의가 필요합니다.", 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)
+            UiUtils.getTextWithFixedScaleForAgreeSubTitle("서비스를 이용하기 위해 고객님의 서비스 이용약관에 동의가 필요합니다.", 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)
           ]),
           UiUtils.getMarginBox(0, 3.h),
           GestureDetector(child: Container(color: ColorStyles.upFinWhiteGray, child: Row(
@@ -494,15 +507,16 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                   UiUtils.getTextWithFixedScale("(필수)전체 동의하기", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null)
                 ],
               )),
-              _getSmallAgreeInfoWidget(thisSetState, "1.업핀 서비스 이용약관", StringConfig.htmlTest, item1SubAgreed1!, _getSmallAgree1Sub1Act),
-              _getSmallAgreeInfoWidget(thisSetState, "2.개인(신용)정보 수집 이용 제공 동의서", StringConfig.agreeContents1, item1SubAgreed2!, _getSmallAgree1Sub2Act),
-              _getSmallAgreeInfoWidget(thisSetState, "3.업핀 서비스 이용약관", StringConfig.htmlTest, item1SubAgreed3!, _getSmallAgree1Sub3Act),
-              _getSmallAgreeInfoWidget(thisSetState, "4.개인(신용)정보 수집 이용 제공 동의서", StringConfig.agreeContents1, item1SubAgreed4!, _getSmallAgree1Sub4Act),
-              _getSmallAgreeInfoWidget(thisSetState, "5.업핀 서비스 이용약관", StringConfig.htmlTest, item1SubAgreed5!, _getSmallAgree1Sub5Act),
-              _getSmallAgreeInfoWidget(thisSetState, "6.개인(신용)정보 수집 이용 제공 동의서", StringConfig.agreeContents1, item1SubAgreed6!, _getSmallAgree1Sub6Act),
+              UiUtils.getMarginBox(0, 1.5.h),
+              _getSmallAgreeInfoWidget(thisSetState, "업핀 서비스 이용약관", StringConfig.htmlTest, item1SubAgreed1!, _getSmallAgree1Sub1Act),
+              _getSmallAgreeInfoWidget(thisSetState, "개인(신용)정보 수집 이용 제공 동의서", StringConfig.agreeContents1, item1SubAgreed2!, _getSmallAgree1Sub2Act),
+              _getSmallAgreeInfoWidget(thisSetState, "업핀 서비스 이용약관", StringConfig.htmlTest, item1SubAgreed3!, _getSmallAgree1Sub3Act),
+              _getSmallAgreeInfoWidget(thisSetState, "개인(신용)정보 수집 이용 제공 동의서", StringConfig.agreeContents1, item1SubAgreed4!, _getSmallAgree1Sub4Act),
+              _getSmallAgreeInfoWidget(thisSetState, "업핀 서비스 이용약관", StringConfig.htmlTest, item1SubAgreed5!, _getSmallAgree1Sub5Act),
+              _getSmallAgreeInfoWidget(thisSetState, "개인(신용)정보 수집 이용 제공 동의서", StringConfig.agreeContents1, item1SubAgreed6!, _getSmallAgree1Sub6Act),
             ]),
           ])),
-          UiUtils.getMarginBox(0, 3.h),
+          UiUtils.getMarginBox(0, 1.5.h),
           item1Agreed!? UiUtils.getTextButtonBox(90.w, "동의하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
             UiUtils.showLoadingPop(context);
             LogfinController.getPrDocsList(MyData.selectedPrInfoData!.productOfferId, MyData.selectedPrInfoData!.productOfferRid, (isSuccessToSearchDocs, _){
@@ -528,7 +542,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
   @override
   Widget build(BuildContext context) {
     if(CommonUtils.isValidStateByAPiExpiredDate()){
-      Widget view = Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: EdgeInsets.all(5.w), child: Column(children: [
+      Widget view = Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: Column(children: [
         Row(children: [
           const Spacer(flex: 2),
           UiUtils.getIconButtonWithHeight(3.h, Icons.close, 25.sp, ColorStyles.upFinDarkGray, () {
@@ -537,7 +551,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
             Navigator.pop(context);
           })
         ]),
-        UiUtils.getMarginBox(0, 3.h),
+        UiUtils.getMarginBox(0, 3.w),
         SizedBox(width: 95.w, height: 5.h , child : UiUtils.getTextWithFixedScale("대출상품", 24.sp, FontWeight.w800, ColorStyles.upFinButtonBlue, TextAlign.start, 1)),
         UiUtils.getMarginBox(0, 1.h),
         SizedBox(width: 95.w, height: 5.h, child: TabBar(
@@ -616,12 +630,12 @@ class _MyPrTabIndicatorPainter extends BoxPainter {
   void paint(Canvas canvas, Offset offset, ImageConfiguration configuration) {
     final Rect rect = offset & configuration.size!;
     final Paint paint = Paint();
-    paint.color = ColorStyles.upFinBlack; // 인디케이터 색상
+    paint.color = ColorStyles.upFinButtonBlue; // 인디케이터 색상
     paint.style = PaintingStyle.fill;
     paint.strokeCap = StrokeCap.round; // 둥글게 된 모서리
 
     final indicatorRect = Rect.fromPoints(
-      Offset(rect.left, rect.bottom - 1), // 네모 모서리 높이 조절
+      Offset(rect.left, rect.bottom - 2), // 네모 모서리 높이 조절
       Offset(rect.right, rect.bottom), // 네모 모서리 높이 조절
     );
 
