@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:sizer/sizer.dart';
 import 'package:upfin/controllers/get_controller.dart';
@@ -97,6 +98,63 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         break;
     }
   }
+  
+  Widget _getHtmlView(String htmlString){
+    return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+      HtmlWidget(
+        htmlString,
+        customStylesBuilder: (element) {
+          if (element.id.contains('type1')) {
+            return {
+              "color" : "black",
+              "font-size": "12px",
+              "line-height" : "120%",
+              "font-weight": "normal"
+            };
+          }else if (element.id.contains('type2')) {
+            return {
+              "color" : "gray",
+              "font-size": "14px",
+              "line-height" : "150%",
+              "font-weight": "bold"
+            };
+          }else if (element.id.contains('type3')) {
+            return {
+              "color" : "black",
+              "font-size": "16px",
+              "line-height" : "200%",
+              "font-weight": "bold"
+            };
+          }else if (element.localName == 'button') {
+            return {
+              //"cursor": "pointer",
+              //"display":"inlne-block",
+              "text-align":"center",
+              "background-color":"#3a6cff",
+              "color" : "white",
+              "font-size": "14px",
+              "line-height" : "250%",
+              "font-weight": "normal",
+              "border-radius":"0.1em",
+              "padding":"5px 20px"
+            };
+          }
+
+          return null;
+        },
+
+        onTapUrl: (url) async {
+          Map<String, String> urlInfoMap = {
+            "url" : url
+          };
+          CommonUtils.moveTo(context, AppView.appWebView.value, urlInfoMap);
+          return true;
+        },
+        renderMode: RenderMode.column,
+        textStyle: TextStyles.upFinHtmlTextStyle,
+      )
+    ]);
+  }
 
   List<Widget> _getChatList(){
     List<Widget> chatList = [];
@@ -114,7 +172,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                     UiUtils.getImage(10.w, 10.w, Image.asset(fit: BoxFit.fitWidth, currentCompanyLogo)),
                     UiUtils.getMarginBox(1.5.w, 0),
                     Column(children: [
-                      UiUtils.getMarginBox(0, 4.h),
                       Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
                         Container(
                             constraints: BoxConstraints(
@@ -122,10 +179,11 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                             ),
                             padding: EdgeInsets.all(3.w),
                             decoration: const BoxDecoration(
-                              borderRadius: BorderRadius.only(topRight: Radius.circular(15), bottomRight: Radius.circular(15), bottomLeft: Radius.circular(15)),
+                              borderRadius: BorderRadius.all(Radius.circular(3)),
                               color: ColorStyles.upFinWhiteSky,
                             ),
-                            child: UiUtils.getTextWithFixedScale(each.message.replaceAll("/", "\n"), 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)),
+                            child: _getHtmlView(each.message)
+                        ),
                         UiUtils.getMarginBox(1.w, 0),
                         UiUtils.getTextWithFixedScale(CommonUtils.getFormattedLastMsgTime(each.messageTime), 8.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null)
                       ])
@@ -146,7 +204,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                           ),
                           padding: EdgeInsets.all(3.w),
                           decoration: const BoxDecoration(
-                            borderRadius: BorderRadius.only(topLeft: Radius.circular(15), bottomRight: Radius.circular(15), bottomLeft: Radius.circular(15)),
+                            borderRadius: BorderRadius.all(Radius.circular(3)),
                             color: ColorStyles.upFinGray,
                           ),
                           child: UiUtils.getTextWithFixedScale(each.message, 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null))
@@ -168,7 +226,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                     UiUtils.getImage(10.w, 10.w, Image.asset(fit: BoxFit.fitWidth, currentCompanyLogo)),
                     UiUtils.getMarginBox(1.5.w, 0),
                     Column(children: [
-                      UiUtils.getMarginBox(0, 4.h),
                       Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
                         Container(
                             constraints: BoxConstraints(
@@ -176,7 +233,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                             ),
                             padding: EdgeInsets.all(3.w),
                             decoration: const BoxDecoration(
-                              borderRadius: BorderRadius.only(topRight: Radius.circular(15), bottomRight: Radius.circular(15), bottomLeft: Radius.circular(15)),
+                              borderRadius: BorderRadius.all(Radius.circular(3)),
                               color: ColorStyles.upFinWhiteSky,
                             ),
                             child: Column(children: [

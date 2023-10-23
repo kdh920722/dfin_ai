@@ -339,7 +339,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
       Map<String, dynamic> msg = jsonData;
       List<dynamic> listMsg = msg["data"];
       CommonUtils.log("i", "each msg info : \nmsg: $msg\nlistMsg: $listMsg");
-      listMsg.sort((a,b) => DateTime.parse(a["created_at"]).compareTo(DateTime.parse(b["created_at"])));
+      listMsg.sort((a,b) => a["id"].compareTo(b["id"]));
       String lastMsg = listMsg[listMsg.length-1]["message"].toString();
       if(lastMsg.contains(" / ")){
         lastMsg = lastMsg.split(" / ")[1];

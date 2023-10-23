@@ -62,7 +62,7 @@ class FireBaseController{
             }
           }
         };
-        saveRef.set(data).then((_) {
+        saveRef.update(data).then((_) {
           CommonUtils.log("i", 'Data has been written successfully.');
         }).catchError((error) {
           CommonUtils.log("i", 'Failed to write data: $error');
