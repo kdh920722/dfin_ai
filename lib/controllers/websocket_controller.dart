@@ -63,17 +63,33 @@ class WebSocketController {
           onConnectionLost: () {
             CommonUtils.log("e", "websocket connect lost");
             subscribedRoomIds.clear();
-            callback(false);
+            disposeSocket();
+            _connectSocket((isSuccessToConnect){
+              if(isSuccessToConnect){
+                callback(true);
+              }
+            });
+            //callback(false);
           },
           onCannotConnect: () {
             CommonUtils.log("e", "websocket cannot connect");
-            subscribedRoomIds.clear();
-            callback(false);
+            disposeSocket();
+            _connectSocket((isSuccessToConnect){
+              if(isSuccessToConnect){
+                callback(true);
+              }
+            });
+            //callback(false);
           });
     } catch (error) {
       CommonUtils.log("e", "get websocket error : ${error.toString()}");
-      subscribedRoomIds.clear();
-      callback(false);
+      disposeSocket();
+      _connectSocket((isSuccessToConnect){
+        if(isSuccessToConnect){
+          callback(true);
+        }
+      });
+      //callback(false);
     }
   }
 
@@ -109,9 +125,15 @@ class WebSocketController {
               if(idx != -1) subscribedRoomIds.removeAt(idx);
               CommonUtils.flutterToast("채팅방 재접속");
               //callback(false);
-              connectSubscribe(roomId, (isSuccessToReTry){
-
+              disposeSocket();
+              _connectSocket((isSuccess){
+                connectSubscribe(roomId, (isSuccessToReTry){
+                  if(isSuccessToReTry){
+                    callback(true);
+                  }
+                });
               });
+
             },
             onMessage: (Map message) {
               CommonUtils.log("i", "arrived message : $message");
@@ -145,7 +167,15 @@ class WebSocketController {
       }
     }catch(error){
       CommonUtils.log("e", "get websocket sub error : ${error.toString()}");
-      callback(false);
+      disposeSocket();
+      _connectSocket((isSuccess){
+        connectSubscribe(roomId, (isSuccessToReTry){
+          if(isSuccessToReTry){
+            callback(true);
+          }
+        });
+      });
+      //callback(false);
     }
   }
 

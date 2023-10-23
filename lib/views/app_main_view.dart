@@ -366,14 +366,14 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
 
       loanChatRoomWidgetList.add(
           Column(children: [
-            UiUtils.getMarginBox(0, 2.h),
+            UiUtils.getMarginBox(0, 1.5.h),
             UiUtils.getBorderButtonBoxWithZeroPadding(92.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
                 Row(mainAxisSize: MainAxisSize.max, children: [
                   Expanded(flex: 2, child: each.chatRoomType == 0? UiUtils.getIcon(11.w, 11.w, Icons.account_box_rounded, 11.w, ColorStyles.upFinButtonBlue)
                       : UiUtils.getImage(11.w, 11.w, Image.asset(each.chatRoomIconPath))),
                   UiUtils.getMarginBox(1.w, 0),
-                  Expanded(flex: 10, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Expanded(flex: 10, child: Column(mainAxisSize: MainAxisSize.max, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Column(mainAxisSize: MainAxisSize.max, crossAxisAlignment: CrossAxisAlignment.start, children: [
                       UiUtils.getMarginBox(0, 1.h),
                       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         UiUtils.getTextWithFixedScale(each.chatRoomTitle, 14.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null),
@@ -384,6 +384,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                           Expanded(child: UiUtils.getTextWithFixedScaleAndOverFlow(lastMsg, 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, 1))
                           //each.chatRoomType != 0? UiUtils.getTextWithFixedScale("${each.loanMinRate}  ${each.loanMaxLimit}", 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null) : Container()
                         ]),
+                        UiUtils.getMarginBox(0, 0.2.h),
                       ])
                     ])
                   ])),
@@ -425,12 +426,11 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                     //CommonUtils.emergencyBackToHome();
                   }
                 }),
-            UiUtils.getMarginBox(0, 2.h),
+            UiUtils.getMarginBox(0, 1.5.h),
             GetController.to.chatLoanInfoDataList.length == 1 || (GetController.to.chatLoanInfoDataList.length != 1 && count == GetController.to.chatLoanInfoDataList.length-1) ?
                 Container() : UiUtils.getMarginColoredBox(90.w, 0.15.h, ColorStyles.upFinWhiteGray)
           ])
       );
-      loanChatRoomWidgetList.add(UiUtils.getMarginBox(0, 1.h));
       count++;
     }
 

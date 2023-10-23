@@ -211,17 +211,9 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
   }
 
   String _setUpdateDateForTitle(String targetString){
-    // 문자열을 DateTime 객체로 변환
-    CommonUtils.log("i", "targetString $targetString");
-    DateTime dateTime = DateTime.parse(targetString);
-    // 대한민국 시간대로 설정
-    dateTime = dateTime.toLocal();
-
-    // 날짜와 시간을 원하는 형식으로 포맷팅
-    var formatter = DateFormat('yyyy.MM.dd hh:mm', 'ko_KR');
-    String formattedDate = formatter.format(dateTime);
-
-    return formattedDate;
+    CommonUtils.log("i", "targetString $targetString || ${CommonUtils.convertTimeToString(CommonUtils.parseToLocalTime(targetString))}");
+    String targetStringDate = CommonUtils.convertTimeToString(CommonUtils.parseToLocalTime(targetString));
+    return "${targetStringDate.substring(0,4)}.${targetStringDate.substring(4,6)}.${targetStringDate.substring(6,8)} ${targetStringDate.substring(8,10)}:${targetStringDate.substring(10,12)}";
   }
 
   @override

@@ -222,16 +222,15 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
       var inputJson = {
         "pr_room_id" : currentRoomId
       };
-      UiUtils.showLoadingPop(context);
       LogfinController.callLogfinApi(LogfinApis.checkMessage, inputJson, (isSuccess, outputJson){
         backPossibleFlag =true;
-        UiUtils.closeLoadingPop(context);
         if(isSuccess){
-          Navigator.pop(context);
+
         }else{
           CommonUtils.flutterToast("메시지를 읽는중\n오류가 발생했습니다.");
         }
       });
+      Navigator.pop(context);
     }
   }
 
@@ -260,17 +259,25 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   }
   Widget _stepTick(int type, bool isChecked){
     String typeString = "";
+    bool passed = false;
     if(type == 0){
       typeString = "접수";
+      if(_ticks > 1){
+        passed = true;
+      }
     }else if(type == 1){
       typeString = "심사";
+      if(_ticks > 2){
+        passed = true;
+      }
     }else{
       typeString = "통보";
     }
 
     return Column(children: [
-      isChecked? UiUtils.getIcon(4.w, 4.w, Icons.check_circle_rounded, 4.w, ColorStyles.upFinButtonBlue) :
-        UiUtils.getIcon(4.w, 4.w, Icons.check_circle_outline_rounded, 4.w, ColorStyles.upFinWhiteSky),
+      isChecked? passed? UiUtils.getIcon(3.w, 3.w, Icons.radio_button_unchecked_rounded, 3.w, ColorStyles.upFinButtonBlue)
+          : UiUtils.getIcon(3.w, 3.w, Icons.radio_button_checked_rounded, 3.w, ColorStyles.upFinButtonBlue)
+            : UiUtils.getIcon(3.w, 3.w, Icons.radio_button_unchecked_rounded, 3.w, ColorStyles.upFinWhiteSky),
       UiUtils.getMarginBox(0, 1.5.h),
       UiUtils.getTextWithFixedScale(typeString, 9.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.center, null),
     ]);
@@ -288,13 +295,45 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
 
   Widget _stepLine(bool isReached) {
     return Column(children: [
-      UiUtils.getMarginBox(0, 0.8.h),
+      UiUtils.getMarginBox(0, 0.5.h),
       Container(
         color: isReached? ColorStyles.upFinButtonBlue : ColorStyles.upFinWhiteSky,
         height: 0.15.h,
         width: 36.w,
       )
     ]);
+  }
+
+  List<Widget> _getAutoAnswerWidgetList(){
+    List<String> answerList = ["자주하는 질문", "대출 현황", "심사결과 보기", "상담원 연걸", "앱정보 보기", "사건정보 상세보기"];
+    List<Widget> widgetList = [];
+    for(var each in answerList){
+      widgetList.add(GestureDetector(child: UiUtils.getRoundedBorderTextWithFixedScale(each, 11.sp, FontWeight.w500, TextAlign.center, ColorStyles.upFinGray, ColorStyles.upFinRealGray),
+      onTap: (){
+        CommonUtils.log("i", "send message $each");
+        //_sendMessage(each);
+      }));
+      widgetList.add(UiUtils.getMarginBox(2.w, 0));
+    }
+
+    return widgetList;
+  }
+
+  void _sendMessage(String message){
+    CommonUtils.hideKeyBoard();
+    var inputJson = {
+      "loan_uid" : currentLoanUid,
+      "message" : message
+    };
+    LogfinController.callLogfinApi(LogfinApis.sendMessage, inputJson, (isSuccess, _){
+      if(!isSuccess){
+        CommonUtils.flutterToast("메시지 전송중\n오류가 발생했습니다.");
+      }
+    });
+    setState(() {
+      _chatTextController.text = "";
+      isTextFieldFocus = false;
+    });
   }
 
   double inputMinHeight = 9.2.h;
@@ -344,9 +383,11 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
           _getTimelineWidget(),
           UiUtils.getMarginBox(0, 3.h),
           UiUtils.getExpandedScrollViewWithController(Axis.vertical, Obx(()=>Column(mainAxisAlignment: MainAxisAlignment.start, children: _getChatList())), _chatScrollController),
-          UiUtils.getMarginBox(0, 0.5.h),
+          UiUtils.getMarginBox(0, 1.5.h),
+          Padding(padding: EdgeInsets.only(left: 2.w, right: 2.w), child: Wrap(runSpacing: 0.8.h, alignment: WrapAlignment.start, direction: Axis.horizontal, children: _getAutoAnswerWidgetList())),
+          UiUtils.getMarginBox(0, 0.2.h),
           AnimatedContainer(
-              duration: const Duration(milliseconds:300),
+              duration: const Duration(milliseconds:200),
               width: 100.w,
               height: inputHeight,
               constraints: BoxConstraints(
@@ -360,7 +401,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                     color: ColorStyles.upFinGray, // 배경색 설정
                     borderRadius: BorderRadius.circular(20.0), // 모서리를 둥글게 하는 부분
                   ),
-                  padding: EdgeInsets.all(0.5.w),
+                  padding: EdgeInsets.all(0.35.w),
                   child: Container(
                       decoration: BoxDecoration(
                         color: ColorStyles.upFinWhite, // 배경색 설정
@@ -397,23 +438,12 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                               })
                         ]))])),
                     Expanded(flex: 1, child: Container(color: ColorStyles.upFinWhite)),
-                    Expanded(flex: 15, child: UiUtils.getBorderButtonBoxWithZeroPadding(12.w, isTextFieldFocus? ColorStyles.upFinWhiteSky : ColorStyles.upFinWhiteGray, isTextFieldFocus? ColorStyles.upFinWhiteSky : ColorStyles.upFinWhiteGray,
-                        UiUtils.getTextWithFixedScale("보내기", 10.sp, FontWeight.w600, isTextFieldFocus? ColorStyles.upFinButtonBlue : ColorStyles.upFinRealGray, TextAlign.start, null), () async {
-                          CommonUtils.hideKeyBoard();
-                          var inputJson = {
-                            "loan_uid" : currentLoanUid,
-                            "message" : _chatTextController.text
-                          };
-                          LogfinController.callLogfinApi(LogfinApis.sendMessage, inputJson, (isSuccess, _){
-                            if(!isSuccess){
-                              CommonUtils.flutterToast("메시지 전송중\n오류가 발생했습니다.");
-                            }
-                          });
-                          setState(() {
-                            _chatTextController.text = "";
-                          });
-                        })),
-                        UiUtils.getMarginBox(2.5.w, 0),
+                    Expanded(flex: 15, child:
+                    UiUtils.getIconButtonWithHeight(14.w, Icons.arrow_circle_up_rounded, 14.w,
+                        isTextFieldFocus? ColorStyles.upFinButtonBlue : ColorStyles.upFinWhiteSky, () {
+                          _sendMessage(_chatTextController.text);
+                        })
+                    ),
                   ]))))
           )
         ])

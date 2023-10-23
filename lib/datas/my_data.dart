@@ -212,7 +212,7 @@ class MyData {
     if(selectedAccidentInfoData != null){
       selectedAccidentInfoDataCheck = selectedAccidentInfoData!.accidentUid.toString();
     }
-    CommonUtils.log("", "\n"
+    CommonUtils.log("i", "\n"
         "name:$name\n"
         "phoneNumber:$phoneNumber\n"
         "carrierType:$telecom\n"
