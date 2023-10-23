@@ -419,48 +419,50 @@ class LogfinController {
             }else{
               MyData.clearLoanInfoList();
               bool isMessageGetSuccess = true;
-              for(var eachLoans in loansList){
-                CommonUtils.log("i", "loan data ====>\n"
-                    "accidentUid: ${eachLoans["accident_uid"]}\n"
-                    "loanUid: ${eachLoans["uid"]}\n"
-                    "lenderPrId: ${eachLoans["lender_pr_id"]}\n"
-                    "submitAmount: ${eachLoans["submit_offer"]["amount"]}\n"
-                    "submitRate: ${eachLoans["submit_offer"]["interest_rate"]}\n"
-                    "companyName: ${eachLoans["lender_pr"]["lender"]["name"]}\n"
-                    "productName: ${eachLoans["lender_pr"]["lender"]["product_name"]}\n"
-                    "contactNo: ${eachLoans["lender_pr"]["lender"]["contact_no"]}\n"
-                    "createdDate: ${eachLoans["submit_offer"]["created_at"]}\n"
-                    "updatedDate: ${eachLoans["submit_offer"]["updated_at"]}\n"
-                    "statueId: ${eachLoans["status_info"]["id"]}\n"
-                    "roomId: ${eachLoans["pr_room"]["id"]}\n");
+              for(Map eachLoans in loansList){
+                if(eachLoans.containsKey("lender_pr_id") && eachLoans.containsKey("lender_pr")){
+                  CommonUtils.log("i", "loan data ====>\n"
+                      "accidentUid: ${eachLoans["accident_uid"]}\n"
+                      "loanUid: ${eachLoans["uid"]}\n"
+                      "lenderPrId: ${eachLoans["lender_pr_id"]}\n"
+                      "submitAmount: ${eachLoans["submit_offer"]["amount"]}\n"
+                      "submitRate: ${eachLoans["submit_offer"]["interest_rate"]}\n"
+                      "companyName: ${eachLoans["lender_pr"]["lender"]["name"]}\n"
+                      "productName: ${eachLoans["lender_pr"]["lender"]["product_name"]}\n"
+                      "contactNo: ${eachLoans["lender_pr"]["lender"]["contact_no"]}\n"
+                      "createdDate: ${eachLoans["submit_offer"]["created_at"]}\n"
+                      "updatedDate: ${eachLoans["submit_offer"]["updated_at"]}\n"
+                      "statueId: ${eachLoans["status_info"]["id"]}\n"
+                      "roomId: ${eachLoans["pr_room"]["id"]}\n");
 
-                await WebSocketController.connectSubscribe(eachLoans["pr_room"]["id"].toString(), (isSuccessToSubscribe){
-                  if(!isSuccessToSubscribe){
-                    isMessageGetSuccess = false;
-                    CommonUtils.emergencyBackToHome();
-                  }
-                });
+                  await WebSocketController.connectSubscribe(eachLoans["pr_room"]["id"].toString(), (isSuccessToSubscribe){
+                    if(!isSuccessToSubscribe){
+                      isMessageGetSuccess = false;
+                      CommonUtils.emergencyBackToHome();
+                    }
+                  });
 
-                var inputJson = {
-                  "loan_uid" : eachLoans["uid"],
-                  "last_message_id" : 0,
-                  "length" : 0
-                };
-                await callLogfinApi(LogfinApis.getMessage, inputJson, (isSuccessToGetLoanMessageInfo, loanMessageInfoOutputJson){
-                  if(isSuccessToGetLoanMessageInfo){
-                    String submitAmount = eachLoans["submit_offer"]["amount"].toString().substring(0, eachLoans["submit_offer"]["amount"].toString().length-4);
-                    loanMessageInfoOutputJson!["last_read_message_id"] = eachLoans["pr_room"]["last_read_message_id"].toString();
-                    CommonUtils.log("i", "loanMessageInfoOutputJson data ====>\n$loanMessageInfoOutputJson");
-                    MyData.addToLoanInfoList(
-                        LoanInfoData(eachLoans["accident_uid"].toString(), eachLoans["uid"].toString(), eachLoans["lender_pr_id"].toString(),
-                            submitAmount, eachLoans["submit_offer"]["interest_rate"].toString(),
-                            eachLoans["lender_pr"]["lender"]["name"].toString(),
-                            eachLoans["lender_pr"]["lender"]["name"].toString() == "(주)안전대부"? "assets/images/bank_logo_safe.png" : "assets/images/bank_logo_default.png",
-                            eachLoans["lender_pr"]["lender"]["product_name"].toString(), eachLoans["lender_pr"]["lender"]["contact_no"].toString(),
-                            eachLoans["submit_offer"]["created_at"].toString(), eachLoans["submit_offer"]["updated_at"].toString(),
-                            eachLoans["status_info"]["id"].toString(), eachLoans["pr_room"]["id"].toString(), jsonEncode(loanMessageInfoOutputJson)));
-                  }
-                });
+                  var inputJson = {
+                    "loan_uid" : eachLoans["uid"],
+                    "last_message_id" : 0,
+                    "length" : 0
+                  };
+                  await callLogfinApi(LogfinApis.getMessage, inputJson, (isSuccessToGetLoanMessageInfo, loanMessageInfoOutputJson){
+                    if(isSuccessToGetLoanMessageInfo){
+                      String submitAmount = eachLoans["submit_offer"]["amount"].toString().substring(0, eachLoans["submit_offer"]["amount"].toString().length-4);
+                      loanMessageInfoOutputJson!["last_read_message_id"] = eachLoans["pr_room"]["last_read_message_id"].toString();
+                      CommonUtils.log("i", "loanMessageInfoOutputJson data ====>\n$loanMessageInfoOutputJson");
+                      MyData.addToLoanInfoList(
+                          LoanInfoData(eachLoans["accident_uid"].toString(), eachLoans["uid"].toString(), eachLoans["lender_pr_id"].toString(),
+                              submitAmount, eachLoans["submit_offer"]["interest_rate"].toString(),
+                              eachLoans["lender_pr"]["lender"]["name"].toString(),
+                              eachLoans["lender_pr"]["lender"]["name"].toString() == "(주)안전대부"? "assets/images/bank_logo_safe.png" : "assets/images/bank_logo_default.png",
+                              eachLoans["lender_pr"]["lender"]["product_name"].toString(), eachLoans["lender_pr"]["lender"]["contact_no"].toString(),
+                              eachLoans["submit_offer"]["created_at"].toString(), eachLoans["submit_offer"]["updated_at"].toString(),
+                              eachLoans["status_info"]["id"].toString(), eachLoans["pr_room"]["id"].toString(), jsonEncode(loanMessageInfoOutputJson)));
+                    }
+                  });
+                }
               }
 
               if(isMessageGetSuccess){

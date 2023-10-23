@@ -94,16 +94,22 @@ class WebSocketController {
   }
   */
 
+  static bool isSubscribe(String roomId){
+    bool isAlreadySubscribe = false;
+    CommonUtils.log("i", "connected subscribe : ${subscribedRoomIds.length}");
+    for(var eachSubscribeRoomId in subscribedRoomIds){
+      CommonUtils.log("i", "connected subscribe : $roomId || $eachSubscribeRoomId");
+      if(eachSubscribeRoomId == roomId) isAlreadySubscribe = true;
+    }
+
+    return isAlreadySubscribe;
+  }
+
   static Future<void> connectSubscribe(String roomId, Function(bool isSuccess) callback) async {
     CommonUtils.log("i", "connect subscribe");
     try{
       CommonUtils.log("i", "room: $roomId");
-      bool isAlreadySubscribe = false;
-      for(var eachSubscribeRoomId in subscribedRoomIds){
-        if(eachSubscribeRoomId == roomId) isAlreadySubscribe = true;
-      }
-
-      if(!isAlreadySubscribe){
+      if(!isSubscribe(roomId)){
         cable.subscribe(
             channelName, channelParams: { "room": roomId },
             onSubscribed: (){
@@ -118,8 +124,11 @@ class WebSocketController {
                 if(subscribedRoomIds[i] == roomId) idx = i;
               }
               if(idx != -1) subscribedRoomIds.removeAt(idx);
-              CommonUtils.flutterToast("채팅방연결에 실패했습니다.\n다시 시작해주세요.");
-              callback(false);
+              CommonUtils.flutterToast("채팅방 재접속");
+              //callback(false);
+              connectSubscribe(roomId, (isSuccessToReTry){
+
+              });
             },
             onMessage: (Map message) {
               CommonUtils.log("i", "arrived message : $message");

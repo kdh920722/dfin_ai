@@ -99,16 +99,22 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             if (scrollNotification is ScrollUpdateNotification) {
               if(!isScrolling){
                 isScrolling = true;
+                /*
                 setState(() {
                   bottomBarHeight = 0;
                 });
+
+                 */
               }
             } else if (scrollNotification is ScrollEndNotification) {
               if(isScrolling){
                 isScrolling = false;
+                /*
                 setState(() {
                   bottomBarHeight = 0;
                 });
+
+                 */
               }
             }
             return true;
@@ -382,30 +388,35 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                       UiUtils.getCountCircleBox(6.w, cnt, 7.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.center, 1), UiUtils.getMarginBox(0.3.w, 0)]) : Container()
                   ]))
                 ]), () async {
-                  GetController.to.resetChatMessageInfoList();
-                  for(Map<String, dynamic> eachMsg in listMsg){
-                    var messageItem = ChatMessageInfoData(eachMsg["id"].toString(), eachMsg["pr_room_id"].toString(), eachMsg["message"].toString(),
-                        CommonUtils.convertTimeToString(CommonUtils.parseToLocalTime(eachMsg["created_at"])),
-                        eachMsg["message_type"].toString(), eachMsg["username"].toString(), jsonEncode(eachMsg));
-                    GetController.to.addChatMessageInfoList(messageItem);
-                  }
-                  await CommonUtils.moveToWithResult(context, AppView.appChatView.value, null);
-                  if(context.mounted){
-                    listMsg.clear();
-                    for(var eachMessage in GetController.to.chatMessageInfoDataList){
-                      listMsg.add(jsonDecode(eachMessage.messageInfo));
+                  if(WebSocketController.isSubscribe(each.chatRoomId)){
+                    GetController.to.resetChatMessageInfoList();
+                    for(Map<String, dynamic> eachMsg in listMsg){
+                      var messageItem = ChatMessageInfoData(eachMsg["id"].toString(), eachMsg["pr_room_id"].toString(), eachMsg["message"].toString(),
+                          CommonUtils.convertTimeToString(CommonUtils.parseToLocalTime(eachMsg["created_at"])),
+                          eachMsg["message_type"].toString(), eachMsg["username"].toString(), jsonEncode(eachMsg));
+                      GetController.to.addChatMessageInfoList(messageItem);
                     }
-                    listMsg.sort((a,b) => DateTime.parse(a["created_at"]).compareTo(DateTime.parse(b["created_at"])));
-                    for(int i = 0 ; i < MyData.getChatRoomInfoList().length ; i++){
-                      if(MyData.getChatRoomInfoList()[i].chatRoomId == each.chatRoomId){
-                        Map<String, dynamic> msgInfo = jsonDecode(MyData.getChatRoomInfoList()[i].chatRoomMsgInfo);
-                        msgInfo.remove("data");
-                        msgInfo["data"] = listMsg;
-                        msgInfo["last_read_message_id"] = listMsg[listMsg.length-1]["id"];
-                        MyData.getChatRoomInfoList()[i].chatRoomMsgInfo = jsonEncode(msgInfo);
+                    await CommonUtils.moveToWithResult(context, AppView.appChatView.value, null);
+                    if(context.mounted){
+                      listMsg.clear();
+                      for(var eachMessage in GetController.to.chatMessageInfoDataList){
+                        listMsg.add(jsonDecode(eachMessage.messageInfo));
                       }
+                      listMsg.sort((a,b) => DateTime.parse(a["created_at"]).compareTo(DateTime.parse(b["created_at"])));
+                      for(int i = 0 ; i < MyData.getChatRoomInfoList().length ; i++){
+                        if(MyData.getChatRoomInfoList()[i].chatRoomId == each.chatRoomId){
+                          Map<String, dynamic> msgInfo = jsonDecode(MyData.getChatRoomInfoList()[i].chatRoomMsgInfo);
+                          msgInfo.remove("data");
+                          msgInfo["data"] = listMsg;
+                          msgInfo["last_read_message_id"] = listMsg[listMsg.length-1]["id"];
+                          MyData.getChatRoomInfoList()[i].chatRoomMsgInfo = jsonEncode(msgInfo);
+                        }
+                      }
+                      GetController.to.updateChatLoanInfoList(MyData.getChatRoomInfoList());
                     }
-                    GetController.to.updateChatLoanInfoList(MyData.getChatRoomInfoList());
+                  }else{
+                    CommonUtils.flutterToast("채탕방 접속에 실패했습니다.");
+                    //CommonUtils.emergencyBackToHome();
                   }
                 }),
             UiUtils.getMarginBox(0, 2.h),
@@ -586,7 +597,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
         CommonUtils.backToHome(context);
       }
     });
-
+    CommonUtils.log("i", "main view redraw!");
     Widget view = Stack(
       children: [
         Positioned(
