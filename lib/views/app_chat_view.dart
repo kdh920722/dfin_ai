@@ -295,58 +295,61 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
 
   @override
   Widget build(BuildContext context) {
-
-    if(CommonUtils.isValidStateByAPiExpiredDate()){
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if(!CommonUtils.isValidStateByAPiExpiredDate()){
+        CommonUtils.flutterToast("접속시간이 만료되었습니다.\n재로그인 해주세요");
+        CommonUtils.backToHome(context);
+      }else{
         isBuild = true;
         _scrollToBottom();
-      });
+      }
+    });
 
-      Widget view =
-      Container(
-          color: ColorStyles.upFinWhite,
-          width: 100.w,
-          height: 100.h,
-          child: Column(children: [
-            UiUtils.getMarginBox(0, 0.5.h),
-            Stack(children: [
-              Positioned(
-                top: 1.h,
-                left: 5.w,
-                child: UiUtils.getBackButton(() {
-                  back();
-                }),
+    Widget view =
+    Container(
+        color: ColorStyles.upFinWhite,
+        width: 100.w,
+        height: 100.h,
+        child: Column(children: [
+          UiUtils.getMarginBox(0, 0.5.h),
+          Stack(children: [
+            Positioned(
+              top: 1.h,
+              left: 5.w,
+              child: UiUtils.getBackButton(() {
+                back();
+              }),
+            ),
+            Positioned(
+              child: Align(
+                  alignment: Alignment.topCenter,
+                  child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    UiUtils.getMarginBox(0, 2.5.h),
+                    UiUtils.getTextWithFixedScale(currentCompany, 16.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.center, 1),
+                    UiUtils.getMarginBox(0, 1.h),
+                    UiUtils.getTextWithFixedScale("AI어드바이저", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.center, 1),
+                  ])
               ),
-              Positioned(
-                child: Align(
-                    alignment: Alignment.topCenter,
-                    child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                      UiUtils.getMarginBox(0, 2.5.h),
-                      UiUtils.getTextWithFixedScale(currentCompany, 16.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.center, 1),
-                      UiUtils.getMarginBox(0, 1.h),
-                      UiUtils.getTextWithFixedScale("AI어드바이저", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.center, 1),
-                    ])
-                ),
+            ),
+          ]),
+          UiUtils.getMarginBox(0, 1.h),
+          _getTimelineWidget(),
+          UiUtils.getMarginBox(0, 3.h),
+          UiUtils.getMarginColoredBox(100.w, 1.h, ColorStyles.upFinWhiteGray),
+          UiUtils.getMarginBox(0, 0.5.h),
+          UiUtils.getExpandedScrollViewWithController(Axis.vertical, Obx(()=>Column(mainAxisAlignment: MainAxisAlignment.start, children: _getChatList())), _chatScrollController),
+          UiUtils.getMarginBox(0, 0.5.h),
+          AnimatedContainer(
+              duration: const Duration(milliseconds:300),
+              width: 100.w,
+              height: inputHeight,
+              constraints: BoxConstraints(
+                minHeight: inputMinHeight,
+                maxHeight: inputMaxHeight,
               ),
-            ]),
-            UiUtils.getMarginBox(0, 1.h),
-            _getTimelineWidget(),
-            UiUtils.getMarginBox(0, 3.h),
-            UiUtils.getMarginColoredBox(100.w, 1.h, ColorStyles.upFinWhiteGray),
-            UiUtils.getMarginBox(0, 0.5.h),
-            UiUtils.getExpandedScrollViewWithController(Axis.vertical, Obx(()=>Column(mainAxisAlignment: MainAxisAlignment.start, children: _getChatList())), _chatScrollController),
-            UiUtils.getMarginBox(0, 0.5.h),
-            AnimatedContainer(
-                duration: const Duration(milliseconds:300),
-                width: 100.w,
-                height: inputHeight,
-                constraints: BoxConstraints(
-                  minHeight: inputMinHeight,
-                  maxHeight: inputMaxHeight,
-                ),
-                color: ColorStyles.upFinWhite,
-                child: Padding(padding: EdgeInsets.only(left: 3.w,right: 3.w,bottom: 2.w,top: 0.5.w), child:
-                Container(color: ColorStyles.upFinGray, padding: EdgeInsets.all(0.5.w),
+              color: ColorStyles.upFinWhite,
+              child: Padding(padding: EdgeInsets.only(left: 3.w,right: 3.w,bottom: 2.w,top: 0.5.w), child:
+              Container(color: ColorStyles.upFinGray, padding: EdgeInsets.all(0.5.w),
                   child: Container(color: ColorStyles.upFinWhite, child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
                     Expanded(flex: 75, child: Column(children: [UiUtils.getExpandedScrollView(Axis.vertical,
                         Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
@@ -394,15 +397,11 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                         })),
                     Expanded(flex: 2, child: Container(color: ColorStyles.upFinWhite)),
                   ]))))
-            )
-          ])
-      );
-      return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
-    }else{
-      CommonUtils.flutterToast("접속시간이 만료되었습니다.\n재로그인 해주세요");
-      CommonUtils.backToHome(context);
-      return Container();
-    }
+          )
+        ])
+    );
+    return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
+
   }
 
 }

@@ -1062,34 +1062,35 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
 
   @override
   Widget build(BuildContext context) {
-    if(CommonUtils.isValidStateByAPiExpiredDate()){
-      Widget? view;
-      if(currentViewId == courtViewId){
-        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: Obx(()=>_getCourtView()));
-      }else if(currentViewId == accidentViewId){
-        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getAccidentView());
-      }else if(currentViewId == bankCodeViewId){
-        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: Obx(()=>_getBankCodeView()));
-      }else if(currentViewId == bankAccountViewId){
-        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getBankAccountView());
-      }else if(currentViewId == preLoanCountViewId){
-        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getPreLoanCountView());
-      }else if(currentViewId == preLoanPriceViewId){
-        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getPreLoanPriceView());
-      }else if(currentViewId == wantLoanPriceViewId){
-        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getWantLoanPriceView());
-      }else if(currentViewId == jobViewId){
-        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getJobView());
-      }else{
-        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getFinishConfirmView());
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if(!CommonUtils.isValidStateByAPiExpiredDate()){
+        CommonUtils.flutterToast("접속시간이 만료되었습니다.\n재로그인 해주세요");
+        CommonUtils.backToHome(context);
       }
+    });
 
-      return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
+    Widget? view;
+    if(currentViewId == courtViewId){
+      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: Obx(()=>_getCourtView()));
+    }else if(currentViewId == accidentViewId){
+      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getAccidentView());
+    }else if(currentViewId == bankCodeViewId){
+      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: Obx(()=>_getBankCodeView()));
+    }else if(currentViewId == bankAccountViewId){
+      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getBankAccountView());
+    }else if(currentViewId == preLoanCountViewId){
+      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getPreLoanCountView());
+    }else if(currentViewId == preLoanPriceViewId){
+      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getPreLoanPriceView());
+    }else if(currentViewId == wantLoanPriceViewId){
+      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getWantLoanPriceView());
+    }else if(currentViewId == jobViewId){
+      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getJobView());
     }else{
-      CommonUtils.flutterToast("접속시간이 만료되었습니다.\n재로그인 해주세요");
-      CommonUtils.backToHome(context);
-      return Container();
+      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getFinishConfirmView());
     }
+
+    return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
   }
 
 }

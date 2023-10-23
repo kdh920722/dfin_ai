@@ -2774,46 +2774,47 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
   @override
   Widget build(BuildContext context) {
-    if(CommonUtils.isValidStateByAPiExpiredDate()){
-      Widget? view;
-      if(currentViewId == addedDocsInfoIntroViewId){
-        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getIntroView());
-      }else {
-        if(_getIdFromListByViewId(currentViewId) == mainBankId){
-          view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: Obx(()=>_getBankCodeView()));
-        }else if(_getIdFromListByViewId(currentViewId) == mainBankAccountId){
-          view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getBankAccountView());
-        }else if(_getIdFromListByViewId(currentViewId) == businessNumberId){
-          view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getBusinessNumberView());
-        }else if(_getIdFromListByViewId(currentViewId) == addressId){
-          view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getAddressView());
-        }else if(_getIdFromListByViewId(currentViewId) == cameraId){
-          view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getCameraForIdCheckView());
-        }else if(_getIdFromListByViewId(currentViewId) == 1 || _getIdFromListByViewId(currentViewId) == 2 || _getIdFromListByViewId(currentViewId) == 15){
-          view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getGov24View());
-        }else if(_getIdFromListByViewId(currentViewId) == 3 || _getIdFromListByViewId(currentViewId) == 4){
-          view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getNhisView());
-        }else if(_getIdFromListByViewId(currentViewId) == 6 || _getIdFromListByViewId(currentViewId) == 10 || _getIdFromListByViewId(currentViewId) == 11){
-          view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getNtsView());
-        }else if(_getIdFromListByViewId(currentViewId) == niceId){
-          view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getNiceKeyCertView());
-        }else if(_getIdFromListByViewId(currentViewId) == lastId){
-          view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getFinishConfirmView());
-        }else if(_getIdFromListByViewId(currentViewId) == confirmedId){
-          view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getConfirmedView());
-        }else if(currentViewId == cameraTakePhotoId){
-          view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinBlack, padding: EdgeInsets.zero, child: _takeCustomCamera());
-        }else{
-          view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhiteSky);
-        }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if(!CommonUtils.isValidStateByAPiExpiredDate()){
+        CommonUtils.flutterToast("접속시간이 만료되었습니다.\n재로그인 해주세요");
+        CommonUtils.backToHome(context);
       }
+    });
 
-      return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
-    }else{
-      CommonUtils.flutterToast("접속시간이 만료되었습니다.\n재로그인 해주세요");
-      CommonUtils.backToHome(context);
-      return Container();
+    Widget? view;
+    if(currentViewId == addedDocsInfoIntroViewId){
+      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getIntroView());
+    }else {
+      if(_getIdFromListByViewId(currentViewId) == mainBankId){
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: Obx(()=>_getBankCodeView()));
+      }else if(_getIdFromListByViewId(currentViewId) == mainBankAccountId){
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getBankAccountView());
+      }else if(_getIdFromListByViewId(currentViewId) == businessNumberId){
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getBusinessNumberView());
+      }else if(_getIdFromListByViewId(currentViewId) == addressId){
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getAddressView());
+      }else if(_getIdFromListByViewId(currentViewId) == cameraId){
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getCameraForIdCheckView());
+      }else if(_getIdFromListByViewId(currentViewId) == 1 || _getIdFromListByViewId(currentViewId) == 2 || _getIdFromListByViewId(currentViewId) == 15){
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getGov24View());
+      }else if(_getIdFromListByViewId(currentViewId) == 3 || _getIdFromListByViewId(currentViewId) == 4){
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getNhisView());
+      }else if(_getIdFromListByViewId(currentViewId) == 6 || _getIdFromListByViewId(currentViewId) == 10 || _getIdFromListByViewId(currentViewId) == 11){
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getNtsView());
+      }else if(_getIdFromListByViewId(currentViewId) == niceId){
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getNiceKeyCertView());
+      }else if(_getIdFromListByViewId(currentViewId) == lastId){
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getFinishConfirmView());
+      }else if(_getIdFromListByViewId(currentViewId) == confirmedId){
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getConfirmedView());
+      }else if(currentViewId == cameraTakePhotoId){
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinBlack, padding: EdgeInsets.zero, child: _takeCustomCamera());
+      }else{
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhiteSky);
+      }
     }
+
+    return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
   }
 
 }

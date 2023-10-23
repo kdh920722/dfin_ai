@@ -31,7 +31,7 @@ class FireBaseController{
     try{
       String dbPath = "";
       if(type == "error"){
-        dbPath = "UPFIN/LOG/error/";
+        dbPath = "UPFIN/LOG/error";
       }else{
         dbPath = "UPFIN/LOG/info";
       }
