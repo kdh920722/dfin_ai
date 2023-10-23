@@ -6,6 +6,8 @@ import 'package:sizer/sizer.dart';
 import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:upfin/controllers/get_controller.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
+import 'package:upfin/datas/chat_message_info_data.dart';
+import 'package:upfin/datas/chatroom_info_data.dart';
 import 'package:upfin/datas/loan_info_data.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
@@ -145,104 +147,67 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     ]);
   }
 
+  Widget _getOtherView(ChatMessageInfoData otherInfo){
+    return Container(
+        padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 1.w, bottom: 2.w),
+        child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+          Column(children: [
+            Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+              CustomPaint(
+                painter: ChatBubbleTriangleForOther(),
+              ),
+              Container(
+                  constraints: BoxConstraints(maxWidth: 70.w),
+                  padding: EdgeInsets.all(3.w),
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomRight: Radius.circular(15)),
+                    color: ColorStyles.upFinWhiteSky,
+                  ),
+                  child: otherInfo.messageType == "text" ? _getHtmlView(otherInfo.message)
+                      : Container()
+              ),
+              UiUtils.getMarginBox(1.w, 0),
+              UiUtils.getTextWithFixedScale(CommonUtils.getFormattedLastMsgTime(otherInfo.messageTime), 8.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null)
+            ]),
+            UiUtils.getMarginBox(0, 1.h)
+          ]),
+        ])
+    );
+  }
+
+  Widget _getMeView(ChatMessageInfoData meInfo){
+    return Container(
+        padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 2.w, bottom: 2.w),
+        width: 100.w,
+        child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+          Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            Container(
+                constraints: BoxConstraints(
+                    maxWidth: 55.w
+                ),
+                padding: EdgeInsets.all(3.w),
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomLeft: Radius.circular(15)),
+                  color: ColorStyles.upFinTextAndBorderBlue,
+                ),
+                child: UiUtils.getTextWithFixedScale(meInfo.message, 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null)
+            ),
+            CustomPaint(
+              painter: ChatBubbleTriangleForMe(),
+            )
+          ]),
+        ])
+    );
+  }
+
   List<Widget> _getChatList(){
     List<Widget> chatList = [];
     CommonUtils.log("i", "re draw chat messages");
     for(var each in GetController.to.chatMessageInfoDataList){
-      if(each.messageType == "text"){
-        /*
-        * type text
-        * */
-        if(each.senderName == "UPFIN"){
-          chatList.add(
-              Container(
-                  padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 1.w, bottom: 2.w),
-                  child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                    Column(children: [
-                      Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                        CustomPaint(
-                          painter: ChatBubbleTriangleForOther(),
-                        ),
-                        Container(
-                            constraints: BoxConstraints(maxWidth: 70.w),
-                            padding: EdgeInsets.all(3.w),
-                            decoration: const BoxDecoration(
-                              borderRadius: BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomRight: Radius.circular(15)),
-                              color: ColorStyles.upFinWhiteSky,
-                            ),
-                            child: _getHtmlView(each.message)
-                        ),
-                        UiUtils.getMarginBox(1.w, 0),
-                        UiUtils.getTextWithFixedScale(CommonUtils.getFormattedLastMsgTime(each.messageTime), 8.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null)
-                      ]),
-                      UiUtils.getMarginBox(0, 1.h)
-                    ]),
-                  ])
-              )
-          );
-        }else{
-          chatList.add(
-              Container(
-                  padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 1.w, bottom: 2.w),
-                  width: 100.w,
-                  child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                    Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                      Container(
-                          constraints: BoxConstraints(
-                              maxWidth: 55.w
-                          ),
-                          padding: EdgeInsets.all(3.w),
-                          decoration: const BoxDecoration(
-                            borderRadius: BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomLeft: Radius.circular(15)),
-                            color: ColorStyles.upFinTextAndBorderBlue,
-                          ),
-                          child: UiUtils.getTextWithFixedScale(each.message, 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null)
-                      ),
-                      CustomPaint(
-                        painter: ChatBubbleTriangleForMe(),
-                      )
-                    ]),
-                  ])
-              )
-          );
-        }
+      if(each.senderName == "UPFIN"){
+        chatList.add(_getOtherView(each));
       }else{
-        /*
-        * type file
-        * */
-        if(each.senderName == "UPFIN"){
-          chatList.add(
-              Container(
-                  padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 5.w, bottom: 5.w),
-                  width: 100.w,
-                  child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                    Column(children: [
-                      Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                        Container(
-                            constraints: BoxConstraints(
-                                maxWidth: 55.w
-                            ),
-                            padding: EdgeInsets.all(3.w),
-                            decoration: const BoxDecoration(
-                              borderRadius: BorderRadius.all(Radius.circular(15)),
-                              color: ColorStyles.upFinWhiteSky,
-                            ),
-                            child: Column(children: [
-                              UiUtils.getTextWithFixedScale(each.message.replaceAll("/", "\n"), 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null),
-                              UiUtils.getMarginBox(0, 2.h),
-                              UiUtils.getBorderButtonBox(60.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
-                                  UiUtils.getTextWithFixedScale("확인", 12.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
-
-                                  })
-                            ])),
-                        UiUtils.getMarginBox(1.w, 0),
-                        UiUtils.getTextWithFixedScale("21시09분", 8.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null)
-                      ])
-                    ])
-                  ])
-              )
-          );
-        }
+        chatList.add(_getMeView(each));
       }
     }
 
@@ -465,8 +430,8 @@ class ChatBubbleTriangleForOther extends CustomPainter {
     var paint = Paint()..color = ColorStyles.upFinWhiteSky;
 
     var path = Path();
-    path.lineTo(0, -4.w);
-    path.lineTo(-2.w, 0);
+    path.lineTo(0, -2.w);
+    path.lineTo(-1.2.w, 0);
     path.lineTo(0, 0);
     canvas.drawPath(path, paint);
   }
@@ -483,8 +448,8 @@ class ChatBubbleTriangleForMe extends CustomPainter {
     var paint = Paint()..color = ColorStyles.upFinTextAndBorderBlue;
 
     var path = Path();
-    path.lineTo(0, -4.w);
-    path.lineTo(2.w, 0);
+    path.lineTo(0, -2.w);
+    path.lineTo(1.2.w, 0);
     path.lineTo(0, 0);
     canvas.drawPath(path, paint);
   }
