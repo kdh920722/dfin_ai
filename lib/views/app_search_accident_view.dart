@@ -338,7 +338,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         }),
       ])),
       UiUtils.getMarginBox(0, 3.w),
-      SizedBox(width: 85.w,  height: 5.h,child: UiUtils.getTextWithFixedScale("우선 ", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w,  height: 5.h,child: UiUtils.getTextWithFixedScale("우선  ", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       SizedBox(width: 85.w,  height: 5.h,child: UiUtils.getTextWithFixedScale("사건정보가 필요합니다.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("해당 법원을 선택해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
@@ -982,6 +982,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         UiUtils.getMarginBox(2.w, 0),
         UiUtils.getBorderButtonBox(42.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
             UiUtils.getTextWithFixedScale("아니오", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
+              selectedAccidentInfo = "2023개회1000794";
               Map<String, dynamic> inputJson = {
                 "court_name": selectedCourtInfo.split("@")[0],
                 "caseNumberYear": selectedAccidentInfo.split("개회")[0],
@@ -998,24 +999,8 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
 
               };
               CommonUtils.log("i", "pr search info:\n$inputJson");
-
-              selectedAccidentInfo = "2023개회1000794";
-              Map<String, dynamic> inputJsonForTest = {
-                "court_name": "서울회생법원",
-                "caseNumberYear": selectedAccidentInfo.split("개회")[0],
-                "caseNumberType": "개회",
-                "caseNumberNumber": selectedAccidentInfo.split("개회")[1],
-                "userName": "정혜경",
-                "bankCode": "004",
-                "account": "40240104",
-                "birthday": "19690710",
-                "job": "2",
-                "lend_count": "1",
-                "lend_amount": "500",
-                "wish_amount": "300",
-              };
               UiUtils.showLoadingPop(context);
-              LogfinController.callLogfinApi(LogfinApis.prSearch, inputJsonForTest, (isSuccess, outputJson){
+              LogfinController.callLogfinApi(LogfinApis.prSearch, inputJson, (isSuccess, outputJson){
                 if(isSuccess){
                   LogfinController.getUserInfo((isSuccessToGetUserInfo){
                     if(isSuccessToGetUserInfo){

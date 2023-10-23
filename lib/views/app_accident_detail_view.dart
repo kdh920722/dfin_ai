@@ -61,6 +61,7 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
   List<Widget> _getLoanWidgetList(){
     List<Widget> loanWidgetList = [];
     CommonUtils.log("i", "MyData.getLoanInfoList size : ${MyData.getLoanInfoList().length}");
+    int count = 0;
     for(var each in MyData.getLoanInfoList()){
       CommonUtils.log("i", "accdient uid in loan : ${each.accidentUid}");
       String eachAccidentNum = "";
@@ -72,40 +73,43 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
       if(eachAccidentNum == selectedAccidentNum){
         CommonUtils.log("i", "@@@");
         loanWidgetList.add(
-            UiUtils.getLoanListBorderButtonBox(90.w, ColorStyles.upFinWhiteGray, ColorStyles.upFinWhiteGray,
+            UiUtils.getLoanListBorderButtonBox(90.w, ColorStyles.upFinMainGray , ColorStyles.upFinMainGray,
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   UiUtils.getMarginBox(0, 1.h),
                   SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScaleAndOverFlow(each.companyName, 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1)),
                   UiUtils.getMarginBox(0, 4.h),
-
-                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("접수일", 10.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
-                  UiUtils.getMarginBox(0, 1.h),
+                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("접수일", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
+                  UiUtils.getMarginBox(0, 1.2.h),
                   SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(_setUpdateDate(each.createdDate), 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)),
-                  UiUtils.getMarginBox(0, 3.h),
-
-                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("상품명", 10.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
-                  UiUtils.getMarginBox(0, 1.h),
-                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScaleAndOverFlow(each.productName, 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, 1)),
-                  UiUtils.getMarginBox(0, 3.h),
-
-                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("한도", 10.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
-                  UiUtils.getMarginBox(0, 1.h),
-                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(CommonUtils.getPriceFormattedString(double.parse(each.submitAmount)), 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, 1)),
-                  UiUtils.getMarginBox(0, 3.h),
-
-                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("금리", 10.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
-                  UiUtils.getMarginBox(0, 1.h),
-                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("${each.submitRate}%", 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, 1)),
-                  UiUtils.getMarginBox(0, 3.h),
-
-                  UiUtils.getMarginColoredBox(90.w, 0.3.h, ColorStyles.upFinGray),
                   UiUtils.getMarginBox(0, 2.h),
-                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(LoanInfoData.getDetailStatusName(each.statueId), 16.sp, FontWeight.w700, ColorStyles.upFinButtonBlue, TextAlign.start, null)),
+
+                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("상품명", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
+                  UiUtils.getMarginBox(0, 1.2.h),
+                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScaleAndOverFlow(each.productName, 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, 1)),
+                  UiUtils.getMarginBox(0, 2.h),
+
+                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("한도", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
+                  UiUtils.getMarginBox(0, 1.2.h),
+                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(CommonUtils.getPriceFormattedString(double.parse(each.submitAmount)), 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, 1)),
+                  UiUtils.getMarginBox(0, 2.h),
+
+                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("금리", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
+                  UiUtils.getMarginBox(0, 1.2.h),
+                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("${each.submitRate}%", 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, 1)),
+                  UiUtils.getMarginBox(0, 2.h),
+
+                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("진행", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
+                  UiUtils.getMarginBox(0, 1.2.h),
+                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(LoanInfoData.getDetailStatusName(each.statueId), 14.sp, FontWeight.w700, ColorStyles.upFinButtonBlue, TextAlign.start, null)),
+                  UiUtils.getMarginBox(0, 3.h),
+                  MyData.getLoanInfoList().length == 1 || (MyData.getLoanInfoList().length != 1 && count == MyData.getLoanInfoList().length-1) ?
+                  Container() : UiUtils.getMarginColoredBox(90.w, 0.1.h, ColorStyles.upFinWhiteGray)
 
                 ]), () {})
         );
         loanWidgetList.add(UiUtils.getMarginBox(0, 1.h));
       }
+      count++;
     }
 
     return loanWidgetList;
@@ -119,27 +123,27 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
 
     CommonUtils.log("i", MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resAmount"]);
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      UiUtils.getMarginBox(0, 4.h),
-
-      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("사건번호", 10.sp, FontWeight.w600, ColorStyles.upFinSky, TextAlign.start, null)),
-      UiUtils.getMarginBox(0, 1.h),
+      UiUtils.getMarginBox(0, 5.h),
+      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("사건번호", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha , TextAlign.start, null)),
+      UiUtils.getMarginBox(0, 2.h),
       SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(MyData.selectedAccidentInfoData!.accidentCaseNumberYear+
           MyData.selectedAccidentInfoData!.accidentCaseNumberType+MyData.selectedAccidentInfoData!.accidentCaseNumberNumber, 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 4.h),
 
-      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("법원", 10.sp, FontWeight.w600, ColorStyles.upFinSky, TextAlign.start, null)),
-      UiUtils.getMarginBox(0, 1.h),
+      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("법원", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
+      UiUtils.getMarginBox(0, 2.h),
       SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(MyData.selectedAccidentInfoData!.accidentCourtInfo.split("@")[0], 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 4.h),
       Row(children: [
         Column(children: [
-          SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale(isSuccessToGetDetailInfo ? "환급계좌" : "환급계좌 오류", 10.sp, FontWeight.w600, isSuccessToGetDetailInfo ? ColorStyles.upFinSky : ColorStyles.upFinRed, TextAlign.start, null)),
-          UiUtils.getMarginBox(0, 1.h),
-          SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale("${MyData.selectedAccidentInfoData!.accidentBankInfo.split("@")[0]} / ${MyData.selectedAccidentInfoData!.accidentBankAccount}", 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)),
+          SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale("환급계좌", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
+          UiUtils.getMarginBox(0, 2.h),
+          SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale("${MyData.selectedAccidentInfoData!.accidentBankInfo.split("@")[0]} / ${MyData.selectedAccidentInfoData!.accidentBankAccount}",
+              14.sp, FontWeight.w500, isSuccessToGetDetailInfo? ColorStyles.upFinBlack : ColorStyles.upFinRed, TextAlign.start, null)),
         ]),
         const Spacer(flex: 2),
-        UiUtils.getBorderButtonBoxWithZeroPadding(18.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
-            UiUtils.getTextWithFixedScale("변경", 10.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null), () async {
+        UiUtils.getBorderButtonBoxWithZeroPadding(18.w, isSuccessToGetDetailInfo? ColorStyles.upFinWhiteSky: ColorStyles.upFinWhiteRed, isSuccessToGetDetailInfo? ColorStyles.upFinWhiteSky: ColorStyles.upFinWhiteRed,
+            UiUtils.getTextWithFixedScale("변경", 10.sp, FontWeight.w600, isSuccessToGetDetailInfo? ColorStyles.upFinButtonBlue : ColorStyles.upFinRed, TextAlign.start, null), () async {
               AppUpdateAccidentViewState.isAccountEditMode = true;
               AppUpdateAccidentViewState.startViewId = AppUpdateAccidentViewState.bankCodeViewId;
               AppUpdateAccidentViewState.endViewId = AppUpdateAccidentViewState.bankAccountViewId;
@@ -161,19 +165,19 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
       ]),
       UiUtils.getMarginBox(0, 4.h),
       isSuccessToGetDetailInfo? Column(children: [
-        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("변제정보", 10.sp, FontWeight.w600, ColorStyles.upFinSky, TextAlign.start, null)),
-        UiUtils.getMarginBox(0, 1.h),
+        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("변제정보", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
+        UiUtils.getMarginBox(0, 2.h),
         SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("•  월 변제금액 : ${CommonUtils.getPriceCommaFormattedString(double.parse(MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resAmount"]))}원", 14.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
-        UiUtils.getMarginBox(0, 1.h),
+        UiUtils.getMarginBox(0, 1.5.h),
         SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("•  납입회차 : ${MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resRoundNo2"]}/${MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resRoundNo1"]}", 14.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
-        UiUtils.getMarginBox(0, 1.h),
+        UiUtils.getMarginBox(0, 1.5.h),
         SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("•  총입금액 : ${CommonUtils.getPriceCommaFormattedString(double.parse(MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resTotalAmt"]))}원", 14.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
-        UiUtils.getMarginBox(0, 1.h),
+        UiUtils.getMarginBox(0, 1.5.h),
         SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("•  상환주기 : ${MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resRepaymentCycle"].toString().trim()} ${MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resRepaymentDate"].toString().trim()}", 14.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
-        UiUtils.getMarginBox(0, 1.h),
-        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("•  미납회차 : ${double.parse(MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resRoundNo"]).toInt()}회", 14.sp, FontWeight.w500, ColorStyles.upFinRed, TextAlign.start, null)),
-        UiUtils.getMarginBox(0, 1.h),
-        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("•  미납금액 : ${CommonUtils.getPriceCommaFormattedString(double.parse(MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resUnpaidAmt"]))}원", 14.sp, FontWeight.w500, ColorStyles.upFinRed, TextAlign.start, null)),
+        UiUtils.getMarginBox(0, 1.5.h),
+        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("•  미납회차 : ${double.parse(MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resRoundNo"]).toInt()}회", 14.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
+        UiUtils.getMarginBox(0, 1.5.h),
+        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("•  미납금액 : ${CommonUtils.getPriceCommaFormattedString(double.parse(MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resUnpaidAmt"]))}원", 14.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
       ]) : Container(),
     ]);
   }
@@ -223,7 +227,6 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
         Stack(children: [
           Positioned(
             top: 1.h,
-            left: 5.w,
             child: UiUtils.getBackButton(() {
               back();
             }),
@@ -246,7 +249,7 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
             unselectedLabelStyle: TextStyles.upFinUnselectedTabTextInButtonStyle,
             unselectedLabelColor: ColorStyles.upFinRealGray,
             labelStyle: TextStyles.upFinSelectedTabTextInButtonStyle,
-            labelColor: ColorStyles.upFinButtonBlue,
+            labelColor: ColorStyles.upFinBlack,
             indicatorSize: TabBarIndicatorSize.tab,
             indicator: MyTabIndicator(),
             indicatorColor: ColorStyles.upFinButtonBlue,

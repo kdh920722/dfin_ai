@@ -18,6 +18,8 @@ class ColorStyles {
   static const Color upFinBlack = Color(0xff1c1c1c);
   static const Color upFinWhite = Colors.white;
   static const Color upFinRealWhite = Colors.white;
+  static const Color upFinMainGray = Color(0xF7F8F9);
+
 
 
 }

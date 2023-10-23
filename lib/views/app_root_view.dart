@@ -425,10 +425,10 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
             UiUtils.getMarginBox(0, 15.h),
             UiUtils.getTitleWithFixedScale("upfin", 75.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
             UiUtils.getMarginBox(0, 10.h),
-            UiUtils.getTextWithFixedScale("나에게 꼭 맞는", 28.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
+            UiUtils.getTextWithFixedScale("나에게 꼭 맞는", 24.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
             UiUtils.getMarginBox(0, 0.5.h),
-            UiUtils.getTextWithFixedScale("다이렉트 대출신는청!", 28.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
-            UiUtils.getMarginBox(0, 8.h)
+            UiUtils.getTextWithFixedScale("다이렉트 대출신는청!", 24.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
+            UiUtils.getMarginBox(0, 10.h)
           ])),
           UiUtils.getExpandedScrollView(Axis.vertical, SizedBox(width: 100.w, child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
             UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
@@ -444,7 +444,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
             SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("소셜계정으로 로그인", 12.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, null)),
             UiUtils.getMarginBox(0, 1.h),
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              SnsLoginController.getKakaoLoginButton(context, 18.w, (isSuccessToLogin) async {
+              SnsLoginController.getKakaoLoginButton(context, 12.w, (isSuccessToLogin) async {
                 if(isSuccessToLogin != null){
                   if(isSuccessToLogin){
                     CommonUtils.flutterToast("환영합니다!");
@@ -463,7 +463,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
                   UiUtils.closeLoadingPop(context);
                 }
               }),
-              SnsLoginController.getAppleLoginButton(context, 18.w, (isSuccessToLogin) async {
+              SnsLoginController.getAppleLoginButton(context, 12.w, (isSuccessToLogin) async {
                 if(isSuccessToLogin != null){
                   if(isSuccessToLogin){
                     CommonUtils.flutterToast("환영합니다!");

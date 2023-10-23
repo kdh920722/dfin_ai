@@ -170,9 +170,9 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                 Row(mainAxisSize: MainAxisSize.max, children: [
                   Expanded(flex: 15, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
                     SizedBox(width: 90.w, child: Row(children: [
-                      UiUtils.getImage(7.w, 7.w, Image.asset(each.productCompanyLogo)),
+                      UiUtils.getImage(6.w, 6.w, Image.asset(each.productCompanyLogo)),
                       UiUtils.getMarginBox(1.5.w, 0),
-                      UiUtils.getTextWithFixedScale(each.productCompanyName, 15.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null),
+                      UiUtils.getTextWithFixedScale(each.productCompanyName, 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null),
                     ])),
                     UiUtils.getMarginBox(0, 1.h),
                     UiUtils.getTextWithFixedScaleAndOverFlow(each.productName, 10.sp, FontWeight.w300, ColorStyles.upFinBlack, TextAlign.start, null),
@@ -183,9 +183,9 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                       SizedBox(width: 45.w,height: 2.5.h , child: UiUtils.getTextWithFixedScale("한도", 10.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, 1))
                     ])),
                     SizedBox(width: 80.w, child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      SizedBox(width: 20.w, child: UiUtils.getTextWithFixedScale("${each.productLoanMinRates}%", 18.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1)),
+                      SizedBox(width: 20.w, child: UiUtils.getTextWithFixedScale("${each.productLoanMinRates}%", 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1)),
                       UiUtils.getMarginBox(5.w, 0),
-                      SizedBox(width: 45.w, child: UiUtils.getTextWithFixedScale(CommonUtils.getPriceFormattedString(double.parse(each.productLoanLimit)), 18.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1))
+                      SizedBox(width: 45.w, child: UiUtils.getTextWithFixedScale(CommonUtils.getPriceFormattedString(double.parse(each.productLoanLimit)), 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1))
                     ])),
                     // UiUtils.getMarginBox(0, 2.h),
 
@@ -194,7 +194,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                     each.isPossible? Container()
                         : Column(crossAxisAlignment: CrossAxisAlignment.start, children: _getMsgListIWidget(msgList)),
                   ])),
-                  Expanded(flex: 1, child: each.isPossible? Icon(Icons.arrow_forward_ios_rounded, color: ColorStyles.upFinButtonBlue, size: 5.5.w) : Container()),
+                  Expanded(flex: 1, child: each.isPossible? Icon(Icons.arrow_forward_ios_rounded, color: ColorStyles.upFinDarkGray , size: 4.5.w) : Container()),
                 ]), () {
                   if(each.isPossible) {
                     CommonUtils.log("i","${each.productOfferLenderPrId} ${each.productOfferRid} ${each.productOfferId}");

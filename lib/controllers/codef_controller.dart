@@ -486,7 +486,7 @@ class CodeFController{
 
     UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, 40.h, 0.0, (context, setState){
       return Obx(()=>Column(mainAxisAlignment: MainAxisAlignment.start, children:[
-        UiUtils.getMarginBox(0, 13.h),
+        UiUtils.getMarginBox(0, 9.5.h),
         GetController.to.isWait.value? UiUtils.getImage(20.w, 20.w,  Image.asset(fit: BoxFit.fill,'assets/images/doc_move.gif'))
             : Column(children: [
               UiUtils.getMarginBox(0, 0.5.h),

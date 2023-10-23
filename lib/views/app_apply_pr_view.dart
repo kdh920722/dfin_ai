@@ -807,6 +807,9 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       );
     }
 
+
+
+
     introWidgetList.add(
         SizedBox(width: 90.w,
             child: UiUtils.getTextWithFixedScale("기본정보", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)
@@ -1369,21 +1372,22 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     List<Widget> addressWidgetList = [];
     Color textColor = ColorStyles.upFinBlack;
     Color textSubColor = ColorStyles.upFinRealGray;
+    FontWeight fontWeight = FontWeight.w500;
     for(var each in addressList){
       Key key = Key(each["roadAddr"]!+each["jibunAddr"]!);
       if(selectedAddressKey == key) {
-        textColor = ColorStyles.upFinTextAndBorderBlue;
-        textSubColor = ColorStyles.upFinTextAndBorderBlue;
+        textColor = ColorStyles.upFinBlack;
+        fontWeight = FontWeight.w600;
       }
       else{
         textColor = ColorStyles.upFinBlack;
-        textSubColor = ColorStyles.upFinRealGray;
+        fontWeight = FontWeight.w500;
       }
       addressWidgetList.add(
           SizedBox(width: 85.w,
               child: Row(mainAxisSize : MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
                 SizedBox(width: 5.w, child:
-                selectedAddressKey == key? UiUtils.getCustomCheckBox(key, 1.2, selectedAddressKey == key, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                selectedAddressKey == key? UiUtils.getCustomCheckBox(key, 1.2, selectedAddressKey == key, ColorStyles.upFinButtonBlue, ColorStyles.upFinWhite,
                     ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
@@ -1415,7 +1419,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                 ),
                 UiUtils.getMarginBox(3.w, 0),
                 SizedBox(width: 77.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  UiUtils.getTextButtonWithFixedScaleForAddress(each["roadAddr"]!, 14.sp, FontWeight.w500, textColor, TextAlign.start, null, (){
+                  UiUtils.getTextButtonWithFixedScaleForAddress(each["roadAddr"]!, 14.sp, fontWeight, textColor, TextAlign.start, null, (){
                     setState(() {
                       selectedAddressKey = key;
                       selectedAddressInfo = each["roadAddrPart1"]!;
@@ -1426,7 +1430,17 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                     });
                   }),
                   UiUtils.getMarginBox(0, 0.8.h),
-                  UiUtils.getTextWithFixedScale(each["jibunAddr"]!, 12.sp, FontWeight.w500, textSubColor, TextAlign.start, null)
+                  GestureDetector(onTap: (){
+                    setState(() {
+                      selectedAddressKey = key;
+                      selectedAddressInfo = each["roadAddrPart1"]!;
+                      _addressInfoTextController.text = selectedAddressInfo;
+                      if(selectedSearchCertAddressInfo != "" && selectedSearchCertAddressInfo != selectedAddressInfo){
+                        CommonUtils.flutterToast("주소정보를 바꾸시면\n서류인증을 다시 받아야합니다.");
+                      }
+                    });
+
+                  }, child: UiUtils.getTextWithFixedScale(each["jibunAddr"]!, 12.sp, FontWeight.w500, textSubColor, TextAlign.start, null))
                 ])),
               ])
           )
@@ -2157,10 +2171,11 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         if(each["is_docs"]){
           title1 = "🙏 아직 받지 못한 서류들은";
           title2 = "정부기관이 달라서";
-          title3 = "다시 한번 인증을 해야해요";
+          title3 = "다시 한번 인증을 해야해요.";
         }
       }
     }
+
     if(_isDocsAllConfirmed("gov24")){
       title1 = "정부24에서 ";
       title2 = "서류들을 모두 가져왔어요";
@@ -2231,7 +2246,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         if(each["is_docs"]){
           title1 = "🙏 아직 받지 못한 서류들은";
           title2 = "정부기관이 달라서";
-          title3 = "다시 한번 인증을 해야해요";
+          title3 = "다시 한번 인증을 해야해요.";
         }
       }
     }
@@ -2300,7 +2315,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         if(each["is_docs"]){
           title1 = "🙏 아직 받지 못한 서류들은";
           title2 = "정부기관이 달라서";
-          title3 = "다시 한번 인증을 해야해요";
+          title3 = "다시 한번 인증을 해야해요.";
         }
       }
     }

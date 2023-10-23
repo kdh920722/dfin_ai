@@ -310,7 +310,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
           Wrap(children: [
             UiUtils.getTextWithFixedScaleForAgreeSubTitle("서비스를 이용하기 위해 고객님의 서비스 이용약관에 동의가 필요합니다.", 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)
           ]),
-          UiUtils.getMarginBox(0, 3.h),
+          UiUtils.getMarginBox(0, 2.4.h),
           GestureDetector(child: Container(color: ColorStyles.upFinWhiteGray, child: Row(
             children: [
               UiUtils.getCheckBox(1.2, allAgreed!, (isChanged) {
