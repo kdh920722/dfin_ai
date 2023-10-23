@@ -1089,6 +1089,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           })
     ]);
   }
+
   void _setSavedData(){
     for(int eachAddedDocIdx = 0 ; eachAddedDocIdx < addedDocsList.length ; eachAddedDocIdx++){
       for(var eachSavedDoc in savedDocsList){
@@ -1137,7 +1138,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           //nhis  : 3:건강보험자격득실확인서    4:건강보험납부확인서
           //nts   : 6:사업자등록증(*테스트불가) 10:소득금액증명       11:부가세과세표준증명원(*테스트불가)
           else if(addedDocsList[eachAddedDocIdx]["id"] == 1 || addedDocsList[eachAddedDocIdx]["id"] == 2 || addedDocsList[eachAddedDocIdx]["id"] == 15 ||
-              addedDocsList[eachAddedDocIdx]["id"] == 3 || addedDocsList[eachAddedDocIdx]["id"] == 4 || addedDocsList[eachAddedDocIdx]["id"] == 10){
+              addedDocsList[eachAddedDocIdx]["id"] == 3 || addedDocsList[eachAddedDocIdx]["id"] == 4
+              || addedDocsList[eachAddedDocIdx]["id"] == 6 || addedDocsList[eachAddedDocIdx]["id"] == 10 || addedDocsList[eachAddedDocIdx]["id"] == 11){
             addedDocsList[eachAddedDocIdx]["is_confirmed"] = true;
             addedDocsList[eachAddedDocIdx]["result"] = eachSavedDoc["result"];
           }
@@ -2666,6 +2668,18 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     ]);
   }
   void _applyPr(){
+    for(var each in addedDocsList){
+      Map<String, dynamic> resultMap = each["result"];
+      CommonUtils.log("i", "finish check ===============================>\n"
+          "view_id:${each["view_id"]}\n"
+          "id:${each["id"]}\n"
+          "name:${each["name"]}\n"
+          "is_confirmed:${each["is_confirmed"]}\n"
+          "is_docs:${each["is_docs"]}\n"
+          "docs_type:${each["docs_type"]}\n"
+          "result:${resultMap.isEmpty? "" : each["result"]["resultValue"]}\n"
+      );
+    }
     UiUtils.showLoadingPop(context);
     _uploadCertImageToAwsServer(pickedFilePath, (isSuccessToUpload){
       if(isSuccessToUpload){
@@ -2678,6 +2692,9 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         for(var each in addedDocsList){
           if(each["is_docs"] && each["is_confirmed"]){
             var resultMap  =  each["result"]["resultValue"]["data"];
+            //gov24 : 1:주민등록등본           2:주민등록초본        15:지방세납세증명서
+            //nhis  : 3:건강보험자격득실확인서    4:건강보험납부확인서
+            //nts   : 6:사업자등록증(*테스트불가) 10:소득금액증명       11:부가세과세표준증명원(*테스트불가)
             if(each["id"] == 3 || each["id"] == 4){
               if(resultMap is List<dynamic>){
                 Map<String, dynamic> eachMap = {

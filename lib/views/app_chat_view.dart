@@ -30,6 +30,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   String currentStatus = "";
   int _ticks = 0;
   bool isBuild = false;
+  bool isTextFieldFocus = false;
 
   @override
   void initState(){
@@ -61,7 +62,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   void _functionForKeyboardHide(){
     _scrollToBottom();
   }
-  Future<void> _functionForKeyboardShow() async {
+  void _functionForKeyboardShow() {
     _scrollToBottom();
   }
 
@@ -100,32 +101,21 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   }
   
   Widget _getHtmlView(String htmlString){
+    htmlString = "<div id='type1'>$htmlString</div>";
     return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
       HtmlWidget(
         htmlString,
         customStylesBuilder: (element) {
-          if (element.id.contains('type1')) {
-            return {
-              "color" : "black",
-              "font-size": "12px",
-              "line-height" : "120%",
-              "font-weight": "normal"
-            };
-          }else if (element.id.contains('type2')) {
-            return {
-              "color" : "gray",
-              "font-size": "14px",
-              "line-height" : "150%",
-              "font-weight": "bold"
-            };
-          }else if (element.id.contains('type3')) {
+          if(element.id == 'type1') {
             return {
               "color" : "black",
               "font-size": "16px",
-              "line-height" : "200%",
-              "font-weight": "bold"
+              "line-height" : "120%",
+              "font-weight": "normal",
             };
-          }else if (element.localName == 'button') {
+          }
+
+          if (element.localName == 'button') {
             return {
               //"cursor": "pointer",
               //"display":"inlne-block",
@@ -139,8 +129,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
               "padding":"5px 20px"
             };
           }
-
-          return null;
         },
 
         onTapUrl: (url) async {
@@ -167,19 +155,15 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         if(each.senderName == "UPFIN"){
           chatList.add(
               Container(
-                  padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 1.w, bottom: 2.w),
+                  padding: EdgeInsets.only(left: 3.w, right: 3.w, top: 1.w, bottom: 2.w),
                   child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                    UiUtils.getImage(10.w, 10.w, Image.asset(fit: BoxFit.fitWidth, currentCompanyLogo)),
-                    UiUtils.getMarginBox(1.5.w, 0),
                     Column(children: [
                       Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
                         Container(
-                            constraints: BoxConstraints(
-                                maxWidth: 55.w
-                            ),
+                            constraints: BoxConstraints(maxWidth: 70.w),
                             padding: EdgeInsets.all(3.w),
                             decoration: const BoxDecoration(
-                              borderRadius: BorderRadius.all(Radius.circular(3)),
+                              borderRadius: BorderRadius.all(Radius.circular(15)),
                               color: ColorStyles.upFinWhiteSky,
                             ),
                             child: _getHtmlView(each.message)
@@ -223,8 +207,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                   padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 5.w, bottom: 5.w),
                   width: 100.w,
                   child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                    UiUtils.getImage(10.w, 10.w, Image.asset(fit: BoxFit.fitWidth, currentCompanyLogo)),
-                    UiUtils.getMarginBox(1.5.w, 0),
                     Column(children: [
                       Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
                         Container(
@@ -319,9 +301,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         UiUtils.getIcon(4.w, 4.w, Icons.check_circle_outline_rounded, 4.w, ColorStyles.upFinWhiteSky),
       UiUtils.getMarginBox(0, 1.5.h),
       UiUtils.getTextWithFixedScale(typeString, 9.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.center, null),
-      isChecked? UiUtils.getMarginBox(0, 0.5.h) : UiUtils.getMarginBox(0, 0.5.h),
-      isChecked? UiUtils.getTextWithFixedScale(LoanInfoData.getDetailStatusName(currentStatus), 9.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.center, null)
-          : UiUtils.getTextWithFixedScale("본인취소", 9.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null),
     ]);
   }
 
@@ -341,7 +320,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
       Container(
         color: isReached? ColorStyles.upFinButtonBlue : ColorStyles.upFinWhiteSky,
         height: 0.15.h,
-        width: 30.w,
+        width: 36.w,
       )
     ]);
   }
@@ -384,14 +363,14 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                     UiUtils.getMarginBox(0, 2.5.h),
                     UiUtils.getTextWithFixedScale(currentCompany, 16.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.center, 1),
                     UiUtils.getMarginBox(0, 1.h),
-                    UiUtils.getTextWithFixedScale("AI어드바이저", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.center, 1),
+                    UiUtils.getTextWithFixedScale(LoanInfoData.getDetailStatusName(currentStatus), 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.center, null)
                   ])
               ),
             ),
           ]),
-          UiUtils.getMarginBox(0, 1.h),
-          _getTimelineWidget(),
           UiUtils.getMarginBox(0, 3.h),
+          _getTimelineWidget(),
+          UiUtils.getMarginBox(0, 2.h),
           UiUtils.getMarginColoredBox(100.w, 1.h, ColorStyles.upFinWhiteGray),
           UiUtils.getMarginBox(0, 0.5.h),
           UiUtils.getExpandedScrollViewWithController(Axis.vertical, Obx(()=>Column(mainAxisAlignment: MainAxisAlignment.start, children: _getChatList())), _chatScrollController),
@@ -414,6 +393,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                           UiUtils.getChatTextField(73.w, TextStyles.upFinTextFormFieldTextStyle, _chatTextFocus, _chatTextController, TextInputType.multiline,
                               UiUtils.getChatInputDecoration(), (textValue) {
                                 if(textValue != ""){
+                                  isTextFieldFocus = true;
                                   final textLinePainter = TextPainter(
                                     text: TextSpan(text: textValue, style: TextStyles.upFinTextFormFieldTextStyle),
                                     maxLines: null,
@@ -430,14 +410,15 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                                   }
                                 }else{
                                   setState(() {
+                                    isTextFieldFocus = false;
                                     inputHeight = inputMinHeight;
                                   });
                                 }
                               })
                         ]))])),
                     Expanded(flex: 1, child: Container(color: ColorStyles.upFinWhite)),
-                    Expanded(flex: 15, child: UiUtils.getBorderButtonBoxWithZeroPadding(12.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
-                        UiUtils.getTextWithFixedScale("보내기", 10.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null), () async {
+                    Expanded(flex: 15, child: UiUtils.getBorderButtonBoxWithZeroPadding(12.w, isTextFieldFocus? ColorStyles.upFinWhiteSky : ColorStyles.upFinWhiteGray, isTextFieldFocus? ColorStyles.upFinWhiteSky : ColorStyles.upFinWhiteGray,
+                        UiUtils.getTextWithFixedScale("보내기", 10.sp, FontWeight.w600, isTextFieldFocus? ColorStyles.upFinButtonBlue : ColorStyles.upFinRealGray, TextAlign.start, null), () async {
                           CommonUtils.hideKeyBoard();
                           var inputJson = {
                             "loan_uid" : currentLoanUid,
