@@ -517,6 +517,9 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     _disposeAllTextControllers();
     _bankScrollController.dispose();
     Config.contextForEmergencyBack = null;
+    if(_cameraController != null){
+      _cameraController!.dispose();
+    }
     super.dispose();
   }
 
