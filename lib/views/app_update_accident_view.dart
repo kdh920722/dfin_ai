@@ -761,7 +761,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
         "caseNumberYear": MyData.selectedAccidentInfoData!.accidentCaseNumberYear,
         "caseNumberType": "개회",
         "caseNumberNumber": MyData.selectedAccidentInfoData!.accidentCaseNumberNumber,
-        "userName": "정혜경",//MyData.name
+        "userName": "황용진",//MyData.name
         "bankCode": selectedBankCodeInfo.split("@")[1],
         "account": selectedBankAccountInfo,
         "birthday": "19690710",//MyData.birth

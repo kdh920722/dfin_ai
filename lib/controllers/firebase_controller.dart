@@ -4,6 +4,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:upfin/configs/app_config.dart';
+import 'package:upfin/views/app_chat_view.dart';
 import '../configs/firebase_options.dart';
 import '../utils/common_utils.dart';
 
@@ -133,31 +134,82 @@ class FireBaseController{
       FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin, AndroidNotificationChannel? channel) async {
     CommonUtils.log("i", "fcm foreground message : ${message.toString()}");
     if (message.notification != null) {
-      print('Message also contained a notification: ${message.notification}');
-      flutterLocalNotificationsPlugin.show(
-          message.hashCode,
-          message.notification?.title,
-          message.notification?.body,
-          NotificationDetails(
-              android: AndroidNotificationDetails(
-                channel!.id,
-                channel.name,
-                channelDescription: channel.description,
-                icon: '@mipmap/ic_launcher',
-              ),
-              iOS: const DarwinNotificationDetails(
-                badgeNumber: 1,
-                subtitle: 'the subtitle',
-                sound: 'slow_spring_board.aiff',
-              )));
+      Map<String, dynamic> resultData = message.data;
+      if (resultData.containsKey("room_id")) {
+        String roomId = resultData["room_id"].toString();
+        if (AppChatViewState.currentRoomId == "" || AppChatViewState.currentRoomId != roomId) {
+          flutterLocalNotificationsPlugin.show(
+              message.hashCode,
+              message.notification?.title,
+              message.notification?.body,
+              NotificationDetails(
+                  android: AndroidNotificationDetails(
+                    channel!.id,
+                    channel.name,
+                    channelDescription: channel.description,
+                    icon: '@mipmap/ic_launcher',
+                  ),
+                  iOS: const DarwinNotificationDetails(
+                    badgeNumber: 1,
+                    subtitle: 'the subtitle',
+                    sound: 'slow_spring_board.aiff',
+                  )));
+        }
+      } else {
+        flutterLocalNotificationsPlugin.show(
+            message.hashCode,
+            message.notification?.title,
+            message.notification?.body,
+            NotificationDetails(
+                android: AndroidNotificationDetails(
+                  channel!.id,
+                  channel.name,
+                  channelDescription: channel.description,
+                  icon: '@mipmap/ic_launcher',
+                ),
+                iOS: const DarwinNotificationDetails(
+                  badgeNumber: 1,
+                  subtitle: 'the subtitle',
+                  sound: 'slow_spring_board.aiff',
+                )));
+      }
     }
   }
   
   static Future<void> _handlerForFirebaseMessagingOnBackground(RemoteMessage message) async {
     CommonUtils.log("i", "fcm background message : ${message.toString()}");
-    await _initFirebase((bool isSuccess){
+    await _initFirebase((bool isSuccess) async {
       if(isSuccess){
         CommonUtils.log("i", "firebase init on background");
+        FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+        AndroidNotificationChannel? androidNotificationChannel;
+
+        if(Config.isAndroid){
+          androidNotificationChannel = AndroidNotificationChannel(channelIdForAndroid, channelNameForAndroid,description: channelDescForAndroid, importance: Importance.max);
+          await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(androidNotificationChannel);
+        }else{
+          FirebaseMessaging messaging = FirebaseMessaging.instance;
+          await messaging.setForegroundNotificationPresentationOptions(alert: true, badge: true, sound: true);
+          await messaging.requestPermission(alert: true, announcement: false, badge: true, carPlay: false, criticalAlert: false, provisional: false, sound: true);
+        }
+
+        flutterLocalNotificationsPlugin.show(
+            message.hashCode,
+            message.notification?.title,
+            message.notification?.body,
+            NotificationDetails(
+                android: AndroidNotificationDetails(
+                  androidNotificationChannel!.id,
+                  androidNotificationChannel.name,
+                  channelDescription: androidNotificationChannel.description,
+                  icon: '@mipmap/ic_launcher',
+                ),
+                iOS: const DarwinNotificationDetails(
+                  badgeNumber: 1,
+                  subtitle: 'the subtitle',
+                  sound: 'slow_spring_board.aiff',
+                )));
+
       }else{
         CommonUtils.log("e", "firebase init error ");
       }

@@ -72,6 +72,8 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
     Navigator.pop(context);
   }
 
+  bool isValidToSignOut = false;
+
   @override
   Widget build(BuildContext context) {
     if(CommonUtils.isValidStateByAPiExpiredDate()){
@@ -88,7 +90,7 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
             ])),
             SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               UiUtils.getMarginBox(0, 3.w),
-              UiUtils.getTextWithFixedScale("사용자정보", 20.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null),
+              UiUtils.getTextWithFixedScale("계정", 20.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
               UiUtils.getMarginBox(0, 3.h)
             ])),
             UiUtils.getDisabledTextField(90.w, MyData.name, TextStyles.upFinDisabledTextFormFieldTextStyle2,
@@ -117,9 +119,19 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
                           UiUtils.getTextWithFixedScale("비밀번호 입력 후 회원탈퇴가 가능합니다.", 14.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null),
                           UiUtils.getMarginBox(0, 3.h),
                           UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _pwdTextFocus, _pwdTextController, TextInputType.visiblePassword, true,
-                              UiUtils.getInputDecoration("비밀번호", 12.sp, "", 0.sp), (text) { }, (value){}),
+                              UiUtils.getInputDecoration("비밀번호", 12.sp, "", 0.sp), (text) {
+                                if(text == ""){
+                                  slideSetState(() {
+                                    isValidToSignOut = false;
+                                  });
+                                }else{
+                                  slideSetState(() {
+                                    isValidToSignOut = true;
+                                  });
+                                }
+                              }, (value){}),
                           UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
-                          UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+                          isValidToSignOut? UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
                               UiUtils.getTextWithFixedScale("진행", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
                                 CommonUtils.hideKeyBoard();
                                 Map<String, dynamic> inputJson = {
@@ -145,7 +157,7 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
 
                                   }
                                 });
-                              })
+                              }) : Container()
                         ]));
 
                     return slideWidget;

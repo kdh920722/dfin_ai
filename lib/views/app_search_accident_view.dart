@@ -905,7 +905,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                 "caseNumberYear": selectedAccidentInfo.split("개회")[0],
                 "caseNumberType": "개회",
                 "caseNumberNumber": selectedAccidentInfo.split("개회")[1],
-                "userName": MyData.name,
+                "userName": "황용진",
                 "bankCode": selectedBankCodeInfo.split("@")[1],
                 "account": selectedBankAccountInfo,
                 "birthday": MyData.birth,
@@ -917,23 +917,8 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
               };
               CommonUtils.log("i", "pr search info:\n$inputJson");
 
-              selectedAccidentInfo = "2023개회1000794";
-              Map<String, dynamic> inputJsonForTest = {
-                "court_name": "서울회생법원",
-                "caseNumberYear": selectedAccidentInfo.split("개회")[0],
-                "caseNumberType": "개회",
-                "caseNumberNumber": selectedAccidentInfo.split("개회")[1],
-                "userName": "정혜경",
-                "bankCode": selectedBankCodeInfo.split("@")[1],
-                "account": selectedBankAccountInfo,
-                "birthday": MyData.birth,
-                "job": selectedJobInfo.split("@")[1],
-                "lend_count": selectedPreLoanCountInfo.split("@")[1],
-                "lend_amount": selectedPreLoanPriceInfo,
-                "wish_amount": selectedWantLoanPriceInfo,
-              };
               UiUtils.showLoadingPop(context);
-              LogfinController.callLogfinApi(LogfinApis.prSearch, inputJsonForTest, (isSuccess, outputJson){
+              LogfinController.callLogfinApi(LogfinApis.prSearch, inputJson, (isSuccess, outputJson){
                 if(isSuccess){
                   LogfinController.getUserInfo((isSuccessToGetUserInfo){
                     if(isSuccessToGetUserInfo){
@@ -982,13 +967,12 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         UiUtils.getMarginBox(2.w, 0),
         UiUtils.getBorderButtonBox(42.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
             UiUtils.getTextWithFixedScale("아니오", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
-              selectedAccidentInfo = "2023개회1000794";
               Map<String, dynamic> inputJson = {
                 "court_name": selectedCourtInfo.split("@")[0],
                 "caseNumberYear": selectedAccidentInfo.split("개회")[0],
                 "caseNumberType": "개회",
                 "caseNumberNumber": selectedAccidentInfo.split("개회")[1],
-                "userName": MyData.name,
+                "userName": "황용진",
                 "bankCode": selectedBankCodeInfo.split("@")[1],
                 "account": selectedBankAccountInfo,
                 "birthday": MyData.birth,

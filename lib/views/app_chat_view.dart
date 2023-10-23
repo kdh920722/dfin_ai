@@ -3,6 +3,7 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:sizer/sizer.dart';
+import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:upfin/controllers/get_controller.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/datas/loan_info_data.dart';
@@ -60,10 +61,10 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
 
   KeyboardVisibilityController? _keyboardVisibilityController;
   void _functionForKeyboardHide(){
-    _scrollToBottom();
+    _scrollToBottom(true);
   }
   void _functionForKeyboardShow() {
-    _scrollToBottom();
+    _scrollToBottom(true);
   }
 
   @override
@@ -155,22 +156,26 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         if(each.senderName == "UPFIN"){
           chatList.add(
               Container(
-                  padding: EdgeInsets.only(left: 3.w, right: 3.w, top: 1.w, bottom: 2.w),
+                  padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 1.w, bottom: 2.w),
                   child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
                     Column(children: [
                       Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                        CustomPaint(
+                          painter: ChatBubbleTriangleForOther(),
+                        ),
                         Container(
                             constraints: BoxConstraints(maxWidth: 70.w),
                             padding: EdgeInsets.all(3.w),
                             decoration: const BoxDecoration(
-                              borderRadius: BorderRadius.all(Radius.circular(15)),
+                              borderRadius: BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomRight: Radius.circular(15)),
                               color: ColorStyles.upFinWhiteSky,
                             ),
                             child: _getHtmlView(each.message)
                         ),
                         UiUtils.getMarginBox(1.w, 0),
                         UiUtils.getTextWithFixedScale(CommonUtils.getFormattedLastMsgTime(each.messageTime), 8.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null)
-                      ])
+                      ]),
+                      UiUtils.getMarginBox(0, 1.h)
                     ]),
                   ])
               )
@@ -181,18 +186,22 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                   padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 1.w, bottom: 2.w),
                   width: 100.w,
                   child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                    Column(children: [
+                    Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
                       Container(
                           constraints: BoxConstraints(
                               maxWidth: 55.w
                           ),
                           padding: EdgeInsets.all(3.w),
                           decoration: const BoxDecoration(
-                            borderRadius: BorderRadius.all(Radius.circular(3)),
-                            color: ColorStyles.upFinGray,
+                            borderRadius: BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomLeft: Radius.circular(15)),
+                            color: ColorStyles.upFinTextAndBorderBlue,
                           ),
-                          child: UiUtils.getTextWithFixedScale(each.message, 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null))
-                    ])
+                          child: UiUtils.getTextWithFixedScale(each.message, 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null)
+                      ),
+                      CustomPaint(
+                        painter: ChatBubbleTriangleForMe(),
+                      )
+                    ]),
                   ])
               )
           );
@@ -215,7 +224,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                             ),
                             padding: EdgeInsets.all(3.w),
                             decoration: const BoxDecoration(
-                              borderRadius: BorderRadius.all(Radius.circular(3)),
+                              borderRadius: BorderRadius.all(Radius.circular(15)),
                               color: ColorStyles.upFinWhiteSky,
                             ),
                             child: Column(children: [
@@ -237,7 +246,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
       }
     }
 
-    _scrollToBottom();
+    _scrollToBottom(false);
     return chatList;
   }
 
@@ -261,17 +270,15 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     }
   }
 
-  Future<void> _scrollToBottom() async {
+  Future<void> _scrollToBottom(bool doDelay) async {
     if(isBuild){
-      await Future.delayed(const Duration(milliseconds: 400), () async {
-        if(_chatScrollController.hasClients){
-          _chatScrollController.animateTo(
-            _chatScrollController.position.maxScrollExtent,
-            duration: const Duration(milliseconds: 100),
-            curve: Curves.fastOutSlowIn,
-          );
-        }
-      });
+      if(doDelay){
+        await Future.delayed(const Duration(milliseconds: 400), () async {});
+      }
+
+      if(_chatScrollController.hasClients){
+        _chatScrollController.jumpTo(_chatScrollController.position.maxScrollExtent);
+      }
     }
   }
 
@@ -337,7 +344,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         CommonUtils.backToHome(context);
       }else{
         isBuild = true;
-        _scrollToBottom();
+        _scrollToBottom(false);
       }
     });
 
@@ -363,16 +370,14 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                     UiUtils.getMarginBox(0, 2.5.h),
                     UiUtils.getTextWithFixedScale(currentCompany, 16.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.center, 1),
                     UiUtils.getMarginBox(0, 1.h),
-                    UiUtils.getTextWithFixedScale(LoanInfoData.getDetailStatusName(currentStatus), 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.center, null)
+                    UiUtils.getTextWithFixedScale(LoanInfoData.getDetailStatusName(currentStatus), 12.sp, FontWeight.w600, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, null)
                   ])
               ),
             ),
           ]),
           UiUtils.getMarginBox(0, 3.h),
           _getTimelineWidget(),
-          UiUtils.getMarginBox(0, 2.h),
-          UiUtils.getMarginColoredBox(100.w, 1.h, ColorStyles.upFinWhiteGray),
-          UiUtils.getMarginBox(0, 0.5.h),
+          UiUtils.getMarginBox(0, 3.h),
           UiUtils.getExpandedScrollViewWithController(Axis.vertical, Obx(()=>Column(mainAxisAlignment: MainAxisAlignment.start, children: _getChatList())), _chatScrollController),
           UiUtils.getMarginBox(0, 0.5.h),
           AnimatedContainer(
@@ -385,12 +390,23 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
               ),
               color: ColorStyles.upFinWhite,
               child: Padding(padding: EdgeInsets.only(left: 3.w,right: 3.w,bottom: 2.w,top: 0.5.w), child:
-              Container(color: ColorStyles.upFinGray, padding: EdgeInsets.all(0.5.w),
-                  child: Container(color: ColorStyles.upFinWhite, child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+              Container(
+                  decoration: BoxDecoration(
+                    color: ColorStyles.upFinGray, // 배경색 설정
+                    borderRadius: BorderRadius.circular(20.0), // 모서리를 둥글게 하는 부분
+                  ),
+                  padding: EdgeInsets.all(0.5.w),
+                  child: Container(
+                      decoration: BoxDecoration(
+                        color: ColorStyles.upFinWhite, // 배경색 설정
+                        borderRadius: BorderRadius.circular(18.0), // 모서리를 둥글게 하는 부분
+                      ),
+                      child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                        UiUtils.getMarginBox(1.5.w, 0),
                     Expanded(flex: 75, child: Column(children: [UiUtils.getExpandedScrollView(Axis.vertical,
                         Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                          UiUtils.getMarginBox(0, 0.5.h),
-                          UiUtils.getChatTextField(73.w, TextStyles.upFinTextFormFieldTextStyle, _chatTextFocus, _chatTextController, TextInputType.multiline,
+                          UiUtils.getMarginBox(0, 0.7.h),
+                          UiUtils.getChatTextField(70.w, TextStyles.upFinTextFormFieldTextStyle, _chatTextFocus, _chatTextController, TextInputType.multiline,
                               UiUtils.getChatInputDecoration(), (textValue) {
                                 if(textValue != ""){
                                   isTextFieldFocus = true;
@@ -398,12 +414,11 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                                     text: TextSpan(text: textValue, style: TextStyles.upFinTextFormFieldTextStyle),
                                     maxLines: null,
                                     textDirection: TextDirection.ltr,
-                                  )..layout(minWidth: 0, maxWidth: 70.w);
+                                  )..layout(minWidth: 0, maxWidth: 67.w);
 
                                   if(inputHeight <= inputMaxHeight){
                                     final desiredHeight = inputMinHeight*0.7+textLinePainter.height;
                                     final height = desiredHeight.clamp(inputMinHeight, inputMaxHeight);
-                                    print("hhh : $inputHeight || $height");
                                     setState(() {
                                       inputHeight = height;
                                     });
@@ -433,7 +448,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                             _chatTextController.text = "";
                           });
                         })),
-                    Expanded(flex: 2, child: Container(color: ColorStyles.upFinWhite)),
+                        UiUtils.getMarginBox(2.5.w, 0),
                   ]))))
           )
         ])
@@ -442,4 +457,40 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
 
   }
 
+}
+
+class ChatBubbleTriangleForOther extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    var paint = Paint()..color = ColorStyles.upFinWhiteSky;
+
+    var path = Path();
+    path.lineTo(0, -4.w);
+    path.lineTo(-2.w, 0);
+    path.lineTo(0, 0);
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return true;
+  }
+}
+
+class ChatBubbleTriangleForMe extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    var paint = Paint()..color = ColorStyles.upFinTextAndBorderBlue;
+
+    var path = Path();
+    path.lineTo(0, -4.w);
+    path.lineTo(2.w, 0);
+    path.lineTo(0, 0);
+    canvas.drawPath(path, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) {
+    return true;
+  }
 }

@@ -50,7 +50,6 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
     CommonUtils.log("i", "AppRootView 화면 파괴");
     WidgetsBinding.instance.removeObserver(this);
     GetController.to.resetPercent();
-    WebSocketController.disposeSocket();
     Config.contextForEmergencyBack = null;
     super.dispose();
   }

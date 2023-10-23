@@ -194,9 +194,9 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                       ):Container(),
                     ],
                   ) : Column(children: [
+                    UiUtils.getMarginBox(0, 1.h),
                     UiUtils.getBorderButtonBoxWithZeroPadding(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
                         Row(children: [
-
                           UiUtils.getTextWithFixedScale("현재 등록된 사건이 없습니다.", 13.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.center, null),
                           const Spacer(flex: 2),
                           UiUtils.getBorderButtonBox(22.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
@@ -320,10 +320,15 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                       UiUtils.getTextWithFixedScale("대출상품 찾기", 12.sp, FontWeight.w700, ColorStyles.upFinWhite, TextAlign.center, null)
                     ]), () {
                       MyData.selectedAccidentInfoData = each;
-                      AppUpdateAccidentViewState.isAccountEditMode = false;
-                      AppUpdateAccidentViewState.startViewId = AppUpdateAccidentViewState.confirmedViewId;
-                      AppUpdateAccidentViewState.endViewId = AppUpdateAccidentViewState.jobViewId;
-                      CommonUtils.moveTo(context, AppView.appUpdateAccidentView.value, null);
+                      if(MyData.isPossibleAccidentInfo(each)){
+                        AppUpdateAccidentViewState.isAccountEditMode = false;
+                        AppUpdateAccidentViewState.startViewId = AppUpdateAccidentViewState.confirmedViewId;
+                        AppUpdateAccidentViewState.endViewId = AppUpdateAccidentViewState.jobViewId;
+                        CommonUtils.moveTo(context, AppView.appUpdateAccidentView.value, null);
+                      }else{
+                        CommonUtils.log("i", "accdient uid : ${each.accidentUid}"); // be  :m-PYw9Qm5gvLonWRrCUAbQ  af : 5L5zVL98TsNC-1uz4xednA
+                        CommonUtils.moveTo(context, AppView.appAccidentDetailInfoView.value, null);
+                      }
                     })
               ]), () {
                 CommonUtils.log("i", "accdient uid : ${each.accidentUid}"); // be  :m-PYw9Qm5gvLonWRrCUAbQ  af : 5L5zVL98TsNC-1uz4xednA
@@ -362,11 +367,12 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
       loanChatRoomWidgetList.add(
           Column(children: [
             UiUtils.getMarginBox(0, 2.h),
-            UiUtils.getBorderButtonBoxWithZeroPadding(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
+            UiUtils.getBorderButtonBoxWithZeroPadding(92.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
                 Row(mainAxisSize: MainAxisSize.max, children: [
-                  Expanded(flex: 2, child: each.chatRoomType == 0? UiUtils.getIcon(11.w, 11.w, Icons.account_box_rounded, 11.w, ColorStyles.upFinButtonBlue) : UiUtils.getImage(11.w, 11.w, Image.asset(each.chatRoomIconPath))),
+                  Expanded(flex: 2, child: each.chatRoomType == 0? UiUtils.getIcon(11.w, 11.w, Icons.account_box_rounded, 11.w, ColorStyles.upFinButtonBlue)
+                      : UiUtils.getImage(11.w, 11.w, Image.asset(each.chatRoomIconPath))),
                   UiUtils.getMarginBox(1.w, 0),
-                  Expanded(flex: 8, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Expanded(flex: 10, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
                       UiUtils.getMarginBox(0, 1.h),
                       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -383,7 +389,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                   ])),
                   Expanded(flex: 2, child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
                     UiUtils.getTextWithFixedScale(CommonUtils.getFormattedLastMsgTime(lastDateString), 8.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null),
-                    UiUtils.getMarginBox(0,0.5.h),
+                    UiUtils.getMarginBox(0,1.h),
                     cnt > 0? Row(mainAxisSize: MainAxisSize.min, children: [
                       UiUtils.getCountCircleBox(6.w, cnt, 7.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.center, 1), UiUtils.getMarginBox(0.3.w, 0)]) : Container()
                   ]))
