@@ -14,6 +14,7 @@ import '../controllers/aws_controller.dart';
 import '../controllers/clova_controller.dart';
 import '../controllers/codef_controller.dart';
 import '../controllers/get_controller.dart';
+import '../controllers/hyphen_controller.dart';
 import '../datas/api_info_data.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
@@ -1547,7 +1548,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("하나를 촬영 해 주세요.", 12.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
 
       UiUtils.getMarginBox(0, 10.h),
-      pickedFilePath != "" ? Container(decoration: BoxDecoration(color: ColorStyles.upFinBlack, borderRadius: BorderRadius.circular(10)), child: UiUtils.getImage(80.w, 24.h, Image.file(File(pickedFilePath))))
+      pickedFilePath != "" ? Container(decoration: BoxDecoration(color: ColorStyles.upFinBlack, borderRadius: BorderRadius.circular(10)), child: UiUtils.getImage(80.w, 22.h, Image.file(File(pickedFilePath))))
           : UiUtils.getImage(85.w, 24.h, Image.asset(fit: BoxFit.fitHeight,'assets/images/img_id_card.png')),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getExpandedScrollView(Axis.vertical, Container()),
@@ -1684,7 +1685,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                     MyData.idNumber = map['personalNum'][0]["formatted"]["value"];
                     String croppedImagePath = await CommonUtils.makeCroppedImageAndGetPath(maskedImagePath, map);
 
-                    //test
+                    /*test
                     _setConfirmedToDocItemByViewId(currentViewId, true);
                     Map<String, dynamic> resultMap = {
                       "resultValue" : croppedImagePath
@@ -1694,9 +1695,9 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                       pickedFilePath = croppedImagePath;
                     });
                     if(context.mounted) UiUtils.closeLoadingPop(context);
-                    //test
+                    test*/
 
-                    /* check real id
+                    //check real id
                      if(map['id_type'] == "dl"){
                       CommonUtils.log("i", "dl : infos\n${map["code"][0]["formatted"]["value"]}${map["num"][0]["formatted"]["value"]}");
                       String licenseNum = map["num"][0]["formatted"]["value"];
@@ -1709,14 +1710,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                         "licence04": licenseNum.split("-")[3],
                         "serialNo": map["code"][0]["formatted"]["value"]
                       };
-                      _setConfirmedToDocItemByViewId(currentViewId, true);
-                      Map<String, dynamic> resultMap = {
-                        "resultValue" : croppedImagePath
-                      };
-                      _setResultToListById(cameraId, resultMap);
-                      setState(() {
-                        pickedFilePath = croppedImagePath;
-                      });
 
                       HyphenController.callHyphenApiForCert(HyphenApis.driveIdCert, inputJson, (isSuccessToCertId){
                         UiUtils.closeLoadingPop(context);
@@ -1731,6 +1724,10 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                           });
                         }else{
                           _setConfirmedToDocItemByViewId(currentViewId, false);
+                          Map<String, dynamic> resultMap = {
+                            "resultValue" : {}
+                          };
+                          _setResultToListById(cameraId, resultMap);
                           setState(() {
                             pickedFilePath = "";
                           });
@@ -1743,14 +1740,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                         "juminNo": MyData.idNumber.replaceAll("-", ""),
                         "issueDt": "${map["issueDate"][0]["formatted"]["year"]}${map["issueDate"][0]["formatted"]["month"]}${map["issueDate"][0]["formatted"]["day"]}"
                       };
-                      _setConfirmedToDocItemByViewId(currentViewId, true);
-                      Map<String, dynamic> resultMap = {
-                        "resultValue" : croppedImagePath
-                      };
-                      _setResultToListById(cameraId, resultMap);
-                      setState(() {
-                        pickedFilePath = croppedImagePath;
-                      });
 
                       HyphenController.callHyphenApiForCert(HyphenApis.idCert, inputJson, (isSuccessToCertId){
                         UiUtils.closeLoadingPop(context);
@@ -1765,13 +1754,17 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                           });
                         }else{
                           _setConfirmedToDocItemByViewId(currentViewId, false);
+                          Map<String, dynamic> resultMap = {
+                            "resultValue" : {}
+                          };
+                          _setResultToListById(cameraId, resultMap);
                           setState(() {
                             pickedFilePath = "";
                           });
                         }
                       });
                     }
-                     */
+
                   }
                 }else{
                   if(context.mounted) UiUtils.closeLoadingPop(context);
