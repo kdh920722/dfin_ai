@@ -38,6 +38,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   bool isBuild = false;
   bool isTextFieldFocus = false;
   String myTempChatText = "";
+  bool inputTextHide = true;
 
   @override
   void initState(){
@@ -377,12 +378,15 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
       XFile? image = await CommonUtils.getCameraImage();
       if(image != null){
         isShowPickedFile = true;
+        inputHelpHeight = inputHelpPickedFileHeight;
         pickedFiles.add(File(image.path));
       }else{
         if(pickedFiles.isEmpty){
           isShowPickedFile = false;
+          inputHelpHeight = inputHelpMinHeight;
         }else{
           isShowPickedFile = true;
+          inputHelpHeight = inputHelpPickedFileHeight;
         }
       }
       setState(() {});
@@ -398,6 +402,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         if(files.length <= maximumSize){
           if(files.length+pickedFiles.length <= maximumSize){
             isShowPickedFile = true;
+            inputHelpHeight = inputHelpPickedFileHeight;
             for(var each in files){
               pickedFiles.add(each);
             }
@@ -410,8 +415,10 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
       }else{
         if(pickedFiles.isEmpty){
           isShowPickedFile = false;
+          inputHelpHeight = inputHelpMinHeight;
         }else{
           isShowPickedFile = true;
+          inputHelpHeight = inputHelpPickedFileHeight;
         }
       }
       setState(() {});
@@ -421,14 +428,14 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   }
 
   List<Widget> _getAutoAnswerWidgetList(){
-    List<String> answerList = ["자주하는 질문 💬", "사건정보 📜", "나의정보 🔒", "대출현황 🏦", "심사결과 📑", "공지사항 📣", "상담원 연결 🤓", "사진 📷", "가져오기 📤"];
+    List<String> answerList = ["자주하는 질문 💬", "나의정보 🔒", "대출현황 🏦", "심사결과 📑", "상담원 연결 🤓", "사진 📷", "가져오기 📤"];
     List<Widget> widgetList = [];
     for(var each in answerList){
       widgetList.add(GestureDetector(child: UiUtils.getRoundedBorderTextWithFixedScale(each, 11.sp, FontWeight.w500, TextAlign.center, ColorStyles.upFinGray, ColorStyles.upFinRealGray),
       onTap: () async {
-        if(each == "카메라"){
+        if(each.contains("사진")){
           _setPickedImgFromCamera();
-        }else if(each == "파일"){
+        }else if(each.contains("가져오기")){
           _setPickedFileFromDevice();
         }else{
 
@@ -479,7 +486,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
 
       String fileName = pickedFiles[i].uri.pathSegments.last; // 파일명 + 확장자
       String basename = pickedFiles[i].uri.pathSegments.last.split('.').first; // 파일명\
-
       widgetList.add(
           Stack(alignment:Alignment.bottomLeft, children: [
             Container(width: 22.5.w, height: 17.h,
@@ -512,8 +518,10 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
               setState(() {
                 pickedFiles.removeAt(i);
                 if(pickedFiles.isEmpty){
+                  inputHelpHeight = inputHelpMinHeight;
                   isShowPickedFile = false;
                 }else{
+                  inputHelpHeight = inputHelpPickedFileHeight;
                   isShowPickedFile = true;
                 }
               });
@@ -532,7 +540,9 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   double inputMinHeight = 9.2.h;
   double inputHeight = 9.2.h;
   double inputMaxHeight = 20.h;
-
+  double inputHelpMinHeight = 17.h;
+  double inputHelpPickedFileHeight = 43.h;
+  double inputHelpHeight = 17.h;
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -576,11 +586,21 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
           _getTimelineWidget(),
           UiUtils.getMarginBox(0, 3.h),
           UiUtils.getExpandedScrollViewWithController(Axis.vertical, Obx(()=>Column(mainAxisAlignment: MainAxisAlignment.start, children: _getChatList())), _chatScrollController),
-          UiUtils.getMarginBox(0, 1.5.h),
-          Wrap(runSpacing: 0.8.h, spacing: 1.5.w, alignment: WrapAlignment.end, direction: Axis.horizontal, children: _getAutoAnswerWidgetList()),
-          isShowPickedFile? UiUtils.getSizedScrollView(90.w, 18.h, Axis.horizontal, _getPickedFilesWidget()) : Container(),
-          UiUtils.getMarginBox(0, 1.5.h),
-          AnimatedContainer(
+          UiUtils.getMarginBox(0, 1.h),
+          UiUtils.getSizedScrollView(100.w, inputHelpHeight, Axis.vertical, Column(children: [
+            Wrap(runSpacing: 0.8.h, spacing: 1.5.w, alignment: WrapAlignment.end, direction: Axis.horizontal, children: _getAutoAnswerWidgetList()),
+            isShowPickedFile? Column(children: [
+              UiUtils.getSizedScrollView(90.w, 18.h, Axis.horizontal, _getPickedFilesWidget()),
+              UiUtils.getMarginBox(0, 1.h),
+              UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+                  UiUtils.getTextWithFixedScale("전송", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
+
+                  }),
+              UiUtils.getMarginBox(0, 1.h),
+            ]) : Container()
+          ])),
+          UiUtils.getMarginBox(0, 0.8.h),
+          inputTextHide? Container() : AnimatedContainer(
               duration: const Duration(milliseconds:200),
               width: 100.w,
               height: inputHeight,

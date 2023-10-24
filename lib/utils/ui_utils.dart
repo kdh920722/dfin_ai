@@ -515,8 +515,20 @@ class UiUtils {
     return Expanded(child: SingleChildScrollView(scrollDirection: scrollDir, physics: const BouncingScrollPhysics(), child: scrollChildView));
   }
 
+  static Widget getExpandedScrollViewFit(Axis scrollDir, Widget scrollChildView){
+    return Flexible(child: SingleChildScrollView(scrollDirection: scrollDir, physics: const BouncingScrollPhysics(), child: scrollChildView));
+  }
+
+  static Widget getExpandedScrollViewFit2(Axis scrollDir, Widget scrollChildView, ScrollController controller){
+    return Flexible(fit: FlexFit.tight, child: SingleChildScrollView(controller: controller, scrollDirection: scrollDir, physics: const BouncingScrollPhysics(), child: scrollChildView));
+  }
+
   static Widget getExpandedScrollViewWithController(Axis scrollDir, Widget scrollChildView, ScrollController controller){
     return Expanded(child: SingleChildScrollView(controller: controller, scrollDirection: scrollDir, physics: const BouncingScrollPhysics(), child: scrollChildView));
+  }
+
+  static Widget getExpandedScrollViewWithControllerFlex(Axis scrollDir, Widget scrollChildView, ScrollController controller){
+    return Expanded(flex:2, child: SingleChildScrollView(controller: controller, scrollDirection: scrollDir, physics: const BouncingScrollPhysics(), child: scrollChildView));
   }
 
   static Widget getDisabledTextField(double width, String initText, TextStyle textStyle, InputDecoration inputDecoration){

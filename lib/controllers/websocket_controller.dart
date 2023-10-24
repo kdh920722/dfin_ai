@@ -19,6 +19,8 @@ class WebSocketController {
   static List<Map<String,dynamic>> subscribedRoomIds = [];
   static bool isReSubScribe = false;
   static bool isConnected = false;
+  static ActionCable? cable;
+  static bool isInit = false;
 
   static Future<void> initWebSocket(Function(bool isSuccess) callback) async{
     try{
@@ -69,17 +71,28 @@ class WebSocketController {
     return isWaiting;
   }
 
+  static void resetConnectWebSocketCable(){
+    isInit = false;
+    isConnected = false;
+    isReSubScribe = false;
+    GetController.to.updateAllSubScribed(false);
+    subscribedRoomIds.clear();
+    if(cable != null) cable!.disconnect();
+    cable = null;
+  }
+
   static void connectToWebSocketCable() {
     try {
       // ActionCable 서버 정보 설정
-      final cable = ActionCable.Connect(
+      cable = ActionCable.Connect(
           wsUrl,
           headers: {
             "Origin": wsOriginUrl,
           }
       );
 
-      cable.onConnected = () {
+      cable!.onConnected = () {
+        isInit = true;
         isConnected = true;
         const Duration intervalForReSubScribe = Duration(seconds: 20);
         Timer.periodic(intervalForReSubScribe, (Timer timer) {
@@ -93,17 +106,19 @@ class WebSocketController {
             int subCnt = 0;
             for(var eachRoom in MyData.getChatRoomInfoList()){
               String roomId = eachRoom.chatRoomId;
-              cable.subscribe(
+              cable!.subscribe(
                   channelName, channelParams: { "room": roomId },
                   onSubscribed: (){
                     CommonUtils.log("i", "onConnected : $roomId");
-                    subCnt++;
                     if(!isSubscribe(roomId)){
                       subscribedRoomIds.add({"room_id" : roomId, "isWaitingForAnswer" : false, "isWaitingForMe" : false});
-                      if(subscribedRoomIds.length == subCnt){
-                        GetController.to.updateAllSubScribed(true);
-                      }
                     }
+
+                    subCnt++;
+                    if(subscribedRoomIds.length == subCnt){
+                      GetController.to.updateAllSubScribed(true);
+                    }
+
                   },
                   onDisconnected: (){
                     CommonUtils.log("i", "onDisconnected : $roomId");
@@ -142,12 +157,12 @@ class WebSocketController {
         });
       };
 
-      cable.onConnectionLost = () {
+      cable!.onConnectionLost = () {
         CommonUtils.log("i", "websocket onConnectionLost error");
         _retryToConnect();
       };
 
-      cable.onCannotConnect = () {
+      cable!.onCannotConnect = () {
         CommonUtils.log("i", "websocket onCannotConnect error");
         _retryToConnect();
       };
@@ -158,12 +173,14 @@ class WebSocketController {
   }
 
   static void _retryToConnect(){
-    isConnected = false;
-    GetController.to.updateAllSubScribed(false);
-    subscribedRoomIds.clear();
-    Future.delayed(const Duration(seconds: 2), () {
-      connectToWebSocketCable(); // 다시 연결
-    });
+    if(isInit){
+      isConnected = false;
+      GetController.to.updateAllSubScribed(false);
+      subscribedRoomIds.clear();
+      Future.delayed(const Duration(seconds: 2), () {
+        connectToWebSocketCable(); // 다시 연결
+      });
+    }
   }
 
   static bool isSubscribe(String roomId){

@@ -371,8 +371,8 @@ class CommonUtils {
       targetDateTime.year,
       targetDateTime.month,
       targetDateTime.day,
-      targetDateTime.hour+1,
-      targetDateTime.minute,
+      targetDateTime.hour,
+      targetDateTime.minute+1,
       targetDateTime.second,
     );
 
@@ -666,7 +666,7 @@ class CommonUtils {
     MyData.resetMyData();
     GetController.to.resetAccdientInfoList();
     GetController.to.resetChatLoanInfoList();
-    GetController.to.updateAllSubScribed(false);
+    WebSocketController.resetConnectWebSocketCable();
     CommonUtils.moveWithUntil(context, AppView.appRootView.value);
   }
 
