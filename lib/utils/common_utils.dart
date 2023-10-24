@@ -676,7 +676,7 @@ class CommonUtils {
       GetController.to.resetAccdientInfoList();
       GetController.to.resetChatLoanInfoList();
       GetController.to.resetChatMessageInfoList();
-      GetController.to.updateAllSubScribed(false);
+      WebSocketController.resetConnectWebSocketCable();
       if(Config.isEmergencyRoot){
         CommonUtils.moveWithReplacementTo(Config.contextForEmergencyBack!, AppView.appRootView.value, null);
       }else{

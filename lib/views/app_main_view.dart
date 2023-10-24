@@ -53,6 +53,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     CommonUtils.log("i", "AppMainView 화면 파괴");
     WidgetsBinding.instance.removeObserver(this);
     Config.contextForEmergencyBack = null;
+    WebSocketController.resetConnectWebSocketCable();
     super.dispose();
   }
 
