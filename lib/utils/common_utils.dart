@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'dart:math';
+import 'package:dio/dio.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter/material.dart';
@@ -444,6 +446,52 @@ class CommonUtils {
     }
   }
 
+  static Future<List<File>?> getFiles() async {
+    try{
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['jpg', 'pdf', 'doc'],
+        allowMultiple: true,
+      );
+      if(result != null) {
+        List<File> pickFiles = result.paths.map((path) => File(path!)).toList();
+        if(pickFiles.isNotEmpty){
+          return pickFiles;
+        }else{
+          return null;
+        }
+      } else {
+        return null;
+      }
+    }catch(error){
+      CommonUtils.log('e', 'getFile error : $error');
+      return null;
+    }
+  }
+
+  static Future<void> sendFiles(List<File> files, Function(bool isSuccess) callback) async {
+    try{
+      FormData formData = FormData.fromMap({
+        "attachments": files,
+      });
+
+      var dio = Dio();
+      var response = await dio.post(
+        "url",
+        data: formData,
+      );
+      String resultString = response.data.toString();
+      if(resultString == ""){
+        callback(true);
+      }else{
+        callback(false);
+      }
+    }catch(error){
+      CommonUtils.log('e', 'sendFile error : $error');
+      callback(false);
+    }
+  }
+
   static Future<void> convertImageFileToJpg(String targetImagePath) async {
     File originalFile = File(targetImagePath);
     String originalFileName = originalFile.path.split('/').last;
@@ -618,7 +666,7 @@ class CommonUtils {
     MyData.resetMyData();
     GetController.to.resetAccdientInfoList();
     GetController.to.resetChatLoanInfoList();
-    WebSocketController.disposeSocket();
+    GetController.to.updateAllSubScribed(false);
     CommonUtils.moveWithUntil(context, AppView.appRootView.value);
   }
 
@@ -628,7 +676,7 @@ class CommonUtils {
       GetController.to.resetAccdientInfoList();
       GetController.to.resetChatLoanInfoList();
       GetController.to.resetChatMessageInfoList();
-      WebSocketController.disposeSocket();
+      GetController.to.updateAllSubScribed(false);
       if(Config.isEmergencyRoot){
         CommonUtils.moveWithReplacementTo(Config.contextForEmergencyBack!, AppView.appRootView.value, null);
       }else{

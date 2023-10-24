@@ -28,6 +28,30 @@ class LogfinController {
   static List<String> courtList = [];
   static List<String> bankList = [];
   static List<String> preLoanCountList = [];
+  static List<Map<String,dynamic>> agreeDocsList = [];
+  static String getAgreeContents(String type){
+    String result = "";
+    for(var each in agreeDocsList){
+      if(each["type"] == type){
+        if(each["result"]["content"] != null){
+          result = each["result"]["content"];
+        }
+      }
+    }
+
+    return result;
+  }
+  static String getAgreeTitle(String type){
+    String result = "";
+    for(var each in agreeDocsList){
+      if(each["type"] == type) result = each["result"]["title"];
+    }
+
+    if(result.length > 21){
+      result = "${result.substring(0,21)}\n${result.substring(21)}";
+    }
+    return result;
+  }
 
   static Future<void> initLogfin(Function(bool) callback) async {
     try {
@@ -145,16 +169,18 @@ class LogfinController {
         failCount++;
       }
 
+
       int cnt = 0;
       for(var each in docTypeTempList){
         String searchType = each.split("@")[0];
         var inputJson = {
           "type" : searchType
         };
-        cnt++;
         callLogfinApi(LogfinApis.getAgreeDocuments, inputJson, (isSuccessToGetAgreeInfo, outputJsonForGetAgreeInfo){
+          cnt++;
           if(isSuccessToGetAgreeInfo){
-            MyData.agreeDocsList.add({"type" : searchType, "result" : outputJsonForGetAgreeInfo});
+            agreeDocsList.add({"type" : searchType, "result" : outputJsonForGetAgreeInfo});
+            CommonUtils.log("i", "agree result : ${{"type" : searchType, "result" : outputJsonForGetAgreeInfo}}");
           }else{
             failCount++;
           }
@@ -418,7 +444,6 @@ class LogfinController {
               callback(true, false);
             }else{
               MyData.clearLoanInfoList();
-              bool isMessageGetSuccess = true;
               for(Map eachLoans in loansList){
                 if(eachLoans.containsKey("lender_pr_id") && eachLoans.containsKey("lender_pr")){
                   CommonUtils.log("i", "loan data ====>\n"
@@ -434,13 +459,6 @@ class LogfinController {
                       "updatedDate: ${eachLoans["submit_offer"]["updated_at"]}\n"
                       "statueId: ${eachLoans["status_info"]["id"]}\n"
                       "roomId: ${eachLoans["pr_room"]["id"]}\n");
-
-                  await WebSocketController.connectSubscribe(eachLoans["pr_room"]["id"].toString(), (isSuccessToSubscribe){
-                    if(!isSuccessToSubscribe){
-                      isMessageGetSuccess = false;
-                      CommonUtils.emergencyBackToHome();
-                    }
-                  });
 
                   var inputJson = {
                     "loan_uid" : eachLoans["uid"],
@@ -465,22 +483,11 @@ class LogfinController {
                 }
               }
 
-              if(isMessageGetSuccess){
-                MyData.sortLoanInfoList();
-                _setChatRoomInfoList();
-                _setTempMsg((isSuccessToSetTemp){
-                  if(isSuccessToSetTemp){
-                    GetController.to.updateChatLoanInfoList(MyData.getChatRoomInfoList());
-                    callback(true, true);
-                  }else{
-                    GetController.to.resetChatLoanInfoList();
-                    callback(false, false);
-                  }
-                });
-              }else{
-                GetController.to.resetChatLoanInfoList();
-                callback(false, false);
-              }
+              MyData.sortLoanInfoList();
+              _setChatRoomInfoList();
+              if(!WebSocketController.isConnected) WebSocketController.connectToWebSocketCable();
+              GetController.to.updateChatLoanInfoList(MyData.getChatRoomInfoList());
+              callback(true, true);
             }
           }else{
             GetController.to.resetChatLoanInfoList();
@@ -505,47 +512,7 @@ class LogfinController {
           each.chatRoomMsg, each.statueId, "${each.submitRate}%",
           CommonUtils.getPriceFormattedString(double.parse(each.submitAmount))));
     }
-  }
-
-  static void _setTempMsg(Function(bool isSuccess) callback){
-    if(WebSocketController.tempMsgList.isEmpty){
-      callback(true);
-    }else{
-      try{
-        bool isSuccessToPut = false;
-        for(var each in WebSocketController.tempMsgList){
-          CommonUtils.log("i", "temp msg here");
-          Map<String,dynamic> resultMap = jsonDecode(each);
-          for(int i = 0 ; i < MyData.getChatRoomInfoList().length ; i++){
-            if(MyData.getChatRoomInfoList()[i].chatRoomId == resultMap["pr_room_id"]){
-              isSuccessToPut = true;
-              Map<String, dynamic> msgInfo = jsonDecode(MyData.getChatRoomInfoList()[i].chatRoomMsgInfo);
-              List<dynamic> msgList = msgInfo["data"];
-              bool isNeedToPut = true;
-              for(var eachMsgList in msgList){
-                if(eachMsgList["id"] == resultMap["id"]) isNeedToPut = false;
-              }
-              if(isNeedToPut){
-                msgList.add(resultMap);
-                msgList.sort((a,b) => DateTime.parse(a["created_at"]).compareTo(DateTime.parse(b["created_at"])));
-                msgInfo.remove("data");
-                msgInfo["data"] = msgList;
-                MyData.getChatRoomInfoList()[i].chatRoomMsgInfo = jsonEncode(msgInfo);
-              }
-            }
-          }
-        }
-
-        if(isSuccessToPut){
-          callback(true);
-        }else{
-          callback(false);
-        }
-      }catch(error){
-        CommonUtils.log("i", "temp msg error : $error");
-        callback(false);
-      }
-    }
+    WebSocketController.isReSubScribe = true;
   }
 
   static Future<void> getPrList(String accidentCase, Function(bool isSuccess, Map<String, dynamic>? outputJson) callback) async {

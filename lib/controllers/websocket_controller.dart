@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:action_cable/action_cable.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -15,9 +16,9 @@ class WebSocketController {
   static String wsUrl = "";
   static String wsOriginUrl = "";
   static String channelName = "";
-  static ActionCable? cable;
-  static List<String> subscribedRoomIds = [];
-  static List<String> tempMsgList = [];
+  static List<Map<String,dynamic>> subscribedRoomIds = [];
+  static bool isReSubScribe = false;
+  static bool isConnected = false;
 
   static Future<void> initWebSocket(Function(bool isSuccess) callback) async{
     try{
@@ -31,15 +32,7 @@ class WebSocketController {
             case "channel_name" : channelName = each.value.toString();
           }
         }
-        disposeSocket();
-        _connectSocket((isSuccessToConnect){
-          if(isSuccessToConnect){
-            callback(true);
-          }else{
-            CommonUtils.flutterToast("채팅서버연결에 실패했습니다.\n다시 시작해주세요.");
-            CommonUtils.emergencyBackToHome();
-          }
-        });
+        callback(true);
       } else {
         callback(false);
       }
@@ -49,145 +42,138 @@ class WebSocketController {
     }
   }
 
-  static Future<void> _connectSocket(Function(bool isSuccess) callback) async {
+  static void setWaitingState(String roomId, String type, bool isWaiting){
+    for(int i = 0 ; i < subscribedRoomIds.length ; i++){
+      if(subscribedRoomIds[i]["room_id"] == roomId){
+        if(type == "UPFIN"){
+          subscribedRoomIds[i]["isWaitingForAnswer"] = isWaiting;
+        }else{
+          subscribedRoomIds[i]["isWaitingForMe"] = isWaiting;
+        }
+      }
+    }
+  }
+
+  static bool isWaitingForAnswerState(String roomId, String type){
+    bool isWaiting = false;
+    for(int i = 0 ; i < subscribedRoomIds.length ; i++){
+      if(subscribedRoomIds[i]["room_id"] == roomId){
+        if(type == "UPFIN"){
+          isWaiting = subscribedRoomIds[i]["isWaitingForAnswer"];
+        }else{
+          isWaiting = subscribedRoomIds[i]["isWaitingForMe"];
+        }
+      }
+    }
+
+    return isWaiting;
+  }
+
+  static void connectToWebSocketCable() {
     try {
-      cable = ActionCable.Connect(
+      // ActionCable 서버 정보 설정
+      final cable = ActionCable.Connect(
           wsUrl,
           headers: {
             "Origin": wsOriginUrl,
-          },
-          onConnected: () {
-            CommonUtils.log("i", "websocket connected");
-            callback(true);
-          },
-          onConnectionLost: () {
-            CommonUtils.log("e", "websocket connect lost");
-            subscribedRoomIds.clear();
-            disposeSocket();
-            _connectSocket((isSuccessToConnect){
-              if(isSuccessToConnect){
-                callback(true);
-              }
-            });
-            //callback(false);
-          },
-          onCannotConnect: () {
-            CommonUtils.log("e", "websocket cannot connect");
-            disposeSocket();
-            _connectSocket((isSuccessToConnect){
-              if(isSuccessToConnect){
-                callback(true);
-              }
-            });
-            //callback(false);
-          });
-    } catch (error) {
-      CommonUtils.log("e", "get websocket error : ${error.toString()}");
-      disposeSocket();
-      _connectSocket((isSuccessToConnect){
-        if(isSuccessToConnect){
-          callback(true);
-        }
-      });
-      //callback(false);
+          }
+      );
+
+      cable.onConnected = () {
+        isConnected = true;
+        const Duration intervalForReSubScribe = Duration(seconds: 20);
+        Timer.periodic(intervalForReSubScribe, (Timer timer) {
+          isReSubScribe = true;
+        });
+        const Duration interval = Duration(seconds: 1);
+        Timer.periodic(interval, (Timer timer) {
+          if(isReSubScribe){
+            CommonUtils.log("i", "re subScribe connect");
+            isReSubScribe = false;
+            int subCnt = 0;
+            for(var eachRoom in MyData.getChatRoomInfoList()){
+              String roomId = eachRoom.chatRoomId;
+              cable.subscribe(
+                  channelName, channelParams: { "room": roomId },
+                  onSubscribed: (){
+                    CommonUtils.log("i", "onConnected : $roomId");
+                    subCnt++;
+                    if(!isSubscribe(roomId)){
+                      subscribedRoomIds.add({"room_id" : roomId, "isWaitingForAnswer" : false, "isWaitingForMe" : false});
+                      if(subscribedRoomIds.length == subCnt){
+                        GetController.to.updateAllSubScribed(true);
+                      }
+                    }
+                  },
+                  onDisconnected: (){
+                    CommonUtils.log("i", "onDisconnected : $roomId");
+                    int idx = -1;
+                    for(int i = 0 ; i < subscribedRoomIds.length ; i++){
+                      if(subscribedRoomIds[i]["room_id"] == roomId) idx = i;
+                    }
+                    if(idx != -1) subscribedRoomIds.removeAt(idx);
+                  },
+                  onMessage: (Map message) {
+                    CommonUtils.log("i", "arrived message : $message");
+                    var eachMsg = message;
+                    for(int i = 0 ; i < MyData.getChatRoomInfoList().length ; i++){
+                      if(MyData.getChatRoomInfoList()[i].chatRoomId == roomId){
+                        Map<String, dynamic> msgInfo = jsonDecode(MyData.getChatRoomInfoList()[i].chatRoomMsgInfo);
+                        List<dynamic> msgList = msgInfo["data"];
+                        msgList.add(eachMsg);
+                        msgInfo.remove("data");
+                        msgInfo["data"] = msgList;
+                        MyData.getChatRoomInfoList()[i].chatRoomMsgInfo = jsonEncode(msgInfo);
+                      }
+                    }
+                    GetController.to.updateChatLoanInfoList(MyData.getChatRoomInfoList());
+
+                    if(AppChatViewState.currentRoomId == eachMsg["pr_room_id"].toString()){
+                      var messageItem = ChatMessageInfoData(eachMsg["id"].toString(), eachMsg["pr_room_id"].toString(), eachMsg["message"].toString(),
+                          CommonUtils.convertTimeToString(CommonUtils.parseToLocalTime(eachMsg["created_at"])),
+                          eachMsg["message_type"].toString(), eachMsg["username"].toString(), jsonEncode(eachMsg));
+                      WebSocketController.setWaitingState(AppChatViewState.currentRoomId, eachMsg["username"].toString(), false);
+                      GetController.to.addChatMessageInfoList(messageItem);
+                    }
+                  }
+              );
+            }
+          }
+        });
+      };
+
+      cable.onConnectionLost = () {
+        CommonUtils.log("i", "websocket onConnectionLost error");
+        _retryToConnect();
+      };
+
+      cable.onCannotConnect = () {
+        CommonUtils.log("i", "websocket onCannotConnect error");
+        _retryToConnect();
+      };
+    }catch(error){
+      CommonUtils.log("e", "websocket connect error : ${error.toString()}");
+      _retryToConnect();
     }
+  }
+
+  static void _retryToConnect(){
+    isConnected = false;
+    GetController.to.updateAllSubScribed(false);
+    subscribedRoomIds.clear();
+    Future.delayed(const Duration(seconds: 2), () {
+      connectToWebSocketCable(); // 다시 연결
+    });
   }
 
   static bool isSubscribe(String roomId){
     bool isAlreadySubscribe = false;
     CommonUtils.log("i", "connected subscribe : ${subscribedRoomIds.length}");
     for(var eachSubscribeRoomId in subscribedRoomIds){
-      CommonUtils.log("i", "connected subscribe : $roomId || $eachSubscribeRoomId");
-      if(eachSubscribeRoomId == roomId) isAlreadySubscribe = true;
+      CommonUtils.log("i", "connected subscribe : $roomId || ${eachSubscribeRoomId["room_id"]}");
+      if(eachSubscribeRoomId["room_id"] == roomId) isAlreadySubscribe = true;
     }
 
     return isAlreadySubscribe;
-  }
-
-  static Future<void> connectSubscribe(String roomId, Function(bool isSuccess) callback) async {
-    CommonUtils.log("i", "connect subscribe");
-    try{
-      CommonUtils.log("i", "room: $roomId");
-      if(!isSubscribe(roomId)){
-        cable!.subscribe(
-            channelName, channelParams: { "room": roomId },
-            onSubscribed: (){
-              CommonUtils.log("i", "websocket sub connect success!!");
-              subscribedRoomIds.add(roomId);
-              callback(true);
-            },
-            onDisconnected: (){
-              CommonUtils.log("e", "websocket sub connect failed");
-              int idx = -1;
-              for(int i = 0 ; i < subscribedRoomIds.length ; i++){
-                if(subscribedRoomIds[i] == roomId) idx = i;
-              }
-              if(idx != -1) subscribedRoomIds.removeAt(idx);
-              CommonUtils.flutterToast("채팅방 재접속");
-              //callback(false);
-              disposeSocket();
-              _connectSocket((isSuccess){
-                connectSubscribe(roomId, (isSuccessToReTry){
-                  if(isSuccessToReTry){
-                    callback(true);
-                  }
-                });
-              });
-
-            },
-            onMessage: (Map message) {
-              CommonUtils.log("i", "arrived message : $message");
-              bool isHere = false;
-              var eachMsg = message;
-              for(int i = 0 ; i < MyData.getChatRoomInfoList().length ; i++){
-                if(MyData.getChatRoomInfoList()[i].chatRoomId == roomId){
-                  isHere = true;
-                  Map<String, dynamic> msgInfo = jsonDecode(MyData.getChatRoomInfoList()[i].chatRoomMsgInfo);
-                  List<dynamic> msgList = msgInfo["data"];
-                  msgList.add(eachMsg);
-                  msgInfo.remove("data");
-                  msgInfo["data"] = msgList;
-                  MyData.getChatRoomInfoList()[i].chatRoomMsgInfo = jsonEncode(msgInfo);
-                }
-              }
-              if(isHere){
-                GetController.to.updateChatLoanInfoList(MyData.getChatRoomInfoList());
-
-                if(AppChatViewState.currentRoomId == eachMsg["pr_room_id"].toString()){
-                  var messageItem = ChatMessageInfoData(eachMsg["id"].toString(), eachMsg["pr_room_id"].toString(), eachMsg["message"].toString(),
-                      CommonUtils.convertTimeToString(CommonUtils.parseToLocalTime(eachMsg["created_at"])),
-                      eachMsg["message_type"].toString(), eachMsg["username"].toString(), jsonEncode(eachMsg));
-                  GetController.to.addChatMessageInfoList(messageItem);
-                }
-              }else{
-                tempMsgList.add(jsonEncode(eachMsg));
-              }
-            }
-        );
-      }
-    }catch(error){
-      CommonUtils.log("e", "get websocket sub error : ${error.toString()}");
-      disposeSocket();
-      _connectSocket((isSuccess){
-        connectSubscribe(roomId, (isSuccessToReTry){
-          if(isSuccessToReTry){
-            callback(true);
-          }
-        });
-      });
-      //callback(false);
-    }
-  }
-
-  static void disposeSocket() async {
-    try{
-      subscribedRoomIds.clear();
-      if(cable != null){
-        cable!.disconnect();
-        cable = null;
-      }
-    }catch(error){
-      CommonUtils.log("e", "disconnect websocket error : ${error.toString()}");
-    }
   }
 }

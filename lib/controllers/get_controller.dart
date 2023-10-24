@@ -11,6 +11,7 @@ class GetController extends GetxController {
   RxInt loadingPercent = 0.obs;
   RxBool isWait = false.obs;
   RxBool isConfirmed = false.obs;
+  RxBool isAllSubscribed = false.obs;
   RxString preLoanPrice = "만원".obs;
   RxString wantLoanPrice = "만원".obs;
 
@@ -65,6 +66,9 @@ class GetController extends GetxController {
     isConfirmed = false.obs;
   }
 
+  void updateAllSubScribed(bool newValue) {
+    isAllSubscribed.value = newValue;
+  }
 
   void updateWantLoanPrice(String newValue) {
     wantLoanPrice.value = newValue;

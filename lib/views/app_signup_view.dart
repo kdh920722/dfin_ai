@@ -1,3 +1,4 @@
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:upfin/configs/string_config.dart';
 import 'package:upfin/controllers/get_controller.dart';
 import 'package:flutter/material.dart';
@@ -288,10 +289,65 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
   }
 
   Future<void> _smallAgreePressEvent(String titleString, String contentsString, Function(bool agreeResult) callback) async {
-    Widget contentsWidget = Column(children: [
-      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(contentsString, 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null))
+    Widget htmlWidget = Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+      HtmlWidget(
+        contentsString,
+        customStylesBuilder: (element) {
+          if (element.id.contains('type1')) {
+            return {
+              "color" : "black",
+              "font-size": "12px",
+              "line-height" : "120%",
+              "font-weight": "normal"
+            };
+          }else if (element.id.contains('type2')) {
+            return {
+              "color" : "gray",
+              "font-size": "14px",
+              "line-height" : "150%",
+              "font-weight": "bold"
+            };
+          }else if (element.id.contains('type3')) {
+            return {
+              "color" : "black",
+              "font-size": "16px",
+              "line-height" : "200%",
+              "font-weight": "bold"
+            };
+          }else if (element.localName == 'button') {
+            return {
+              //"cursor": "pointer",
+              //"display":"inlne-block",
+              "text-align":"center",
+              "background-color":"#3a6cff",
+              "color" : "white",
+              "font-size": "14px",
+              "line-height" : "250%",
+              "font-weight": "normal",
+              "border-radius":"0.1em",
+              "padding":"5px 20px"
+            };
+          }
+
+          return null;
+        },
+
+        onTapUrl: (url) async {
+          UiUtils.showLoadingPop(context);
+          Map<String, String> urlInfoMap = {
+            "url" : url
+          };
+          bool isSuccess = false;
+          var result = await CommonUtils.moveToWithResult(context, AppView.appWebView.value, urlInfoMap);
+          if(context.mounted) UiUtils.closeLoadingPop(context);
+          return true;
+        },
+        renderMode: RenderMode.column,
+        textStyle: TextStyles.upFinHtmlTextStyle,
+      )
     ]);
-    bool isAgree = await CommonUtils.moveToWithResult(context, AppView.appAgreeDetailInfoView.value, {"title": titleString, "contents" : contentsWidget}) as bool;
+
+    bool isAgree = await CommonUtils.moveToWithResult(context, AppView.appAgreeDetailInfoView.value, {"title": titleString, "contents" : htmlWidget}) as bool;
     callback(isAgree);
   }
 
@@ -368,10 +424,10 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                   UiUtils.getTextWithFixedScale("(필수)전체 동의하기", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null)
                 ],
               )),
-              UiUtils.getMarginBox(0, 1.5.h), //MyData.getAgreeContents("A1");
-              _getSmallAgreeInfoWidget(thisSetState, "업핀 서비스 이용약관", StringConfig.agreeContents1, item1SubAgreed1!, _getSmallAgree1Sub1Act),
-              _getSmallAgreeInfoWidget(thisSetState, "개인(신용)정보 수집 이용 제공 동의서", StringConfig.agreeContents1, item1SubAgreed2!, _getSmallAgree1Sub2Act),
-              _getSmallAgreeInfoWidget(thisSetState, "개인(신용)정보 수집 이용 제공 동의서", StringConfig.agreeContents1, item1SubAgreed3!, _getSmallAgree1Sub3Act),
+              UiUtils.getMarginBox(0, 1.5.h),
+              _getSmallAgreeInfoWidget(thisSetState, LogfinController.getAgreeTitle("A1"), LogfinController.getAgreeContents("A1"), item1SubAgreed1!, _getSmallAgree1Sub1Act),
+              _getSmallAgreeInfoWidget(thisSetState, LogfinController.getAgreeTitle("A2"), LogfinController.getAgreeContents("A2"), item1SubAgreed2!, _getSmallAgree1Sub2Act),
+              _getSmallAgreeInfoWidget(thisSetState, LogfinController.getAgreeTitle("A3"), LogfinController.getAgreeContents("A3"), item1SubAgreed3!, _getSmallAgree1Sub3Act),
             ]),
             UiUtils.getMarginBox(0, 1.5.h),
             Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
@@ -391,7 +447,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                   UiUtils.getTextWithFixedScale("(선택)전체 동의하기", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null)
                 ],
               )),
-              _getSmallAgreeInfoWidget(thisSetState, "마케팅 정보 수신 동의", StringConfig.agreeContents1, item2SubAgreed1!, _getSmallAgree2Sub1Act)
+              _getSmallAgreeInfoWidget(thisSetState, LogfinController.getAgreeTitle("A4"), LogfinController.getAgreeContents("A4"), item2SubAgreed1!, _getSmallAgree2Sub1Act)
             ]),
           ])),
           UiUtils.getMarginBox(0, 3.h),

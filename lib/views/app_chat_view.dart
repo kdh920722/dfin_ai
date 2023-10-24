@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
@@ -6,6 +8,7 @@ import 'package:sizer/sizer.dart';
 import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:upfin/controllers/get_controller.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
+import 'package:upfin/controllers/websocket_controller.dart';
 import 'package:upfin/datas/chat_message_info_data.dart';
 import 'package:upfin/datas/chatroom_info_data.dart';
 import 'package:upfin/datas/loan_info_data.dart';
@@ -34,6 +37,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   int _ticks = 0;
   bool isBuild = false;
   bool isTextFieldFocus = false;
+  String myTempChatText = "";
 
   @override
   void initState(){
@@ -55,10 +59,17 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
           _ticks = 3;
         }
       }
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _setImagePreLoad();
+      });
     }
     Config.contextForEmergencyBack = context;
     Config.isEmergencyRoot = false;
     _keyboardVisibilityController = CommonUtils.getKeyboardViewController(_functionForKeyboardShow, _functionForKeyboardHide);
+  }
+
+  void _setImagePreLoad(){
+    precacheImage(const AssetImage('assets/images/chat_loading.gif'), context);
   }
 
   KeyboardVisibilityController? _keyboardVisibilityController;
@@ -149,7 +160,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
 
   Widget _getOtherView(ChatMessageInfoData otherInfo){
     return Container(
-        padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 1.w, bottom: 2.w),
+        padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 2.w, bottom: 2.w),
         child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
           Column(children: [
             Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
@@ -161,13 +172,37 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                   padding: EdgeInsets.all(3.w),
                   decoration: const BoxDecoration(
                     borderRadius: BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomRight: Radius.circular(15)),
-                    color: ColorStyles.upFinWhiteSky,
+                    color: ColorStyles.upFinWhiteGray,
                   ),
-                  child: otherInfo.messageType == "text" ? _getHtmlView(otherInfo.message)
-                      : Container()
+                  child: otherInfo.messageType == "text" ? _getHtmlView(otherInfo.message) : Container()
               ),
               UiUtils.getMarginBox(1.w, 0),
               UiUtils.getTextWithFixedScale(CommonUtils.getFormattedLastMsgTime(otherInfo.messageTime), 8.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null)
+            ]),
+            UiUtils.getMarginBox(0, 1.h)
+          ]),
+        ])
+    );
+  }
+
+  Widget _getOtherForLoadingView(){
+    return Container(
+        padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 2.w, bottom: 2.w),
+        child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+          Column(children: [
+            Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+              CustomPaint(
+                painter: ChatBubbleTriangleForOther(),
+              ),
+              Container(
+                  constraints: BoxConstraints(maxWidth: 70.w),
+                  padding: EdgeInsets.all(3.w),
+                  decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomRight: Radius.circular(15)),
+                    color: ColorStyles.upFinWhiteGray,
+                  ),
+                  child: UiUtils.getImage(5.w, 5.w, Image.asset(fit: BoxFit.fill,'assets/images/chat_loading.gif'))
+              ),
             ]),
             UiUtils.getMarginBox(0, 1.h)
           ]),
@@ -183,7 +218,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
           Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
             Container(
                 constraints: BoxConstraints(
-                    maxWidth: 55.w
+                    maxWidth: 70.w
                 ),
                 padding: EdgeInsets.all(3.w),
                 decoration: const BoxDecoration(
@@ -191,6 +226,31 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                   color: ColorStyles.upFinTextAndBorderBlue,
                 ),
                 child: UiUtils.getTextWithFixedScale(meInfo.message, 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null)
+            ),
+            CustomPaint(
+              painter: ChatBubbleTriangleForMe(),
+            )
+          ]),
+        ])
+    );
+  }
+
+  Widget _getMeViewForLoading(){
+    return Container(
+        padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 2.w, bottom: 2.w),
+        width: 100.w,
+        child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+          Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            Container(
+                constraints: BoxConstraints(
+                    maxWidth: 70.w
+                ),
+                padding: EdgeInsets.all(3.w),
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomLeft: Radius.circular(15)),
+                  color: ColorStyles.upFinTextAndBorderBlue
+                ),
+                child: UiUtils.getTextWithFixedScale(myTempChatText, 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null)
             ),
             CustomPaint(
               painter: ChatBubbleTriangleForMe(),
@@ -211,7 +271,15 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
       }
     }
 
-    _scrollToBottom(false);
+    if(WebSocketController.isWaitingForAnswerState(currentRoomId, "ME")){
+      chatList.add(_getMeViewForLoading());
+    }
+
+    if(WebSocketController.isWaitingForAnswerState(currentRoomId, "UPFIN")){
+      chatList.add(_getOtherForLoadingView());
+    }
+
+    _scrollToBottom(true);
     return chatList;
   }
 
@@ -275,8 +343,8 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     }
 
     return Column(children: [
-      isChecked? passed? UiUtils.getIcon(3.w, 3.w, Icons.radio_button_unchecked_rounded, 3.w, ColorStyles.upFinButtonBlue)
-          : UiUtils.getIcon(3.w, 3.w, Icons.radio_button_checked_rounded, 3.w, ColorStyles.upFinButtonBlue)
+      isChecked? passed? UiUtils.getIcon(3.w, 3.w, Icons.radio_button_checked_rounded, 3.w, ColorStyles.upFinButtonBlue)
+          : UiUtils.getIcon(3.w, 3.w, Icons.circle, 3.w, ColorStyles.upFinButtonBlue)
             : UiUtils.getIcon(3.w, 3.w, Icons.radio_button_unchecked_rounded, 3.w, ColorStyles.upFinWhiteSky),
       UiUtils.getMarginBox(0, 1.5.h),
       UiUtils.getTextWithFixedScale(typeString, 9.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.center, null),
@@ -304,16 +372,68 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     ]);
   }
 
+  Future<void> _setPickedImgFromCamera() async {
+    if(pickedFiles.length <= maximumSize){
+      XFile? image = await CommonUtils.getCameraImage();
+      if(image != null){
+        isShowPickedFile = true;
+        pickedFiles.add(File(image.path));
+      }else{
+        if(pickedFiles.isEmpty){
+          isShowPickedFile = false;
+        }else{
+          isShowPickedFile = true;
+        }
+      }
+      setState(() {});
+    }else{
+      CommonUtils.flutterToast("최대 $maximumSize개의 파일만\n전송할 수 있습니다.");
+    }
+  }
+
+  Future<void> _setPickedFileFromDevice() async {
+    if(pickedFiles.length <= maximumSize){
+      List<File>? files = await CommonUtils.getFiles();
+      if(files != null){
+        if(files.length <= maximumSize){
+          if(files.length+pickedFiles.length <= maximumSize){
+            isShowPickedFile = true;
+            for(var each in files){
+              pickedFiles.add(each);
+            }
+          }else{
+            CommonUtils.flutterToast("최대 $maximumSize개의 파일만\n전송할 수 있습니다.");
+          }
+        }else{
+          CommonUtils.flutterToast("최대 $maximumSize개의 파일만\n전송할 수 있습니다.");
+        }
+      }else{
+        if(pickedFiles.isEmpty){
+          isShowPickedFile = false;
+        }else{
+          isShowPickedFile = true;
+        }
+      }
+      setState(() {});
+    }else{
+      CommonUtils.flutterToast("최대 $maximumSize개의 파일만\n전송할 수 있습니다.");
+    }
+  }
+
   List<Widget> _getAutoAnswerWidgetList(){
-    List<String> answerList = ["자주하는 질문", "대출 현황", "심사결과 보기", "상담원 연걸", "앱정보 보기", "사건정보 상세보기"];
+    List<String> answerList = ["자주하는 질문 💬", "사건정보 📜", "나의정보 🔒", "대출현황 🏦", "심사결과 📑", "공지사항 📣", "상담원 연결 🤓", "사진 📷", "가져오기 📤"];
     List<Widget> widgetList = [];
     for(var each in answerList){
       widgetList.add(GestureDetector(child: UiUtils.getRoundedBorderTextWithFixedScale(each, 11.sp, FontWeight.w500, TextAlign.center, ColorStyles.upFinGray, ColorStyles.upFinRealGray),
-      onTap: (){
-        CommonUtils.log("i", "send message $each");
-        //_sendMessage(each);
+      onTap: () async {
+        if(each == "카메라"){
+          _setPickedImgFromCamera();
+        }else if(each == "파일"){
+          _setPickedFileFromDevice();
+        }else{
+
+        }
       }));
-      widgetList.add(UiUtils.getMarginBox(2.w, 0));
     }
 
     return widgetList;
@@ -321,19 +441,92 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
 
   void _sendMessage(String message){
     CommonUtils.hideKeyBoard();
-    var inputJson = {
-      "loan_uid" : currentLoanUid,
-      "message" : message
-    };
-    LogfinController.callLogfinApi(LogfinApis.sendMessage, inputJson, (isSuccess, _){
-      if(!isSuccess){
-        CommonUtils.flutterToast("메시지 전송중\n오류가 발생했습니다.");
+    if(!WebSocketController.isWaitingForAnswerState(currentRoomId, "ME")){
+      var inputJson = {
+        "loan_uid" : currentLoanUid,
+        "message" : message
+      };
+      WebSocketController.setWaitingState(currentRoomId, "ME", true);
+      WebSocketController.setWaitingState(currentRoomId, "UPFIN", true);
+      myTempChatText = message;
+      LogfinController.callLogfinApi(LogfinApis.sendMessage, inputJson, (isSuccess, _){
+        if(!isSuccess){
+          CommonUtils.flutterToast("메시지 전송중\n오류가 발생했습니다.");
+          WebSocketController.setWaitingState(currentRoomId, "ME", false);
+          WebSocketController.setWaitingState(currentRoomId, "UPFIN", false);
+        }
+      });
+    }else{
+      CommonUtils.flutterToast("응답을 기다리는 중입니다.");
+    }
+  }
+
+  bool isShowPickedFile = false;
+  List<File> pickedFiles = [];
+  int maximumSize = 6;
+  Widget _getPickedFilesWidget(){
+    List<Widget> widgetList = [];
+
+    for(int i = 0 ; i < pickedFiles.length ; i++){
+      bool isImage = true;
+      String extension = pickedFiles[i].path.split('.').last.toLowerCase();
+      List<String> imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp'];
+      if (imageExtensions.contains(extension)) {
+        isImage = true;
+      } else {
+        isImage = false;
       }
-    });
-    setState(() {
-      _chatTextController.text = "";
-      isTextFieldFocus = false;
-    });
+
+      String fileName = pickedFiles[i].uri.pathSegments.last; // 파일명 + 확장자
+      String basename = pickedFiles[i].uri.pathSegments.last.split('.').first; // 파일명\
+
+      widgetList.add(
+          Stack(alignment:Alignment.bottomLeft, children: [
+            Container(width: 22.5.w, height: 17.h,
+                decoration: const BoxDecoration(
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                    color: ColorStyles.upFinWhite
+                )),
+            Positioned(
+                left: 1.w,
+                bottom: 1.w,
+                child: Container(
+                  width: 20.w,
+                  height: 16.h,
+                  padding: EdgeInsets.zero,
+                  decoration: const BoxDecoration(
+                      borderRadius: BorderRadius.all(Radius.circular(5)),
+                      color: ColorStyles.upFinBlack
+                  ),
+                  child: isImage? UiUtils.getImage(19.5.w, 15.5.h, Image.file(File(pickedFiles[i].path)))
+                      : Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+                        UiUtils.getMarginBox(0, 1.5.h),
+                        //UiUtils.getTextWithFixedScaleAndOverFlow(extension.toUpperCase(), 10.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null),
+                        UiUtils.getMarginBox(0, 0.5.h),
+                        UiUtils.getIcon(19.5.w, 5.5.h, Icons.folder_copy_outlined, 5.5.h, ColorStyles.upFinWhite),
+                        UiUtils.getMarginBox(0, 1.h),
+                        UiUtils.getTextWithFixedScale(fileName, 9.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null)
+                  ]),
+                )),
+            Positioned(top: 0.1.h, right: -3.3.w, child: UiUtils.getIconButtonWithHeight(2.h, Icons.cancel_rounded, 2.h, ColorStyles.upFinWhiteSky, () {
+              setState(() {
+                pickedFiles.removeAt(i);
+                if(pickedFiles.isEmpty){
+                  isShowPickedFile = false;
+                }else{
+                  isShowPickedFile = true;
+                }
+              });
+            }))
+          ])
+      );
+    }
+
+    if(widgetList.isEmpty){
+      return Container();
+    }else{
+      return Row(children: widgetList);
+    }
   }
 
   double inputMinHeight = 9.2.h;
@@ -384,8 +577,9 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
           UiUtils.getMarginBox(0, 3.h),
           UiUtils.getExpandedScrollViewWithController(Axis.vertical, Obx(()=>Column(mainAxisAlignment: MainAxisAlignment.start, children: _getChatList())), _chatScrollController),
           UiUtils.getMarginBox(0, 1.5.h),
-          Padding(padding: EdgeInsets.only(left: 2.w, right: 2.w), child: Wrap(runSpacing: 0.8.h, alignment: WrapAlignment.start, direction: Axis.horizontal, children: _getAutoAnswerWidgetList())),
-          UiUtils.getMarginBox(0, 0.2.h),
+          Wrap(runSpacing: 0.8.h, spacing: 1.5.w, alignment: WrapAlignment.end, direction: Axis.horizontal, children: _getAutoAnswerWidgetList()),
+          isShowPickedFile? UiUtils.getSizedScrollView(90.w, 18.h, Axis.horizontal, _getPickedFilesWidget()) : Container(),
+          UiUtils.getMarginBox(0, 1.5.h),
           AnimatedContainer(
               duration: const Duration(milliseconds:200),
               width: 100.w,
@@ -442,6 +636,10 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                     UiUtils.getIconButtonWithHeight(14.w, Icons.arrow_circle_up_rounded, 14.w,
                         isTextFieldFocus? ColorStyles.upFinButtonBlue : ColorStyles.upFinWhiteSky, () {
                           _sendMessage(_chatTextController.text);
+                          setState(() {
+                            _chatTextController.text = "";
+                            isTextFieldFocus = false;
+                          });
                         })
                     ),
                   ]))))

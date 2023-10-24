@@ -164,7 +164,7 @@ class UiUtils {
   }
 
   static Widget getRoundedBorderTextWithFixedScale(String text, double fontSize, FontWeight fontWeight, TextAlign? textAlign, Color borderColor, Color textColor){
-    return Container(padding: EdgeInsets.only(top: 2.w, bottom: 2.w, left: 3.w, right: 3.w), // 텍스트 주위에 여백 추가
+    return Container(padding: EdgeInsets.only(top: 3.w, bottom: 3.w, left: 3.w, right: 3.w), // 텍스트 주위에 여백 추가
         decoration: BoxDecoration(border: Border.all(color: borderColor, width: 0.32.w), borderRadius: BorderRadius.circular(20)),
         child: Text(text, style: TextStyle(decoration: TextDecoration.none, height: 1, fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor)));
   }
@@ -635,6 +635,7 @@ class UiUtils {
   static bool isLoadingPopOn = false;
   static void showLoadingPop(BuildContext targetContext){
     if(!isLoadingPopOn){
+      isLoadingPopOn = true;
       showGeneralDialog(
         barrierDismissible: false,
         context: targetContext,
@@ -643,7 +644,6 @@ class UiUtils {
             onWillPop: () async => false,
             child: StatefulBuilder(// You need this, notice the parameters below:
                 builder: (_, StateSetter setState) {
-                  isLoadingPopOn = true;
                   return Container(
                       width: 100.w,
                       height: 100.h,
@@ -659,8 +659,8 @@ class UiUtils {
 
   static void closeLoadingPop(BuildContext targetContext){
     if(isLoadingPopOn){
-      isLoadingPopOn = false;
       Navigator.pop(targetContext);
+      isLoadingPopOn = false;
     }
   }
 

@@ -347,29 +347,9 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
     ]));
   }
   Future<void> _smallAgreePressEvent(String titleString, String contentsString, Function(bool agreeResult) callback) async {
-    Widget contentsWidget = Column(children: [
-      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(contentsString, 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null))
-    ]);
-    String htmlTest = """ 
-    <h2>큰제목타이틀</h2> 
-    <h3>부제목타이틀</h3> 
-    <div id='type1'>(본문1)type1: 업핀을 찾아주셔서 너무너무감사하네요~ 하하하깔깔깔 한번 잘 사용해보세요~~부자되세요~본문내용 여기에 들어갑니다</div>
-    <br> 
-    <div id='type2'>(본문2)type2: 업핀을 찾아주셔서 너무너무감사하네요~ 하하하깔깔깔 한번 잘 사용해보세요~~부자되세요~본문내용 여기에 들어갑니다</div>
-    <br>
-    <div id='type3'>(본문3)type3: 업핀을 찾아주셔서 너무너무감사하네요~ 하하하깔깔깔 한번 잘 사용해보세요~~부자되세요~본문내용 여기에 들어갑니다</div>
-    
-    <div id='type3'>(본문3)type3: 업핀을 찾아주셔서 너무너무감사하네요~ 하하하깔깔깔 한번 잘 사용해보세요~~부자되세요~본문내용 여기에 들어갑니다</div>
-    
-    <a href="https://www.naver.com"><button>예제 링크</button></a>
- 
-    <br>
-    <a href='/mycredit/cXfOR99PRmMZyaORJKl3-w?checklist=1'>  나이스신용인증 바로가기  </a>
-    """;
-
     Widget htmlWidget = Column(mainAxisAlignment: MainAxisAlignment.start, children: [
       HtmlWidget(
-        htmlTest,
+        contentsString,
         customStylesBuilder: (element) {
           if (element.id.contains('type1')) {
             return {
@@ -419,7 +399,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
           var result = await CommonUtils.moveToWithResult(context, AppView.appWebView.value, urlInfoMap);
           if(context.mounted) UiUtils.closeLoadingPop(context);
           return true;
-          },
+        },
         renderMode: RenderMode.column,
         textStyle: TextStyles.upFinHtmlTextStyle,
       )
@@ -508,12 +488,12 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                 ],
               )),
               UiUtils.getMarginBox(0, 1.5.h),
-              _getSmallAgreeInfoWidget(thisSetState, "업핀 서비스 이용약관", StringConfig.htmlTest, item1SubAgreed1!, _getSmallAgree1Sub1Act),
-              _getSmallAgreeInfoWidget(thisSetState, "개인(신용)정보 수집 이용 제공 동의서", StringConfig.agreeContents1, item1SubAgreed2!, _getSmallAgree1Sub2Act),
-              _getSmallAgreeInfoWidget(thisSetState, "업핀 서비스 이용약관", StringConfig.htmlTest, item1SubAgreed3!, _getSmallAgree1Sub3Act),
-              _getSmallAgreeInfoWidget(thisSetState, "개인(신용)정보 수집 이용 제공 동의서", StringConfig.agreeContents1, item1SubAgreed4!, _getSmallAgree1Sub4Act),
-              _getSmallAgreeInfoWidget(thisSetState, "업핀 서비스 이용약관", StringConfig.htmlTest, item1SubAgreed5!, _getSmallAgree1Sub5Act),
-              _getSmallAgreeInfoWidget(thisSetState, "개인(신용)정보 수집 이용 제공 동의서", StringConfig.agreeContents1, item1SubAgreed6!, _getSmallAgree1Sub6Act),
+              _getSmallAgreeInfoWidget(thisSetState, LogfinController.getAgreeTitle("B1"), LogfinController.getAgreeContents("B1"), item1SubAgreed1!, _getSmallAgree1Sub1Act),
+              _getSmallAgreeInfoWidget(thisSetState, LogfinController.getAgreeTitle("B2"), LogfinController.getAgreeContents("B2"), item1SubAgreed2!, _getSmallAgree1Sub2Act),
+              _getSmallAgreeInfoWidget(thisSetState, LogfinController.getAgreeTitle("B3"), LogfinController.getAgreeContents("B3"), item1SubAgreed3!, _getSmallAgree1Sub3Act),
+              _getSmallAgreeInfoWidget(thisSetState, LogfinController.getAgreeTitle("B4"), LogfinController.getAgreeContents("B4"), item1SubAgreed4!, _getSmallAgree1Sub4Act),
+              _getSmallAgreeInfoWidget(thisSetState, LogfinController.getAgreeTitle("B5"), LogfinController.getAgreeContents("B5"), item1SubAgreed5!, _getSmallAgree1Sub5Act),
+              _getSmallAgreeInfoWidget(thisSetState, LogfinController.getAgreeTitle("B6"), LogfinController.getAgreeContents("B6"), item1SubAgreed6!, _getSmallAgree1Sub6Act),
             ]),
           ])),
           UiUtils.getMarginBox(0, 1.5.h),

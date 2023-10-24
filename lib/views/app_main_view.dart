@@ -1,11 +1,12 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:sizer/sizer.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:upfin/configs/app_config.dart';
-import 'package:upfin/configs/string_config.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/controllers/websocket_controller.dart';
 import 'package:upfin/datas/accident_info_data.dart';
@@ -28,6 +29,8 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   final PageController _pageControllerForPop = PageController();
   bool doCheckToSearchAccident = false;
   int viewTypeId = 2; // 1: 대출 / 2: MY / 3: 설정
+  int tryOut = 0;
+  String retryChatRoomId = "";
 
   @override
   void initState(){
@@ -40,10 +43,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     }else{
       doCheckToSearchAccident = false;
     }
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _setImagePreLoad();
-    });
 
     Config.contextForEmergencyBack = context;
     Config.isEmergencyRoot = false;
@@ -83,6 +82,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     precacheImage(const AssetImage('assets/images/img_man_welcome.png'), context);
     precacheImage(const AssetImage('assets/images/img_man_searcher.png'), context);
     precacheImage(const AssetImage('assets/images/img_woman_searcher.png'), context);
+    precacheImage(const AssetImage('assets/images/img_woman_searcher_01.png'), context);
     precacheImage(const AssetImage('assets/images/img_woman_coffee.png'), context);
     precacheImage(const AssetImage('assets/images/img_woman_sports.png'), context);
     precacheImage(const AssetImage('assets/images/accident_icon.png'), context);
@@ -396,34 +396,10 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                   ]))
                 ]), () async {
                   if(WebSocketController.isSubscribe(each.chatRoomId)){
-                    GetController.to.resetChatMessageInfoList();
-                    for(Map<String, dynamic> eachMsg in listMsg){
-                      var messageItem = ChatMessageInfoData(eachMsg["id"].toString(), eachMsg["pr_room_id"].toString(), eachMsg["message"].toString(),
-                          CommonUtils.convertTimeToString(CommonUtils.parseToLocalTime(eachMsg["created_at"])),
-                          eachMsg["message_type"].toString(), eachMsg["username"].toString(), jsonEncode(eachMsg));
-                      GetController.to.addChatMessageInfoList(messageItem);
-                    }
-                    await CommonUtils.moveToWithResult(context, AppView.appChatView.value, null);
-                    if(context.mounted){
-                      listMsg.clear();
-                      for(var eachMessage in GetController.to.chatMessageInfoDataList){
-                        listMsg.add(jsonDecode(eachMessage.messageInfo));
-                      }
-                      listMsg.sort((a,b) => DateTime.parse(a["created_at"]).compareTo(DateTime.parse(b["created_at"])));
-                      for(int i = 0 ; i < MyData.getChatRoomInfoList().length ; i++){
-                        if(MyData.getChatRoomInfoList()[i].chatRoomId == each.chatRoomId){
-                          Map<String, dynamic> msgInfo = jsonDecode(MyData.getChatRoomInfoList()[i].chatRoomMsgInfo);
-                          msgInfo.remove("data");
-                          msgInfo["data"] = listMsg;
-                          msgInfo["last_read_message_id"] = listMsg[listMsg.length-1]["id"];
-                          MyData.getChatRoomInfoList()[i].chatRoomMsgInfo = jsonEncode(msgInfo);
-                        }
-                      }
-                      GetController.to.updateChatLoanInfoList(MyData.getChatRoomInfoList());
-                    }
+                    _goToChatRoom(listMsg, each.chatRoomId);
                   }else{
                     CommonUtils.flutterToast("채탕방 접속에 실패했습니다.");
-                    //CommonUtils.emergencyBackToHome();
+                    _refreshMyView(context);
                   }
                 }),
             UiUtils.getMarginBox(0, 1.5.h),
@@ -437,7 +413,35 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     return loanChatRoomWidgetList;
   }
 
-  void _refreshMyView(BuildContext context){
+  Future<void> _goToChatRoom(List<dynamic> listMsg, String chatRoomId) async {
+    GetController.to.resetChatMessageInfoList();
+    for(Map<String, dynamic> eachMsg in listMsg){
+      var messageItem = ChatMessageInfoData(eachMsg["id"].toString(), eachMsg["pr_room_id"].toString(), eachMsg["message"].toString(),
+          CommonUtils.convertTimeToString(CommonUtils.parseToLocalTime(eachMsg["created_at"])),
+          eachMsg["message_type"].toString(), eachMsg["username"].toString(), jsonEncode(eachMsg));
+      GetController.to.addChatMessageInfoList(messageItem);
+    }
+    await CommonUtils.moveToWithResult(context, AppView.appChatView.value, null);
+    if(context.mounted){
+      listMsg.clear();
+      for(var eachMessage in GetController.to.chatMessageInfoDataList){
+        listMsg.add(jsonDecode(eachMessage.messageInfo));
+      }
+      listMsg.sort((a,b) => DateTime.parse(a["created_at"]).compareTo(DateTime.parse(b["created_at"])));
+      for(int i = 0 ; i < MyData.getChatRoomInfoList().length ; i++){
+        if(MyData.getChatRoomInfoList()[i].chatRoomId == chatRoomId){
+          Map<String, dynamic> msgInfo = jsonDecode(MyData.getChatRoomInfoList()[i].chatRoomMsgInfo);
+          msgInfo.remove("data");
+          msgInfo["data"] = listMsg;
+          msgInfo["last_read_message_id"] = listMsg[listMsg.length-1]["id"];
+          MyData.getChatRoomInfoList()[i].chatRoomMsgInfo = jsonEncode(msgInfo);
+        }
+      }
+      GetController.to.updateChatLoanInfoList(MyData.getChatRoomInfoList());
+    }
+  }
+
+  void _refreshMyView(BuildContext context) {
     UiUtils.showLoadingPop(context);
     LogfinController.getMainViewInfo((isSuccessToGetMainInfo){
       UiUtils.closeLoadingPop(context);
@@ -558,8 +562,33 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     ]);
   }
   void _back(){
-    if(viewTypeId != 2){
-      setState(() {viewTypeId = 2;});
+    tryOut++;
+    Future.delayed(const Duration(milliseconds: 500), () async {
+      tryOut = 0;
+    });
+    if(tryOut >= 2 && Config.isAndroid){
+      UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, 100.w, 23.h, 0.3, (slideContext, slideSetState){
+        return Column(mainAxisAlignment: MainAxisAlignment.start, children:
+        [
+          UiUtils.getMarginBox(0, 3.h),
+          SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("🥹 앱을 종료할까요?", 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
+          UiUtils.getMarginBox(0, 3.h),
+          UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
+          UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinButtonBlue,
+              UiUtils.getTextWithFixedScale("나가기", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), (){
+                MyData.resetMyData();
+                GetController.to.resetAccdientInfoList();
+                GetController.to.resetChatLoanInfoList();
+                GetController.to.resetChatMessageInfoList();
+                GetController.to.updateAllSubScribed(false);
+                SystemNavigator.pop();
+              })
+        ]);
+      });
+    }else{
+      if(viewTypeId != 2){
+        setState(() {viewTypeId = 2;});
+      }
     }
   }
   Widget _getSettingView(){
@@ -601,8 +630,21 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
       if(!CommonUtils.isValidStateByAPiExpiredDate()){
         CommonUtils.flutterToast("접속시간이 만료되었습니다.\n재로그인 해주세요");
         CommonUtils.backToHome(context);
+      }else{
+        _setImagePreLoad();
+        Obx((){
+          if(!GetController.to.isAllSubscribed.value){
+            UiUtils.showLoadingPop(context);
+          }else{
+            UiUtils.closeLoadingPop(context);
+          }
+
+          return Container();
+        });
+
       }
     });
+
     CommonUtils.log("i", "main view redraw!");
     Widget view = Stack(
       children: [
@@ -662,6 +704,19 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                   child: UiUtils.getImage(150.w, 150.w, Image.asset(fit: BoxFit.fitWidth,'assets/images/img_woman_coffee.png')))
             ]) : Container()
         ),
+        Positioned(child: Obx((){
+          if(GetController.to.isAllSubscribed.value){
+            return Container();
+          }else{
+            return Container(
+                width: 100.w,
+                height: 100.h,
+                color: Colors.black54,
+                child: SpinKitWave(color: ColorStyles.upFinTextAndBorderBlue, size: 15.w)
+            );
+          }
+        })
+        )
       ],
     );
     return UiUtils.getViewWithAllowBackForAndroid(context, view, _back);

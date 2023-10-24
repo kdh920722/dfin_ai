@@ -23,7 +23,6 @@ class MyData {
   static String nameFromSns = "";
   static String emailFromSns = "";
   static String phoneNumberFromSns = "";
-  static List<Map<String,dynamic>> agreeDocsList = [];
 
   // accident data
   static final List<AccidentInfoData> _accidentInfoList = [];
@@ -194,15 +193,6 @@ class MyData {
   static PrInfoData? selectedPrInfoData;
   static AccidentInfoData? selectedAccidentInfoData;
 
-  static String getAgreeContents(String type){
-    String result = "";
-    for(var each in agreeDocsList){
-      if(each["type"] == type) result = each["data"];
-    }
-
-    return result;
-  }
-
   static void printData(){
     String selectedPrInfoDataCheck = "";
     if(selectedPrInfoData != null){
@@ -256,6 +246,5 @@ class MyData {
     clearChatRoomInfoList();
     selectedPrInfoData = null;
     selectedAccidentInfoData = null;
-    agreeDocsList.clear();
   }
 }
