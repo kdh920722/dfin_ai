@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'package:dio/dio.dart';
@@ -11,6 +12,7 @@ import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:upfin/controllers/get_controller.dart';
@@ -35,9 +37,12 @@ class CommonUtils {
     if(FireBaseController.fcmToken != ""){
       if(logType.toLowerCase() == "e"){
         FireBaseController.writeLog("error", FireBaseController.fcmToken, logMessage);
-      }else if(logType.toLowerCase() == ""){
+      }
+      /*
+      else if(logType.toLowerCase() == ""){
         FireBaseController.writeLog("info", FireBaseController.fcmToken, logMessage);
       }
+      */
     }
 
     if(logType.toLowerCase() == "i"){
@@ -666,21 +671,27 @@ class CommonUtils {
     }
   }
 
-  static void backToHome(BuildContext context){
+  static Future<void> backToHome(BuildContext context) async {
     MyData.resetMyData();
     GetController.to.resetAccdientInfoList();
     GetController.to.resetChatLoanInfoList();
     WebSocketController.resetConnectWebSocketCable();
-    CommonUtils.moveWithUntil(context, AppView.appRootView.value);
+    await CommonUtils.saveSettingsToFile("push_from", "");
+    await CommonUtils.saveSettingsToFile("push_room_id", "");
+    CommonUtils.log("", "delete file");
+    if(context.mounted) CommonUtils.moveWithUntil(context, AppView.appRootView.value);
   }
 
-  static void emergencyBackToHome(){
+  static Future<void> emergencyBackToHome() async {
     if(Config.contextForEmergencyBack != null){
       MyData.resetMyData();
       GetController.to.resetAccdientInfoList();
       GetController.to.resetChatLoanInfoList();
       GetController.to.resetChatMessageInfoList();
       WebSocketController.resetConnectWebSocketCable();
+      await CommonUtils.saveSettingsToFile("push_from", "");
+      await CommonUtils.saveSettingsToFile("push_room_id", "");
+      CommonUtils.log("", "delete file");
       if(Config.isEmergencyRoot){
         CommonUtils.moveWithReplacementTo(Config.contextForEmergencyBack!, AppView.appRootView.value, null);
       }else{
@@ -879,5 +890,47 @@ class CommonUtils {
     }
 
     return result;
+  }
+
+  static Future<File> get _localFile async {
+    Directory directory = await getApplicationDocumentsDirectory();
+    CommonUtils.log("", "_localFile path : ${directory.path}/push_settings.json");
+    return File("${directory.path}/push_settings.json");
+  }
+
+  static Future<Map<String, dynamic>> readSettingsFromFile() async {
+    final file = await _localFile;
+
+    Map<String, dynamic> settings;
+    try {
+      final contents = await file.readAsString();
+      settings = jsonDecode(contents);
+      CommonUtils.log("", "contents : $contents");
+    } catch (error) {
+      CommonUtils.log("", "readSettingsFromFile error : $error");
+      settings = {
+        "push_from": "",
+        "push_room_id": ""
+      };
+
+      file.writeAsString(
+        jsonEncode(settings),
+      );
+    }
+
+    return settings;
+  }
+
+  static Future<void> saveSettingsToFile<T>(String key, T value) async {
+    final file = await _localFile;
+    Map<String, dynamic> settings = await readSettingsFromFile();
+
+    settings.containsKey(key)
+        ? settings[key] = value
+        : settings.addAll({key: value});
+
+    await file.writeAsString(
+      jsonEncode(settings),
+    );
   }
 }

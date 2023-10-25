@@ -1,7 +1,9 @@
+import 'dart:io' as io;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:upfin/configs/app_config.dart';
 import 'package:upfin/views/app_chat_view.dart';
@@ -15,6 +17,7 @@ class FireBaseController{
   static FirebaseApp? firebaseApp;
   static UserCredential? userCredential;
   static String fcmToken = "";
+  static String pushFrom = "";
 
   /// firebase database =========================================================================== ///
   static Future<void> _initFirebase(Function(bool) callback) async {
@@ -76,9 +79,10 @@ class FireBaseController{
 
   /// firebase FCM =========================================================================== ///
   static String channelIdForAndroid = "upfin_notification";
-  static String channelNameForAndroid = "upfin notification";
+  static String channelNameForAndroid = "upfin_notification";
   static String channelDescForAndroid = "upfin 알림";
   static String channelTitleForIOS = "upfin 알림";
+  static StateSetter? setStateForForeground;
 
   static Future<void> initFcm(Function(bool isSuccess, String fcmToken) callback) async {
     try{
@@ -88,26 +92,35 @@ class FireBaseController{
           FirebaseMessaging messaging = FirebaseMessaging.instance;
           await messaging.setForegroundNotificationPresentationOptions(alert: true, badge: true, sound: true);
           FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+          await flutterLocalNotificationsPlugin.initialize(
+            const InitializationSettings(
+              android: AndroidInitializationSettings("@mipmap/ic_launcher"),
+              iOS: DarwinInitializationSettings(),
+            ),
+            onDidReceiveNotificationResponse: foregroundHandler,
+            onDidReceiveBackgroundNotificationResponse: backgroundHandler,
+          );
           AndroidNotificationChannel? androidNotificationChannel;
 
           if(Config.isAndroid){
-            androidNotificationChannel = AndroidNotificationChannel(channelIdForAndroid, channelNameForAndroid,description: channelDescForAndroid, importance: Importance.max);
+            androidNotificationChannel = AndroidNotificationChannel(channelIdForAndroid, channelNameForAndroid, description: channelDescForAndroid, importance: Importance.max);
             await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(androidNotificationChannel);
           }else{
             await messaging.requestPermission(alert: true, announcement: false, badge: true, carPlay: false, criticalAlert: false, provisional: false, sound: true);
           }
 
-          // Background handling event
-          FirebaseMessaging.onBackgroundMessage(_handlerForFirebaseMessagingOnBackground);
           // Foreground handling event
           FirebaseMessaging.onMessage.listen((RemoteMessage message) {_handlerForFirebaseMessagingOnForeground(message, flutterLocalNotificationsPlugin, androidNotificationChannel);});
+
+          // Background handling event
+          FirebaseMessaging.onBackgroundMessage(_handlerForFirebaseMessagingOnBackground);
 
           await initInteractedMessageForBackground(messaging);
 
           String? firebaseToken = await messaging.getToken();
           if(firebaseToken != null){
             fcmToken = firebaseToken;
-            CommonUtils.log("i", "fcm token : $firebaseToken");
+            CommonUtils.log("d", "fcm token : $firebaseToken");
             messaging.onTokenRefresh.listen((event) {
               //TODO : 서버에 해당 토큰을 저장하는 로직 구현
               CommonUtils.log("i", "updated fcm token : $firebaseToken");
@@ -132,7 +145,8 @@ class FireBaseController{
 
   static Future<void> _handlerForFirebaseMessagingOnForeground(RemoteMessage message,
       FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin, AndroidNotificationChannel? channel) async {
-    CommonUtils.log("i", "fcm foreground message : ${message.toString()}");
+    CommonUtils.log("", "fcm foreground message : ${message.toString()}");
+    await CommonUtils.saveSettingsToFile("push_from", "F");
     if (message.notification != null) {
       Map<String, dynamic> resultData = message.data;
       if (resultData.containsKey("room_id")) {
@@ -153,7 +167,9 @@ class FireBaseController{
                     badgeNumber: 1,
                     subtitle: 'the subtitle',
                     sound: 'slow_spring_board.aiff',
-                  )));
+                  )),
+              payload: _getRoomIdFromMessage(message)
+          );
         }
       } else {
         flutterLocalNotificationsPlugin.show(
@@ -171,17 +187,27 @@ class FireBaseController{
                   badgeNumber: 1,
                   subtitle: 'the subtitle',
                   sound: 'slow_spring_board.aiff',
-                )));
+                )),
+            payload: _getRoomIdFromMessage(message));
       }
     }
   }
   
   static Future<void> _handlerForFirebaseMessagingOnBackground(RemoteMessage message) async {
-    CommonUtils.log("i", "fcm background message : ${message.toString()}");
+    await CommonUtils.saveSettingsToFile("push_from", "B");
     await _initFirebase((bool isSuccess) async {
       if(isSuccess){
-        CommonUtils.log("i", "firebase init on background");
+        CommonUtils.log("", "firebase init on background");
         FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+        await flutterLocalNotificationsPlugin.initialize(
+          const InitializationSettings(
+            android: AndroidInitializationSettings("@mipmap/ic_launcher"),
+            iOS: DarwinInitializationSettings(),
+          ),
+          onDidReceiveNotificationResponse: foregroundHandler,
+          onDidReceiveBackgroundNotificationResponse: backgroundHandler,
+        );
+
         AndroidNotificationChannel? androidNotificationChannel;
 
         if(Config.isAndroid){
@@ -208,7 +234,9 @@ class FireBaseController{
                   badgeNumber: 1,
                   subtitle: 'the subtitle',
                   sound: 'slow_spring_board.aiff',
-                )));
+                ),
+            ),
+            payload: _getRoomIdFromMessage(message));
 
       }else{
         CommonUtils.log("e", "firebase init error ");
@@ -217,15 +245,46 @@ class FireBaseController{
   }
 
   static Future<void> initInteractedMessageForBackground(FirebaseMessaging fbMsg) async {
-    RemoteMessage? initialMessage = await fbMsg.getInitialMessage();
-    // 종료상태에서 클릭한 푸시 알림 메세지 핸들링
-    if (initialMessage != null) _clickMessageEvent(initialMessage);
-    // 앱이 백그라운드 상태에서 푸시 알림 클릭 하여 열릴 경우 메세지 스트림을 통해 처리
-    FirebaseMessaging.onMessageOpenedApp.listen(_clickMessageEvent);
+    if(io.Platform.isAndroid){
+      RemoteMessage? message = await fbMsg.getInitialMessage();
+      if (message != null) {
+        // 액션 부분 -> 파라미터는 message.data['test_parameter1'] 이런 방식으로...
+        CommonUtils.log("", "fcm getInitialMessage android : ${_getRoomIdFromMessage(message)}");
+      }
+    }else if(io.Platform.isIOS){
+      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+        CommonUtils.log("", "fcm getInitialMessage ios : ${_getRoomIdFromMessage(message)}");
+      });
+    }
   }
 
-  static void _clickMessageEvent(RemoteMessage message) {
-    CommonUtils.log("i", "fcm message click : ${message.notification!.toString()}");
-    //TODO : 메시지 클릭 이벤트 구현
+  static Future<void> backgroundHandler(NotificationResponse details) async {
+    CommonUtils.log("", "[Background] onDidReceiveNotificationResponse : ${details.id} || ${details.payload}");
+    await CommonUtils.saveSettingsToFile("push_room_id", "${details.payload}");
+    if(setStateForForeground != null){
+      CommonUtils.log("", "not null");
+      setStateForForeground!((){});
+    }
+  }
+
+  static Future<void> foregroundHandler(NotificationResponse details) async {
+    CommonUtils.log("", "[Foreground] onDidReceiveNotificationResponse : ${details.id} || ${details.payload}");
+    await CommonUtils.saveSettingsToFile("push_room_id", "${details.payload}");
+    if(setStateForForeground != null){
+      CommonUtils.log("", "not null");
+      setStateForForeground!((){});
+    }
+  }
+
+  static String _getRoomIdFromMessage(RemoteMessage message){
+    String roomId = "";
+    if(message.notification != null){
+      Map<String, dynamic> resultData = message.data;
+      if (resultData.containsKey("room_id")) {
+        roomId = resultData["room_id"].toString();
+      }
+    }
+
+    return roomId;
   }
 }

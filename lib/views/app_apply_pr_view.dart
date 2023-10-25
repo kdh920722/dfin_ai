@@ -13,6 +13,7 @@ import 'package:upfin/styles/TextStyles.dart';
 import '../controllers/aws_controller.dart';
 import '../controllers/clova_controller.dart';
 import '../controllers/codef_controller.dart';
+import '../controllers/firebase_controller.dart';
 import '../controllers/get_controller.dart';
 import '../controllers/hyphen_controller.dart';
 import '../datas/api_info_data.dart';
@@ -363,7 +364,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     if(_isIdHereFromListById(10)) ntsCount++;
     if(_isIdHereFromListById(11)) ntsCount++;
 
-    CommonUtils.log("", "savedDocsList l: ${savedDocsList.length} ");
     for(var each in savedDocsList){
       Map<String, dynamic> resultMap = each["result"];
       CommonUtils.log("i", "!!!!saved check\n"
@@ -508,6 +508,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     GetController.to.updateLastIndex2_3(lastVisibleItem2);
     Config.contextForEmergencyBack = context;
     Config.isEmergencyRoot = false;
+    FireBaseController.setStateForForeground = null;
   }
 
   @override

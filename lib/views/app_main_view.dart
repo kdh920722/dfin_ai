@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:sizer/sizer.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:upfin/configs/app_config.dart';
+import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/controllers/websocket_controller.dart';
 import 'package:upfin/datas/accident_info_data.dart';
@@ -15,6 +17,7 @@ import 'package:upfin/datas/loan_info_data.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import '../controllers/get_controller.dart';
+import '../controllers/sharedpreference_controller.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
 import 'app_update_accident_view.dart';
@@ -46,14 +49,17 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
 
     Config.contextForEmergencyBack = context;
     Config.isEmergencyRoot = false;
+    FireBaseController.setStateForForeground = setState;
+    AppMainViewState.isStart = false;
   }
 
   @override
-  void dispose(){
+  void dispose() {
     CommonUtils.log("i", "AppMainView 화면 파괴");
     WidgetsBinding.instance.removeObserver(this);
     Config.contextForEmergencyBack = null;
     WebSocketController.resetConnectWebSocketCable();
+    AppMainViewState.isStart = false;
     super.dispose();
   }
 
@@ -346,10 +352,13 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
       }
       String lastDateString = CommonUtils.convertTimeToString(CommonUtils.parseToLocalTime(listMsg[listMsg.length-1]["created_at"]));
       int lastReadId = int.parse(msg["last_read_message_id"].toString());
+      CommonUtils.log("", "last_read_message_id : $lastReadId");
       int cnt = 0;
       for(Map<String, dynamic> eachMsg in listMsg){
-        if(int.parse(eachMsg["id"].toString()) > lastReadId){
-          cnt++;
+        if(eachMsg["username"].toString() == "UPFIN"){
+          if(int.parse(eachMsg["id"].toString()) > lastReadId){
+            cnt++;
+          }
         }
       }
 
@@ -412,11 +421,12 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     }
     await CommonUtils.moveToWithResult(context, AppView.appChatView.value, null);
     if(context.mounted){
+      FireBaseController.setStateForForeground = setState;
       listMsg.clear();
       for(var eachMessage in GetController.to.chatMessageInfoDataList){
         listMsg.add(jsonDecode(eachMessage.messageInfo));
       }
-      listMsg.sort((a,b) => DateTime.parse(a["created_at"]).compareTo(DateTime.parse(b["created_at"])));
+      listMsg.sort((a,b) => a["id"].compareTo(b["id"]));
       for(int i = 0 ; i < MyData.getChatRoomInfoList().length ; i++){
         if(MyData.getChatRoomInfoList()[i].chatRoomId == chatRoomId){
           Map<String, dynamic> msgInfo = jsonDecode(MyData.getChatRoomInfoList()[i].chatRoomMsgInfo);
@@ -612,25 +622,113 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     );
   }
 
+  static Timer? reSubScribeCheckTimer;
+  static bool isStart = false;
+  Future<void> _detectPushClickFromBack() async {
+    if(!isStart){
+      CommonUtils.log("", "check..");
+      isStart = true;
+      UiUtils.showLoadingPop(context);
+      Map<String, dynamic> map = await CommonUtils.readSettingsFromFile();
+      if(map["push_room_id"] != ""){
+        CommonUtils.log("", "push_room_id1: ${map["push_room_id"]}");
+        if(map["push_from"] == "F"){
+          bool isHere = false;
+          for(var each in MyData.getChatRoomInfoList()){
+            if(each.chatRoomId == map["push_room_id"].toString()) isHere = true;
+          }
+          if(isHere){
+            const Duration intervalFoCheckSubScribe = Duration(seconds: 1);
+            reSubScribeCheckTimer = Timer.periodic(intervalFoCheckSubScribe, (Timer timer) {
+              if(GetController.to.isAllSubscribed.value){
+                CommonUtils.log("", "timer..");
+                if(context.mounted) UiUtils.closeLoadingPop(context);
+                if(reSubScribeCheckTimer != null){
+                  reSubScribeCheckTimer!.cancel();
+                }else{
+                  CommonUtils.log("", "timer.. null");
+                }
+                _directGoToChatRoom(map["push_room_id"].toString());
+              }
+            });
+          }else{
+            if(context.mounted) UiUtils.closeLoadingPop(context);
+            if(reSubScribeCheckTimer != null) reSubScribeCheckTimer!.cancel();
+            await CommonUtils.saveSettingsToFile("push_from", "");
+            await CommonUtils.saveSettingsToFile("push_room_id", "");
+            CommonUtils.log("", "delete file");
+            isStart = false;
+          }
+        }else if(map["push_from"] == "B"){
+          bool isHere = false;
+          for(var each in MyData.getChatRoomInfoList()){
+            if(each.chatRoomId == map["push_room_id"].toString()) isHere = true;
+          }
+          if(isHere){
+            const Duration intervalFoCheckSubScribe = Duration(seconds: 1);
+            reSubScribeCheckTimer = Timer.periodic(intervalFoCheckSubScribe, (Timer timer) {
+              if(GetController.to.isAllSubscribed.value){
+                CommonUtils.log("", "timer..");
+                if(context.mounted) UiUtils.closeLoadingPop(context);
+                if(reSubScribeCheckTimer != null){
+                  reSubScribeCheckTimer!.cancel();
+                }else{
+                  CommonUtils.log("", "timer.. null");
+                }
+                _directGoToChatRoom(map["push_room_id"].toString());
+              }
+            });
+          }else{
+            if(context.mounted) UiUtils.closeLoadingPop(context);
+            if(reSubScribeCheckTimer != null) reSubScribeCheckTimer!.cancel();
+            await CommonUtils.saveSettingsToFile("push_from", "");
+            await CommonUtils.saveSettingsToFile("push_room_id", "");
+            CommonUtils.log("", "delete file");
+            isStart = false;
+          }
+        }else{
+          CommonUtils.log("", "no room number");
+          if(context.mounted) UiUtils.closeLoadingPop(context);
+          if(reSubScribeCheckTimer != null) reSubScribeCheckTimer!.cancel();
+          await CommonUtils.saveSettingsToFile("push_from", "");
+          await CommonUtils.saveSettingsToFile("push_room_id", "");
+          CommonUtils.log("", "delete file");
+          isStart = false;
+        }
+      }else{
+        CommonUtils.log("", "no room number");
+        if(context.mounted) UiUtils.closeLoadingPop(context);
+        if(reSubScribeCheckTimer != null) reSubScribeCheckTimer!.cancel();
+        await CommonUtils.saveSettingsToFile("push_from", "");
+        await CommonUtils.saveSettingsToFile("push_room_id", "");
+        CommonUtils.log("", "delete file");
+        isStart = false;
+      }
+    }
+  }
+
+  void _directGoToChatRoom(String pushedRoomId){
+    for(var each in GetController.to.chatLoanInfoDataList){
+      if(each.chatRoomId == pushedRoomId){
+        var jsonData = jsonDecode(each.chatRoomMsgInfo);
+        Map<String, dynamic> msg = jsonData;
+        List<dynamic> listMsg = msg["data"];
+        listMsg.sort((a,b) => a["id"].compareTo(b["id"]));
+        _goToChatRoom(listMsg, each.chatRoomId);
+      }
+    }
+  }
+
   double bottomBarHeight = 0;
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       if(!CommonUtils.isValidStateByAPiExpiredDate()){
         CommonUtils.flutterToast("접속시간이 만료되었습니다.\n재로그인 해주세요");
         CommonUtils.backToHome(context);
       }else{
         _setImagePreLoad();
-        Obx((){
-          if(!GetController.to.isAllSubscribed.value){
-            UiUtils.showLoadingPop(context);
-          }else{
-            UiUtils.closeLoadingPop(context);
-          }
-
-          return Container();
-        });
-
+        _detectPushClickFromBack();
       }
     });
 

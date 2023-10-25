@@ -43,14 +43,17 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
     });
     Config.contextForEmergencyBack = context;
     Config.isEmergencyRoot = true;
+    FireBaseController.setStateForForeground = null;
   }
 
   @override
-  void dispose(){
+  void dispose() {
     CommonUtils.log("i", "AppRootView 화면 파괴");
     WidgetsBinding.instance.removeObserver(this);
     GetController.to.resetPercent();
     Config.contextForEmergencyBack = null;
+    CommonUtils.saveSettingsToFile("push_from", "");
+    CommonUtils.saveSettingsToFile("push_room_id", "");
     super.dispose();
   }
 

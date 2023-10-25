@@ -3,6 +3,7 @@ import 'package:sizer/sizer.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
+import '../controllers/firebase_controller.dart';
 import '../controllers/sharedpreference_controller.dart';
 import '../styles/TextStyles.dart';
 import '../configs/app_config.dart';
@@ -33,6 +34,7 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
     WidgetsBinding.instance.addObserver(this);
     Config.contextForEmergencyBack = context;
     Config.isEmergencyRoot = false;
+    FireBaseController.setStateForForeground = null;
   }
 
   @override

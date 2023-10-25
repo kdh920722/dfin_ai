@@ -191,7 +191,7 @@ class LogfinController {
           cnt++;
           if(isSuccessToGetAgreeInfo){
             agreeDocsList.add({"type" : searchType, "detailType": each, "isAgree": false, "result" : outputJsonForGetAgreeInfo});
-            CommonUtils.log("i", "agree result : ${{"type" : searchType, "result" : outputJsonForGetAgreeInfo}}");
+            CommonUtils.log("d", "agree result : ${{"type" : searchType, "result" : outputJsonForGetAgreeInfo}}");
           }else{
             failCount++;
           }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import '../configs/app_config.dart';
+import '../controllers/firebase_controller.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
 
@@ -19,6 +20,7 @@ class AppAgreeDetailInfoViewState extends State<AppAgreeDetailInfoView> with Wid
     WidgetsBinding.instance.addObserver(this);
     Config.contextForEmergencyBack = context;
     Config.isEmergencyRoot = false;
+    FireBaseController.setStateForForeground = null;
   }
 
   @override

@@ -47,11 +47,16 @@ class WebSocketController {
 
   static void setWaitingState(String roomId, String type, bool isWaiting){
     for(int i = 0 ; i < subscribedRoomIds.length ; i++){
-      if(subscribedRoomIds[i]["room_id"] == roomId){
-        if(type == "UPFIN"){
-          subscribedRoomIds[i]["isWaitingForAnswer"] = isWaiting;
-        }else{
-          subscribedRoomIds[i]["isWaitingForMe"] = isWaiting;
+      if(roomId == ""){
+        subscribedRoomIds[i]["isWaitingForAnswer"] = isWaiting;
+        subscribedRoomIds[i]["isWaitingForMe"] = isWaiting;
+      }else{
+        if(subscribedRoomIds[i]["room_id"] == roomId){
+          if(type == "UPFIN"){
+            subscribedRoomIds[i]["isWaitingForAnswer"] = isWaiting;
+          }else{
+            subscribedRoomIds[i]["isWaitingForMe"] = isWaiting;
+          }
         }
       }
     }
@@ -95,7 +100,7 @@ class WebSocketController {
 
       cable!.onConnected = () {
         isInit = true;
-        const Duration intervalForReSubScribe = Duration(seconds: 30);
+        const Duration intervalForReSubScribe = Duration(seconds: 20);
         reSubScribeCheckTimer = Timer.periodic(intervalForReSubScribe, (Timer timer) {
           isReSubScribe = true;
         });
@@ -131,7 +136,7 @@ class WebSocketController {
                     if(idx != -1) subscribedRoomIds.removeAt(idx);
                   },
                   onMessage: (Map message) {
-                    CommonUtils.log("i", "arrived message : $message");
+                    CommonUtils.log("", "arrived message : $message");
                     var eachMsg = message;
                     for(int i = 0 ; i < MyData.getChatRoomInfoList().length ; i++){
                       if(MyData.getChatRoomInfoList()[i].chatRoomId == roomId){

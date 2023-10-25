@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/utils/common_utils.dart';
+import '../controllers/firebase_controller.dart';
 import '../utils/ui_utils.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
@@ -113,6 +114,7 @@ class AppWebViewState extends State<AppWebView> {
     }else{
       CommonUtils.flutterToast("접속시간이 만료되었습니다.\n재로그인 해주세요");
       CommonUtils.backToHome(context);
+      FireBaseController.setStateForForeground = null;
       return Container();
     }
   }

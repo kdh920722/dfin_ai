@@ -15,6 +15,7 @@ import 'package:upfin/datas/loan_info_data.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import 'package:upfin/styles/TextStyles.dart';
+import 'package:upfin/views/app_main_view.dart';
 import '../configs/app_config.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
@@ -67,6 +68,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     Config.contextForEmergencyBack = context;
     Config.isEmergencyRoot = false;
     _keyboardVisibilityController = CommonUtils.getKeyboardViewController(_functionForKeyboardShow, _functionForKeyboardHide);
+    FireBaseController.setStateForForeground = null;
   }
 
   void _setImagePreLoad(){
@@ -91,6 +93,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     currentRoomId = "";
     Config.contextForEmergencyBack = null;
     _keyboardVisibilityController = null;
+    AppMainViewState.isStart = false;
     super.dispose();
   }
 
@@ -459,9 +462,9 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
       LogfinController.callLogfinApi(LogfinApis.sendMessage, inputJson, (isSuccess, _){
         if(!isSuccess){
           CommonUtils.flutterToast("메시지 전송중\n오류가 발생했습니다.");
-          WebSocketController.setWaitingState(currentRoomId, "ME", false);
-          WebSocketController.setWaitingState(currentRoomId, "UPFIN", false);
         }
+        WebSocketController.setWaitingState(currentRoomId, "ME", false);
+        WebSocketController.setWaitingState(currentRoomId, "UPFIN", false);
       });
     }else{
       CommonUtils.flutterToast("응답을 기다리는 중입니다.");
@@ -545,11 +548,14 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   double inputHelpHeight = 17.h;
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       if(!CommonUtils.isValidStateByAPiExpiredDate()){
         CommonUtils.flutterToast("접속시간이 만료되었습니다.\n재로그인 해주세요");
         CommonUtils.backToHome(context);
       }else{
+        await CommonUtils.saveSettingsToFile("push_from", "");
+        await CommonUtils.saveSettingsToFile("push_room_id", "");
+        CommonUtils.log("", "delete file");
         isBuild = true;
         _scrollToBottom(false);
       }
@@ -600,7 +606,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
             ]) : Container()
           ])),
           UiUtils.getMarginBox(0, 0.8.h),
-          inputTextHide? Container() : AnimatedContainer(
+          !inputTextHide? Container() : AnimatedContainer(
               duration: const Duration(milliseconds:200),
               width: 100.w,
               height: inputHeight,
@@ -675,7 +681,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
 class ChatBubbleTriangleForOther extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    var paint = Paint()..color = ColorStyles.upFinWhiteSky;
+    var paint = Paint()..color = ColorStyles.upFinWhiteGray;
 
     var path = Path();
     path.lineTo(0, -2.w);

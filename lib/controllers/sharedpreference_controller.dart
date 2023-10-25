@@ -24,15 +24,15 @@ class SharedPreferenceController {
   }
 
   static Future<void> saveSharedPreference(String key, String value) async {
-    CommonUtils.log("i", "[s]: save origin value: $value");
+    CommonUtils.log("d", "[s]: save origin value: $value");
     if(key == sharedPreferenceIdKey || key == sharedPreferencePwKey || key == sharedPreferenceApplyPrKey){
       value = CommonUtils.encryptData(value);
-      CommonUtils.log("i", "[s]: save encoded value: $value");
+      CommonUtils.log("d", "[s]: save encoded value: $value");
     }
 
     await sharedPreferences!.setString(key, value);
     String returnValue = sharedPreferences!.getString(key)!;
-    CommonUtils.log("i", "[s]: saved value: $returnValue");
+    CommonUtils.log("i", "[d]: saved value: $returnValue");
   }
 
   static String getSharedPreferenceValue(String key){

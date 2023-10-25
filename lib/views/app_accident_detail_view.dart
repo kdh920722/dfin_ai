@@ -5,6 +5,7 @@ import 'package:upfin/datas/loan_info_data.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import 'package:upfin/views/app_update_accident_view.dart';
+import '../controllers/firebase_controller.dart';
 import '../styles/TextStyles.dart';
 import '../configs/app_config.dart';
 import '../utils/common_utils.dart';
@@ -25,6 +26,7 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
     _tabController = TabController(length: 2, vsync: this);
     Config.contextForEmergencyBack = context;
     Config.isEmergencyRoot = false;
+    FireBaseController.setStateForForeground = null;
   }
 
   @override

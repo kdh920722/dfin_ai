@@ -3,6 +3,7 @@ import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:sizer/sizer.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import '../configs/app_config.dart';
+import '../controllers/firebase_controller.dart';
 import '../styles/TextStyles.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
@@ -20,6 +21,7 @@ class AppAgreeDetailInfoViewTestState extends State<AppAgreeDetailInfoViewTest> 
     WidgetsBinding.instance.addObserver(this);
     Config.contextForEmergencyBack = context;
     Config.isEmergencyRoot = false;
+    FireBaseController.setStateForForeground = null;
   }
 
   @override
