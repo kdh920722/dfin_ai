@@ -371,8 +371,8 @@ class CommonUtils {
       targetDateTime.year,
       targetDateTime.month,
       targetDateTime.day,
-      targetDateTime.hour,
-      targetDateTime.minute+1,
+      targetDateTime.hour+2,
+      targetDateTime.minute,
       targetDateTime.second,
     );
 
