@@ -3,6 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:upfin/views/app_accident_detail_view.dart';
 import 'package:upfin/views/app_agree_detail_info_view.dart';
+import 'package:upfin/views/app_agree_detail_info_view_test.dart';
 import 'package:upfin/views/app_apply_pr_view.dart';
 import 'package:upfin/views/app_detail_pr_view.dart';
 import 'package:upfin/views/app_main_view.dart';
@@ -52,7 +53,8 @@ class Config{
     AppView.appChatView.value : (context) => AppChatView(),
     AppView.appAccidentDetailInfoView.value : (context) => AppAccidentDetailView(),
     AppView.appAgreeDetailInfoView.value : (context) => AppAgreeDetailInfoView(),
-    AppView.appSignOutView.value : (context) => AppSignOutView()
+    AppView.appSignOutView.value : (context) => AppSignOutView(),
+    AppView.appAgreeDetailInfoViewTest.value : (context) => AppAgreeDetailInfoViewTest(),
   };
 
   static Future<void> initAppState(Function(bool isSuccess) callback) async{
@@ -89,7 +91,7 @@ class Config{
 
 enum AppView {
   appRootView, appLoginView, appCertificationView, appWebView, appSignupView, appMainView, appSearchAccidentView, appSignOutView,
-  appUpdateAccidentView, appResultPrView, appDetailPrView, appApplyPrView, appChatView, appAccidentDetailInfoView, appAgreeDetailInfoView
+  appUpdateAccidentView, appResultPrView, appDetailPrView, appApplyPrView, appChatView, appAccidentDetailInfoView, appAgreeDetailInfoView, appAgreeDetailInfoViewTest
 }
 
 extension SAppViewExtension on AppView {
@@ -125,6 +127,8 @@ extension SAppViewExtension on AppView {
         return '/agreeDetailInfoView';
       case AppView.appSignOutView:
         return '/appSignOutView';
+      case AppView.appAgreeDetailInfoViewTest:
+        return '/appAgreeDetailInfoViewTest';
     }
   }
 }

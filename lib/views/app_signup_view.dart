@@ -44,13 +44,6 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
   bool isConfirmed = false;
   String confirmedName = "";
   String confirmedPhone = "";
-  bool? allAgreed = false;
-  bool? item1Agreed = false;
-  bool? item1SubAgreed1 = false;
-  bool? item1SubAgreed2 = false;
-  bool? item1SubAgreed3 = false;
-  bool? item2Agreed = false;
-  bool? item2SubAgreed1 = false;
 
   void _unFocusAllNodes(){
     _nameTextFocus.unfocus();
@@ -185,348 +178,6 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
     }
   }
 
-  void _getSmallAgree1Sub1Act(bool checkedValue){
-    item1SubAgreed1 = checkedValue;
-    if(item1SubAgreed1!){
-      if(item1SubAgreed1! == item1SubAgreed2! && item1SubAgreed2! == item1SubAgreed3!){
-        item1Agreed = true;
-        if(item1Agreed == item2Agreed){
-          allAgreed = true;
-        }else{
-          allAgreed = false;
-        }
-      }
-    }else{
-      item1Agreed = false;
-      allAgreed = false;
-    }
-  }
-  void _getSmallAgree1Sub2Act(bool checkedValue){
-    item1SubAgreed2 = checkedValue;
-    if(item1SubAgreed2!){
-      if(item1SubAgreed1! == item1SubAgreed2! && item1SubAgreed2! == item1SubAgreed3!){
-        item1Agreed = true;
-        if(item1Agreed == item2Agreed){
-          allAgreed = true;
-        }else{
-          allAgreed = false;
-        }
-      }
-    }else{
-      item1Agreed = false;
-      allAgreed = false;
-    }
-  }
-  void _getSmallAgree1Sub3Act(bool checkedValue){
-    item1SubAgreed3 = checkedValue;
-    if(item1SubAgreed3!){
-      if(item1SubAgreed1! == item1SubAgreed2! && item1SubAgreed2! == item1SubAgreed3!){
-        item1Agreed = true;
-        if(item1Agreed == item2Agreed){
-          allAgreed = true;
-        }else{
-          allAgreed = false;
-        }
-      }
-    }else{
-      item1Agreed = false;
-      allAgreed = false;
-    }
-  }
-  void _getSmallAgree2Sub1Act(bool checkedValue){
-    item2SubAgreed1 = checkedValue;
-    if(item2SubAgreed1!){
-      item2Agreed = true;
-      allAgreed = true;
-    }else{
-      item2Agreed = false;
-      allAgreed = false;
-    }
-  }
-  Widget _getSmallAgreeInfoWidget(StateSetter thisSetState, String titleString, String contentsString, bool isAgreeCheck, Function(bool isCheck) callAct){
-    return SizedBox(width: 100.w, height: 4.h, child: Row(children: [
-      UiUtils.getBorderButtonBoxWithZeroPadding(87.5.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite, Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-        isAgreeCheck? UiUtils.getCustomCheckBox(UniqueKey(), 1, isAgreeCheck, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
-            ColorStyles.upFinWhite, ColorStyles.upFinWhite, (checkedValue){
-              thisSetState(() {
-                if(checkedValue != null){
-                  callAct(checkedValue);
-                }
-              });
-            }) : UiUtils.getCustomCheckBox(UniqueKey(), 1, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
-            ColorStyles.upFinWhite, ColorStyles.upFinWhite, (checkedValue){
-              thisSetState(() {
-                if(checkedValue != null){
-                  if(!checkedValue) {
-                    callAct(true);
-                  }
-                }
-              });
-            }),
-        UiUtils.getTextButtonWithFixedScale(titleString, 10.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null, () {
-          _smallAgreePressEvent(titleString, contentsString, (agreeResult){
-            thisSetState(() {
-              callAct(agreeResult);
-            });
-          });
-        }),
-        const Spacer(flex: 2),
-        UiUtils.getIconButton(Icons.arrow_forward_ios_rounded, 4.w, ColorStyles.upFinRealGray, () {
-          _smallAgreePressEvent(titleString, contentsString, (agreeResult){
-            thisSetState(() {
-              callAct(agreeResult);
-            });
-          });
-        })
-      ]), () {
-        _smallAgreePressEvent(titleString, contentsString, (agreeResult){
-          thisSetState(() {
-            callAct(agreeResult);
-          });
-        });
-      })
-    ]));
-  }
-
-  Future<void> _smallAgreePressEvent(String titleString, String contentsString, Function(bool agreeResult) callback) async {
-    Widget htmlWidget = Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-      HtmlWidget(
-        contentsString,
-        customStylesBuilder: (element) {
-          if (element.id.contains('type1')) {
-            return {
-              "color" : "black",
-              "font-size": "12px",
-              "line-height" : "120%",
-              "font-weight": "normal"
-            };
-          }else if (element.id.contains('type2')) {
-            return {
-              "color" : "gray",
-              "font-size": "14px",
-              "line-height" : "150%",
-              "font-weight": "bold"
-            };
-          }else if (element.id.contains('type3')) {
-            return {
-              "color" : "black",
-              "font-size": "16px",
-              "line-height" : "200%",
-              "font-weight": "bold"
-            };
-          }else if (element.localName == 'button') {
-            return {
-              //"cursor": "pointer",
-              //"display":"inlne-block",
-              "text-align":"center",
-              "background-color":"#3a6cff",
-              "color" : "white",
-              "font-size": "14px",
-              "line-height" : "250%",
-              "font-weight": "normal",
-              "border-radius":"0.1em",
-              "padding":"5px 20px"
-            };
-          }
-
-          return null;
-        },
-
-        onTapUrl: (url) async {
-          UiUtils.showLoadingPop(context);
-          Map<String, String> urlInfoMap = {
-            "url" : url
-          };
-          bool isSuccess = false;
-          var result = await CommonUtils.moveToWithResult(context, AppView.appWebView.value, urlInfoMap);
-          if(context.mounted) UiUtils.closeLoadingPop(context);
-          return true;
-        },
-        renderMode: RenderMode.column,
-        textStyle: TextStyles.upFinHtmlTextStyle,
-      )
-    ]);
-
-    bool isAgree = await CommonUtils.moveToWithResult(context, AppView.appAgreeDetailInfoView.value, {"title": titleString, "contents" : htmlWidget}) as bool;
-    callback(isAgree);
-  }
-
-  Widget _makeAgreeWidget(BuildContext thisContext, StateSetter thisSetState){
-    return Material(child: Container(color: ColorStyles.upFinWhite,
-        child: Column(children: [
-          Row(mainAxisAlignment: MainAxisAlignment.end,children: [
-            UiUtils.getIconButton(Icons.close, 7.w, ColorStyles.upFinDarkGray, () {
-              Navigator.pop(thisContext);
-            })
-          ]),
-          Row(mainAxisAlignment: MainAxisAlignment.start,children: [
-            UiUtils.getTextWithFixedScale("업핀 서비스 약관동의", 16.sp, FontWeight.w800, ColorStyles.upFinBlack, TextAlign.center, null)
-          ]),
-          UiUtils.getMarginBox(0, 1.5.h),
-          Wrap(children: [
-            UiUtils.getTextWithFixedScaleForAgreeSubTitle("서비스를 이용하기 위해 고객님의 서비스 이용약관에 동의가 필요합니다.", 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)
-          ]),
-          UiUtils.getMarginBox(0, 2.4.h),
-          GestureDetector(child: Container(color: ColorStyles.upFinWhiteGray, child: Row(
-            children: [
-              UiUtils.getCheckBox(1.2, allAgreed!, (isChanged) {
-                thisSetState(() {
-                  allAgreed = isChanged;
-                  item1Agreed = isChanged;
-                  item2Agreed = isChanged;
-                  item1SubAgreed1 = isChanged;
-                  item1SubAgreed2 = isChanged;
-                  item1SubAgreed3 = isChanged;
-                  item2SubAgreed1 = isChanged;
-                });
-              }),
-              UiUtils.getTextWithFixedScale("전체동의", 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null)
-            ],
-          )),onTap: (){
-            thisSetState(() {
-              if(allAgreed!){
-                allAgreed = false;
-                item1Agreed = false;
-                item1SubAgreed1 = false;
-                item1SubAgreed2 = false;
-                item1SubAgreed3 = false;
-                item2Agreed = false;
-                item2SubAgreed1 = false;
-              }else{
-                allAgreed = true;
-                item1Agreed = true;
-                item1SubAgreed1 = true;
-                item1SubAgreed2 = true;
-                item1SubAgreed3 = true;
-                item2Agreed = true;
-                item2SubAgreed1 = true;
-              }
-            });
-          }),
-          UiUtils.getMarginBox(0, 2.h),
-          UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
-            Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
-              Container(padding: EdgeInsets.zero, height: 3.h, child: Row(
-                children: [
-                  UiUtils.getCheckBox(1.2, item1Agreed!, (isChanged) {
-                    thisSetState(() {
-                      item1Agreed = isChanged;
-                      item1SubAgreed1 = isChanged;
-                      item1SubAgreed2 = isChanged;
-                      item1SubAgreed3 = isChanged;
-                      if(item1Agreed == item2Agreed){
-                        allAgreed = isChanged;
-                      }else{
-                        allAgreed = false;
-                      }
-                    });
-                  }),
-                  UiUtils.getTextWithFixedScale("(필수)전체 동의하기", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null)
-                ],
-              )),
-              UiUtils.getMarginBox(0, 1.5.h),
-              _getSmallAgreeInfoWidget(thisSetState, LogfinController.getAgreeTitle("A1"), LogfinController.getAgreeContents("A1"), item1SubAgreed1!, _getSmallAgree1Sub1Act),
-              _getSmallAgreeInfoWidget(thisSetState, LogfinController.getAgreeTitle("A2"), LogfinController.getAgreeContents("A2"), item1SubAgreed2!, _getSmallAgree1Sub2Act),
-              _getSmallAgreeInfoWidget(thisSetState, LogfinController.getAgreeTitle("A3"), LogfinController.getAgreeContents("A3"), item1SubAgreed3!, _getSmallAgree1Sub3Act),
-            ]),
-            UiUtils.getMarginBox(0, 1.5.h),
-            Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
-              Container(padding: EdgeInsets.zero, height: 3.h, child: Row(
-                children: [
-                  UiUtils.getCheckBox(1.2, item2Agreed!, (isChanged) {
-                    thisSetState(() {
-                      item2Agreed = isChanged;
-                      item2SubAgreed1 = isChanged;
-                      if(item1Agreed == item2Agreed){
-                        allAgreed = isChanged;
-                      }else{
-                        allAgreed = false;
-                      }
-                    });
-                  }),
-                  UiUtils.getTextWithFixedScale("(선택)전체 동의하기", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null)
-                ],
-              )),
-              _getSmallAgreeInfoWidget(thisSetState, LogfinController.getAgreeTitle("A4"), LogfinController.getAgreeContents("A4"), item2SubAgreed1!, _getSmallAgree2Sub1Act)
-            ]),
-          ])),
-          UiUtils.getMarginBox(0, 3.h),
-          item1Agreed!? UiUtils.getTextButtonBox(90.w, "동의하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-
-            Map<String, String> inputJsonForCert = {
-              "carrier": "",
-              "name" : _nameTextController.text.trim(),
-              "phone" : _phoneNumberTextController.text.trim()
-            };
-            var result = await CommonUtils.moveToWithResult(context, AppView.appCertificationView.value, inputJsonForCert);
-            if(result != null){
-              CommonUtils.flutterToast("인증 성공");
-              Map<String, dynamic> resultMap = result as Map<String, dynamic>;
-              for(var each in IamportController.carrierList){
-                if(each.split("@")[0] == resultMap["carrier"]){
-                  MyData.telecomTypeFromPhoneCert = each.split("@")[1];
-                }
-              }
-
-              if(resultMap["gender"] == "male"){
-                MyData.isMaleFromPhoneCert = true;
-              }else{
-                MyData.isMaleFromPhoneCert = false;
-              }
-              MyData.birthFromPhoneCert = (resultMap["birth"] as String).split("-")[0]+(resultMap["birth"] as String).split("-")[1]+(resultMap["birth"] as String).split("-")[2];
-
-              confirmedName = _nameTextController.text.trim();
-              confirmedPhone = _phoneNumberTextController.text.trim();
-
-              // 가입 & 로그인
-              Map<String, dynamic> inputJson = {
-                "user" : {
-                  "email": _emailTextController.text.trim(),
-                  "password": _pwdTextController.text.trim(),
-                  "password_confirmation": _pwdConfirmTextController.text.trim(),
-                  "name" : _nameTextController.text.trim(),
-                  "contact_no" : _phoneNumberTextController.text.trim(),
-                  "telecom" : MyData.telecomTypeFromPhoneCert,
-                  "birthday" : MyData.birthFromPhoneCert,
-                  "gender" : MyData.isMaleFromPhoneCert? "1" : "2",
-                }
-              };
-              CommonUtils.log("i", "signup input :\n$inputJson");
-              if(thisContext.mounted){
-                Navigator.pop(thisContext);
-                if(context.mounted){
-                  UiUtils.showLoadingPop(context);
-                  LogfinController.callLogfinApi(LogfinApis.signUp, inputJson, (isSuccessToSignup, outputJson) async {
-                    if(isSuccessToSignup){
-                      isConfirmed = true;
-                      GetController.to.updateConfirmed(isConfirmed);
-                      CommonUtils.flutterToast("환영합니다!");
-                      // 캐시 데이터 저장
-                      await LogfinController.getMainViewInfo((isSuccessToGetMainInfo){
-                        UiUtils.closeLoadingPop(context);
-                        if(isSuccessToGetMainInfo){
-                          SharedPreferenceController.deleteAllData();
-                          CommonUtils.goToMain(context, _emailTextController.text.trim(), _pwdTextController.text.trim());
-                        }
-                      });
-                    }else{
-                      isConfirmed = false;
-                      GetController.to.updateConfirmed(isConfirmed);
-                      UiUtils.closeLoadingPop(context);
-                      CommonUtils.flutterToast(outputJson!["error"]);
-                    }
-                  });
-                }
-              }
-            }else{
-              isConfirmed = false;
-              CommonUtils.flutterToast("본인인증에 실패했습니다.");
-            }
-          }) : UiUtils.getTextButtonBox(90.w, "동의하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinGray, () {})
-        ])
-    ));
-  }
-
   Widget _getEmailAndPwInfoView(){
     return Form(key: _formKey1, child: UiUtils.getRowColumnWithAlignCenter([
       SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -645,7 +296,75 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
           UiUtils.getTextWithFixedScale("다음", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () async {
             CommonUtils.hideKeyBoard();
             if(_phoneNumberTextController.text.trim() != ""){
-              UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, 100.w, 62.h, 0.5, _makeAgreeWidget);
+              //UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, 100.w, 62.h, 0.5, _makeAgreeWidget);
+              UiUtils.showAgreePop(context, "A", () async {
+                Map<String, String> inputJsonForCert = {
+                  "carrier": "",
+                  "name" : _nameTextController.text.trim(),
+                  "phone" : _phoneNumberTextController.text.trim()
+                };
+                var result = await CommonUtils.moveToWithResult(context, AppView.appCertificationView.value, inputJsonForCert);
+                if(result != null){
+                  CommonUtils.flutterToast("인증 성공");
+                  Map<String, dynamic> resultMap = result as Map<String, dynamic>;
+                  for(var each in IamportController.carrierList){
+                    if(each.split("@")[0] == resultMap["carrier"]){
+                      MyData.telecomTypeFromPhoneCert = each.split("@")[1];
+                    }
+                  }
+
+                  if(resultMap["gender"] == "male"){
+                    MyData.isMaleFromPhoneCert = true;
+                  }else{
+                    MyData.isMaleFromPhoneCert = false;
+                  }
+                  MyData.birthFromPhoneCert = (resultMap["birth"] as String).split("-")[0]+(resultMap["birth"] as String).split("-")[1]+(resultMap["birth"] as String).split("-")[2];
+
+                  confirmedName = _nameTextController.text.trim();
+                  confirmedPhone = _phoneNumberTextController.text.trim();
+
+                  // 가입 & 로그인
+                  Map<String, dynamic> inputJson = {
+                    "user" : {
+                      "email": _emailTextController.text.trim(),
+                      "password": _pwdTextController.text.trim(),
+                      "password_confirmation": _pwdConfirmTextController.text.trim(),
+                      "name" : _nameTextController.text.trim(),
+                      "contact_no" : _phoneNumberTextController.text.trim(),
+                      "telecom" : MyData.telecomTypeFromPhoneCert,
+                      "birthday" : MyData.birthFromPhoneCert,
+                      "gender" : MyData.isMaleFromPhoneCert? "1" : "2",
+                    }
+                  };
+                  CommonUtils.log("i", "signup input :\n$inputJson");
+                  if(context.mounted){
+                    UiUtils.showLoadingPop(context);
+                    LogfinController.callLogfinApi(LogfinApis.signUp, inputJson, (isSuccessToSignup, outputJson) async {
+                      if(isSuccessToSignup){
+                        isConfirmed = true;
+                        GetController.to.updateConfirmed(isConfirmed);
+                        CommonUtils.flutterToast("환영합니다!");
+                        // 캐시 데이터 저장
+                        await LogfinController.getMainViewInfo((isSuccessToGetMainInfo){
+                          UiUtils.closeLoadingPop(context);
+                          if(isSuccessToGetMainInfo){
+                            SharedPreferenceController.deleteAllData();
+                            CommonUtils.goToMain(context, _emailTextController.text.trim(), _pwdTextController.text.trim());
+                          }
+                        });
+                      }else{
+                        isConfirmed = false;
+                        GetController.to.updateConfirmed(isConfirmed);
+                        UiUtils.closeLoadingPop(context);
+                        CommonUtils.flutterToast(outputJson!["error"]);
+                      }
+                    });
+                  }
+                }else{
+                  isConfirmed = false;
+                  CommonUtils.flutterToast("본인인증에 실패했습니다.");
+                }
+              });
             }else{
               CommonUtils.flutterToast("휴대전화 번호를 입력하세요.");
             }

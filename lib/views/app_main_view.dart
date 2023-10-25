@@ -696,13 +696,17 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
           if(GetController.to.isAllSubscribed.value){
             return Container();
           }else{
-            if(!UiUtils.isLoadingPopOn){
-              return Container(
-                  width: 100.w,
-                  height: 100.h,
-                  color: Colors.black54,
-                  child: SpinKitWave(color: ColorStyles.upFinTextAndBorderBlue, size: 15.w)
-              );
+            if(MyData.getChatRoomInfoList().isNotEmpty){
+              if(!UiUtils.isLoadingPopOn){
+                return Container(
+                    width: 100.w,
+                    height: 100.h,
+                    color: Colors.black54,
+                    child: SpinKitWave(color: ColorStyles.upFinTextAndBorderBlue, size: 15.w)
+                );
+              }else{
+                return Container();
+              }
             }else{
               return Container();
             }

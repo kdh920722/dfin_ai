@@ -29,6 +29,7 @@ class LogfinController {
   static List<String> bankList = [];
   static List<String> preLoanCountList = [];
   static List<Map<String,dynamic>> agreeDocsList = [];
+  static List<String> agreeDocsDetailTypeInfoList = [];
   static String getAgreeContents(String type){
     String result = "";
     for(var each in agreeDocsList){
@@ -151,6 +152,16 @@ class LogfinController {
       }
       CommonUtils.log("i", "niceUrl : $niceUrl");
 
+      final agreeTypeSnapshot = await ref.child('UPFIN/API/logfin/list_data/agree/agreeDetailType').get();
+      if (agreeTypeSnapshot.exists) {
+        for (var each in agreeTypeSnapshot.children) {
+          agreeDocsDetailTypeInfoList.add(each.value.toString());
+        }
+      } else {
+        failCount++;
+      }
+
+
       final agreeASnapshot = await ref.child('UPFIN/API/logfin/list_data/agree/agreeA').get();
       List<String> docTypeTempList = [];
       if (agreeASnapshot.exists) {
@@ -179,7 +190,7 @@ class LogfinController {
         callLogfinApi(LogfinApis.getAgreeDocuments, inputJson, (isSuccessToGetAgreeInfo, outputJsonForGetAgreeInfo){
           cnt++;
           if(isSuccessToGetAgreeInfo){
-            agreeDocsList.add({"type" : searchType, "result" : outputJsonForGetAgreeInfo});
+            agreeDocsList.add({"type" : searchType, "detailType": each, "isAgree": false, "result" : outputJsonForGetAgreeInfo});
             CommonUtils.log("i", "agree result : ${{"type" : searchType, "result" : outputJsonForGetAgreeInfo}}");
           }else{
             failCount++;

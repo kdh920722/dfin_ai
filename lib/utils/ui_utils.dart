@@ -1,6 +1,8 @@
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:sizer/sizer.dart';
+import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/styles/TextStyles.dart';
 import '../styles/ColorStyles.dart';
 import '../configs/app_config.dart';
@@ -12,7 +14,7 @@ class UiUtils {
       builder: (BuildContext context, Orientation orientation, DeviceType deviceType) {
         return MaterialApp(
           theme: ThemeData(useMaterial3: true),
-          initialRoute: AppView.appRootView.value,
+          initialRoute: AppView.appAgreeDetailInfoViewTest.value, // AppView.appRootView.value,
           routes: Config.appRoutes
         );
       },
@@ -699,6 +701,298 @@ class UiUtils {
     );
   }
 
+  static bool isInitAgree = false;
+  static List<Map<String, dynamic>> agreeInfoList = [];
+  static void _resetAgreeInfo(){
+    isInitAgree = false;
+    agreeInfoList.clear();
+    agreeInfoList = [];
+    for(int i = 0 ; i <LogfinController.agreeDocsList.length ; i++){
+      LogfinController.agreeDocsList[i]["isAgree"] = false;
+    }
+  }
+
+  static void showAgreePop(BuildContext parentContext, String type, VoidCallback onPressedCallback){
+    _resetAgreeInfo();
+    _showSlideMenuForAgreePop(parentContext, SlideMenuMoveType.bottomToTop, true, 100.w, 65.h, 0.5, type, onPressedCallback, _makeAgreeWidget);
+  }
+
+  static Widget _makeAgreeWidget(String type, BuildContext parentContext, BuildContext thisContext, StateSetter thisSetState, VoidCallback onPressedCallback){
+    if(!isInitAgree){
+      for(var each in LogfinController.agreeDocsList){
+        if(each["type"].toString().contains(type)){
+          agreeInfoList.add(each);
+        }
+      }
+      agreeInfoList.sort((a,b)=>int.parse(a["detailType"].toString().split("@")[2]).compareTo(int.parse(b["detailType"].toString().split("@")[2])));
+      for(var each in agreeInfoList){
+        CommonUtils.log("i", "agree result : "
+            "\n${{"type" : each["type"].toString(),
+          "\ndetailType" : each["detailType"].toString(),
+          "\nisAgree" : each["isAgree"],
+          "\nresult" : each["result"].toString()}}"
+        );
+      }
+      isInitAgree =  true;
+      thisSetState(() {});
+    }
+
+    void setAgreeState(bool isAgree, bool isForAll, String targetId){
+      for(int i = 0 ; i < agreeInfoList.length ; i++){
+        if(isForAll){
+          agreeInfoList[i]["isAgree"] = isAgree;
+        }else{
+          if(agreeInfoList[i]["type"].toString() == targetId){
+            agreeInfoList[i]["isAgree"] = isAgree;
+          }
+        }
+      }
+    }
+
+    void setTypeAgreeState(bool isAgree, String type, String targetDetailType){
+      for(int i = 0 ; i < agreeInfoList.length ; i++){
+        if(agreeInfoList[i]["type"].toString().contains(type)){
+          if(agreeInfoList[i]["detailType"].toString().split("@")[1] == targetDetailType){
+            agreeInfoList[i]["isAgree"] = isAgree;
+          }
+        }
+      }
+    }
+
+    bool isAllAgree(){
+      bool isAllAgreed = true;
+      for(int i = 0 ; i < agreeInfoList.length ; i++){
+        if(!agreeInfoList[i]["isAgree"]) isAllAgreed = false;
+      }
+
+      return isAllAgreed;
+    }
+
+    bool isTypeAgree(String detailType){
+      bool isAllAgreed = true;
+      for(int i = 0 ; i < agreeInfoList.length ; i++){
+        if(agreeInfoList[i]["detailType"].toString().split("@")[1] == detailType){
+          if(!agreeInfoList[i]["isAgree"]) isAllAgreed = false;
+        }
+      }
+
+      return isAllAgreed;
+    }
+
+    String getAgreeTypeTitle(String detailType){
+      String resultTitle = "";
+      for(var each in LogfinController.agreeDocsDetailTypeInfoList){
+        if(each.split("@")[0] == detailType) resultTitle = each.split("@")[1];
+      }
+
+      return resultTitle;
+    }
+
+    Future<void> smallAgreePressEvent(BuildContext parentContext, String titleString, String contentsString, Function(bool agreeResult) callback) async {
+      Widget htmlWidget = Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+        HtmlWidget(
+          contentsString,
+          customStylesBuilder: (element) {
+            if (element.id.contains('type1')) {
+              return {
+                "color" : "black",
+                "font-size": "12px",
+                "line-height" : "120%",
+                "font-weight": "normal"
+              };
+            }else if (element.id.contains('type2')) {
+              return {
+                "color" : "gray",
+                "font-size": "14px",
+                "line-height" : "150%",
+                "font-weight": "bold"
+              };
+            }else if (element.id.contains('type3')) {
+              return {
+                "color" : "black",
+                "font-size": "16px",
+                "line-height" : "200%",
+                "font-weight": "bold"
+              };
+            }else if (element.localName == 'button') {
+              return {
+                //"cursor": "pointer",
+                //"display":"inlne-block",
+                "text-align":"center",
+                "background-color":"#3a6cff",
+                "color" : "white",
+                "font-size": "14px",
+                "line-height" : "250%",
+                "font-weight": "normal",
+                "border-radius":"0.1em",
+                "padding":"5px 20px"
+              };
+            }
+
+            return null;
+          },
+
+          onTapUrl: (url) async {
+            UiUtils.showLoadingPop(parentContext);
+            Map<String, String> urlInfoMap = {
+              "url" : url
+            };
+            await CommonUtils.moveToWithResult(parentContext, AppView.appWebView.value, urlInfoMap);
+            if(parentContext.mounted) UiUtils.closeLoadingPop(parentContext);
+            return true;
+          },
+          renderMode: RenderMode.column,
+          textStyle: TextStyles.upFinHtmlTextStyle,
+        )
+      ]);
+
+      bool isAgree = await CommonUtils.moveToWithResult(parentContext, AppView.appAgreeDetailInfoView.value, {"title": titleString, "contents" : htmlWidget}) as bool;
+      callback(isAgree);
+    }
+
+    Widget getSmallAgreeInfoWidget(String titleString, String contentsString, bool isAgreeCheck, Function(bool isCheck) callAct){
+      return SizedBox(width: 100.w, height: 4.h, child: Row(children: [
+        UiUtils.getBorderButtonBoxWithZeroPadding(87.5.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite, Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+          isAgreeCheck? UiUtils.getCustomCheckBox(UniqueKey(), 1, isAgreeCheck, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+              ColorStyles.upFinWhite, ColorStyles.upFinWhite, (checkedValue){
+                thisSetState(() {
+                  if(checkedValue != null){
+                    callAct(checkedValue);
+                  }
+                });
+              }) : UiUtils.getCustomCheckBox(UniqueKey(), 1, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
+              ColorStyles.upFinWhite, ColorStyles.upFinWhite, (checkedValue){
+                thisSetState(() {
+                  if(checkedValue != null){
+                    if(!checkedValue) {
+                      callAct(true);
+                    }
+                  }
+                });
+              }),
+          UiUtils.getTextButtonWithFixedScale(titleString, 10.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null, () {
+            smallAgreePressEvent(parentContext, titleString, contentsString, (agreeResult){
+              thisSetState(() {
+                callAct(agreeResult);
+              });
+            });
+          }),
+          const Spacer(flex: 2),
+          UiUtils.getIconButton(Icons.arrow_forward_ios_rounded, 4.w, ColorStyles.upFinRealGray, () {
+            smallAgreePressEvent(parentContext, titleString, contentsString, (agreeResult){
+              thisSetState(() {
+                callAct(agreeResult);
+              });
+            });
+          })
+        ]), () {
+          smallAgreePressEvent(parentContext, titleString, contentsString, (agreeResult){
+            thisSetState(() {
+              callAct(agreeResult);
+            });
+          });
+        })
+      ]));
+    }
+
+    Widget getAgreeTypeTitleWidget(String type, String detailType){
+      return Container(padding: EdgeInsets.zero, height: 3.h, child: Row(
+        children: [
+          UiUtils.getCheckBox(1.2, isTypeAgree(detailType), (isChanged) {
+            thisSetState(() {
+              setTypeAgreeState(isChanged!, type, detailType);
+            });
+          }),
+          UiUtils.getTextWithFixedScale(getAgreeTypeTitle(detailType), 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null)
+        ],
+      ));
+    }
+
+    List<Widget> getTypeAgreeWidgetList(String type, String detailType){
+      List<Widget> widgetList = [];
+      List<Map<String,dynamic>> agreeTypeInfoList = [];
+      for(int i = 0 ; i < agreeInfoList.length ; i++){
+        if(agreeInfoList[i]["type"].toString().contains(type) && agreeInfoList[i]["detailType"].toString().split("@")[1] == detailType){
+          agreeTypeInfoList.add(agreeInfoList[i]);
+        }
+      }
+
+      agreeTypeInfoList.sort((a,b)=>int.parse(a["detailType"].toString().split("@")[2]).compareTo(int.parse(b["detailType"].toString().split("@")[2])));
+      for(int i = 0 ; i < agreeTypeInfoList.length ; i++){
+        if(i == 0){
+          widgetList.add(getAgreeTypeTitleWidget(type, detailType));
+          widgetList.add(UiUtils.getMarginBox(0, 1.5.h));
+        }
+        widgetList.add(
+          getSmallAgreeInfoWidget(LogfinController.getAgreeTitle(agreeTypeInfoList[i]["type"].toString()),
+              LogfinController.getAgreeContents(agreeTypeInfoList[i]["type"].toString()), agreeTypeInfoList[i]["isAgree"], (bool isChecked){
+                agreeTypeInfoList[i]["isAgree"] = isChecked;
+              }),
+        );
+      }
+
+      return widgetList;
+    }
+
+    List<Widget> getAgreeWidgetList(){
+      List<Widget> widgetList = [];
+      String currentDetailType = "";
+      for(int i = 0 ; i < agreeInfoList.length ; i++){
+        if(currentDetailType != agreeInfoList[i]["detailType"].toString().split("@")[1]){
+          CommonUtils.log("i","$currentDetailType || ${agreeInfoList[i]["detailType"].toString()}");
+          widgetList.addAll(getTypeAgreeWidgetList(agreeInfoList[i]["type"].toString().substring(0,1), agreeInfoList[i]["detailType"].toString().split("@")[1]));
+          if(currentDetailType != "") widgetList.add(UiUtils.getMarginBox(0, 1.5.h));
+          currentDetailType = agreeInfoList[i]["detailType"].toString().split("@")[1];
+        }
+      }
+
+      return widgetList;
+    }
+
+    return Material(child: Container(color: ColorStyles.upFinWhite,
+        child: Column(children: [
+          Row(mainAxisAlignment: MainAxisAlignment.end,children: [
+            UiUtils.getIconButton(Icons.close, 7.w, ColorStyles.upFinDarkGray, () {
+              Navigator.pop(thisContext);
+            })
+          ]),
+          Row(mainAxisAlignment: MainAxisAlignment.start,children: [
+            UiUtils.getTextWithFixedScale("업핀 서비스 약관동의", 16.sp, FontWeight.w800, ColorStyles.upFinBlack, TextAlign.center, null)
+          ]),
+          UiUtils.getMarginBox(0, 1.5.h),
+          Wrap(children: [
+            UiUtils.getTextWithFixedScaleForAgreeSubTitle("서비스를 이용하기 위해 고객님의 서비스 이용약관에 동의가 필요합니다.", 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)
+          ]),
+          UiUtils.getMarginBox(0, 3.h),
+          GestureDetector(child: Container(color: ColorStyles.upFinWhiteGray, child: Row(
+            children: [
+              UiUtils.getCheckBox(1.2, isAllAgree(), (isChanged) {
+                thisSetState(() {
+                  setAgreeState(isChanged!, true, "");
+                });
+              }),
+              UiUtils.getTextWithFixedScale("전체동의", 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null)
+            ],
+          )),onTap: (){
+            thisSetState(() {
+              if(isAllAgree()){
+                setAgreeState(false, true, "");
+              }else{
+                setAgreeState(true, true, "");
+              }
+            });
+          }),
+          UiUtils.getMarginBox(0, 2.h),
+          UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
+            Column(crossAxisAlignment:CrossAxisAlignment.start, children: getAgreeWidgetList()),
+          ])),
+          UiUtils.getMarginBox(0, 1.5.h),
+          isTypeAgree("1") ? UiUtils.getTextButtonBox(90.w, "동의하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, onPressedCallback)
+              : UiUtils.getTextButtonBox(90.w, "동의하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinGray, () {})
+        ])
+    ));
+  }
+
   static Widget getRowColumnWithAlignCenter(List<Widget> viewList){
     return Row(mainAxisAlignment: MainAxisAlignment.center,
         children: [Column(crossAxisAlignment: CrossAxisAlignment.center, children: viewList)]);
@@ -817,6 +1111,113 @@ class UiUtils {
               ),
             ),
           )
+        );
+      },
+      transitionBuilder: (context, anim1, anim2, child) {
+        switch (slideType) {
+          case SlideMenuMoveType.rightToLeft:
+            return SlideTransition(
+              position: Tween(begin: const Offset(1, 0), end: const Offset(0,0)).animate(anim1),
+              child: child,
+            );
+          case SlideMenuMoveType.leftToRight:
+            return SlideTransition(
+              position: Tween(begin: const Offset(-1, 0), end: const Offset(0,0)).animate(anim1),
+              child: child,
+            );
+          case SlideMenuMoveType.bottomToTop:
+            return SlideTransition(
+              position: Tween(begin: const Offset(0, 1), end: const Offset(0,0)).animate(anim1),
+              child: child,
+            );
+          case SlideMenuMoveType.topToBottom:
+            return SlideTransition(
+              position: Tween(begin: const Offset(0, -1), end: const Offset(0,0)).animate(anim1),
+              child: child,
+            );
+          default:
+            return SlideTransition(
+              position: Tween(begin: const Offset(1, 0), end: const Offset(0,0)).animate(anim1),
+              child: child,
+            );
+        }
+      },
+    );
+  }
+
+  static void _showSlideMenuForAgreePop(BuildContext parentViewContext, SlideMenuMoveType slideType, bool isDismissible, double? width, double? height, double opacity,
+      String type, VoidCallback onPressedCallback, Widget Function(String type, BuildContext parentContext, BuildContext thisContext, StateSetter thisSetState, VoidCallback onPressedCallback) createWidgetMethod){
+    double popWidth = 0.0;
+    double popHeight = 0.0;
+    if(width == null) {
+      popWidth = 66.w;
+    }else{
+      popWidth = width;
+    }
+    if(height == null) {
+      popHeight = 33.w;
+    }else{
+      popHeight = height;
+    }
+
+    BorderRadius borderRadius = BorderRadius.circular(30);
+    Alignment alignment = Alignment.bottomCenter;
+
+    showGeneralDialog(
+      barrierLabel: "",
+      barrierDismissible: isDismissible,
+      barrierColor: Colors.black.withOpacity(opacity),
+      transitionDuration: const Duration(milliseconds: 300),
+      context: parentViewContext,
+      pageBuilder: (context, anim1, anim2) {
+        switch (slideType) {
+          case SlideMenuMoveType.leftToRight:
+            popHeight = 100.h;
+            alignment = Alignment.centerLeft;
+            borderRadius = const BorderRadius.only(topRight: Radius.circular(30), bottomRight: Radius.circular(30));
+            break;
+          case SlideMenuMoveType.rightToLeft:
+            popHeight = 100.h;
+            alignment = Alignment.centerRight;
+            borderRadius = const BorderRadius.only(topLeft: Radius.circular(30), bottomLeft: Radius.circular(30));
+            break;
+          case SlideMenuMoveType.bottomToTop:
+            popWidth = 100.w;
+            alignment = Alignment.bottomCenter;
+            borderRadius = const BorderRadius.only(topLeft: Radius.circular(30), topRight: Radius.circular(30));
+            break;
+          case SlideMenuMoveType.topToBottom:
+            popWidth = 100.w;
+            alignment = Alignment.topCenter;
+            borderRadius = const BorderRadius.only(bottomLeft: Radius.circular(30), bottomRight: Radius.circular(30));
+            break;
+          default:
+            popWidth = 100.w;
+            alignment = Alignment.bottomCenter;
+            borderRadius = const BorderRadius.only(topLeft: Radius.circular(30), bottomLeft: Radius.circular(30));
+        }
+
+        return WillPopScope(
+            onWillPop: () async => isDismissible,
+            child: Align(
+              alignment: alignment,
+              child: Container(
+                width: popWidth,
+                height: popHeight,
+                decoration: BoxDecoration(
+                  color: ColorStyles.upFinWhite,
+                  borderRadius: borderRadius,
+                ),
+                child: SizedBox.expand(
+                    child: StatefulBuilder(
+                        builder: (_, StateSetter popViewSetState){
+                          Widget contentsWidget = createWidgetMethod(type, parentViewContext, parentViewContext, popViewSetState, onPressedCallback);
+                          return Padding(padding: EdgeInsets.all(5.w), child: contentsWidget);
+                        }
+                    )
+                ),
+              ),
+            )
         );
       },
       transitionBuilder: (context, anim1, anim2, child) {
