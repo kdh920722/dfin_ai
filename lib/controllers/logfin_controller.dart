@@ -467,7 +467,14 @@ class LogfinController {
                   };
                   await callLogfinApi(LogfinApis.getMessage, inputJson, (isSuccessToGetLoanMessageInfo, loanMessageInfoOutputJson){
                     if(isSuccessToGetLoanMessageInfo){
-                      String submitAmount = eachLoans["submit_offer"]["amount"].toString().substring(0, eachLoans["submit_offer"]["amount"].toString().length-4);
+                      String tempAmount = eachLoans["submit_offer"]["amount"].toString();
+                      String submitAmount = "0";
+                      if(tempAmount.length < 5){
+                        CommonUtils.log("e", "submitAmount error $tempAmount");
+                      }else{
+                        submitAmount = eachLoans["submit_offer"]["amount"].toString().substring(0, eachLoans["submit_offer"]["amount"].toString().length-4);
+                      }
+
                       loanMessageInfoOutputJson!["last_read_message_id"] = eachLoans["pr_room"]["last_read_message_id"].toString();
                       CommonUtils.log("i", "loanMessageInfoOutputJson data ====>\n$loanMessageInfoOutputJson");
                       MyData.addToLoanInfoList(
@@ -485,9 +492,12 @@ class LogfinController {
 
               MyData.sortLoanInfoList();
               _setChatRoomInfoList();
-              if(!WebSocketController.isConnected) WebSocketController.connectToWebSocketCable();
-              GetController.to.updateChatLoanInfoList(MyData.getChatRoomInfoList());
-              callback(true, true);
+              WebSocketController.resetConnectWebSocketCable();
+              Future.delayed(const Duration(seconds: 2), () {
+                WebSocketController.connectToWebSocketCable();
+                GetController.to.updateChatLoanInfoList(MyData.getChatRoomInfoList());
+                callback(true, true);
+              });
             }
           }else{
             GetController.to.resetChatLoanInfoList();

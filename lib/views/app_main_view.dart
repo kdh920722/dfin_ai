@@ -100,22 +100,10 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             if (scrollNotification is ScrollUpdateNotification) {
               if(!isScrolling){
                 isScrolling = true;
-                /*
-                setState(() {
-                  bottomBarHeight = 0;
-                });
-
-                 */
               }
             } else if (scrollNotification is ScrollEndNotification) {
               if(isScrolling){
                 isScrolling = false;
-                /*
-                setState(() {
-                  bottomBarHeight = 0;
-                });
-
-                 */
               }
             }
             return true;
@@ -646,7 +634,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
       }
     });
 
-    CommonUtils.log("i", "main view redraw!");
     Widget view = Stack(
       children: [
         Positioned(
@@ -709,12 +696,16 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
           if(GetController.to.isAllSubscribed.value){
             return Container();
           }else{
-            return Container(
-                width: 100.w,
-                height: 100.h,
-                color: Colors.black54,
-                child: SpinKitWave(color: ColorStyles.upFinTextAndBorderBlue, size: 15.w)
-            );
+            if(!UiUtils.isLoadingPopOn){
+              return Container(
+                  width: 100.w,
+                  height: 100.h,
+                  color: Colors.black54,
+                  child: SpinKitWave(color: ColorStyles.upFinTextAndBorderBlue, size: 15.w)
+              );
+            }else{
+              return Container();
+            }
           }
         })
         )

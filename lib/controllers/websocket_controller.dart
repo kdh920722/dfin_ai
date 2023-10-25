@@ -18,9 +18,10 @@ class WebSocketController {
   static String channelName = "";
   static List<Map<String,dynamic>> subscribedRoomIds = [];
   static bool isReSubScribe = false;
-  static bool isConnected = false;
   static ActionCable? cable;
   static bool isInit = false;
+  static Timer? reSubScribeCheckTimer;
+  static Timer? reSubScribeTimer;
 
   static Future<void> initWebSocket(Function(bool isSuccess) callback) async{
     try{
@@ -73,8 +74,9 @@ class WebSocketController {
 
   static void resetConnectWebSocketCable(){
     isInit = false;
-    isConnected = false;
     isReSubScribe = false;
+    if(reSubScribeTimer != null) reSubScribeTimer!.cancel();
+    if(reSubScribeCheckTimer != null) reSubScribeCheckTimer!.cancel();
     GetController.to.updateAllSubScribed(false);
     subscribedRoomIds.clear();
     if(cable != null) cable!.disconnect();
@@ -93,13 +95,13 @@ class WebSocketController {
 
       cable!.onConnected = () {
         isInit = true;
-        isConnected = true;
-        const Duration intervalForReSubScribe = Duration(seconds: 20);
-        Timer.periodic(intervalForReSubScribe, (Timer timer) {
+        const Duration intervalForReSubScribe = Duration(seconds: 30);
+        reSubScribeCheckTimer = Timer.periodic(intervalForReSubScribe, (Timer timer) {
           isReSubScribe = true;
         });
+        isReSubScribe = true;
         const Duration interval = Duration(seconds: 1);
-        Timer.periodic(interval, (Timer timer) {
+        reSubScribeTimer = Timer.periodic(interval, (Timer timer) {
           if(isReSubScribe){
             CommonUtils.log("i", "re subScribe connect");
             isReSubScribe = false;
@@ -174,8 +176,9 @@ class WebSocketController {
 
   static void _retryToConnect(){
     if(isInit){
-      isConnected = false;
       GetController.to.updateAllSubScribed(false);
+      if(reSubScribeTimer != null) reSubScribeTimer!.cancel();
+      if(reSubScribeCheckTimer != null) reSubScribeCheckTimer!.cancel();
       subscribedRoomIds.clear();
       Future.delayed(const Duration(seconds: 2), () {
         connectToWebSocketCable(); // 다시 연결
