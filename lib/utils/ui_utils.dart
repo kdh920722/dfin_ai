@@ -14,7 +14,7 @@ class UiUtils {
       builder: (BuildContext context, Orientation orientation, DeviceType deviceType) {
         return MaterialApp(
           theme: ThemeData(useMaterial3: true),
-          initialRoute: AppView.appAgreeDetailInfoViewTest.value, // AppView.appRootView.value,
+          initialRoute: AppView.appRootView.value,
           routes: Config.appRoutes
         );
       },

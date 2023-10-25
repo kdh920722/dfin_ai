@@ -40,6 +40,10 @@ class CommonUtils {
       }
     }
 
+    if(logType.toLowerCase() == "i"){
+      logType = "K";
+    }
+
     var logger = Logger();
     if(logMessage.length > logMaxSize){
       switch(logType.toLowerCase()){
@@ -49,7 +53,7 @@ class CommonUtils {
           logger.i("long log start=======================>");
         case "e":
           logger.e("long log start=======================>");
-        default :
+        case "":
           logger.wtf("long log start=======================>");
       }
 
@@ -62,7 +66,7 @@ class CommonUtils {
             logger.i(logMessage.substring(i, end));
           case "e":
             logger.e(logMessage.substring(i, end));
-          default :
+          case "":
             logger.wtf(logMessage.substring(i, end));
         }
       }
@@ -74,7 +78,7 @@ class CommonUtils {
           logger.i("long log end=======================>");
         case "e":
           logger.e("long log end=======================>");
-        default :
+        case "":
           logger.wtf("long log end=======================>");
       }
     }else{
@@ -85,7 +89,7 @@ class CommonUtils {
           return logger.i(logMessage);
         case "e":
           return logger.e(logMessage);
-        default :
+        case "":
           return logger.wtf(logMessage);
       }
     }
