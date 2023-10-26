@@ -1,3 +1,4 @@
+import 'package:expansion_tile_group/expansion_tile_group.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
@@ -918,18 +919,25 @@ class UiUtils {
       }
 
       agreeTypeInfoList.sort((a,b)=>int.parse(a["detailType"].toString().split("@")[2]).compareTo(int.parse(b["detailType"].toString().split("@")[2])));
+      Widget titleWidget = Container();
+      List<Widget> titleChildWidgetList = [];
       for(int i = 0 ; i < agreeTypeInfoList.length ; i++){
         if(i == 0){
-          widgetList.add(getAgreeTypeTitleWidget(type, detailType));
-          widgetList.add(UiUtils.getMarginBox(0, 1.5.h));
+          titleWidget = getAgreeTypeTitleWidget(type, detailType);
         }
-        widgetList.add(
-          getSmallAgreeInfoWidget(LogfinController.getAgreeTitle(agreeTypeInfoList[i]["type"].toString()),
-              LogfinController.getAgreeContents(agreeTypeInfoList[i]["type"].toString()), agreeTypeInfoList[i]["isAgree"], (bool isChecked){
-                agreeTypeInfoList[i]["isAgree"] = isChecked;
-              }),
-        );
+        titleChildWidgetList.add(getSmallAgreeInfoWidget(LogfinController.getAgreeTitle(agreeTypeInfoList[i]["type"].toString()),
+            LogfinController.getAgreeContents(agreeTypeInfoList[i]["type"].toString()), agreeTypeInfoList[i]["isAgree"], (bool isChecked){
+              agreeTypeInfoList[i]["isAgree"] = isChecked;
+            }));
       }
+
+      titleChildWidgetList.add(UiUtils.getMarginBox(0, 1.5.h));
+      widgetList.add(
+        ExpansionTileWithoutBorderItem(
+            title: titleWidget,
+            childrenPadding: EdgeInsets.zero,tilePadding: EdgeInsets.zero, iconColor: ColorStyles.upFinBlack,
+            children: titleChildWidgetList),
+      );
 
       return widgetList;
     }
@@ -940,7 +948,6 @@ class UiUtils {
       for(int i = 0 ; i < agreeInfoList.length ; i++){
         if(currentDetailType != agreeInfoList[i]["detailType"].toString().split("@")[1]){
           widgetList.addAll(getTypeAgreeWidgetList(agreeInfoList[i]["type"].toString().substring(0,1), agreeInfoList[i]["detailType"].toString().split("@")[1]));
-          widgetList.add(UiUtils.getMarginBox(0, 1.5.h));
           currentDetailType = agreeInfoList[i]["detailType"].toString().split("@")[1];
         }
       }
