@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
@@ -17,7 +16,6 @@ import 'package:upfin/datas/loan_info_data.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import '../controllers/get_controller.dart';
-import '../controllers/sharedpreference_controller.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
 import 'app_update_accident_view.dart';
@@ -29,11 +27,11 @@ class AppMainView extends StatefulWidget{
 
 class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   final PageController _pageController = PageController();
-  final PageController _pageControllerForPop = PageController();
   bool doCheckToSearchAccident = false;
   int viewTypeId = 2; // 1: 대출 / 2: MY / 3: 설정
   int tryOut = 0;
   String retryChatRoomId = "";
+  bool isViewHere = false;
 
   @override
   void initState(){
@@ -51,6 +49,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     Config.isEmergencyRoot = false;
     FireBaseController.setStateForForeground = setState;
     AppMainViewState.isStart = false;
+    isViewHere = true;
   }
 
   @override
@@ -61,6 +60,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     WebSocketController.resetConnectWebSocketCable();
     AppMainViewState.isStart = false;
     FireBaseController.setStateForForeground = null;
+    isViewHere = false;
     super.dispose();
   }
 
@@ -83,20 +83,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
       default:
         break;
     }
-  }
-
-  void _setImagePreLoad(){
-    precacheImage(const AssetImage('assets/images/img_man_banner.png'), context);
-    precacheImage(const AssetImage('assets/images/img_man_welcome.png'), context);
-    precacheImage(const AssetImage('assets/images/img_man_searcher.png'), context);
-    precacheImage(const AssetImage('assets/images/img_woman_searcher.png'), context);
-    precacheImage(const AssetImage('assets/images/img_woman_searcher_01.png'), context);
-    precacheImage(const AssetImage('assets/images/img_woman_coffee.png'), context);
-    precacheImage(const AssetImage('assets/images/img_woman_sports.png'), context);
-    precacheImage(const AssetImage('assets/images/accident_icon.png'), context);
-    precacheImage(const AssetImage('assets/images/bank_logo_default.png'), context);
-    precacheImage(const AssetImage('assets/images/bank_logo_safe.png'), context);
-    precacheImage(const AssetImage('assets/images/ani_man_search.gif'), context);
   }
 
   bool isScrolling = false;
@@ -136,9 +122,11 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                         SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("개인회생사건 등록", 22.sp, FontWeight.w800, ColorStyles.upFinWhite, TextAlign.start, null)),
                         UiUtils.getMarginBox(0, 5.h),
                         UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
-                            UiUtils.getTextWithFixedScale("✚ 추가하기", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, null), () {
+                            UiUtils.getTextWithFixedScale("✚ 추가하기", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, null), () async {
                               Navigator.pop(slideContext);
-                              CommonUtils.moveTo(context, AppView.appSearchAccidentView.value, null);
+                              isViewHere = false;
+                              await CommonUtils.moveToWithResult(context, AppView.appSearchAccidentView.value, null);
+                              isViewHere = true;
                             }),
                         UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
                         Align(alignment: Alignment.bottomCenter, child: Image.asset(fit: BoxFit.fitHeight,'assets/images/img_woman_searcher_01.png')),
@@ -196,8 +184,10 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                           UiUtils.getTextWithFixedScale("현재 등록된 사건이 없습니다.", 13.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.center, null),
                           const Spacer(flex: 2),
                           UiUtils.getBorderButtonBox(22.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                              UiUtils.getTextWithFixedScale("등록하기", 10.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.end, null), () {
-                                CommonUtils.moveTo(context, AppView.appSearchAccidentView.value, null);
+                              UiUtils.getTextWithFixedScale("등록하기", 10.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.end, null), () async {
+                                isViewHere = false;
+                                await CommonUtils.moveToWithResult(context, AppView.appSearchAccidentView.value, null);
+                                isViewHere = false;
                               })
                         ]), () { })
                   ]));
@@ -314,22 +304,28 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                       UiUtils.getIcon(5.w, 5.w, Icons.search_rounded, 5.w, ColorStyles.upFinWhite),
                       UiUtils.getMarginBox(0.5.w, 0),
                       UiUtils.getTextWithFixedScale("대출상품 찾기", 12.sp, FontWeight.w700, ColorStyles.upFinWhite, TextAlign.center, null)
-                    ]), () {
+                    ]), () async {
                       MyData.selectedAccidentInfoData = each;
                       if(MyData.isPossibleAccidentInfo(each)){
                         AppUpdateAccidentViewState.isAccountEditMode = false;
                         AppUpdateAccidentViewState.startViewId = AppUpdateAccidentViewState.confirmedViewId;
                         AppUpdateAccidentViewState.endViewId = AppUpdateAccidentViewState.jobViewId;
-                        CommonUtils.moveTo(context, AppView.appUpdateAccidentView.value, null);
+                        isViewHere = false;
+                        await CommonUtils.moveToWithResult(context, AppView.appUpdateAccidentView.value, null);
+                        isViewHere = false;
                       }else{
                         CommonUtils.log("i", "accdient uid : ${each.accidentUid}"); // be  :m-PYw9Qm5gvLonWRrCUAbQ  af : 5L5zVL98TsNC-1uz4xednA
-                        CommonUtils.moveTo(context, AppView.appAccidentDetailInfoView.value, null);
+                        isViewHere = false;
+                        await CommonUtils.moveToWithResult(context, AppView.appAccidentDetailInfoView.value, null);
+                        isViewHere = false;
                       }
                     })
-              ]), () {
+              ]), () async {
                 CommonUtils.log("i", "accdient uid : ${each.accidentUid}"); // be  :m-PYw9Qm5gvLonWRrCUAbQ  af : 5L5zVL98TsNC-1uz4xednA
                 MyData.selectedAccidentInfoData = each;
-                CommonUtils.moveTo(context, AppView.appAccidentDetailInfoView.value, null);
+                isViewHere = false;
+                await CommonUtils.moveToWithResult(context, AppView.appAccidentDetailInfoView.value, null);
+                isViewHere = false;
               })
       );
     }
@@ -353,7 +349,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
       }
       String lastDateString = CommonUtils.convertTimeToString(CommonUtils.parseToLocalTime(listMsg[listMsg.length-1]["created_at"]));
       int lastReadId = int.parse(msg["last_read_message_id"].toString());
-      CommonUtils.log("", "last_read_message_id : $lastReadId");
       int cnt = 0;
       for(Map<String, dynamic> eachMsg in listMsg){
         if(eachMsg["username"].toString() == "UPFIN"){
@@ -420,7 +415,9 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
           eachMsg["message_type"].toString(), eachMsg["username"].toString(), jsonEncode(eachMsg));
       GetController.to.addChatMessageInfoList(messageItem);
     }
+    isViewHere = false;
     await CommonUtils.moveToWithResult(context, AppView.appChatView.value, null);
+    isViewHere = true;
     if(context.mounted){
       FireBaseController.setStateForForeground = setState;
       listMsg.clear();
@@ -448,119 +445,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     });
   }
 
-  Widget _getApplyView(){
-    return Stack(alignment: Alignment.center, children: [
-      Container(
-          color: ColorStyles.upFinButtonBlue,
-          width: 100.w,
-          height: 100.h,
-          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            UiUtils.getMarginBox(0, 10.h),
-            SizedBox(width: 80.w, child: UiUtils.getTextWithFixedScale("빠르고", 30.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, 1)),
-            UiUtils.getMarginBox(0, 2.h),
-            SizedBox(width: 80.w, child: UiUtils.getTextWithFixedScale("쉽게", 30.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, 1)),
-            UiUtils.getMarginBox(0, 2.h),
-            SizedBox(width: 80.w, child: UiUtils.getTextWithFixedScale("대출받자!", 30.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, 1)),
-            UiUtils.getMarginBox(0, 5.h),
-            UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
-                MyData.getAccidentInfoList().isNotEmpty ?
-                UiUtils.getTextWithFixedScale("대출상품 검색하기", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, 1) :
-                UiUtils.getTextWithFixedScale("사건 등록하기", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, 1), () async {
-                  if(MyData.getAccidentInfoList().isNotEmpty){
-                    UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, 100.w, 45.h, 0.5, (slideContext, slideSetState){
-                      List<Widget> accidentWidgetList = [];
-                      for(var each in MyData.getAccidentInfoList()){
-                        accidentWidgetList.add(
-                            UiUtils.getAccidentBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinGray,
-                                Column(children: [
-                                  Row(children: [
-                                    Expanded(flex: 15, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                      Row(children: [
-                                        UiUtils.getMarginBox(1.w, 0),
-                                        UiUtils.getBoxTextWithFixedScale("개인회생", 8.sp, FontWeight.w500, TextAlign.center, ColorStyles.upFinButtonBlue, ColorStyles.upFinWhite),
-                                      ]),
-                                      UiUtils.getMarginBox(0, 0.4.h),
-                                      Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                                        UiUtils.getImage(16.w, 16.w, Image.asset('assets/images/accident_icon.png', fit: BoxFit.fill)),
-                                        UiUtils.getMarginBox(0.2.w, 0),
-                                        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                                          UiUtils.getTextWithFixedScale(each.accidentCourtInfo.split("@")[0], 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.center, 1),
-                                          UiUtils.getMarginBox(0, 0.5.h),
-                                          UiUtils.getTextWithFixedScale("${each.accidentCaseNumberYear}${each.accidentCaseNumberType}${each.accidentCaseNumberNumber}", 18.sp,
-                                              FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null),
-                                        ])
-                                      ]),
-                                      //UiUtils.getTextWithFixedScale("${each.accidentBankInfo.split("@")[0]} ${each.accidentBankAccount} / ${each.resData["resRepaymentList"][0]["resRoundNo2"]}회 납부", 10.sp, FontWeight.w600, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, 1),
-                                    ])),
-                                    Expanded(flex: 1, child: Icon(Icons.arrow_forward_ios_rounded, color: ColorStyles.upFinDarkGray, size: 5.5.w))
-                                  ]),
-                                ]), () {
-                                  Navigator.pop(slideContext);
-                                  UiUtils.showLoadingPop(context);
-                                  LogfinController.getPrList("${each.accidentCaseNumberYear}${each.accidentCaseNumberType}${each.accidentCaseNumberNumber}", (isSuccessToGetOffers, _){
-                                    UiUtils.closeLoadingPop(context);
-                                    if(isSuccessToGetOffers){
-                                      MyData.selectedAccidentInfoData = each;
-                                      setState(() {
-                                        viewTypeId = 2;
-                                      });
-                                      CommonUtils.moveTo(context, AppView.appResultPrView.value, null);
-                                    }else{
-                                      // findUidInAccidentInfoList 실패
-                                      CommonUtils.flutterToast("에러가 발생했습니다.");
-                                    }
-                                  });
-                                })
-                        );
-                      }
-
-                      return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        UiUtils.getMarginBox(0, 3.h),
-                        UiUtils.getTextWithFixedScale("사건정보를 선택해주세요.", 16.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.center, 1),
-                        UiUtils.getMarginBox(0, 3.h),
-                        SizedBox(width: 90.w, height: 21.h, child: Column(
-                          children: <Widget>[
-                            // PageView
-                            SizedBox(width: 90.w, height: 16.h,
-                              child: PageView(
-                                controller: _pageControllerForPop,
-                                children: accidentWidgetList,
-                              ),
-                            ),
-                            UiUtils.getMarginBox(0, 3.h),
-                            accidentWidgetList.length>1? SmoothPageIndicator(
-                              controller: _pageControllerForPop,
-                              count: accidentWidgetList.length, // 페이지 수
-                              effect: WormEffect(dotWidth: 2.2.w, dotHeight: 2.2.w, dotColor: ColorStyles.upFinWhiteSky, activeDotColor: ColorStyles.upFinTextAndBorderBlue), // 페이지 인디케이터 스타일
-                            ):Container(),
-                          ],
-                        )),
-                        UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
-                        UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
-                            UiUtils.getTextWithFixedScale("사건 추가하기", 12.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.center, 1), () {
-                              Navigator.pop(slideContext);
-                              setState(() {
-                                viewTypeId = 2;
-                              });
-                              CommonUtils.moveTo(context, AppView.appSearchAccidentView.value, null);
-                            })
-                      ]);
-                    });
-                  }else{
-                    setState(() {
-                      viewTypeId = 2;
-                    });
-                    CommonUtils.moveTo(context, AppView.appSearchAccidentView.value, null);
-                  }
-                }),
-            UiUtils.getMarginBox(0, 0.6.h),
-            UiUtils.getExpandedScrollView(Axis.vertical, MyData.getAccidentInfoList().isNotEmpty ?
-            Align(alignment: Alignment.bottomCenter, child: Image.asset(fit: BoxFit.fitHeight,'assets/images/ani_man_search.gif')) :
-            Align(alignment: Alignment.bottomCenter, child: Image.asset(fit: BoxFit.fitHeight,'assets/images/img_woman_searcher.png'))),
-          ])
-      ),
-    ]);
-  }
   void _back(){
     tryOut++;
     Future.delayed(const Duration(milliseconds: 500), () async {
@@ -604,8 +488,10 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               Row(children: [UiUtils.getTextWithFixedScale("설정", 22.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null)]), () {}),
           UiUtils.getMarginBox(0, 3.h),
           UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
-              Row(children: [UiUtils.getTextWithFixedScale("계정", 15.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)]), () {
-                CommonUtils.moveTo(context, AppView.appSignOutView.value, null);
+              Row(children: [UiUtils.getTextWithFixedScale("계정", 15.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)]), () async {
+                isViewHere = false;
+                await CommonUtils.moveToWithResult(context, AppView.appSignOutView.value, null);
+                isViewHere = true;
               }),
           UiUtils.getMarginBox(0, 0.4.h),
           UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
@@ -724,12 +610,11 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if(!CommonUtils.isValidStateByAPiExpiredDate()){
-        CommonUtils.flutterToast("접속시간이 만료되었습니다.\n재로그인 해주세요");
-        CommonUtils.backToHome(context);
-      }else{
-        _setImagePreLoad();
+      if(isViewHere){
         _detectPushClickFromBack();
+      }else{
+        isStart = false;
+        if(reSubScribeCheckTimer != null) reSubScribeCheckTimer!.cancel();
       }
     });
 
@@ -737,7 +622,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
       children: [
         Positioned(
             child: Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, child: Column(children: [
-              Expanded(child: viewTypeId == 1? _getApplyView() : viewTypeId == 2? _getMyView() : _getSettingView()),
+              Expanded(child: viewTypeId == 1? Container() : viewTypeId == 2? _getMyView() : _getSettingView()),
               AnimatedContainer(width: 100.w, height: bottomBarHeight, duration: const Duration(milliseconds:100),
                   child: Row(mainAxisAlignment: MainAxisAlignment.center, mainAxisSize: MainAxisSize.max, children: [
                     GestureDetector(child: Container(width: 30.w, color: ColorStyles.upFinWhiteGray, padding: EdgeInsets.only(left: 0, right: 0, top: 0.1.h, bottom: 0),
@@ -772,14 +657,17 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                   SizedBox(width: 80.w, child: UiUtils.getTextWithFixedScale("찾으실 수 있어요~ ", 22.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, null)),
                   UiUtils.getMarginBox(0, 3.h),
                   UiUtils.getBorderButtonBox(80.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
-                      UiUtils.getTextWithFixedScale("시작하기", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, null), () {
+                      UiUtils.getTextWithFixedScale("시작하기", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, null), () async {
+                        isViewHere = false;
+                        await CommonUtils.moveToWithResult(context, AppView.appSearchAccidentView.value, null);
+                        isViewHere = true;
                         setState(() {
                           doCheckToSearchAccident = false;
                         });
-                        CommonUtils.moveTo(context, AppView.appSearchAccidentView.value, null);
                       }),
                   UiUtils.getMarginBox(0, 2.5.h),
                   SizedBox(width: 80.w, child: UiUtils.getTextButtonWithFixedScale("넘어가기", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null, (){
+                    isViewHere = true;
                     setState(() {
                       doCheckToSearchAccident = false;
                     });

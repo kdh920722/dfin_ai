@@ -31,6 +31,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
   bool isScrolling2= false;
 
   bool isInputValid = true;
+  bool isViewHere = false;
 
   final String errorMsg = "정보를 입력해주세요";
   int currentViewId = 1;
@@ -181,6 +182,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
     Config.contextForEmergencyBack = context;
     Config.isEmergencyRoot = false;
     FireBaseController.setStateForForeground = null;
+    isViewHere = true;
   }
 
   @override
@@ -194,6 +196,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
     startViewId = 0;
     endViewId = 0;
     Config.contextForEmergencyBack = null;
+    isViewHere = false;
     super.dispose();
   }
 
@@ -849,14 +852,13 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
     if(posIdx != -1){
       double pos = eachSize*posIdx;
       _scrollTo(_bankScrollController, pos);
-    }else{
-      CommonUtils.log("e", "!!!!!");
     }
   }
 
   void back(){
     CommonUtils.hideKeyBoard();
     if(currentViewId == startViewId){
+      isViewHere = false;
       Navigator.pop(context, false);
     }else{
       backInputView();
@@ -866,19 +868,14 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
   bool isAutoScrollableForTarget = true;
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if(!CommonUtils.isValidStateByAPiExpiredDate()){
-        CommonUtils.flutterToast("접속시간이 만료되었습니다.\n재로그인 해주세요");
-        CommonUtils.backToHome(context);
-      }
-    });
-
     Widget? view;
     if(currentViewId == bankCodeViewId){
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        if(isAutoScrollableForTarget) {
-          isAutoScrollableForTarget = false;
-          _scrollBankCode();
+        if(isViewHere){
+          if(isAutoScrollableForTarget) {
+            isAutoScrollableForTarget = false;
+            _scrollBankCode();
+          }
         }
       });
       view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: Obx(()=>_getBankCodeView()));

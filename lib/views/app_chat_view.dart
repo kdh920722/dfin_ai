@@ -40,6 +40,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   bool isTextFieldFocus = false;
   String myTempChatText = "";
   bool inputTextHide = true;
+  bool isViewHere = false;
 
   @override
   void initState(){
@@ -61,18 +62,13 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
           _ticks = 3;
         }
       }
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _setImagePreLoad();
-      });
     }
     Config.contextForEmergencyBack = context;
     Config.isEmergencyRoot = false;
     _keyboardVisibilityController = CommonUtils.getKeyboardViewController(_functionForKeyboardShow, _functionForKeyboardHide);
     FireBaseController.setStateForForeground = null;
-  }
-
-  void _setImagePreLoad(){
-    precacheImage(const AssetImage('assets/images/chat_loading.gif'), context);
+    isViewHere = true;
+    _setAutoAnswerWidgetList();
   }
 
   KeyboardVisibilityController? _keyboardVisibilityController;
@@ -94,6 +90,11 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     Config.contextForEmergencyBack = null;
     _keyboardVisibilityController = null;
     AppMainViewState.isStart = false;
+    isViewHere = false;
+    widgetList.clear();
+    GetController.to.resetChatAutoAnswerWidgetList();
+    GetController.to.updateInputTextHide(true);
+    GetController.to.updateShowPickedFile(false);
     super.dispose();
   }
 
@@ -308,6 +309,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
       });
 
       if(context.mounted) {
+        isViewHere = false;
         UiUtils.closeLoadingPop(context);
         Navigator.pop(context);
       }
@@ -389,15 +391,21 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
       XFile? image = await CommonUtils.getCameraImage();
       if(image != null){
         isShowPickedFile = true;
+        GetController.to.updateShowPickedFile(isShowPickedFile);
         inputHelpHeight = inputHelpPickedFileHeight;
+        GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
         pickedFiles.add(File(image.path));
       }else{
         if(pickedFiles.isEmpty){
           isShowPickedFile = false;
+          GetController.to.updateShowPickedFile(isShowPickedFile);
           inputHelpHeight = inputHelpMinHeight;
+          GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
         }else{
           isShowPickedFile = true;
+          GetController.to.updateShowPickedFile(isShowPickedFile);
           inputHelpHeight = inputHelpPickedFileHeight;
+          GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
         }
       }
       setState(() {});
@@ -413,7 +421,9 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         if(files.length <= maximumSize){
           if(files.length+pickedFiles.length <= maximumSize){
             isShowPickedFile = true;
+            GetController.to.updateShowPickedFile(isShowPickedFile);
             inputHelpHeight = inputHelpPickedFileHeight;
+            GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
             for(var each in files){
               pickedFiles.add(each);
             }
@@ -426,10 +436,14 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
       }else{
         if(pickedFiles.isEmpty){
           isShowPickedFile = false;
+          GetController.to.updateShowPickedFile(isShowPickedFile);
           inputHelpHeight = inputHelpMinHeight;
+          GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
         }else{
           isShowPickedFile = true;
+          GetController.to.updateShowPickedFile(isShowPickedFile);
           inputHelpHeight = inputHelpPickedFileHeight;
+          GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
         }
       }
       setState(() {});
@@ -438,23 +452,186 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     }
   }
 
-  List<Widget> _getAutoAnswerWidgetList(){
-    List<String> answerList = ["자주하는 질문 💬", "나의정보 🔒", "대출현황 🏦", "심사결과 📑", "상담원 연결 🤓", "사진 📷", "가져오기 📤"];
-    List<Widget> widgetList = [];
+  String currentKey = "";
+  Map<String, dynamic> test = {
+    "질문1" :
+    {
+      "질문11" :
+      {
+        "질문112" :
+        {
+          "질문1122" : "답1122",
+          "질문1113" : "답1113"
+        },
+        "질문113" : "답113"
+      },
+      "질문12" : "답12",
+      "질문13" : "답13"
+    },
+
+    "질문2" :
+    {
+      "질문22":
+      {
+        "질문222" : "답222",
+        "질문223" : "답223"
+      },
+      "질문23": "답233"
+    },
+    "질문3" : "답3",
+    "질문4" : "답4"
+  };
+  List<String> _getAnswerListMap(String targetKey){
+    List<String> childKeys = [];
+    if(targetKey == ""){
+      test.forEach((key, value) {
+        childKeys.add(key);
+      });
+      return childKeys;
+    }else{
+      void searchChildKeys(Map<String, dynamic> currentMap) {
+        currentMap.forEach((key, value) {
+          if (key == targetKey && value is Map<String, dynamic>) {
+            childKeys.addAll(value.keys);
+          }
+          if (value is Map<String, dynamic>) {
+            searchChildKeys(value);
+          }
+        });
+      }
+
+      searchChildKeys(test);
+
+      return childKeys;
+    }
+  }
+  String _findPrevKey(String targetKey) {
+    String parentKey = "";
+
+    void searchParentKey(Map<String, dynamic> currentMap, String currentParent) {
+      if (currentMap.containsKey(targetKey)) {
+        parentKey = currentParent;
+      }else{
+        currentMap.forEach((key, value) {
+          if (value is Map<String, dynamic>) {
+            searchParentKey(value, key);
+          }
+        });
+      }
+    }
+
+    searchParentKey(test, "");
+    CommonUtils.log("", "parentKey : $parentKey");
+    return parentKey;
+  }
+
+  int _getLineFromAutoAnswerWidgetList(List<Widget> listWidget){
+    int cnt = 1;
+    for(int i = 0 ; i < listWidget.length ; i++){
+      if(listWidget[i].key != null){
+        cnt++;
+      }
+    }
+
+    return cnt;
+  }
+  List<Widget> widgetList = [];
+  void _setAutoAnswerWidgetList(){
+    widgetList.clear();
+    GetController.to.resetChatAutoAnswerWidgetList();
+    //List<String> answerList = ["자주하는 질문 💬", "나의정보 🔒", "대출현황 🏦", "심사결과 📑", "상담원 연결 🤓", "사진 📷", "가져오기 📤"];
+    List<String> answerList = _getAnswerListMap(currentKey);
+    CommonUtils.log("", "answerList : ${answerList.length}");
+    if(currentKey == ""){
+      answerList.add("사진");
+      answerList.add("가져오기");
+      answerList.add("채팅");
+    }else{
+      answerList.add("이전");
+    }
     for(var each in answerList){
-      widgetList.add(GestureDetector(child: UiUtils.getRoundedBorderTextWithFixedScale(each, 11.sp, FontWeight.w500, TextAlign.center, ColorStyles.upFinGray, ColorStyles.upFinRealGray),
+      Color borderColor = ColorStyles.upFinGray;
+      Color fillColor = ColorStyles.upFinWhiteGray;
+      Color textColor = ColorStyles.upFinBlack;
+      if(each == "이전"){
+        borderColor = ColorStyles.upFinKakaoYellow;
+        fillColor = ColorStyles.upFinKakaoYellow;
+        textColor = ColorStyles.upFinBlack;
+      }else if(each == "채팅"){
+        borderColor = ColorStyles.upFinButtonBlue;
+        fillColor = ColorStyles.upFinButtonBlue;
+        textColor = ColorStyles.upFinWhite;
+      }else if(each == "사진"){
+        borderColor = ColorStyles.upFinBlack;
+        fillColor = ColorStyles.upFinBlack;
+        textColor = ColorStyles.upFinWhite;
+      }else if(each == "가져오기"){
+        borderColor = ColorStyles.upFinBlack;
+        fillColor = ColorStyles.upFinBlack;
+        textColor = ColorStyles.upFinWhite;
+      }
+
+      if(each == "질문3"){
+        widgetList.add(Container(key: UniqueKey()));
+      }
+
+      if(each == "사진"){
+        widgetList.add(Container(key: UniqueKey()));
+      }
+
+      if(each == "이전"){
+        if(answerList.length != 1){
+          widgetList.add(Container(key: UniqueKey()));
+        }
+      }
+
+      widgetList.add(
+          GestureDetector(
+              child: UiUtils.getRoundedBoxTextWithFixedScale(each, 11.sp, FontWeight.w500, TextAlign.center, borderColor, fillColor, textColor),
       onTap: () async {
+        currentKey = each;
         if(each.contains("사진")){
           _setPickedImgFromCamera();
         }else if(each.contains("가져오기")){
           _setPickedFileFromDevice();
+        }else if(each.contains("채팅")){
+          inputTextHide = false;
+          GetController.to.updateInputTextHide(inputTextHide);
+          _setAutoAnswerWidgetList();
+        }else if(each.contains("이전")){
+          inputTextHide = true;
+          GetController.to.updateInputTextHide(inputTextHide);
+          String tempKey = _findPrevKey(answerList[0]);
+          currentKey = _findPrevKey(tempKey);
+          _setAutoAnswerWidgetList();
+          setState(() {});
         }else{
-
+          if(_getAnswerListMap(each).isNotEmpty){
+            _setAutoAnswerWidgetList();
+            setState(() {});
+          }else{
+            CommonUtils.flutterToast(each);
+          }
         }
       }));
     }
 
-    return widgetList;
+    _setAutoAnswerLineHeight();
+    GetController.to.updateChatAutoAnswerWidgetList(widgetList);
+    CommonUtils.log("", "updateChatAutoAnswerWidgetList : ${GetController.to.autoAnswerWidgetList.length}");
+  }
+
+  void _setAutoAnswerLineHeight(){
+    if(_getLineFromAutoAnswerWidgetList(widgetList) == 1){
+      inputHelpHeight = 6.h;
+      GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
+    }else if(_getLineFromAutoAnswerWidgetList(widgetList) == 2){
+      inputHelpHeight = 12.h;
+      GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
+    }else{
+      inputHelpHeight = 17.5.h;
+      GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
+    }
   }
 
   void _sendMessage(String message){
@@ -526,16 +703,19 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                   ]),
                 )),
             Positioned(top: 0.1.h, right: -3.3.w, child: UiUtils.getIconButtonWithHeight(2.h, Icons.cancel_rounded, 2.h, ColorStyles.upFinWhiteSky, () {
-              setState(() {
-                pickedFiles.removeAt(i);
-                if(pickedFiles.isEmpty){
-                  inputHelpHeight = inputHelpMinHeight;
-                  isShowPickedFile = false;
-                }else{
-                  inputHelpHeight = inputHelpPickedFileHeight;
-                  isShowPickedFile = true;
-                }
-              });
+              pickedFiles.removeAt(i);
+              if(pickedFiles.isEmpty){
+                inputHelpHeight = inputHelpMinHeight;
+                GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
+                isShowPickedFile = false;
+                GetController.to.updateShowPickedFile(isShowPickedFile);
+              }else{
+                inputHelpHeight = inputHelpPickedFileHeight;
+                GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
+                isShowPickedFile = true;
+                GetController.to.updateShowPickedFile(isShowPickedFile);
+              }
+              setState(() {});
             }))
           ])
       );
@@ -551,19 +731,13 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   double inputMinHeight = 9.2.h;
   double inputHeight = 9.2.h;
   double inputMaxHeight = 20.h;
-  double inputHelpMinHeight = 17.h;
-  double inputHelpPickedFileHeight = 43.h;
-  double inputHelpHeight = 17.h;
+  double inputHelpMinHeight = 17.5.h;
+  double inputHelpPickedFileHeight = 45.h;
+  double inputHelpHeight = 17.5.h;
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if(!CommonUtils.isValidStateByAPiExpiredDate()){
-        CommonUtils.flutterToast("접속시간이 만료되었습니다.\n재로그인 해주세요");
-        CommonUtils.backToHome(context);
-      }else{
-        await CommonUtils.saveSettingsToFile("push_from", "");
-        await CommonUtils.saveSettingsToFile("push_room_id", "");
-        CommonUtils.log("", "delete file");
+      if(isViewHere){
         isBuild = true;
         _scrollToBottom(false);
       }
@@ -601,83 +775,89 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
           UiUtils.getMarginBox(0, 3.h),
           UiUtils.getExpandedScrollViewWithController(Axis.vertical, Obx(()=>Column(mainAxisAlignment: MainAxisAlignment.start, children: _getChatList())), _chatScrollController),
           UiUtils.getMarginBox(0, 1.h),
-          UiUtils.getSizedScrollView(100.w, inputHelpHeight, Axis.vertical, Column(children: [
-            Wrap(runSpacing: 0.8.h, spacing: 1.5.w, alignment: WrapAlignment.end, direction: Axis.horizontal, children: _getAutoAnswerWidgetList()),
-            isShowPickedFile? Column(children: [
-              UiUtils.getSizedScrollView(90.w, 18.h, Axis.horizontal, _getPickedFilesWidget()),
-              UiUtils.getMarginBox(0, 1.h),
-              UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                  UiUtils.getTextWithFixedScale("전송", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
+          Obx((){
+            return SizedBox(width: 100.w, height: GetController.to.chatAutoAnswerHeight.value, child: Column(children: [
+              Align(alignment: Alignment.topRight, child: Padding(padding: EdgeInsets.only(right: 5.w),
+                  child: Wrap(runSpacing: 0.4.h, spacing: 1.5.w, alignment: WrapAlignment.end, direction: Axis.horizontal, children: GetController.to.autoAnswerWidgetList))),
+              GetController.to.isShowPickedFile.value? Column(children: [
+                UiUtils.getSizedScrollView(90.w, inputHelpMinHeight+1.h, Axis.horizontal, _getPickedFilesWidget()),
+                UiUtils.getMarginBox(0, 2.3.h),
+                UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+                    UiUtils.getTextWithFixedScale("전송", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
 
-                  }),
-              UiUtils.getMarginBox(0, 1.h),
-            ]) : Container()
-          ])),
+                    }),
+              ]) : Container()
+            ]));
+          }),
           UiUtils.getMarginBox(0, 0.8.h),
-          !inputTextHide? Container() : AnimatedContainer(
-              duration: const Duration(milliseconds:200),
-              width: 100.w,
-              height: inputHeight,
-              constraints: BoxConstraints(
-                minHeight: inputMinHeight,
-                maxHeight: inputMaxHeight,
-              ),
-              color: ColorStyles.upFinWhite,
-              child: Padding(padding: EdgeInsets.only(left: 3.w,right: 3.w,bottom: 2.w,top: 0.5.w), child:
-              Container(
-                  decoration: BoxDecoration(
-                    color: ColorStyles.upFinGray, // 배경색 설정
-                    borderRadius: BorderRadius.circular(20.0), // 모서리를 둥글게 하는 부분
-                  ),
-                  padding: EdgeInsets.all(0.35.w),
-                  child: Container(
-                      decoration: BoxDecoration(
-                        color: ColorStyles.upFinWhite, // 배경색 설정
-                        borderRadius: BorderRadius.circular(18.0), // 모서리를 둥글게 하는 부분
-                      ),
-                      child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-                        UiUtils.getMarginBox(1.5.w, 0),
-                    Expanded(flex: 75, child: Column(children: [UiUtils.getExpandedScrollView(Axis.vertical,
-                        Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                          UiUtils.getMarginBox(0, 0.7.h),
-                          UiUtils.getChatTextField(70.w, TextStyles.upFinTextFormFieldTextStyle, _chatTextFocus, _chatTextController, TextInputType.multiline,
-                              UiUtils.getChatInputDecoration(), (textValue) {
-                                if(textValue != ""){
-                                  isTextFieldFocus = true;
-                                  final textLinePainter = TextPainter(
-                                    text: TextSpan(text: textValue, style: TextStyles.upFinTextFormFieldTextStyle),
-                                    maxLines: null,
-                                    textDirection: TextDirection.ltr,
-                                  )..layout(minWidth: 0, maxWidth: 67.w);
+          Obx((){
+            return GetController.to.isInputTextHide.value? Container() : AnimatedContainer(
+                duration: const Duration(milliseconds:200),
+                width: 100.w,
+                height: inputHeight,
+                constraints: BoxConstraints(
+                  minHeight: inputMinHeight,
+                  maxHeight: inputMaxHeight,
+                ),
+                color: ColorStyles.upFinWhite,
+                child: Padding(padding: EdgeInsets.only(left: 3.w,right: 3.w,bottom: 2.w,top: 0.5.w), child:
+                Container(
+                    decoration: BoxDecoration(
+                      color: ColorStyles.upFinGray, // 배경색 설정
+                      borderRadius: BorderRadius.circular(20.0), // 모서리를 둥글게 하는 부분
+                    ),
+                    padding: EdgeInsets.all(0.35.w),
+                    child: Container(
+                        decoration: BoxDecoration(
+                          color: ColorStyles.upFinWhite, // 배경색 설정
+                          borderRadius: BorderRadius.circular(18.0), // 모서리를 둥글게 하는 부분
+                        ),
+                        child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                          UiUtils.getMarginBox(1.5.w, 0),
+                          Expanded(flex: 75, child: Column(children: [UiUtils.getExpandedScrollView(Axis.vertical,
+                              Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                                UiUtils.getMarginBox(0, 0.7.h),
+                                UiUtils.getChatTextField(70.w, TextStyles.upFinTextFormFieldTextStyle, _chatTextFocus, _chatTextController, TextInputType.multiline,
+                                    UiUtils.getChatInputDecoration(), (textValue) {
+                                      if(textValue != ""){
+                                        isTextFieldFocus = true;
+                                        final textLinePainter = TextPainter(
+                                          text: TextSpan(text: textValue, style: TextStyles.upFinTextFormFieldTextStyle),
+                                          maxLines: null,
+                                          textDirection: TextDirection.ltr,
+                                        )..layout(minWidth: 0, maxWidth: 67.w);
 
-                                  if(inputHeight <= inputMaxHeight){
-                                    final desiredHeight = inputMinHeight*0.7+textLinePainter.height;
-                                    final height = desiredHeight.clamp(inputMinHeight, inputMaxHeight);
-                                    setState(() {
-                                      inputHeight = height;
-                                    });
-                                  }
-                                }else{
+                                        if(inputHeight <= inputMaxHeight){
+                                          final desiredHeight = inputMinHeight*0.7+textLinePainter.height;
+                                          final height = desiredHeight.clamp(inputMinHeight, inputMaxHeight);
+                                          setState(() {
+                                            inputHeight = height;
+                                          });
+                                        }
+                                      }else{
+                                        setState(() {
+                                          isTextFieldFocus = false;
+                                          inputHeight = inputMinHeight;
+                                        });
+                                      }
+                                    })
+                              ]))])),
+                          Expanded(flex: 1, child: Container(color: ColorStyles.upFinWhite)),
+                          Expanded(flex: 15, child:
+                          UiUtils.getIconButtonWithHeight(14.w, Icons.arrow_circle_up_rounded, 14.w,
+                              isTextFieldFocus? ColorStyles.upFinButtonBlue : ColorStyles.upFinWhiteSky, () {
+                                if(_chatTextController.text.toString().trim() != ""){
+                                  _sendMessage(_chatTextController.text);
                                   setState(() {
+                                    _chatTextController.text = "";
                                     isTextFieldFocus = false;
-                                    inputHeight = inputMinHeight;
                                   });
                                 }
                               })
-                        ]))])),
-                    Expanded(flex: 1, child: Container(color: ColorStyles.upFinWhite)),
-                    Expanded(flex: 15, child:
-                    UiUtils.getIconButtonWithHeight(14.w, Icons.arrow_circle_up_rounded, 14.w,
-                        isTextFieldFocus? ColorStyles.upFinButtonBlue : ColorStyles.upFinWhiteSky, () {
-                          _sendMessage(_chatTextController.text);
-                          setState(() {
-                            _chatTextController.text = "";
-                            isTextFieldFocus = false;
-                          });
-                        })
-                    ),
-                  ]))))
-          )
+                          ),
+                        ]))))
+            );
+          })
         ])
     );
     return UiUtils.getViewWithAllowBackForAndroid(context, view, back);

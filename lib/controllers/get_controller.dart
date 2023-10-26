@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:upfin/datas/accident_info_data.dart';
 import 'package:upfin/datas/chat_message_info_data.dart';
 import 'package:upfin/datas/chatroom_info_data.dart';
@@ -30,6 +31,11 @@ class GetController extends GetxController {
   RxInt lastVisibleItem2_2 = 0.obs;
   RxInt firstVisibleItem2_3= 0.obs;
   RxInt lastVisibleItem2_3 = 0.obs;
+
+  RxDouble chatAutoAnswerHeight = 0.0.obs;
+  RxBool isInputTextHide = false.obs;
+  RxList<Widget> autoAnswerWidgetList = <Widget>[].obs;
+  RxBool isShowPickedFile = false.obs;
 
   @override
   void onInit() {
@@ -196,4 +202,24 @@ class GetController extends GetxController {
   void resetLastIndex2_3() {
     lastVisibleItem2_3 = 0.obs;
   }
+
+  void updateChatAutoAnswerHeight(double newValue) {
+    chatAutoAnswerHeight.value = newValue;
+  }
+  void updateInputTextHide(bool newValue) {
+    isInputTextHide.value = newValue;
+  }
+  void updateChatAutoAnswerWidgetList(List<Widget> newList) {
+    autoAnswerWidgetList.clear();
+    autoAnswerWidgetList.assignAll(newList);
+  }
+  void resetChatAutoAnswerWidgetList() {
+    List<Widget> emptyList = [];
+    autoAnswerWidgetList.clear();
+    autoAnswerWidgetList.assignAll(emptyList);
+  }
+  void updateShowPickedFile(bool newValue) {
+    isShowPickedFile.value = newValue;
+  }
+
 }

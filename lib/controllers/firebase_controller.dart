@@ -146,7 +146,6 @@ class FireBaseController{
   static Future<void> _handlerForFirebaseMessagingOnForeground(RemoteMessage message,
       FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin, AndroidNotificationChannel? channel) async {
     CommonUtils.log("", "fcm foreground message : ${message.toString()}");
-    await CommonUtils.saveSettingsToFile("push_from", "F");
     if (message.notification != null) {
       Map<String, dynamic> resultData = message.data;
       if (resultData.containsKey("room_id")) {
@@ -194,7 +193,6 @@ class FireBaseController{
   }
   
   static Future<void> _handlerForFirebaseMessagingOnBackground(RemoteMessage message) async {
-    await CommonUtils.saveSettingsToFile("push_from", "B");
     await _initFirebase((bool isSuccess) async {
       if(isSuccess){
         CommonUtils.log("", "firebase init on background");
@@ -260,6 +258,7 @@ class FireBaseController{
 
   static Future<void> backgroundHandler(NotificationResponse details) async {
     CommonUtils.log("", "[Background] onDidReceiveNotificationResponse : ${details.id} || ${details.payload}");
+    await CommonUtils.saveSettingsToFile("push_from", "B");
     await CommonUtils.saveSettingsToFile("push_room_id", "${details.payload}");
     await CommonUtils.printSettingsFromFile();
     if(setStateForForeground != null){
@@ -270,6 +269,7 @@ class FireBaseController{
 
   static Future<void> foregroundHandler(NotificationResponse details) async {
     CommonUtils.log("", "[Foreground] onDidReceiveNotificationResponse : ${details.id} || ${details.payload}");
+    await CommonUtils.saveSettingsToFile("push_from", "F");
     await CommonUtils.saveSettingsToFile("push_room_id", "${details.payload}");
     await CommonUtils.printSettingsFromFile();
     if(setStateForForeground != null){

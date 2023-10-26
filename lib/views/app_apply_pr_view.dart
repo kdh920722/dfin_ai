@@ -116,17 +116,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   int nhisCount = 0;
   int ntsCount = 0;
 
-  void _setImagePreLoad(){
-    precacheImage(const AssetImage('assets/images/img_id_card.png'), context);
-    precacheImage(const AssetImage('assets/images/kakao_icon.png'), context);
-    precacheImage(const AssetImage('assets/images/naver_icon.png'), context);
-    precacheImage(const AssetImage('assets/images/pass_icon.png'), context);
-    precacheImage(const AssetImage('assets/images/toss_icon.png'), context);
-    precacheImage(const AssetImage('assets/images/logo_nice_square.png'), context);
-    precacheImage(const AssetImage('assets/images/bank_logo_default.png'), context);
-    precacheImage(const AssetImage('assets/images/bank_logo_safe.png'), context);
-  }
-
   void _initDocsList(){
     currentViewId = 1;
     addedDocsList.clear();
@@ -476,9 +465,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     _addressInfoTextController.addListener(_addressTextControllerListener);
     _bankAccountInfoTextController.addListener(_bankAccountInfoTextControllerListener);
     _businessNumberInfoTextController.addListener(_businessNumberTextControllerListener);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _setImagePreLoad();
-    });
     availableCameras().then((cameras) {
       if (cameras.isNotEmpty && _cameraController == null) {
         _cameraController = CameraController(
@@ -873,7 +859,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           SizedBox(width: 90.w,
               child: Row(children: [
                 UiUtils.getMarginBox(3.w, 0),
-                UiUtils.getTextButtonWithFixedScale("•  인가후대출금액 ${CommonUtils.getPriceCommaFormattedString(double.parse(MyData.selectedAccidentInfoData!.accidentLendAmount))}",
+                UiUtils.getTextButtonWithFixedScale("•  인가후대출금액 ${CommonUtils.getPriceFormattedString(double.parse(MyData.selectedAccidentInfoData!.accidentLendAmount))}",
                     13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
               ])
@@ -1465,40 +1451,39 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         UiUtils.getMarginBox(0, 3.w),
         SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("주소를 입력해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
         // SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-        UiUtils.getMarginBox(0, 3.h),
+        UiUtils.getMarginBox(0, 5.h),
         SizedBox(width: 85.w, height: 10.h,
-            child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-              UiUtils.getTextField(75.w, TextStyles.upFinSmallTextFormFieldTextStyle, _addressInfoFocus,
-                  _addressInfoTextController, TextInputType.text, UiUtils.getInputDecoration("등본상 주소", 12.sp, "", 0.sp), (value) { }),
-              UiUtils.getMarginBox(1.w, 0),
-              Padding(padding: EdgeInsets.only(bottom: 1.h), child: UiUtils.getIconButton(Icons.search, 8.w, ColorStyles.upFinButtonBlue, () {
-                if(_addressInfoTextController.text.trim() != ""){
-                  CommonUtils.hideKeyBoard();
-                  selectedAddressKey = null;
-                  selectedAddressInfo = "";
-                  addressList.clear();
-                  UiUtils.showLoadingPop(context);
-                  JusoController.getAddressFromJuso(_addressInfoTextController.text,(bool isSuccess, outputList){
-                    UiUtils.closeLoadingPop(context);
-                    if(isSuccess){
-                      if(outputList!.isNotEmpty){
-                        for(var eachAddress in outputList){
-                          addressList.add(<String, String>
-                          {"jibunAddr" : eachAddress["jibunAddr"],
-                            "roadAddr" : eachAddress["roadAddr"],
-                            "roadAddrPart1" : eachAddress["roadAddrPart1"]});
-                        }
-                        setState(() {});
+            child: UiUtils.getTextField(80.w, TextStyles.upFinSmallTextFormFieldTextStyle, _addressInfoFocus,
+                _addressInfoTextController, TextInputType.text, UiUtils.getInputDecorationForAddress("등본상 주소", 12.sp,
+                    UiUtils.getIconButton(Icons.search, 8.w, ColorStyles.upFinButtonBlue, () {
+                      if(_addressInfoTextController.text.trim() != ""){
+                        CommonUtils.hideKeyBoard();
+                        selectedAddressKey = null;
+                        selectedAddressInfo = "";
+                        addressList.clear();
+                        UiUtils.showLoadingPop(context);
+                        JusoController.getAddressFromJuso(_addressInfoTextController.text,(bool isSuccess, outputList){
+                          UiUtils.closeLoadingPop(context);
+                          if(isSuccess){
+                            if(outputList!.isNotEmpty){
+                              for(var eachAddress in outputList){
+                                addressList.add(<String, String>
+                                {"jibunAddr" : eachAddress["jibunAddr"],
+                                  "roadAddr" : eachAddress["roadAddr"],
+                                  "roadAddrPart1" : eachAddress["roadAddrPart1"]});
+                              }
+                              setState(() {});
+                            }else{
+                              CommonUtils.flutterToast("검색 결과가 없습니다.");
+                            }
+                          }
+                        });
                       }else{
-                        CommonUtils.flutterToast("검색 결과가 없습니다.");
+                        CommonUtils.flutterToast("주소를 입력해주세요.");
                       }
-                    }
-                  });
-                }else{
-                  CommonUtils.flutterToast("주소를 입력해주세요.");
-                }
-              }))
-            ])),
+                    })
+                ), (value) { })
+        ),
         UiUtils.getMarginBox(0, 2.h),
         UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: addressWidgetList)),
         UiUtils.getMarginBox(0, 3.h),
@@ -1700,7 +1685,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
                     //check real id
                      if(map['id_type'] == "dl"){
-                      CommonUtils.log("i", "dl : infos\n${map["code"][0]["formatted"]["value"]}${map["num"][0]["formatted"]["value"]}");
+                      CommonUtils.log("d", "dl : infos\n${map["code"][0]["formatted"]["value"]}${map["num"][0]["formatted"]["value"]}");
                       String licenseNum = map["num"][0]["formatted"]["value"];
                       Map<String, dynamic> inputJson = {
                         "ownerNm": MyData.name,
@@ -1735,7 +1720,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                         }
                       });
                     }else{
-                      CommonUtils.log("i", "ic : infos\n${map["issueDate"][0]["formatted"]["year"]}${map["issueDate"][0]["formatted"]["month"]}${map["issueDate"][0]["formatted"]["day"]}");
+                      CommonUtils.log("d", "ic : infos\n${map["issueDate"][0]["formatted"]["year"]}${map["issueDate"][0]["formatted"]["month"]}${map["issueDate"][0]["formatted"]["day"]}");
                       Map<String, dynamic> inputJson = {
                         "ownerNm": MyData.name,
                         "juminNo": MyData.idNumber.replaceAll("-", ""),
@@ -2516,7 +2501,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           SizedBox(width: 90.w,
               child: Row(children: [
                 UiUtils.getMarginBox(3.w, 0),
-                UiUtils.getTextButtonWithFixedScale("•  인가후대출금액 ${CommonUtils.getPriceCommaFormattedString(double.parse(MyData.selectedAccidentInfoData!.accidentLendAmount))}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                UiUtils.getTextButtonWithFixedScale("•  인가후대출금액 ${CommonUtils.getPriceFormattedString(double.parse(MyData.selectedAccidentInfoData!.accidentLendAmount))}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
               ])
           )
@@ -2588,7 +2573,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           SizedBox(width: 90.w,
               child: Row(children: [
                 UiUtils.getMarginBox(3.w, 0),
-                UiUtils.getTextButtonWithFixedScale("•  대출희망금액 ${CommonUtils.getPriceCommaFormattedString(double.parse(MyData.selectedAccidentInfoData!.accidentWishAmount))}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                UiUtils.getTextButtonWithFixedScale("•  대출희망금액 ${CommonUtils.getPriceFormattedString(double.parse(MyData.selectedAccidentInfoData!.accidentWishAmount))}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
               ])
           )
@@ -2803,13 +2788,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if(!CommonUtils.isValidStateByAPiExpiredDate()){
-        CommonUtils.flutterToast("접속시간이 만료되었습니다.\n재로그인 해주세요");
-        CommonUtils.backToHome(context);
-      }
-    });
-
     Widget? view;
     if(currentViewId == addedDocsInfoIntroViewId){
       view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getIntroView());

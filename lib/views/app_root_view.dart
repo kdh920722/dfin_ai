@@ -82,6 +82,24 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
     precacheImage(const AssetImage('assets/images/img_man_searcher.png'), context);
     precacheImage(const AssetImage('assets/images/logo_kakao_circle.png'), context);
     precacheImage(const AssetImage('assets/images/logo_apple_circle.png'), context);
+    precacheImage(const AssetImage('assets/images/img_man_banner.png'), context);
+    precacheImage(const AssetImage('assets/images/img_man_welcome.png'), context);
+    precacheImage(const AssetImage('assets/images/img_man_searcher.png'), context);
+    precacheImage(const AssetImage('assets/images/img_woman_searcher.png'), context);
+    precacheImage(const AssetImage('assets/images/img_woman_searcher_01.png'), context);
+    precacheImage(const AssetImage('assets/images/img_woman_coffee.png'), context);
+    precacheImage(const AssetImage('assets/images/img_woman_sports.png'), context);
+    precacheImage(const AssetImage('assets/images/accident_icon.png'), context);
+    precacheImage(const AssetImage('assets/images/bank_logo_default.png'), context);
+    precacheImage(const AssetImage('assets/images/bank_logo_safe.png'), context);
+    precacheImage(const AssetImage('assets/images/ani_man_search.gif'), context);
+    precacheImage(const AssetImage('assets/images/img_id_card.png'), context);
+    precacheImage(const AssetImage('assets/images/kakao_icon.png'), context);
+    precacheImage(const AssetImage('assets/images/naver_icon.png'), context);
+    precacheImage(const AssetImage('assets/images/pass_icon.png'), context);
+    precacheImage(const AssetImage('assets/images/toss_icon.png'), context);
+    precacheImage(const AssetImage('assets/images/logo_nice_square.png'), context);
+    precacheImage(const AssetImage('assets/images/chat_loading.gif'), context);
   }
 
   Future<void> _initFirebase() async {

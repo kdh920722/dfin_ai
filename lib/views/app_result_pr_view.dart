@@ -32,9 +32,6 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
     setPrCnt();
     MyData.selectedPrInfoData = null;
     _tabController = TabController(length: 2, vsync: this);
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _setImagePreLoad();
-    });
 
     for(var each in MyData.getPrInfoList()){
       if(each.isPossible){
@@ -112,11 +109,6 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
         MyData.sortPrInfoListBy(isOrderByLimit);
       });
     }
-  }
-
-  void _setImagePreLoad(){
-    precacheImage(const AssetImage('assets/images/bank_logo_default.png'), context);
-    precacheImage(const AssetImage('assets/images/bank_logo_safe.png'), context);
   }
 
   List<Widget> _getMsgListIWidget(List<String> msgList){
@@ -246,13 +238,6 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if(!CommonUtils.isValidStateByAPiExpiredDate()){
-        CommonUtils.flutterToast("접속시간이 만료되었습니다.\n재로그인 해주세요");
-        CommonUtils.backToHome(context);
-      }
-    });
-
     Widget view = Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: Column(children: [
       Row(children: [
         const Spacer(flex: 2),

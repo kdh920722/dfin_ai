@@ -166,9 +166,9 @@ class UiUtils {
       child: Text(text, style: TextStyle(decoration: TextDecoration.none, height: 1, fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor)));
   }
 
-  static Widget getRoundedBorderTextWithFixedScale(String text, double fontSize, FontWeight fontWeight, TextAlign? textAlign, Color borderColor, Color textColor){
+  static Widget getRoundedBoxTextWithFixedScale(String text, double fontSize, FontWeight fontWeight, TextAlign? textAlign, Color borderColor, Color fillColor, Color textColor){
     return Container(padding: EdgeInsets.only(top: 3.w, bottom: 3.w, left: 3.w, right: 3.w), // 텍스트 주위에 여백 추가
-        decoration: BoxDecoration(border: Border.all(color: borderColor, width: 0.32.w), borderRadius: BorderRadius.circular(20)),
+        decoration: BoxDecoration(color: fillColor, border: Border.all(color: borderColor, width: 0.22.w), borderRadius: BorderRadius.circular(20)),
         child: Text(text, style: TextStyle(decoration: TextDecoration.none, height: 1, fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor)));
   }
 
@@ -606,6 +606,29 @@ class UiUtils {
     );
   }
 
+  static InputDecoration getInputDecorationForAddress(String labelText, double labelTextSize, Widget iconWidget){
+    return InputDecoration(
+        labelText: labelText,
+        floatingLabelBehavior: FloatingLabelBehavior.auto,
+        labelStyle: TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "SpoqaHanSansNeo", color: ColorStyles.upFinTextAndBorderBlue, fontSize: labelTextSize, fontWeight: FontWeight.w500),
+        hintText: "",
+        isDense: true,
+        suffixIcon: iconWidget,
+        suffixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
+        errorStyle: TextStyle(fontSize: 0.sp),
+        enabledBorder: const UnderlineInputBorder(
+            borderSide: BorderSide(color: ColorStyles.upFinButtonBlue)),
+
+        focusedBorder: UnderlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: const BorderSide(color: ColorStyles.upFinButtonBlue),
+        ),
+        errorBorder: const UnderlineInputBorder(borderSide: BorderSide(color: ColorStyles.upFinRed)),
+        filled: true,
+        fillColor: ColorStyles.upFinWhite
+    );
+  }
+
   static InputDecoration getDisabledInputDecoration(String labelText, double labelTextSize, String counterText, double counterTextSize){
     return InputDecoration(
         labelText: labelText,
@@ -704,10 +727,13 @@ class UiUtils {
 
   static bool isInitAgree = false;
   static List<Map<String, dynamic>> agreeInfoList = [];
+  static ScrollController _agreeScrollController = ScrollController();
   static void _resetAgreeInfo(){
     isInitAgree = false;
     agreeInfoList.clear();
     agreeInfoList = [];
+    _agreeScrollController.dispose();
+    _agreeScrollController = ScrollController();
     for(int i = 0 ; i <LogfinController.agreeDocsList.length ; i++){
       LogfinController.agreeDocsList[i]["isAgree"] = false;
     }
@@ -909,6 +935,16 @@ class UiUtils {
       ));
     }
 
+    String getMaxDetailType(String detailType){
+      int maxDetailType = 0;
+      for(int i = 0 ; i < agreeInfoList.length ; i++){
+        int eachDetailType = int.parse(agreeInfoList[i]["detailType"].toString().split("@")[1]);
+        if(maxDetailType < eachDetailType) maxDetailType = eachDetailType;
+      }
+
+      return maxDetailType.toString();
+    }
+
     List<Widget> getTypeAgreeWidgetList(String type, String detailType){
       List<Widget> widgetList = [];
       List<Map<String,dynamic>> agreeTypeInfoList = [];
@@ -936,6 +972,22 @@ class UiUtils {
         ExpansionTileWithoutBorderItem(
             title: titleWidget,
             childrenPadding: EdgeInsets.zero,tilePadding: EdgeInsets.zero, iconColor: ColorStyles.upFinBlack,
+            onExpansionChanged: (isExpanded){
+              if (isExpanded) {
+                if(detailType == getMaxDetailType(detailType)){
+                  Future.delayed(const Duration(milliseconds: 200), () async {
+                    if(_agreeScrollController.hasClients){
+                      _agreeScrollController.animateTo(
+                        _agreeScrollController.position.maxScrollExtent,
+                        duration: const Duration(milliseconds: 250),
+                        curve: Curves.ease,
+                      );
+                    }
+                  });
+
+                }
+              }
+            },
             children: titleChildWidgetList),
       );
 
@@ -951,7 +1003,6 @@ class UiUtils {
           currentDetailType = agreeInfoList[i]["detailType"].toString().split("@")[1];
         }
       }
-
       return widgetList;
     }
 
@@ -989,9 +1040,9 @@ class UiUtils {
             });
           }),
           UiUtils.getMarginBox(0, 2.h),
-          UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
+          UiUtils.getExpandedScrollViewWithController(Axis.vertical, Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
             Column(crossAxisAlignment:CrossAxisAlignment.start, children: getAgreeWidgetList()),
-          ])),
+          ]), _agreeScrollController),
           UiUtils.getMarginBox(0, 1.5.h),
           isTypeAgree("1") ? UiUtils.getTextButtonBox(90.w, "동의하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, onPressedCallback)
               : UiUtils.getTextButtonBox(90.w, "동의하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinGray, () {})

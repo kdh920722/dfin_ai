@@ -220,13 +220,6 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if(!CommonUtils.isValidStateByAPiExpiredDate()){
-        CommonUtils.flutterToast("접속시간이 만료되었습니다.\n재로그인 해주세요");
-        CommonUtils.backToHome(context);
-      }
-    });
-
     Widget view = Container(
       color: ColorStyles.upFinWhite,
       width: 100.w,

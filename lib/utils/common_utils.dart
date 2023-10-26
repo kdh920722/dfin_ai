@@ -895,7 +895,6 @@ class CommonUtils {
 
   static Future<File> get _localFile async {
     Directory directory = await getApplicationDocumentsDirectory();
-    CommonUtils.log("", "_localFile path : ${directory.path}/push_settings.json");
     return File("${directory.path}/push_settings.json");
   }
 
