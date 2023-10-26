@@ -889,7 +889,8 @@ class CommonUtils {
       result = false;
     }
 
-    return result;
+    //return result;
+    return true;
   }
 
   static Future<File> get _localFile async {

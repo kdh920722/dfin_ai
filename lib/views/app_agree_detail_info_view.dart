@@ -59,13 +59,6 @@ class AppAgreeDetailInfoViewState extends State<AppAgreeDetailInfoView> with Wid
 
   @override
   Widget build(BuildContext context) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if(!CommonUtils.isValidStateByAPiExpiredDate()){
-        CommonUtils.flutterToast("접속시간이 만료되었습니다.\n재로그인 해주세요");
-        CommonUtils.backToHome(context);
-      }
-    });
-
     Map<String, dynamic> agreeInfo = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
     String title = agreeInfo["title"].toString();
     Widget subContents = agreeInfo["contents"] as Widget;
