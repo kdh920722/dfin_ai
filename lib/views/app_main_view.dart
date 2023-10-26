@@ -134,8 +134,8 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                         UiUtils.getMarginBox(0, 1.h),
                         SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("개인회생사건 등록", 22.sp, FontWeight.w800, ColorStyles.upFinWhite, TextAlign.start, null)),
                         UiUtils.getMarginBox(0, 5.h),
-                        UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
-                            UiUtils.getTextWithFixedScale("+ 추가하기", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, null), () {
+                        UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
+                            UiUtils.getTextWithFixedScale("✚ 추가하기", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, null), () {
                               Navigator.pop(slideContext);
                               CommonUtils.moveTo(context, AppView.appSearchAccidentView.value, null);
                             }),

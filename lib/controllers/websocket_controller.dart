@@ -122,7 +122,7 @@ class WebSocketController {
                     }
 
                     subCnt++;
-                    if(subscribedRoomIds.length == subCnt){
+                    if(MyData.getChatRoomInfoList().length == subCnt){
                       GetController.to.updateAllSubScribed(true);
                     }
 
