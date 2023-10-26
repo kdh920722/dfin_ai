@@ -345,6 +345,8 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                         GetController.to.updateConfirmed(isConfirmed);
                         CommonUtils.flutterToast("환영합니다!");
                         // 캐시 데이터 저장
+                        await CommonUtils.saveSettingsToFile("push_from", "");
+                        await CommonUtils.saveSettingsToFile("push_room_id", "");
                         await LogfinController.getMainViewInfo((isSuccessToGetMainInfo){
                           UiUtils.closeLoadingPop(context);
                           if(isSuccessToGetMainInfo){

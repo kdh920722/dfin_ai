@@ -48,8 +48,15 @@ class LogfinController {
       if(each["type"] == type) result = each["result"]["title"];
     }
 
-    if(result.length > 21){
-      result = "${result.substring(0,21)}\n${result.substring(21)}";
+    if(result.length > 25){
+      String front = result.substring(0,25);
+      String back = result.substring(25);
+      if(back.length > 1){
+        if(back.substring(0,1) == " "){
+          back =  result.substring(26);
+        }
+      }
+      result = "$front\n$back";
     }
     return result;
   }
