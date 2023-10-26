@@ -1998,7 +1998,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     //2 : fail result
     int resultType = 0;
     if(resultMap.containsKey("resultValue")){
-      if(resultMap["resultValue"].isNotEmpty){
+      if(resultMap["resultValue"] != null){
         CommonUtils.log("i", "result ==> ${resultMap["resultValue"]}");
         Map<String, dynamic> resultDataMap = resultMap["resultValue"];
         if(resultDataMap.isNotEmpty){

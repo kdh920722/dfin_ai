@@ -906,9 +906,7 @@ class CommonUtils {
     try {
       final contents = await file.readAsString();
       settings = jsonDecode(contents);
-      CommonUtils.log("", "contents : $contents");
     } catch (error) {
-      CommonUtils.log("", "readSettingsFromFile error : $error");
       settings = {
         "push_from": "",
         "push_room_id": ""
@@ -933,5 +931,26 @@ class CommonUtils {
     await file.writeAsString(
       jsonEncode(settings),
     );
+  }
+
+  static Future<void> printSettingsFromFile() async {
+    final file = await _localFile;
+
+    Map<String, dynamic> settings;
+    try {
+      final contents = await file.readAsString();
+      settings = jsonDecode(contents);
+      CommonUtils.log("", "print settings : ${jsonEncode(settings)}");
+    } catch (error) {
+      CommonUtils.log("", "readSettingsFromFile error : $error");
+      settings = {
+        "push_from": "",
+        "push_room_id": ""
+      };
+
+      file.writeAsString(
+        jsonEncode(settings),
+      );
+    }
   }
 }

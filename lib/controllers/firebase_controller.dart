@@ -261,6 +261,7 @@ class FireBaseController{
   static Future<void> backgroundHandler(NotificationResponse details) async {
     CommonUtils.log("", "[Background] onDidReceiveNotificationResponse : ${details.id} || ${details.payload}");
     await CommonUtils.saveSettingsToFile("push_room_id", "${details.payload}");
+    await CommonUtils.printSettingsFromFile();
     if(setStateForForeground != null){
       CommonUtils.log("", "not null");
       setStateForForeground!((){});
@@ -270,6 +271,7 @@ class FireBaseController{
   static Future<void> foregroundHandler(NotificationResponse details) async {
     CommonUtils.log("", "[Foreground] onDidReceiveNotificationResponse : ${details.id} || ${details.payload}");
     await CommonUtils.saveSettingsToFile("push_room_id", "${details.payload}");
+    await CommonUtils.printSettingsFromFile();
     if(setStateForForeground != null){
       CommonUtils.log("", "not null");
       setStateForForeground!((){});

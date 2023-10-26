@@ -58,7 +58,7 @@ class HyphenController {
           "Hkey": hkey,
         },
         body: jsonEncode(inputJson),
-      );
+      ).timeout(const Duration(seconds: 30));
 
       final json = jsonDecode(response.body);
       CommonUtils.log('i', 'out full : \n$json');

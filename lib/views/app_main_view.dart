@@ -60,6 +60,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     Config.contextForEmergencyBack = null;
     WebSocketController.resetConnectWebSocketCable();
     AppMainViewState.isStart = false;
+    FireBaseController.setStateForForeground = null;
     super.dispose();
   }
 
@@ -631,7 +632,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
       UiUtils.showLoadingPop(context);
       Map<String, dynamic> map = await CommonUtils.readSettingsFromFile();
       if(map["push_room_id"] != ""){
-        CommonUtils.log("", "push_room_id1: ${map["push_room_id"]}");
+        CommonUtils.log("", "push_room_id: ${map["push_room_id"]}");
         if(map["push_from"] == "F"){
           bool isHere = false;
           for(var each in MyData.getChatRoomInfoList()){

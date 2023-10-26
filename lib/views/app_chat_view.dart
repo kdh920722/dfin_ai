@@ -287,14 +287,18 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     return chatList;
   }
 
-  void back(){
+  Future<void> back() async {
     if(backPossibleFlag){
       backPossibleFlag = false;
       CommonUtils.hideKeyBoard();
       var inputJson = {
         "pr_room_id" : currentRoomId
       };
-      LogfinController.callLogfinApi(LogfinApis.checkMessage, inputJson, (isSuccess, outputJson){
+      UiUtils.showLoadingPop(context);
+      await CommonUtils.saveSettingsToFile("push_from", "");
+      await CommonUtils.saveSettingsToFile("push_room_id", "");
+      CommonUtils.log("", "delete file");
+      await LogfinController.callLogfinApi(LogfinApis.checkMessage, inputJson, (isSuccess, outputJson){
         backPossibleFlag =true;
         if(isSuccess){
 
@@ -302,7 +306,11 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
           CommonUtils.flutterToast("메시지를 읽는중\n오류가 발생했습니다.");
         }
       });
-      Navigator.pop(context);
+
+      if(context.mounted) {
+        UiUtils.closeLoadingPop(context);
+        Navigator.pop(context);
+      }
     }
   }
 

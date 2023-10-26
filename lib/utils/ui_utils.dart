@@ -939,9 +939,8 @@ class UiUtils {
       String currentDetailType = "";
       for(int i = 0 ; i < agreeInfoList.length ; i++){
         if(currentDetailType != agreeInfoList[i]["detailType"].toString().split("@")[1]){
-          CommonUtils.log("i","$currentDetailType || ${agreeInfoList[i]["detailType"].toString()}");
           widgetList.addAll(getTypeAgreeWidgetList(agreeInfoList[i]["type"].toString().substring(0,1), agreeInfoList[i]["detailType"].toString().split("@")[1]));
-          if(currentDetailType != "") widgetList.add(UiUtils.getMarginBox(0, 1.5.h));
+          widgetList.add(UiUtils.getMarginBox(0, 1.5.h));
           currentDetailType = agreeInfoList[i]["detailType"].toString().split("@")[1];
         }
       }

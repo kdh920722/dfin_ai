@@ -103,7 +103,7 @@ class CodeFController{
             'Content-Type': 'application/json'
           },
           body: jsonEncode(inputJson)
-      );
+      ).timeout(const Duration(seconds: 60));
 
       if(response.statusCode == 200) {
         final decodedResponseBody = Uri.decodeFull(response.body);
