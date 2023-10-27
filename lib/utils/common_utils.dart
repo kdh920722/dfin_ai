@@ -796,8 +796,11 @@ class CommonUtils {
     for(var each in Config.permissionList){
       if(!statuses[each]!.isGranted) {
         String permissionName = each.toString().split('.').last;
+        CommonUtils.log("","permissionName : $permissionName");
         switch(permissionName){
           case "notification" : permissionName = "알림";
+          case "storage" : permissionName = "내부저장소";
+          case "camera" : permissionName = "카메라";
         }
         deniedPermissions.add(permissionName);
       }

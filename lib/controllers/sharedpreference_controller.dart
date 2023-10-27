@@ -10,6 +10,7 @@ class SharedPreferenceController {
   static String sharedPreferencePwKey = "KEY_PW";
   static String sharedPreferenceApplyPrKey = "KEY_APPLY_PR";
   static String sharedPreferenceValidDateKey = "VALID_DATE";
+  static String sharedPreferenceFileName = "FILE_NAME_KEY";
   static SharedPreferences? sharedPreferences;
 
   static Future<void> initSharedPreference(Function(bool) callback) async {

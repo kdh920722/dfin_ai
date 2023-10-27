@@ -364,34 +364,36 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
   }
 
   Future<void> _requestPermissions() async {
-    await CommonUtils.requestPermissions((isDenied, deniedPermissionsList) async {
-      if(isDenied){
-        String deniedPermissionsString = "";
-        for(int i = 0; i < deniedPermissionsList!.length; i++){
-          deniedPermissionsString += deniedPermissionsList[i];
-          if(i != deniedPermissionsList.length-1){
-            deniedPermissionsString += ", ";
+    if(Config.isAndroid){
+      await CommonUtils.requestPermissions((isDenied, deniedPermissionsList) async {
+        if(isDenied){
+          String deniedPermissionsString = "";
+          for(int i = 0; i < deniedPermissionsList!.length; i++){
+            deniedPermissionsString += deniedPermissionsList[i];
+            if(i != deniedPermissionsList.length-1){
+              deniedPermissionsString += ", ";
+            }
           }
+
+          await Future.delayed(const Duration(milliseconds: 1500), () async {
+            UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, 18.h, 0.5, (slideContext, setState) =>
+                Column(mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      UiUtils.getStyledTextWithFixedScale("[$deniedPermissionsString] 권한이 필요합니다. ", TextStyles.upFinBasicTextStyle, TextAlign.center, null),
+                      UiUtils.getMarginBox(100.w, 2.h),
+                      UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinTextAndBorderBlue,
+                          UiUtils.getTextWithFixedScale("설정 바로가기", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
+                            openAppSettings();
+                            Navigator.of(slideContext).pop();
+                          })
+                    ]
+                ));
+          });
+
+          CommonUtils.log("i", "denied permissions : $deniedPermissionsString");
         }
-
-        await Future.delayed(const Duration(milliseconds: 1500), () async {
-          UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, 18.h, 0.5, (slideContext, setState) =>
-              Column(mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    UiUtils.getStyledTextWithFixedScale("[$deniedPermissionsString] 권한이 필요합니다. ", TextStyles.upFinBasicTextStyle, TextAlign.center, null),
-                    UiUtils.getMarginBox(100.w, 2.h),
-                    UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinTextAndBorderBlue,
-                        UiUtils.getTextWithFixedScale("설정 바로가기", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
-                          openAppSettings();
-                          Navigator.of(slideContext).pop();
-                        })
-                  ]
-              ));
-        });
-
-        CommonUtils.log("i", "denied permissions : $deniedPermissionsString");
-      }
-    });
+      });
+    }
   }
 
   Future<void> _initAtFirst() async {

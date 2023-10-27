@@ -36,6 +36,7 @@ class GetController extends GetxController {
   RxBool isInputTextHide = false.obs;
   RxList<Widget> autoAnswerWidgetList = <Widget>[].obs;
   RxBool isShowPickedFile = false.obs;
+  RxBool isShowStatus = false.obs;
 
   @override
   void onInit() {
@@ -220,6 +221,9 @@ class GetController extends GetxController {
   }
   void updateShowPickedFile(bool newValue) {
     isShowPickedFile.value = newValue;
+  }
+  void updateShowStatus(bool newValue) {
+    isShowStatus.value = newValue;
   }
 
 }

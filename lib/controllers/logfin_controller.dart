@@ -30,6 +30,7 @@ class LogfinController {
   static List<String> preLoanCountList = [];
   static List<Map<String,dynamic>> agreeDocsList = [];
   static List<String> agreeDocsDetailTypeInfoList = [];
+  static Map<String,dynamic> autoAnswerMap = {};
   static String getAgreeContents(String type){
     String result = "";
     for(var each in agreeDocsList){
@@ -168,7 +169,6 @@ class LogfinController {
         failCount++;
       }
 
-
       final agreeASnapshot = await ref.child('UPFIN/API/logfin/list_data/agree/agreeA').get();
       List<String> docTypeTempList = [];
       if (agreeASnapshot.exists) {
@@ -186,6 +186,15 @@ class LogfinController {
       } else {
         failCount++;
       }
+
+      await LogfinController.callLogfinApi(LogfinApis.getFaqs, {}, (isSuccessToGetMap, outputJsonMap){
+        if(isSuccessToGetMap){
+          autoAnswerMap = outputJsonMap!;
+
+        }else{
+          failCount++;
+        }
+      });
 
 
       int cnt = 0;
@@ -234,7 +243,7 @@ class LogfinController {
     }
 
     if(api != LogfinApis.signIn && api != LogfinApis.signUp && api != LogfinApis.socialLogin
-        && api != LogfinApis.deleteAccount && api != LogfinApis.checkMember && api != LogfinApis.getAgreeDocuments){
+        && api != LogfinApis.deleteAccount && api != LogfinApis.checkMember && api != LogfinApis.getAgreeDocuments && api != LogfinApis.getFaqs){
       if(userToken != ""){
         inputJson['api_token'] = userToken;
       }else{
@@ -258,7 +267,7 @@ class LogfinController {
       );
 
       final json = jsonDecode(response.body);
-      CommonUtils.log('i', 'out full : \n$json');
+      CommonUtils.log('', 'out full : \n$json');
 
       if (response.statusCode == 200) { // HTTP_OK
         final resultData = json;
@@ -277,6 +286,9 @@ class LogfinController {
             return;
           }else if(api == LogfinApis.getAgreeDocuments){
             callback(true, resultData);
+            return;
+          }else if(api == LogfinApis.getFaqs){
+            callback(true, jsonDecode(resultData['data']));
             return;
           }
           callback(true, resultData['data']);
@@ -619,7 +631,7 @@ enum LogfinApis {
   applyProductDocSearch, applyProduct,
   getAccidentInfo, getOffersInfo,
   getLoansInfo, getLoansDetailInfo,
-  sendMessage, getMessage, checkMessage, getAgreeDocuments
+  sendMessage, getMessage, checkMessage, getAgreeDocuments, getFaqs
 }
 
 extension LogfinApisExtension on LogfinApis {
@@ -665,6 +677,8 @@ extension LogfinApisExtension on LogfinApis {
         return '/checked_messages.json';
       case LogfinApis.getAgreeDocuments:
         return '/get_documents.json';
+      case LogfinApis.getFaqs:
+        return '/get_faqs.json';
     }
   }
 }

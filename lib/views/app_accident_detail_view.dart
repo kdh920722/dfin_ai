@@ -100,9 +100,9 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
                   SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("${each.submitRate}%", 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, 1)),
                   UiUtils.getMarginBox(0, 2.h),
 
-                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("진행", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
+                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("진행상태", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
                   UiUtils.getMarginBox(0, 1.2.h),
-                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(LoanInfoData.getDetailStatusName(each.statueId), 14.sp, FontWeight.w700, ColorStyles.upFinButtonBlue, TextAlign.start, null)),
+                  UiUtils.getRoundBoxTextWithFixedScale(LoanInfoData.getDetailStatusName(each.statueId), 11.sp, FontWeight.w600, TextAlign.center, ColorStyles.upFinWhiteSky, ColorStyles.upFinButtonBlue),
                   UiUtils.getMarginBox(0, 3.h),
                   MyData.getLoanInfoList().length == 1 || (MyData.getLoanInfoList().length != 1 && count == MyData.getLoanInfoList().length-1) ?
                   Container() : UiUtils.getMarginColoredBox(90.w, 0.1.h, ColorStyles.upFinWhiteGray)

@@ -13,6 +13,7 @@ class AwsController {
   static String awsRegion = "";
   static String bucket = "";
   static String maskedImageDir = "";
+  static String chatFilesDir = "";
   static String uploadedUrl = "";
 
   static Future<void> initAWS(Function(bool isSuccess) callback) async{
@@ -27,6 +28,7 @@ class AwsController {
             case "region" : awsRegion = each.value.toString();
             case "bucket" : bucket = each.value.toString();
             case "masked_img_dir" : maskedImageDir = each.value.toString();
+            case "chat_files_dir" : chatFilesDir = each.value.toString();
             case "uploaded_url" : uploadedUrl = each.value.toString();
           }
         }
@@ -62,9 +64,30 @@ class AwsController {
       CommonUtils.log('e', e.toString());
       return callback(false, "");
     }
+  }
 
-
-
+  static Future<void> uploadFileToAWS(String filePath, String awsPath, Function(bool isSuccess, String resultUrl) callback) async {
+    try{
+      String? result = await AwsS3.uploadFile(
+          accessKey: awsAccessKey,
+          secretKey: awsSecretKey,
+          file: File(filePath),
+          bucket: bucket,
+          region: awsRegion,
+          destDir: "$chatFilesDir/$awsPath",
+          metadata: {"test": "test"} // optional
+      );
+      if(result != null){
+        CommonUtils.log('i', 'aws s3 result : $result');
+        return callback(true, result);
+      }else{
+        CommonUtils.log('e', 'aws s3 result is null');
+        return callback(false, "");
+      }
+    }catch(e){
+      CommonUtils.log('e', e.toString());
+      return callback(false, "");
+    }
   }
 
 }

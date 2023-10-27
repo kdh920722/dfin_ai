@@ -1,16 +1,19 @@
+import 'dart:convert';
 import 'dart:io';
+import 'dart:isolate';
+import 'dart:ui';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:sizer/sizer.dart';
+import 'package:upfin/controllers/aws_controller.dart';
 import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:upfin/controllers/get_controller.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/controllers/websocket_controller.dart';
 import 'package:upfin/datas/chat_message_info_data.dart';
-import 'package:upfin/datas/chatroom_info_data.dart';
 import 'package:upfin/datas/loan_info_data.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
@@ -19,6 +22,8 @@ import 'package:upfin/views/app_main_view.dart';
 import '../configs/app_config.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:path_provider/path_provider.dart';
 
 class AppChatView extends StatefulWidget{
   @override
@@ -38,9 +43,11 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   int _ticks = 0;
   bool isBuild = false;
   bool isTextFieldFocus = false;
-  String myTempChatText = "";
   bool inputTextHide = true;
   bool isViewHere = false;
+
+  final ReceivePort _port = ReceivePort();
+  static String savedFileName = "";
 
   @override
   void initState(){
@@ -69,14 +76,43 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     FireBaseController.setStateForForeground = null;
     isViewHere = true;
     _setAutoAnswerWidgetList();
+    GetController.to.updateInputTextHide(true);
+    GetController.to.updateShowPickedFile(false);
+    GetController.to.updateShowStatus(true);
+    currentKey = "";
+
+    IsolateNameServer.registerPortWithName(_port.sendPort, 'downloader_send_port');
+    _port.listen((dynamic data) async {
+      try{
+        String id = data[0];
+        int status = data[1];
+        int progress = data[2];
+        if(status == 3 && progress == 100){
+          await FlutterDownloader.open(taskId: id);
+          if(context.mounted) UiUtils.closeLoadingPop(context);
+        }
+      }catch(error){
+        CommonUtils.log("e", "port.listen error : $error");
+        UiUtils.closeLoadingPop(context);
+      }
+    });
+    FlutterDownloader.registerCallback(downloadCallback);
   }
+
+
+  @pragma('vm:entry-point')
+  static Future<void> downloadCallback(String id, int status, int progress) async {
+    final SendPort? send = IsolateNameServer.lookupPortByName('downloader_send_port');
+    send?.send([id, status, progress]);
+  }
+
 
   KeyboardVisibilityController? _keyboardVisibilityController;
   void _functionForKeyboardHide(){
-    _scrollToBottom(true);
+    _scrollToBottom(true,400);
   }
   void _functionForKeyboardShow() {
-    _scrollToBottom(true);
+    _scrollToBottom(true,400);
   }
 
   @override
@@ -95,6 +131,9 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     GetController.to.resetChatAutoAnswerWidgetList();
     GetController.to.updateInputTextHide(true);
     GetController.to.updateShowPickedFile(false);
+    GetController.to.updateShowStatus(true);
+    currentKey = "";
+    IsolateNameServer.removePortNameMapping('downloader_send_port');
     super.dispose();
   }
 
@@ -119,42 +158,139 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     }
   }
   
-  Widget _getHtmlView(String htmlString){
-    htmlString = "<div id='type1'>$htmlString</div>";
+  Widget _getHtmlView(String message, String sender, String type){
+    CommonUtils.log("", "message : $message\nsender : $sender\ntype : $type");
+    bool isImage = true;
+    String htmlTag = "";
+    String htmlTextTag = "";
+    String extension = "";
+    String buttonId = "";
+    String fileName = "";
+    if(sender == "UPFIN") {
+      htmlTextTag = "<div id='typeOther'>";
+      buttonId = "buttonTypeOther";
+    }else{
+      htmlTextTag = "<div id='typeMe'>";
+      buttonId = "buttonTypeMe";
+    }
+
+    if(type == "file"){
+      List<String> fileInfo = message.split('.');
+      extension = fileInfo.last.toLowerCase();
+      fileName = fileInfo[fileInfo.length-2].split("/").last;
+      List<String> imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp'];
+      if (imageExtensions.contains(extension.toLowerCase())) {
+        isImage = true;
+      } else {
+        isImage = false;
+      }
+
+      if(isImage){
+        htmlTag = """
+        <a href='$message'><img src='$message'/></a>
+        """;
+      }else{
+        htmlTag = """
+        <center>
+        <p>$fileName</p>
+     
+        <a href='$message'><button id='$buttonId'>${extension.toUpperCase()} 열기</button></a>
+        </center>
+        """;
+      }
+    }else{
+      htmlTag = message;
+      isImage = false;
+    }
+
+    String htmlString = "$htmlTextTag $htmlTag </div>";
     return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
       HtmlWidget(
         htmlString,
+        onLoadingBuilder: (context, element, progress){
+            CommonUtils.log("", "html : $progress");
+            _scrollToBottom(true,100);
+        },
         customStylesBuilder: (element) {
-          if(element.id == 'type1') {
+          if(element.id == 'typeMe') {
+            return {
+              "color" : "white",
+              "font-size": "14px",
+              "line-height" : "120%",
+              "font-weight": "normal",
+            };
+          }else if(element.id == 'typeOther') {
             return {
               "color" : "black",
-              "font-size": "16px",
+              "font-size": "14px",
               "line-height" : "120%",
               "font-weight": "normal",
             };
           }
 
           if (element.localName == 'button') {
-            return {
-              //"cursor": "pointer",
-              //"display":"inlne-block",
-              "text-align":"center",
-              "background-color":"#3a6cff",
-              "color" : "white",
-              "font-size": "14px",
-              "line-height" : "250%",
-              "font-weight": "normal",
-              "border-radius":"0.1em",
-              "padding":"5px 20px"
-            };
+            if(element.id == 'buttonTypeOther') {
+              return {
+                "text-align":"center",
+                "background-color":"#3a6cff",
+                "color" : "white",
+                "font-size": "14px",
+                "line-height" : "250%",
+                "font-weight": "normal",
+                "border-radius":"0.1em",
+                "padding":"5px 20px"
+              };
+            }else if(element.id == 'buttonTypeMe'){
+              return {
+                "text-align":"center",
+                "background-color":"white",
+                "color" : "#3a6cff",
+                "font-size": "14px",
+                "line-height" : "250%",
+                "font-weight": "normal",
+                "border-radius":"0.1em",
+                "padding":"5px 20px",
+                "width": "500px",
+              };
+            }
           }
         },
 
         onTapUrl: (url) async {
-          Map<String, String> urlInfoMap = {
-            "url" : url
-          };
-          CommonUtils.moveTo(context, AppView.appWebView.value, urlInfoMap);
+          CommonUtils.log("", "cilck url from a tag : $url");
+          String dir = "";
+          if(Config.isAndroid){
+            dir = '/storage/emulated/0/Download';
+            //dir = (await getApplicationSupportDirectory()).path;
+            CommonUtils.log("", "document dir : ${(await getApplicationDocumentsDirectory()).path}");
+          }else{
+            dir = (await getApplicationDocumentsDirectory()).path;
+            CommonUtils.log("", "document dir : ${(await getApplicationDocumentsDirectory()).path}");
+          }
+          try{
+            await FlutterDownloader.enqueue(
+              url: url, 	// file url
+              savedDir: '$dir/',	// 저장할 dir
+              fileName: '${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_doc.$extension',	// 파일명
+              saveInPublicStorage: true ,	// 동일한 파일 있을 경우 덮어쓰기 없으면 오류발생함!
+              showNotification: true,
+              openFileFromNotification: true,
+            );
+            String fileRealName = "${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_doc.$extension";
+            String fileName = "$dir/$fileRealName";
+            savedFileName = fileName;
+
+            if(context.mounted) UiUtils.showLoadingPop(context);
+            if(isImage){
+
+            }else{
+              CommonUtils.flutterToast("문서를 다운로드합니다.");
+            }
+
+          }catch(e){
+            CommonUtils.log("", "fail download");
+          }
+
           return true;
         },
         renderMode: RenderMode.column,
@@ -173,13 +309,13 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                 painter: ChatBubbleTriangleForOther(),
               ),
               Container(
-                  constraints: BoxConstraints(maxWidth: 70.w),
+                  constraints: BoxConstraints(maxWidth: 65.w),
                   padding: EdgeInsets.all(3.w),
                   decoration: const BoxDecoration(
                     borderRadius: BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomRight: Radius.circular(15)),
                     color: ColorStyles.upFinWhiteGray,
                   ),
-                  child: otherInfo.messageType == "text" ? _getHtmlView(otherInfo.message) : Container()
+                  child: _getHtmlView(otherInfo.message, "UPFIN", otherInfo.messageType)
               ),
               UiUtils.getMarginBox(1.w, 0),
               UiUtils.getTextWithFixedScale(CommonUtils.getFormattedLastMsgTime(otherInfo.messageTime), 8.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null)
@@ -200,7 +336,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                 painter: ChatBubbleTriangleForOther(),
               ),
               Container(
-                  constraints: BoxConstraints(maxWidth: 70.w),
+                  constraints: BoxConstraints(maxWidth: 65.w),
                   padding: EdgeInsets.all(3.w),
                   decoration: const BoxDecoration(
                     borderRadius: BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomRight: Radius.circular(15)),
@@ -216,25 +352,34 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   }
 
   Widget _getMeView(ChatMessageInfoData meInfo){
+    Widget? meInfoWidget;
+    if(meInfo.messageType == "text"){
+      meInfoWidget = UiUtils.getTextWithFixedScale(meInfo.message, 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null);
+    }else{
+      meInfoWidget = _getHtmlView(meInfo.message, "ME", meInfo.messageType);
+    }
+
     return Container(
         padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 2.w, bottom: 2.w),
         width: 100.w,
         child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
           Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+            UiUtils.getTextWithFixedScale(CommonUtils.getFormattedLastMsgTime(meInfo.messageTime), 8.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null),
+            UiUtils.getMarginBox(1.w, 0),
             Container(
                 constraints: BoxConstraints(
-                    maxWidth: 70.w
+                    maxWidth: 65.w
                 ),
                 padding: EdgeInsets.all(3.w),
                 decoration: const BoxDecoration(
                   borderRadius: BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomLeft: Radius.circular(15)),
                   color: ColorStyles.upFinTextAndBorderBlue,
                 ),
-                child: UiUtils.getTextWithFixedScale(meInfo.message, 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null)
+                child: meInfoWidget
             ),
             CustomPaint(
               painter: ChatBubbleTriangleForMe(),
-            )
+            ),
           ]),
         ])
     );
@@ -248,14 +393,14 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
           Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
             Container(
                 constraints: BoxConstraints(
-                    maxWidth: 70.w
+                    maxWidth: 65.w
                 ),
                 padding: EdgeInsets.all(3.w),
                 decoration: const BoxDecoration(
                   borderRadius: BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomLeft: Radius.circular(15)),
                   color: ColorStyles.upFinTextAndBorderBlue
                 ),
-                child: UiUtils.getTextWithFixedScale(myTempChatText, 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null)
+                child: UiUtils.getImage(5.w, 5.w, Image.asset(fit: BoxFit.fill,'assets/images/chat_loading.gif'))
             ),
             CustomPaint(
               painter: ChatBubbleTriangleForMe(),
@@ -284,7 +429,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
       chatList.add(_getOtherForLoadingView());
     }
 
-    _scrollToBottom(true);
+    _scrollToBottom(true,400);
     return chatList;
   }
 
@@ -316,10 +461,10 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     }
   }
 
-  Future<void> _scrollToBottom(bool doDelay) async {
+  Future<void> _scrollToBottom(bool doDelay, int delayTime) async {
     if(isBuild){
       if(doDelay){
-        await Future.delayed(const Duration(milliseconds: 400), () async {});
+        await Future.delayed(Duration(milliseconds: delayTime), () async {});
       }
 
       if(_chatScrollController.hasClients){
@@ -388,27 +533,31 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
 
   Future<void> _setPickedImgFromCamera() async {
     if(pickedFiles.length <= maximumSize){
-      XFile? image = await CommonUtils.getCameraImage();
-      if(image != null){
-        isShowPickedFile = true;
-        GetController.to.updateShowPickedFile(isShowPickedFile);
-        inputHelpHeight = inputHelpPickedFileHeight;
-        GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
-        pickedFiles.add(File(image.path));
+      if(pickedFiles.length == maximumSize){
+        CommonUtils.flutterToast("최대 $maximumSize개의 파일만\n전송할 수 있습니다.");
       }else{
-        if(pickedFiles.isEmpty){
-          isShowPickedFile = false;
-          GetController.to.updateShowPickedFile(isShowPickedFile);
-          inputHelpHeight = inputHelpMinHeight;
-          GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
-        }else{
+        XFile? image = await CommonUtils.getCameraImage();
+        if(image != null){
           isShowPickedFile = true;
           GetController.to.updateShowPickedFile(isShowPickedFile);
           inputHelpHeight = inputHelpPickedFileHeight;
           GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
+          pickedFiles.add(File(image.path));
+        }else{
+          if(pickedFiles.isEmpty){
+            isShowPickedFile = false;
+            GetController.to.updateShowPickedFile(isShowPickedFile);
+            inputHelpHeight = inputHelpMinHeight;
+            GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
+          }else{
+            isShowPickedFile = true;
+            GetController.to.updateShowPickedFile(isShowPickedFile);
+            inputHelpHeight = inputHelpPickedFileHeight;
+            GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
+          }
         }
+        setState(() {});
       }
-      setState(() {});
     }else{
       CommonUtils.flutterToast("최대 $maximumSize개의 파일만\n전송할 수 있습니다.");
     }
@@ -416,75 +565,105 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
 
   Future<void> _setPickedFileFromDevice() async {
     if(pickedFiles.length <= maximumSize){
-      List<File>? files = await CommonUtils.getFiles();
-      if(files != null){
-        if(files.length <= maximumSize){
-          if(files.length+pickedFiles.length <= maximumSize){
-            isShowPickedFile = true;
-            GetController.to.updateShowPickedFile(isShowPickedFile);
-            inputHelpHeight = inputHelpPickedFileHeight;
-            GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
-            for(var each in files){
-              pickedFiles.add(each);
+      if(pickedFiles.length == maximumSize){
+        CommonUtils.flutterToast("최대 $maximumSize개의 파일만\n전송할 수 있습니다.");
+      }else{
+        List<File>? files = await CommonUtils.getFiles();
+        if(files != null){
+          if(files.length <= maximumSize){
+            if(files.length+pickedFiles.length <= maximumSize){
+              isShowPickedFile = true;
+              GetController.to.updateShowPickedFile(isShowPickedFile);
+              inputHelpHeight = inputHelpPickedFileHeight;
+              GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
+              for(var each in files){
+                pickedFiles.add(each);
+              }
+            }else{
+              CommonUtils.flutterToast("최대 $maximumSize개의 파일만\n전송할 수 있습니다.");
             }
           }else{
             CommonUtils.flutterToast("최대 $maximumSize개의 파일만\n전송할 수 있습니다.");
           }
         }else{
-          CommonUtils.flutterToast("최대 $maximumSize개의 파일만\n전송할 수 있습니다.");
+          if(pickedFiles.isEmpty){
+            isShowPickedFile = false;
+            GetController.to.updateShowPickedFile(isShowPickedFile);
+            inputHelpHeight = inputHelpMinHeight;
+            GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
+          }else{
+            isShowPickedFile = true;
+            GetController.to.updateShowPickedFile(isShowPickedFile);
+            inputHelpHeight = inputHelpPickedFileHeight;
+            GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
+          }
         }
-      }else{
-        if(pickedFiles.isEmpty){
-          isShowPickedFile = false;
-          GetController.to.updateShowPickedFile(isShowPickedFile);
-          inputHelpHeight = inputHelpMinHeight;
-          GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
-        }else{
-          isShowPickedFile = true;
-          GetController.to.updateShowPickedFile(isShowPickedFile);
-          inputHelpHeight = inputHelpPickedFileHeight;
-          GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
-        }
+        setState(() {});
       }
-      setState(() {});
     }else{
       CommonUtils.flutterToast("최대 $maximumSize개의 파일만\n전송할 수 있습니다.");
     }
   }
 
   String currentKey = "";
-  Map<String, dynamic> test = {
-    "질문1" :
+  Map<String, dynamic> test3 = {
+    "대출관리" :
     {
-      "질문11" :
-      {
-        "질문112" :
-        {
-          "질문1122" : "답1122",
-          "질문1113" : "답1113"
-        },
-        "질문113" : "답113"
-      },
-      "질문12" : "답12",
-      "질문13" : "답13"
+      "대출상품" : "a1",
+      "제출정보" : "a2",
+      "상환일정" : "a3",
+      "취소,철회" : "a4"
     },
 
-    "질문2" :
+    "심사결과" :
     {
-      "질문22":
-      {
-        "질문222" : "답222",
-        "질문223" : "답223"
-      },
-      "질문23": "답233"
+      "대출현황": "b1",
+      "요청서류": "b2"
     },
-    "질문3" : "답3",
-    "질문4" : "답4"
+    "나의정보" :
+    {
+      "사건정보": "c1",
+    },
+    "자주하는 질문" :
+    {
+      "대출상환":
+      {
+        "수수료" : "d11",
+        "일정" : "d12",
+        "이자율" : "d13",
+        "미납" : "d14",
+        "연장" : "d15",
+        "추가대출" : "d16",
+        "상환액" : "d17",
+      },
+      "신용점수": "d2",
+      "금융사기": "d3"
+    },
+    "상담원 연결": "e"
   };
+  String _findValueForKey(Map<String, dynamic> map, String targetKey) {
+    String resultValue = "";
+
+    void searchValue(Map<String, dynamic> currentMap, String currentKey) {
+      if (currentMap.containsKey(currentKey)) {
+        resultValue = currentMap[currentKey];
+        return;
+      }
+
+      currentMap.forEach((key, value) {
+        if (value is Map<String, dynamic>) {
+          searchValue(value, targetKey);
+        }
+      });
+    }
+
+    searchValue(map, targetKey);
+    return resultValue;
+  }
   List<String> _getAnswerListMap(String targetKey){
     List<String> childKeys = [];
     if(targetKey == ""){
-      test.forEach((key, value) {
+      LogfinController.autoAnswerMap.forEach((key, value) {
         childKeys.add(key);
       });
       return childKeys;
@@ -500,7 +679,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         });
       }
 
-      searchChildKeys(test);
+      searchChildKeys(LogfinController.autoAnswerMap);
 
       return childKeys;
     }
@@ -520,7 +699,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
       }
     }
 
-    searchParentKey(test, "");
+    searchParentKey(LogfinController.autoAnswerMap, "");
     CommonUtils.log("", "parentKey : $parentKey");
     return parentKey;
   }
@@ -571,7 +750,15 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         textColor = ColorStyles.upFinWhite;
       }
 
-      if(each == "질문3"){
+      if(each == "자주하는 질문"){
+        widgetList.add(Container(key: UniqueKey()));
+      }
+
+      if(each == "상환일정"){
+        widgetList.add(Container(key: UniqueKey()));
+      }
+
+      if(each == "미납"){
         widgetList.add(Container(key: UniqueKey()));
       }
 
@@ -610,7 +797,8 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
             _setAutoAnswerWidgetList();
             setState(() {});
           }else{
-            CommonUtils.flutterToast(each);
+            String result = _findValueForKey(LogfinController.autoAnswerMap, currentKey);
+            CommonUtils.flutterToast(result);
           }
         }
       }));
@@ -619,6 +807,11 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     _setAutoAnswerLineHeight();
     GetController.to.updateChatAutoAnswerWidgetList(widgetList);
     CommonUtils.log("", "updateChatAutoAnswerWidgetList : ${GetController.to.autoAnswerWidgetList.length}");
+  }
+
+  static Future<bool> checkFileExists(String filePath) async {
+    File file = File(filePath);
+    return await file.exists();
   }
 
   void _setAutoAnswerLineHeight(){
@@ -634,16 +827,56 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     }
   }
 
-  void _sendMessage(String message){
+  void _sendFileToAws(){
+    int cnt = 0;
+    int failCnt = 0;
+    UiUtils.showLoadingPop(context);
+    for(var each in pickedFiles){
+      AwsController.uploadFileToAWS(each.path, "${MyData.email}/${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}", (isSuccess, resultUrl){
+        cnt++;
+        if(!isSuccess){
+          failCnt++;
+        }
+        if(cnt == pickedFiles.length){
+          if(failCnt > 0){
+            CommonUtils.flutterToast("파일 전송중 에러가\n발생했습니다.");
+          }else{
+            _sendMessage(resultUrl,"");
+            pickedFiles.clear();
+            inputHelpHeight = inputHelpMinHeight;
+            GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
+            isShowPickedFile = false;
+            GetController.to.updateShowPickedFile(isShowPickedFile);
+            UiUtils.closeLoadingPop(context);
+            setState(() {});
+          }
+        }
+      });
+    }
+  }
+
+  void _sendMessage(String message, String customMessageType){
     CommonUtils.hideKeyBoard();
     if(!WebSocketController.isWaitingForAnswerState(currentRoomId, "ME")){
       var inputJson = {
         "loan_uid" : currentLoanUid,
         "message" : message
       };
+
       WebSocketController.setWaitingState(currentRoomId, "ME", true);
-      WebSocketController.setWaitingState(currentRoomId, "UPFIN", true);
-      myTempChatText = message;
+      if(pickedFiles.isEmpty){
+        // message, custom message
+        if(customMessageType != ""){
+          inputJson["type"] = "custom";
+        }else{
+          inputJson["type"] = "text";
+        }
+        WebSocketController.setWaitingState(currentRoomId, "UPFIN", true);
+      }else{
+        // file
+        inputJson["type"] = "file";
+      }
+
       LogfinController.callLogfinApi(LogfinApis.sendMessage, inputJson, (isSuccess, _){
         if(!isSuccess){
           CommonUtils.flutterToast("메시지 전송중\n오류가 발생했습니다.");
@@ -658,12 +891,12 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
 
   bool isShowPickedFile = false;
   List<File> pickedFiles = [];
-  int maximumSize = 6;
+  int maximumSize = 1;
   Widget _getPickedFilesWidget(){
     List<Widget> widgetList = [];
-
     for(int i = 0 ; i < pickedFiles.length ; i++){
       bool isImage = true;
+      CommonUtils.log("","picked file : ${pickedFiles[i].path}");
       String extension = pickedFiles[i].path.split('.').last.toLowerCase();
       List<String> imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp'];
       if (imageExtensions.contains(extension)) {
@@ -689,10 +922,10 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                   height: 16.h,
                   padding: EdgeInsets.zero,
                   decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.all(Radius.circular(5)),
+                      borderRadius: BorderRadius.all(Radius.circular(2)),
                       color: ColorStyles.upFinBlack
                   ),
-                  child: isImage? UiUtils.getImage(19.5.w, 15.5.h, Image.file(File(pickedFiles[i].path)))
+                  child: isImage? Padding(padding: EdgeInsets.only(left: 1.w, right: 1.w, top: 2.w, bottom: 2.w), child: Image.file(File(pickedFiles[i].path),fit: BoxFit.fitWidth))
                       : Column(mainAxisAlignment: MainAxisAlignment.start, children: [
                         UiUtils.getMarginBox(0, 1.5.h),
                         //UiUtils.getTextWithFixedScaleAndOverFlow(extension.toUpperCase(), 10.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null),
@@ -739,7 +972,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if(isViewHere){
         isBuild = true;
-        _scrollToBottom(false);
+        _scrollToBottom(false, 0);
       }
     });
 
@@ -769,10 +1002,32 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                   ])
               ),
             ),
+            Positioned(
+              child: Align(
+                  alignment: Alignment.centerRight,
+                  child: Obx((){
+                    return Padding(padding: EdgeInsets.only(right: 3.w), child: Column(children: [
+                      UiUtils.getMarginBox(0, 1.8.h),
+                      UiUtils.getIconButtonWithHeight(8.w, GetController.to.isShowStatus.value? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
+                          8.w, ColorStyles.upFinDarkGray, () {
+                            GetController.to.updateShowStatus(!GetController.to.isShowStatus.value);
+                          })
+                    ]));
+                  })
+              ),
+            ),
           ]),
-          UiUtils.getMarginBox(0, 3.h),
-          _getTimelineWidget(),
-          UiUtils.getMarginBox(0, 3.h),
+          Obx((){
+            if(GetController.to.isShowStatus.value){
+              return Column(children:[
+                UiUtils.getMarginBox(0, 3.h),
+                _getTimelineWidget()
+              ]);
+            }else{
+              return Container();
+            }
+          }),
+          UiUtils.getMarginBox(0, 1.h),
           UiUtils.getExpandedScrollViewWithController(Axis.vertical, Obx(()=>Column(mainAxisAlignment: MainAxisAlignment.start, children: _getChatList())), _chatScrollController),
           UiUtils.getMarginBox(0, 1.h),
           Obx((){
@@ -780,11 +1035,11 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
               Align(alignment: Alignment.topRight, child: Padding(padding: EdgeInsets.only(right: 5.w),
                   child: Wrap(runSpacing: 0.4.h, spacing: 1.5.w, alignment: WrapAlignment.end, direction: Axis.horizontal, children: GetController.to.autoAnswerWidgetList))),
               GetController.to.isShowPickedFile.value? Column(children: [
-                UiUtils.getSizedScrollView(90.w, inputHelpMinHeight+1.h, Axis.horizontal, _getPickedFilesWidget()),
-                UiUtils.getMarginBox(0, 2.3.h),
+                UiUtils.getSizedScrollView(90.w, inputHelpMinHeight+2.h, Axis.horizontal, _getPickedFilesWidget()),
+                UiUtils.getMarginBox(0, 1.3.h),
                 UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                    UiUtils.getTextWithFixedScale("전송", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
-
+                    UiUtils.getTextWithFixedScale("전송", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () async{
+                      _sendFileToAws();
                     }),
               ]) : Container()
             ]));
@@ -847,11 +1102,13 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                           UiUtils.getIconButtonWithHeight(14.w, Icons.arrow_circle_up_rounded, 14.w,
                               isTextFieldFocus? ColorStyles.upFinButtonBlue : ColorStyles.upFinWhiteSky, () {
                                 if(_chatTextController.text.toString().trim() != ""){
-                                  _sendMessage(_chatTextController.text);
+                                  _sendMessage(_chatTextController.text, "");
                                   setState(() {
                                     _chatTextController.text = "";
                                     isTextFieldFocus = false;
                                   });
+                                }else{
+                                  CommonUtils.flutterToast("메시지를 입력하세요.");
                                 }
                               })
                           ),

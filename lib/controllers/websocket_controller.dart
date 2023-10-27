@@ -22,6 +22,7 @@ class WebSocketController {
   static bool isInit = false;
   static Timer? reSubScribeCheckTimer;
   static Timer? reSubScribeTimer;
+  static int reTryCount = 0;
 
   static Future<void> initWebSocket(Function(bool isSuccess) callback) async{
     try{
@@ -78,6 +79,7 @@ class WebSocketController {
   }
 
   static void resetConnectWebSocketCable(){
+    reTryCount = 0;
     isInit = false;
     isReSubScribe = false;
     if(reSubScribeTimer != null) reSubScribeTimer!.cancel();
@@ -100,6 +102,7 @@ class WebSocketController {
 
       cable!.onConnected = () {
         isInit = true;
+        reTryCount = 0;
         const Duration intervalForReSubScribe = Duration(seconds: 20);
         reSubScribeCheckTimer = Timer.periodic(intervalForReSubScribe, (Timer timer) {
           isReSubScribe = true;
@@ -181,13 +184,20 @@ class WebSocketController {
 
   static void _retryToConnect(){
     if(isInit){
-      GetController.to.updateAllSubScribed(false);
-      if(reSubScribeTimer != null) reSubScribeTimer!.cancel();
-      if(reSubScribeCheckTimer != null) reSubScribeCheckTimer!.cancel();
-      subscribedRoomIds.clear();
-      Future.delayed(const Duration(seconds: 2), () {
-        connectToWebSocketCable(); // 다시 연결
-      });
+      reTryCount++;
+      if(reTryCount > 5){
+        resetConnectWebSocketCable();
+      }else{
+        GetController.to.updateAllSubScribed(false);
+        if(reSubScribeTimer != null) reSubScribeTimer!.cancel();
+        if(reSubScribeCheckTimer != null) reSubScribeCheckTimer!.cancel();
+        subscribedRoomIds.clear();
+        Future.delayed(const Duration(seconds: 2), () {
+          connectToWebSocketCable(); // 다시 연결
+        });
+      }
+    }else{
+      resetConnectWebSocketCable();
     }
   }
 

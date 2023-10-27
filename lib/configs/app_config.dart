@@ -1,6 +1,8 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:upfin/views/app_accident_detail_view.dart';
 import 'package:upfin/views/app_agree_detail_info_view.dart';
 import 'package:upfin/views/app_agree_detail_info_view_test.dart';
@@ -33,10 +35,11 @@ class Config{
   static bool isWeb = kIsWeb;
   static bool isAndroid = Platform.isAndroid;
   static String deppLinkInfo = "";
-  static List<Permission> permissionList = [Permission.notification];
+  static List<Permission> permissionList = [Permission.notification, Permission.camera];
   static String appVersion = "";
   static BuildContext? contextForEmergencyBack;
   static bool isEmergencyRoot = false;
+  static FlutterDownloader flutterDownloader = FlutterDownloader();
 
   static Map<String, WidgetBuilder> appRoutes = {
     AppView.appRootView.value : (context) => AppRootView(),

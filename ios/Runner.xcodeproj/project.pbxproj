@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		00873F29FF089E5CCC98E4C0 /* Pods_RunnerTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 396D70C35A5EB584DDA515CA /* Pods_RunnerTests.framework */; };
 		0C827EF82AC4111C00CFE11A /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 97C147021CF9000F007C117D /* Info.plist */; };
+		0C82C90B2AEB6AC80052C0B4 /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = 0C82C90A2AEB6AAC0052C0B4 /* libsqlite3.tbd */; };
 		0CF9B6D02AC3FD8F00BE451D /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0CF9B6CF2AC3FD8F00BE451D /* GoogleService-Info.plist */; };
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
@@ -45,6 +46,7 @@
 
 /* Begin PBXFileReference section */
 		06DC0FECEEED955DD4C63314 /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
+		0C82C90A2AEB6AAC0052C0B4 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		0CF9B6CF2AC3FD8F00BE451D /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../../GoogleService-Info.plist"; sourceTree = "<group>"; };
 		0CFC92BD2AD50AE40015AA3B /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
@@ -84,6 +86,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0C82C90B2AEB6AC80052C0B4 /* libsqlite3.tbd in Frameworks */,
 				5B206270ED757897FEE39073 /* Pods_Runner.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -102,6 +105,7 @@
 		40881C32EFD1CD05237C806E /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				0C82C90A2AEB6AAC0052C0B4 /* libsqlite3.tbd */,
 				C7155C9D3BCFC0B2DF8CF8ED /* Pods_Runner.framework */,
 				396D70C35A5EB584DDA515CA /* Pods_RunnerTests.framework */,
 			);
