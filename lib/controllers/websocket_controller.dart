@@ -169,16 +169,16 @@ class WebSocketController {
 
       cable!.onConnectionLost = () {
         CommonUtils.log("i", "websocket onConnectionLost error");
-        _retryToConnect();
+        _retryToConnectNewVer();
       };
 
       cable!.onCannotConnect = () {
         CommonUtils.log("i", "websocket onCannotConnect error");
-        _retryToConnect();
+        _retryToConnectNewVer();
       };
     }catch(error){
       CommonUtils.log("e", "websocket connect error : ${error.toString()}");
-      _retryToConnect();
+      _retryToConnectNewVer();
     }
   }
 
@@ -199,6 +199,13 @@ class WebSocketController {
     }else{
       resetConnectWebSocketCable();
     }
+  }
+
+  static void _retryToConnectNewVer(){
+    resetConnectWebSocketCable();
+    Future.delayed(const Duration(seconds: 2), () {
+      connectToWebSocketCable(); // 다시 연결
+    });
   }
 
   static bool isSubscribe(String roomId){
