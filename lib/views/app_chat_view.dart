@@ -434,9 +434,9 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   }
 
   Future<void> back() async {
+    CommonUtils.hideKeyBoard();
     if(backPossibleFlag){
       backPossibleFlag = false;
-      CommonUtils.hideKeyBoard();
       var inputJson = {
         "pr_room_id" : currentRoomId
       };

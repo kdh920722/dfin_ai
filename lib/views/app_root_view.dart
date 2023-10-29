@@ -23,6 +23,7 @@ import '../styles/TextStyles.dart';
 import '../configs/app_config.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class AppRootView extends StatefulWidget{
   @override
@@ -381,7 +382,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
                     children: [
                       UiUtils.getStyledTextWithFixedScale("[$deniedPermissionsString] 권한이 필요합니다. ", TextStyles.upFinBasicTextStyle, TextAlign.center, null),
                       UiUtils.getMarginBox(100.w, 2.h),
-                      UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinTextAndBorderBlue,
+                      UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
                           UiUtils.getTextWithFixedScale("설정 바로가기", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
                             openAppSettings();
                             Navigator.of(slideContext).pop();
@@ -422,10 +423,31 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
       _initIamport();
       _initSnsLogin();
       _initWebSocketForChat();
-    }else{
+    }else if(Config.appState == Config.appUpdateState){
+      if(context.mounted){
+        UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, 18.h, 0.5, (context, setState){
+          return Center(child: Column(children: [
+            UiUtils.getMarginBox(0, 1.h),
+            UiUtils.getTextWithFixedScale("🥹 앱 업데이트가 필요합니다.", 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
+            UiUtils.getMarginBox(0, 3.h),
+            UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+                UiUtils.getTextWithFixedScale("업데이트", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
+                  launchUrl(Uri.parse(Config.appStoreUrl));
+                })
+          ]));
+        });
+      }
+    }else if(Config.appState == Config.appCloseState){
       if(context.mounted){
         UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, 30.h, 0.5, (context, setState){
-          return Center(child: UiUtils.getTextWithFixedScale("시스템 점검중입니다.", 20.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, null));
+          return Column(children: [
+            UiUtils.getMarginBox(0, 3.h),
+            Center(child: UiUtils.getTextWithFixedScale("🥹 시스템 점검중입니다.", 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
+            UiUtils.getMarginBox(0, 3.h),
+            UiUtils.getExpandedScrollView(Axis.vertical,
+                UiUtils.getTextWithFixedScale(Config.appCloseText.replaceAll("@@", "\n"), 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
+            UiUtils.getMarginBox(0, 1.h)
+          ]);
         });
       }
     }

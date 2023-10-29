@@ -2,6 +2,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:upfin/views/app_accident_detail_view.dart';
 import 'package:upfin/views/app_agree_detail_info_view.dart';
@@ -30,13 +31,16 @@ class Config{
   static const double appWidth = 393;
   static const double appHeight = 852;
   static const int appOpenState = 10;
+  static const int appUpdateState = 44;
   static const int appCloseState = 99;
-  static int appState = 10; // 10 : open, 99: close
+  static int appState = 10; // 10 : open, 99: close, 44: update
+  static String appCloseText = "";
   static bool isWeb = kIsWeb;
   static bool isAndroid = Platform.isAndroid;
   static String deppLinkInfo = "";
   static List<Permission> permissionList = [Permission.notification, Permission.camera];
   static String appVersion = "";
+  static String appStoreUrl = "";
   static BuildContext? contextForEmergencyBack;
   static bool isEmergencyRoot = false;
   static FlutterDownloader flutterDownloader = FlutterDownloader();
@@ -69,17 +73,27 @@ class Config{
         int iosState = 99;
         String androidVersion = "";
         String iosVersion = "";
+        String androidStoreUrl = "";
+        String iosStoreUrl = "";
+
         for(var each in snapshot.children){
           switch(each.key){
             case "android_open_state" : androidState = int.parse(each.value.toString());
             case "ios_open_state" : iosState = int.parse(each.value.toString());
             case "android_app_version" : androidVersion = each.value.toString();
             case "ios_app_version" : iosVersion = each.value.toString();
+            case "android_store" : androidStoreUrl = each.value.toString();
+            case "ios_store" : iosStoreUrl = each.value.toString();
+            case "app_close_text" : appCloseText = each.value.toString();
           }
         }
 
         appState = isAndroid? androidState : iosState;
         appVersion = isAndroid? androidVersion : iosVersion;
+        appStoreUrl = isAndroid? androidStoreUrl : iosStoreUrl;
+        if(await _isNeedToUpdateVersion()){
+          appState = appUpdateState;
+        }
 
         callback(true);
       } else {
@@ -89,6 +103,30 @@ class Config{
       CommonUtils.log("e", "init app state error : ${e.toString()}");
       callback(false);
     }
+  }
+
+  static Future<bool> _isNeedToUpdateVersion() async {
+    bool result = false;
+    PackageInfo packageInfo = await PackageInfo.fromPlatform();
+
+    String appName = packageInfo.appName;
+    String packageName = packageInfo.packageName;
+    String version = packageInfo.version;
+    String buildNumber = packageInfo.buildNumber;
+    CommonUtils.log("", ""
+        "\nappName : $appName"
+        "\npackageName : $packageName"
+        "\nversion : $version"
+        "\nbuildNumber : $buildNumber");
+
+    CommonUtils.log("", "appVersion : $appVersion || $version");
+    if(version == appVersion){
+      result = false;
+    }else{
+      result = true;
+    }
+
+    return result;
   }
 }
 

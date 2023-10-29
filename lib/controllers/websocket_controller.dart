@@ -153,11 +153,11 @@ class WebSocketController {
                     }
                     GetController.to.updateChatLoanInfoList(MyData.getChatRoomInfoList());
 
+                    WebSocketController.setWaitingState(eachMsg["pr_room_id"].toString(), eachMsg["username"].toString(), false);
                     if(AppChatViewState.currentRoomId == eachMsg["pr_room_id"].toString()){
                       var messageItem = ChatMessageInfoData(eachMsg["id"].toString(), eachMsg["pr_room_id"].toString(), eachMsg["message"].toString(),
                           CommonUtils.convertTimeToString(CommonUtils.parseToLocalTime(eachMsg["created_at"])),
                           eachMsg["message_type"].toString(), eachMsg["username"].toString(), jsonEncode(eachMsg));
-                      WebSocketController.setWaitingState(AppChatViewState.currentRoomId, eachMsg["username"].toString(), false);
                       GetController.to.addChatMessageInfoList(messageItem);
                     }
                   }

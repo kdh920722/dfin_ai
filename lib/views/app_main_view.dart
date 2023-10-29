@@ -392,8 +392,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                   if(WebSocketController.isSubscribe(each.chatRoomId)){
                     _goToChatRoom(listMsg, each.chatRoomId);
                   }else{
-                    CommonUtils.flutterToast("채탕방 접속에 실패했습니다.");
-                    _refreshMyView(context);
+                    _resetAndGoToChatRoom(context, each.chatRoomId);
                   }
                 }),
             UiUtils.getMarginBox(0, 1.5.h),
@@ -443,6 +442,19 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     LogfinController.getMainViewInfo((isSuccessToGetMainInfo){
       UiUtils.closeLoadingPop(context);
     });
+  }
+
+  Future<void> _resetAndGoToChatRoom(BuildContext context, String chatRoomId) async {
+    UiUtils.showLoadingPop(context);
+    LogfinController.getMainViewInfo((isSuccessToGetMainInfo) async {
+      UiUtils.closeLoadingPop(context);
+      if(isSuccessToGetMainInfo){
+        await CommonUtils.saveSettingsToFile("push_from", "F");
+        await CommonUtils.saveSettingsToFile("push_room_id", chatRoomId);
+        _directGoToChatRoom(chatRoomId);
+      }
+    });
+
   }
 
   void _back(){
