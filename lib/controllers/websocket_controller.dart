@@ -5,8 +5,11 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:upfin/controllers/get_controller.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/views/app_chat_view.dart';
+import 'package:upfin/views/app_main_view.dart';
+import '../configs/app_config.dart';
 import '../datas/chat_message_info_data.dart';
 import '../utils/common_utils.dart';
+import 'logfin_controller.dart';
 
 class WebSocketController {
   static final WebSocketController _instance = WebSocketController._internal();
@@ -20,9 +23,9 @@ class WebSocketController {
   static bool isReSubScribe = false;
   static ActionCable? cable;
   static bool isInit = false;
+  static bool isRetry = false;
   static Timer? reSubScribeCheckTimer;
   static Timer? reSubScribeTimer;
-  static int reTryCount = 0;
 
   static Future<void> initWebSocket(Function(bool isSuccess) callback) async{
     try{
@@ -79,7 +82,6 @@ class WebSocketController {
   }
 
   static void resetConnectWebSocketCable(){
-    reTryCount = 0;
     isInit = false;
     isReSubScribe = false;
     if(reSubScribeTimer != null) reSubScribeTimer!.cancel();
@@ -102,7 +104,6 @@ class WebSocketController {
 
       cable!.onConnected = () {
         isInit = true;
-        reTryCount = 0;
         const Duration intervalForReSubScribe = Duration(seconds: 20);
         reSubScribeCheckTimer = Timer.periodic(intervalForReSubScribe, (Timer timer) {
           isReSubScribe = true;
@@ -184,28 +185,32 @@ class WebSocketController {
 
   static void _retryToConnect(){
     if(isInit){
-      reTryCount++;
-      if(reTryCount > 5){
-        resetConnectWebSocketCable();
-      }else{
-        GetController.to.updateAllSubScribed(false);
-        if(reSubScribeTimer != null) reSubScribeTimer!.cancel();
-        if(reSubScribeCheckTimer != null) reSubScribeCheckTimer!.cancel();
-        subscribedRoomIds.clear();
-        Future.delayed(const Duration(seconds: 2), () {
-          connectToWebSocketCable(); // 다시 연결
-        });
-      }
+      GetController.to.updateAllSubScribed(false);
+      if(reSubScribeTimer != null) reSubScribeTimer!.cancel();
+      if(reSubScribeCheckTimer != null) reSubScribeCheckTimer!.cancel();
+      subscribedRoomIds.clear();
+      Future.delayed(const Duration(seconds: 2), () {
+        connectToWebSocketCable(); // 다시 연결
+      });
     }else{
       resetConnectWebSocketCable();
     }
   }
 
   static void _retryToConnectNewVer(){
-    resetConnectWebSocketCable();
-    Future.delayed(const Duration(seconds: 2), () {
-      connectToWebSocketCable(); // 다시 연결
-    });
+    if(!isRetry){
+      isRetry = true;
+      GetController.to.updateAllSubScribed(false);
+
+      if(AppChatViewState.isViewHere){
+        AppChatViewState.isViewHere = false;
+        CommonUtils.moveWithUntil(Config.contextForEmergencyBack!, AppView.appMainView.value);
+      }
+
+      LogfinController.getLoanInfo((isSuccess, isNotEmpty){
+        isRetry = false;
+      });
+    }
   }
 
   static bool isSubscribe(String roomId){

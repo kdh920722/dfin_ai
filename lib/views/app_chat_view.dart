@@ -44,7 +44,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   bool isBuild = false;
   bool isTextFieldFocus = false;
   bool inputTextHide = true;
-  bool isViewHere = false;
+  static bool isViewHere = false;
 
   final ReceivePort _port = ReceivePort();
   static String savedFileName = "";

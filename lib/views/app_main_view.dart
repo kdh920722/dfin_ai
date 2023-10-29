@@ -31,7 +31,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   int viewTypeId = 2; // 1: 대출 / 2: MY / 3: 설정
   int tryOut = 0;
   String retryChatRoomId = "";
-  bool isViewHere = false;
+  static bool isViewHere = false;
 
   @override
   void initState(){
