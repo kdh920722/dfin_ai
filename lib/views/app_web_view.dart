@@ -51,12 +51,15 @@ class AppWebViewState extends State<AppWebView> {
               ),
               onLoadStop: (InAppWebViewController controller, uri) {
                 CommonUtils.log("i", "UPDATED URL CHECK URL: $uri");
+                /*
                 setState(() {
                   myUrl = uri!;
                   if(LogfinController.niceSuccessUrl == myUrl.toString()){
                     Navigator.pop(context, true);
                   }
                 });
+
+                 */
               },
               onCreateWindow: (controller, createWindowRequest) async{
                 showDialog(

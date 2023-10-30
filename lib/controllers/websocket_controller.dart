@@ -161,11 +161,6 @@ class WebSocketController {
 
                     GetController.to.updateChatLoanInfoList(MyData.getChatRoomInfoList());
                     WebSocketController.setWaitingState(eachMsg["pr_room_id"].toString(), eachMsg["username"].toString(), false);
-                    if(WebSocketController.isWaitingForAnswerState(eachMsg["pr_room_id"].toString(), "ME")){
-                      GetController.to.updateAutoAnswerWaiting(true);
-                    }else{
-                      GetController.to.updateAutoAnswerWaiting(false);
-                    }
 
                     if(eachMsg["status_flg"].toString() == "1"){
                       String statusId = eachMsg["status_id"].toString();
@@ -178,7 +173,6 @@ class WebSocketController {
                           CommonUtils.convertTimeToString(CommonUtils.parseToLocalTime(eachMsg["created_at"])),
                           eachMsg["message_type"].toString(), eachMsg["username"].toString(), jsonEncode(eachMsg));
                       GetController.to.addChatMessageInfoList(messageItem);
-                      // 채팅방
                       if(eachMsg["status_flg"].toString() == "1"){
                         String statusId = eachMsg["status_id"].toString();
                         if(LoanInfoData.getStatusName(statusId) == "접수"){

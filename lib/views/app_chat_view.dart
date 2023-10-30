@@ -19,6 +19,7 @@ import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import 'package:upfin/styles/TextStyles.dart';
 import 'package:upfin/views/app_main_view.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../configs/app_config.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
@@ -106,8 +107,12 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   }
 
   void _setAutoAnswerWaitingState(){
-    if(WebSocketController.isWaitingForAnswerState(currentRoomId, "ME")){
-      GetController.to.updateAutoAnswerWaiting(true);
+    if(WebSocketController.isWaitingForAnswerState(currentRoomId, "ME") == WebSocketController.isWaitingForAnswerState(currentRoomId, "UPFIN")){
+      if(WebSocketController.isWaitingForAnswerState(currentRoomId, "ME")){
+        GetController.to.updateAutoAnswerWaiting(true);
+      }else{
+        GetController.to.updateAutoAnswerWaiting(false);
+      }
     }else{
       GetController.to.updateAutoAnswerWaiting(false);
     }
@@ -206,6 +211,8 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     String extension = "";
     String buttonId = "";
     String fileName = "";
+    bool isFileType = true;
+
     if(sender == "UPFIN") {
       htmlTextTag = "<div id='typeOther'>";
       buttonId = "buttonTypeOther";
@@ -215,6 +222,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     }
 
     if(type == "file"){
+      isFileType = true;
       List<String> fileInfo = message.split('.');
       extension = fileInfo.last.toLowerCase();
       fileName = fileInfo[fileInfo.length-2].split("/").last;
@@ -239,6 +247,8 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         """;
       }
     }else{
+      isFileType = false;
+      /*
       List<String> tempMsg = message.split("다.");
       message = "";
       for(int i = 0 ; i < tempMsg.length ; i++){
@@ -248,6 +258,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
             if(tempMsg[i].length > 20) tempMsg[i] += "<br>";
           }
         }
+
 
         tempMsg[i] = _getEndLineChangeFormattedText(tempMsg[i], "요!");
         tempMsg[i] = _getEndLineChangeFormattedText(tempMsg[i], "요.");
@@ -268,6 +279,8 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
 
         message += tempMsg[i];
       }
+       */
+
       htmlTag = message;
       isImage = false;
     }
@@ -311,13 +324,14 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
             if(element.id == 'buttonTypeOther') {
               return {
                 "text-align":"center",
-                "background-color":"#3a6cff",
-                "color" : "white",
+                "background-color": "white", //"#3a6cff",
+                "color" : "black",
                 "font-size": "15px",
                 "line-height" : "250%",
                 "font-weight": "normal",
                 "border-radius":"0.1em",
-                "padding":"5px 20px"
+                "padding":"5px 20px",
+                "width": "500px",
               };
             }else if(element.id == 'buttonTypeMe'){
               return {
@@ -336,34 +350,44 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         },
 
         onTapUrl: (url) async {
-          String dir = "";
-          if(Config.isAndroid){
-            dir = '/storage/emulated/0/Download';
-            CommonUtils.log("", "document dir : ${(await getApplicationDocumentsDirectory()).path}");
-          }else{
-            dir = (await getApplicationDocumentsDirectory()).path;
-            CommonUtils.log("", "document dir : ${(await getApplicationDocumentsDirectory()).path}");
-          }
-          try{
-            await FlutterDownloader.enqueue(
-              url: url, 	// file url
-              savedDir: '$dir/',	// 저장할 dir
-              fileName: '${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_doc.$extension',	// 파일명
-              saveInPublicStorage: true ,	// 동일한 파일 있을 경우 덮어쓰기 없으면 오류발생함!
-              showNotification: true,
-              openFileFromNotification: true,
-            );
-            String fileRealName = "${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_doc.$extension";
-            String fileName = "$dir/$fileRealName";
-            savedFileName = fileName;
+          if(isFileType){
+            String dir = "";
+            if(Config.isAndroid){
+              dir = '/storage/emulated/0/Download';
+              CommonUtils.log("", "document dir : ${(await getApplicationDocumentsDirectory()).path}");
+            }else{
+              dir = (await getApplicationDocumentsDirectory()).path;
+              CommonUtils.log("", "document dir : ${(await getApplicationDocumentsDirectory()).path}");
+            }
+            try{
+              await FlutterDownloader.enqueue(
+                url: url, 	// file url
+                savedDir: '$dir/',	// 저장할 dir
+                fileName: '${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_doc.$extension',	// 파일명
+                saveInPublicStorage: true ,	// 동일한 파일 있을 경우 덮어쓰기 없으면 오류발생함!
+                showNotification: true,
+                openFileFromNotification: true,
+              );
+              String fileRealName = "${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_doc.$extension";
+              String fileName = "$dir/$fileRealName";
+              savedFileName = fileName;
 
-            if(context.mounted) UiUtils.showLoadingPop(context);
-            if(!isImage){
-              CommonUtils.flutterToast("문서를 다운로드합니다.");
+              if(context.mounted) UiUtils.showLoadingPop(context);
+              if(!isImage){
+                CommonUtils.flutterToast("문서를 다운로드합니다.");
+              }
+
+            }catch(e){
+              CommonUtils.log("", "fail download");
+            }
+          }else{
+            CommonUtils.log("", "furl : $url");
+            if(await canLaunchUrl(Uri.parse(url))){
+              await launchUrl(Uri.parse(url));
+            }else{
+              CommonUtils.flutterToast("연결할 수 없습니다.");
             }
 
-          }catch(e){
-            CommonUtils.log("", "fail download");
           }
 
           return true;
@@ -756,9 +780,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
       Color fillColor = ColorStyles.upFinWhite;
       Color textColor = ColorStyles.upFinBlack;
       if(each.contains("이전")){
-        borderColor = ColorStyles.upFinKakaoYellow;
-        fillColor = ColorStyles.upFinKakaoYellow;
-        textColor = ColorStyles.upFinBlack;
+
       }
 
       if(each.contains("자주하는 질문")){
@@ -901,6 +923,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         }
         WebSocketController.setWaitingState(currentRoomId, "ME", false);
         WebSocketController.setWaitingState(currentRoomId, "UPFIN", false);
+        _setAutoAnswerWaitingState();
       });
     }else{
       CommonUtils.flutterToast("응답을 기다리는 중입니다.");
@@ -989,6 +1012,8 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if(isViewHere){
+        await CommonUtils.saveSettingsToFile("push_from", "");
+        await CommonUtils.saveSettingsToFile("push_room_id", "");
         isBuild = true;
         _scrollToBottom(false, 0);
       }
@@ -1049,13 +1074,13 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
           }),
           UiUtils.getMarginBox(0, 1.h),
           UiUtils.getExpandedScrollViewWithController(Axis.vertical, Obx(()=>Column(mainAxisAlignment: MainAxisAlignment.start, children: _getChatList())), _chatScrollController),
-          UiUtils.getMarginBox(0, 1.h),
           Obx((){
-            return Column(
+            return Container(color:ColorStyles.upFinWhite, child: Column(
               mainAxisSize: MainAxisSize.min, // 자식 위젯에 맞게 높이를 조절합니다.
               children: [
+                GetController.to.isAutoAnswerWaiting.value ? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 0.8.h),
                 GetController.to.isAutoAnswerWaiting.value ? Container() : Align(alignment: Alignment.topRight,
-                    child: Padding(padding: EdgeInsets.only(left: 5.w, right: 5.w),
+                    child: Padding(padding: EdgeInsets.only(left: 2.w, right: 2.w),
                         child: Wrap(runSpacing: 0.7.h, spacing: 1.7.w, alignment: WrapAlignment.end, direction: Axis.horizontal,
                             children: GetController.to.autoAnswerWidgetList))),
                 GetController.to.isShowPickedFile.value? Column(children: [
@@ -1065,10 +1090,10 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                       UiUtils.getTextWithFixedScale("전송", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () async{
                         _sendFileToAws();
                       }),
-                ]) : Container()
-                // 다른 컨텐츠나 다른 위젯들
+                ]) : Container(),
+                GetController.to.isAutoAnswerWaiting.value ? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 0.8.h)
               ],
-            );
+            ));
             /*
             return SizedBox(width: 100.w, height: GetController.to.chatAutoAnswerHeight.value, child: Column(children: [
               Align(alignment: Alignment.topRight, child: Padding(padding: EdgeInsets.only(right: 5.w),
@@ -1084,7 +1109,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
             ]));
              */
           }),
-          UiUtils.getMarginBox(0, 0.8.h),
+
           Obx((){
             return GetController.to.isInputTextHide.value? Container() : AnimatedContainer(
                 duration: const Duration(milliseconds:200),

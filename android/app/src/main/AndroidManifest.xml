@@ -16,6 +16,11 @@
             <data android:scheme="kakaotalk" />
         </intent>
 
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="tel" />
+        </intent>
+
         <package android:name="com.nhn.android.search" /> <!-- 네이버 -->
         <intent>
             <action android:name="android.intent.action.VIEW" />
@@ -56,6 +61,12 @@
             <action android:name="android.intent.action.VIEW" />
             <data android:scheme="https" />
         </intent>
+
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="http" />
+        </intent>
+
     </queries>
     <application
         android:label="UpFin"
