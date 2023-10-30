@@ -1007,7 +1007,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           introWidgetList.add(
               SizedBox(width: 90.w,
                   child: Row(children: [
-                    UiUtils.getCustomCheckBox(key, 1.5, true, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
+                    UiUtils.getCustomCheckBox(key, 1.2, true, ColorStyles.upFinBlack, ColorStyles.upFinWhite,
                         ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
                     UiUtils.getTextButtonWithFixedScale(addedDocsList[i]["name"], 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
                   ])

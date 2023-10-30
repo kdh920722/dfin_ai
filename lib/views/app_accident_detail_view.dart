@@ -102,7 +102,7 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
 
                   SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("진행상태", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
                   UiUtils.getMarginBox(0, 1.2.h),
-                  UiUtils.getRoundBoxTextWithFixedScale(LoanInfoData.getDetailStatusName(each.statueId), 11.sp, FontWeight.w600, TextAlign.center, ColorStyles.upFinWhiteSky, ColorStyles.upFinButtonBlue),
+                  UiUtils.getRoundBoxTextWithFixedScale2(LoanInfoData.getDetailStatusName(each.statueId), 10.sp, FontWeight.w600, TextAlign.center, ColorStyles.upFinWhiteSky, ColorStyles.upFinButtonBlue),
                   UiUtils.getMarginBox(0, 3.h),
                   MyData.getLoanInfoList().length == 1 || (MyData.getLoanInfoList().length != 1 && count == MyData.getLoanInfoList().length-1) ?
                   Container() : UiUtils.getMarginColoredBox(90.w, 0.1.h, ColorStyles.upFinWhiteGray)
@@ -137,7 +137,7 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
           UiUtils.getMarginBox(0, 2.h),
           SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(MyData.selectedAccidentInfoData!.accidentCourtInfo.split("@")[0], 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)),
           UiUtils.getMarginBox(0, 4.h),
-          Row(children: [
+          Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
             Column(children: [
               SizedBox(width: 61.w, child: UiUtils.getTextWithFixedScale("환급계좌", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
               UiUtils.getMarginBox(0, 2.h),
@@ -145,8 +145,8 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
                   14.sp, FontWeight.w500, isSuccessToGetDetailInfo? ColorStyles.upFinBlack : ColorStyles.upFinRed, TextAlign.start, null)),
             ]),
             const Spacer(flex: 2),
-            UiUtils.getBorderButtonBoxWithZeroPadding(16.w, isSuccessToGetDetailInfo? ColorStyles.upFinWhiteSky: ColorStyles.upFinWhiteRed, isSuccessToGetDetailInfo? ColorStyles.upFinWhiteSky: ColorStyles.upFinWhiteRed,
-                UiUtils.getTextWithFixedScale("변경", 10.sp, FontWeight.w600, isSuccessToGetDetailInfo? ColorStyles.upFinButtonBlue : ColorStyles.upFinRed, TextAlign.start, null), () async {
+            UiUtils.getBorderButtonBoxWithZeroPadding(16.w, isSuccessToGetDetailInfo? ColorStyles.upFinButtonBlue: ColorStyles.upFinWhiteRed, isSuccessToGetDetailInfo? ColorStyles.upFinButtonBlue: ColorStyles.upFinWhiteRed,
+                UiUtils.getTextWithFixedScale("변경", 10.sp, FontWeight.w600, isSuccessToGetDetailInfo? ColorStyles.upFinWhite : ColorStyles.upFinRed, TextAlign.start, null), () async {
                   AppUpdateAccidentViewState.isAccountEditMode = true;
                   AppUpdateAccidentViewState.startViewId = AppUpdateAccidentViewState.bankCodeViewId;
                   AppUpdateAccidentViewState.endViewId = AppUpdateAccidentViewState.bankAccountViewId;

@@ -89,8 +89,8 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         int status = data[1];
         int progress = data[2];
         if(status == 3 && progress == 100){
+          UiUtils.closeLoadingPop(context);
           await FlutterDownloader.open(taskId: id);
-          if(context.mounted) UiUtils.closeLoadingPop(context);
         }
       }catch(error){
         CommonUtils.log("e", "port.listen error : $error");
