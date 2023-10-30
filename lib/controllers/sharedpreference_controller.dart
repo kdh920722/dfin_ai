@@ -73,6 +73,26 @@ class SharedPreferenceController {
         sharedPreferences!.remove(sharedPreferencePwKey);
       }
 
+      if(sharedPreferences!.containsKey(sharedPreferenceIsSnsLogin)){
+        sharedPreferences!.remove(sharedPreferenceIsSnsLogin);
+      }
+
+      if(sharedPreferences!.containsKey(sharedPreferenceSnsToken)){
+        sharedPreferences!.remove(sharedPreferenceSnsToken);
+      }
+
+      if(sharedPreferences!.containsKey(sharedPreferenceSnsId)){
+        sharedPreferences!.remove(sharedPreferenceSnsId);
+      }
+
+      if(sharedPreferences!.containsKey(sharedPreferenceSnsType)){
+        sharedPreferences!.remove(sharedPreferenceSnsType);
+      }
+
+      if(sharedPreferences!.containsKey(sharedPreferenceFileName)){
+        sharedPreferences!.remove(sharedPreferenceFileName);
+      }
+
       if(sharedPreferences!.containsKey(sharedPreferenceApplyPrKey)){
         sharedPreferences!.remove(sharedPreferenceApplyPrKey);
       }

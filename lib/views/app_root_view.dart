@@ -483,14 +483,12 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
                   UiUtils.closeLoadingPop(context);
                   if(isSuccessToGetMainInfo){
                     CommonUtils.flutterToast("환영합니다!");
-                    isAutoLogin = true;
                     CommonUtils.goToMain(context, null, null);
                   }
                 });
               }else{
                 UiUtils.closeLoadingPop(context);
                 CommonUtils.flutterToast("오류가 발생했습니다.");
-                isAutoLogin = true;
               }
             });
           }else{
@@ -509,14 +507,12 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
                   UiUtils.closeLoadingPop(context);
                   if(isSuccessToGetMainInfo){
                     CommonUtils.flutterToast("환영합니다!");
-                    isAutoLogin = true;
                     CommonUtils.goToMain(context, null, null);
                   }
                 });
               }else{
                 UiUtils.closeLoadingPop(context);
                 CommonUtils.flutterToast("오류가 발생했습니다.");
-                isAutoLogin = true;
               }
             });
           }
