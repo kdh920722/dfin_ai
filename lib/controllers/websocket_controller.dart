@@ -226,8 +226,21 @@ class WebSocketController {
         CommonUtils.moveWithUntil(Config.contextForEmergencyBack!, AppView.appMainView.value);
       }
 
-      LogfinController.getLoanInfo((isSuccess, isNotEmpty){
-        isRetry = false;
+      Future.delayed(const Duration(seconds: 5), () {
+        LogfinController.getLoanInfo((isSuccess, isNotEmpty){
+          isRetry = false;
+          if(isSuccess){
+            if(isNotEmpty){
+              // success
+            }else{
+              // fail
+              _retryToConnectNewVer();
+            }
+          }else{
+            // fail
+            _retryToConnectNewVer();
+          }
+        });
       });
     }
   }
