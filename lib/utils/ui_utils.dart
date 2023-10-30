@@ -167,8 +167,8 @@ class UiUtils {
   }
 
   static Widget getRoundedBoxTextWithFixedScale(String text, double fontSize, FontWeight fontWeight, TextAlign? textAlign, Color borderColor, Color fillColor, Color textColor){
-    return Container(padding: EdgeInsets.only(top: 3.w, bottom: 3.w, left: 3.w, right: 3.w), // 텍스트 주위에 여백 추가
-        decoration: BoxDecoration(color: fillColor, border: Border.all(color: borderColor, width: 0.22.w), borderRadius: BorderRadius.circular(20)),
+    return Container(padding: EdgeInsets.only(top: 2.w, bottom: 2.w, left: 3.w, right: 3.w), // 텍스트 주위에 여백 추가
+        decoration: BoxDecoration(color: fillColor, border: Border.all(color: borderColor, width: 0.4.w), borderRadius: BorderRadius.circular(20)),
         child: Text(text, style: TextStyle(decoration: TextDecoration.none, height: 1, fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor)));
   }
 

@@ -8,6 +8,7 @@ import 'package:upfin/views/app_chat_view.dart';
 import 'package:upfin/views/app_main_view.dart';
 import '../configs/app_config.dart';
 import '../datas/chat_message_info_data.dart';
+import '../datas/loan_info_data.dart';
 import '../utils/common_utils.dart';
 import 'logfin_controller.dart';
 
@@ -140,7 +141,7 @@ class WebSocketController {
                     if(idx != -1) subscribedRoomIds.removeAt(idx);
                   },
                   onMessage: (Map message) {
-                    CommonUtils.log("", "arrived message : $message");
+                    CommonUtils.log("", "arrived message : $roomId \n $message");
                     var eachMsg = message;
                     for(int i = 0 ; i < MyData.getChatRoomInfoList().length ; i++){
                       if(MyData.getChatRoomInfoList()[i].chatRoomId == roomId){
@@ -152,14 +153,32 @@ class WebSocketController {
                         MyData.getChatRoomInfoList()[i].chatRoomMsgInfo = jsonEncode(msgInfo);
                       }
                     }
-                    GetController.to.updateChatLoanInfoList(MyData.getChatRoomInfoList());
 
+                    GetController.to.updateChatLoanInfoList(MyData.getChatRoomInfoList());
                     WebSocketController.setWaitingState(eachMsg["pr_room_id"].toString(), eachMsg["username"].toString(), false);
+
+                    if(eachMsg["status_flg"].toString() == "1"){
+                      String statusId = eachMsg["status_id"].toString();
+                      MyData.updateStatusToLoanInfoAndChatRoomInfo(roomId, statusId);
+                      GetController.to.updateChatLoanInfoList(MyData.getChatRoomInfoList());
+                    }
+
                     if(AppChatViewState.currentRoomId == eachMsg["pr_room_id"].toString()){
                       var messageItem = ChatMessageInfoData(eachMsg["id"].toString(), eachMsg["pr_room_id"].toString(), eachMsg["message"].toString(),
                           CommonUtils.convertTimeToString(CommonUtils.parseToLocalTime(eachMsg["created_at"])),
                           eachMsg["message_type"].toString(), eachMsg["username"].toString(), jsonEncode(eachMsg));
                       GetController.to.addChatMessageInfoList(messageItem);
+                      // 채팅방
+                      if(eachMsg["status_flg"].toString() == "1"){
+                        String statusId = eachMsg["status_id"].toString();
+                        if(LoanInfoData.getStatusName(statusId) == "접수"){
+                          GetController.to.updateChatStatusTick(1);
+                        }else if(LoanInfoData.getStatusName(statusId) == "심사"){
+                          GetController.to.updateChatStatusTick(2);
+                        }else if(LoanInfoData.getStatusName(statusId) == "통보"){
+                          GetController.to.updateChatStatusTick(3);
+                        }
+                      }
                     }
                   }
               );

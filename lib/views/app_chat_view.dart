@@ -40,7 +40,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   String currentCompany = "";
   String currentCompanyLogo = "";
   String currentStatus = "";
-  int _ticks = 0;
   bool isBuild = false;
   bool isTextFieldFocus = false;
   bool inputTextHide = true;
@@ -62,11 +61,11 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         currentCompanyLogo = each.companyLogo;
         currentStatus = each.statueId;
         if(LoanInfoData.getStatusName(currentStatus) == "접수"){
-          _ticks = 1;
+          GetController.to.updateChatStatusTick(1);
         }else if(LoanInfoData.getStatusName(currentStatus) == "심사"){
-          _ticks = 2;
+          GetController.to.updateChatStatusTick(2);
         }else if(LoanInfoData.getStatusName(currentStatus) == "통보"){
-          _ticks = 3;
+          GetController.to.updateChatStatusTick(3);
         }
       }
     }
@@ -159,7 +158,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   }
   
   Widget _getHtmlView(String message, String sender, String type){
-    CommonUtils.log("", "message : $message\nsender : $sender\ntype : $type");
     bool isImage = true;
     String htmlTag = "";
     String htmlTextTag = "";
@@ -199,6 +197,33 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         """;
       }
     }else{
+      List<String> tempMsg = message.split("다.");
+      message = "";
+      for(int i = 0 ; i < tempMsg.length ; i++){
+        if(i != tempMsg.length-1){
+          tempMsg[i] +="다.<br>";
+          if(i != tempMsg.length-2) {
+            if(tempMsg[i].length > 20) tempMsg[i] += "<br>";
+          }
+        }
+
+        if(tempMsg[i].contains("요!")){
+          String temp = tempMsg[i].split("요!")[0] +="요!<br>${tempMsg[i].split("요!")[1]}";
+          tempMsg[i] = temp;
+        }
+
+        if(tempMsg[i].contains("요.")){
+          String temp = tempMsg[i].split("요.")[0] +="요.<br>${tempMsg[i].split("요.")[1]}";
+          tempMsg[i] = temp;
+        }
+
+        if(tempMsg[i].contains("요?")){
+          String temp = tempMsg[i].split("요?")[0] +="요?<br>${tempMsg[i].split("요?")[1]}";
+          tempMsg[i] = temp;
+        }
+
+        message += tempMsg[i];
+      }
       htmlTag = message;
       isImage = false;
     }
@@ -215,14 +240,14 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
           if(element.id == 'typeMe') {
             return {
               "color" : "white",
-              "font-size": "14px",
+              "font-size": "15px",
               "line-height" : "120%",
               "font-weight": "normal",
             };
           }else if(element.id == 'typeOther') {
             return {
               "color" : "black",
-              "font-size": "14px",
+              "font-size": "15px",
               "line-height" : "120%",
               "font-weight": "normal",
             };
@@ -234,7 +259,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                 "text-align":"center",
                 "background-color":"#3a6cff",
                 "color" : "white",
-                "font-size": "14px",
+                "font-size": "15px",
                 "line-height" : "250%",
                 "font-weight": "normal",
                 "border-radius":"0.1em",
@@ -245,7 +270,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                 "text-align":"center",
                 "background-color":"white",
                 "color" : "#3a6cff",
-                "font-size": "14px",
+                "font-size": "15px",
                 "line-height" : "250%",
                 "font-weight": "normal",
                 "border-radius":"0.1em",
@@ -257,11 +282,9 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         },
 
         onTapUrl: (url) async {
-          CommonUtils.log("", "cilck url from a tag : $url");
           String dir = "";
           if(Config.isAndroid){
             dir = '/storage/emulated/0/Download';
-            //dir = (await getApplicationSupportDirectory()).path;
             CommonUtils.log("", "document dir : ${(await getApplicationDocumentsDirectory()).path}");
           }else{
             dir = (await getApplicationDocumentsDirectory()).path;
@@ -281,9 +304,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
             savedFileName = fileName;
 
             if(context.mounted) UiUtils.showLoadingPop(context);
-            if(isImage){
-
-            }else{
+            if(!isImage){
               CommonUtils.flutterToast("문서를 다운로드합니다.");
             }
 
@@ -309,7 +330,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                 painter: ChatBubbleTriangleForOther(),
               ),
               Container(
-                  constraints: BoxConstraints(maxWidth: 65.w),
+                  constraints: BoxConstraints(maxWidth: 70.w),
                   padding: EdgeInsets.all(3.w),
                   decoration: const BoxDecoration(
                     borderRadius: BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomRight: Radius.circular(15)),
@@ -336,7 +357,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                 painter: ChatBubbleTriangleForOther(),
               ),
               Container(
-                  constraints: BoxConstraints(maxWidth: 65.w),
+                  constraints: BoxConstraints(maxWidth: 70.w),
                   padding: EdgeInsets.all(3.w),
                   decoration: const BoxDecoration(
                     borderRadius: BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomRight: Radius.circular(15)),
@@ -367,9 +388,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
             UiUtils.getTextWithFixedScale(CommonUtils.getFormattedLastMsgTime(meInfo.messageTime), 8.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null),
             UiUtils.getMarginBox(1.w, 0),
             Container(
-                constraints: BoxConstraints(
-                    maxWidth: 65.w
-                ),
+                constraints: BoxConstraints(maxWidth: 70.w),
                 padding: EdgeInsets.all(3.w),
                 decoration: const BoxDecoration(
                   borderRadius: BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomLeft: Radius.circular(15)),
@@ -392,9 +411,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
           Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
             Container(
-                constraints: BoxConstraints(
-                    maxWidth: 65.w
-                ),
+                constraints: BoxConstraints(maxWidth: 70.w),
                 padding: EdgeInsets.all(3.w),
                 decoration: const BoxDecoration(
                   borderRadius: BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomLeft: Radius.circular(15)),
@@ -433,8 +450,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     return chatList;
   }
 
-  Future<void> back() async {
-    CommonUtils.hideKeyBoard();
+  Future<void> _back() async {
     if(backPossibleFlag){
       backPossibleFlag = false;
       var inputJson = {
@@ -455,6 +471,8 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
 
       if(context.mounted) {
         isViewHere = false;
+        _chatTextFocus.unfocus();
+        CommonUtils.hideKeyBoard();
         UiUtils.closeLoadingPop(context);
         Navigator.pop(context);
       }
@@ -476,11 +494,11 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   Widget _getTimelineWidget(){
     return Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start,
       children: <Widget>[
-        _stepTick1(),
-        _ticks>1? _stepLine(true) : _stepLine(false),
-        _stepTick2(),
-        _ticks>2? _stepLine(true) : _stepLine(false),
-        _stepTick3()
+        GetController.to.chatStatusTick.value>0?_stepTick(0, true):_stepTick(0, false),
+        GetController.to.chatStatusTick.value>1? _stepLine(true) : _stepLine(false),
+        GetController.to.chatStatusTick.value>1?_stepTick(1, true):_stepTick(1, false),
+        GetController.to.chatStatusTick.value>2? _stepLine(true) : _stepLine(false),
+        GetController.to.chatStatusTick.value>2?_stepTick(2, true):_stepTick(2, false)
       ],
     );
   }
@@ -489,12 +507,12 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     bool passed = false;
     if(type == 0){
       typeString = "접수";
-      if(_ticks > 1){
+      if(GetController.to.chatStatusTick.value > 1){
         passed = true;
       }
     }else if(type == 1){
       typeString = "심사";
-      if(_ticks > 2){
+      if(GetController.to.chatStatusTick.value > 2){
         passed = true;
       }
     }else{
@@ -511,13 +529,13 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   }
 
   Widget _stepTick1() {
-    return _ticks>0?_stepTick(0, true):_stepTick(0, false);
+    return GetController.to.chatStatusTick.value>0?_stepTick(0, true):_stepTick(0, false);
   }
   Widget _stepTick2() {
-    return _ticks>1?_stepTick(1, true):_stepTick(1, false);
+    return GetController.to.chatStatusTick.value>1?_stepTick(1, true):_stepTick(1, false);
   }
   Widget _stepTick3() {
-    return _ticks>2?_stepTick(2, true):_stepTick(2, false);
+    return GetController.to.chatStatusTick.value>2?_stepTick(2, true):_stepTick(2, false);
   }
 
   Widget _stepLine(bool isReached) {
@@ -724,49 +742,49 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     if(currentKey == ""){
       answerList.add("사진");
       answerList.add("가져오기");
-      answerList.add("채팅");
+      answerList.add("AI 채팅");
     }else{
       answerList.add("이전");
     }
     for(var each in answerList){
       Color borderColor = ColorStyles.upFinGray;
-      Color fillColor = ColorStyles.upFinWhiteGray;
+      Color fillColor = ColorStyles.upFinWhite;
       Color textColor = ColorStyles.upFinBlack;
-      if(each == "이전"){
+      if(each.contains("이전")){
         borderColor = ColorStyles.upFinKakaoYellow;
         fillColor = ColorStyles.upFinKakaoYellow;
         textColor = ColorStyles.upFinBlack;
-      }else if(each == "채팅"){
+      }else if(each.contains("채팅")){
         borderColor = ColorStyles.upFinButtonBlue;
         fillColor = ColorStyles.upFinButtonBlue;
         textColor = ColorStyles.upFinWhite;
-      }else if(each == "사진"){
+      }else if(each.contains("사진")){
         borderColor = ColorStyles.upFinBlack;
         fillColor = ColorStyles.upFinBlack;
         textColor = ColorStyles.upFinWhite;
-      }else if(each == "가져오기"){
+      }else if(each.contains("가져오기")){
         borderColor = ColorStyles.upFinBlack;
         fillColor = ColorStyles.upFinBlack;
         textColor = ColorStyles.upFinWhite;
       }
 
-      if(each == "자주하는 질문"){
+      if(each.contains("자주하는 질문")){
         widgetList.add(Container(key: UniqueKey()));
       }
 
-      if(each == "상환일정"){
+      if(each.contains("상환일정")){
         widgetList.add(Container(key: UniqueKey()));
       }
 
-      if(each == "미납"){
+      if(each.contains("미납")){
         widgetList.add(Container(key: UniqueKey()));
       }
 
-      if(each == "사진"){
+      if(each.contains("사진")){
         widgetList.add(Container(key: UniqueKey()));
       }
 
-      if(each == "이전"){
+      if(each.contains("이전")){
         if(answerList.length != 1){
           widgetList.add(Container(key: UniqueKey()));
         }
@@ -798,7 +816,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
             setState(() {});
           }else{
             String result = _findValueForKey(LogfinController.autoAnswerMap, currentKey);
-            CommonUtils.flutterToast(result);
+            _sendMessage(currentKey, result);
           }
         }
       }));
@@ -988,7 +1006,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
               top: 1.h,
               left: 5.w,
               child: UiUtils.getBackButton(() {
-                back();
+                _back();
               }),
             ),
             Positioned(
@@ -998,7 +1016,10 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                     UiUtils.getMarginBox(0, 2.5.h),
                     UiUtils.getTextWithFixedScale(currentCompany, 16.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.center, 1),
                     UiUtils.getMarginBox(0, 1.h),
-                    UiUtils.getTextWithFixedScale(LoanInfoData.getDetailStatusName(currentStatus), 12.sp, FontWeight.w600, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, null)
+                    Obx((){
+                      String statusName = LoanInfoData.getDetailStatusName(GetController.to.chatStatusTick.value.toString());
+                      return UiUtils.getTextWithFixedScale(statusName, 12.sp, FontWeight.w600, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, null);
+                    })
                   ])
               ),
             ),
@@ -1008,8 +1029,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                   child: Obx((){
                     return Padding(padding: EdgeInsets.only(right: 3.w), child: Column(children: [
                       UiUtils.getMarginBox(0, 1.8.h),
-                      UiUtils.getIconButtonWithHeight(8.w, GetController.to.isShowStatus.value? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
-                          8.w, ColorStyles.upFinDarkGray, () {
+                      UiUtils.getIconButtonWithHeight(8.w, GetController.to.isShowStatus.value? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded, 8.w, ColorStyles.upFinDarkGray, () {
                             GetController.to.updateShowStatus(!GetController.to.isShowStatus.value);
                           })
                     ]));
@@ -1021,7 +1041,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
             if(GetController.to.isShowStatus.value){
               return Column(children:[
                 UiUtils.getMarginBox(0, 3.h),
-                _getTimelineWidget()
+                Obx(()=>_getTimelineWidget())
               ]);
             }else{
               return Container();
@@ -1117,7 +1137,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
           })
         ])
     );
-    return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
+    return UiUtils.getViewWithAllowBackForAndroid(context, view, _back);
 
   }
 

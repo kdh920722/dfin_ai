@@ -37,6 +37,7 @@ class GetController extends GetxController {
   RxList<Widget> autoAnswerWidgetList = <Widget>[].obs;
   RxBool isShowPickedFile = false.obs;
   RxBool isShowStatus = false.obs;
+  RxInt chatStatusTick = 0.obs;
 
   @override
   void onInit() {
@@ -206,6 +207,9 @@ class GetController extends GetxController {
 
   void updateChatAutoAnswerHeight(double newValue) {
     chatAutoAnswerHeight.value = newValue;
+  }
+  void updateChatStatusTick(int newValue) {
+    chatStatusTick.value = newValue;
   }
   void updateInputTextHide(bool newValue) {
     isInputTextHide.value = newValue;

@@ -446,9 +446,9 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
 
   Future<void> _resetAndGoToChatRoom(BuildContext context, String chatRoomId) async {
     UiUtils.showLoadingPop(context);
-    LogfinController.getMainViewInfo((isSuccessToGetMainInfo) async {
+    LogfinController.getLoanInfo((isSuccessToGetLoanInfo, _) async {
       UiUtils.closeLoadingPop(context);
-      if(isSuccessToGetMainInfo){
+      if(isSuccessToGetLoanInfo){
         await CommonUtils.saveSettingsToFile("push_from", "F");
         await CommonUtils.saveSettingsToFile("push_room_id", chatRoomId);
         _directGoToChatRoom(chatRoomId);

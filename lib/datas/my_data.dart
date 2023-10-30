@@ -100,6 +100,18 @@ class MyData {
   static void clearLoanInfoList(){
     _loanInfoList.clear();
   }
+  static void updateStatusToLoanInfoAndChatRoomInfo(String roomId, String statusId) {
+    for(int i1 = 0 ; i1 < _loanInfoList.length ; i1 ++){
+      if(roomId == _loanInfoList[i1].chatRoomId){
+        _loanInfoList[i1].statueId = statusId;
+        for(int i2 = 0 ; i2 < _chatRoomInfoList.length ; i2 ++){
+          if(roomId == _chatRoomInfoList[i2].chatRoomId){
+            _chatRoomInfoList[i2].chatRoomLoanStatus = statusId;
+          }
+        }
+      }
+    }
+  }
 
   // loan chat data
   static final List<ChatRoomInfoData> _chatRoomInfoList = [];
