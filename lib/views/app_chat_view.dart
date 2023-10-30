@@ -156,6 +156,40 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         break;
     }
   }
+
+  String _getInfoFormattedText(String message, String targetMessage, String convertMessage){
+    if(message.contains(targetMessage)){
+      if(message.split(targetMessage)[0].length > 2){
+        String temp = "${message.split(targetMessage)[0]}<br><text id='boldText'><br>$convertMessage</text><br>${message.split(targetMessage)[1]}";
+        message = temp;
+      }else{
+        String temp = "${message.split(targetMessage)[0]}<br><text id='boldText'>$convertMessage</text><br>${message.split(targetMessage)[1]}";
+        message = temp;
+      }
+    }
+
+    return message;
+  }
+
+  String _getEndLineChangeFormattedText(String message, String targetMessage){
+    if(message.contains(targetMessage)){
+      String temp = "${message.split(targetMessage)[0]}$targetMessage<br>${message.split(targetMessage)[1]}";
+      message = temp;
+    }
+
+    return message;
+  }
+
+  String _getFrontLineChangeFormattedText(String message, String targetMessage){
+    if(message.contains(targetMessage)){
+      if(message.split(targetMessage)[0].length > 2){
+        String temp = "${message.split(targetMessage)[0]}<br><br>$targetMessage${message.split(targetMessage)[1]}";
+        message = temp;
+      }
+    }
+
+    return message;
+  }
   
   Widget _getHtmlView(String message, String sender, String type){
     bool isImage = true;
@@ -207,20 +241,19 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
           }
         }
 
-        if(tempMsg[i].contains("요!")){
-          String temp = tempMsg[i].split("요!")[0] +="요!<br>${tempMsg[i].split("요!")[1]}";
-          tempMsg[i] = temp;
-        }
+        tempMsg[i] = _getEndLineChangeFormattedText(tempMsg[i], "요!");
+        tempMsg[i] = _getEndLineChangeFormattedText(tempMsg[i], "요.");
+        tempMsg[i] = _getEndLineChangeFormattedText(tempMsg[i], "요?");
+        tempMsg[i] = _getEndLineChangeFormattedText(tempMsg[i], "며,");
+        tempMsg[i] = _getEndLineChangeFormattedText(tempMsg[i], "이고");
 
-        if(tempMsg[i].contains("요.")){
-          String temp = tempMsg[i].split("요.")[0] +="요.<br>${tempMsg[i].split("요.")[1]}";
-          tempMsg[i] = temp;
-        }
+        tempMsg[i] = _getFrontLineChangeFormattedText(tempMsg[i], "더 자세한");
 
-        if(tempMsg[i].contains("요?")){
-          String temp = tempMsg[i].split("요?")[0] +="요?<br>${tempMsg[i].split("요?")[1]}";
-          tempMsg[i] = temp;
-        }
+        tempMsg[i] = _getInfoFormattedText(tempMsg[i], "- 대출 상품:", "대출상품");
+        tempMsg[i] = _getInfoFormattedText(tempMsg[i], "- 금융사:", "금융사");
+        tempMsg[i] = _getInfoFormattedText(tempMsg[i], "- 대출 한도:", "대출한도");
+        tempMsg[i] = _getInfoFormattedText(tempMsg[i], "- 금리:", "금리");
+        tempMsg[i] = _getInfoFormattedText(tempMsg[i], "- 대출 상태:", "대출상태");
 
         message += tempMsg[i];
       }
@@ -232,6 +265,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
       HtmlWidget(
         htmlString,
+        enableCaching: true,buildAsync: false,
         onLoadingBuilder: (context, element, progress){
             CommonUtils.log("", "html : $progress");
             _scrollToBottom(true,100);
@@ -250,6 +284,15 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
               "font-size": "15px",
               "line-height" : "120%",
               "font-weight": "normal",
+            };
+          }
+
+          if(element.id == 'boldText') {
+            return {
+              "color" : "black",
+              "font-size": "16px",
+              "line-height" : "120%",
+              "font-weight": "bold",
             };
           }
 
@@ -330,7 +373,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                 painter: ChatBubbleTriangleForOther(),
               ),
               Container(
-                  constraints: BoxConstraints(maxWidth: 70.w),
+                  constraints: BoxConstraints(maxWidth: 73.w),
                   padding: EdgeInsets.all(3.w),
                   decoration: const BoxDecoration(
                     borderRadius: BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomRight: Radius.circular(15)),
@@ -357,7 +400,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                 painter: ChatBubbleTriangleForOther(),
               ),
               Container(
-                  constraints: BoxConstraints(maxWidth: 70.w),
+                  constraints: BoxConstraints(maxWidth: 73.w),
                   padding: EdgeInsets.all(3.w),
                   decoration: const BoxDecoration(
                     borderRadius: BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomRight: Radius.circular(15)),
@@ -388,7 +431,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
             UiUtils.getTextWithFixedScale(CommonUtils.getFormattedLastMsgTime(meInfo.messageTime), 8.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null),
             UiUtils.getMarginBox(1.w, 0),
             Container(
-                constraints: BoxConstraints(maxWidth: 70.w),
+                constraints: BoxConstraints(maxWidth: 73.w),
                 padding: EdgeInsets.all(3.w),
                 decoration: const BoxDecoration(
                   borderRadius: BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomLeft: Radius.circular(15)),
@@ -411,7 +454,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
           Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
             Container(
-                constraints: BoxConstraints(maxWidth: 70.w),
+                constraints: BoxConstraints(maxWidth: 73.w),
                 padding: EdgeInsets.all(3.w),
                 decoration: const BoxDecoration(
                   borderRadius: BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomLeft: Radius.circular(15)),
