@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
@@ -5,6 +6,7 @@ import 'dart:ui';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:sizer/sizer.dart';
@@ -45,12 +47,14 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   bool isTextFieldFocus = false;
   bool inputTextHide = true;
   static bool isViewHere = false;
+  double deviceH = 100.h;
 
   final ReceivePort _port = ReceivePort();
   static String savedFileName = "";
-
   bool searchNoMore = false;
-  bool isScrollStop = false;
+  bool isScrollBottom = true;
+  double prevScrollPos = 0.0;
+  static bool isScrollMove = false;
 
   @override
   void initState(){
@@ -77,12 +81,40 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     Config.isEmergencyRoot = false;
     _keyboardVisibilityController = CommonUtils.getKeyboardViewController(_functionForKeyboardShow, _functionForKeyboardHide);
     _chatScrollController.addListener(() {
+      double currPos = _chatScrollController.position.pixels;
+      double maxH = _chatScrollController.position.maxScrollExtent;
+      if((maxH - deviceH/2) >= 0) maxH = maxH - deviceH/2;
+
+      CommonUtils.log("", "currPos : ${100.h} || $currPos || $maxH");
+
+      if(deviceH <= currPos){
+        if(currPos <= maxH){
+          GetController.to.updateShowScrollBottom(true);
+        }else{
+          GetController.to.updateShowScrollBottom(false);
+        }
+      }else{
+        GetController.to.updateShowScrollBottom(false);
+      }
+
       if (_chatScrollController.offset == _chatScrollController.position.maxScrollExtent && !_chatScrollController.position.outOfRange) {
-        CommonUtils.log('','스크롤이 맨 바닥에 위치해 있습니다');
-        isScrollStop = false;
-      } else if (_chatScrollController.offset == _chatScrollController.position.minScrollExtent && !_chatScrollController.position.outOfRange) {
-        CommonUtils.log('','스크롤이 맨 위에 위치해 있습니다');
-        isScrollStop = true;
+        isScrollBottom = true;
+        isScrollMove = false;
+        GetController.to.updateShowScrollBottom(false);
+        setState(() {});
+      }
+      // else if (_chatScrollController.offset == _chatScrollController.position.minScrollExtent && !_chatScrollController.position.outOfRange) {
+      //   isScrollStop = true;
+      //   isScrollMove = true;
+      // }
+      else{
+        if(isScrollBottom){
+          isScrollBottom = false;
+        }
+
+        if(!isScrollMove){
+          isScrollMove = true;
+        }
       }
     });
     FireBaseController.setStateForForeground = null;
@@ -91,8 +123,20 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     GetController.to.updateInputTextHide(true);
     GetController.to.updateShowStatus(true);
     GetController.to.updateAutoAnswerWaiting(false);
+    GetController.to.updateShowScrollBottom(false);
     _setAutoAnswerWaitingState();
+    isScrollMove = false;
     currentKey = "";
+
+    htmlLoadTimer = Timer.periodic(const Duration(milliseconds: 300), (Timer timer) {
+      htmlBuildCnt++;
+      if(htmlBuildCnt > 4){
+        isHtmlLoad = true;
+        htmlLoadTimer!.cancel();
+        _scrollToBottom(true,0);
+        setState(() {});
+      }
+    });
 
     IsolateNameServer.registerPortWithName(_port.sendPort, 'downloader_send_port');
     _port.listen((dynamic data) async {
@@ -100,8 +144,11 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         String id = data[0];
         int status = data[1];
         int progress = data[2];
-        if(status == 3 && progress == 100){
+
+        if(status == 2){
           UiUtils.closeLoadingPop(context);
+        }
+        if(status == 3 && progress == 100){
           await FlutterDownloader.open(taskId: id);
         }
       }catch(error){
@@ -135,11 +182,11 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
 
   KeyboardVisibilityController? _keyboardVisibilityController;
   void _functionForKeyboardHide(){
-    isScrollStop = false;
+    isScrollMove = false;
     _scrollToBottom(true,400);
   }
   void _functionForKeyboardShow() {
-    isScrollStop = false;
+    isScrollMove = false;
     _scrollToBottom(true,400);
   }
 
@@ -219,7 +266,10 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
 
     return message;
   }
-  
+
+  Timer? htmlLoadTimer;
+  bool isHtmlLoad = false;
+  int htmlBuildCnt = 0;
   Widget _getHtmlView(String message, String sender, String type){
     bool isImage = true;
     String htmlTag = "";
@@ -307,9 +357,20 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         htmlString,
         enableCaching: false,
         buildAsync: false,
-        onLoadingBuilder: (context, element, progress){
-            CommonUtils.log("", "html : $progress");
-            _scrollToBottom(true,100);
+        onLoadingBuilder: (htmlContext, element, progress){
+          CommonUtils.log("", "html!!");
+          htmlBuildCnt = 0;
+          isHtmlLoad = false;
+          if(htmlLoadTimer != null) htmlLoadTimer!.cancel();
+          htmlLoadTimer = Timer.periodic(const Duration(milliseconds: 300), (Timer timer) {
+            htmlBuildCnt++;
+            if(htmlBuildCnt > 4){
+              isHtmlLoad = true;
+              htmlLoadTimer!.cancel();
+              _scrollToBottom(true,0);
+              setState(() {});
+            }
+          });
         },
         customStylesBuilder: (element) {
           if(element.id == 'typeMe') {
@@ -524,7 +585,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
 
   List<Widget> _getChatList(){
     List<Widget> chatList = [];
-    CommonUtils.log("i", "re draw chat messages");
     for(var each in GetController.to.chatMessageInfoDataList){
       if(each.senderName == "UPFIN"){
         chatList.add(_getOtherView(each));
@@ -578,7 +638,8 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   Future<void> _scrollToBottom(bool doDelay, int delayTime) async {
     CommonUtils.log("", "scroll..?");
     if(isBuild){
-      if(!isScrollStop){
+      if(!isScrollMove){
+        CommonUtils.log("", "scroll..!!");
         if(doDelay){
           await Future.delayed(Duration(milliseconds: delayTime), () async {});
         }
@@ -586,8 +647,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         if(_chatScrollController.hasClients){
           _chatScrollController.jumpTo(_chatScrollController.position.maxScrollExtent);
         }
-      }else{
-        CommonUtils.flutterToast("메시지가 추가되었습니다.");
       }
     }
   }
@@ -795,7 +854,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     //List<String> answerList = ["자주하는 질문 💬", "나의정보 🔒", "대출현황 🏦", "심사결과 📑", "상담원 연결 🤓", "사진 📷", "가져오기 📤"];
     List<String> answerList = _getAnswerListMap(currentKey);
     CommonUtils.log("", "answerList : ${answerList.length}");
-    answerList.add("맨아래");
     if(currentKey != ""){
       answerList.add("이전");
     }
@@ -850,7 +908,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         }else if(each.contains("가져오기")){
           _setPickedFileFromDevice();
         }else if(each.contains("맨아래")){
-          isScrollStop = false;
+          isScrollMove = false;
           _scrollToBottom(false, 0);
         }else if(each.contains("채팅")){
           inputTextHide = false;
@@ -951,6 +1009,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
       }
 
       GetController.to.updateAutoAnswerWaiting(true);
+      if(!isScrollMove) setState(() {});
 
       LogfinController.callLogfinApi(LogfinApis.sendMessage, inputJson, (isSuccess, _){
         GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
@@ -1035,9 +1094,8 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     }
   }
 
-  Future<void> _requestNew() async {
+  Future<void> _requestPrev() async {
     if(!searchNoMore){
-      isScrollStop = true;
       UiUtils.showLoadingPop(context);
       await Future.delayed(const Duration(milliseconds: 1000));
       var inputJson = {
@@ -1046,13 +1104,17 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         "length" : 20
       };
       LogfinController.callLogfinApi(LogfinApis.getMessage, inputJson, (isSuccessToGetLoanMessageInfo, loanMessageInfoOutputJson){
-        UiUtils.closeLoadingPop(context);
         if(isSuccessToGetLoanMessageInfo){
           CommonUtils.log("", "get prev $loanMessageInfoOutputJson");
           List<dynamic> prevMsgList = loanMessageInfoOutputJson!['data'];
           if(prevMsgList.isEmpty){
+            UiUtils.closeLoadingPop(context);
             searchNoMore = true;
           }else{
+            // 스크롤뷰의 현재 스크롤 위치를 가져옵니다.
+            prevScrollPos = _chatScrollController.position.maxScrollExtent;
+            CommonUtils.log("", "prevScrollPos : $prevScrollPos");
+            CommonUtils.flutterToast("메시지가 추가되었습니다.");
             prevMsgList.sort((a,b) => a["id"].compareTo(b["id"]));
             List<ChatMessageInfoData> prevMsgInfoList = [];
             for(var eachMsg in prevMsgList){
@@ -1064,6 +1126,14 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
             }
 
             GetController.to.addPrevChatMessageInfoList(prevMsgInfoList);
+            Future.delayed(const Duration(milliseconds: 400), () async {
+              UiUtils.closeLoadingPop(context);
+              CommonUtils.log("", "!!!do prevScrollPos : $prevScrollPos || current pos : ${_chatScrollController.position.maxScrollExtent}");
+              double afterPos = _chatScrollController.position.maxScrollExtent - prevScrollPos;
+              if(afterPos - 200 >= 0) afterPos = afterPos - 200;
+              _chatScrollController.jumpTo(afterPos);
+
+            });
           }
           /*
         for(int i = 0 ; i < MyData.getLoanInfoList().length ; i++){
@@ -1089,6 +1159,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         }
          */
         }else{
+          UiUtils.closeLoadingPop(context);
           CommonUtils.flutterToast("조회에 실패했습니다.");
         }
       });
@@ -1113,8 +1184,8 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
       }
     });
 
-    Widget view =
-    Container(
+    Widget view = Stack(children: [
+        Container(
         color: ColorStyles.upFinWhite,
         width: 100.w,
         height: 100.h,
@@ -1149,8 +1220,8 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                     return Padding(padding: EdgeInsets.only(right: 3.w), child: Column(children: [
                       UiUtils.getMarginBox(0, 1.8.h),
                       UiUtils.getIconButtonWithHeight(8.w, GetController.to.isShowStatus.value? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded, 8.w, ColorStyles.upFinDarkGray, () {
-                            GetController.to.updateShowStatus(!GetController.to.isShowStatus.value);
-                          })
+                        GetController.to.updateShowStatus(!GetController.to.isShowStatus.value);
+                      })
                     ]));
                   })
               ),
@@ -1167,7 +1238,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
             }
           }),
           UiUtils.getMarginBox(0, 1.h),
-          Expanded(child: RefreshIndicator(onRefresh: ()=>_requestNew(),color: ColorStyles.upFinButtonBlue, backgroundColor: ColorStyles.upFinWhiteSky,
+          Expanded(child: RefreshIndicator(onRefresh: ()=>_requestPrev(),color: ColorStyles.upFinButtonBlue, backgroundColor: ColorStyles.upFinWhiteSky,
               child: SingleChildScrollView(controller: _chatScrollController, scrollDirection: Axis.vertical, physics: const BouncingScrollPhysics(),
                   child: Obx(()=>Column(mainAxisAlignment: MainAxisAlignment.start, children: _getChatList()))))),
           Obx((){
@@ -1279,7 +1350,28 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
             );
           })
         ])
-    );
+    ),
+      Positioned(child: !isHtmlLoad? Container(
+          width: 100.w,
+          height: 100.h,
+          color: Colors.black54,
+          child: SpinKitWave(color: ColorStyles.upFinTextAndBorderBlue, size: 15.w)
+      ) : Container()),
+      Obx((){
+        if(GetController.to.isShowScrollBottom.value){
+          return Positioned( bottom: 17.h, left: 5.w, right: 5.w,
+              child: UiUtils.getBorderButtonBoxForRound(10.w, Colors.black12, Colors.transparent,
+                  UiUtils.getTextWithFixedScale("맨아래", 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.center, null), () {
+                    isScrollMove = false;
+                    isScrollBottom = true;
+                    GetController.to.updateShowScrollBottom(false);
+                    _scrollToBottom(false, 0);
+                  }));
+        }else{
+          return Container();
+        }
+      })
+    ]);
     return UiUtils.getViewWithAllowBackForAndroid(context, view, _back);
 
   }

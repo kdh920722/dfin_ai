@@ -149,6 +149,12 @@ class WebSocketController {
                     var eachMsg = message;
                     CommonUtils.log("", "arrived message : ${eachMsg["pr_room_id"].toString()} || $roomId \n $message");
 
+                    if(AppChatViewState.isScrollMove && eachMsg["username"].toString() == "UPFIN"){
+                      String lastMsg = eachMsg["message"].toString();
+                      lastMsg = "${lastMsg.substring(0,8)}...";
+                      CommonUtils.flutterToast("새로운 메시지\n$lastMsg");
+                    }
+
                     for(int i = 0 ; i < MyData.getChatRoomInfoList().length ; i++){
                       if(MyData.getChatRoomInfoList()[i].chatRoomId == eachMsg["pr_room_id"].toString()){
                         Map<String, dynamic> msgInfo = jsonDecode(MyData.getChatRoomInfoList()[i].chatRoomMsgInfo);

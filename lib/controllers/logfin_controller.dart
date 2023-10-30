@@ -493,7 +493,7 @@ class LogfinController {
                   var inputJson = {
                     "loan_uid" : eachLoans["uid"],
                     "last_message_id" : 0,
-                    "length" : 20
+                    "length" : 100
                   };
                   await callLogfinApi(LogfinApis.getMessage, inputJson, (isSuccessToGetLoanMessageInfo, loanMessageInfoOutputJson){
                     if(isSuccessToGetLoanMessageInfo){
