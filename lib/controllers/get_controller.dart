@@ -13,6 +13,7 @@ class GetController extends GetxController {
   RxBool isWait = false.obs;
   RxBool isConfirmed = false.obs;
   RxBool isAllSubscribed = false.obs;
+  RxBool isAutoAnswerWaiting = false.obs;
   RxString preLoanPrice = "만원".obs;
   RxString wantLoanPrice = "만원".obs;
 
@@ -228,6 +229,9 @@ class GetController extends GetxController {
   }
   void updateShowStatus(bool newValue) {
     isShowStatus.value = newValue;
+  }
+  void updateAutoAnswerWaiting(bool newValue) {
+    isAutoAnswerWaiting.value = newValue;
   }
 
 }

@@ -38,7 +38,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     _emailTextController.text = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceIdKey);
     _pwdTextController.text = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferencePwKey);
     Config.contextForEmergencyBack = context;
-    Config.isEmergencyRoot = true;
+    Config.isEmergencyRoot = false;
   }
 
   @override
@@ -133,8 +133,10 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
                       // 캐시 데이터 저장
                       if(SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceIdKey) == "" ||
                           SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceIdKey) != _emailTextController.text.trim()){
-                        SharedPreferenceController.deleteAllData();
                       }
+                      SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceSnsToken, "");
+                      SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceSnsId, "");
+                      SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceIsSnsLogin, "N");
                       CommonUtils.goToMain(context, _emailTextController.text.trim(), _pwdTextController.text.trim());
                     }
                   });
@@ -142,6 +144,9 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
                   UiUtils.closeLoadingPop(context);
                   CommonUtils.flutterToast(outputJson!["error"]);
                   if(outputJson["error"] == "회원가입이 필요합니다."){
+                    SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceSnsToken, "");
+                    SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceSnsId, "");
+                    SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceIsSnsLogin, "N");
                     CommonUtils.moveWithReplacementTo(context, AppView.appSignupView.value, null);
                   }
                 }

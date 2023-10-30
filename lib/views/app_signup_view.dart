@@ -80,7 +80,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
     isConfirmed = false;
     GetController.to.resetConfirmed();
     Config.contextForEmergencyBack = context;
-    Config.isEmergencyRoot = true;
+    Config.isEmergencyRoot = false;
   }
 
   @override
@@ -204,7 +204,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
           }),
       UiUtils.getMarginBox(0, 2.h),
       isPwShowValid? UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _pwdTextFocus, _pwdTextController, TextInputType.visiblePassword, true,
-          UiUtils.getInputDecoration("비밀번호 확인", 12.sp, "", 0.sp), (text) { }, (value){
+          UiUtils.getInputDecoration("비밀번호", 12.sp, "", 0.sp), (text) { }, (value){
             if(value != null && value.trim().isEmpty){
               return "비밀번호를 입력하세요.";
             }else{
@@ -350,7 +350,6 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                         await LogfinController.getMainViewInfo((isSuccessToGetMainInfo){
                           UiUtils.closeLoadingPop(context);
                           if(isSuccessToGetMainInfo){
-                            SharedPreferenceController.deleteAllData();
                             CommonUtils.goToMain(context, _emailTextController.text.trim(), _pwdTextController.text.trim());
                           }
                         });

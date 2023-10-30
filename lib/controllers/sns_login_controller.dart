@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
+import 'package:upfin/controllers/sharedpreference_controller.dart';
 import 'package:upfin/datas/my_data.dart';
 import '../configs/app_config.dart';
 import '../styles/ColorStyles.dart';
@@ -280,7 +281,7 @@ class SnsLoginController{
       if(SnsLoginController.loginPlatform == LoginPlatform.kakao){
         token = SnsLoginController.kakaoToken;
         id = SnsLoginController.kakaoId;
-      }else{
+      }else if(SnsLoginController.loginPlatform == LoginPlatform.apple){
         token = appleToken;
         id = appleId;
       }
@@ -294,6 +295,13 @@ class SnsLoginController{
 
       CommonUtils.log("i", "social login :\n$inputJson");
       await LogfinController.callLogfinApi(LogfinApis.socialLogin, inputJson, (isSuccess, outputJson) {
+        SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceSnsToken, token);
+        SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceSnsId, id);
+        SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceSnsType, SnsLoginController.loginPlatform.value);
+        SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceIsSnsLogin, "Y");
+        if(isSuccess){
+          SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceIdKey, MyData.emailFromSns);
+        }
         isMember = isSuccess;
       });
       return isMember;

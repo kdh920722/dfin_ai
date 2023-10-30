@@ -76,8 +76,9 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     isViewHere = true;
     _setAutoAnswerWidgetList();
     GetController.to.updateInputTextHide(true);
-    GetController.to.updateShowPickedFile(false);
     GetController.to.updateShowStatus(true);
+    GetController.to.updateAutoAnswerWaiting(false);
+    _setAutoAnswerWaitingState();
     currentKey = "";
 
     IsolateNameServer.registerPortWithName(_port.sendPort, 'downloader_send_port');
@@ -98,11 +99,18 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     FlutterDownloader.registerCallback(downloadCallback);
   }
 
-
   @pragma('vm:entry-point')
   static Future<void> downloadCallback(String id, int status, int progress) async {
     final SendPort? send = IsolateNameServer.lookupPortByName('downloader_send_port');
     send?.send([id, status, progress]);
+  }
+
+  void _setAutoAnswerWaitingState(){
+    if(WebSocketController.isWaitingForAnswerState(currentRoomId, "ME")){
+      GetController.to.updateAutoAnswerWaiting(true);
+    }else{
+      GetController.to.updateAutoAnswerWaiting(false);
+    }
   }
 
 
@@ -248,6 +256,9 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         tempMsg[i] = _getEndLineChangeFormattedText(tempMsg[i], "이고");
 
         tempMsg[i] = _getFrontLineChangeFormattedText(tempMsg[i], "더 자세한");
+
+        tempMsg[i] = _getInfoFormattedText(tempMsg[i], "- 고객 이름:", "이름");
+        tempMsg[i] = _getInfoFormattedText(tempMsg[i], "- 신청 대출 상품:", "대출상품");
 
         tempMsg[i] = _getInfoFormattedText(tempMsg[i], "- 대출 상품:", "대출상품");
         tempMsg[i] = _getInfoFormattedText(tempMsg[i], "- 금융사:", "금융사");
@@ -571,16 +582,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     ]);
   }
 
-  Widget _stepTick1() {
-    return GetController.to.chatStatusTick.value>0?_stepTick(0, true):_stepTick(0, false);
-  }
-  Widget _stepTick2() {
-    return GetController.to.chatStatusTick.value>1?_stepTick(1, true):_stepTick(1, false);
-  }
-  Widget _stepTick3() {
-    return GetController.to.chatStatusTick.value>2?_stepTick(2, true):_stepTick(2, false);
-  }
-
   Widget _stepLine(bool isReached) {
     return Column(children: [
       UiUtils.getMarginBox(0, 0.5.h),
@@ -667,41 +668,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   }
 
   String currentKey = "";
-  Map<String, dynamic> test3 = {
-    "대출관리" :
-    {
-      "대출상품" : "a1",
-      "제출정보" : "a2",
-      "상환일정" : "a3",
-      "취소,철회" : "a4"
-    },
-
-    "심사결과" :
-    {
-      "대출현황": "b1",
-      "요청서류": "b2"
-    },
-    "나의정보" :
-    {
-      "사건정보": "c1",
-    },
-    "자주하는 질문" :
-    {
-      "대출상환":
-      {
-        "수수료" : "d11",
-        "일정" : "d12",
-        "이자율" : "d13",
-        "미납" : "d14",
-        "연장" : "d15",
-        "추가대출" : "d16",
-        "상환액" : "d17",
-      },
-      "신용점수": "d2",
-      "금융사기": "d3"
-    },
-    "상담원 연결": "e"
-  };
   String _findValueForKey(Map<String, dynamic> map, String targetKey) {
     String resultValue = "";
 
@@ -782,11 +748,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     //List<String> answerList = ["자주하는 질문 💬", "나의정보 🔒", "대출현황 🏦", "심사결과 📑", "상담원 연결 🤓", "사진 📷", "가져오기 📤"];
     List<String> answerList = _getAnswerListMap(currentKey);
     CommonUtils.log("", "answerList : ${answerList.length}");
-    if(currentKey == ""){
-      answerList.add("사진");
-      answerList.add("가져오기");
-      answerList.add("AI 채팅");
-    }else{
+    if(currentKey != ""){
       answerList.add("이전");
     }
     for(var each in answerList){
@@ -797,39 +759,31 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         borderColor = ColorStyles.upFinKakaoYellow;
         fillColor = ColorStyles.upFinKakaoYellow;
         textColor = ColorStyles.upFinBlack;
-      }else if(each.contains("채팅")){
-        borderColor = ColorStyles.upFinButtonBlue;
-        fillColor = ColorStyles.upFinButtonBlue;
-        textColor = ColorStyles.upFinWhite;
-      }else if(each.contains("사진")){
-        borderColor = ColorStyles.upFinBlack;
-        fillColor = ColorStyles.upFinBlack;
-        textColor = ColorStyles.upFinWhite;
-      }else if(each.contains("가져오기")){
-        borderColor = ColorStyles.upFinBlack;
-        fillColor = ColorStyles.upFinBlack;
-        textColor = ColorStyles.upFinWhite;
       }
 
       if(each.contains("자주하는 질문")){
-        widgetList.add(Container(key: UniqueKey()));
+       // widgetList.add(Container(key: UniqueKey()));
+      }
+
+      if(each.contains("파일첨부")){
+       // widgetList.add(Container(key: UniqueKey()));
       }
 
       if(each.contains("상환일정")){
-        widgetList.add(Container(key: UniqueKey()));
+       // widgetList.add(Container(key: UniqueKey()));
       }
 
       if(each.contains("미납")){
-        widgetList.add(Container(key: UniqueKey()));
+       // widgetList.add(Container(key: UniqueKey()));
       }
 
       if(each.contains("사진")){
-        widgetList.add(Container(key: UniqueKey()));
+       // widgetList.add(Container(key: UniqueKey()));
       }
 
       if(each.contains("이전")){
         if(answerList.length != 1){
-          widgetList.add(Container(key: UniqueKey()));
+         // widgetList.add(Container(key: UniqueKey()));
         }
       }
 
@@ -838,7 +792,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
               child: UiUtils.getRoundedBoxTextWithFixedScale(each, 11.sp, FontWeight.w500, TextAlign.center, borderColor, fillColor, textColor),
       onTap: () async {
         currentKey = each;
-        if(each.contains("사진")){
+        if(each.contains("카메라")){
           _setPickedImgFromCamera();
         }else if(each.contains("가져오기")){
           _setPickedFileFromDevice();
@@ -859,7 +813,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
             setState(() {});
           }else{
             String result = _findValueForKey(LogfinController.autoAnswerMap, currentKey);
-            _sendMessage(currentKey, result);
+            _sendMessage("", result);
           }
         }
       }));
@@ -925,10 +879,12 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
       };
 
       WebSocketController.setWaitingState(currentRoomId, "ME", true);
+      _setAutoAnswerWaitingState();
       if(pickedFiles.isEmpty){
         // message, custom message
         if(customMessageType != ""){
           inputJson["type"] = "custom";
+          inputJson["message"] = customMessageType;
         }else{
           inputJson["type"] = "text";
         }
@@ -939,6 +895,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
       }
 
       LogfinController.callLogfinApi(LogfinApis.sendMessage, inputJson, (isSuccess, _){
+        GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
         if(!isSuccess){
           CommonUtils.flutterToast("메시지 전송중\n오류가 발생했습니다.");
         }
@@ -1094,6 +1051,25 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
           UiUtils.getExpandedScrollViewWithController(Axis.vertical, Obx(()=>Column(mainAxisAlignment: MainAxisAlignment.start, children: _getChatList())), _chatScrollController),
           UiUtils.getMarginBox(0, 1.h),
           Obx((){
+            return Column(
+              mainAxisSize: MainAxisSize.min, // 자식 위젯에 맞게 높이를 조절합니다.
+              children: [
+                GetController.to.isAutoAnswerWaiting.value ? Container() : Align(alignment: Alignment.topRight,
+                    child: Padding(padding: EdgeInsets.only(left: 5.w, right: 5.w),
+                        child: Wrap(runSpacing: 0.7.h, spacing: 1.7.w, alignment: WrapAlignment.end, direction: Axis.horizontal,
+                            children: GetController.to.autoAnswerWidgetList))),
+                GetController.to.isShowPickedFile.value? Column(children: [
+                  UiUtils.getSizedScrollView(90.w, inputHelpMinHeight+2.h, Axis.horizontal, _getPickedFilesWidget()),
+                  UiUtils.getMarginBox(0, 1.3.h),
+                  UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+                      UiUtils.getTextWithFixedScale("전송", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () async{
+                        _sendFileToAws();
+                      }),
+                ]) : Container()
+                // 다른 컨텐츠나 다른 위젯들
+              ],
+            );
+            /*
             return SizedBox(width: 100.w, height: GetController.to.chatAutoAnswerHeight.value, child: Column(children: [
               Align(alignment: Alignment.topRight, child: Padding(padding: EdgeInsets.only(right: 5.w),
                   child: Wrap(runSpacing: 0.4.h, spacing: 1.5.w, alignment: WrapAlignment.end, direction: Axis.horizontal, children: GetController.to.autoAnswerWidgetList))),
@@ -1106,6 +1082,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                     }),
               ]) : Container()
             ]));
+             */
           }),
           UiUtils.getMarginBox(0, 0.8.h),
           Obx((){

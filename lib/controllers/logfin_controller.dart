@@ -190,7 +190,7 @@ class LogfinController {
       await LogfinController.callLogfinApi(LogfinApis.getFaqs, {}, (isSuccessToGetMap, outputJsonMap){
         if(isSuccessToGetMap){
           autoAnswerMap = outputJsonMap!;
-
+          autoAnswerMap["파일첨부 📁"] = {"카메라 📷" : "camera", "가져오기 🏞" : "files"};
         }else{
           failCount++;
         }
@@ -252,7 +252,7 @@ class LogfinController {
       }
     }
 
-    CommonUtils.log("i", "${api.value} inputJson :\n$inputJson");
+    CommonUtils.log("", "${api.value} inputJson :\n$inputJson");
 
     try {
       final url = Uri.parse(targetUrl);

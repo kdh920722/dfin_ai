@@ -11,6 +11,10 @@ class SharedPreferenceController {
   static String sharedPreferenceApplyPrKey = "KEY_APPLY_PR";
   static String sharedPreferenceValidDateKey = "VALID_DATE";
   static String sharedPreferenceFileName = "FILE_NAME_KEY";
+  static String sharedPreferenceSnsToken = "SNS_TOKEN";
+  static String sharedPreferenceSnsId = "SNS_ID";
+  static String sharedPreferenceSnsType = "SNS_TYPE";
+  static String sharedPreferenceIsSnsLogin = "IS_SNS_LOGIN";
   static SharedPreferences? sharedPreferences;
 
   static Future<void> initSharedPreference(Function(bool) callback) async {
@@ -26,7 +30,8 @@ class SharedPreferenceController {
 
   static Future<void> saveSharedPreference(String key, String value) async {
     CommonUtils.log("d", "[s]: save origin value: $value");
-    if(key == sharedPreferenceIdKey || key == sharedPreferencePwKey || key == sharedPreferenceApplyPrKey){
+    if(key == sharedPreferenceIdKey || key == sharedPreferencePwKey || key == sharedPreferenceApplyPrKey
+        || key == sharedPreferenceSnsToken || key == sharedPreferenceSnsId){
       value = CommonUtils.encryptData(value);
       CommonUtils.log("d", "[s]: save encoded value: $value");
     }
@@ -41,7 +46,8 @@ class SharedPreferenceController {
       if(sharedPreferences!.containsKey(key)){
         String? returnValue = sharedPreferences!.getString(key);
         if(returnValue != null){
-          if(key == sharedPreferenceIdKey || key == sharedPreferencePwKey || key == sharedPreferenceApplyPrKey){
+          if(key == sharedPreferenceIdKey || key == sharedPreferencePwKey || key == sharedPreferenceApplyPrKey
+              || key == sharedPreferenceSnsToken || key == sharedPreferenceSnsId){
             returnValue = CommonUtils.decryptData(returnValue);
           }
           return returnValue;

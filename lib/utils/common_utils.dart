@@ -380,7 +380,7 @@ class CommonUtils {
       targetDateTime.year,
       targetDateTime.month,
       targetDateTime.day,
-      targetDateTime.hour+2,
+      targetDateTime.hour+1,
       targetDateTime.minute,
       targetDateTime.second,
     );
@@ -702,12 +702,17 @@ class CommonUtils {
 
   static void goToMain(BuildContext context, String? email, String? password){
     DateTime thirtyMinutesLater = CommonUtils.addTimeToTargetTime(CommonUtils.getCurrentLocalTime());
-    SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceValidDateKey, CommonUtils.convertTimeToString(thirtyMinutesLater));
     if(email != null && password != null){
+      String prevId = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceIdKey);
+      if(prevId != email){
+        SharedPreferenceController.deleteAllData();
+      }
+      SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceValidDateKey, CommonUtils.convertTimeToString(thirtyMinutesLater));
       SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceIdKey, email);
       SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferencePwKey, password);
       CommonUtils.moveWithReplacementTo(context, AppView.appMainView.value, null);
     }else{
+      SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceValidDateKey, CommonUtils.convertTimeToString(thirtyMinutesLater));
       CommonUtils.moveTo(context, AppView.appMainView.value, null);
     }
   }
@@ -892,8 +897,7 @@ class CommonUtils {
       result = false;
     }
 
-    //return result;
-    return true;
+    return result;
   }
 
   static Future<File> get _localFile async {

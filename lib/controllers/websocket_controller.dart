@@ -27,6 +27,7 @@ class WebSocketController {
   static bool isRetry = false;
   static Timer? reSubScribeCheckTimer;
   static Timer? reSubScribeTimer;
+  static Map<String,dynamic> connectionInfoMap = {};
 
   static Future<void> initWebSocket(Function(bool isSuccess) callback) async{
     try{
@@ -94,6 +95,8 @@ class WebSocketController {
   }
 
   static void connectToWebSocketCable() {
+    String connectionKey = "";
+
     try {
       // ActionCable 서버 정보 설정
       cable = ActionCable.Connect(
@@ -104,6 +107,8 @@ class WebSocketController {
       );
 
       cable!.onConnected = () {
+        connectionKey = CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime());
+        connectionInfoMap = {"connection_key" : connectionKey, "is_connected": true};
         isInit = true;
         const Duration intervalForReSubScribe = Duration(seconds: 20);
         reSubScribeCheckTimer = Timer.periodic(intervalForReSubScribe, (Timer timer) {
@@ -156,6 +161,11 @@ class WebSocketController {
 
                     GetController.to.updateChatLoanInfoList(MyData.getChatRoomInfoList());
                     WebSocketController.setWaitingState(eachMsg["pr_room_id"].toString(), eachMsg["username"].toString(), false);
+                    if(WebSocketController.isWaitingForAnswerState(eachMsg["pr_room_id"].toString(), "ME")){
+                      GetController.to.updateAutoAnswerWaiting(true);
+                    }else{
+                      GetController.to.updateAutoAnswerWaiting(false);
+                    }
 
                     if(eachMsg["status_flg"].toString() == "1"){
                       String statusId = eachMsg["status_id"].toString();
@@ -188,17 +198,17 @@ class WebSocketController {
       };
 
       cable!.onConnectionLost = () {
-        CommonUtils.log("i", "websocket onConnectionLost error");
-        _retryToConnectNewVer();
+        CommonUtils.log("e", "websocket onConnectionLost error");
+        _retryToConnectNewVer(connectionKey);
       };
 
       cable!.onCannotConnect = () {
-        CommonUtils.log("i", "websocket onCannotConnect error");
-        _retryToConnectNewVer();
+        CommonUtils.log("e", "websocket onCannotConnect error");
+        _retryToConnectNewVer(connectionKey);
       };
     }catch(error){
       CommonUtils.log("e", "websocket connect error : ${error.toString()}");
-      _retryToConnectNewVer();
+      _retryToConnectNewVer(connectionKey);
     }
   }
 
@@ -216,33 +226,47 @@ class WebSocketController {
     }
   }
 
-  static void _retryToConnectNewVer(){
-    if(!isRetry){
-      isRetry = true;
-      GetController.to.updateAllSubScribed(false);
+  static void _retryToConnectNewVer(String connectedKey){
+    String key = connectionInfoMap["connection_key"];
+    if(connectedKey != "" && connectionInfoMap["is_connected"] && key == connectedKey){
+      connectionInfoMap["is_connected"] = false;
+      if(!isRetry){
+        isRetry = true;
+        GetController.to.updateAllSubScribed(false);
 
-      if(AppChatViewState.isViewHere){
-        AppChatViewState.isViewHere = false;
-        CommonUtils.moveWithUntil(Config.contextForEmergencyBack!, AppView.appMainView.value);
-      }
+        if(!AppMainViewState.isViewHere){
+          AppChatViewState.isViewHere = false;
+          AppMainViewState.isViewHere = true;
+          CommonUtils.flutterToast("서버 연결이 끊켰습니다.\n잠시만 기다려 주세요.");
+          CommonUtils.moveWithUntil(Config.contextForEmergencyBack!, AppView.appMainView.value);
+        }
 
-      Future.delayed(const Duration(seconds: 5), () {
         LogfinController.getLoanInfo((isSuccess, isNotEmpty){
           isRetry = false;
           if(isSuccess){
             if(isNotEmpty){
               // success
+              connectionInfoMap["is_connected"] = true;
             }else{
               // fail
-              _retryToConnectNewVer();
+              CommonUtils.flutterToast("F1");
+              Future.delayed(const Duration(seconds: 5), () {
+                connectionInfoMap["is_connected"] = true;
+                _retryToConnectNewVer(connectedKey);
+              });
             }
           }else{
             // fail
-            _retryToConnectNewVer();
+            CommonUtils.flutterToast("F2");
+            Future.delayed(const Duration(seconds: 5), () {
+              connectionInfoMap["is_connected"] = true;
+              _retryToConnectNewVer(connectedKey);
+            });
           }
         });
-      });
+      }
     }
+
   }
 
   static bool isSubscribe(String roomId){

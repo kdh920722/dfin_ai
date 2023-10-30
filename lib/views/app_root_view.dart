@@ -31,7 +31,7 @@ class AppRootView extends StatefulWidget{
 }
 
 class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
-
+  bool isAutoLogin = false;
   @override
   void initState(){
     CommonUtils.log("i", "AppRootView 화면 입장");
@@ -455,6 +455,75 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if(Config.isControllerLoadFinished && Config.isEmergencyRoot){
+        CommonUtils.log("", "root post call");
+        if(CommonUtils.isValidStateByAPiExpiredDate() && !isAutoLogin){
+          isAutoLogin = true;
+
+          String isSnsLogin = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceIsSnsLogin);
+          String emailId = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceIdKey);
+          UiUtils.showLoadingPop(context);
+
+          if(isSnsLogin == "Y"){
+            String token = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceSnsToken);
+            String id = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceSnsId);
+            String provider = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceSnsType);
+            Map<String, String> inputJson = {
+              "email": emailId,
+              "token": token,
+              "user_id": id,
+              "provider": provider
+            };
+
+            await LogfinController.callLogfinApi(LogfinApis.socialLogin, inputJson, (isSuccessToLogin, outputJson) async {
+              if(isSuccessToLogin){
+                SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceIsSnsLogin, "Y");
+                await LogfinController.getMainViewInfo((isSuccessToGetMainInfo){
+                  UiUtils.closeLoadingPop(context);
+                  if(isSuccessToGetMainInfo){
+                    CommonUtils.flutterToast("환영합니다!");
+                    isAutoLogin = true;
+                    CommonUtils.goToMain(context, null, null);
+                  }
+                });
+              }else{
+                UiUtils.closeLoadingPop(context);
+                CommonUtils.flutterToast("오류가 발생했습니다.");
+                isAutoLogin = true;
+              }
+            });
+          }else{
+            String pw = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferencePwKey);
+            Map<String, dynamic> inputJson = {
+              "user" : {
+                "email": emailId,
+                "password": pw
+              }
+            };
+
+            LogfinController.callLogfinApi(LogfinApis.signIn, inputJson, (isSuccessToLogin, outputJson) async {
+              if(isSuccessToLogin){
+                SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceIsSnsLogin, "N");
+                await LogfinController.getMainViewInfo((isSuccessToGetMainInfo){
+                  UiUtils.closeLoadingPop(context);
+                  if(isSuccessToGetMainInfo){
+                    CommonUtils.flutterToast("환영합니다!");
+                    isAutoLogin = true;
+                    CommonUtils.goToMain(context, null, null);
+                  }
+                });
+              }else{
+                UiUtils.closeLoadingPop(context);
+                CommonUtils.flutterToast("오류가 발생했습니다.");
+                isAutoLogin = true;
+              }
+            });
+          }
+        }
+      }
+    });
+
     Widget? view;
     if(!Config.isAppMainInit){
       _initAtFirst();
@@ -477,11 +546,17 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
           UiUtils.getExpandedScrollView(Axis.vertical, SizedBox(width: 100.w, child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
             UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
                 UiUtils.getTextWithFixedScale("로그인", 16.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
+                  SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceSnsToken, "");
+                  SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceSnsId, "");
+                  SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceIsSnsLogin, "N");
                   CommonUtils.moveTo(context, AppView.appLoginView.value, null);
                 }),
             UiUtils.getMarginBox(0, 1.5.h),
             UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
                 UiUtils.getTextWithFixedScale("회원가입 ", 16.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
+                  SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceSnsToken, "");
+                  SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceSnsId, "");
+                  SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceIsSnsLogin, "N");
                   CommonUtils.moveTo(context, AppView.appSignupView.value, null);
                 }),
             UiUtils.getMarginBox(0, 4.h),

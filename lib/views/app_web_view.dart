@@ -107,15 +107,8 @@ class AppWebViewState extends State<AppWebView> {
 
   @override
   Widget build(BuildContext context) {
-    if(CommonUtils.isValidStateByAPiExpiredDate()){
-      Map<String, String> urlInfo = ModalRoute.of(context)?.settings.arguments as Map<String, String>;
-      Widget view = _getWebView(context, setState, urlInfo['url']!);
-      return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
-    }else{
-      CommonUtils.flutterToast("접속시간이 만료되었습니다.\n재로그인 해주세요");
-      CommonUtils.backToHome(context);
-      FireBaseController.setStateForForeground = null;
-      return Container();
-    }
+    Map<String, String> urlInfo = ModalRoute.of(context)?.settings.arguments as Map<String, String>;
+    Widget view = _getWebView(context, setState, urlInfo['url']!);
+    return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
   }
 }
