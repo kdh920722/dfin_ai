@@ -493,7 +493,7 @@ class LogfinController {
                   var inputJson = {
                     "loan_uid" : eachLoans["uid"],
                     "last_message_id" : 0,
-                    "length" : 0
+                    "length" : 20
                   };
                   await callLogfinApi(LogfinApis.getMessage, inputJson, (isSuccessToGetLoanMessageInfo, loanMessageInfoOutputJson){
                     if(isSuccessToGetLoanMessageInfo){
@@ -506,7 +506,8 @@ class LogfinController {
                       }
 
                       loanMessageInfoOutputJson!["last_read_message_id"] = eachLoans["pr_room"]["last_read_message_id"].toString();
-                      CommonUtils.log("i", "loanMessageInfoOutputJson data ====>\n$loanMessageInfoOutputJson");
+                      List<dynamic> temp = loanMessageInfoOutputJson['data'];
+                      CommonUtils.log("", "loanMessageInfoOutputJson data ====>\n${temp.length}\n$loanMessageInfoOutputJson");
                       MyData.addToLoanInfoList(
                           LoanInfoData(eachLoans["accident_uid"].toString(), eachLoans["uid"].toString(), eachLoans["lender_pr_id"].toString(),
                               submitAmount, eachLoans["submit_offer"]["interest_rate"].toString(),

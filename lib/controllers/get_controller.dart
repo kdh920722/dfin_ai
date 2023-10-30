@@ -130,6 +130,10 @@ class GetController extends GetxController {
     CommonUtils.log("i", "loanInfoDataList length : ${chatLoanInfoDataList.length}");
   }
 
+  void addPrevChatMessageInfoList(List<ChatMessageInfoData> newItemList) {
+    chatMessageInfoDataList.insertAll(0, newItemList);
+    CommonUtils.log("i", "chatMessageInfoDataList length : ${chatLoanInfoDataList.length}");
+  }
   void addChatMessageInfoList(ChatMessageInfoData newItem) {
     chatMessageInfoDataList.add(newItem);
     CommonUtils.log("i", "chatMessageInfoDataList length : ${chatLoanInfoDataList.length}");

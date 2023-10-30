@@ -341,7 +341,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
       var jsonData = jsonDecode(each.chatRoomMsgInfo);
       Map<String, dynamic> msg = jsonData;
       List<dynamic> listMsg = msg["data"];
-      CommonUtils.log("i", "each msg info : \nmsg: $msg\nlistMsg: $listMsg");
+      CommonUtils.log("", "each msg info : \nmsg: $msg\nlistMsg: $listMsg");
       listMsg.sort((a,b) => a["id"].compareTo(b["id"]));
       String lastMsg = listMsg[listMsg.length-1]["message"].toString();
       if(lastMsg.contains(" / ")){
@@ -390,7 +390,14 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                   ]))
                 ]), () async {
                   if(WebSocketController.isSubscribe(each.chatRoomId)){
-                    _goToChatRoom(listMsg, each.chatRoomId);
+                    if(listMsg.length>40){
+                      UiUtils.showLoadingPop(context);
+                      Future.delayed(const Duration(milliseconds: 500), () {
+                        _goToChatRoom(listMsg, each.chatRoomId);
+                      });
+                    }else{
+                      _goToChatRoom(listMsg, each.chatRoomId);
+                    }
                   }else{
                     _resetAndGoToChatRoom(context, each.chatRoomId);
                   }
@@ -408,6 +415,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
 
   Future<void> _goToChatRoom(List<dynamic> listMsg, String chatRoomId) async {
     GetController.to.resetChatMessageInfoList();
+    CommonUtils.log("", "listMsg.length : ${listMsg.length}");
     for(Map<String, dynamic> eachMsg in listMsg){
       var messageItem = ChatMessageInfoData(eachMsg["id"].toString(), eachMsg["pr_room_id"].toString(), eachMsg["message"].toString(),
           CommonUtils.convertTimeToString(CommonUtils.parseToLocalTime(eachMsg["created_at"])),
@@ -415,6 +423,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
       GetController.to.addChatMessageInfoList(messageItem);
     }
     isViewHere = false;
+    UiUtils.closeLoadingPop(context);
     await CommonUtils.moveToWithResult(context, AppView.appChatView.value, null);
     isViewHere = true;
     if(context.mounted){

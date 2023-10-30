@@ -49,6 +49,9 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   final ReceivePort _port = ReceivePort();
   static String savedFileName = "";
 
+  bool searchNoMore = false;
+  bool isScrollStop = false;
+
   @override
   void initState(){
     CommonUtils.log("i", "AppChatViewState 화면 입장");
@@ -73,6 +76,15 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     Config.contextForEmergencyBack = context;
     Config.isEmergencyRoot = false;
     _keyboardVisibilityController = CommonUtils.getKeyboardViewController(_functionForKeyboardShow, _functionForKeyboardHide);
+    _chatScrollController.addListener(() {
+      if (_chatScrollController.offset == _chatScrollController.position.maxScrollExtent && !_chatScrollController.position.outOfRange) {
+        CommonUtils.log('','스크롤이 맨 바닥에 위치해 있습니다');
+        isScrollStop = false;
+      } else if (_chatScrollController.offset == _chatScrollController.position.minScrollExtent && !_chatScrollController.position.outOfRange) {
+        CommonUtils.log('','스크롤이 맨 위에 위치해 있습니다');
+        isScrollStop = true;
+      }
+    });
     FireBaseController.setStateForForeground = null;
     isViewHere = true;
     _setAutoAnswerWidgetList();
@@ -107,6 +119,8 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   }
 
   void _setAutoAnswerWaitingState(){
+    CommonUtils.log("", "${WebSocketController.isWaitingForAnswerState(currentRoomId, "ME")} || ${WebSocketController.isWaitingForAnswerState(currentRoomId, "UPFIN")}");
+
     if(WebSocketController.isWaitingForAnswerState(currentRoomId, "ME") == WebSocketController.isWaitingForAnswerState(currentRoomId, "UPFIN")){
       if(WebSocketController.isWaitingForAnswerState(currentRoomId, "ME")){
         GetController.to.updateAutoAnswerWaiting(true);
@@ -114,16 +128,18 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         GetController.to.updateAutoAnswerWaiting(false);
       }
     }else{
-      GetController.to.updateAutoAnswerWaiting(false);
+      GetController.to.updateAutoAnswerWaiting(true);
     }
   }
 
 
   KeyboardVisibilityController? _keyboardVisibilityController;
   void _functionForKeyboardHide(){
+    isScrollStop = false;
     _scrollToBottom(true,400);
   }
   void _functionForKeyboardShow() {
+    isScrollStop = false;
     _scrollToBottom(true,400);
   }
 
@@ -289,7 +305,8 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
       HtmlWidget(
         htmlString,
-        enableCaching: true,buildAsync: false,
+        enableCaching: false,
+        buildAsync: false,
         onLoadingBuilder: (context, element, progress){
             CommonUtils.log("", "html : $progress");
             _scrollToBottom(true,100);
@@ -525,6 +542,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     }
 
     _scrollToBottom(true,400);
+
     return chatList;
   }
 
@@ -558,13 +576,18 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   }
 
   Future<void> _scrollToBottom(bool doDelay, int delayTime) async {
+    CommonUtils.log("", "scroll..?");
     if(isBuild){
-      if(doDelay){
-        await Future.delayed(Duration(milliseconds: delayTime), () async {});
-      }
+      if(!isScrollStop){
+        if(doDelay){
+          await Future.delayed(Duration(milliseconds: delayTime), () async {});
+        }
 
-      if(_chatScrollController.hasClients){
-        _chatScrollController.jumpTo(_chatScrollController.position.maxScrollExtent);
+        if(_chatScrollController.hasClients){
+          _chatScrollController.jumpTo(_chatScrollController.position.maxScrollExtent);
+        }
+      }else{
+        CommonUtils.flutterToast("메시지가 추가되었습니다.");
       }
     }
   }
@@ -772,6 +795,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     //List<String> answerList = ["자주하는 질문 💬", "나의정보 🔒", "대출현황 🏦", "심사결과 📑", "상담원 연결 🤓", "사진 📷", "가져오기 📤"];
     List<String> answerList = _getAnswerListMap(currentKey);
     CommonUtils.log("", "answerList : ${answerList.length}");
+    answerList.add("맨아래");
     if(currentKey != ""){
       answerList.add("이전");
     }
@@ -780,7 +804,14 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
       Color fillColor = ColorStyles.upFinWhite;
       Color textColor = ColorStyles.upFinBlack;
       if(each.contains("이전")){
-
+        borderColor = ColorStyles.upFinBlack;
+        fillColor = ColorStyles.upFinBlack;
+        textColor = ColorStyles.upFinWhite;
+      }
+      if(each.contains("맨아래")){
+        borderColor = ColorStyles.upFinRealGray;
+        fillColor = ColorStyles.upFinRealGray;
+        textColor = ColorStyles.upFinWhite;
       }
 
       if(each.contains("자주하는 질문")){
@@ -818,6 +849,9 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
           _setPickedImgFromCamera();
         }else if(each.contains("가져오기")){
           _setPickedFileFromDevice();
+        }else if(each.contains("맨아래")){
+          isScrollStop = false;
+          _scrollToBottom(false, 0);
         }else if(each.contains("채팅")){
           inputTextHide = false;
           GetController.to.updateInputTextHide(inputTextHide);
@@ -901,7 +935,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
       };
 
       WebSocketController.setWaitingState(currentRoomId, "ME", true);
-      _setAutoAnswerWaitingState();
+
       if(pickedFiles.isEmpty){
         // message, custom message
         if(customMessageType != ""){
@@ -916,14 +950,13 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         inputJson["type"] = "file";
       }
 
+      GetController.to.updateAutoAnswerWaiting(true);
+
       LogfinController.callLogfinApi(LogfinApis.sendMessage, inputJson, (isSuccess, _){
         GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
         if(!isSuccess){
           CommonUtils.flutterToast("메시지 전송중\n오류가 발생했습니다.");
         }
-        WebSocketController.setWaitingState(currentRoomId, "ME", false);
-        WebSocketController.setWaitingState(currentRoomId, "UPFIN", false);
-        _setAutoAnswerWaitingState();
       });
     }else{
       CommonUtils.flutterToast("응답을 기다리는 중입니다.");
@@ -1002,6 +1035,67 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     }
   }
 
+  Future<void> _requestNew() async {
+    if(!searchNoMore){
+      isScrollStop = true;
+      UiUtils.showLoadingPop(context);
+      await Future.delayed(const Duration(milliseconds: 1000));
+      var inputJson = {
+        "loan_uid" : currentLoanUid,
+        "last_message_id" : GetController.to.chatMessageInfoDataList[0].chatId,
+        "length" : 20
+      };
+      LogfinController.callLogfinApi(LogfinApis.getMessage, inputJson, (isSuccessToGetLoanMessageInfo, loanMessageInfoOutputJson){
+        UiUtils.closeLoadingPop(context);
+        if(isSuccessToGetLoanMessageInfo){
+          CommonUtils.log("", "get prev $loanMessageInfoOutputJson");
+          List<dynamic> prevMsgList = loanMessageInfoOutputJson!['data'];
+          if(prevMsgList.isEmpty){
+            searchNoMore = true;
+          }else{
+            prevMsgList.sort((a,b) => a["id"].compareTo(b["id"]));
+            List<ChatMessageInfoData> prevMsgInfoList = [];
+            for(var eachMsg in prevMsgList){
+              var messageItem = ChatMessageInfoData(eachMsg["id"].toString(), eachMsg["pr_room_id"].toString(), eachMsg["message"].toString(),
+                  CommonUtils.convertTimeToString(CommonUtils.parseToLocalTime(eachMsg["created_at"])),
+                  eachMsg["message_type"].toString(), eachMsg["username"].toString(), jsonEncode(eachMsg));
+
+              prevMsgInfoList.add(messageItem);
+            }
+
+            GetController.to.addPrevChatMessageInfoList(prevMsgInfoList);
+          }
+          /*
+        for(int i = 0 ; i < MyData.getLoanInfoList().length ; i++){
+          if(MyData.getLoanInfoList()[i].loanUid == currentLoanUid){
+            Map<String, dynamic> msgInfo = jsonDecode(MyData.getLoanInfoList()[i].chatRoomMsg);
+            List<dynamic> msgList = msgInfo["data"];
+            msgList.addAll(prevMsgList);
+            msgList.sort((a,b) => b["id"].compareTo(a["id"]));
+            msgInfo.remove("data");
+            msgInfo["data"] = msgList;
+          }
+        }
+
+        for(int i = 0 ; i < MyData.getChatRoomInfoList().length ; i++){
+          if(MyData.getChatRoomInfoList()[i].chatLoanUid == currentLoanUid){
+            Map<String, dynamic> msgInfo = jsonDecode(MyData.getChatRoomInfoList()[i].chatRoomMsgInfo);
+            List<dynamic> msgList = msgInfo["data"];
+            msgList.addAll(prevMsgList);
+            msgList.sort((a,b) => b["id"].compareTo(a["id"]));
+            msgInfo.remove("data");
+            msgInfo["data"] = msgList;
+          }
+        }
+         */
+        }else{
+          CommonUtils.flutterToast("조회에 실패했습니다.");
+        }
+      });
+    }
+
+  }
+
   double inputMinHeight = 9.2.h;
   double inputHeight = 9.2.h;
   double inputMaxHeight = 20.h;
@@ -1073,13 +1167,17 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
             }
           }),
           UiUtils.getMarginBox(0, 1.h),
-          UiUtils.getExpandedScrollViewWithController(Axis.vertical, Obx(()=>Column(mainAxisAlignment: MainAxisAlignment.start, children: _getChatList())), _chatScrollController),
+          Expanded(child: RefreshIndicator(onRefresh: ()=>_requestNew(),color: ColorStyles.upFinButtonBlue, backgroundColor: ColorStyles.upFinWhiteSky,
+              child: SingleChildScrollView(controller: _chatScrollController, scrollDirection: Axis.vertical, physics: const BouncingScrollPhysics(),
+                  child: Obx(()=>Column(mainAxisAlignment: MainAxisAlignment.start, children: _getChatList()))))),
           Obx((){
+            bool isWaiting = GetController.to.isAutoAnswerWaiting.value;
+            CommonUtils.log("", "obx rebuild ${ GetController.to.isAutoAnswerWaiting.value}");
             return Container(color:ColorStyles.upFinWhite, child: Column(
               mainAxisSize: MainAxisSize.min, // 자식 위젯에 맞게 높이를 조절합니다.
               children: [
-                GetController.to.isAutoAnswerWaiting.value ? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 0.8.h),
-                GetController.to.isAutoAnswerWaiting.value ? Container() : Align(alignment: Alignment.topRight,
+                isWaiting ? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 0.8.h),
+                isWaiting ? Container() : Align(alignment: Alignment.topRight,
                     child: Padding(padding: EdgeInsets.only(left: 2.w, right: 2.w),
                         child: Wrap(runSpacing: 0.7.h, spacing: 1.7.w, alignment: WrapAlignment.end, direction: Axis.horizontal,
                             children: GetController.to.autoAnswerWidgetList))),
@@ -1091,7 +1189,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                         _sendFileToAws();
                       }),
                 ]) : Container(),
-                GetController.to.isAutoAnswerWaiting.value ? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 0.8.h)
+                isWaiting ? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 0.8.h)
               ],
             ));
             /*

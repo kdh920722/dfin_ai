@@ -146,10 +146,11 @@ class WebSocketController {
                     if(idx != -1) subscribedRoomIds.removeAt(idx);
                   },
                   onMessage: (Map message) {
-                    CommonUtils.log("", "arrived message : $roomId \n $message");
                     var eachMsg = message;
+                    CommonUtils.log("", "arrived message : ${eachMsg["pr_room_id"].toString()} || $roomId \n $message");
+
                     for(int i = 0 ; i < MyData.getChatRoomInfoList().length ; i++){
-                      if(MyData.getChatRoomInfoList()[i].chatRoomId == roomId){
+                      if(MyData.getChatRoomInfoList()[i].chatRoomId == eachMsg["pr_room_id"].toString()){
                         Map<String, dynamic> msgInfo = jsonDecode(MyData.getChatRoomInfoList()[i].chatRoomMsgInfo);
                         List<dynamic> msgList = msgInfo["data"];
                         msgList.add(eachMsg);
@@ -161,10 +162,21 @@ class WebSocketController {
 
                     GetController.to.updateChatLoanInfoList(MyData.getChatRoomInfoList());
                     WebSocketController.setWaitingState(eachMsg["pr_room_id"].toString(), eachMsg["username"].toString(), false);
+                    CommonUtils.log("", "ARRAIVED : ${WebSocketController.isWaitingForAnswerState(eachMsg["pr_room_id"].toString(), "ME")} "
+                        "|| ${WebSocketController.isWaitingForAnswerState(eachMsg["pr_room_id"].toString(), "UPFIN")}");
+                    if(WebSocketController.isWaitingForAnswerState(eachMsg["pr_room_id"].toString(), "ME") == WebSocketController.isWaitingForAnswerState(eachMsg["pr_room_id"].toString(), "UPFIN")){
+                      if(WebSocketController.isWaitingForAnswerState(eachMsg["pr_room_id"].toString(), "ME")){
+                        GetController.to.updateAutoAnswerWaiting(true);
+                      }else{
+                        GetController.to.updateAutoAnswerWaiting(false);
+                      }
+                    }else{
+                      GetController.to.updateAutoAnswerWaiting(true);
+                    }
 
                     if(eachMsg["status_flg"].toString() == "1"){
                       String statusId = eachMsg["status_id"].toString();
-                      MyData.updateStatusToLoanInfoAndChatRoomInfo(roomId, statusId);
+                      MyData.updateStatusToLoanInfoAndChatRoomInfo(eachMsg["pr_room_id"].toString(), statusId);
                       GetController.to.updateChatLoanInfoList(MyData.getChatRoomInfoList());
                     }
 
