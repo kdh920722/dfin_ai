@@ -119,7 +119,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   int nhisCount = 0;
   int ntsCount = 0;
 
-  void _initDocsList(){
+  Future<void> _initDocsList() async {
     currentViewId = 1;
     addedDocsList.clear();
     savedDocsList.clear();
@@ -229,12 +229,12 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
     //gov24 : 1:주민등록등본           2:주민등록초본        15:지방세납세증명서
     //nhis  : 3:건강보험자격득실확인서    4:건강보험납부확인서
-    //nts   : 6:사업자등록증(*테스트불가) 10:소득금액증명       11:부가세과세표준증명원(*테스트불가)
+    //nts   : 6:사업자등록증(*테스트불가) 10:소득금액증명       11:부가세과세표준증명원(*테스트불가)      14:납세증명서
     for(var each in MyData.getPrDocsInfoList()){
-      CommonUtils.log("i", "each docs : ${each.productDocsId}  ${each.productDocsName}");
+      CommonUtils.log("", "each docs : ${each.productDocsId}  ${each.productDocsName}");
       if(each.productDocsId == 1 || each.productDocsId == 2 || each.productDocsId == 15
           || each.productDocsId == 3 || each.productDocsId == 4
-          || each.productDocsId == 6 || each.productDocsId == 10 || each.productDocsId == 11){
+          || each.productDocsId == 6 || each.productDocsId == 10 || each.productDocsId == 11 || each.productDocsId == 14){
         String docsType = "";
         if(each.productDocsId == 1 || each.productDocsId == 2 || each.productDocsId == 15){
           docsType = "gov24";
@@ -287,6 +287,9 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         addedIndexId++;
         each["view_id"] = addedIndexId;
       }else if(each["id"] == 11){
+        addedIndexId++;
+        each["view_id"] = addedIndexId;
+      }else if(each["id"] == 14){
         addedIndexId++;
         each["view_id"] = addedIndexId;
       }
@@ -357,10 +360,11 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     if(_isIdHereFromListById(6)) ntsCount++;
     if(_isIdHereFromListById(10)) ntsCount++;
     if(_isIdHereFromListById(11)) ntsCount++;
+    if(_isIdHereFromListById(14)) ntsCount++;
 
     for(var each in savedDocsList){
       Map<String, dynamic> resultMap = each["result"];
-      CommonUtils.log("i", "!!!!saved check\n"
+      CommonUtils.log("", "!!!!saved check\n"
           "view_id:${each["view_id"]}\n"
           "id:${each["id"]}\n"
           "name:${each["name"]}\n"
@@ -370,6 +374,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           "result:${resultMap.isEmpty? "" : each["result"]["resultValue"]}\n"
       );
     }
+
 
     for(int addedDocIndex = 0 ; addedDocIndex < addedDocsList.length ; addedDocIndex++){
       if(addedDocsList[addedDocIndex]["id"] != 999 && addedDocsList[addedDocIndex]["id"] != 1000){
@@ -382,6 +387,50 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
         if(!isSaved){
           unSavedDocsList.add(addedDocsList[addedDocIndex]);
+        }
+      }
+    }
+
+    for(var each in unSavedDocsList){
+      Map<String, dynamic> resultMap = each["result"];
+      CommonUtils.log("", "!!!!unsaved check\n"
+          "view_id:${each["view_id"]}\n"
+          "id:${each["id"]}\n"
+          "name:${each["name"]}\n"
+          "is_confirmed:${each["is_confirmed"]}\n"
+          "is_docs:${each["is_docs"]}\n"
+          "docs_type:${each["docs_type"]}\n"
+          "result:${resultMap.isEmpty? "" : each["result"]["resultValue"]}\n"
+      );
+    }
+  }
+  Future<void> _setValidImg() async {
+    bool isSavedImgValid = true;
+    String imgFilePath = _getSavedData(cameraId);
+    if(imgFilePath != ""){
+      if(!await CommonUtils.isFileExists(pickedFilePath)){
+          isSavedImgValid = false;
+      }
+    }else{
+      isSavedImgValid = false;
+    }
+
+    if(!isSavedImgValid){
+      int targetIdx = -1;
+      for(int i = 0 ; i < savedDocsList.length ; i++){
+        if(savedDocsList[i]["id"] == cameraId){
+          targetIdx = i;
+        }
+      }
+
+      if(targetIdx != -1){
+        savedDocsList.removeAt(targetIdx);
+        for(var each in addedDocsList){
+          if(each["id"] == cameraId){
+            each["is_confirmed"] = false;
+            each["result"] = <String, dynamic>{};
+            unSavedDocsList.add(each);
+          }
         }
       }
     }
@@ -578,7 +627,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               if(prevDocsType == "nhis") prevDocsCount = nhisCount;
               if(prevDocsType == "nts") prevDocsCount = ntsCount;
 
-              if(prevId == 1 || prevId == 2 || prevId == 15 || prevId == 3 || prevId == 4 || prevId == 6 || prevId == 10 || prevId == 11 ){
+              if(prevId == 1 || prevId == 2 || prevId == 15 || prevId == 3 || prevId == 4 || prevId == 6 || prevId == 10 || prevId == 11 || prevId == 14){
                 if(isPrevDocs){
                   currentViewId = currentViewId-prevDocsCount+1;
                 }
@@ -610,7 +659,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             if(prevDocsType == "nhis") prevDocsCount = nhisCount;
             if(prevDocsType == "nts") prevDocsCount = ntsCount;
 
-            if(prevId == 1 || prevId == 2 || prevId == 15 || prevId == 3 || prevId == 4 || prevId == 6 || prevId == 10 || prevId == 11 ){
+            if(prevId == 1 || prevId == 2 || prevId == 15 || prevId == 3 || prevId == 4 || prevId == 6 || prevId == 10 || prevId == 11 || prevId == 14){
               if(isPrevDocs){
                 currentViewId = currentViewId-prevDocsCount+1;
               }
@@ -655,7 +704,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         if(nhisCount != 1){
           currentViewId = currentViewId+nhisCount-1;
         }
-      }else if(_getIdFromListByViewId(currentViewId) == 6 || _getIdFromListByViewId(currentViewId) == 10 || _getIdFromListByViewId(currentViewId) == 11){
+      }else if(_getIdFromListByViewId(currentViewId) == 6 || _getIdFromListByViewId(currentViewId) == 10
+          || _getIdFromListByViewId(currentViewId) == 11 || _getIdFromListByViewId(currentViewId) == 14){
         if(ntsCount != 1){
           currentViewId = currentViewId+ntsCount-1;
         }
@@ -721,7 +771,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     isHist = true;
     for(var each in savedDocsList){
       Map<String, dynamic> resultMap = each["result"];
-      CommonUtils.log("i", "saved check\n"
+      CommonUtils.log("", "saved check\n"
           "view_id:${each["view_id"]}\n"
           "id:${each["id"]}\n"
           "name:${each["name"]}\n"
@@ -734,7 +784,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
     for(var each in unSavedDocsList){
       Map<String, dynamic> resultMap = each["result"];
-      CommonUtils.log("i", "unsaved check\n"
+      CommonUtils.log("", "unsaved check\n"
           "view_id:${each["view_id"]}\n"
           "id:${each["id"]}\n"
           "name:${each["name"]}\n"
@@ -747,7 +797,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
     for(var each in addedDocsList){
       Map<String, dynamic> resultMap = each["result"];
-      CommonUtils.log("i", "addedDoc check\n"
+      CommonUtils.log("", "addedDoc check\n"
           "view_id:${each["view_id"]}\n"
           "id:${each["id"]}\n"
           "name:${each["name"]}\n"
@@ -1107,8 +1157,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: introWidgetList)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-          UiUtils.getTextWithFixedScale("네 좋아요!", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
-            _setSavedData();
+          UiUtils.getTextWithFixedScale("네 좋아요!", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () async {
+            await _setSavedData();
             if(unSavedDocsList.isEmpty){
               _applyPr();
             }else{
@@ -1158,7 +1208,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     ]);
   }
 
-  void _setSavedData(){
+  Future<void> _setSavedData() async {
     for(int eachAddedDocIdx = 0 ; eachAddedDocIdx < addedDocsList.length ; eachAddedDocIdx++){
       for(var eachSavedDoc in savedDocsList){
         if(addedDocsList[eachAddedDocIdx]["id"] == eachSavedDoc["id"]){
@@ -1189,9 +1239,12 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           }else if(addedDocsList[eachAddedDocIdx]["id"] == cameraId){
             String imgFilePath = _getSavedData(cameraId);
             if(imgFilePath != ""){
-              pickedFilePath = imgFilePath;
-              addedDocsList[eachAddedDocIdx]["is_confirmed"] = true;
-              addedDocsList[eachAddedDocIdx]["result"] = eachSavedDoc["result"];
+              if(await CommonUtils.isFileExists(pickedFilePath)){
+                CommonUtils.log("", "ehere??");
+                pickedFilePath = imgFilePath;
+                addedDocsList[eachAddedDocIdx]["is_confirmed"] = true;
+                addedDocsList[eachAddedDocIdx]["result"] = eachSavedDoc["result"];
+              }
             }
           }else if(addedDocsList[eachAddedDocIdx]["id"] == addressId){
             String addressInfo = _getSavedData(addressId);
@@ -1207,7 +1260,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           //nts   : 6:사업자등록증(*테스트불가) 10:소득금액증명       11:부가세과세표준증명원(*테스트불가)
           else if(addedDocsList[eachAddedDocIdx]["id"] == 1 || addedDocsList[eachAddedDocIdx]["id"] == 2 || addedDocsList[eachAddedDocIdx]["id"] == 15 ||
               addedDocsList[eachAddedDocIdx]["id"] == 3 || addedDocsList[eachAddedDocIdx]["id"] == 4
-              || addedDocsList[eachAddedDocIdx]["id"] == 6 || addedDocsList[eachAddedDocIdx]["id"] == 10 || addedDocsList[eachAddedDocIdx]["id"] == 11){
+              || addedDocsList[eachAddedDocIdx]["id"] == 6 || addedDocsList[eachAddedDocIdx]["id"] == 10
+              || addedDocsList[eachAddedDocIdx]["id"] == 11 || addedDocsList[eachAddedDocIdx]["id"] == 14){
             addedDocsList[eachAddedDocIdx]["is_confirmed"] = true;
             addedDocsList[eachAddedDocIdx]["result"] = eachSavedDoc["result"];
           }
@@ -2189,6 +2243,9 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           if(each["id"] == 11){
             name = "부가세과세표준증명원";
           }
+          if(each["id"] == 14){
+            name = "국세납세증명서";
+          }
 
           if(docType == "nts"){
             checkColor = ColorStyles.upFinGray;
@@ -2366,7 +2423,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   }
   /// nhis(id:3,4) view end
 
-  /// nts(id:6,10,11) view 국세청 사업자등록증 소득금액증명 부가세과세표준증명원
+  /// nts(id:6,10,11,14) view 국세청 사업자등록증 소득금액증명 부가세과세표준증명원
   Widget _getNtsView(){
     String subTitle = "'국세청'";
     String title1 = "간편인증을 통해";
@@ -2430,6 +2487,11 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.ntsProofAdditionalTasStandard,
                   identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
               apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.ntsProofAdditionalTasStandard, true));
+            }else if(each["id"] == 14){
+              // 국세납세증명서
+              Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.ntsTaxCert,
+                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
+              apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.ntsTaxCert, true));
             }
           }
         }
@@ -2438,7 +2500,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       }
     });
   }
-  /// nts(id:6,10,11) view end
+  /// nts(id:6,10,11,14) view end
 
   /// nice key cert web view
   Widget _getNiceKeyCertView(){
@@ -2730,10 +2792,10 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       })
     ]);
   }
-  void _applyPr(){
+  Future<void> _applyPr() async {
     for(var each in addedDocsList){
       Map<String, dynamic> resultMap = each["result"];
-      CommonUtils.log("i", "finish check ===============================>\n"
+      CommonUtils.log("", "finish check ===============================>\n"
           "view_id:${each["view_id"]}\n"
           "id:${each["id"]}\n"
           "name:${each["name"]}\n"
@@ -2748,11 +2810,11 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       UiUtils.showLoadingPop(context);
       List<dynamic> docResultList = [];
       for(var each in addedDocsList){
-        if(each["is_docs"] && each["is_confirmed"] && !_isSavedData(each["id"])){
+        if(each["is_docs"] && each["is_confirmed"]){
           var resultMap  =  each["result"]["resultValue"]["data"];
           //gov24 : 1:주민등록등본           2:주민등록초본        15:지방세납세증명서
           //nhis  : 3:건강보험자격득실확인서    4:건강보험납부확인서
-          //nts   : 6:사업자등록증(*테스트불가) 10:소득금액증명       11:부가세과세표준증명원(*테스트불가)
+          //nts   : 6:사업자등록증(*테스트불가) 10:소득금액증명       11:부가세과세표준증명원(*테스트불가)      14:국세납세증명서
           if(each["id"] == 3 || each["id"] == 4){
             if(resultMap is List<dynamic>){
               Map<String, dynamic> eachMap = {
@@ -2796,11 +2858,50 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         UiUtils.closeLoadingPop(context);
         if(isSuccess){
           List<Map<String, dynamic>> addedDocsListForSave = [];
-          for(var each in addedDocsList){
-            if(each["is_confirmed"]){
-              addedDocsListForSave.add(each);
+          List<Map<String, dynamic>> addedDupleDocsListForSave = [];
+          for(var eachAdded in addedDocsList){
+            if(eachAdded["is_confirmed"] && eachAdded["id"] != 1000 && eachAdded["id"] != 999){
+              for(var each in savedDocsList){
+                if(each["id"] == eachAdded["id"]){
+                  addedDupleDocsListForSave.add(eachAdded);
+                }
+              }
             }
           }
+          for(var eachAdded in addedDocsList){
+            if(eachAdded["is_confirmed"] && eachAdded["id"] != 1000 && eachAdded["id"] != 999){
+              addedDocsListForSave.add(eachAdded);
+            }
+          }
+          if(addedDupleDocsListForSave.isNotEmpty){
+            for(var each in savedDocsList){
+              bool isDuple = false;
+              for(var eachDuple in addedDupleDocsListForSave){
+                if(each["id"] == eachDuple["id"]){
+                  isDuple = true;
+                }
+              }
+              if(!isDuple){
+                addedDocsListForSave.add(each);
+              }
+            }
+          }else{
+            addedDocsListForSave.addAll(savedDocsList);
+          }
+
+          for(var each in addedDocsListForSave){
+            Map<String, dynamic> resultMap = each["result"];
+            CommonUtils.log("", "docs cache save!!! ===============================>\n"
+                "view_id:${each["view_id"]}\n"
+                "id:${each["id"]}\n"
+                "name:${each["name"]}\n"
+                "is_confirmed:${each["is_confirmed"]}\n"
+                "is_docs:${each["is_docs"]}\n"
+                "docs_type:${each["docs_type"]}\n"
+                "result:${resultMap.isEmpty? "" : each["result"]["resultValue"]}\n"
+            );
+          }
+
           SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceApplyPrKey, jsonEncode(addedDocsListForSave));
           setState(() {
             currentViewId = _getViewIdFromListById(confirmedId);
@@ -2811,103 +2912,153 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       });
     }else{
       UiUtils.showLoadingPop(context);
-      _uploadCertImageToAwsServer(pickedFilePath, (isSuccessToUpload){
-        if(isSuccessToUpload){
-          List<dynamic> docResultList = [];
-          Map<String, dynamic> eachMap = {
-            "pr_document_id" : "12",
-            "response_data" : awsUploadUrl
-          };
-          docResultList.add(eachMap);
-          for(var each in addedDocsList){
-            if(each["is_docs"] && each["is_confirmed"]){
-              var resultMap  =  each["result"]["resultValue"]["data"];
-              //gov24 : 1:주민등록등본           2:주민등록초본        15:지방세납세증명서
-              //nhis  : 3:건강보험자격득실확인서    4:건강보험납부확인서
-              //nts   : 6:사업자등록증(*테스트불가) 10:소득금액증명       11:부가세과세표준증명원(*테스트불가)
-              if(each["id"] == 3 || each["id"] == 4){
-                if(resultMap is List<dynamic>){
-                  Map<String, dynamic> eachMap = {
-                    "pr_document_id" : each["id"],
-                    "response_data" : json.encode(resultMap)
-                  };
-                  docResultList.add(eachMap);
+      if(await CommonUtils.isFileExists(pickedFilePath)){
+        _uploadCertImageToAwsServer(pickedFilePath, (isSuccessToUpload){
+          if(isSuccessToUpload){
+            List<dynamic> docResultList = [];
+            Map<String, dynamic> eachMap = {
+              "pr_document_id" : "12",
+              "response_data" : awsUploadUrl
+            };
+            docResultList.add(eachMap);
+            for(var each in addedDocsList){
+              if(each["is_docs"] && each["is_confirmed"]){
+                var resultMap  =  each["result"]["resultValue"]["data"];
+                //gov24 : 1:주민등록등본           2:주민등록초본        15:지방세납세증명서
+                //nhis  : 3:건강보험자격득실확인서    4:건강보험납부확인서
+                //nts   : 6:사업자등록증(*테스트불가) 10:소득금액증명       11:부가세과세표준증명원(*테스트불가)      14:국세납세증명서
+                if(each["id"] == 3 || each["id"] == 4){
+                  if(resultMap is List<dynamic>){
+                    Map<String, dynamic> eachMap = {
+                      "pr_document_id" : each["id"],
+                      "response_data" : json.encode(resultMap)
+                    };
+                    docResultList.add(eachMap);
+                  }else{
+                    List<dynamic> wrapListMap = [];
+                    wrapListMap.add(resultMap);
+                    Map<String, dynamic> eachMap = {
+                      "pr_document_id" : each["id"],
+                      "response_data" : json.encode(wrapListMap)
+                    };
+                    docResultList.add(eachMap);
+                  }
                 }else{
-                  List<dynamic> wrapListMap = [];
-                  wrapListMap.add(resultMap);
-                  Map<String, dynamic> eachMap = {
-                    "pr_document_id" : each["id"],
-                    "response_data" : json.encode(wrapListMap)
-                  };
-                  docResultList.add(eachMap);
-                }
-              }else{
-                if(resultMap is List<dynamic>){
-                  Map<String, dynamic> eachMap = {
-                    "pr_document_id" : each["id"],
-                    "response_data" : json.encode(resultMap)
-                  };
-                  docResultList.add(eachMap);
-                }else{
-                  Map<String, dynamic> eachMap = {
-                    "pr_document_id" : each["id"],
-                    "response_data" : resultMap
-                  };
-                  docResultList.add(eachMap);
+                  if(resultMap is List<dynamic>){
+                    Map<String, dynamic> eachMap = {
+                      "pr_document_id" : each["id"],
+                      "response_data" : json.encode(resultMap)
+                    };
+                    docResultList.add(eachMap);
+                  }else{
+                    Map<String, dynamic> eachMap = {
+                      "pr_document_id" : each["id"],
+                      "response_data" : resultMap
+                    };
+                    docResultList.add(eachMap);
+                  }
                 }
               }
             }
-          }
-          String address = _getResultFromListById(addressId)["resultValue"];
-          Map<String, dynamic> applyInputMap = {
-            "offer_id": MyData.selectedPrInfoData!.productOfferId,
-            "offer_rid": MyData.selectedPrInfoData!.productOfferRid,
-            "lender_pr_id": MyData.selectedPrInfoData!.productOfferLenderPrId,
-            "address": address,
-            "contact_no1": MyData.phoneNumber.substring(0,3),
-            "contact_no2": MyData.phoneNumber.substring(3,7),
-            "contact_no3": MyData.phoneNumber.substring(7),
-            "jumin_no1": MyData.idNumber.split("-")[0],
-            "jumin_no2": MyData.idNumber.split("-")[1],
-            "memo": '모바일 신청',
-            "documents": docResultList
-          };
+            String address = _getResultFromListById(addressId)["resultValue"];
+            Map<String, dynamic> applyInputMap = {
+              "offer_id": MyData.selectedPrInfoData!.productOfferId,
+              "offer_rid": MyData.selectedPrInfoData!.productOfferRid,
+              "lender_pr_id": MyData.selectedPrInfoData!.productOfferLenderPrId,
+              "address": address,
+              "contact_no1": MyData.phoneNumber.substring(0,3),
+              "contact_no2": MyData.phoneNumber.substring(3,7),
+              "contact_no3": MyData.phoneNumber.substring(7),
+              "jumin_no1": MyData.idNumber.split("-")[0],
+              "jumin_no2": MyData.idNumber.split("-")[1],
+              "memo": '모바일 신청',
+              "documents": docResultList
+            };
 
-          LogfinController.callLogfinApi(LogfinApis.applyProduct, applyInputMap, (isSuccess, outputJson){
-            if(isSuccess){
-              LogfinController.getLoanInfo((isSuccessToGetLoanInfo, isNotEmpty){
-                if(isSuccessToGetLoanInfo){
-                  if(isNotEmpty){
-                    List<Map<String, dynamic>> addedDocsListForSave = [];
-                    for(var each in addedDocsList){
-                      if(each["is_confirmed"]){
-                        addedDocsListForSave.add(each);
+            LogfinController.callLogfinApi(LogfinApis.applyProduct, applyInputMap, (isSuccess, outputJson){
+              if(isSuccess){
+                LogfinController.getLoanInfo((isSuccessToGetLoanInfo, isNotEmpty){
+                  if(isSuccessToGetLoanInfo){
+                    if(isNotEmpty){
+                      List<Map<String, dynamic>> addedDocsListForSave = [];
+                      List<Map<String, dynamic>> addedDupleDocsListForSave = [];
+                      for(var eachAdded in addedDocsList){
+                        if(eachAdded["is_confirmed"] && eachAdded["id"] != 1000 && eachAdded["id"] != 999){
+                          for(var each in savedDocsList){
+                            if(each["id"] == eachAdded["id"]){
+                              addedDupleDocsListForSave.add(eachAdded);
+                            }
+                          }
+                        }
                       }
+                      for(var eachAdded in addedDocsList){
+                        if(eachAdded["is_confirmed"] && eachAdded["id"] != 1000 && eachAdded["id"] != 999){
+                          addedDocsListForSave.add(eachAdded);
+                        }
+                      }
+                      if(addedDupleDocsListForSave.isNotEmpty){
+                        for(var each in savedDocsList){
+                          bool isDuple = false;
+                          for(var eachDuple in addedDupleDocsListForSave){
+                            if(each["id"] == eachDuple["id"]){
+                              isDuple = true;
+                            }
+                          }
+                          if(!isDuple){
+                            addedDocsListForSave.add(each);
+                          }
+                        }
+                      }else{
+                        addedDocsListForSave.addAll(savedDocsList);
+                      }
+
+                      for(var each in addedDocsListForSave){
+                        Map<String, dynamic> resultMap = each["result"];
+                        CommonUtils.log("", "apply cache save!!! ===============================>\n"
+                            "view_id:${each["view_id"]}\n"
+                            "id:${each["id"]}\n"
+                            "name:${each["name"]}\n"
+                            "is_confirmed:${each["is_confirmed"]}\n"
+                            "is_docs:${each["is_docs"]}\n"
+                            "docs_type:${each["docs_type"]}\n"
+                            "result:${resultMap.isEmpty? "" : each["result"]["resultValue"]}\n"
+                        );
+                      }
+
+                      SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceApplyPrKey, jsonEncode(addedDocsListForSave));
+                      UiUtils.closeLoadingPop(context);
+                      setState(() {
+                        currentViewId = _getViewIdFromListById(confirmedId);
+                      });
+                    }else{
+                      UiUtils.closeLoadingPop(context);
+                      CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
                     }
-                    SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceApplyPrKey, jsonEncode(addedDocsListForSave));
-                    UiUtils.closeLoadingPop(context);
-                    setState(() {
-                      currentViewId = _getViewIdFromListById(confirmedId);
-                    });
                   }else{
                     UiUtils.closeLoadingPop(context);
                     CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
                   }
-                }else{
-                  UiUtils.closeLoadingPop(context);
-                  CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
-                }
-              });
-            }else{
-              UiUtils.closeLoadingPop(context);
-              CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
-            }
-          });
-        }else{
+                });
+              }else{
+                UiUtils.closeLoadingPop(context);
+                CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
+              }
+            });
+          }else{
+            UiUtils.closeLoadingPop(context);
+            CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
+          }
+        });
+      }else{
+        if(context.mounted) {
           UiUtils.closeLoadingPop(context);
           CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
+          await _setValidImg();
+          setState(() {
+
+          });
         }
-      });
+      }
     }
   }
   /// finish view end
@@ -2962,7 +3113,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getGov24View());
       }else if(_getIdFromListByViewId(currentViewId) == 3 || _getIdFromListByViewId(currentViewId) == 4){
         view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getNhisView());
-      }else if(_getIdFromListByViewId(currentViewId) == 6 || _getIdFromListByViewId(currentViewId) == 10 || _getIdFromListByViewId(currentViewId) == 11){
+      }else if(_getIdFromListByViewId(currentViewId) == 6 || _getIdFromListByViewId(currentViewId) == 10 || _getIdFromListByViewId(currentViewId) == 11 || _getIdFromListByViewId(currentViewId) == 14){
         view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getNtsView());
       }else if(_getIdFromListByViewId(currentViewId) == niceId){
         view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getNiceKeyCertView());

@@ -753,7 +753,7 @@ class CodeFController{
       };
 
       return inputJsonForNtsPoorfIssue;
-    }else{
+    }else if(api == Apis.ntsProofAdditionalTasStandard){
       DateTime now = CommonUtils.getCurrentLocalTime();
       DateTime julyFirst = DateTime(now.year, 7, 1);
       bool isBeforeJuly = now.isBefore(julyFirst);
@@ -788,6 +788,46 @@ class CodeFController{
       };
 
       return inputJsonForNtsProofAdditionalTasStandard;
+    }else if(api == Apis.ntsTaxCert){
+      DateTime now = CommonUtils.getCurrentLocalTime();
+      DateTime julyFirst = DateTime(now.year, 7, 1);
+      bool isBeforeJuly = now.isBefore(julyFirst);
+      DateTime lastYearDate = isBeforeJuly
+          ? DateTime(now.year - 2, 12, 31) // 7월 1일 이전이면 재작년 날짜
+          : DateTime(now.year - 1, 12, 31); // 7월 1일 이후이면 작년 날짜
+
+      String lastYearString = CommonUtils.convertTimeToString(lastYearDate).substring(0,4);
+      String startDate = isBeforeJuly? "${lastYearString}07" : "${lastYearString}01";
+      String endDate = isBeforeJuly? "${CommonUtils.convertTimeToString(DateTime(now.year - 1, 12, 31)).substring(0,4)}06" : "${lastYearString}12";
+      CommonUtils.log("i", "last year : $lastYearString $startDate $endDate");
+
+      Map<String, dynamic> inputJsonForNtsTexCert = {
+        "organization": "0001",
+        "loginType": "6",
+        "loginTypeLevel": loginCertType,
+        "loginIdentity": loginIdentity,
+        "userName": name,
+        "phoneNo": phoneNo,
+        "manageNo": "",
+        "managePassword": "",
+        "id": randomKey,
+        "startDate": startDate,
+        "endDate": endDate,
+        "isIdentityViewYN": "0",
+        "usePurposes": "04",
+        "submitTargets": "01",
+        "identity": identity,
+        "applicationType": "01",
+        "originDataYN": "0",
+        "isAddrViewYn": "0",
+        "proofType": "B0006",
+        "clientTypeLevel": "1",
+        "telecom": telecom
+      };
+
+      return inputJsonForNtsTexCert;
+    }else{
+      return {};
     }
   }
 
@@ -853,7 +893,7 @@ enum Apis {
   addressApi1, addressApi2, carRegistration1Api, carRegistration2Api, bankruptApi1, bankruptApi2,
   gov24residentRegistrationAbstract, gov24residentRegistrationCopy, gov24localTaxPaymentCert,
   nhisIdentifyConfirmation, nhisConfirmation,
-  ntsProofCorporateRegistration, ntsProofIssue, ntsProofAdditionalTasStandard
+  ntsProofCorporateRegistration, ntsProofIssue, ntsProofAdditionalTasStandard, ntsTaxCert
 }
 
 extension ApisExtension on Apis {
@@ -887,6 +927,8 @@ extension ApisExtension on Apis {
         return '/v1/kr/public/nt/proof-issue/proof-income';
       case Apis.ntsProofAdditionalTasStandard:
         return '/v1/kr/public/nt/proof-issue/additional-tax-standard';
+      case Apis.ntsTaxCert:
+        return '/v1/kr/public/nt/proof-issue/tax-cert-all';
       default:
         throw Exception('Unknown host value');
     }

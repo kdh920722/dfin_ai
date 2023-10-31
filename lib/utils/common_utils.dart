@@ -501,6 +501,11 @@ class CommonUtils {
     }
   }
 
+  static Future<bool> isFileExists(String filePath) async {
+    File file = File(filePath);
+    return await file.exists();
+  }
+
   static Future<void> convertImageFileToJpg(String targetImagePath) async {
     File originalFile = File(targetImagePath);
     String originalFileName = originalFile.path.split('/').last;

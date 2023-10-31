@@ -134,6 +134,10 @@ class UiUtils {
     return Text(text, style: TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor), textScaleFactor: 1.0, textAlign: textAlign, maxLines: textMaxLine);
   }
 
+  static Text getTextWithFixedScale2(String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign? textAlign, int? textMaxLine){
+    return Text(text, style: TextStyle(decoration: TextDecoration.none, height: 1.3, fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor), textScaleFactor: 1.0, textAlign: textAlign, maxLines: textMaxLine);
+  }
+
   static Text getTextWithFixedScaleForAgreeSubTitle(String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign? textAlign, int? textMaxLine){
     return Text(text, style: TextStyle(decoration: TextDecoration.none, height: 1.4, fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor), textScaleFactor: 1.0, textAlign: textAlign, maxLines: textMaxLine);
   }
@@ -148,6 +152,10 @@ class UiUtils {
 
   static Widget getTextButtonWithFixedScale(String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign? textAlign, int? textMaxLine, Function() onPressedCallback){
     return GestureDetector(onTap: onPressedCallback, child : UiUtils.getTextWithFixedScale(text, fontSize, fontWeight, textColor, textAlign, null));
+  }
+
+  static Widget getTextButtonWithFixedScale2(String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign? textAlign, int? textMaxLine, Function() onPressedCallback){
+    return GestureDetector(onTap: onPressedCallback, child : UiUtils.getTextWithFixedScale2(text, fontSize, fontWeight, textColor, textAlign, null));
   }
 
   static Widget getTextButtonWithFixedScaleForAddress(String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign? textAlign, int? textMaxLine, Function() onPressedCallback){
@@ -944,7 +952,7 @@ class UiUtils {
                   }
                 });
               }),
-          UiUtils.getTextButtonWithFixedScale(titleString, 10.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null, () {
+          UiUtils.getTextButtonWithFixedScale2(titleString, 10.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null, () {
             smallAgreePressEvent(parentContext, titleString, contentsString, (agreeResult){
               thisSetState(() {
                 callAct(agreeResult);
