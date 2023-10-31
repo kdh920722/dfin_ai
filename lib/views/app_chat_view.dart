@@ -54,9 +54,10 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   final ReceivePort _port = ReceivePort();
   static String savedFileName = "";
   bool searchNoMore = false;
-  bool isScrollBottom = true;
   double prevScrollPos = 0.0;
   static bool isScrollMove = false;
+
+  Timer? scrollCheckTimer;
 
   @override
   void initState(){
@@ -83,62 +84,57 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     Config.isEmergencyRoot = false;
     _keyboardVisibilityController = CommonUtils.getKeyboardViewController(_functionForKeyboardShow, _functionForKeyboardHide);
     _chatScrollController.addListener(() {
-      double currPos = _chatScrollController.position.pixels;
-      double maxH = _chatScrollController.position.maxScrollExtent;
-      if((maxH - deviceH/2) >= 0) maxH = maxH - deviceH/2;
+      scrollCheckTimer ??= Timer.periodic(const Duration(milliseconds: 500), (Timer timer) {
+          double currPos = _chatScrollController.position.pixels;
+          double maxH = _chatScrollController.position.maxScrollExtent;
+          if((maxH - deviceH/2) >= 0) maxH = maxH - deviceH/2;
 
-      CommonUtils.log("", "currPos : ${100.h} || $currPos || $maxH");
-      /*
-      if(deviceH <= currPos){
-        if(currPos <= maxH){
-          if(!isScrollMove){
-            isScrollMove = true;
-            GetController.to.updateShowScrollBottom(true);
+          if(deviceH <= currPos){
+            if(currPos <= maxH){
+              if(!isScrollMove){
+                isScrollMove = true;
+                GetController.to.updateShowScrollBottom(true);
+              }
+            }else{
+              if(isScrollMove){
+                isScrollMove = false;
+                GetController.to.updateShowScrollBottom(false);
+              }
+            }
+          }else{
+            if(_chatScrollController.position.maxScrollExtent <= deviceH){
+              if(isScrollMove){
+                isScrollMove = false;
+                GetController.to.updateShowScrollBottom(false);
+              }
+            }else{
+              if(!isScrollMove){
+                isScrollMove = true;
+                GetController.to.updateShowScrollBottom(true);
+              }
+            }
           }
-        }else{
-          isScrollMove = false;
-          GetController.to.updateShowScrollBottom(false);
-        }
-      }else{
-        if(_chatScrollController.position.maxScrollExtent <= deviceH){
-          isScrollMove = false;
-          GetController.to.updateShowScrollBottom(false);
-        }else{
-          if(!isScrollMove){
-            isScrollMove = true;
-            GetController.to.updateShowScrollBottom(true);
-          }
-        }
-      }
-
-       */
-
+        });
       if (_chatScrollController.offset == _chatScrollController.position.maxScrollExtent && !_chatScrollController.position.outOfRange) {
-        if(!isScrollBottom){
-          isScrollBottom = true;
-        }
 
-        if(isScrollMove){
-          isScrollMove = false;
-          GetController.to.updateShowScrollBottom(false);
-        }
-       // setState(() {});
+        // if(isScrollMove){
+        //   isScrollMove = false;
+        //   GetController.to.updateShowScrollBottom(false);
+        // }
+        // setState(() {});
       }
       // else if (_chatScrollController.offset == _chatScrollController.position.minScrollExtent && !_chatScrollController.position.outOfRange) {
       //   isScrollStop = true;
       //   isScrollMove = true;
       // }
       else{
-        if(isScrollBottom){
-          isScrollBottom = false;
-        }
-
-        if(!isScrollMove){
-          isScrollMove = true;
-          GetController.to.updateShowScrollBottom(true);
-        }
+        // if(!isScrollMove){
+        //   isScrollMove = true;
+        //   GetController.to.updateShowScrollBottom(true);
+        // }
       }
     });
+
     FireBaseController.setStateForForeground = null;
     isViewHere = true;
     _setAutoAnswerWidgetList();
@@ -146,22 +142,20 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     GetController.to.updateShowStatus(true);
     GetController.to.updateAutoAnswerWaiting(false);
     GetController.to.updateShowScrollBottom(false);
-    GetController.to.updateHtmlLoad(true);
+
+    bool isFileHere = false;
+    for(var each in GetController.to.chatMessageInfoDataList){
+      if(each.messageType == "file") isFileHere = true;
+    }
+    if(isFileHere){
+      GetController.to.updateHtmlLoad(false);
+    }else{
+      GetController.to.updateHtmlLoad(true);
+    }
+
     _setAutoAnswerWaitingState();
     isScrollMove = false;
     currentKey = "";
-
-    /*
-    htmlLoadTimer = Timer.periodic(const Duration(milliseconds: 300), (Timer timer) {
-      htmlBuildCnt++;
-      if(htmlBuildCnt > 4){
-        isHtmlLoad = true;
-        htmlLoadTimer!.cancel();
-        _scrollToBottom(true,0);
-        setState(() {});
-      }
-    });
-     */
 
     IsolateNameServer.registerPortWithName(_port.sendPort, 'downloader_send_port');
     _port.listen((dynamic data) async {
@@ -191,8 +185,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   }
 
   void _setAutoAnswerWaitingState(){
-    CommonUtils.log("", "${WebSocketController.isWaitingForAnswerState(currentRoomId, "ME")} || ${WebSocketController.isWaitingForAnswerState(currentRoomId, "UPFIN")}");
-
     if(WebSocketController.isWaitingForAnswerState(currentRoomId, "ME") == WebSocketController.isWaitingForAnswerState(currentRoomId, "UPFIN")){
       if(WebSocketController.isWaitingForAnswerState(currentRoomId, "ME")){
         GetController.to.updateAutoAnswerWaiting(true);
@@ -203,7 +195,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
       GetController.to.updateAutoAnswerWaiting(true);
     }
   }
-
 
   KeyboardVisibilityController? _keyboardVisibilityController;
   void _functionForKeyboardHide(){
@@ -227,6 +218,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     _keyboardVisibilityController = null;
     AppMainViewState.isStart = false;
     isViewHere = false;
+    if(scrollCheckTimer != null) scrollCheckTimer!.cancel();
     widgetList.clear();
     GetController.to.resetChatAutoAnswerWidgetList();
     GetController.to.updateInputTextHide(true);
@@ -295,6 +287,13 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   Timer? htmlLoadTimer;
   int htmlBuildCnt = 0;
   Widget _getHtmlView(String message, String sender, String type){
+    if(type == "file"){
+      if(!isScrollMove){
+        //GetController.to.updateHtmlLoad(false);
+      }
+    }
+
+
     bool isImage = true;
     String htmlTag = "";
     String htmlTextTag = "";
@@ -384,17 +383,21 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         buildAsync: false,
         onLoadingBuilder: (htmlContext, element, progress){
           htmlBuildCnt = 0;
-          if(GetController.to.isHtmlLoad.value){
-            GetController.to.updateHtmlLoad(false);
-          }
-
+          // if(GetController.to.isHtmlLoad.value){
+          //   GetController.to.updateHtmlLoad(false);
+          // }
           if(htmlLoadTimer != null) htmlLoadTimer!.cancel();
           htmlLoadTimer = Timer.periodic(const Duration(milliseconds: 300), (Timer timer) {
             htmlBuildCnt++;
             if(htmlBuildCnt > 4){
               htmlLoadTimer!.cancel();
-              GetController.to.updateHtmlLoad(true);
-              _scrollToBottom(true,0);
+              CommonUtils.log("", "html loadscroll");
+              // GetController.to.updateHtmlLoad(true);
+              _scrollToBottom(false,0);
+              Future.delayed(const Duration(milliseconds: 500), () async {
+                GetController.to.updateHtmlLoad(true);
+              });
+
             }
           });
         },
@@ -402,14 +405,14 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
           if(element.id == 'typeMe') {
             return {
               "color" : "white",
-              "font-size": "18px",
+              "font-size": "17px",
               "line-height" : "120%",
               "font-weight": "normal",
             };
           }else if(element.id == 'typeOther') {
             return {
               "color" : "black",
-              "font-size": "18px",
+              "font-size": "17px",
               "line-height" : "120%",
               "font-weight": "normal",
             };
@@ -418,7 +421,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
           if(element.id == 'boldText') {
             return {
               "color" : "black",
-              "font-size": "18px",
+              "font-size": "17px",
               "line-height" : "120%",
               "font-weight": "bold",
             };
@@ -536,10 +539,10 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   Widget _getOtherView(ChatMessageInfoData otherInfo){
     Widget? otherInfoWidget;
     if(otherInfo.messageType == "text"){
-      if(otherInfo.message.contains("<button")){
+      if(otherInfo.message.contains("<button") || otherInfo.message.contains("<br>")){
         otherInfoWidget = _getHtmlView(otherInfo.message, "UPFIN", otherInfo.messageType);
       }else{
-        otherInfoWidget = UiUtils.getTextWithFixedScale(otherInfo.message, 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null);
+        otherInfoWidget = UiUtils.getTextWithFixedScale(otherInfo.message, 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null);
       }
     }else{
       otherInfoWidget = _getHtmlView(otherInfo.message, "UPFIN", otherInfo.messageType);
@@ -599,7 +602,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   Widget _getMeView(ChatMessageInfoData meInfo){
     Widget? meInfoWidget;
     if(meInfo.messageType == "text"){
-      meInfoWidget = UiUtils.getTextWithFixedScale(meInfo.message, 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null);
+      meInfoWidget = UiUtils.getTextWithFixedScale(meInfo.message, 13.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null);
     }else{
       meInfoWidget = _getHtmlView(meInfo.message, "ME", meInfo.messageType);
     }
@@ -683,7 +686,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
       UiUtils.showLoadingPop(context);
       await CommonUtils.saveSettingsToFile("push_from", "");
       await CommonUtils.saveSettingsToFile("push_room_id", "");
-      CommonUtils.log("", "delete file");
       await LogfinController.callLogfinApi(LogfinApis.checkMessage, inputJson, (isSuccess, outputJson){
         backPossibleFlag =true;
         if(isSuccess){
@@ -694,6 +696,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
       });
 
       if(context.mounted) {
+        if(scrollCheckTimer != null) scrollCheckTimer!.cancel();
         isViewHere = false;
         _chatTextFocus.unfocus();
         CommonUtils.hideKeyBoard();
@@ -704,10 +707,8 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   }
 
   Future<void> _scrollToBottom(bool doDelay, int delayTime) async {
-    CommonUtils.log("", "scroll..?");
     if(isBuild){
       if(!isScrollMove){
-        CommonUtils.log("", "scroll..!!");
         if(doDelay){
           await Future.delayed(Duration(milliseconds: delayTime), () async {});
         }
@@ -1238,10 +1239,11 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if(isViewHere){
+        CommonUtils.log("", "rebuild");
         await CommonUtils.saveSettingsToFile("push_from", "");
         await CommonUtils.saveSettingsToFile("push_room_id", "");
         isBuild = true;
-        _scrollToBottom(false, 0);
+        //_scrollToBottom(false, 0);
       }
     });
 
@@ -1305,8 +1307,14 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
           Obx((){
             bool isWaiting = GetController.to.isAutoAnswerWaiting.value;
             bool isScrollWaiting = GetController.to.isShowScrollBottom.value;
+
             if(isScrollWaiting){
               isWaiting = isScrollWaiting;
+            }
+
+            if(!isWaiting){
+              CommonUtils.log("", "scroll~~~~~~~~~~~~~");
+              _scrollToBottom(true, 500);
             }
 
             return Container(color:ColorStyles.upFinWhite, child: Column(
@@ -1441,7 +1449,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
               bottom: 5.w, right: 5.w,
               child: UiUtils.getIconButtonWithHeight(10.w, Icons.arrow_drop_down_circle, 10.w, Colors.black54, () {
                 isScrollMove = false;
-                isScrollBottom = true;
                 GetController.to.updateShowScrollBottom(false);
                 _scrollToBottom(false, 0);
               })

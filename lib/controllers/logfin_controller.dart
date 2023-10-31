@@ -252,7 +252,7 @@ class LogfinController {
       }
     }
 
-    CommonUtils.log("", "${api.value} inputJson :\n$inputJson");
+    CommonUtils.log("i", "${api.value} inputJson :\n$inputJson");
 
     try {
       final url = Uri.parse(targetUrl);
@@ -267,7 +267,7 @@ class LogfinController {
       );
 
       final json = jsonDecode(response.body);
-      CommonUtils.log('', 'out full : \n$json');
+      CommonUtils.log('i', 'out full : \n$json');
 
       if (response.statusCode == 200) { // HTTP_OK
         final resultData = json;

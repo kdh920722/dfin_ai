@@ -415,7 +415,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
 
   Future<void> _goToChatRoom(List<dynamic> listMsg, String chatRoomId) async {
     GetController.to.resetChatMessageInfoList();
-    CommonUtils.log("", "listMsg.length : ${listMsg.length}");
+    CommonUtils.log("i", "listMsg.length : ${listMsg.length}");
     for(Map<String, dynamic> eachMsg in listMsg){
       var messageItem = ChatMessageInfoData(eachMsg["id"].toString(), eachMsg["pr_room_id"].toString(), eachMsg["message"].toString(),
           CommonUtils.convertTimeToString(CommonUtils.parseToLocalTime(eachMsg["created_at"])),

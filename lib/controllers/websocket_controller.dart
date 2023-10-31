@@ -168,8 +168,6 @@ class WebSocketController {
 
                     GetController.to.updateChatLoanInfoList(MyData.getChatRoomInfoList());
                     WebSocketController.setWaitingState(eachMsg["pr_room_id"].toString(), eachMsg["username"].toString(), false);
-                    CommonUtils.log("", "ARRAIVED : ${WebSocketController.isWaitingForAnswerState(eachMsg["pr_room_id"].toString(), "ME")} "
-                        "|| ${WebSocketController.isWaitingForAnswerState(eachMsg["pr_room_id"].toString(), "UPFIN")}");
                     if(WebSocketController.isWaitingForAnswerState(eachMsg["pr_room_id"].toString(), "ME") == WebSocketController.isWaitingForAnswerState(eachMsg["pr_room_id"].toString(), "UPFIN")){
                       if(WebSocketController.isWaitingForAnswerState(eachMsg["pr_room_id"].toString(), "ME")){
                         GetController.to.updateAutoAnswerWaiting(true);
@@ -200,6 +198,10 @@ class WebSocketController {
                         }else if(LoanInfoData.getStatusName(statusId) == "통보"){
                           GetController.to.updateChatStatusTick(3);
                         }
+                      }
+
+                      if(eachMsg["message_type"] == "file" && !AppChatViewState.isScrollMove){
+                        GetController.to.updateHtmlLoad(false);
                       }
                     }
                   }
