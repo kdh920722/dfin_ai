@@ -39,6 +39,7 @@ class GetController extends GetxController {
   RxBool isShowPickedFile = false.obs;
   RxBool isShowStatus = false.obs;
   RxBool isShowScrollBottom = false.obs;
+  RxBool isHtmlLoad = false.obs;
   RxInt chatStatusTick = 0.obs;
 
   @override
@@ -240,6 +241,9 @@ class GetController extends GetxController {
   }
   void updateAutoAnswerWaiting(bool newValue) {
     isAutoAnswerWaiting.value = newValue;
+  }
+  void updateHtmlLoad(bool newValue) {
+    isHtmlLoad.value = newValue;
   }
 
 }

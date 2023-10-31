@@ -60,7 +60,7 @@ class AppAgreeDetailInfoViewState extends State<AppAgreeDetailInfoView> with Wid
   @override
   Widget build(BuildContext context) {
     Map<String, dynamic> agreeInfo = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
-    String title = agreeInfo["title"].toString();
+    //String title = agreeInfo["title"].toString();
     Widget subContents = agreeInfo["contents"] as Widget;
 
     Widget view = Container(

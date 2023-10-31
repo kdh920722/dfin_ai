@@ -202,6 +202,17 @@ class MyData {
     _prDocsInfoList.clear();
   }
 
+  static final List<PrDocsInfoData> _prRetryDocsInfoList = [];
+  static List<PrDocsInfoData> getPrRetryDocsInfoList(){
+    return _prRetryDocsInfoList;
+  }
+  static void addToPrRetryDocsInfoList(PrDocsInfoData prRetryDocsInfoData){
+    _prRetryDocsInfoList.add(prRetryDocsInfoData);
+  }
+  static void clearPrRetryDocsInfoList(){
+    _prRetryDocsInfoList.clear();
+  }
+
   static PrInfoData? selectedPrInfoData;
   static AccidentInfoData? selectedAccidentInfoData;
 
@@ -256,6 +267,7 @@ class MyData {
     clearPrInfoList();
     clearPrDocsInfoList();
     clearChatRoomInfoList();
+    clearPrRetryDocsInfoList();
     selectedPrInfoData = null;
     selectedAccidentInfoData = null;
   }

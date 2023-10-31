@@ -267,7 +267,7 @@ class LogfinController {
       );
 
       final json = jsonDecode(response.body);
-      CommonUtils.log('i', 'out full : \n$json');
+      CommonUtils.log('', 'out full : \n$json');
 
       if (response.statusCode == 200) { // HTTP_OK
         final resultData = json;
@@ -507,7 +507,7 @@ class LogfinController {
 
                       loanMessageInfoOutputJson!["last_read_message_id"] = eachLoans["pr_room"]["last_read_message_id"].toString();
                       List<dynamic> temp = loanMessageInfoOutputJson['data'];
-                      CommonUtils.log("", "loanMessageInfoOutputJson data ====>\n${temp.length}\n$loanMessageInfoOutputJson");
+                      CommonUtils.log("i", "loanMessageInfoOutputJson data ====>\n${temp.length}\n$loanMessageInfoOutputJson");
                       MyData.addToLoanInfoList(
                           LoanInfoData(eachLoans["accident_uid"].toString(), eachLoans["uid"].toString(), eachLoans["lender_pr_id"].toString(),
                               submitAmount, eachLoans["submit_offer"]["interest_rate"].toString(),
@@ -632,7 +632,8 @@ enum LogfinApis {
   applyProductDocSearch, applyProduct,
   getAccidentInfo, getOffersInfo,
   getLoansInfo, getLoansDetailInfo,
-  sendMessage, getMessage, checkMessage, getAgreeDocuments, getFaqs
+  sendMessage, getMessage, checkMessage, getAgreeDocuments, getFaqs,
+  getRetryDocs, retryDocs
 }
 
 extension LogfinApisExtension on LogfinApis {
@@ -680,6 +681,10 @@ extension LogfinApisExtension on LogfinApis {
         return '/get_documents.json';
       case LogfinApis.getFaqs:
         return '/get_faqs.json';
+      case LogfinApis.getRetryDocs:
+        return '/unsubmitted_documents.json';
+      case LogfinApis.retryDocs:
+        return '/add_documents.json';
     }
   }
 }

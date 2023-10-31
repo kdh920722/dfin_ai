@@ -261,7 +261,6 @@ class WebSocketController {
               connectionInfoMap["is_connected"] = true;
             }else{
               // fail
-              CommonUtils.flutterToast("F1");
               Future.delayed(const Duration(seconds: 5), () {
                 connectionInfoMap["is_connected"] = true;
                 _retryToConnectNewVer(connectedKey);
@@ -269,7 +268,6 @@ class WebSocketController {
             }
           }else{
             // fail
-            CommonUtils.flutterToast("F2");
             Future.delayed(const Duration(seconds: 5), () {
               connectionInfoMap["is_connected"] = true;
               _retryToConnectNewVer(connectedKey);
@@ -278,7 +276,6 @@ class WebSocketController {
         });
       }
     }
-
   }
 
   static bool isSubscribe(String roomId){

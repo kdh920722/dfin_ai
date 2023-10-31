@@ -3,10 +3,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:upfin/views/app_accident_detail_view.dart';
 import 'package:upfin/views/app_agree_detail_info_view.dart';
 import 'package:upfin/views/app_agree_detail_info_view_test.dart';
+import 'package:upfin/views/app_apply_doc_view.dart';
 import 'package:upfin/views/app_apply_pr_view.dart';
 import 'package:upfin/views/app_detail_pr_view.dart';
 import 'package:upfin/views/app_main_view.dart';
@@ -57,6 +57,7 @@ class Config{
     AppView.appResultPrView.value : (context) => AppResultPrView(),
     AppView.appDetailPrView.value : (context) => AppDetailPrView(),
     AppView.appApplyPrView.value : (context) => AppApplyPrView(),
+    AppView.appApplyDocView.value : (context) => AppApplyDocView(),
     AppView.appChatView.value : (context) => AppChatView(),
     AppView.appAccidentDetailInfoView.value : (context) => AppAccidentDetailView(),
     AppView.appAgreeDetailInfoView.value : (context) => AppAgreeDetailInfoView(),
@@ -131,7 +132,7 @@ class Config{
 }
 
 enum AppView {
-  appRootView, appLoginView, appCertificationView, appWebView, appSignupView, appMainView, appSearchAccidentView, appSignOutView,
+  appRootView, appLoginView, appCertificationView, appWebView, appSignupView, appMainView, appSearchAccidentView, appSignOutView, appApplyDocView,
   appUpdateAccidentView, appResultPrView, appDetailPrView, appApplyPrView, appChatView, appAccidentDetailInfoView, appAgreeDetailInfoView, appAgreeDetailInfoViewTest
 }
 
@@ -160,6 +161,8 @@ extension SAppViewExtension on AppView {
         return '/detailPrView';
       case AppView.appApplyPrView:
         return '/applyPrView';
+      case AppView.appApplyDocView:
+        return '/applyDocView';
       case AppView.appChatView:
         return '/appChatView';
       case AppView.appAccidentDetailInfoView:

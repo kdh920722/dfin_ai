@@ -20,9 +20,11 @@ import 'package:upfin/datas/loan_info_data.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import 'package:upfin/styles/TextStyles.dart';
+import 'package:upfin/views/app_apply_pr_view.dart';
 import 'package:upfin/views/app_main_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../configs/app_config.dart';
+import '../datas/pr_docs_info_data.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
@@ -39,7 +41,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   final _chatTextFocus = FocusNode();
   final _chatTextController = TextEditingController();
   static String currentRoomId = "";
-  String currentLoanUid = "";
+  static String currentLoanUid = "";
   String currentCompany = "";
   String currentCompanyLogo = "";
   String currentStatus = "";
@@ -89,19 +91,30 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
 
       if(deviceH <= currPos){
         if(currPos <= maxH){
+          if(!isScrollMove){
+            isScrollMove = true;
+          }
           GetController.to.updateShowScrollBottom(true);
         }else{
+          isScrollMove = false;
           GetController.to.updateShowScrollBottom(false);
         }
       }else{
-        GetController.to.updateShowScrollBottom(false);
+        if(_chatScrollController.position.maxScrollExtent <= deviceH){
+          isScrollMove = false;
+          GetController.to.updateShowScrollBottom(false);
+        }else{
+          if(!isScrollMove){
+            isScrollMove = true;
+          }
+          GetController.to.updateShowScrollBottom(true);
+        }
       }
 
       if (_chatScrollController.offset == _chatScrollController.position.maxScrollExtent && !_chatScrollController.position.outOfRange) {
         isScrollBottom = true;
-        isScrollMove = false;
         GetController.to.updateShowScrollBottom(false);
-        setState(() {});
+       // setState(() {});
       }
       // else if (_chatScrollController.offset == _chatScrollController.position.minScrollExtent && !_chatScrollController.position.outOfRange) {
       //   isScrollStop = true;
@@ -110,10 +123,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
       else{
         if(isScrollBottom){
           isScrollBottom = false;
-        }
-
-        if(!isScrollMove){
-          isScrollMove = true;
         }
       }
     });
@@ -124,10 +133,12 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     GetController.to.updateShowStatus(true);
     GetController.to.updateAutoAnswerWaiting(false);
     GetController.to.updateShowScrollBottom(false);
+    GetController.to.updateHtmlLoad(true);
     _setAutoAnswerWaitingState();
     isScrollMove = false;
     currentKey = "";
 
+    /*
     htmlLoadTimer = Timer.periodic(const Duration(milliseconds: 300), (Timer timer) {
       htmlBuildCnt++;
       if(htmlBuildCnt > 4){
@@ -137,6 +148,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         setState(() {});
       }
     });
+     */
 
     IsolateNameServer.registerPortWithName(_port.sendPort, 'downloader_send_port');
     _port.listen((dynamic data) async {
@@ -268,7 +280,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   }
 
   Timer? htmlLoadTimer;
-  bool isHtmlLoad = false;
   int htmlBuildCnt = 0;
   Widget _getHtmlView(String message, String sender, String type){
     bool isImage = true;
@@ -352,23 +363,25 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     }
 
     String htmlString = "$htmlTextTag $htmlTag </div>";
+
     return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
       HtmlWidget(
         htmlString,
         enableCaching: false,
         buildAsync: false,
         onLoadingBuilder: (htmlContext, element, progress){
-          CommonUtils.log("", "html!!");
           htmlBuildCnt = 0;
-          isHtmlLoad = false;
+          if(GetController.to.isHtmlLoad.value){
+            GetController.to.updateHtmlLoad(false);
+          }
+
           if(htmlLoadTimer != null) htmlLoadTimer!.cancel();
           htmlLoadTimer = Timer.periodic(const Duration(milliseconds: 300), (Timer timer) {
             htmlBuildCnt++;
             if(htmlBuildCnt > 4){
-              isHtmlLoad = true;
               htmlLoadTimer!.cancel();
+              GetController.to.updateHtmlLoad(true);
               _scrollToBottom(true,0);
-              setState(() {});
             }
           });
         },
@@ -460,12 +473,39 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
             }
           }else{
             CommonUtils.log("", "furl : $url");
-            if(await canLaunchUrl(Uri.parse(url))){
-              await launchUrl(Uri.parse(url));
-            }else{
-              CommonUtils.flutterToast("연결할 수 없습니다.");
-            }
+            if(url.toLowerCase() == "doc"){
+              Map<String, dynamic> inputMap = {
+                "loan_uid": currentLoanUid
+              };
 
+              UiUtils.showLoadingPop(context);
+              LogfinController.callLogfinApi(LogfinApis.getRetryDocs, inputMap, (isSuccess, outputJson) async {
+                UiUtils.closeLoadingPop(context);
+                if(isSuccess){
+                  MyData.clearPrDocsInfoList();
+                  for(var each in outputJson!["documents"]){
+                    MyData.addToPrDocsInfoList(PrDocsInfoData(each["id"], each["name"], each["del_flg"]));
+                  }
+                  if(MyData.getPrDocsInfoList().isNotEmpty){
+                    isScrollMove = true;
+                    isViewHere = false;
+                    AppApplyPrViewState.isRetry = true;
+                    await CommonUtils.moveToWithResult(context, AppView.appApplyPrView.value, null);
+                    isViewHere = true;
+                  }else{
+                    CommonUtils.flutterToast("서류 제출을 완료했습니다.");
+                  }
+                }else{
+                  CommonUtils.flutterToast("서류목록을 가져오는데 실패했습니다.\n다시 시도해주세요.");
+                }
+              });
+            }else{
+              if(await canLaunchUrl(Uri.parse(url))){
+                await launchUrl(Uri.parse(url));
+              }else{
+                CommonUtils.flutterToast("연결할 수 없습니다.");
+              }
+            }
           }
 
           return true;
@@ -903,13 +943,12 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
               child: UiUtils.getRoundedBoxTextWithFixedScale(each, 11.sp, FontWeight.w500, TextAlign.center, borderColor, fillColor, textColor),
       onTap: () async {
         currentKey = each;
+        isScrollMove = false;
+        _scrollToBottom(false, 0);
         if(each.contains("카메라")){
           _setPickedImgFromCamera();
         }else if(each.contains("가져오기")){
           _setPickedFileFromDevice();
-        }else if(each.contains("맨아래")){
-          isScrollMove = false;
-          _scrollToBottom(false, 0);
         }else if(each.contains("채팅")){
           inputTextHide = false;
           GetController.to.updateInputTextHide(inputTextHide);
@@ -956,12 +995,13 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     }
   }
 
-  void _sendFileToAws(){
+  Future<void> _sendFileToAws() async {
     int cnt = 0;
     int failCnt = 0;
     UiUtils.showLoadingPop(context);
     for(var each in pickedFiles){
-      AwsController.uploadFileToAWS(each.path, "${MyData.email}/${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}", (isSuccess, resultUrl){
+      await AwsController.uploadFileToAWS(each.path, "${MyData.email}/${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}", (isSuccess, resultUrl){
+        UiUtils.closeLoadingPop(context);
         cnt++;
         if(!isSuccess){
           failCnt++;
@@ -976,8 +1016,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
             GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
             isShowPickedFile = false;
             GetController.to.updateShowPickedFile(isShowPickedFile);
-            UiUtils.closeLoadingPop(context);
-            setState(() {});
           }
         }
       });
@@ -1039,7 +1077,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
       }
 
       String fileName = pickedFiles[i].uri.pathSegments.last; // 파일명 + 확장자
-      String basename = pickedFiles[i].uri.pathSegments.last.split('.').first; // 파일명\
+      //String basename = pickedFiles[i].uri.pathSegments.last.split('.').first; // 파일명\
       widgetList.add(
           Stack(alignment:Alignment.bottomLeft, children: [
             Container(width: 22.5.w, height: 17.h,
@@ -1247,18 +1285,36 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
             return Container(color:ColorStyles.upFinWhite, child: Column(
               mainAxisSize: MainAxisSize.min, // 자식 위젯에 맞게 높이를 조절합니다.
               children: [
-                isWaiting ? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 0.8.h),
+                Obx((){
+                  if(GetController.to.isShowScrollBottom.value){
+                    if(isWaiting){
+                      return Container();
+                    }else{
+                      return UiUtils.getBorderButtonBoxWithZeroPadding2(100.w, 4.h, Colors.black26, Colors.transparent,
+                          UiUtils.getTextWithFixedScale("맨아래", 10.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
+                            isScrollMove = false;
+                            isScrollBottom = true;
+                            GetController.to.updateShowScrollBottom(false);
+                            _scrollToBottom(false, 0);
+                          });
+                    }
+                  }else{
+                    return Container();
+                  }
+                }),
+                isWaiting ? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 0.6.h),
                 isWaiting ? Container() : Align(alignment: Alignment.topRight,
                     child: Padding(padding: EdgeInsets.only(left: 2.w, right: 2.w),
                         child: Wrap(runSpacing: 0.7.h, spacing: 1.7.w, alignment: WrapAlignment.end, direction: Axis.horizontal,
                             children: GetController.to.autoAnswerWidgetList))),
                 GetController.to.isShowPickedFile.value? Column(children: [
-                  UiUtils.getSizedScrollView(90.w, inputHelpMinHeight+2.h, Axis.horizontal, _getPickedFilesWidget()),
-                  UiUtils.getMarginBox(0, 1.3.h),
+                  UiUtils.getSizedScrollView(90.w, inputHelpMinHeight, Axis.horizontal, _getPickedFilesWidget()),
+                  UiUtils.getMarginBox(0, 5.w),
                   UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
                       UiUtils.getTextWithFixedScale("전송", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () async{
-                        _sendFileToAws();
+                        await _sendFileToAws();
                       }),
+                  UiUtils.getMarginBox(0, 5.w),
                 ]) : Container(),
                 isWaiting ? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 0.8.h)
               ],
@@ -1319,15 +1375,21 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                                         if(inputHeight <= inputMaxHeight){
                                           final desiredHeight = inputMinHeight*0.7+textLinePainter.height;
                                           final height = desiredHeight.clamp(inputMinHeight, inputMaxHeight);
+                                          /*
                                           setState(() {
                                             inputHeight = height;
                                           });
+
+                                           */
                                         }
                                       }else{
+                                        /*
                                         setState(() {
                                           isTextFieldFocus = false;
                                           inputHeight = inputMinHeight;
                                         });
+
+                                         */
                                       }
                                     })
                               ]))])),
@@ -1351,22 +1413,14 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
           })
         ])
     ),
-      Positioned(child: !isHtmlLoad? Container(
-          width: 100.w,
-          height: 100.h,
-          color: Colors.black54,
-          child: SpinKitWave(color: ColorStyles.upFinTextAndBorderBlue, size: 15.w)
-      ) : Container()),
       Obx((){
-        if(GetController.to.isShowScrollBottom.value){
-          return Positioned( bottom: 17.h, left: 5.w, right: 5.w,
-              child: UiUtils.getBorderButtonBoxForRound(10.w, Colors.black12, Colors.transparent,
-                  UiUtils.getTextWithFixedScale("맨아래", 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.center, null), () {
-                    isScrollMove = false;
-                    isScrollBottom = true;
-                    GetController.to.updateShowScrollBottom(false);
-                    _scrollToBottom(false, 0);
-                  }));
+        if(!GetController.to.isHtmlLoad.value){
+          return Container(
+              width: 100.w,
+              height: 100.h,
+              color: Colors.black54,
+              child: SpinKitWave(color: ColorStyles.upFinTextAndBorderBlue, size: 15.w)
+          );
         }else{
           return Container();
         }

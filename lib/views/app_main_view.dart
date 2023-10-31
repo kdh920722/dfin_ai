@@ -341,7 +341,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
       var jsonData = jsonDecode(each.chatRoomMsgInfo);
       Map<String, dynamic> msg = jsonData;
       List<dynamic> listMsg = msg["data"];
-      CommonUtils.log("", "each msg info : \nmsg: $msg\nlistMsg: $listMsg");
+      CommonUtils.log("i", "each msg info : \nmsg: $msg\nlistMsg: $listMsg");
       listMsg.sort((a,b) => a["id"].compareTo(b["id"]));
       String lastMsg = listMsg[listMsg.length-1]["message"].toString();
       if(lastMsg.contains(" / ")){
@@ -485,7 +485,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                 GetController.to.resetAccdientInfoList();
                 GetController.to.resetChatLoanInfoList();
                 GetController.to.resetChatMessageInfoList();
-                GetController.to.updateAllSubScribed(false);
+                WebSocketController.resetConnectWebSocketCable();
                 SystemNavigator.pop();
               })
         ]);
