@@ -29,6 +29,7 @@ class LogfinController {
   static List<String> bankList = [];
   static List<String> preLoanCountList = [];
   static List<String> validFileTypeList = [];
+  static List<String> validDocFileTypeList = [];
   static List<Map<String,dynamic>> agreeDocsList = [];
   static List<String> agreeDocsDetailTypeInfoList = [];
   static Map<String,dynamic> autoAnswerMap = {};
@@ -173,7 +174,10 @@ class LogfinController {
       final fileTypeSnapshot = await ref.child('UPFIN/API/logfin/list_data/valid_file_type').get();
       if (fileTypeSnapshot.exists) {
         for (var each in fileTypeSnapshot.children) {
-          validFileTypeList.add(each.value.toString());
+          validFileTypeList.add(each.value.toString().split("@").first);
+          if(each.value.toString().split("@").last == "2"){
+            validDocFileTypeList.add(each.value.toString().split("@").first);
+          }
         }
       } else {
         failCount++;

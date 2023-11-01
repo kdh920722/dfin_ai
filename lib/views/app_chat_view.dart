@@ -588,7 +588,12 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
       }
 
       if(isValid){
-        otherInfoWidget = _getHtmlView(otherInfo.message, "UPFIN", otherInfo.messageType);
+        List<String> validDocExtensions = LogfinController.validDocFileTypeList;
+        if (validDocExtensions.contains(extension)) {
+          otherInfoWidget = _getHtmlView(otherInfo.message, "UPFIN", otherInfo.messageType);
+        }else{
+          otherInfoWidget = _getImageView(otherInfo.message);
+        }
       }else{
         otherInfoWidget = UiUtils.getTextWithFixedScale("$extension은 지원히지 않는 파일입니다.\n\n(${otherInfo.message})", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null);
       }
@@ -645,12 +650,47 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     );
   }
 
+  Widget _getImageView(String srcUrl){
+    return GestureDetector(
+        child: Stack(alignment: Alignment.center, children: [
+          Container(color:ColorStyles.upFinBlack, width: 70.w, height: 70.w),
+          Image.network(srcUrl, width: 70.w, height: 70.w, loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress){
+            if(loadingProgress == null){
+              return child;
+            }
+            return Center(
+              child: CircularProgressIndicator(
+                color: ColorStyles.upFinWhite,
+                value: loadingProgress.expectedTotalBytes != null ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes! : null,
+              ),
+            );
+          })
+        ]),
+        onTap: (){UiUtils.showPopMenu(context, true, 100.w, 100.h, 0.5, 0, ColorStyles.upFinBlack, (slideContext, slideSetState){
+        Widget slideWidget = Stack(alignment: Alignment.topCenter, children: [
+          Image.network(srcUrl, fit: BoxFit.fitWidth, height: 90.h, width: 90.w),
+          Positioned(right: 5.w, top: 5.w,
+              child: UiUtils.getCloseButton(ColorStyles.upFinWhite, () {
+            Navigator.pop(slideContext);
+          }))
+        ]);
+        return slideWidget;
+      });
+    });
+  }
+
   Widget _getMeView(ChatMessageInfoData meInfo){
     Widget? meInfoWidget;
     if(meInfo.messageType == "text"){
       meInfoWidget = UiUtils.getTextWithFixedScale(meInfo.message, 13.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null);
     }else{
-      meInfoWidget = _getHtmlView(meInfo.message, "ME", meInfo.messageType);
+      String extension = meInfo.message.split('.').last.toLowerCase();
+      List<String> validDocExtensions = LogfinController.validDocFileTypeList;
+      if (validDocExtensions.contains(extension)) {
+        meInfoWidget = _getHtmlView(meInfo.message, "ME", meInfo.messageType);
+      }else{
+        meInfoWidget = _getImageView(meInfo.message);
+      }
     }
 
     return Container(
@@ -1505,7 +1545,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         if(GetController.to.isShowScrollBottom.value){
           return Positioned(
               bottom: 5.w, right: 5.w,
-              child: UiUtils.getIconButtonWithHeight(10.w, Icons.arrow_drop_down_circle, 10.w, Colors.black54, () {
+              child: UiUtils.getIconButtonWithHeight(10.w, Icons.arrow_drop_down_circle, 10.w, ColorStyles.upFinDarkGray, () {
                 isScrollMove = false;
                 GetController.to.updateAutoAnswerWaiting(false);
                 GetController.to.updateShowScrollBottom(false);
