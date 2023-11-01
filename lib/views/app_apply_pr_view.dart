@@ -409,7 +409,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     String imgFilePath = _getSavedData(cameraId);
     if(imgFilePath != ""){
       if(!await CommonUtils.isFileExists(pickedFilePath)){
-          isSavedImgValid = false;
+        pickedFilePath = "";
+        isSavedImgValid = false;
       }
     }else{
       isSavedImgValid = false;
@@ -1239,12 +1240,9 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           }else if(addedDocsList[eachAddedDocIdx]["id"] == cameraId){
             String imgFilePath = _getSavedData(cameraId);
             if(imgFilePath != ""){
-              if(await CommonUtils.isFileExists(pickedFilePath)){
-                CommonUtils.log("", "ehere??");
-                pickedFilePath = imgFilePath;
-                addedDocsList[eachAddedDocIdx]["is_confirmed"] = true;
-                addedDocsList[eachAddedDocIdx]["result"] = eachSavedDoc["result"];
-              }
+              pickedFilePath = imgFilePath;
+              addedDocsList[eachAddedDocIdx]["is_confirmed"] = true;
+              addedDocsList[eachAddedDocIdx]["result"] = eachSavedDoc["result"];
             }
           }else if(addedDocsList[eachAddedDocIdx]["id"] == addressId){
             String addressInfo = _getSavedData(addressId);
@@ -1982,7 +1980,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         }else{
           certType = 0;
           isCertTypeSelected = false;
-          CommonUtils.flutterToast("입력하신 정보를\n확인해주세요");
+          if(CodeFController.isTimeOutException) CommonUtils.flutterToast("응답 대기시간이 초과되었습니다.");
+          //CommonUtils.flutterToast("입력하신 정보를\n확인해주세요");
         }
       }else{
         certType = 0;
@@ -2088,6 +2087,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                         UiUtils.getTextWithFixedScale(_isDocsAllConfirmed(docsType) ? "인증완료" : !isErrorResult? "간편인증 진행하기" : "서류 다시 가져오기",
                             14.sp, FontWeight.w500, !isErrorResult? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRed, TextAlign.start, null), (){
                           if(certType != 0){
+                            GetController.to.updateWait(false);
+                            CodeFController.isTimeOutException = false;
                             onPressedCallback();
                             isCertTypeSelected = true;
                           }else{
@@ -2789,7 +2790,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "접수하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
         _applyPr();
-      })
+      }),
+      UiUtils.getMarginBox(0, 1.2.h),
     ]);
   }
   Future<void> _applyPr() async {
@@ -3052,11 +3054,9 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       }else{
         if(context.mounted) {
           UiUtils.closeLoadingPop(context);
-          CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
+          CommonUtils.flutterToast("신분증정보가 만료되었습니다.\n다시 시도해주세요.");
           await _setValidImg();
-          setState(() {
-
-          });
+          setState(() {});
         }
       }
     }

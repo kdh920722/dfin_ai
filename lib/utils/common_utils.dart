@@ -16,6 +16,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:upfin/controllers/get_controller.dart';
+import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/controllers/sharedpreference_controller.dart';
 import 'package:upfin/controllers/websocket_controller.dart';
 import '../configs/app_config.dart';
@@ -459,7 +460,7 @@ class CommonUtils {
     try{
       FilePickerResult? result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
-        allowedExtensions: ['jpg', 'pdf', 'doc'],
+        allowedExtensions: LogfinController.validFileTypeList,
         allowMultiple: true,
       );
       if(result != null) {

@@ -28,6 +28,7 @@ class LogfinController {
   static List<String> courtList = [];
   static List<String> bankList = [];
   static List<String> preLoanCountList = [];
+  static List<String> validFileTypeList = [];
   static List<Map<String,dynamic>> agreeDocsList = [];
   static List<String> agreeDocsDetailTypeInfoList = [];
   static Map<String,dynamic> autoAnswerMap = {};
@@ -169,6 +170,15 @@ class LogfinController {
         failCount++;
       }
 
+      final fileTypeSnapshot = await ref.child('UPFIN/API/logfin/list_data/valid_file_type').get();
+      if (fileTypeSnapshot.exists) {
+        for (var each in fileTypeSnapshot.children) {
+          validFileTypeList.add(each.value.toString());
+        }
+      } else {
+        failCount++;
+      }
+
       final agreeASnapshot = await ref.child('UPFIN/API/logfin/list_data/agree/agreeA').get();
       List<String> docTypeTempList = [];
       if (agreeASnapshot.exists) {
@@ -252,7 +262,7 @@ class LogfinController {
       }
     }
 
-    CommonUtils.log("i", "${api.value} inputJson :\n$inputJson");
+    CommonUtils.log("", "${api.value} inputJson :\n$inputJson");
 
     try {
       final url = Uri.parse(targetUrl);
@@ -267,7 +277,7 @@ class LogfinController {
       );
 
       final json = jsonDecode(response.body);
-      CommonUtils.log('i', 'out full : \n$json');
+      CommonUtils.log('', 'out full : \n$json');
 
       if (response.statusCode == 200) { // HTTP_OK
         final resultData = json;

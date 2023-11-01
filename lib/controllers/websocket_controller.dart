@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:action_cable/action_cable.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:upfin/controllers/get_controller.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/views/app_chat_view.dart';
@@ -28,6 +29,7 @@ class WebSocketController {
   static Timer? reSubScribeCheckTimer;
   static Timer? reSubScribeTimer;
   static Map<String,dynamic> connectionInfoMap = {};
+  static bool isMessageReceived = false;
 
   static Future<void> initWebSocket(Function(bool isSuccess) callback) async{
     try{
@@ -86,6 +88,7 @@ class WebSocketController {
   static void resetConnectWebSocketCable(){
     isInit = false;
     isReSubScribe = false;
+    isMessageReceived = false;
     if(reSubScribeTimer != null) reSubScribeTimer!.cancel();
     if(reSubScribeCheckTimer != null) reSubScribeCheckTimer!.cancel();
     GetController.to.updateAllSubScribed(false);
@@ -118,7 +121,6 @@ class WebSocketController {
         const Duration interval = Duration(seconds: 1);
         reSubScribeTimer = Timer.periodic(interval, (Timer timer) {
           if(isReSubScribe){
-            CommonUtils.log("i", "re subScribe connect");
             isReSubScribe = false;
             int subCnt = 0;
             for(var eachRoom in MyData.getChatRoomInfoList()){
@@ -126,12 +128,15 @@ class WebSocketController {
               cable!.subscribe(
                   channelName, channelParams: { "room": roomId },
                   onSubscribed: (){
-                    CommonUtils.log("i", "onConnected : $roomId");
+
                     if(!isSubscribe(roomId)){
                       subscribedRoomIds.add({"room_id" : roomId, "isWaitingForAnswer" : false, "isWaitingForMe" : false});
                     }
 
                     subCnt++;
+
+                    CommonUtils.log("", "onConnected : $roomId : $subCnt || ${MyData.getChatRoomInfoList().length}");
+
                     if(MyData.getChatRoomInfoList().length == subCnt){
                       GetController.to.updateAllSubScribed(true);
                     }
@@ -139,11 +144,13 @@ class WebSocketController {
                   },
                   onDisconnected: (){
                     CommonUtils.log("i", "onDisconnected : $roomId");
-                    int idx = -1;
-                    for(int i = 0 ; i < subscribedRoomIds.length ; i++){
-                      if(subscribedRoomIds[i]["room_id"] == roomId) idx = i;
-                    }
-                    if(idx != -1) subscribedRoomIds.removeAt(idx);
+                    // int idx = -1;
+                    // for(int i = 0 ; i < subscribedRoomIds.length ; i++){
+                    //   if(subscribedRoomIds[i]["room_id"] == roomId) idx = i;
+                    // }
+                    // if(idx != -1) subscribedRoomIds.removeAt(idx);
+                    CommonUtils.log("e", "websocket subscribe onDisconnected error");
+                    _retryToConnectNewVer(connectionKey);
                   },
                   onMessage: (Map message) {
                     var eachMsg = message;
@@ -185,6 +192,7 @@ class WebSocketController {
                     }
 
                     if(AppChatViewState.currentRoomId == eachMsg["pr_room_id"].toString()){
+                      isMessageReceived = true;
                       var messageItem = ChatMessageInfoData(eachMsg["id"].toString(), eachMsg["pr_room_id"].toString(), eachMsg["message"].toString(),
                           CommonUtils.convertTimeToString(CommonUtils.parseToLocalTime(eachMsg["created_at"])),
                           eachMsg["message_type"].toString(), eachMsg["username"].toString(), jsonEncode(eachMsg));
@@ -203,6 +211,8 @@ class WebSocketController {
                       if(eachMsg["message_type"] == "file" && !AppChatViewState.isScrollMove){
                         GetController.to.updateHtmlLoad(false);
                       }
+                    }else{
+                      isMessageReceived = false;
                     }
                   }
               );
@@ -251,7 +261,7 @@ class WebSocketController {
         if(!AppMainViewState.isViewHere){
           AppChatViewState.isViewHere = false;
           AppMainViewState.isViewHere = true;
-          CommonUtils.flutterToast("서버 연결이 끊켰습니다.\n잠시만 기다려 주세요.");
+          CommonUtils.flutterToast("재접속 중입니다.\n잠시만 기다려 주세요.");
           CommonUtils.moveWithUntil(Config.contextForEmergencyBack!, AppView.appMainView.value);
         }
 

@@ -4,9 +4,12 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:upfin/configs/app_config.dart';
 import 'package:upfin/utils/ui_utils.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
+  WakelockPlus.enable();
+
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,

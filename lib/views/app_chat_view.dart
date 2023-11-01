@@ -142,6 +142,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     GetController.to.updateShowStatus(true);
     GetController.to.updateAutoAnswerWaiting(false);
     GetController.to.updateShowScrollBottom(false);
+    WebSocketController.isMessageReceived = false;
 
     bool isFileHere = false;
     for(var each in GetController.to.chatMessageInfoDataList){
@@ -224,6 +225,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     GetController.to.updateInputTextHide(true);
     GetController.to.updateShowPickedFile(false);
     GetController.to.updateShowStatus(true);
+    WebSocketController.isMessageReceived = false;
     currentKey = "";
     IsolateNameServer.removePortNameMapping('downloader_send_port');
     super.dispose();
@@ -285,7 +287,14 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   }
 
   Timer? htmlLoadTimer;
+  Timer? htmlNormalLoadTimer;
   int htmlBuildCnt = 0;
+  int htmlNormalLoadBuildCnt = 0;
+  Timer? infiniteLoadTimer;
+  int infiniteCnt = 0;
+  bool isHtmlLoading = false;
+  bool isNormalLoading = false;
+  bool isHtmlLoadTimeOut = false;
   Widget _getHtmlView(String message, String sender, String type){
     if(type == "file"){
       if(!isScrollMove){
@@ -329,9 +338,9 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
       }else{
         htmlTag = """
         <center>
-        <p>$fileName</p>
+        <p>파일명:$fileName</p>
      
-        <a href='$message'><button id='$buttonId'>${extension.toUpperCase()} 열기</button></a>
+        <a href='$message'><button id='$buttonId'>${extension.toUpperCase()}</button></a>
         </center>
         """;
       }
@@ -382,6 +391,20 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         enableCaching: false,
         buildAsync: false,
         onLoadingBuilder: (htmlContext, element, progress){
+          CommonUtils.log("", "loading??");
+
+          infiniteLoadTimer ??= Timer.periodic(const Duration(milliseconds: 200), (Timer timer) {
+              infiniteCnt++;
+              if(infiniteCnt > 30){
+                infiniteLoadTimer!.cancel();
+                infiniteLoadTimer = null;
+                isHtmlLoading = false;
+                infiniteCnt = 0;
+                GetController.to.updateHtmlLoad(true);
+              }
+            });
+
+          isHtmlLoading = true;
           htmlBuildCnt = 0;
           // if(GetController.to.isHtmlLoad.value){
           //   GetController.to.updateHtmlLoad(false);
@@ -389,19 +412,31 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
           if(htmlLoadTimer != null) htmlLoadTimer!.cancel();
           htmlLoadTimer = Timer.periodic(const Duration(milliseconds: 300), (Timer timer) {
             htmlBuildCnt++;
-            if(htmlBuildCnt > 4){
+            if(htmlBuildCnt > 4 && !isNormalLoading){
               htmlLoadTimer!.cancel();
-              CommonUtils.log("", "html loadscroll");
-              // GetController.to.updateHtmlLoad(true);
+              isHtmlLoading = false;
+              CommonUtils.log("", "html loading build finished!!");
               _scrollToBottom(false,0);
-              Future.delayed(const Duration(milliseconds: 500), () async {
-                GetController.to.updateHtmlLoad(true);
-              });
+              GetController.to.updateHtmlLoad(true);
+              isHtmlLoadTimeOut = true;
 
             }
           });
         },
         customStylesBuilder: (element) {
+          isNormalLoading = true;
+          if(htmlNormalLoadTimer != null) htmlNormalLoadTimer!.cancel();
+          htmlNormalLoadTimer = Timer.periodic(const Duration(milliseconds: 50), (Timer timer) {
+            htmlNormalLoadBuildCnt++;
+            if(htmlNormalLoadBuildCnt > 2 && !isHtmlLoading){
+              htmlNormalLoadTimer!.cancel();
+              isNormalLoading = false;
+              CommonUtils.log("", "html normal build finished!!");
+              _scrollToBottom(false,0);
+              GetController.to.updateHtmlLoad(true);
+            }
+          });
+
           if(element.id == 'typeMe') {
             return {
               "color" : "white",
@@ -412,7 +447,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
           }else if(element.id == 'typeOther') {
             return {
               "color" : "black",
-              "font-size": "17px",
+              "font-size": "16px",
               "line-height" : "120%",
               "font-weight": "normal",
             };
@@ -421,7 +456,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
           if(element.id == 'boldText') {
             return {
               "color" : "black",
-              "font-size": "17px",
+              "font-size": "16px",
               "line-height" : "120%",
               "font-weight": "bold",
             };
@@ -545,7 +580,18 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         otherInfoWidget = UiUtils.getTextWithFixedScale(otherInfo.message, 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null);
       }
     }else{
-      otherInfoWidget = _getHtmlView(otherInfo.message, "UPFIN", otherInfo.messageType);
+      bool isValid = true;
+      String extension = otherInfo.message.split('.').last.toLowerCase();
+      List<String> validExtensions = LogfinController.validFileTypeList;
+      if (!validExtensions.contains(extension)) {
+        isValid = false;
+      }
+
+      if(isValid){
+        otherInfoWidget = _getHtmlView(otherInfo.message, "UPFIN", otherInfo.messageType);
+      }else{
+        otherInfoWidget = UiUtils.getTextWithFixedScale("$extension은 지원히지 않는 파일입니다.\n\n(${otherInfo.message})", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null);
+      }
     }
 
     return Container(
@@ -809,12 +855,24 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         if(files != null){
           if(files.length <= maximumSize){
             if(files.length+pickedFiles.length <= maximumSize){
-              isShowPickedFile = true;
-              GetController.to.updateShowPickedFile(isShowPickedFile);
-              inputHelpHeight = inputHelpPickedFileHeight;
-              GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
+              String inValidExt = "";
               for(var each in files){
-                pickedFiles.add(each);
+                String extension = each.path.split('.').last.toLowerCase();
+                List<String> validExtensions = LogfinController.validFileTypeList;
+                if (!validExtensions.contains(extension)) {
+                  inValidExt = extension;
+                }
+              }
+              if(inValidExt == ""){
+                isShowPickedFile = true;
+                GetController.to.updateShowPickedFile(isShowPickedFile);
+                inputHelpHeight = inputHelpPickedFileHeight;
+                GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
+                for(var each in files){
+                  pickedFiles.add(each);
+                }
+              }else{
+                CommonUtils.flutterToast("$inValidExt 파일은\n전송할수 없습니다.");
               }
             }else{
               CommonUtils.flutterToast("최대 $maximumSize개의 파일만\n전송할 수 있습니다.");
@@ -1001,7 +1059,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
       }));
     }
 
-    _setAutoAnswerLineHeight();
+    //_setAutoAnswerLineHeight();
     GetController.to.updateChatAutoAnswerWidgetList(widgetList);
     CommonUtils.log("", "updateChatAutoAnswerWidgetList : ${GetController.to.autoAnswerWidgetList.length}");
   }

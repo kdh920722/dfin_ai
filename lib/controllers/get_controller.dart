@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
+import 'package:upfin/configs/app_config.dart';
 import 'package:upfin/datas/accident_info_data.dart';
 import 'package:upfin/datas/chat_message_info_data.dart';
 import 'package:upfin/datas/chatroom_info_data.dart';
@@ -78,11 +79,20 @@ class GetController extends GetxController {
   }
 
   void updateAllSubScribed(bool newValue) {
-    isAllSubscribed.value = newValue;
+    if(Config.contextForEmergencyBack != null){
+      if(Config.contextForEmergencyBack!.mounted){
+        isAllSubscribed.value = newValue;
+      }else{
+        Future.delayed(const Duration(milliseconds: 700), () {
+          isAllSubscribed.value = newValue;
+        });
+      }
+    }
   }
 
   void updateWantLoanPrice(String newValue) {
     wantLoanPrice.value = newValue;
+
   }
   void resetWantLoanPrice() {
     wantLoanPrice = "만원".obs;
@@ -213,7 +223,7 @@ class GetController extends GetxController {
   }
 
   void updateChatAutoAnswerHeight(double newValue) {
-    chatAutoAnswerHeight.value = newValue;
+    //chatAutoAnswerHeight.value = newValue;
   }
   void updateChatStatusTick(int newValue) {
     chatStatusTick.value = newValue;
@@ -222,28 +232,92 @@ class GetController extends GetxController {
     isInputTextHide.value = newValue;
   }
   void updateChatAutoAnswerWidgetList(List<Widget> newList) {
-    autoAnswerWidgetList.clear();
-    autoAnswerWidgetList.assignAll(newList);
+    if(Config.contextForEmergencyBack != null){
+      if(Config.contextForEmergencyBack!.mounted){
+        autoAnswerWidgetList.clear();
+        autoAnswerWidgetList.assignAll(newList);
+      }else{
+        Future.delayed(const Duration(milliseconds: 700), () {
+          autoAnswerWidgetList.clear();
+          autoAnswerWidgetList.assignAll(newList);
+        });
+      }
+    }
   }
   void resetChatAutoAnswerWidgetList() {
-    List<Widget> emptyList = [];
-    autoAnswerWidgetList.clear();
-    autoAnswerWidgetList.assignAll(emptyList);
+    if(Config.contextForEmergencyBack != null){
+      if(Config.contextForEmergencyBack!.mounted){
+        List<Widget> emptyList = [];
+        autoAnswerWidgetList.clear();
+        autoAnswerWidgetList.assignAll(emptyList);
+      }else{
+        Future.delayed(const Duration(milliseconds: 700), () {
+          List<Widget> emptyList = [];
+          autoAnswerWidgetList.clear();
+          autoAnswerWidgetList.assignAll(emptyList);
+        });
+      }
+    }
   }
   void updateShowPickedFile(bool newValue) {
-    isShowPickedFile.value = newValue;
+    if(Config.contextForEmergencyBack != null){
+      if(Config.contextForEmergencyBack!.mounted){
+        isShowPickedFile.value = newValue;
+      }else{
+        Future.delayed(const Duration(milliseconds: 700), () {
+          isShowPickedFile.value = newValue;
+        });
+      }
+    }
+
   }
   void updateShowStatus(bool newValue) {
-    isShowStatus.value = newValue;
+    if(Config.contextForEmergencyBack != null){
+      if(Config.contextForEmergencyBack!.mounted){
+        isShowStatus.value = newValue;
+      }else{
+        Future.delayed(const Duration(milliseconds: 700), () {
+          isShowStatus.value = newValue;
+        });
+      }
+    }
+
   }
   void updateShowScrollBottom(bool newValue) {
-    isShowScrollBottom.value = newValue;
+    if(Config.contextForEmergencyBack != null){
+      if(Config.contextForEmergencyBack!.mounted){
+        isShowScrollBottom.value = newValue;
+      }else{
+        Future.delayed(const Duration(milliseconds: 700), () {
+          isShowScrollBottom.value = newValue;
+        });
+      }
+    }
+
   }
   void updateAutoAnswerWaiting(bool newValue) {
-    isAutoAnswerWaiting.value = newValue;
+    if(Config.contextForEmergencyBack != null){
+      if(Config.contextForEmergencyBack!.mounted){
+        isAutoAnswerWaiting.value = newValue;
+      }else{
+        Future.delayed(const Duration(milliseconds: 700), () {
+          isAutoAnswerWaiting.value = newValue;
+        });
+      }
+    }
+
   }
   void updateHtmlLoad(bool newValue) {
-    isHtmlLoad.value = newValue;
+    if(Config.contextForEmergencyBack != null){
+      if(Config.contextForEmergencyBack!.mounted){
+        isHtmlLoad.value = newValue;
+      }else{
+        Future.delayed(const Duration(milliseconds: 700), () {
+          isHtmlLoad.value = newValue;
+        });
+      }
+    }
+
   }
 
 }

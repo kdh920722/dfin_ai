@@ -706,6 +706,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
           }else{
             if(MyData.getChatRoomInfoList().isNotEmpty){
               if(!UiUtils.isLoadingPopOn){
+                UiUtils.closeLoadingPop(context);
                 return Container(
                     width: 100.w,
                     height: 100.h,

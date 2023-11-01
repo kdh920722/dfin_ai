@@ -27,6 +27,7 @@ class CodeFController{
   static HostStatus hostStatus = HostStatus.prod;
   static String token = "";
   static const errorCodeKey = "codefError";
+  static bool isTimeOutException = false;
   static void setHostStatus(HostStatus host){
     hostStatus = host;
   }
@@ -103,7 +104,7 @@ class CodeFController{
             'Content-Type': 'application/json'
           },
           body: jsonEncode(inputJson)
-      ).timeout(const Duration(seconds: 60));
+      ).timeout(const Duration(seconds: 120));
 
       if(response.statusCode == 200) {
         final decodedResponseBody = Uri.decodeFull(response.body);
@@ -111,7 +112,7 @@ class CodeFController{
         if(json.containsKey('result') && json.containsKey('data')){
           final result = json['result'];
           final resultCode = result['code'];
-          CommonUtils.log('i', 'out full : \n$json');
+          CommonUtils.log('', 'out full : \n$json');
 
           // CF-00000 : 성공, CF-03002 : 추가 인증 필요
           final msg = result['message'];
@@ -164,6 +165,7 @@ class CodeFController{
         callback(true, false, resultData, null, null);
       }
     } catch (e) {
+      isTimeOutException = true;
       CommonUtils.log('e', e.toString());
       final Map<String, dynamic> resultData = {};
       resultData['result_code'] = errorCodeKey;
@@ -180,6 +182,7 @@ class CodeFController{
     for(var each in apiInfoDataList){
       if(each.isCallWithCert){
         if(!isFirstCalledOnCert){
+          isFirstCalledOnCert = true;
           _callApiWithCert(context, setState, certType, each.api, each.inputJson, (isSuccess, resultMap, resultListMap, fullMap) {
             if(isSuccess){
               if(resultMap != null){
@@ -221,7 +224,7 @@ class CodeFController{
               }
 
               callCount++;
-              if(callCount == apiInfoDataList.length){
+              if(callCount >= apiInfoDataList.length){
                 GetController.to.updateWait(false);
                 isSetAuthPopOn = false;
                 Navigator.of(context).pop();
@@ -241,7 +244,6 @@ class CodeFController{
             }
           });
           await Future.delayed(const Duration(milliseconds: 1000), () async {});
-          isFirstCalledOnCert = true;
         }else{
           _callApiWithOutCert(context, each.api, each.inputJson, (isSuccess, resultMap, resultListMap, fullMap){
             if(isSuccess){
@@ -284,7 +286,7 @@ class CodeFController{
               }
 
               callCount++;
-              if(callCount == apiInfoDataList.length){
+              if(callCount >= apiInfoDataList.length){
                 if(isSetAuthPopOn){
                   GetController.to.updateWait(false);
                   isSetAuthPopOn = false;
@@ -411,7 +413,6 @@ class CodeFController{
               }
               isSetAuthPopOn = true;
               if(context.mounted){
-                CommonUtils.log("e", "error f1");
                 _setAuthPop(context, representApi, certType, resultMap,(isAuthSuccess, authMap, authListMap, fullMap) async {
                   if(isAuthSuccess){
                     if(authMap != null){
@@ -426,7 +427,7 @@ class CodeFController{
               }
               setState(() {});
             }else{
-              CommonUtils.log("e", "error f2");
+
             }
           }else{
             callback(true, map, null, fullResultMap);
