@@ -215,7 +215,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     _chatTextFocus.dispose();
     _chatTextController.dispose();
     currentRoomId = "";
-    Config.contextForEmergencyBack = null;
     _keyboardVisibilityController = null;
     AppMainViewState.isStart = false;
     isViewHere = false;
@@ -226,6 +225,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     GetController.to.updateShowPickedFile(false);
     GetController.to.updateShowStatus(true);
     WebSocketController.isMessageReceived = false;
+    Config.contextForEmergencyBack = null;
     currentKey = "";
     IsolateNameServer.removePortNameMapping('downloader_send_port');
     super.dispose();
@@ -395,7 +395,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
 
           infiniteLoadTimer ??= Timer.periodic(const Duration(milliseconds: 200), (Timer timer) {
               infiniteCnt++;
-              if(infiniteCnt > 30){
+              if(infiniteCnt > 24){
                 infiniteLoadTimer!.cancel();
                 infiniteLoadTimer = null;
                 isHtmlLoading = false;
@@ -412,7 +412,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
           if(htmlLoadTimer != null) htmlLoadTimer!.cancel();
           htmlLoadTimer = Timer.periodic(const Duration(milliseconds: 300), (Timer timer) {
             htmlBuildCnt++;
-            if(htmlBuildCnt > 4 && !isNormalLoading){
+            if(htmlBuildCnt > 2 && !isNormalLoading){
               htmlLoadTimer!.cancel();
               isHtmlLoading = false;
               CommonUtils.log("", "html loading build finished!!");
@@ -718,7 +718,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
       chatList.add(_getOtherForLoadingView());
     }
 
-    _scrollToBottom(true,400);
+    _scrollToBottom(true,300);
 
     return chatList;
   }
@@ -1372,7 +1372,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
 
             if(!isWaiting){
               CommonUtils.log("", "scroll~~~~~~~~~~~~~");
-              _scrollToBottom(true, 500);
+              _scrollToBottom(true, 350);
             }
 
             return Container(color:ColorStyles.upFinWhite, child: Column(

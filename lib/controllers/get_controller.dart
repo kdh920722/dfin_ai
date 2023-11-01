@@ -79,15 +79,7 @@ class GetController extends GetxController {
   }
 
   void updateAllSubScribed(bool newValue) {
-    if(Config.contextForEmergencyBack != null){
-      if(Config.contextForEmergencyBack!.mounted){
-        isAllSubscribed.value = newValue;
-      }else{
-        Future.delayed(const Duration(milliseconds: 700), () {
-          isAllSubscribed.value = newValue;
-        });
-      }
-    }
+    isAllSubscribed.value = newValue;
   }
 
   void updateWantLoanPrice(String newValue) {
@@ -245,19 +237,9 @@ class GetController extends GetxController {
     }
   }
   void resetChatAutoAnswerWidgetList() {
-    if(Config.contextForEmergencyBack != null){
-      if(Config.contextForEmergencyBack!.mounted){
-        List<Widget> emptyList = [];
-        autoAnswerWidgetList.clear();
-        autoAnswerWidgetList.assignAll(emptyList);
-      }else{
-        Future.delayed(const Duration(milliseconds: 700), () {
-          List<Widget> emptyList = [];
-          autoAnswerWidgetList.clear();
-          autoAnswerWidgetList.assignAll(emptyList);
-        });
-      }
-    }
+    List<Widget> emptyList = [];
+    autoAnswerWidgetList.clear();
+    autoAnswerWidgetList.assignAll(emptyList);
   }
   void updateShowPickedFile(bool newValue) {
     if(Config.contextForEmergencyBack != null){
