@@ -1507,8 +1507,11 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
               bottom: 5.w, right: 5.w,
               child: UiUtils.getIconButtonWithHeight(10.w, Icons.arrow_drop_down_circle, 10.w, Colors.black54, () {
                 isScrollMove = false;
+                GetController.to.updateAutoAnswerWaiting(false);
                 GetController.to.updateShowScrollBottom(false);
-                _scrollToBottom(false, 0);
+                if(_chatScrollController.hasClients){
+                  _chatScrollController.jumpTo(_chatScrollController.position.maxScrollExtent+100);
+                }
               })
           );
         }else{
