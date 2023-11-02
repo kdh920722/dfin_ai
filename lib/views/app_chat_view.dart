@@ -573,6 +573,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   }
 
   Widget _getOtherView(ChatMessageInfoData otherInfo){
+    bool isImageView = false;
     Widget? otherInfoWidget;
     if(otherInfo.messageType == "text"){
       if(otherInfo.message.contains("<button") || otherInfo.message.contains("<br>")){
@@ -593,6 +594,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         if (validDocExtensions.contains(extension)) {
           otherInfoWidget = _getHtmlView(otherInfo.message, "UPFIN", otherInfo.messageType);
         }else{
+          isImageView = true;
           otherInfoWidget = _getImageView(otherInfo.message);
         }
       }else{
@@ -610,9 +612,10 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
               ),
               Container(
                   constraints: BoxConstraints(maxWidth: 73.w),
-                  padding: EdgeInsets.all(3.w),
-                  decoration: const BoxDecoration(
-                    borderRadius: BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomRight: Radius.circular(15)),
+                  padding: isImageView? EdgeInsets.all(1.w) : EdgeInsets.all(3.w),
+                  decoration: BoxDecoration(
+                    borderRadius: isImageView? const BorderRadius.only(topRight: Radius.circular(5), topLeft: Radius.circular(5), bottomRight: Radius.circular(5))
+                      : const BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomRight: Radius.circular(15)),
                     color: ColorStyles.upFinWhiteGray,
                   ),
                   child: otherInfoWidget
@@ -707,8 +710,11 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     return GestureDetector(
         child: Stack(alignment: Alignment.center, children: [
           Container(
-              color:ColorStyles.upFinBlack,
-              padding: EdgeInsets.only(top: 0.5.w, bottom: 0.5.w),
+              decoration: const BoxDecoration(
+                borderRadius: BorderRadius.all(Radius.circular(3)),
+                color: ColorStyles.upFinBlack,
+              ),
+              padding: EdgeInsets.all(1.w),
               alignment: Alignment.center,
               constraints: BoxConstraints(maxWidth: 70.w, maxHeight: 70.w, minWidth: 20.w, minHeight: 70.w),
               child: CachedNetworkImage(
@@ -719,10 +725,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                 fit: BoxFit.contain,
                 cacheManager: CustomCacheManager.instance,
                 progressIndicatorBuilder: (context, url, downloadProgress) => Center(
-                  child: CircularProgressIndicator(
-                      color: ColorStyles.upFinWhite,
-                      value: downloadProgress.progress)
-                ),
+                  child: CircularProgressIndicator(color: ColorStyles.upFinWhite, value: downloadProgress.progress)),
                   errorWidget: (context, url, error){
                   errorUrlList.add(srcUrl);
                   return const Icon(Icons.error, color: ColorStyles.upFinRed);
@@ -772,6 +775,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
 
   Widget _getMeView(ChatMessageInfoData meInfo){
     Widget? meInfoWidget;
+    bool isImageView = false;
     if(meInfo.messageType == "text"){
 
       meInfoWidget = UiUtils.getTextWithFixedScale(meInfo.message, 13.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null);
@@ -782,6 +786,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         meInfoWidget = _getHtmlView(meInfo.message, "ME", meInfo.messageType);
       }else{
         meInfoWidget = _getImageView(meInfo.message);
+        isImageView = true;
       }
     }
 
@@ -794,9 +799,10 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
             UiUtils.getMarginBox(1.w, 0),
             Container(
                 constraints: BoxConstraints(maxWidth: 73.w),
-                padding: EdgeInsets.all(3.w),
-                decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomLeft: Radius.circular(15)),
+                padding: isImageView? EdgeInsets.all(1.w) : EdgeInsets.all(3.w),
+                decoration: BoxDecoration(
+                  borderRadius: isImageView? const BorderRadius.only(topRight: Radius.circular(5), topLeft: Radius.circular(5), bottomLeft: Radius.circular(5))
+                      : const BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomLeft: Radius.circular(15)),
                   color: ColorStyles.upFinTextAndBorderBlue,
                 ),
                 child: meInfoWidget
