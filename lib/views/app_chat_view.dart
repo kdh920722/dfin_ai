@@ -668,7 +668,11 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         ]),
         onTap: (){UiUtils.showPopMenu(context, true, 100.w, 100.h, 0.5, 0, ColorStyles.upFinBlack, (slideContext, slideSetState){
         Widget slideWidget = Stack(alignment: Alignment.topCenter, children: [
-          Image.network(srcUrl, fit: BoxFit.fitWidth, height: 90.h, width: 90.w),
+          SizedBox(width: 90.w, height: 90.h, child:
+          InteractiveViewer(
+              constrained: false,
+              child: Image.network(srcUrl, fit: BoxFit.fitWidth, height: 90.h, width: 90.w)
+          )),
           Positioned(right: 5.w, top: 5.w,
               child: UiUtils.getCloseButton(ColorStyles.upFinWhite, () {
             Navigator.pop(slideContext);
@@ -758,7 +762,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
       chatList.add(_getOtherForLoadingView());
     }
 
-    _scrollToBottom(true,300);
+    _scrollToBottom(false,0);
 
     return chatList;
   }
@@ -1412,7 +1416,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
 
             if(!isWaiting){
               CommonUtils.log("", "scroll~~~~~~~~~~~~~");
-              _scrollToBottom(true, 350);
+              _scrollToBottom(true, 30);
             }
 
             return Container(color:ColorStyles.upFinWhite, child: Column(
