@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -10,6 +11,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:sizer/sizer.dart';
+import 'package:upfin/controllers/CutsomCacheManager.dart';
 import 'package:upfin/controllers/aws_controller.dart';
 import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:upfin/controllers/get_controller.dart';
@@ -88,21 +90,20 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
           double currPos = _chatScrollController.position.pixels;
           double maxH = _chatScrollController.position.maxScrollExtent;
           if((maxH - deviceH/2) >= 0) maxH = maxH - deviceH/2;
-
-          if(deviceH <= currPos){
-            if(currPos <= maxH){
+          if(deviceH < currPos){
+            if(currPos < maxH - 200){
               if(!isScrollMove){
                 isScrollMove = true;
                 GetController.to.updateShowScrollBottom(true);
               }
-            }else{
+            }else if(currPos > maxH){
               if(isScrollMove){
                 isScrollMove = false;
                 GetController.to.updateShowScrollBottom(false);
               }
             }
           }else{
-            if(_chatScrollController.position.maxScrollExtent <= deviceH){
+            if(_chatScrollController.position.maxScrollExtent < deviceH){
               if(isScrollMove){
                 isScrollMove = false;
                 GetController.to.updateShowScrollBottom(false);
@@ -337,11 +338,11 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         """;
       }else{
         htmlTag = """
-        <center>
-        <p>파일명:$fileName</p>
+        
+        <p><text id='boldText'>${extension.toUpperCase()}문서</text><br><text>$fileName.$extension</text> </p>
      
-        <a href='$message'><button id='$buttonId'>${extension.toUpperCase()}</button></a>
-        </center>
+        <a href='$message'><button id='$buttonId'>열어보기</button></a>
+        
         """;
       }
     }else{
@@ -649,34 +650,120 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         ])
     );
   }
-
+/*
   Widget _getImageView(String srcUrl){
     return GestureDetector(
         child: Stack(alignment: Alignment.center, children: [
-          Container(color:ColorStyles.upFinBlack, width: 70.w, height: 70.w),
-          Image.network(srcUrl, width: 70.w, height: 70.w, loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress){
-            if(loadingProgress == null){
-              return child;
-            }
-            return Center(
-              child: CircularProgressIndicator(
-                color: ColorStyles.upFinWhite,
-                value: loadingProgress.expectedTotalBytes != null ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes! : null,
-              ),
-            );
-          })
-        ]),
+          Container(
+              constraints: BoxConstraints(maxWidth: 70.w, maxHeight: 70.w, minWidth: 20.w, minHeight: 20.w),
+              color:ColorStyles.upFinBlack,
+              width: cachedImage != null? cachedImageSize![0]/rate : 70.w,
+              height: cachedImage != null? cachedImageSize![1]/rate : 70.w),
+          Container(
+              constraints: BoxConstraints(maxWidth: 70.w, maxHeight: 70.w, minWidth: 20.w, minHeight: 20.w),
+              width: cachedImage != null? cachedImageSize![0]/rate : 70.w,
+              height: cachedImage != null? cachedImageSize![1]/rate : 70.w,
+              child: cachedImage ??
+                  Image.network(srcUrl, fit: BoxFit.contain, loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress){
+                    if(loadingProgress == null){
+                      return child;
+                    }
+                    return Center(
+                        child: CircularProgressIndicator(
+                          color: ColorStyles.upFinWhite,
+                          value: loadingProgress.expectedTotalBytes != null ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes! : null,
+                        )
+                    );
+                  })
+          )]),
         onTap: (){UiUtils.showPopMenu(context, true, 100.w, 100.h, 0.5, 0, ColorStyles.upFinBlack, (slideContext, slideSetState){
-        Widget slideWidget = Stack(alignment: Alignment.topCenter, children: [
-          SizedBox(width: 90.w, height: 90.h, child:
-          InteractiveViewer(
-              constrained: false,
-              child: Image.network(srcUrl, fit: BoxFit.fitWidth, height: 90.h, width: 90.w)
-          )),
-          Positioned(right: 5.w, top: 5.w,
-              child: UiUtils.getCloseButton(ColorStyles.upFinWhite, () {
-            Navigator.pop(slideContext);
-          }))
+          Widget slideWidget = Column(children: [
+            SizedBox(width: 90.w, height: 5.h, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+              UiUtils.getCloseButton(ColorStyles.upFinWhite, () {
+                Navigator.pop(slideContext);
+              })
+            ])),
+            SizedBox(
+                width: 90.w, height: 85.h,
+                child: InteractiveViewer(
+                    constrained: false,
+                    child: cachedImage != null?
+                    Container(constraints: BoxConstraints(maxWidth: 90.w, maxHeight: 85.h, minWidth: 20.w, minHeight: 20.w),
+                        width: cachedImageSize![0]/fullWRate,
+                        height: cachedImageSize![1]/fullHRate,
+                        child: cachedImage) : Image.network(srcUrl, fit: BoxFit.contain, height: 85.h, width: 90.w)))
+          ]);
+          return slideWidget;
+        });
+        });
+  }
+  */
+
+  List<String> errorUrlList = [];
+  Widget _getImageView(String srcUrl){
+    final mediaQueryData = MediaQuery.of(context);
+    final devicePixelRatio = mediaQueryData.devicePixelRatio;
+
+    return GestureDetector(
+        child: Stack(alignment: Alignment.center, children: [
+          Container(
+              color:ColorStyles.upFinBlack,
+              padding: EdgeInsets.only(top: 0.5.w, bottom: 0.5.w),
+              alignment: Alignment.center,
+              constraints: BoxConstraints(maxWidth: 70.w, maxHeight: 70.w, minWidth: 20.w, minHeight: 70.w),
+              child: CachedNetworkImage(
+                fadeInDuration: const Duration(milliseconds: 100),
+                fadeOutDuration: const Duration(milliseconds: 100),
+                imageUrl: srcUrl,
+                memCacheHeight: (35.w*devicePixelRatio).round().toInt(),
+                fit: BoxFit.contain,
+                cacheManager: CustomCacheManager.instance,
+                progressIndicatorBuilder: (context, url, downloadProgress) => Center(
+                  child: CircularProgressIndicator(
+                      color: ColorStyles.upFinWhite,
+                      value: downloadProgress.progress)
+                ),
+                  errorWidget: (context, url, error){
+                  errorUrlList.add(srcUrl);
+                  return const Icon(Icons.error, color: ColorStyles.upFinRed);
+                },
+              )
+            )
+          ]),
+        onTap: (){UiUtils.showPopMenu(context, true, 100.w, 100.h, 0.5, 0, ColorStyles.upFinBlack, (slideContext, slideSetState){
+        Widget slideWidget = Column(children: [
+          SizedBox(width: 90.w, height: 5.h, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+            UiUtils.getCloseButton(ColorStyles.upFinWhite, () {
+              Navigator.pop(slideContext);
+            })
+          ])),
+          Container(
+              color:ColorStyles.upFinBlack,
+              width: 90.w, height: 85.h,
+              child: InteractiveViewer(
+                  constrained: false,
+                  child: Container(
+                    alignment: Alignment.center,
+                    constraints: BoxConstraints(maxWidth: 90.w, maxHeight: 85.h, minWidth: 20.w, minHeight: 20.w),
+                    child: CachedNetworkImage(
+                      fadeInDuration: const Duration(milliseconds: 100),
+                      fadeOutDuration: const Duration(milliseconds: 100),
+                      cacheManager: CustomCacheManagerForHigh.instance,
+                      memCacheWidth: (45.w*devicePixelRatio).round().toInt(),
+                      fit: BoxFit.contain,
+                      imageUrl: srcUrl,
+                      progressIndicatorBuilder: (context, url, downloadProgress) => Center(
+                          child: CircularProgressIndicator(
+                              color: ColorStyles.upFinWhite,
+                              value: downloadProgress.progress)
+                      ),
+                      errorWidget: (context, url, error){
+                        errorUrlList.add(srcUrl);
+                        return const Icon(Icons.error, color: ColorStyles.upFinRed);
+                      },
+                    )
+                  )
+              ))
         ]);
         return slideWidget;
       });
@@ -686,6 +773,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   Widget _getMeView(ChatMessageInfoData meInfo){
     Widget? meInfoWidget;
     if(meInfo.messageType == "text"){
+
       meInfoWidget = UiUtils.getTextWithFixedScale(meInfo.message, 13.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null);
     }else{
       String extension = meInfo.message.split('.').last.toLowerCase();
@@ -774,6 +862,10 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         "pr_room_id" : currentRoomId
       };
       UiUtils.showLoadingPop(context);
+      for(var each in errorUrlList){
+        await CachedNetworkImage.evictFromCache(each);
+      }
+      errorUrlList.clear();
       await CommonUtils.saveSettingsToFile("push_from", "");
       await CommonUtils.saveSettingsToFile("push_room_id", "");
       await LogfinController.callLogfinApi(LogfinApis.checkMessage, inputJson, (isSuccess, outputJson){
@@ -1085,6 +1177,12 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
           GetController.to.updateInputTextHide(inputTextHide);
           _setAutoAnswerWidgetList();
         }else if(each.contains("이전")){
+          pickedFiles.clear();
+          inputHelpHeight = inputHelpMinHeight;
+          GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
+          isShowPickedFile = false;
+          GetController.to.updateShowPickedFile(isShowPickedFile);
+          setState(() {});
           inputTextHide = true;
           GetController.to.updateInputTextHide(inputTextHide);
           String tempKey = _findPrevKey(answerList[0]);
@@ -1345,7 +1443,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         await CommonUtils.saveSettingsToFile("push_from", "");
         await CommonUtils.saveSettingsToFile("push_room_id", "");
         isBuild = true;
-        //_scrollToBottom(false, 0);
+        _scrollToBottom(false, 0);
       }
     });
 
@@ -1409,14 +1507,18 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
           Obx((){
             bool isWaiting = GetController.to.isAutoAnswerWaiting.value;
             bool isScrollWaiting = GetController.to.isShowScrollBottom.value;
+            CommonUtils.log("", "isShowBottom : ${_chatScrollController.position.pixels}");
 
             if(isScrollWaiting){
               isWaiting = isScrollWaiting;
             }
 
             if(!isWaiting){
-              CommonUtils.log("", "scroll~~~~~~~~~~~~~");
-              _scrollToBottom(true, 30);
+              if(_chatScrollController.hasClients){
+                if(_chatScrollController.position.hasPixels){
+                  if(isBuild) _chatScrollController.jumpTo(_chatScrollController.position.pixels);
+                }
+              }
             }
 
             return Container(color:ColorStyles.upFinWhite, child: Column(
@@ -1554,7 +1656,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
                 GetController.to.updateAutoAnswerWaiting(false);
                 GetController.to.updateShowScrollBottom(false);
                 if(_chatScrollController.hasClients){
-                  _chatScrollController.jumpTo(_chatScrollController.position.maxScrollExtent+100);
+                  if(isBuild) _chatScrollController.jumpTo(_chatScrollController.position.maxScrollExtent+100);
                 }
               })
           );

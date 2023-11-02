@@ -100,6 +100,7 @@ class SharedPreferenceController {
       if(sharedPreferences!.containsKey(sharedPreferenceValidDateKey)){
         sharedPreferences!.remove(sharedPreferenceValidDateKey);
       }
+
     }catch(e){
       CommonUtils.log('e', e.toString());
     }

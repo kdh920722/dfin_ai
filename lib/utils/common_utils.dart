@@ -19,6 +19,7 @@ import 'package:upfin/controllers/get_controller.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/controllers/sharedpreference_controller.dart';
 import 'package:upfin/controllers/websocket_controller.dart';
+import 'package:velocity_x/velocity_x.dart';
 import '../configs/app_config.dart';
 import '../datas/my_data.dart';
 import '../styles/ColorStyles.dart';
@@ -26,6 +27,7 @@ import '../styles/TextStyles.dart';
 import 'package:image/image.dart' as imglib;
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:http/http.dart' as http;
 
 class CommonUtils {
 
@@ -453,6 +455,72 @@ class CommonUtils {
     }catch(e){
       CommonUtils.log('e', e.toString());
       return imageList;
+    }
+  }
+
+  static Map<String, Image> cachedImageMap = {};
+  static Map<String, List<double>> cachedImageSizedMap = {};
+
+  static void setCachedImage(String url) async {
+    try{
+      var response = await http.get(Uri.parse(url));
+      String responseString = String.fromCharCodes(response.bodyBytes);
+      Image image = Image.memory(response.bodyBytes);
+      image.fittedBox(fit:BoxFit.contain);
+      image.image.resolve(const ImageConfiguration()).addListener(
+        ImageStreamListener((ImageInfo info, bool synchronousCall) {
+          String widthString = info.image.width.toString();
+          String heightString = info.image.height.toString();
+          CommonUtils.log("", "saved img : $url\n$widthString, $heightString");
+        }),
+      );
+    }catch(error){
+      CommonUtils.log('e', 'set cached image size error : $error');
+    }
+  }
+
+  static bool isCachedImage(String url){
+    String result = "";
+    if(result != ""){
+      return true;
+    }else{
+      return false;
+    }
+  }
+
+  static Image? getCachedImage(String url) {
+    try{
+      if(isCachedImage(url)){
+        String result = "";
+        List<int> responseBytes = result.codeUnits;
+        return Image.memory(Uint8List.fromList(responseBytes));
+      }else{
+        CommonUtils.log('e', 'set cached image null');
+        return null;
+      }
+    }catch(error){
+      CommonUtils.log('e', 'set cached image error : $error');
+      return null;
+    }
+  }
+
+  static List<double>? getCachedImageSize(String url) {
+    try{
+      if(isCachedImage(url)){
+        double w = 0;
+        double h = 0;
+        String wResult = "";
+        w = double.parse(wResult);
+        String hResult = "";
+        h = double.parse(hResult);
+        return [w,h];
+      }else{
+        CommonUtils.log('e', 'set cached image null');
+        return null;
+      }
+    }catch(error){
+      CommonUtils.log('e', 'set cached image error : $error');
+      return null;
     }
   }
 
