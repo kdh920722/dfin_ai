@@ -385,9 +385,9 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
 
   @override
   Widget build(BuildContext context) {
-    Widget view = Container(width: 100.w, height: 95.h, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w),
-        child: viewId == 1 ? _getEmailAndPwInfoView() : _getPhoneValidView()
-    );
+    Widget view = Container(width: 100.w, height: Config.isAndroid? 95.h: 90.h, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w),
+        child: viewId == 1 ? _getEmailAndPwInfoView() : _getPhoneValidView());
+
 
     return UiUtils.getScrollViewWithAllowBackForAndroid(context, view, _scrollController, back);
   }

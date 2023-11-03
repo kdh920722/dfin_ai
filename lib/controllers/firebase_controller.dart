@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io' as io;
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -145,53 +146,60 @@ class FireBaseController{
 
   static Future<void> _handlerForFirebaseMessagingOnForeground(RemoteMessage message,
       FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin, AndroidNotificationChannel? channel) async {
-    CommonUtils.log("", "fcm foreground message : ${message.toString()}");
+    CommonUtils.log("", "fcm foreground message : ${jsonEncode(message.data)}");
     if (message.notification != null) {
       Map<String, dynamic> resultData = message.data;
       if (resultData.containsKey("room_id")) {
         String roomId = resultData["room_id"].toString();
+        CommonUtils.log("", "fcm room id check : $roomId || ${AppChatViewState.currentRoomId}");
         if (AppChatViewState.currentRoomId == "" || AppChatViewState.currentRoomId != roomId) {
           flutterLocalNotificationsPlugin.show(
               message.hashCode,
               message.notification?.title,
               message.notification?.body,
-              NotificationDetails(
+              Config.isAndroid? NotificationDetails(
                   android: AndroidNotificationDetails(
                     channel!.id,
                     channel.name,
                     channelDescription: channel.description,
                     icon: '@mipmap/ic_launcher',
-                  ),
-                  iOS: const DarwinNotificationDetails(
+                  )
+              ) : NotificationDetails(
+                  iOS: DarwinNotificationDetails(
                     badgeNumber: 1,
-                    subtitle: 'the subtitle',
+                    subtitle: channelTitleForIOS,
                     sound: 'slow_spring_board.aiff',
-                  )),
+                  )
+              ),
               payload: _getRoomIdFromMessage(message)
           );
         }
       } else {
+        CommonUtils.log("", "fcm room id check222 : ");
         flutterLocalNotificationsPlugin.show(
             message.hashCode,
             message.notification?.title,
             message.notification?.body,
-            NotificationDetails(
+            Config.isAndroid? NotificationDetails(
                 android: AndroidNotificationDetails(
                   channel!.id,
                   channel.name,
                   channelDescription: channel.description,
                   icon: '@mipmap/ic_launcher',
-                ),
-                iOS: const DarwinNotificationDetails(
+                )
+            ) : NotificationDetails(
+                  iOS: DarwinNotificationDetails(
                   badgeNumber: 1,
-                  subtitle: 'the subtitle',
+                  subtitle: channelTitleForIOS,
                   sound: 'slow_spring_board.aiff',
-                )),
+                )
+            ),
             payload: _getRoomIdFromMessage(message));
       }
     }
   }
-  
+
+  @pragma('vm:entry-point')
   static Future<void> _handlerForFirebaseMessagingOnBackground(RemoteMessage message) async {
     await _initFirebase((bool isSuccess) async {
       if(isSuccess){
@@ -211,31 +219,40 @@ class FireBaseController{
         if(Config.isAndroid){
           androidNotificationChannel = AndroidNotificationChannel(channelIdForAndroid, channelNameForAndroid,description: channelDescForAndroid, importance: Importance.max);
           await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(androidNotificationChannel);
-        }else{
-          FirebaseMessaging messaging = FirebaseMessaging.instance;
-          await messaging.setForegroundNotificationPresentationOptions(alert: true, badge: true, sound: true);
-          await messaging.requestPermission(alert: true, announcement: false, badge: true, carPlay: false, criticalAlert: false, provisional: false, sound: true);
-        }
-
-        flutterLocalNotificationsPlugin.show(
-            message.hashCode,
-            message.notification?.title,
-            message.notification?.body,
-            NotificationDetails(
+          flutterLocalNotificationsPlugin.show(
+              message.hashCode,
+              message.notification?.title,
+              message.notification?.body,
+              NotificationDetails(
                 android: AndroidNotificationDetails(
                   androidNotificationChannel!.id,
                   androidNotificationChannel.name,
                   channelDescription: androidNotificationChannel.description,
                   icon: '@mipmap/ic_launcher',
                 ),
-                iOS: const DarwinNotificationDetails(
-                  badgeNumber: 1,
-                  subtitle: 'the subtitle',
-                  sound: 'slow_spring_board.aiff',
-                ),
-            ),
-            payload: _getRoomIdFromMessage(message));
+              ),
+              payload: _getRoomIdFromMessage(message));
+        }else{
+          FirebaseMessaging messaging = FirebaseMessaging.instance;
+          await messaging.setForegroundNotificationPresentationOptions(alert: true, badge: true, sound: true);
+          await messaging.requestPermission(alert: true, announcement: false, badge: true, carPlay: false, criticalAlert: false, provisional: false, sound: true);
 
+          if(AppChatViewState.currentRoomId == "" || AppChatViewState.currentRoomId != _getRoomIdFromMessage(message)){
+            flutterLocalNotificationsPlugin.show(
+                message.hashCode,
+                message.notification?.title,
+                message.notification?.body,
+                NotificationDetails(
+                  iOS: DarwinNotificationDetails(
+                    badgeNumber: 1,
+                    subtitle: channelTitleForIOS,
+                    sound: 'slow_spring_board.aiff',
+                  ),
+                ),
+                payload: _getRoomIdFromMessage(message));
+          }
+
+        }
       }else{
         CommonUtils.log("e", "firebase init error ");
       }
@@ -250,8 +267,15 @@ class FireBaseController{
         CommonUtils.log("", "fcm getInitialMessage android : ${_getRoomIdFromMessage(message)}");
       }
     }else if(io.Platform.isIOS){
-      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
         CommonUtils.log("", "fcm getInitialMessage ios : ${_getRoomIdFromMessage(message)}");
+        await CommonUtils.saveSettingsToFile("push_from", "B");
+        await CommonUtils.saveSettingsToFile("push_room_id", _getRoomIdFromMessage(message));
+        await CommonUtils.printSettingsFromFile();
+        if(setStateForForeground != null){
+          CommonUtils.log("", "not null");
+          setStateForForeground!((){});
+        }
       });
     }
   }

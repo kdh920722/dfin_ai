@@ -269,6 +269,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
 
     for(var each in accidentInfoList){
       CommonUtils.log("i", "accdient uid@@@@ : ${each.accidentUid}");
+
       accidentWidgetList.add(
           UiUtils.getAccidentBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinGray,
               Column(children: [
@@ -375,7 +376,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                         Row(mainAxisAlignment: MainAxisAlignment.start, children: [
                           UiUtils.getRoundBoxTextWithFixedScale(LoanInfoData.getDetailStatusName(each.chatRoomLoanStatus), 7.sp, FontWeight.w600, TextAlign.center,  ColorStyles.upFinWhiteSky, ColorStyles.upFinButtonBlue),
                           UiUtils.getMarginBox(2.w, 0),
-                          Expanded(child: UiUtils.getTextWithFixedScaleAndOverFlow(lastMsg, 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, 1))
+                          Expanded(child: UiUtils.getTextWithFixedScaleAndOverFlow(lastMsg, 9.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, 1))
                           //each.chatRoomType != 0? UiUtils.getTextWithFixedScale("${each.loanMinRate}  ${each.loanMaxLimit}", 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null) : Container()
                         ]),
                         UiUtils.getMarginBox(0, 0.2.h),

@@ -1,6 +1,7 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:upfin/views/app_accident_detail_view.dart';
@@ -19,6 +20,7 @@ import 'package:upfin/views/app_update_accident_view.dart';
 import 'package:upfin/views/app_web_view.dart';
 import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:yaml/yaml.dart';
 import '../utils/common_utils.dart';
 import '../views/app_chat_view.dart';
 import '../views/app_login_certification_view.dart';
@@ -110,6 +112,7 @@ class Config{
     bool result = false;
     PackageInfo packageInfo = await PackageInfo.fromPlatform();
 
+
     String appName = packageInfo.appName;
     String packageName = packageInfo.packageName;
     String version = packageInfo.version;
@@ -119,6 +122,11 @@ class Config{
         "\npackageName : $packageName"
         "\nversion : $version"
         "\nbuildNumber : $buildNumber");
+
+    String yamlValue = await rootBundle.loadString("pubspec.yaml");
+    var yamlDoc = loadYaml(yamlValue);
+    CommonUtils.log("", "doc : ${yamlDoc["version"]}");
+    version = yamlDoc["version"].toString();
 
     CommonUtils.log("", "appVersion : $appVersion || $version");
     if(version == appVersion){

@@ -262,7 +262,7 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
               Tab(text: "접수내역"),
             ],
           )),
-          SizedBox(width: 95.w, height: 75.h, child: TabBarView(
+          SizedBox(width: 95.w, height: Config.isAndroid? 75.h : 70.h, child: TabBarView(
             controller: _tabController,
             children: <Widget>[
               Column(children: [UiUtils.getExpandedScrollView(Axis.vertical, _getAccidentWidgetList())]),

@@ -204,7 +204,11 @@ class LogfinController {
       await LogfinController.callLogfinApi(LogfinApis.getFaqs, {}, (isSuccessToGetMap, outputJsonMap){
         if(isSuccessToGetMap){
           autoAnswerMap = outputJsonMap!;
-          autoAnswerMap["파일첨부 📁"] = {"카메라 📷" : "camera", "가져오기 🏞" : "files"};
+          if(Config.isAndroid){
+            autoAnswerMap["파일첨부 📁"] = {"카메라 📷" : "camera", "가져오기 🏞" : "files"};
+          }else{
+            autoAnswerMap["파일첨부 📁"] = {"카메라 📷" : "camera", "사진 가져오기 🏞" : "imgfiles", "문서 가져오기 📄" : "docfiles"};
+          }
         }else{
           failCount++;
         }

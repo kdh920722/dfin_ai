@@ -524,13 +524,31 @@ class CommonUtils {
     }
   }
 
-  static Future<List<File>?> getFiles() async {
+  static Future<List<File>?> getFiles(int type) async {
     try{
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.custom,
-        allowedExtensions: LogfinController.validFileTypeList,
-        allowMultiple: true,
-      );
+      // type 1: android all
+      // type 2: ios img
+      // type 3: ios doc
+      FilePickerResult? result;
+      if(type == 1){
+        result = await FilePicker.platform.pickFiles(
+          type: FileType.custom,
+          allowedExtensions: LogfinController.validFileTypeList,
+          allowMultiple: false,
+        );
+      }else if(type == 2){
+        result = await FilePicker.platform.pickFiles(
+          type: FileType.image,
+          allowMultiple: false,
+        );
+      }else if(type == 3){
+        result = await FilePicker.platform.pickFiles(
+          type: FileType.custom,
+          allowedExtensions: LogfinController.validDocFileTypeList,
+          allowMultiple: false,
+        );
+      }
+
       if(result != null) {
         List<File> pickFiles = result.paths.map((path) => File(path!)).toList();
         if(pickFiles.isNotEmpty){
@@ -873,13 +891,15 @@ class CommonUtils {
     Map<Permission, PermissionStatus> statuses = await Config.permissionList.request();
     List<String> deniedPermissions = [];
     for(var each in Config.permissionList){
+      CommonUtils.log("","permissionName1 : ${each.toString().split('.').last}");
       if(!statuses[each]!.isGranted) {
         String permissionName = each.toString().split('.').last;
-        CommonUtils.log("","permissionName : $permissionName");
+        CommonUtils.log("","permissionName2 : $permissionName");
         switch(permissionName){
           case "notification" : permissionName = "알림";
           case "storage" : permissionName = "내부저장소";
           case "camera" : permissionName = "카메라";
+          case "photos" : permissionName = "사진";
         }
         deniedPermissions.add(permissionName);
       }

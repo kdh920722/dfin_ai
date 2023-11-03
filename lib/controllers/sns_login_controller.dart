@@ -78,10 +78,10 @@ class SnsLoginController{
   static Widget getKakaoLoginButton(BuildContext context, double size, Function(bool? isSuccessToLogin) callback){
     return UiUtils.getImageButton(Image.asset('assets/images/logo_kakao_circle.png', fit: BoxFit.fill), size, ColorStyles.upFinBlack, () async {
       if(Config.isControllerLoadFinished){
-        UiUtils.showLoadingPop(context);
+        if(Config.isAndroid) UiUtils.showLoadingPop(context);
         loginPlatform = LoginPlatform.kakao;
         await SnsLoginController._kakaoLogin((bool isSuccess) async {
-          UiUtils.closeLoadingPop(context);
+          if(Config.isAndroid) UiUtils.closeLoadingPop(context);
           if(isSuccess){
             MyData.isSnsLogin = true;
             if(await _isMemberFromSns()){

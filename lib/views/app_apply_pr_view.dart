@@ -1692,7 +1692,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       alignment: Alignment.center,
       children: [
         Positioned(
-            child: SizedBox(width: 100.w, height: 70.h, child: _cameraController != null && _isCameraReady ? CameraPreview(_cameraController!) : Container(color: ColorStyles.upFinBlack))
+            child: SizedBox(width: 100.w, height: Config.isAndroid? 70.h : 63.h, child: _cameraController != null && _isCameraReady ? CameraPreview(_cameraController!) : Container(color: ColorStyles.upFinBlack))
         ),
         Positioned(
           top: 0,
@@ -1756,7 +1756,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             ),
         ),
         Positioned(
-            top: 87.5.h,
+            top: Config.isAndroid? 87.5.h : 80.h,
             child: UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
                 UiUtils.getTextWithFixedScale("촬영", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
                   if(_cameraController != null){
@@ -2094,7 +2094,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                           }else{
                             CommonUtils.flutterToast("인증서를 선택해주세요");
                           }
-                        })
+                        }),
+                    Config.isAndroid? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 3.h)
                   ]);
                 });
               }else{

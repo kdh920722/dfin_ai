@@ -570,7 +570,8 @@ class CodeFController{
                   }
                 }
               });
-            })
+            }),
+        Config.isAndroid? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 3.h)
       ]));
     });
   }

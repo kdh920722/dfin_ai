@@ -270,17 +270,17 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
         UiUtils.getTextWithFixedScale("상품 ", 14.sp, FontWeight.w400, ColorStyles.upFinBlack, TextAlign.center, 1),
         UiUtils.getTextWithFixedScale("$selectedTabCount개", 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, 1),
         const Spacer(flex: 2),
-        UiUtils.getCustomTextButtonBox(20.w, "금리순", 9.sp, FontWeight.w600, isOrderByLimit? ColorStyles.upFinWhiteSky : ColorStyles.upFinButtonBlue,
+        UiUtils.getCustomTextButtonBox(22.w, "금리순", 9.sp, FontWeight.w600, isOrderByLimit? ColorStyles.upFinWhiteSky : ColorStyles.upFinButtonBlue,
             isOrderByLimit? ColorStyles.upFinButtonBlue : ColorStyles.upFinWhiteSky, () {
               _reOrderList(false);
             }),
         UiUtils.getMarginBox(1.5.w, 0),
-        UiUtils.getCustomTextButtonBox(20.w, "한도순", 9.sp, FontWeight.w600, isOrderByLimit? ColorStyles.upFinButtonBlue : ColorStyles.upFinWhiteSky,
+        UiUtils.getCustomTextButtonBox(22.w, "한도순", 9.sp, FontWeight.w600, isOrderByLimit? ColorStyles.upFinButtonBlue : ColorStyles.upFinWhiteSky,
             isOrderByLimit? ColorStyles.upFinWhiteSky : ColorStyles.upFinButtonBlue, () {
               _reOrderList(true);
             })
       ])),
-      SizedBox(width: 95.w, height: 65.h, child: TabBarView(
+      SizedBox(width: 95.w, height: 60.h, child: TabBarView(
         controller: _tabController,
         children: <Widget>[
           possiblePrCnt>0 ? Column(children: [

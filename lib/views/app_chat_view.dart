@@ -161,7 +161,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
         String id = data[0];
         int status = data[1];
         int progress = data[2];
-
+        CommonUtils.log("d", "download : $status, $progress");
         if(status == 2){
           UiUtils.closeLoadingPop(context);
         }
@@ -599,7 +599,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                 borderRadius: BorderRadius.all(Radius.circular(5)),
                 color: ColorStyles.upFinBlack,
               ),
-              padding: EdgeInsets.zero,
+              padding: EdgeInsets.only(top:1.w, bottom: 1.w),
               alignment: Alignment.center,
               constraints: BoxConstraints(maxWidth: 70.w, maxHeight: 70.w, minWidth: 20.w, minHeight: 20.w),
               child: FutureBuilder(
@@ -681,13 +681,13 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                 ])),
                 Container(
                     color:ColorStyles.upFinBlack,
-                    width: 90.w, height: 85.h,
+                    width: 90.w, height: appConfig.Config.isAndroid? 85.h : 80.h,
                     child: InteractiveViewer(
                         constrained: false,
                         child: Container(
                             color:ColorStyles.upFinBlack,
                             alignment: Alignment.center,
-                            constraints: BoxConstraints(maxWidth: 90.w, maxHeight: 85.h, minWidth: 20.w, minHeight: 20.w),
+                            constraints: BoxConstraints(maxWidth: 90.w, maxHeight: appConfig.Config.isAndroid? 85.h : 80.h, minWidth: 20.w, minHeight: 20.w),
                             child: ExtendedImage.network(
                               srcUrl,
                               fit: BoxFit.contain,
@@ -953,12 +953,12 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
     }
   }
 
-  Future<void> _setPickedFileFromDevice() async {
+  Future<void> _setPickedFileFromDevice(int type) async {
     if(pickedFiles.length <= maximumSize){
       if(pickedFiles.length == maximumSize){
         CommonUtils.flutterToast("최대 $maximumSize개의 파일만\n전송할 수 있습니다.");
       }else{
-        List<File>? files = await CommonUtils.getFiles();
+        List<File>? files = await CommonUtils.getFiles(type);
         if(files != null){
           if(files.length <= maximumSize){
             if(files.length+pickedFiles.length <= maximumSize){
@@ -1142,12 +1142,22 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
         if(each.contains("카메라")){
           _setPickedImgFromCamera();
         }else if(each.contains("가져오기")){
-          _setPickedFileFromDevice();
+          if(appConfig.Config.isAndroid){
+            _setPickedFileFromDevice(1);
+          }else{
+            if(each.contains("사진")){
+              _setPickedFileFromDevice(2);
+            }else if(each.contains("문서")){
+              _setPickedFileFromDevice(3);
+            }
+          }
+
         }else if(each.contains("채팅")){
           inputTextHide = false;
           GetController.to.updateInputTextHide(inputTextHide);
           _setAutoAnswerWidgetList();
         }else if(each.contains("이전")){
+          CommonUtils.log("","fcm : ${FireBaseController.fcmToken}");
           pickedFiles.clear();
           inputHelpHeight = inputHelpMinHeight;
           GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
@@ -1167,6 +1177,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
           }else{
             String result = _findValueForKey(LogfinController.autoAnswerMap, currentKey);
             _sendMessage("", result);
+
           }
         }
       }));
@@ -1243,6 +1254,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
 
       GetController.to.updateAutoAnswerWaiting(true);
       if(!isScrollMove) setState(() {});
+
 
       LogfinController.callLogfinApi(LogfinApis.sendMessage, inputJson, (isSuccess, _){
         GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
