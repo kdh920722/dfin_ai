@@ -3,15 +3,14 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:camera/camera.dart';
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:sizer/sizer.dart';
-import 'package:upfin/controllers/CutsomCacheManager.dart';
 import 'package:upfin/controllers/aws_controller.dart';
 import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:upfin/controllers/get_controller.dart';
@@ -37,7 +36,7 @@ class AppChatView extends StatefulWidget{
   AppChatViewState createState() => AppChatViewState();
 }
 
-class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
+class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, SingleTickerProviderStateMixin{
   bool backPossibleFlag = true;
   final ScrollController _chatScrollController = ScrollController();
   final _chatTextFocus = FocusNode();
@@ -52,6 +51,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   bool inputTextHide = true;
   static bool isViewHere = false;
   double deviceH = 100.h;
+  late AnimationController _aniController;
 
   final ReceivePort _port = ReceivePort();
   static String savedFileName = "";
@@ -66,6 +66,11 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     CommonUtils.log("i", "AppChatViewState 화면 입장");
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+    _aniController = AnimationController(
+        vsync: this,
+        duration: const Duration(seconds: 1),
+        lowerBound: 0.0,
+        upperBound: 1.0);
     currentRoomId = GetController.to.chatMessageInfoDataList[0].chatRoomId;
     for(var each in MyData.getLoanInfoList()){
       if(each.chatRoomId == currentRoomId){
@@ -118,21 +123,9 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         });
       if (_chatScrollController.offset == _chatScrollController.position.maxScrollExtent && !_chatScrollController.position.outOfRange) {
 
-        // if(isScrollMove){
-        //   isScrollMove = false;
-        //   GetController.to.updateShowScrollBottom(false);
-        // }
-        // setState(() {});
       }
-      // else if (_chatScrollController.offset == _chatScrollController.position.minScrollExtent && !_chatScrollController.position.outOfRange) {
-      //   isScrollStop = true;
-      //   isScrollMove = true;
-      // }
       else{
-        // if(!isScrollMove){
-        //   isScrollMove = true;
-        //   GetController.to.updateShowScrollBottom(true);
-        // }
+
       }
     });
 
@@ -215,6 +208,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     _chatScrollController.dispose();
     _chatTextFocus.dispose();
     _chatTextController.dispose();
+    _aniController.dispose();
     currentRoomId = "";
     _keyboardVisibilityController = null;
     AppMainViewState.isStart = false;
@@ -253,40 +247,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
     }
   }
 
-  String _getInfoFormattedText(String message, String targetMessage, String convertMessage){
-    if(message.contains(targetMessage)){
-      if(message.split(targetMessage)[0].length > 2){
-        String temp = "${message.split(targetMessage)[0]}<br><text id='boldText'><br>$convertMessage</text><br>${message.split(targetMessage)[1]}";
-        message = temp;
-      }else{
-        String temp = "${message.split(targetMessage)[0]}<br><text id='boldText'>$convertMessage</text><br>${message.split(targetMessage)[1]}";
-        message = temp;
-      }
-    }
-
-    return message;
-  }
-
-  String _getEndLineChangeFormattedText(String message, String targetMessage){
-    if(message.contains(targetMessage)){
-      String temp = "${message.split(targetMessage)[0]}$targetMessage<br>${message.split(targetMessage)[1]}";
-      message = temp;
-    }
-
-    return message;
-  }
-
-  String _getFrontLineChangeFormattedText(String message, String targetMessage){
-    if(message.contains(targetMessage)){
-      if(message.split(targetMessage)[0].length > 2){
-        String temp = "${message.split(targetMessage)[0]}<br><br>$targetMessage${message.split(targetMessage)[1]}";
-        message = temp;
-      }
-    }
-
-    return message;
-  }
-
   Timer? htmlLoadTimer;
   Timer? htmlNormalLoadTimer;
   int htmlBuildCnt = 0;
@@ -297,13 +257,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
   bool isNormalLoading = false;
   bool isHtmlLoadTimeOut = false;
   Widget _getHtmlView(String message, String sender, String type){
-    if(type == "file"){
-      if(!isScrollMove){
-        //GetController.to.updateHtmlLoad(false);
-      }
-    }
-
-
     bool isImage = true;
     String htmlTag = "";
     String htmlTextTag = "";
@@ -347,39 +300,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
       }
     }else{
       isFileType = false;
-      /*
-      List<String> tempMsg = message.split("다.");
-      message = "";
-      for(int i = 0 ; i < tempMsg.length ; i++){
-        if(i != tempMsg.length-1){
-          tempMsg[i] +="다.<br>";
-          if(i != tempMsg.length-2) {
-            if(tempMsg[i].length > 20) tempMsg[i] += "<br>";
-          }
-        }
-
-
-        tempMsg[i] = _getEndLineChangeFormattedText(tempMsg[i], "요!");
-        tempMsg[i] = _getEndLineChangeFormattedText(tempMsg[i], "요.");
-        tempMsg[i] = _getEndLineChangeFormattedText(tempMsg[i], "요?");
-        tempMsg[i] = _getEndLineChangeFormattedText(tempMsg[i], "며,");
-        tempMsg[i] = _getEndLineChangeFormattedText(tempMsg[i], "이고");
-
-        tempMsg[i] = _getFrontLineChangeFormattedText(tempMsg[i], "더 자세한");
-
-        tempMsg[i] = _getInfoFormattedText(tempMsg[i], "- 고객 이름:", "이름");
-        tempMsg[i] = _getInfoFormattedText(tempMsg[i], "- 신청 대출 상품:", "대출상품");
-
-        tempMsg[i] = _getInfoFormattedText(tempMsg[i], "- 대출 상품:", "대출상품");
-        tempMsg[i] = _getInfoFormattedText(tempMsg[i], "- 금융사:", "금융사");
-        tempMsg[i] = _getInfoFormattedText(tempMsg[i], "- 대출 한도:", "대출한도");
-        tempMsg[i] = _getInfoFormattedText(tempMsg[i], "- 금리:", "금리");
-        tempMsg[i] = _getInfoFormattedText(tempMsg[i], "- 대출 상태:", "대출상태");
-
-        message += tempMsg[i];
-      }
-       */
-
       htmlTag = message;
       isImage = false;
     }
@@ -653,124 +573,136 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         ])
     );
   }
-/*
-  Widget _getImageView(String srcUrl){
-    return GestureDetector(
-        child: Stack(alignment: Alignment.center, children: [
-          Container(
-              constraints: BoxConstraints(maxWidth: 70.w, maxHeight: 70.w, minWidth: 20.w, minHeight: 20.w),
-              color:ColorStyles.upFinBlack,
-              width: cachedImage != null? cachedImageSize![0]/rate : 70.w,
-              height: cachedImage != null? cachedImageSize![1]/rate : 70.w),
-          Container(
-              constraints: BoxConstraints(maxWidth: 70.w, maxHeight: 70.w, minWidth: 20.w, minHeight: 20.w),
-              width: cachedImage != null? cachedImageSize![0]/rate : 70.w,
-              height: cachedImage != null? cachedImageSize![1]/rate : 70.w,
-              child: cachedImage ??
-                  Image.network(srcUrl, fit: BoxFit.contain, loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress){
-                    if(loadingProgress == null){
-                      return child;
-                    }
-                    return Center(
-                        child: CircularProgressIndicator(
-                          color: ColorStyles.upFinWhite,
-                          value: loadingProgress.expectedTotalBytes != null ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes! : null,
-                        )
-                    );
-                  })
-          )]),
-        onTap: (){UiUtils.showPopMenu(context, true, 100.w, 100.h, 0.5, 0, ColorStyles.upFinBlack, (slideContext, slideSetState){
-          Widget slideWidget = Column(children: [
-            SizedBox(width: 90.w, height: 5.h, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-              UiUtils.getCloseButton(ColorStyles.upFinWhite, () {
-                Navigator.pop(slideContext);
-              })
-            ])),
-            SizedBox(
-                width: 90.w, height: 85.h,
-                child: InteractiveViewer(
-                    constrained: false,
-                    child: cachedImage != null?
-                    Container(constraints: BoxConstraints(maxWidth: 90.w, maxHeight: 85.h, minWidth: 20.w, minHeight: 20.w),
-                        width: cachedImageSize![0]/fullWRate,
-                        height: cachedImageSize![1]/fullHRate,
-                        child: cachedImage) : Image.network(srcUrl, fit: BoxFit.contain, height: 85.h, width: 90.w)))
-          ]);
-          return slideWidget;
-        });
-        });
-  }
-  */
 
-  List<String> errorUrlList = [];
   Widget _getImageView(String srcUrl){
     final mediaQueryData = MediaQuery.of(context);
     final devicePixelRatio = mediaQueryData.devicePixelRatio;
-
     return GestureDetector(
         child: Stack(alignment: Alignment.center, children: [
           Container(
               decoration: const BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(3)),
+                borderRadius: BorderRadius.all(Radius.circular(5)),
                 color: ColorStyles.upFinBlack,
               ),
-              padding: EdgeInsets.all(1.w),
+              padding: EdgeInsets.zero,
               alignment: Alignment.center,
-              constraints: BoxConstraints(maxWidth: 70.w, maxHeight: 70.w, minWidth: 20.w, minHeight: 70.w),
-              child: CachedNetworkImage(
-                fadeInDuration: const Duration(milliseconds: 100),
-                fadeOutDuration: const Duration(milliseconds: 100),
-                imageUrl: srcUrl,
-                memCacheHeight: (35.w*devicePixelRatio).round().toInt(),
+              constraints: BoxConstraints(maxWidth: 70.w, maxHeight: 70.w, minWidth: 20.w, minHeight: 20.w),
+              child: ExtendedImage.network(
+                srcUrl,
                 fit: BoxFit.contain,
-                cacheManager: CustomCacheManager.instance,
-                progressIndicatorBuilder: (context, url, downloadProgress) => Center(
-                  child: CircularProgressIndicator(color: ColorStyles.upFinWhite, value: downloadProgress.progress)),
-                  errorWidget: (context, url, error){
-                  errorUrlList.add(srcUrl);
-                  return const Icon(Icons.error, color: ColorStyles.upFinRed);
+                cache: true,
+                handleLoadingProgress: true,
+                cacheHeight: (40.w*devicePixelRatio).round().toInt(),
+                cacheMaxAge: const Duration(days: 3),
+                shape: BoxShape.rectangle,
+                borderRadius: const BorderRadius.all(Radius.circular(4)),
+                loadStateChanged: (ExtendedImageState state) {
+                  switch (state.extendedImageLoadState) {
+                    case LoadState.loading:
+                      _aniController.reset();
+                      if(state.loadingProgress != null && state.loadingProgress!.expectedTotalBytes != null){
+                        int total = state.loadingProgress!.expectedTotalBytes!;
+                        int val = state.loadingProgress!.cumulativeBytesLoaded;
+                        return Center(
+                            child: CircularProgressIndicator(
+                              color: ColorStyles.upFinWhite,
+                              value: val / total
+                            )
+                        );
+                      }else{
+                        return UiUtils.getImage(8.w, 8.w, Image.asset(fit: BoxFit.fill,'assets/images/chat_loading.gif'));
+                      }
+                    case LoadState.completed:
+                      _aniController.forward();
+                      CommonUtils.log("", "size..\n70.w: ${70.w} \n${(40.w*devicePixelRatio).round().toInt()} ${state.extendedImageInfo?.image.width.toDouble()}, ${state.extendedImageInfo?.image.height.toDouble()}");
+                      return FadeTransition(
+                        opacity: _aniController,
+                        child: ExtendedRawImage(
+                          image: state.extendedImageInfo?.image,
+                          fit: BoxFit.contain,
+                        ),
+                      );
+                    case LoadState.failed:
+                      _aniController.reset();
+                      return GestureDetector(
+                        child: UiUtils.getIcon(10.w, 10.w, Icons.refresh_rounded, 10.w, ColorStyles.upFinRed),
+                        onTap: () {
+                          state.reLoadImage();
+                        },
+                      );
+                  }
                 },
               )
-            )
-          ]),
-        onTap: (){UiUtils.showPopMenu(context, true, 100.w, 100.h, 0.5, 0, ColorStyles.upFinBlack, (slideContext, slideSetState){
-        Widget slideWidget = Column(children: [
-          SizedBox(width: 90.w, height: 5.h, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-            UiUtils.getCloseButton(ColorStyles.upFinWhite, () {
-              Navigator.pop(slideContext);
-            })
-          ])),
-          Container(
-              color:ColorStyles.upFinBlack,
-              width: 90.w, height: 85.h,
-              child: InteractiveViewer(
-                  constrained: false,
-                  child: Container(
-                    alignment: Alignment.center,
-                    constraints: BoxConstraints(maxWidth: 90.w, maxHeight: 85.h, minWidth: 20.w, minHeight: 20.w),
-                    child: CachedNetworkImage(
-                      fadeInDuration: const Duration(milliseconds: 100),
-                      fadeOutDuration: const Duration(milliseconds: 100),
-                      cacheManager: CustomCacheManagerForHigh.instance,
-                      memCacheWidth: (45.w*devicePixelRatio).round().toInt(),
-                      fit: BoxFit.contain,
-                      imageUrl: srcUrl,
-                      progressIndicatorBuilder: (context, url, downloadProgress) => Center(
-                          child: CircularProgressIndicator(
-                              color: ColorStyles.upFinWhite,
-                              value: downloadProgress.progress)
-                      ),
-                      errorWidget: (context, url, error){
-                        errorUrlList.add(srcUrl);
-                        return const Icon(Icons.error, color: ColorStyles.upFinRed);
-                      },
-                    )
-                  )
-              ))
-        ]);
-        return slideWidget;
-      });
-    });
+          )
+        ]),
+        onTap: ()  {
+          UiUtils.showPopMenu(context, true, 100.w, 100.h, 0.5, 0, ColorStyles.upFinBlack, (slideContext, slideSetState){
+            Widget slideWidget = Column(children: [
+              SizedBox(width: 90.w, height: 5.h, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                UiUtils.getCloseButton(ColorStyles.upFinWhite, () {
+                  Navigator.pop(slideContext);
+                })
+              ])),
+              Container(
+                  color:ColorStyles.upFinBlack,
+                  width: 90.w, height: 85.h,
+                  child: InteractiveViewer(
+                      constrained: false,
+                      child: Container(
+                          color:ColorStyles.upFinBlack,
+                          alignment: Alignment.center,
+                          constraints: BoxConstraints(maxWidth: 90.w, maxHeight: 85.h, minWidth: 20.w, minHeight: 20.w),
+                          child: ExtendedImage.network(
+                            srcUrl,
+                            fit: BoxFit.contain,
+                            cache: true,
+                            cacheWidth: (50.w*devicePixelRatio).round().toInt(),
+                            cacheMaxAge: const Duration(days: 1),
+                            shape: BoxShape.rectangle,
+                            borderRadius: const BorderRadius.all(Radius.circular(3)),
+                            loadStateChanged: (ExtendedImageState state) {
+                              switch (state.extendedImageLoadState) {
+                                case LoadState.loading:
+                                  _aniController.reset();
+                                  if(state.loadingProgress != null && state.loadingProgress!.expectedTotalBytes != null){
+                                    int total = state.loadingProgress!.expectedTotalBytes!;
+                                    int val = state.loadingProgress!.cumulativeBytesLoaded;
+                                    return Center(
+                                        child: CircularProgressIndicator(
+                                            color: ColorStyles.upFinWhite,
+                                            value: val / total
+                                        )
+                                    );
+                                  }else{
+                                    return UiUtils.getImage(8.w, 8.w, Image.asset(fit: BoxFit.fill,'assets/images/chat_loading.gif'));
+                                  }
+                                case LoadState.completed:
+                                  _aniController.forward();
+
+                                  return FadeTransition(
+                                    opacity: _aniController,
+                                    child: ExtendedRawImage(
+                                      image: state.extendedImageInfo?.image,
+                                      fit: BoxFit.contain,
+                                    ),
+                                  );
+                                case LoadState.failed:
+                                  _aniController.reset();
+                                  return GestureDetector(
+                                    child: UiUtils.getIcon(10.w, 10.w, Icons.refresh_rounded, 10.w, ColorStyles.upFinRed),
+                                    onTap: () {
+                                      state.reLoadImage();
+                                    },
+                                  );
+                              }
+                            },
+                          )
+                      )
+                  ))
+            ]);
+            return slideWidget;
+          });
+        });
   }
 
   Widget _getMeView(ChatMessageInfoData meInfo){
@@ -868,10 +800,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver{
         "pr_room_id" : currentRoomId
       };
       UiUtils.showLoadingPop(context);
-      for(var each in errorUrlList){
-        await CachedNetworkImage.evictFromCache(each);
-      }
-      errorUrlList.clear();
       await CommonUtils.saveSettingsToFile("push_from", "");
       await CommonUtils.saveSettingsToFile("push_room_id", "");
       await LogfinController.callLogfinApi(LogfinApis.checkMessage, inputJson, (isSuccess, outputJson){
