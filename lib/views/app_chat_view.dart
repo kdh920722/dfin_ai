@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
 import 'package:camera/camera.dart';
+import 'package:dio/dio.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -24,7 +25,7 @@ import 'package:upfin/styles/TextStyles.dart';
 import 'package:upfin/views/app_apply_pr_view.dart';
 import 'package:upfin/views/app_main_view.dart';
 import 'package:url_launcher/url_launcher.dart';
-import '../configs/app_config.dart';
+import '../configs/app_config.dart' as appConfig;
 import '../datas/pr_docs_info_data.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
@@ -59,6 +60,8 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
   double prevScrollPos = 0.0;
   static bool isScrollMove = false;
 
+  int imageLoadCnt = 0;
+  Map<String,bool> imageLoadMap = {};
   Timer? scrollCheckTimer;
 
   @override
@@ -87,8 +90,8 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
         }
       }
     }
-    Config.contextForEmergencyBack = context;
-    Config.isEmergencyRoot = false;
+    appConfig.Config.contextForEmergencyBack = context;
+    appConfig.Config.isEmergencyRoot = false;
     _keyboardVisibilityController = CommonUtils.getKeyboardViewController(_functionForKeyboardShow, _functionForKeyboardHide);
     _chatScrollController.addListener(() {
       scrollCheckTimer ??= Timer.periodic(const Duration(milliseconds: 500), (Timer timer) {
@@ -220,8 +223,9 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
     GetController.to.updateShowPickedFile(false);
     GetController.to.updateShowStatus(true);
     WebSocketController.isMessageReceived = false;
-    Config.contextForEmergencyBack = null;
+    appConfig.Config.contextForEmergencyBack = null;
     currentKey = "";
+    imageLoadMap = {};
     IsolateNameServer.removePortNameMapping('downloader_send_port');
     super.dispose();
   }
@@ -415,7 +419,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
         onTapUrl: (url) async {
           if(isFileType){
             String dir = "";
-            if(Config.isAndroid){
+            if(appConfig.Config.isAndroid){
               dir = '/storage/emulated/0/Download';
               CommonUtils.log("", "document dir : ${(await getApplicationDocumentsDirectory()).path}");
             }else{
@@ -463,7 +467,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                       isScrollMove = true;
                       isViewHere = false;
                       AppApplyPrViewState.isRetry = true;
-                      await CommonUtils.moveToWithResult(context, AppView.appApplyPrView.value, null);
+                      await CommonUtils.moveToWithResult(context, appConfig.AppView.appApplyPrView.value, null);
                       isViewHere = true;
                     }else{
                       CommonUtils.flutterToast("서류 제출을 완료했습니다.");
@@ -574,9 +578,20 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
     );
   }
 
+  Future<void> _loadImageAsync() async {
+    if(imageLoadCnt > 5){
+      await Future.delayed(const Duration(seconds: 2));
+    }
+  }
+
   Widget _getImageView(String srcUrl){
     final mediaQueryData = MediaQuery.of(context);
     final devicePixelRatio = mediaQueryData.devicePixelRatio;
+    if(!imageLoadMap.containsKey(srcUrl)){
+      imageLoadCnt++;
+      imageLoadMap[srcUrl] = true;
+    }
+    bool isLoading = true;
     return GestureDetector(
         child: Stack(alignment: Alignment.center, children: [
           Container(
@@ -587,121 +602,143 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
               padding: EdgeInsets.zero,
               alignment: Alignment.center,
               constraints: BoxConstraints(maxWidth: 70.w, maxHeight: 70.w, minWidth: 20.w, minHeight: 20.w),
-              child: ExtendedImage.network(
-                srcUrl,
-                fit: BoxFit.contain,
-                cache: true,
-                handleLoadingProgress: true,
-                cacheHeight: (40.w*devicePixelRatio).round().toInt(),
-                cacheMaxAge: const Duration(days: 3),
-                shape: BoxShape.rectangle,
-                borderRadius: const BorderRadius.all(Radius.circular(4)),
-                loadStateChanged: (ExtendedImageState state) {
-                  switch (state.extendedImageLoadState) {
-                    case LoadState.loading:
-                      _aniController.reset();
-                      if(state.loadingProgress != null && state.loadingProgress!.expectedTotalBytes != null){
-                        int total = state.loadingProgress!.expectedTotalBytes!;
-                        int val = state.loadingProgress!.cumulativeBytesLoaded;
-                        return Center(
-                            child: CircularProgressIndicator(
-                              color: ColorStyles.upFinWhite,
-                              value: val / total
-                            )
-                        );
-                      }else{
-                        return UiUtils.getImage(8.w, 8.w, Image.asset(fit: BoxFit.fill,'assets/images/chat_loading.gif'));
-                      }
-                    case LoadState.completed:
-                      _aniController.forward();
-                      CommonUtils.log("", "size..\n70.w: ${70.w} \n${(40.w*devicePixelRatio).round().toInt()} ${state.extendedImageInfo?.image.width.toDouble()}, ${state.extendedImageInfo?.image.height.toDouble()}");
-                      return FadeTransition(
-                        opacity: _aniController,
-                        child: ExtendedRawImage(
-                          image: state.extendedImageInfo?.image,
-                          fit: BoxFit.contain,
-                        ),
-                      );
-                    case LoadState.failed:
-                      _aniController.reset();
-                      return GestureDetector(
-                        child: UiUtils.getIcon(10.w, 10.w, Icons.refresh_rounded, 10.w, ColorStyles.upFinRed),
-                        onTap: () {
-                          state.reLoadImage();
-                        },
-                      );
+              child: FutureBuilder(
+                future: _loadImageAsync(), // 이미지 로딩을 처리하는 비동기 함수
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    CommonUtils.log("", "done!!");
+                    return ExtendedImage.network(
+                      srcUrl,
+                      fit: BoxFit.contain,
+                      cache: true,
+                      cacheHeight: (40.w*devicePixelRatio).round().toInt(),
+                      cacheMaxAge: const Duration(hours: 1),
+                      shape: BoxShape.rectangle,
+                      borderRadius: const BorderRadius.all(Radius.circular(4)),
+                      loadStateChanged: (ExtendedImageState state) {
+                        switch (state.extendedImageLoadState) {
+                          case LoadState.loading:
+                            _aniController.reset();
+                            if(state.loadingProgress != null && state.loadingProgress!.expectedTotalBytes != null){
+                              int total = state.loadingProgress!.expectedTotalBytes!;
+                              int val = state.loadingProgress!.cumulativeBytesLoaded;
+                              return Center(
+                                  child: CircularProgressIndicator(
+                                      color: ColorStyles.upFinWhite,
+                                      value: val / total
+                                  )
+                              );
+                            }else{
+                              return UiUtils.getImage(8.w, 8.w, Image.asset(fit: BoxFit.fill,'assets/images/chat_loading.gif'));
+                            }
+                          case LoadState.completed:
+                            isLoading = false;
+                            _aniController.forward();
+                            CommonUtils.log("", "size..\n70.w: ${70.w} \n${(40.w*devicePixelRatio).round().toInt()} ${state.extendedImageInfo?.image.width.toDouble()}, ${state.extendedImageInfo?.image.height.toDouble()}");
+                            if(imageLoadMap.containsKey(srcUrl)){
+                              imageLoadCnt--;
+                              imageLoadMap.remove(srcUrl);
+                            }
+                            return FadeTransition(
+                              opacity: _aniController,
+                              child: ExtendedRawImage(
+                                image: state.extendedImageInfo?.image,
+                                fit: BoxFit.contain,
+                              ),
+                            );
+                          case LoadState.failed:
+                            _aniController.reset();
+                            if(imageLoadMap.containsKey(srcUrl)){
+                              imageLoadCnt--;
+                              imageLoadMap.remove(srcUrl);
+                            }
+                            return GestureDetector(
+                              child: UiUtils.getIcon(10.w, 10.w, Icons.refresh_rounded, 10.w, ColorStyles.upFinRed),
+                              onTap: () {
+                                state.reLoadImage();
+                              },
+                            );
+                        }
+                      },
+                    );
+                  } else {
+                    // 이미지 로딩 중에 표시할 로딩 표시 등을 추가할 수 있습니다.
+                    CommonUtils.log("", "loading!!");
+                    return UiUtils.getImage(8.w, 8.w, Image.asset(fit: BoxFit.fill,'assets/images/chat_loading.gif'));
                   }
                 },
               )
           )
         ]),
         onTap: ()  {
-          UiUtils.showPopMenu(context, true, 100.w, 100.h, 0.5, 0, ColorStyles.upFinBlack, (slideContext, slideSetState){
-            Widget slideWidget = Column(children: [
-              SizedBox(width: 90.w, height: 5.h, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                UiUtils.getCloseButton(ColorStyles.upFinWhite, () {
-                  Navigator.pop(slideContext);
-                })
-              ])),
-              Container(
-                  color:ColorStyles.upFinBlack,
-                  width: 90.w, height: 85.h,
-                  child: InteractiveViewer(
-                      constrained: false,
-                      child: Container(
-                          color:ColorStyles.upFinBlack,
-                          alignment: Alignment.center,
-                          constraints: BoxConstraints(maxWidth: 90.w, maxHeight: 85.h, minWidth: 20.w, minHeight: 20.w),
-                          child: ExtendedImage.network(
-                            srcUrl,
-                            fit: BoxFit.contain,
-                            cache: true,
-                            cacheWidth: (50.w*devicePixelRatio).round().toInt(),
-                            cacheMaxAge: const Duration(days: 1),
-                            shape: BoxShape.rectangle,
-                            borderRadius: const BorderRadius.all(Radius.circular(3)),
-                            loadStateChanged: (ExtendedImageState state) {
-                              switch (state.extendedImageLoadState) {
-                                case LoadState.loading:
-                                  _aniController.reset();
-                                  if(state.loadingProgress != null && state.loadingProgress!.expectedTotalBytes != null){
-                                    int total = state.loadingProgress!.expectedTotalBytes!;
-                                    int val = state.loadingProgress!.cumulativeBytesLoaded;
-                                    return Center(
-                                        child: CircularProgressIndicator(
-                                            color: ColorStyles.upFinWhite,
-                                            value: val / total
-                                        )
-                                    );
-                                  }else{
-                                    return UiUtils.getImage(8.w, 8.w, Image.asset(fit: BoxFit.fill,'assets/images/chat_loading.gif'));
-                                  }
-                                case LoadState.completed:
-                                  _aniController.forward();
+          if(!isLoading){
+            UiUtils.showPopMenu(context, true, 100.w, 100.h, 0.5, 0, ColorStyles.upFinBlack, (slideContext, slideSetState){
+              Widget slideWidget = Column(children: [
+                SizedBox(width: 90.w, height: 5.h, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                  UiUtils.getCloseButton(ColorStyles.upFinWhite, () {
+                    Navigator.pop(slideContext);
+                  })
+                ])),
+                Container(
+                    color:ColorStyles.upFinBlack,
+                    width: 90.w, height: 85.h,
+                    child: InteractiveViewer(
+                        constrained: false,
+                        child: Container(
+                            color:ColorStyles.upFinBlack,
+                            alignment: Alignment.center,
+                            constraints: BoxConstraints(maxWidth: 90.w, maxHeight: 85.h, minWidth: 20.w, minHeight: 20.w),
+                            child: ExtendedImage.network(
+                              srcUrl,
+                              fit: BoxFit.contain,
+                              cache: true,
+                              cacheWidth: (50.w*devicePixelRatio).round().toInt(),
+                              cacheMaxAge: const Duration(hours: 1),
+                              shape: BoxShape.rectangle,
+                              borderRadius: const BorderRadius.all(Radius.circular(3)),
+                              loadStateChanged: (ExtendedImageState state) {
+                                switch (state.extendedImageLoadState) {
+                                  case LoadState.loading:
+                                    _aniController.reset();
+                                    if(state.loadingProgress != null && state.loadingProgress!.expectedTotalBytes != null){
+                                      int total = state.loadingProgress!.expectedTotalBytes!;
+                                      int val = state.loadingProgress!.cumulativeBytesLoaded;
+                                      return Center(
+                                          child: CircularProgressIndicator(
+                                              color: ColorStyles.upFinWhite,
+                                              value: val / total
+                                          )
+                                      );
+                                    }else{
+                                      return UiUtils.getImage(8.w, 8.w, Image.asset(fit: BoxFit.fill,'assets/images/chat_loading.gif'));
+                                    }
+                                  case LoadState.completed:
+                                    _aniController.forward();
 
-                                  return FadeTransition(
-                                    opacity: _aniController,
-                                    child: ExtendedRawImage(
-                                      image: state.extendedImageInfo?.image,
-                                      fit: BoxFit.contain,
-                                    ),
-                                  );
-                                case LoadState.failed:
-                                  _aniController.reset();
-                                  return GestureDetector(
-                                    child: UiUtils.getIcon(10.w, 10.w, Icons.refresh_rounded, 10.w, ColorStyles.upFinRed),
-                                    onTap: () {
-                                      state.reLoadImage();
-                                    },
-                                  );
-                              }
-                            },
-                          )
-                      )
-                  ))
-            ]);
-            return slideWidget;
-          });
+                                    return FadeTransition(
+                                      opacity: _aniController,
+                                      child: ExtendedRawImage(
+                                        image: state.extendedImageInfo?.image,
+                                        fit: BoxFit.contain,
+                                      ),
+                                    );
+                                  case LoadState.failed:
+                                    _aniController.reset();
+                                    return GestureDetector(
+                                      child: UiUtils.getIcon(10.w, 10.w, Icons.refresh_rounded, 10.w, ColorStyles.upFinRed),
+                                      onTap: () {
+                                        state.reLoadImage();
+                                      },
+                                    );
+                                }
+                              },
+                            )
+                        )
+                    ))
+              ]);
+              return slideWidget;
+            });
+          }
         });
   }
 
