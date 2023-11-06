@@ -980,12 +980,26 @@ class CommonUtils {
     return text.replaceAll(regex, '');
   }
 
-  static bool isValidStateByAPiExpiredDate(){
+  static bool isValidStateByApiExpiredDate(){
     bool result = false;
     String thirtyMinutesLaterString = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceValidDateKey);
     if(thirtyMinutesLaterString != ""){
       CommonUtils.log("i", "\ncurr:${CommonUtils.getCurrentLocalTime()}\nthir:${CommonUtils.convertStringToTime(thirtyMinutesLaterString)}");
       CommonUtils.log("i", "isBefore : ${CommonUtils.getCurrentLocalTime().isBefore(CommonUtils.convertStringToTime(thirtyMinutesLaterString))}");
+      result = CommonUtils.getCurrentLocalTime().isBefore(CommonUtils.convertStringToTime(thirtyMinutesLaterString));
+    } else{
+      result = false;
+    }
+
+    return result;
+  }
+
+  static bool isValidStateByInfoExpiredDate(){
+    bool result = false;
+    String thirtyMinutesLaterString = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceValidInfoDateKey);
+    if(thirtyMinutesLaterString != ""){
+      CommonUtils.log("", "\ncurr:${CommonUtils.getCurrentLocalTime()}\nthir:${CommonUtils.convertStringToTime(thirtyMinutesLaterString)}");
+      CommonUtils.log("", "isBefore : ${CommonUtils.getCurrentLocalTime().isBefore(CommonUtils.convertStringToTime(thirtyMinutesLaterString))}");
       result = CommonUtils.getCurrentLocalTime().isBefore(CommonUtils.convertStringToTime(thirtyMinutesLaterString));
     } else{
       result = false;

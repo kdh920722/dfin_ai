@@ -599,7 +599,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                 borderRadius: BorderRadius.all(Radius.circular(5)),
                 color: ColorStyles.upFinBlack,
               ),
-              padding: EdgeInsets.only(top:1.w, bottom: 1.w),
+              padding: EdgeInsets.all(0.8.w),
               alignment: Alignment.center,
               constraints: BoxConstraints(maxWidth: 70.w, maxHeight: 70.w, minWidth: 20.w, minHeight: 20.w),
               child: FutureBuilder(
@@ -840,7 +840,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
       await CommonUtils.saveSettingsToFile("push_from", "");
       await CommonUtils.saveSettingsToFile("push_room_id", "");
       await LogfinController.callLogfinApi(LogfinApis.checkMessage, inputJson, (isSuccess, outputJson){
-        backPossibleFlag =true;
         if(isSuccess){
 
         }else{
@@ -854,6 +853,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
         _chatTextFocus.unfocus();
         CommonUtils.hideKeyBoard();
         UiUtils.closeLoadingPop(context);
+        backPossibleFlag =true;
         Navigator.pop(context);
       }
     }

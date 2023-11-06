@@ -91,7 +91,8 @@ class FireBaseController{
         if(isSuccess){
           CommonUtils.log("i", "firebase init");
           FirebaseMessaging messaging = FirebaseMessaging.instance;
-          await messaging.setForegroundNotificationPresentationOptions(alert: true, badge: true, sound: true);
+          Config.isAndroid? await messaging.setForegroundNotificationPresentationOptions(alert: true, badge: true, sound: true)
+              : await messaging.setForegroundNotificationPresentationOptions(alert: false, badge: false, sound: false);
           FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
           await flutterLocalNotificationsPlugin.initialize(
             const InitializationSettings(
@@ -144,57 +145,49 @@ class FireBaseController{
     }
   }
 
+  static Future<void> _showNotification(RemoteMessage message, FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin, AndroidNotificationChannel? channel) async {
+    if(!Config.isAndroid) {
+      await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(alert: true, badge: true, sound: true);
+    }
+    flutterLocalNotificationsPlugin.show(
+        message.hashCode,
+        message.notification?.title,
+        message.notification?.body,
+        Config.isAndroid? NotificationDetails(
+            android: AndroidNotificationDetails(
+              channel!.id,
+              channel.name,
+              channelDescription: channel.description,
+              icon: '@mipmap/ic_launcher',
+            )
+        ) : NotificationDetails(
+            iOS: DarwinNotificationDetails(
+              badgeNumber: 1,
+              subtitle: channelTitleForIOS,
+              sound: 'slow_spring_board.aiff',
+            )
+        ),
+        payload: _getRoomIdFromMessage(message)
+    );
+    Future.delayed(const Duration(milliseconds: 120), () async {
+      FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(alert: false, badge: false, sound: false);
+    });
+
+  }
+
   static Future<void> _handlerForFirebaseMessagingOnForeground(RemoteMessage message,
       FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin, AndroidNotificationChannel? channel) async {
-    CommonUtils.log("", "fcm foreground message : ${jsonEncode(message.data)}");
-    if (message.notification != null) {
-      Map<String, dynamic> resultData = message.data;
-      if (resultData.containsKey("room_id")) {
-        String roomId = resultData["room_id"].toString();
-        CommonUtils.log("", "fcm room id check : $roomId || ${AppChatViewState.currentRoomId}");
-        if (AppChatViewState.currentRoomId == "" || AppChatViewState.currentRoomId != roomId) {
-          flutterLocalNotificationsPlugin.show(
-              message.hashCode,
-              message.notification?.title,
-              message.notification?.body,
-              Config.isAndroid? NotificationDetails(
-                  android: AndroidNotificationDetails(
-                    channel!.id,
-                    channel.name,
-                    channelDescription: channel.description,
-                    icon: '@mipmap/ic_launcher',
-                  )
-              ) : NotificationDetails(
-                  iOS: DarwinNotificationDetails(
-                    badgeNumber: 1,
-                    subtitle: channelTitleForIOS,
-                    sound: 'slow_spring_board.aiff',
-                  )
-              ),
-              payload: _getRoomIdFromMessage(message)
-          );
-        }
-      } else {
-        CommonUtils.log("", "fcm room id check222 : ");
-        flutterLocalNotificationsPlugin.show(
-            message.hashCode,
-            message.notification?.title,
-            message.notification?.body,
-            Config.isAndroid? NotificationDetails(
-                android: AndroidNotificationDetails(
-                  channel!.id,
-                  channel.name,
-                  channelDescription: channel.description,
-                  icon: '@mipmap/ic_launcher',
-                )
-            ) : NotificationDetails(
-                  iOS: DarwinNotificationDetails(
-                  badgeNumber: 1,
-                  subtitle: channelTitleForIOS,
-                  sound: 'slow_spring_board.aiff',
-                )
-            ),
-            payload: _getRoomIdFromMessage(message));
+    if(AppChatViewState.currentRoomId == ""){
+      // 채팅방 아닐때, show notification
+      CommonUtils.log("", "fore fcm currentRoomId is null");
+      await _showNotification(message, flutterLocalNotificationsPlugin, channel);
+
+    }else{
+      // 채팅방
+      if(AppChatViewState.currentRoomId != _getRoomIdFromMessage(message)){
+        // 채팅방이지만 다른 채팅방 알림일 때, show notification
+        CommonUtils.log("", "fore fcm currentRoomId is not null");
+        await _showNotification(message, flutterLocalNotificationsPlugin, channel);
       }
     }
   }
@@ -215,43 +208,29 @@ class FireBaseController{
         );
 
         AndroidNotificationChannel? androidNotificationChannel;
+        FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+        Config.isAndroid? await messaging.setForegroundNotificationPresentationOptions(alert: true, badge: true, sound: true)
+            : await messaging.setForegroundNotificationPresentationOptions(alert: false, badge: false, sound: false);
 
         if(Config.isAndroid){
           androidNotificationChannel = AndroidNotificationChannel(channelIdForAndroid, channelNameForAndroid,description: channelDescForAndroid, importance: Importance.max);
           await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(androidNotificationChannel);
-          flutterLocalNotificationsPlugin.show(
-              message.hashCode,
-              message.notification?.title,
-              message.notification?.body,
-              NotificationDetails(
-                android: AndroidNotificationDetails(
-                  androidNotificationChannel!.id,
-                  androidNotificationChannel.name,
-                  channelDescription: androidNotificationChannel.description,
-                  icon: '@mipmap/ic_launcher',
-                ),
-              ),
-              payload: _getRoomIdFromMessage(message));
         }else{
-          FirebaseMessaging messaging = FirebaseMessaging.instance;
-          await messaging.setForegroundNotificationPresentationOptions(alert: true, badge: true, sound: true);
           await messaging.requestPermission(alert: true, announcement: false, badge: true, carPlay: false, criticalAlert: false, provisional: false, sound: true);
+        }
 
-          if(AppChatViewState.currentRoomId == "" || AppChatViewState.currentRoomId != _getRoomIdFromMessage(message)){
-            flutterLocalNotificationsPlugin.show(
-                message.hashCode,
-                message.notification?.title,
-                message.notification?.body,
-                NotificationDetails(
-                  iOS: DarwinNotificationDetails(
-                    badgeNumber: 1,
-                    subtitle: channelTitleForIOS,
-                    sound: 'slow_spring_board.aiff',
-                  ),
-                ),
-                payload: _getRoomIdFromMessage(message));
+        if(AppChatViewState.currentRoomId == ""){
+          // 채팅방 아닐때, show notification
+          CommonUtils.log("", "back fcm currentRoomId is null");
+          await _showNotification(message, flutterLocalNotificationsPlugin, androidNotificationChannel);
+        }else{
+          // 채팅방
+          if(AppChatViewState.currentRoomId != _getRoomIdFromMessage(message)){
+            // 채팅방이지만 다른 채팅방 알림일 때, show notification
+            CommonUtils.log("", "back fcm currentRoomId is not null");
+            await _showNotification(message, flutterLocalNotificationsPlugin, androidNotificationChannel);
           }
-
         }
       }else{
         CommonUtils.log("e", "firebase init error ");

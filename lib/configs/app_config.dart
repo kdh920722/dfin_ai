@@ -37,6 +37,7 @@ class Config{
   static const int appCloseState = 99;
   static int appState = 10; // 10 : open, 99: close, 44: update
   static String appCloseText = "";
+  static String appInfoText = "";
   static bool isWeb = kIsWeb;
   static bool isAndroid = Platform.isAndroid;
   static String deppLinkInfo = "";
@@ -88,6 +89,7 @@ class Config{
             case "android_store" : androidStoreUrl = each.value.toString();
             case "ios_store" : iosStoreUrl = each.value.toString();
             case "app_close_text" : appCloseText = each.value.toString();
+            case "app_info_text" : appInfoText = each.value.toString();
           }
         }
 

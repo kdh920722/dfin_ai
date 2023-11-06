@@ -16,6 +16,7 @@ import 'package:upfin/datas/loan_info_data.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import '../controllers/get_controller.dart';
+import '../controllers/sharedpreference_controller.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
 import 'app_update_accident_view.dart';
@@ -579,7 +580,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             const Duration intervalFoCheckSubScribe = Duration(seconds: 1);
             reSubScribeCheckTimer = Timer.periodic(intervalFoCheckSubScribe, (Timer timer) {
               if(GetController.to.isAllSubscribed.value){
-                CommonUtils.log("", "timer..");
+
                 if(context.mounted) UiUtils.closeLoadingPop(context);
                 if(reSubScribeCheckTimer != null){
                   reSubScribeCheckTimer!.cancel();
@@ -631,11 +632,37 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   }
 
   double bottomBarHeight = 0;
+  bool isInfoPopShow = false;
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if(isViewHere){
-        _detectPushClickFromBack();
+
+        if(Config.appInfoText != "" && !isInfoPopShow && !CommonUtils.isValidStateByInfoExpiredDate()){
+          isInfoPopShow = true;
+          UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, 30.h, 0.5, (slideContext, setState){
+            return Center(child: Column(children: [
+              UiUtils.getMarginBox(0, 1.h),
+              UiUtils.getTextWithFixedScale("📌 안내사항", 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
+              UiUtils.getMarginBox(0, 3.h),
+              UiUtils.getExpandedScrollView(Axis.vertical,
+                  UiUtils.getTextWithFixedScale2(Config.appInfoText.replaceAll("@@", "\n"), 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
+              UiUtils.getMarginBox(0, 3.h),
+              UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+                  UiUtils.getTextWithFixedScale("확인", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
+                    DateTime thirtyMinutesLater = CommonUtils.addTimeToTargetTime(CommonUtils.getCurrentLocalTime());
+                    SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceValidInfoDateKey, CommonUtils.convertTimeToString(thirtyMinutesLater));
+                    isInfoPopShow = false;
+                    Navigator.pop(slideContext);
+                    _detectPushClickFromBack();
+                  }),
+              Config.isAndroid? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 5.h)
+            ]));
+          });
+        }else{
+          isInfoPopShow = false;
+          _detectPushClickFromBack();
+        }
       }else{
         isStart = false;
         if(reSubScribeCheckTimer != null) reSubScribeCheckTimer!.cancel();

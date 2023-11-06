@@ -433,7 +433,8 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
             UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
                 UiUtils.getTextWithFixedScale("업데이트", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
                   launchUrl(Uri.parse(Config.appStoreUrl));
-                })
+                }),
+            Config.isAndroid? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 5.h)
           ]));
         });
       }
@@ -445,7 +446,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
             Center(child: UiUtils.getTextWithFixedScale("🥹 시스템 점검중입니다.", 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
             UiUtils.getMarginBox(0, 3.h),
             UiUtils.getExpandedScrollView(Axis.vertical,
-                UiUtils.getTextWithFixedScale(Config.appCloseText.replaceAll("@@", "\n"), 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
+                UiUtils.getTextWithFixedScale2(Config.appCloseText.replaceAll("@@", "\n"), 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
             UiUtils.getMarginBox(0, 1.h)
           ]);
         });
@@ -458,7 +459,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if(Config.isControllerLoadFinished && Config.isEmergencyRoot){
         CommonUtils.log("", "root post call");
-        if(CommonUtils.isValidStateByAPiExpiredDate() && !isAutoLogin){
+        if(CommonUtils.isValidStateByApiExpiredDate() && !isAutoLogin){
           isAutoLogin = true;
 
           String isSnsLogin = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceIsSnsLogin);
