@@ -390,22 +390,17 @@ class WebSocketController {
       }
 
       LogfinController.getLoanInfo((isSuccess, isNotEmpty){
-
+        GetController.to.updateAllSubScribed(true);
+        connectionInfoMap["is_connected"] = true;
         if(isSuccess){
-          if(isNotEmpty){
-            // success
-            connectionInfoMap["is_connected"] = true;
-          }else{
-            // fail
+          if(!isNotEmpty){
             Future.delayed(const Duration(seconds: 5), () {
-              connectionInfoMap["is_connected"] = true;
               _retryToConnectNewVer(connectedKey);
             });
           }
         }else{
           // fail
           Future.delayed(const Duration(seconds: 5), () {
-            connectionInfoMap["is_connected"] = true;
             _retryToConnectNewVer(connectedKey);
           });
         }

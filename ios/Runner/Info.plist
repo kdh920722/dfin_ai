@@ -2,8 +2,6 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-	<key>KAKAO_APP_KEY</key>
-	<string>077c95950e4c99aefd181d2cd069524a</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
@@ -31,8 +29,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>kakao</string>
-				<string>077c95950e4c99aefd181d2cd069524a</string>
+				<string>kakao077c95950e4c99aefd181d2cd069524a</string>
 			</array>
 		</dict>
 	</array>
@@ -42,6 +39,8 @@
 	<string>All files have been downloaded</string>
 	<key>FDMaximumConcurrentTasks</key>
 	<integer>5</integer>
+	<key>KAKAO_APP_KEY</key>
+	<string>077c95950e4c99aefd181d2cd069524a</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>kakao077c95950e4c99aefd181d2cd069524a</string>

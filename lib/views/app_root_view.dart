@@ -458,7 +458,6 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if(Config.isControllerLoadFinished && Config.isEmergencyRoot){
-        CommonUtils.log("", "root post call");
         if(CommonUtils.isValidStateByApiExpiredDate() && !isAutoLogin){
           isAutoLogin = true;
 

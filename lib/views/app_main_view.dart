@@ -392,14 +392,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                   ]))
                 ]), () async {
                   if(WebSocketController.isSubscribe(each.chatRoomId)){
-                    if(listMsg.length>40){
-                      UiUtils.showLoadingPop(context);
-                      Future.delayed(const Duration(milliseconds: 500), () {
-                        _goToChatRoom(listMsg, each.chatRoomId);
-                      });
-                    }else{
-                      _goToChatRoom(listMsg, each.chatRoomId);
-                    }
+                    _goToChatRoom(listMsg, each.chatRoomId);
                   }else{
                     _resetAndGoToChatRoom(context, each.chatRoomId);
                   }
@@ -416,6 +409,8 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   }
 
   Future<void> _goToChatRoom(List<dynamic> listMsg, String chatRoomId) async {
+    if(listMsg.length>40) UiUtils.showLoadingPop(context);
+
     GetController.to.resetChatMessageInfoList();
     CommonUtils.log("i", "listMsg.length : ${listMsg.length}");
     for(Map<String, dynamic> eachMsg in listMsg){

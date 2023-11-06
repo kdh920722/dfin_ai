@@ -162,8 +162,11 @@ class SnsLoginController{
       // 카카오계정으로 로그인
       OAuthToken token;
       if (await isKakaoTalkInstalled()) {
+        CommonUtils.log("", '카카오톡으로11');
         try {
+          CommonUtils.log("", '카카오톡으로22');
           token = await UserApi.instance.loginWithKakaoTalk();
+          CommonUtils.log("", '카카오톡으로33');
           await _getKakaoAgree();
           kakaoToken = token.accessToken;
           callback(true);
@@ -222,8 +225,10 @@ class SnsLoginController{
 
         if (scopes.isNotEmpty) {
           OAuthToken token = await UserApi.instance.loginWithNewScopes(scopes);
-          CommonUtils.log("i", '사용자에게 추가 동의 받아야 하는 항목 ${token.scopes}');
+          CommonUtils.log("", '사용자에게 추가 동의 받아야 하는 항목 ${token.scopes}');
           user = await UserApi.instance.me();
+        }else{
+          CommonUtils.log("", '카카오톡으로22');
         }
 
         kakaoId = user.id.toString();

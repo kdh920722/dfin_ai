@@ -162,7 +162,6 @@ class FireBaseController{
             )
         ) : NotificationDetails(
             iOS: DarwinNotificationDetails(
-              badgeNumber: 1,
               subtitle: channelTitleForIOS,
               sound: 'slow_spring_board.aiff',
             )
