@@ -141,9 +141,6 @@ PODS:
     - Flutter
   - iamport_webview_flutter (0.0.1):
     - Flutter
-  - image_cropper (0.0.4):
-    - Flutter
-    - TOCropViewController (~> 2.6.1)
   - image_picker_ios (0.0.1):
     - Flutter
   - just_audio (0.0.1):
@@ -179,13 +176,13 @@ PODS:
     - FMDB (>= 2.7.5)
   - SwiftyGif (5.4.4)
   - Toast (4.0.0)
-  - TOCropViewController (2.6.1)
   - uni_links (0.0.1):
     - Flutter
   - url_launcher_ios (0.0.1):
     - Flutter
   - video_player_avfoundation (0.0.1):
     - Flutter
+    - FlutterMacOS
   - wakelock_plus (0.0.1):
     - Flutter
   - webview_flutter_wkwebview (0.0.1):
@@ -207,7 +204,6 @@ DEPENDENCIES:
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
   - iamport_flutter (from `.symlinks/plugins/iamport_flutter/ios`)
   - iamport_webview_flutter (from `.symlinks/plugins/iamport_webview_flutter/ios`)
-  - image_cropper (from `.symlinks/plugins/image_cropper/ios`)
   - image_picker_ios (from `.symlinks/plugins/image_picker_ios/ios`)
   - just_audio (from `.symlinks/plugins/just_audio/ios`)
   - kakao_flutter_sdk_common (from `.symlinks/plugins/kakao_flutter_sdk_common/ios`)
@@ -219,7 +215,7 @@ DEPENDENCIES:
   - sqflite (from `.symlinks/plugins/sqflite/ios`)
   - uni_links (from `.symlinks/plugins/uni_links/ios`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
-  - video_player_avfoundation (from `.symlinks/plugins/video_player_avfoundation/ios`)
+  - video_player_avfoundation (from `.symlinks/plugins/video_player_avfoundation/darwin`)
   - wakelock_plus (from `.symlinks/plugins/wakelock_plus/ios`)
   - webview_flutter_wkwebview (from `.symlinks/plugins/webview_flutter_wkwebview/ios`)
 
@@ -247,7 +243,6 @@ SPEC REPOS:
     - SDWebImage
     - SwiftyGif
     - Toast
-    - TOCropViewController
 
 EXTERNAL SOURCES:
   audio_session:
@@ -280,8 +275,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/iamport_flutter/ios"
   iamport_webview_flutter:
     :path: ".symlinks/plugins/iamport_webview_flutter/ios"
-  image_cropper:
-    :path: ".symlinks/plugins/image_cropper/ios"
   image_picker_ios:
     :path: ".symlinks/plugins/image_picker_ios/ios"
   just_audio:
@@ -305,7 +298,7 @@ EXTERNAL SOURCES:
   url_launcher_ios:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
   video_player_avfoundation:
-    :path: ".symlinks/plugins/video_player_avfoundation/ios"
+    :path: ".symlinks/plugins/video_player_avfoundation/darwin"
   wakelock_plus:
     :path: ".symlinks/plugins/wakelock_plus/ios"
   webview_flutter_wkwebview:
@@ -341,7 +334,6 @@ SPEC CHECKSUMS:
   GTMSessionFetcher: e8647203b65cee28c5f73d0f473d096653945e72
   iamport_flutter: f698983444b7c0f83e356407631cfeec77a776bf
   iamport_webview_flutter: 70dbc31045e4cf7a0c829b76c6f8319dc94b299e
-  image_cropper: a3291c624a953049bc6a02e1f8c8ceb162a24b25
   image_picker_ios: 4a8aadfbb6dc30ad5141a2ce3832af9214a705b5
   just_audio: baa7252489dbcf47a4c7cc9ca663e9661c99aafa
   kakao_flutter_sdk_common: 7167cfbf5725acf75252af46bb045b9ad99ed6ce
@@ -359,10 +351,9 @@ SPEC CHECKSUMS:
   sqflite: 31f7eba61e3074736dff8807a9b41581e4f7f15a
   SwiftyGif: 93a1cc87bf3a51916001cf8f3d63835fb64c819f
   Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
-  TOCropViewController: edfd4f25713d56905ad1e0b9f5be3fbe0f59c863
   uni_links: d97da20c7701486ba192624d99bffaaffcfc298a
   url_launcher_ios: 68d46cc9766d0c41dbdc884310529557e3cd7a86
-  video_player_avfoundation: 81e49bb3d9fb63dccf9fa0f6d877dc3ddbeac126
+  video_player_avfoundation: 8563f13d8fc8b2c29dc2d09e60b660e4e8128837
   wakelock_plus: 8b09852c8876491e4b6d179e17dfe2a0b5f60d47
   webview_flutter_wkwebview: 2e2d318f21a5e036e2c3f26171342e95908bd60a
 

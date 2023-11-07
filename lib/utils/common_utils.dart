@@ -4,11 +4,11 @@ import 'dart:math';
 import 'package:dio/dio.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
@@ -656,32 +656,6 @@ class CommonUtils {
     return newPath;
   }
 
-  static Future<String> cropImageAndGetPath(XFile targetImage) async {
-    final croppedFile = await ImageCropper().cropImage(
-      sourcePath: targetImage.path,
-      compressFormat: ImageCompressFormat.jpg,
-      compressQuality: 100,
-      uiSettings: [
-        AndroidUiSettings(
-            toolbarTitle: '자르기',
-            toolbarColor: ColorStyles.upFinTextAndBorderBlue,
-            toolbarWidgetColor: ColorStyles.upFinWhite,
-            initAspectRatio: CropAspectRatioPreset.original,
-            lockAspectRatio: false),
-        IOSUiSettings(
-          title: 'Cropper',
-        ),
-      ],
-    );
-    if (croppedFile != null) {
-      CommonUtils.log('i', 'croppedFile path : ${croppedFile.path}');
-      String remakeFilePath = await _remakeFileAndGetPath(croppedFile.path);
-      return remakeFilePath;
-    }else{
-      return "";
-    }
-  }
-
   static Future<String> makeMaskingImageAndGetPath(String imagePath, Map<String,dynamic> maskingInfoMap) async {
     try {
       final imglib.Image image = imglib.decodeImage(File(imagePath).readAsBytesSync())!;
@@ -912,6 +886,28 @@ class CommonUtils {
     }
   }
 
+  static String decryptLogData(String token, String encText) {
+    try {
+      if (encText != "") {
+        final keyBytes = _getEnCodeKey();
+        final key = encrypt.Key(Uint8List.fromList(keyBytes));
+        var ivText = removeSpecialCharacters(token).substring(0,16);
+        final ivBytes = ivText.codeUnits;
+        final iv = encrypt.IV(Uint8List.fromList(ivBytes));
+        final encrypter = encrypt.Encrypter(encrypt.AES(key));
+        final encodedData = encrypt.Encrypted.fromBase64(encText);
+        final decrypted = encrypter.decrypt(encodedData, iv: iv);
+        return decrypted;
+      } else {
+        CommonUtils.flutterToast("enc 값이 없습니다.");
+        return "";
+      }
+    } catch (error) {
+      CommonUtils.flutterToast("$error");
+      return "";
+    }
+  }
+
   static String encryptData(String data) {
     try {
       if (data != "") {
@@ -1045,6 +1041,40 @@ class CommonUtils {
     await file.writeAsString(
       jsonEncode(settings),
     );
+  }
+
+  static Future<(List<int>, String)> getFileBytesAndName(Object? file) async {
+    List<int> bytes;
+    String fileName;
+
+    if (file is XFile) {
+      bytes = await file.readAsBytes();
+      fileName = file.name;
+    } else if (file is File) {
+      bytes = await file.readAsBytes();
+      fileName = file.path.split('/').last;
+    } else if (file is PlatformFile) {
+      if (kIsWeb) {
+        bytes = file.bytes!;
+      } else {
+        bytes = await _getFileBytes(file);
+      }
+      fileName = file.name;
+    } else {
+      throw Exception('Invalid file type');
+    }
+    return (bytes, fileName);
+  }
+
+  static Future<List<int>> _getFileBytes(PlatformFile platformFile) async {
+    // Get the file path from the PlatformFile object
+    String? filePath = platformFile.path;
+
+    // Read the file as bytes, File is from the dart:io library
+    File file = File(filePath!);
+    List<int> fileBytes = await file.readAsBytes();
+
+    return fileBytes;
   }
 
   static Future<void> printSettingsFromFile() async {

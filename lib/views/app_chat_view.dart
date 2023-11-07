@@ -1206,7 +1206,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
     int failCnt = 0;
     UiUtils.showLoadingPop(context);
     for(var each in pickedFiles){
-      await AwsController.uploadFileToAWS(each.path, "${MyData.email}/${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}", (isSuccess, resultUrl){
+      await AwsController.uploadFileToAWS(each.path, "${AwsController.chatFilesDir}/${MyData.email}/${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}", (isSuccess, resultUrl){
         UiUtils.closeLoadingPop(context);
         cnt++;
         if(!isSuccess){
@@ -1225,6 +1225,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
           }
         }
       });
+
     }
   }
 

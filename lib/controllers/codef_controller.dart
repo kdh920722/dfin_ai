@@ -18,11 +18,19 @@ class CodeFController{
   static final CodeFController _instance = CodeFController._internal();
   factory CodeFController() => _instance;
   CodeFController._internal();
-  // CF-13000 사업자번호(주민등록번호)오류
-  // CF-12100 해당기관오류
-  // CF-01004 응답대기시간 초과
-  // CF-12872 강제종료
-  // CF-12835 인증서정보 없음
+  static final Map<String,String> errorMsgMap = {
+    "CF-13000" : "사업자번호(주민등록번호) 오류입니다.",
+    "CF-12100" : "인증기관 오류입니다.",
+    "CF-12100A" : "주소정보가 일치하지 않습니다.",
+    "CF-01004" : "응답대기시간이 초과되었습니다.",
+    "CF-12872" : "인증요청이 취소되었습니다.",
+    "CF-12835" : "인증서정보가 없습니다.",
+    "error_timeout" : "응답대기시간이 초과되었습니다.",
+    "error_http" : "인터넷연결 오류입니다.",
+    "error_connection" : "서버연결 오류입니다.",
+    "error_cert" : "정보를 가져오는데 문제가 발생했습니다.",
+    "error_null" : "정보를 가져오는데 실패했습니다.",
+    };
   /// CODEF API ------------------------------------------------------------------------------------------------------------------------ ///
   static HostStatus hostStatus = HostStatus.prod;
   static String token = "";
@@ -30,6 +38,16 @@ class CodeFController{
   static bool isTimeOutException = false;
   static void setHostStatus(HostStatus host){
     hostStatus = host;
+  }
+
+  static String getErrorMsg(String errorCode){
+    String result = "";
+    if(errorMsgMap.containsKey(errorCode)){
+      result = errorMsgMap[errorCode]!;
+      return result;
+    }else{
+      return result;
+    }
   }
 
   static Future<void> initAccessToken(Function(bool) callback) async {
@@ -121,6 +139,7 @@ class CodeFController{
             if (resultData is Map<String, dynamic>) {
               if(resultData.isNotEmpty){
                 resultData['result_code'] = resultCode;
+                resultData['result_codef_code'] = resultCode;
                 if(resultCode == 'CF-03002') {
                   callback(true, true, resultData, null, json);
                 } else {
@@ -129,6 +148,7 @@ class CodeFController{
               }else{
                 final Map<String, dynamic> resultData = {};
                 resultData['result_code'] = errorCodeKey;
+                resultData['result_codef_code'] = resultCode;
                 resultData['result_msg'] = msg;
                 CommonUtils.log('e', 'out resultCode error : $resultCode');
                 callback(true, false, resultData, null, json);
@@ -136,6 +156,7 @@ class CodeFController{
             } else if (resultData is List<dynamic>) {
               if(resultData.isNotEmpty){
                 resultData[0]['result_code'] = resultCode;
+                resultData[0]['result_codef_code'] = resultCode;
                 if(resultCode == 'CF-03002') {
                   callback(true, true, null, resultData, json);
                 } else {
@@ -144,6 +165,7 @@ class CodeFController{
               }else{
                 final Map<String, dynamic> resultData = {};
                 resultData['result_code'] = errorCodeKey;
+                resultData['result_codef_code'] = resultCode;
                 resultData['result_msg'] = msg;
                 CommonUtils.log('e', 'out resultCode error : $resultCode');
                 callback(true, false, resultData, null, json);
@@ -152,6 +174,7 @@ class CodeFController{
           } else {
             final Map<String, dynamic> resultData = {};
             resultData['result_code'] = errorCodeKey;
+            resultData['result_codef_code'] = resultCode;
             resultData['result_msg'] = msg;
             CommonUtils.log('e', 'out resultCode error : $resultCode');
             callback(true, false, resultData, null, json);
@@ -161,6 +184,7 @@ class CodeFController{
         CommonUtils.log('e', 'http error code : ${response.statusCode}');
         final Map<String, dynamic> resultData = {};
         resultData['result_code'] = errorCodeKey;
+        resultData['result_codef_code'] = "error_http";
         resultData['result_msg'] = "인터넷 연결에러가 발생했습니다.";
         callback(true, false, resultData, null, null);
       }
@@ -169,11 +193,166 @@ class CodeFController{
       CommonUtils.log('e', e.toString());
       final Map<String, dynamic> resultData = {};
       resultData['result_code'] = errorCodeKey;
+      resultData['result_codef_code'] = "error_timeout";
       resultData['result_msg'] = "에러가 발생했습니다.";
       callback(true, false, resultData, null, null);
     }
   }
 
+  static Future<void> _getDataFromApi2(Apis apiInfo, Map<String, dynamic> inputJson,
+      void Function(bool isSuccess, bool is2WayProcess, Map<String, dynamic>? outputJson, List<dynamic>? outputJsonArray, Map<String, dynamic>? fullOutPut) callback) async {
+    final baseUrl = hostStatus.value == HostStatus.prod.value ? Host.baseUrl.value : HostDev.baseUrl.value;
+    final endPoint = apiInfo.value;
+    CommonUtils.log("i", "call api : $endPoint");
+    CommonUtils.log("i", "call input json : \n$inputJson");
+    final url = baseUrl + endPoint;
+    var targetUrl = "";
+    if(Config.isWeb){
+      targetUrl = 'https://corsproxy.io/?${Uri.encodeComponent(url)}';
+    }else{
+      targetUrl = url;
+    }
+
+    final tokenHeader = 'Bearer $token';
+
+    try {
+      final response = await http.post(Uri.parse(targetUrl),
+          headers: {
+            'Authorization': tokenHeader,
+            'Content-Type': 'application/json'
+          },
+          body: jsonEncode(inputJson)
+      ).timeout(const Duration(seconds: 120));
+
+      if(response.statusCode == 200) {
+        final decodedResponseBody = Uri.decodeFull(response.body);
+        final json = jsonDecode(decodedResponseBody);
+        if(json.containsKey('result') && json.containsKey('data')){
+          final result = json['result'];
+          var resultCode = result['code'];
+          CommonUtils.log('', 'out full : \n$json');
+
+          // CF-00000 : 성공, CF-03002 : 추가 인증 필요
+          final msg = result['message'];
+          if(resultCode == 'CF-00000' || resultCode == 'CF-03002'){
+            final resultData = json['data'];
+            if (resultData is Map<String, dynamic>) {
+              if(resultData.isNotEmpty){
+                resultData['result_code'] = resultCode;
+
+                if(resultCode == "CF-12100"){
+                  if(result['extraMessage'].toString().contains("시군구")){
+                    resultCode = "CF-12100A";
+                  }
+                }
+
+                resultData['result_codef_code'] = resultCode;
+                if(resultCode == 'CF-03002') {
+                  callback(true, true, resultData, null, json);
+                } else {
+                  callback(true, false, resultData, null, json);
+                }
+              }else{
+                final Map<String, dynamic> resultData = {};
+                resultData['result_code'] = errorCodeKey;
+
+                if(resultCode == "CF-12100"){
+                  if(result['extraMessage'].toString().contains("시군구")){
+                    resultCode = "CF-12100A";
+                  }
+                }
+
+                resultData['result_codef_code'] = resultCode;
+                resultData['result_msg'] = msg;
+                CommonUtils.log('e', 'out resultCode error : $resultCode');
+                callback(true, false, resultData, null, json);
+              }
+            } else if (resultData is List<dynamic>) {
+              if(resultData.isNotEmpty){
+                resultData[0]['result_code'] = resultCode;
+
+                if(resultCode == "CF-12100"){
+                  if(result['extraMessage'].toString().contains("시군구")){
+                    resultCode = "CF-12100A";
+                  }
+                }
+
+                resultData[0]['result_codef_code'] = resultCode;
+                if(resultCode == 'CF-03002') {
+                  callback(true, true, null, resultData, json);
+                } else {
+                  callback(true, false, null, resultData, json);
+                }
+              }else{
+                final Map<String, dynamic> resultData = {};
+                resultData['result_code'] = errorCodeKey;
+
+                if(resultCode == "CF-12100"){
+                  if(result['extraMessage'].toString().contains("시군구")){
+                    resultCode = "CF-12100A";
+                  }
+                }
+
+                resultData['result_codef_code'] = resultCode;
+                resultData['result_msg'] = msg;
+                CommonUtils.log('e', 'out resultCode error : $resultCode');
+                callback(true, false, resultData, null, json);
+              }
+            }
+          } else {
+            final Map<String, dynamic> resultData = {};
+            resultData['result_code'] = errorCodeKey;
+
+            if(resultCode == "CF-12100"){
+              if(result['extraMessage'].toString().contains("시군구")){
+                resultCode = "CF-12100A";
+              }
+            }
+
+            resultData['result_codef_code'] = resultCode;
+            resultData['result_msg'] = msg;
+            CommonUtils.log('e', 'out resultCode error : $resultCode');
+            callback(true, false, resultData, null, json);
+          }
+        }
+      } else {
+        CommonUtils.log('e', 'http error code : ${response.statusCode}');
+        final Map<String, dynamic> resultData = {};
+        resultData['result_code'] = errorCodeKey;
+        resultData['result_codef_code'] = "error_http";
+        resultData['result_msg'] = "인터넷 연결에러가 발생했습니다.";
+        callback(false, false, resultData, null, null);
+      }
+    } catch (e) {
+      isTimeOutException = true;
+      CommonUtils.log('e', e.toString());
+      final Map<String, dynamic> resultData = {};
+      resultData['result_code'] = errorCodeKey;
+      resultData['result_codef_code'] = "error_timeout";
+      resultData['result_msg'] = "에러가 발생했습니다.";
+      callback(false, false, resultData, null, null);
+    }
+  }
+  /// ------------------------------------------------------------------------------------------------------------------------ ///
+  static Future<void> callApisWithCert2(BuildContext context, StateSetter setState, int certType,
+      List<ApiInfoData> apiInfoDataList, Function(bool isSuccess, List<ApiInfoData>? resultApiInfoDataList) callback) async {
+    _callApiWithCert2(context, setState, certType, apiInfoDataList, (isSuccess, resultApiInfoDataListFromCall) {
+      if(isSetAuthPopOn) Navigator.of(context).pop();
+      GetController.to.updateWait(false);
+      isSetAuthPopOn = false;
+
+      if(isSuccess){
+        if(resultApiInfoDataListFromCall == null){
+          callback(false, apiInfoDataList);
+        }else{
+          callback(true, resultApiInfoDataListFromCall);
+        }
+      }else{
+        callback(false, resultApiInfoDataListFromCall);
+      }
+
+    });
+  }
   /// ------------------------------------------------------------------------------------------------------------------------ ///
   static Future<void> callApisWithCert(BuildContext context, StateSetter setState, int certType,
       List<ApiInfoData> apiInfoDataList, Function(bool isSuccess, List<ApiInfoData>? resultApiInfoDataList) callback) async {
@@ -352,6 +531,306 @@ class CodeFController{
     });
   }
 
+  static Future<void> _callApiWithOutCert2(BuildContext context, Apis api, Map<String, dynamic> inputJson,
+      Function(bool isSuccess, Map<String,dynamic>? resultMap, List<dynamic>? resultListMap, Map<String,dynamic>? fullMap) callback) async {
+    CodeFController._getDataFromApi2(api, inputJson, (isSuccess, _, map, listMap, fullResultMap) {
+      if(isSuccess){
+        if(map != null){
+          callback(true, map, null, fullResultMap);
+        }else{
+          callback(true, null, listMap, fullResultMap);
+        }
+      }else{
+        if(map != null){
+          callback(true, map, null, fullResultMap);
+        }else{
+          callback(true, null, listMap, fullResultMap);
+        }
+      }
+    });
+  }
+
+  static Future<void> _callApiWithCert2(BuildContext context, StateSetter setState, int certType,
+  List<ApiInfoData> apiInfoDataList, Function(bool isSuccess, List<ApiInfoData>? resultApiInfoDataList) callback) async {
+    await CodeFController._getDataFromApi2(apiInfoDataList[0].api, apiInfoDataList[0].inputJson, (isSuccess, is2WayProcess, map, listMap, fullResultMap) async {
+      if(isSuccess){
+        if(fullResultMap != null){
+          if(is2WayProcess){
+            if(map == null){
+              // cert call is null..
+              callback(false, null);
+            }else{
+              Map<String, dynamic>? result2WayMap = _set2WayMap(apiInfoDataList[0].inputJson, map);
+              if(result2WayMap == null){
+                // cert call is wrong and null..
+                callback(false, null);
+              }else{
+                // cert call for auth..
+                if(certType == 1){
+                  if(await canLaunchUrl(Uri.parse("kakaotalk://launch"))){
+                    launchUrl(Uri.parse("kakaotalk://launch"));
+                  }else{
+                    Config.isAndroid ? launchUrl(Uri.parse("market://details?id=com.kakao.talk"))
+                        : launchUrl(Uri.parse("https://apps.apple.com/kr/app/kakaotalk/id869223134?mt=12"));
+                  }
+                }else if(certType == 6){
+                  if(await canLaunchUrl(Uri.parse("naversearchapp://default?version=1"))){
+                    launchUrl(Uri.parse("market://details?id=com.nhn.android.search"));
+                  }else{
+                    Config.isAndroid ? launchUrl(Uri.parse("market://details?id=com.nhn.android.search"))
+                        : launchUrl(Uri.parse("https://apps.apple.com/kr/app/%EB%84%A4%EC%9D%B4%EB%B2%84-naver/id393499958"));
+                  }
+                }else if(certType == 8){
+                  if(await canLaunchUrl(Uri.parse("supertoss://launch"))){
+                    launchUrl(Uri.parse("market://details?id=viva.republica.toss"));
+                  }else{
+                    Config.isAndroid ? launchUrl(Uri.parse("market://details?id=viva.republica.toss"))
+                        : launchUrl(Uri.parse("https://apps.apple.com/kr/app/%ED%86%A0%EC%8A%A4/id839333328"));
+                  }
+                }else if(certType == 5){
+                  if(apiInfoDataList[0].inputJson.containsKey("telecom")){
+                    String telecom = apiInfoDataList[0].inputJson["telecom"];
+                    if(telecom == "0"){
+                      if(await canLaunchUrl(Uri.parse("tauthlink://launch"))){
+                        //launchUrl(Uri.parse("tauthlink://launch"));
+                        launchUrl(Uri.parse("market://details?id=com.sktelecom.tauth"));
+                      }else{
+                        Config.isAndroid ? launchUrl(Uri.parse("market://details?id=com.sktelecom.tauth"))
+                            : launchUrl(Uri.parse("https://apps.apple.com/kr/app/pass-by-skt/id1141258007"));
+                      }
+                    }else if(telecom == "1"){
+                      if(await canLaunchUrl(Uri.parse("ktauthexternalcall://launch"))){
+                        //launchUrl(Uri.parse("ktauthexternalcall://launch"));
+                        launchUrl(Uri.parse("market://details?id=com.kt.ktauth"));
+                      }else{
+                        Config.isAndroid ? launchUrl(Uri.parse("market://details?id=com.kt.ktauth"))
+                            : launchUrl(Uri.parse("https://apps.apple.com/kr/app/pass-by-kt/id1134371550"));
+                      }
+                    }else{
+                      if(await canLaunchUrl(Uri.parse("upluscorporation://launch"))){
+                        //launchUrl(Uri.parse("upluscorporation://launch"));
+                        launchUrl(Uri.parse("market://details?id=com.lguplus.smartotp"));
+                      }else{
+                        Config.isAndroid ? launchUrl(Uri.parse("market://details?id=com.lguplus.smartotp"))
+                            : launchUrl(Uri.parse("https://apps.apple.com/kr/app/pass-by-u/id1147394645"));
+                      }
+                    }
+                  }
+                }
+
+                if(context.mounted){
+                  int callCount = 0;
+                  if(apiInfoDataList.length > 1){
+                    for(int i = 1 ; i < apiInfoDataList.length ; i++){
+                      _callApiWithOutCert2(context, apiInfoDataList[i].api, apiInfoDataList[i].inputJson, (isSuccess, resultMap, resultListMap, fullMap) {
+                        callCount++;
+                        if(isSuccess){
+                          if(fullMap == null){
+                            apiInfoDataList[i].isResultSuccess = false;
+                            apiInfoDataList[i].resultMap = null;
+                            apiInfoDataList[i].resultListMap = null;
+                            apiInfoDataList[i].resultFullMap = null;
+                            if(resultMap != null){
+                              apiInfoDataList[i].errorCode = resultMap["result_codef_code"];
+                            }else if(resultListMap != null){
+                              apiInfoDataList[i].errorCode = resultListMap[0]["result_codef_code"];
+                            }
+                          }else{
+                            if(resultMap != null){
+                              if(resultMap["result_code"] == errorCodeKey){
+                                apiInfoDataList[i].isResultSuccess = false;
+                                apiInfoDataList[i].resultMap = null;
+                                apiInfoDataList[i].resultListMap = null;
+                                apiInfoDataList[i].resultFullMap = fullMap;
+                                apiInfoDataList[i].errorCode = resultMap["result_codef_code"];
+                              }else{
+                                if(fullMap["result"]["code"] == "CF-03002"){
+                                  apiInfoDataList[i].isResultSuccess = false;
+                                  apiInfoDataList[i].resultMap = null;
+                                  apiInfoDataList[i].resultListMap = null;
+                                  apiInfoDataList[i].resultFullMap = fullMap;
+                                  apiInfoDataList[i].errorCode = "error_cert";
+                                }else{
+                                  apiInfoDataList[i].isResultSuccess = true;
+                                  apiInfoDataList[i].resultMap = resultMap;
+                                  apiInfoDataList[i].resultListMap = null;
+                                  apiInfoDataList[i].resultFullMap = fullMap;
+                                }
+                              }
+                            }else{
+                              if(resultListMap == null || resultListMap.isEmpty){
+                                apiInfoDataList[i].isResultSuccess = false;
+                                apiInfoDataList[i].resultMap = null;
+                                apiInfoDataList[i].resultListMap = null;
+                                apiInfoDataList[i].resultFullMap = fullMap;
+                                apiInfoDataList[i].errorCode = "error_null";
+                              }else{
+                                if(resultListMap[0]["result_code"] == errorCodeKey){
+                                  apiInfoDataList[i].isResultSuccess = false;
+                                  apiInfoDataList[i].resultMap = null;
+                                  apiInfoDataList[i].resultListMap = null;
+                                  apiInfoDataList[i].resultFullMap = fullMap;
+                                  apiInfoDataList[i].errorCode = resultListMap[0]["result_codef_code"];
+                                }else if(fullMap["result"]["code"] == "CF-03002"){
+                                  apiInfoDataList[i].isResultSuccess = false;
+                                  apiInfoDataList[i].resultMap = null;
+                                  apiInfoDataList[i].resultListMap = null;
+                                  apiInfoDataList[i].resultFullMap = fullMap;
+                                  apiInfoDataList[i].errorCode = "error_cert";
+                                }else{
+                                  apiInfoDataList[i].isResultSuccess = true;
+                                  apiInfoDataList[i].resultMap = null;
+                                  apiInfoDataList[i].resultListMap = resultListMap;
+                                  apiInfoDataList[i].resultFullMap = fullMap;
+                                }
+                              }
+                            }
+                          }
+                        }else{
+                          apiInfoDataList[i].isResultSuccess = false;
+                          apiInfoDataList[i].resultMap = null;
+                          apiInfoDataList[i].resultListMap = null;
+                          apiInfoDataList[i].resultFullMap = null;
+                          if(resultMap != null){
+                            apiInfoDataList[i].errorCode = resultMap["result_codef_code"];
+                          }else if(resultListMap != null){
+                            apiInfoDataList[i].errorCode = resultListMap[0]["result_codef_code"];
+                          }
+                        }
+
+                        if(callCount == apiInfoDataList.length){
+                          callback(true, apiInfoDataList);
+                        }
+                      });
+                    }
+                  }
+
+                  isSetAuthPopOn = true;
+                  _setAuthPop2(context, apiInfoDataList[0].api, certType, result2WayMap,(isAuthSuccess, authMap, authListMap, fullMap) async {
+                    callCount++;
+                    if(isAuthSuccess){
+                      if(fullMap == null){
+                        apiInfoDataList[0].isResultSuccess = false;
+                        apiInfoDataList[0].resultMap = null;
+                        apiInfoDataList[0].resultListMap = null;
+                        apiInfoDataList[0].resultFullMap = null;
+                        if(fullMap != null){
+                          apiInfoDataList[0].errorCode = fullMap["result_codef_code"];
+                        }else if(authListMap != null){
+                          apiInfoDataList[0].errorCode = authListMap[0]["result_codef_code"];
+                        }
+                      }else{
+                        if(authMap == null){
+                          if(authListMap == null || authListMap.isEmpty){
+                            apiInfoDataList[0].isResultSuccess = false;
+                            apiInfoDataList[0].resultMap = null;
+                            apiInfoDataList[0].resultListMap = null;
+                            apiInfoDataList[0].resultFullMap = fullMap;
+                            apiInfoDataList[0].errorCode = "error_null";
+                          }else{
+                            if(authListMap[0]["result_code"] == errorCodeKey){
+                              apiInfoDataList[0].isResultSuccess = false;
+                              apiInfoDataList[0].resultMap = null;
+                              apiInfoDataList[0].resultListMap = null;
+                              apiInfoDataList[0].resultFullMap = fullMap;
+                              apiInfoDataList[0].errorCode = authListMap[0]["result_codef_code"];
+                            }else if(fullMap["result"]["code"] == "CF-03002"){
+                              apiInfoDataList[0].isResultSuccess = false;
+                              apiInfoDataList[0].resultMap = null;
+                              apiInfoDataList[0].resultListMap = null;
+                              apiInfoDataList[0].resultFullMap = fullMap;
+                              apiInfoDataList[0].errorCode = "error_cert";
+                            }else{
+                              apiInfoDataList[0].isResultSuccess = true;
+                              apiInfoDataList[0].resultMap = null;
+                              apiInfoDataList[0].resultListMap = authListMap;
+                              apiInfoDataList[0].resultFullMap = fullMap;
+                            }
+                          }
+                        }else{
+                          if(authMap["result_code"] == errorCodeKey){
+                            apiInfoDataList[0].isResultSuccess = false;
+                            apiInfoDataList[0].resultMap = null;
+                            apiInfoDataList[0].resultListMap = null;
+                            apiInfoDataList[0].resultFullMap = fullMap;
+                            apiInfoDataList[0].errorCode = authMap["result_codef_code"];
+                          }else{
+                            if(fullMap["result"]["code"] == "CF-03002"){
+                              apiInfoDataList[0].isResultSuccess = false;
+                              apiInfoDataList[0].resultMap = null;
+                              apiInfoDataList[0].resultListMap = null;
+                              apiInfoDataList[0].resultFullMap = fullMap;
+                              apiInfoDataList[0].errorCode = "error_cert";
+                            }else{
+                              apiInfoDataList[0].isResultSuccess = true;
+                              apiInfoDataList[0].resultMap = authMap;
+                              apiInfoDataList[0].resultListMap = null;
+                              apiInfoDataList[0].resultFullMap = fullMap;
+                            }
+                          }
+                        }
+                      }
+                    }else{
+                      apiInfoDataList[0].isResultSuccess = false;
+                      apiInfoDataList[0].resultMap = null;
+                      apiInfoDataList[0].resultListMap = null;
+                      apiInfoDataList[0].resultFullMap = fullMap;
+                      if(authMap != null){
+                        apiInfoDataList[0].errorCode = authMap["result_codef_code"];
+                      }else if(authListMap != null){
+                        apiInfoDataList[0].errorCode = "error_cert";
+                      }
+                    }
+
+                    if(callCount == apiInfoDataList.length){
+                      callback(true, apiInfoDataList);
+                    }
+                  });
+                }
+              }
+            }
+          }else{
+            // cert call is wrong..
+            apiInfoDataList[0].isResultSuccess = false;
+            apiInfoDataList[0].resultMap = null;
+            apiInfoDataList[0].resultListMap = null;
+            apiInfoDataList[0].resultFullMap = null;
+            if(map != null){
+              apiInfoDataList[0].errorCode = map["result_codef_code"];
+            }else if(listMap != null){
+              apiInfoDataList[0].errorCode = listMap[0]["result_codef_code"];
+            }
+            callback(false, apiInfoDataList);
+          }
+        }else{
+          // cert call full map is null..
+          apiInfoDataList[0].isResultSuccess = false;
+          apiInfoDataList[0].resultMap = null;
+          apiInfoDataList[0].resultListMap = null;
+          apiInfoDataList[0].resultFullMap = null;
+          if(map != null){
+            apiInfoDataList[0].errorCode = map["result_codef_code"];
+          }else if(listMap != null){
+            apiInfoDataList[0].errorCode = listMap[0]["result_codef_code"];
+          }
+          callback(false, apiInfoDataList);
+        }
+      }else{
+        // cert call is null..
+        apiInfoDataList[0].isResultSuccess = false;
+        apiInfoDataList[0].resultMap = null;
+        apiInfoDataList[0].resultListMap = null;
+        apiInfoDataList[0].resultFullMap = null;
+        if(map != null){
+          apiInfoDataList[0].errorCode = map["result_codef_code"];
+        }else if(listMap != null){
+          apiInfoDataList[0].errorCode = listMap[0]["result_codef_code"];
+        }
+        callback(false, apiInfoDataList);
+      }
+    });
+  }
+
   static Future<void> _callApiWithCert(BuildContext context, StateSetter setState, int certType, Apis representApi, Map<String, dynamic> inputJson,
       Function(bool isSuccess, Map<String,dynamic>? resultMap, List<dynamic>? resultListMap, Map<String,dynamic>? fullMap) callback) async {
     await CodeFController._getDataFromApi(representApi, inputJson, (isSuccess, is2WayProcess, map, listMap, fullResultMap) async {
@@ -472,7 +951,7 @@ class CodeFController{
   }
 
   static bool isSetAuthPopOn = false;
-  static Future<void> _setAuthPop(BuildContext context, Apis apiInfo, int certType, Map<String, dynamic> resultInputMap,
+  static Future<void> _setAuthPop2(BuildContext context, Apis apiInfo, int certType, Map<String, dynamic> resultInputMap,
       Function(bool isSuccess, Map<String,dynamic>? resultMap, List<dynamic>? resultListMap, Map<String,dynamic>? fullResultMap) callback) async {
     String certName = "인증을 완료하셨다면,";
     if(certType == 1){
@@ -492,6 +971,80 @@ class CodeFController{
             : Column(children: [
               UiUtils.getMarginBox(0, 0.5.h),
               UiUtils.getStyledTextWithFixedScale(certName, TextStyles.upFinBasicTextStyle, TextAlign.center, null)]),
+        GetController.to.isWait.value? UiUtils.getMarginBox(0, 3.h) : UiUtils.getMarginBox(0, 0.5.h),
+        GetController.to.isWait.value? UiUtils.getStyledTextWithFixedScale("서류를 가지고 오는중입니다.", TextStyles.upFinBasicTextStyle, TextAlign.center, null) : Container(),
+        GetController.to.isWait.value? Container() : UiUtils.getStyledTextWithFixedScale("간편인증 후 확인 버튼을 눌러주세요.", TextStyles.upFinBasicTextStyle, TextAlign.center, null),
+        GetController.to.isWait.value? Container() : UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
+        GetController.to.isWait.value? Container() : UiUtils.getBorderButtonBox(85.w, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinTextAndBorderBlue,
+            UiUtils.getTextWithFixedScale("확인", 15.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
+              GetController.to.updateWait(true);
+              CodeFController._getDataFromApi2(apiInfo, resultInputMap, (isSuccess, _, map, listMap, fullMap){
+                if(isSuccess){
+                  if(map != null){
+                    if(map['result_code'] == "CF-03002"){
+                      CommonUtils.flutterToast("인증을 진행해주세요.");
+                      GetController.to.updateWait(false);
+                    }else if(fullMap!['result']['code'] == "CF-12872"){
+                      callback(false, map, listMap, fullMap);
+                    }else if(fullMap['result']['code'] == "CF-12835"){
+                      callback(false, map, listMap, fullMap);
+                    }else if(fullMap['result']['code'] == "CF-01004"){
+                      callback(false, map, listMap, fullMap);
+                    }else if(fullMap['result']['code'] == "CF-13000"){
+                      callback(false, map, listMap, fullMap);
+                    }else if(fullMap['result']['code'] == "CF-12100"){
+                      callback(false, map, listMap, fullMap);
+                    }else{
+                      callback(true, map, listMap, fullMap);
+                    }
+                  }else{
+                    if(listMap?[0]['result_code'] == "CF-03002"){
+                      CommonUtils.flutterToast("인증을 진행해주세요.");
+                      GetController.to.updateWait(false);
+                    }else if(fullMap!['result']['code'] == "CF-12872"){
+                      callback(false, map, listMap, fullMap);
+                    }else if(fullMap['result']['code'] == "CF-12835"){
+                      callback(false, map, listMap, fullMap);
+                    }else if(fullMap['result']['code'] == "CF-01004"){
+                      callback(false, map, listMap, fullMap);
+                    }else if(fullMap['result']['code'] == "CF-13000"){
+                      callback(false, map, listMap, fullMap);
+                    }else if(fullMap['result']['code'] == "CF-12100"){
+                      callback(false, map, listMap, fullMap);
+                    }else{
+                      callback(true, map, listMap, fullMap);
+                    }
+                  }
+                }else{
+                  callback(false, map, listMap, fullMap);
+                }
+              });
+            }),
+        Config.isAndroid? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 3.h)
+      ]));
+    });
+  }
+
+  static Future<void> _setAuthPop(BuildContext context, Apis apiInfo, int certType, Map<String, dynamic> resultInputMap,
+      Function(bool isSuccess, Map<String,dynamic>? resultMap, List<dynamic>? resultListMap, Map<String,dynamic>? fullResultMap) callback) async {
+    String certName = "인증을 완료하셨다면,";
+    if(certType == 1){
+      certName = "카카오앱에서 $certName";
+    }else if(certType == 6){
+      certName = "네이버앱에서 $certName";
+    }else if(certType == 8){
+      certName = "토스앱에서 $certName";
+    }else if(certType == 5){
+      certName = "PASS앱에서 $certName";
+    }
+
+    UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, 40.h, 0.0, (context, setState){
+      return Obx(()=>Column(mainAxisAlignment: MainAxisAlignment.start, children:[
+        UiUtils.getMarginBox(0, 9.5.h),
+        GetController.to.isWait.value? UiUtils.getImage(20.w, 20.w,  Image.asset(fit: BoxFit.fill,'assets/images/doc_move.gif'))
+            : Column(children: [
+          UiUtils.getMarginBox(0, 0.5.h),
+          UiUtils.getStyledTextWithFixedScale(certName, TextStyles.upFinBasicTextStyle, TextAlign.center, null)]),
         GetController.to.isWait.value? UiUtils.getMarginBox(0, 3.h) : UiUtils.getMarginBox(0, 0.5.h),
         GetController.to.isWait.value? UiUtils.getStyledTextWithFixedScale("서류를 가지고 오는중입니다.", TextStyles.upFinBasicTextStyle, TextAlign.center, null) : Container(),
         GetController.to.isWait.value? Container() : UiUtils.getStyledTextWithFixedScale("간편인증 후 확인 버튼을 눌러주세요.", TextStyles.upFinBasicTextStyle, TextAlign.center, null),

@@ -107,6 +107,9 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 0.h, bottom: 1.h), child: Row(mainAxisSize: MainAxisSize.max, children: [
               UiUtils.getTextWithFixedScale("사건기록", 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1),
               const Spacer(flex: 2),
+              MyData.idNumber == "920722-1199215" ? UiUtils.getIconButton(Icons.comments_disabled_sharp, 7.w, ColorStyles.upFinRed, () {
+                CommonUtils.moveTo(context, AppView.debugForAdminView.value, null);
+              }) : UiUtils.getMarginBox(0, 0),
               UiUtils.getMarginBox(2.w, 0),
               UiUtils.getIconButton(Icons.add, 7.w, ColorStyles.upFinDarkGray, () {
                 UiUtils.showPopMenu(context, true, 100.w, 100.h, 0.5, 0, ColorStyles.upFinButtonBlue, (slideContext, slideSetState){

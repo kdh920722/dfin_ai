@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/date_symbol_data_local.dart';
@@ -8,17 +9,18 @@ import 'package:wakelock_plus/wakelock_plus.dart';
 
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
-  WakelockPlus.enable();
-
-  await SystemChrome.setPreferredOrientations([
-    DeviceOrientation.portraitUp,
-    DeviceOrientation.portraitDown,
-  ]);
-  await initializeDateFormatting();
-  await FlutterDownloader.initialize(
-      debug: false,
-      ignoreSsl: false
-  );
+  if(!kIsWeb){
+    WakelockPlus.enable();
+    await SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+      DeviceOrientation.portraitDown,
+    ]);
+    await FlutterDownloader.initialize(
+        debug: false,
+        ignoreSsl: false
+    );
+    await initializeDateFormatting();
+  }
 
   runApp(const MyApp());
 }

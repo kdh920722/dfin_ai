@@ -20,6 +20,7 @@ import 'package:upfin/views/app_update_accident_view.dart';
 import 'package:upfin/views/app_web_view.dart';
 import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:upfin/views/debug_for_admin_view.dart';
 import 'package:yaml/yaml.dart';
 import '../utils/common_utils.dart';
 import '../views/app_chat_view.dart';
@@ -66,6 +67,7 @@ class Config{
     AppView.appAgreeDetailInfoView.value : (context) => AppAgreeDetailInfoView(),
     AppView.appSignOutView.value : (context) => AppSignOutView(),
     AppView.appAgreeDetailInfoViewTest.value : (context) => AppAgreeDetailInfoViewTest(),
+    AppView.debugForAdminView.value : (context) => DebugForAdminView(),
   };
 
   static Future<void> initAppState(Function(bool isSuccess) callback) async{
@@ -143,7 +145,8 @@ class Config{
 
 enum AppView {
   appRootView, appLoginView, appCertificationView, appWebView, appSignupView, appMainView, appSearchAccidentView, appSignOutView, appApplyDocView,
-  appUpdateAccidentView, appResultPrView, appDetailPrView, appApplyPrView, appChatView, appAccidentDetailInfoView, appAgreeDetailInfoView, appAgreeDetailInfoViewTest
+  appUpdateAccidentView, appResultPrView, appDetailPrView, appApplyPrView, appChatView, appAccidentDetailInfoView, appAgreeDetailInfoView, appAgreeDetailInfoViewTest,
+  debugForAdminView
 }
 
 extension SAppViewExtension on AppView {
@@ -183,6 +186,8 @@ extension SAppViewExtension on AppView {
         return '/appSignOutView';
       case AppView.appAgreeDetailInfoViewTest:
         return '/appAgreeDetailInfoViewTest';
+      case AppView.debugForAdminView:
+        return '/debugForAdminView';
     }
   }
 }

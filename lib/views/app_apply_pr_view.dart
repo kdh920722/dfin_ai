@@ -1816,73 +1816,76 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                     test*/
 
                     //check real id
-                     if(map['id_type'] == "dl"){
-                      CommonUtils.log("d", "dl : infos\n${map["code"][0]["formatted"]["value"]}${map["num"][0]["formatted"]["value"]}");
-                      String licenseNum = map["num"][0]["formatted"]["value"];
-                      Map<String, dynamic> inputJson = {
-                        "ownerNm": MyData.name,
-                        "juminNo": MyData.birth,
-                        "licence01": licenseNum.split("-")[0],
-                        "licence02": licenseNum.split("-")[1],
-                        "licence03": licenseNum.split("-")[2],
-                        "licence04": licenseNum.split("-")[3],
-                        "serialNo": map["code"][0]["formatted"]["value"]
-                      };
+                    try{
+                      if(map['id_type'] == "dl"){
+                        CommonUtils.log("d", "dl : infos\n${map["code"][0]["formatted"]["value"]}${map["num"][0]["formatted"]["value"]}");
+                        String licenseNum = map["num"][0]["formatted"]["value"];
+                        Map<String, dynamic> inputJson = {
+                          "ownerNm": MyData.name,
+                          "juminNo": MyData.birth,
+                          "licence01": licenseNum.split("-")[0],
+                          "licence02": licenseNum.split("-")[1],
+                          "licence03": licenseNum.split("-")[2],
+                          "licence04": licenseNum.split("-")[3],
+                          "serialNo": map["code"][0]["formatted"]["value"]
+                        };
 
-                      HyphenController.callHyphenApiForCert(HyphenApis.driveIdCert, inputJson, (isSuccessToCertId){
-                        UiUtils.closeLoadingPop(context);
-                        if(isSuccessToCertId){
-                          _setConfirmedToDocItemByViewId(currentViewId, true);
-                          Map<String, dynamic> resultMap = {
-                            "resultValue" : croppedImagePath
-                          };
-                          _setResultToListById(cameraId, resultMap);
-                          setState(() {
-                            pickedFilePath = croppedImagePath;
-                          });
-                        }else{
-                          _setConfirmedToDocItemByViewId(currentViewId, false);
-                          Map<String, dynamic> resultMap = {
-                            "resultValue" : {}
-                          };
-                          _setResultToListById(cameraId, resultMap);
-                          setState(() {
-                            pickedFilePath = "";
-                          });
-                        }
-                      });
-                    }else{
-                      CommonUtils.log("d", "ic : infos\n${map["issueDate"][0]["formatted"]["year"]}${map["issueDate"][0]["formatted"]["month"]}${map["issueDate"][0]["formatted"]["day"]}");
-                      Map<String, dynamic> inputJson = {
-                        "ownerNm": MyData.name,
-                        "juminNo": MyData.idNumber.replaceAll("-", ""),
-                        "issueDt": "${map["issueDate"][0]["formatted"]["year"]}${map["issueDate"][0]["formatted"]["month"]}${map["issueDate"][0]["formatted"]["day"]}"
-                      };
+                        HyphenController.callHyphenApiForCert(HyphenApis.driveIdCert, inputJson, (isSuccessToCertId){
+                          UiUtils.closeLoadingPop(context);
+                          if(isSuccessToCertId){
+                            _setConfirmedToDocItemByViewId(currentViewId, true);
+                            Map<String, dynamic> resultMap = {
+                              "resultValue" : croppedImagePath
+                            };
+                            _setResultToListById(cameraId, resultMap);
+                            setState(() {
+                              pickedFilePath = croppedImagePath;
+                            });
+                          }else{
+                            _setConfirmedToDocItemByViewId(currentViewId, false);
+                            Map<String, dynamic> resultMap = {
+                              "resultValue" : {}
+                            };
+                            _setResultToListById(cameraId, resultMap);
+                            setState(() {
+                              pickedFilePath = "";
+                            });
+                          }
+                        });
+                      }else{
+                        CommonUtils.log("d", "ic : infos\n${map["issueDate"][0]["formatted"]["year"]}${map["issueDate"][0]["formatted"]["month"]}${map["issueDate"][0]["formatted"]["day"]}");
+                        Map<String, dynamic> inputJson = {
+                          "ownerNm": MyData.name,
+                          "juminNo": MyData.idNumber.replaceAll("-", ""),
+                          "issueDt": "${map["issueDate"][0]["formatted"]["year"]}${map["issueDate"][0]["formatted"]["month"]}${map["issueDate"][0]["formatted"]["day"]}"
+                        };
 
-                      HyphenController.callHyphenApiForCert(HyphenApis.idCert, inputJson, (isSuccessToCertId){
-                        UiUtils.closeLoadingPop(context);
-                        if(isSuccessToCertId){
-                          _setConfirmedToDocItemByViewId(currentViewId, true);
-                          Map<String, dynamic> resultMap = {
-                            "resultValue" : croppedImagePath
-                          };
-                          _setResultToListById(cameraId, resultMap);
-                          setState(() {
-                            pickedFilePath = croppedImagePath;
-                          });
-                        }else{
-                          _setConfirmedToDocItemByViewId(currentViewId, false);
-                          Map<String, dynamic> resultMap = {
-                            "resultValue" : {}
-                          };
-                          _setResultToListById(cameraId, resultMap);
-                          setState(() {
-                            pickedFilePath = "";
-                          });
-                        }
-                      });
+                        HyphenController.callHyphenApiForCert(HyphenApis.idCert, inputJson, (isSuccessToCertId){
+                          UiUtils.closeLoadingPop(context);
+                          if(isSuccessToCertId){
+                            _setConfirmedToDocItemByViewId(currentViewId, true);
+                            Map<String, dynamic> resultMap = {
+                              "resultValue" : croppedImagePath
+                            };
+                            _setResultToListById(cameraId, resultMap);
+                            setState(() {
+                              pickedFilePath = croppedImagePath;
+                            });
+                          }else{
+                            _setConfirmedToDocItemByViewId(currentViewId, false);
+                            Map<String, dynamic> resultMap = {
+                              "resultValue" : {}
+                            };
+                            _setResultToListById(cameraId, resultMap);
+                            setState(() {
+                              pickedFilePath = "";
+                            });
+                          }
+                        });
+                      }
+                    }catch(imageError){
+                      CommonUtils.log("e", "tage imageError : $imageError");
                     }
-
                   }
                 }else{
                   if(context.mounted) UiUtils.closeLoadingPop(context);
@@ -1928,18 +1931,19 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         }
       });
     }catch(error){
-      UiUtils.closeLoadingPop(context);
+      if(context.mounted) UiUtils.closeLoadingPop(context);
       _setConfirmedToDocItemByViewId(currentViewId, false);
       setState(() {
         pickedFilePath = "";
       });
-      CommonUtils.log("i", "tage image error : $error");
+      CommonUtils.log("e", "tage image error : $error");
       CommonUtils.flutterToast("사진을 가져오는 중\n에러가 발생했습니다.");
     }
   }
   Future<void> _uploadCertImageToAwsServer(String croppedImagePath, Function(bool isSuccess) callback) async {
     try{
-      await AwsController.uploadImageToAWS(croppedImagePath, (isSuccessToSave, resultUrl) async {
+      await AwsController.uploadFileToAWS(croppedImagePath,"${AwsController.maskedImageDir}/${MyData.email}/${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}",
+              (isSuccessToSave, resultUrl) async {
         if(isSuccessToSave){
           awsUploadUrl = "${AwsController.uploadedUrl}/${AwsController.maskedImageDir}/${resultUrl.split("/").last}";
           callback(true);
@@ -1957,12 +1961,12 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
   void _showAuth(String subTitle, String docsType,  List<ApiInfoData> apiInfoDataList){
     UiUtils.showLoadingPop(context);
-    CodeFController.callApisWithCert(context, setState, certType, apiInfoDataList, (isSuccess, resultApiInfoDataList) {
+    CodeFController.callApisWithCert2(context, setState, certType, apiInfoDataList, (isSuccess, resultApiInfoDataList) {
       UiUtils.closeLoadingPop(context);
       if(isSuccess){
         for(var each in resultApiInfoDataList!){
-          CommonUtils.log("i", "${each.apiId}\n${each.resultFullMap}${each.resultListMap?.length}");
           Map<String, dynamic> resultMap = {
+            "result_codef_code" : each.errorCode ?? "",
             "resultValue" : each.resultFullMap
           };
           _setResultToListById(each.apiId, resultMap);
@@ -1973,23 +1977,36 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           }
         }
 
-        setState(() {});
         if(_isDocsAllConfirmed(docsType)){
           CommonUtils.flutterToast("$subTitle에서\n서류를 가져왔습니다");
           nextInputView();
         }else{
           certType = 0;
           isCertTypeSelected = false;
-          if(CodeFController.isTimeOutException) CommonUtils.flutterToast("응답 대기시간이 초과되었습니다.");
-          //CommonUtils.flutterToast("입력하신 정보를\n확인해주세요");
+          CommonUtils.flutterToast("에러내용을 확인해주세요.");
         }
       }else{
         certType = 0;
         isCertTypeSelected = false;
-        for(var each in resultApiInfoDataList!){
-          _setConfirmedToDocItemByViewId(_getViewIdFromListById(each.apiId), false);
+        String errorMsgCode = "";
+        if(resultApiInfoDataList != null){
+          for(var each in resultApiInfoDataList){
+            if(each.errorCode != null && each.errorCode != ""){
+              errorMsgCode = each.errorCode!;
+            }
+          }
+          for(var each in resultApiInfoDataList){
+            Map<String, dynamic> resultMap = {
+              "result_codef_code" : errorMsgCode,
+              "resultValue" : each.resultFullMap
+            };
+            _setResultToListById(each.apiId, resultMap);
+            _setConfirmedToDocItemByViewId(_getViewIdFromListById(each.apiId), false);
+          }
         }
       }
+
+      setState(() {});
     });
   }
 
@@ -2107,7 +2124,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           }),
       UiUtils.getMarginBox(0, 1.2.h),
       isRetry? Container() : !_isDocsAllConfirmed(docsType)? UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
-          UiUtils.getTextWithFixedScale(isErrorResult? "실패서류는 다음에 할게요" : "다음에 할게요", 12.sp, FontWeight.w500, isErrorResult? ColorStyles.upFinRed : ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
+          UiUtils.getTextWithFixedScale(isErrorResult? "다음에 할게요" : "다음에 할게요", 12.sp, FontWeight.w500, isErrorResult? ColorStyles.upFinRed : ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
             nextInputView();
           }) : Container()
     ]);
@@ -2182,23 +2199,34 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             textColor = ColorStyles.upFinBlack;
           }
 
-          if(_setDocResultText(each["result"]) == 1){
-            textColor = successTextColor;
-            checkColor = successCheckedColor;
-            fontWeight = FontWeight.w600;
-          }else if(_setDocResultText(each["result"]) == 2){
+          Map<String, dynamic> resultMap = each["result"];
+          String errorMsg = "";
+          if(resultMap.containsKey("result_codef_code") && resultMap["result_codef_code"] != ""){
+            errorMsg = CodeFController.getErrorMsg(resultMap["result_codef_code"]);
             textColor = errorTextColor;
             checkColor = errorTextColor;
             fontWeight = FontWeight.w500;
             name += " 실패";
             isError = true;
+          }else{
+            if(_setDocResultText(each["result"]) == 1){
+              textColor = successTextColor;
+              checkColor = successCheckedColor;
+              fontWeight = FontWeight.w600;
+            }
           }
 
           docsWidgetList.add(
               SizedBox(width: 90.w,
-                  child: Row(children: [
-                    UiUtils.getCustomCheckBox(key, 1.5, true, checkColor, ColorStyles.upFinWhite, ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-                    UiUtils.getTextButtonWithFixedScale(name, 15.sp, fontWeight, textColor, TextAlign.center, null, (){})
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Row(children: [
+                      UiUtils.getCustomCheckBox(key, 1.5, true, checkColor, ColorStyles.upFinWhite, ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
+                      UiUtils.getTextButtonWithFixedScale(name, 15.sp, fontWeight, textColor, TextAlign.center, null, (){})
+                    ]),
+                    errorMsg != "" ? Row(children: [
+                      UiUtils.getMarginBox(12.w, 0),
+                      UiUtils.getTextButtonWithFixedScale("* $errorMsg", 11.sp, FontWeight.w300, textColor, TextAlign.start, null, (){})
+                    ]) : UiUtils.getMarginBox(0, 0),
                   ])
               )
           );
@@ -2214,7 +2242,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             checkColor = ColorStyles.upFinGray;
             textColor = ColorStyles.upFinBlack;
           }
-
+/*
           if(_setDocResultText(each["result"]) == 1){
             textColor = successTextColor;
             checkColor = successCheckedColor;
@@ -2227,11 +2255,36 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             isError = true;
           }
 
+ */
+
+          Map<String, dynamic> resultMap = each["result"];
+          String errorMsg = "";
+          if(resultMap.containsKey("result_codef_code") && resultMap["result_codef_code"] != ""){
+            errorMsg = CodeFController.getErrorMsg(resultMap["result_codef_code"]);
+            textColor = errorTextColor;
+            checkColor = errorTextColor;
+            fontWeight = FontWeight.w500;
+            name += " 실패";
+            isError = true;
+          }else{
+            if(_setDocResultText(each["result"]) == 1){
+              textColor = successTextColor;
+              checkColor = successCheckedColor;
+              fontWeight = FontWeight.w600;
+            }
+          }
+
           docsWidgetList.add(
               SizedBox(width: 90.w,
-                  child: Row(children: [
-                    UiUtils.getCustomCheckBox(key, 1.5, true, checkColor, ColorStyles.upFinWhite, ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-                    UiUtils.getTextButtonWithFixedScale(name, 15.sp, fontWeight, textColor, TextAlign.center, null, (){})
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Row(children: [
+                      UiUtils.getCustomCheckBox(key, 1.5, true, checkColor, ColorStyles.upFinWhite, ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
+                      UiUtils.getTextButtonWithFixedScale(name, 15.sp, fontWeight, textColor, TextAlign.center, null, (){})
+                    ]),
+                    errorMsg != "" ? Row(children: [
+                      UiUtils.getMarginBox(12.w, 0),
+                      UiUtils.getTextButtonWithFixedScale("* $errorMsg", 11.sp, FontWeight.w300, textColor, TextAlign.start, null, (){})
+                    ]) : UiUtils.getMarginBox(0, 0),
                   ])
               )
           );
@@ -2266,11 +2319,34 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             isError = true;
           }
 
+          Map<String, dynamic> resultMap = each["result"];
+          String errorMsg = "";
+          if(resultMap.containsKey("result_codef_code") && resultMap["result_codef_code"] != ""){
+            errorMsg = CodeFController.getErrorMsg(resultMap["result_codef_code"]);
+            textColor = errorTextColor;
+            checkColor = errorTextColor;
+            fontWeight = FontWeight.w500;
+            name += " 실패";
+            isError = true;
+          }else{
+            if(_setDocResultText(each["result"]) == 1){
+              textColor = successTextColor;
+              checkColor = successCheckedColor;
+              fontWeight = FontWeight.w600;
+            }
+          }
+
           docsWidgetList.add(
               SizedBox(width: 90.w,
-                  child: Row(children: [
-                    UiUtils.getCustomCheckBox(key, 1.5, true, checkColor, ColorStyles.upFinWhite, ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-                    UiUtils.getTextButtonWithFixedScale(name, 15.sp, fontWeight, textColor, TextAlign.center, null, (){})
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Row(children: [
+                      UiUtils.getCustomCheckBox(key, 1.5, true, checkColor, ColorStyles.upFinWhite, ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
+                      UiUtils.getTextButtonWithFixedScale(name, 15.sp, fontWeight, textColor, TextAlign.center, null, (){})
+                    ]),
+                    errorMsg != "" ? Row(children: [
+                      UiUtils.getMarginBox(12.w, 0),
+                      UiUtils.getTextButtonWithFixedScale("* $errorMsg", 11.sp, FontWeight.w300, textColor, TextAlign.start, null, (){})
+                    ]) : UiUtils.getMarginBox(0, 0),
                   ])
               )
           );

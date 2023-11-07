@@ -372,12 +372,17 @@ class LogfinController {
           if(userInfoOutputJson != null){
             MyData.name = userInfoOutputJson["user"]["name"];
             MyData.email =  userInfoOutputJson["user"]["email"];
-            MyData.phoneNumber = userInfoOutputJson["user"]["contact_no"];
-            MyData.telecom = userInfoOutputJson["user"]["telecom"];
-            MyData.birth =  userInfoOutputJson["user"]["birthday"];
+            MyData.phoneNumber = userInfoOutputJson["user"]["contact_no"].toString();
+            if(userInfoOutputJson["user"]["telecom"] != null){
+              MyData.telecom = userInfoOutputJson["user"]["telecom"].toString();
+            }
+            MyData.birth =  userInfoOutputJson["user"]["birthday"].toString();
             MyData.isMale =  userInfoOutputJson["user"]["gender"] == "1"? true : false;
             if(userInfoOutputJson.containsKey("customer")){
               Map<String, dynamic> customerMap = userInfoOutputJson["customer"];
+              if(userInfoOutputJson["user"]["telecom"] == null && customerMap["telecom"] != null){
+                MyData.telecom = customerMap["telecom"].toString();
+              }
               if(customerMap.containsKey("uid")) MyData.customerUidForNiceCert = customerMap["uid"].toString();
               if(customerMap.containsKey("registration_no")) MyData.idNumber = customerMap["registration_no"] == null? "" : customerMap["registration_no"].toString();
               if(customerMap.containsKey("job_type_id")){
