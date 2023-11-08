@@ -45,6 +45,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
     Config.contextForEmergencyBack = context;
     Config.isEmergencyRoot = true;
     FireBaseController.setStateForForeground = null;
+    FireBaseController.analytics!.logAppOpen();
   }
 
   @override
@@ -402,7 +403,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
     Get.put(GetController());
     await _initFirebase();
     await _initAppState();
-    if(Config.appState == Config.appOpenState){
+    if(Config.appState == Config.stateInfoMap["open"]){
       await _initDeepLink().then((value){
         if(value != null){
           Config.deppLinkInfo = value;
@@ -423,12 +424,12 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
       _initIamport();
       _initSnsLogin();
       _initWebSocketForChat();
-    }else if(Config.appState == Config.appUpdateState){
+    }else if(Config.appState == Config.stateInfoMap["update"]){
       if(context.mounted){
         UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, 18.h, 0.5, (context, setState){
           return Center(child: Column(children: [
             UiUtils.getMarginBox(0, 1.h),
-            UiUtils.getTextWithFixedScale("🥹 앱 업데이트가 필요합니다.", 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
+            UiUtils.getTextWithFixedScale("🔔 앱 업데이트가 필요합니다.", 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
             UiUtils.getMarginBox(0, 3.h),
             UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
                 UiUtils.getTextWithFixedScale("업데이트", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
@@ -438,7 +439,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
           ]));
         });
       }
-    }else if(Config.appState == Config.appCloseState){
+    }else if(Config.appState == Config.stateInfoMap["close"]){
       if(context.mounted){
         UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, 30.h, 0.5, (context, setState){
           return Column(children: [
@@ -446,7 +447,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
             Center(child: UiUtils.getTextWithFixedScale("🥹 시스템 점검중입니다.", 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
             UiUtils.getMarginBox(0, 3.h),
             UiUtils.getExpandedScrollView(Axis.vertical,
-                UiUtils.getTextWithFixedScale2(Config.appCloseText.replaceAll("@@", "\n"), 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
+                SizedBox(width : 80.w, child: UiUtils.getTextWithFixedScale2(Config.appInfoTextMap["close_text"].replaceAll("@@", "\n"), 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null))),
             UiUtils.getMarginBox(0, 1.h)
           ]);
         });

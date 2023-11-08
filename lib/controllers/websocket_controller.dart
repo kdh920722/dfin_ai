@@ -390,9 +390,9 @@ class WebSocketController {
       }
 
       LogfinController.getLoanInfo((isSuccess, isNotEmpty){
-        GetController.to.updateAllSubScribed(true);
         connectionInfoMap["is_connected"] = true;
         if(isSuccess){
+          GetController.to.updateAllSubScribed(true);
           if(!isNotEmpty){
             Future.delayed(const Duration(seconds: 5), () {
               _retryToConnectNewVer(connectedKey);

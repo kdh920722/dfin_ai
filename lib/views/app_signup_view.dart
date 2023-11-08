@@ -6,6 +6,7 @@ import 'package:upfin/controllers/iamport_controller.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
+import '../controllers/firebase_controller.dart';
 import '../styles/TextStyles.dart';
 import '../configs/app_config.dart';
 import '../utils/common_utils.dart';
@@ -78,6 +79,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
     GetController.to.resetConfirmed();
     Config.contextForEmergencyBack = context;
     Config.isEmergencyRoot = false;
+    FireBaseController.analytics!.logSignUp(signUpMethod: '');
   }
 
   @override
@@ -189,14 +191,14 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
       ])),
       UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _emailTextFocus, _emailTextController, TextInputType.emailAddress, false,
           UiUtils.getInputDecoration("이메일", 12.sp, "", 0.sp), (text) { }, (value){
-            if(value != null && value.trim().isEmpty){
+            if(value == null || value.trim().isEmpty){
               return "이메일을 입력하세요.";
-            }else if((value != null && value.trim().isNotEmpty && value.trim().length <4)
-                || (value != null && value.trim().isNotEmpty && !value.trim().contains("@"))
-                || (value != null && value.trim().isNotEmpty && !value.trim().contains("."))){
-              return "이메일 형식이 잘못되었습니다.";
             }else{
-              return null;
+              if(!CommonUtils.isEmailValid(value.trim())){
+                return "이메일 형식이 잘못되었습니다.";
+              }else{
+                return null;
+              }
             }
           }),
       UiUtils.getMarginBox(0, 2.h),

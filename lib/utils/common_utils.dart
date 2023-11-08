@@ -861,6 +861,19 @@ class CommonUtils {
     return parameterValue;
   }
 
+  static bool isEmailValid(String email) {
+    if(email.length <= 5 || email.contains(" ") ||  email.contains("..")){
+      return false;
+    }else{
+      // 이메일 형식을 확인하기 위한 정규 표현식
+      String emailRegex = r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$';
+      RegExp regExp = RegExp(emailRegex);
+
+      // 정규 표현식과 매치되는지 확인
+      return regExp.hasMatch(email);
+    }
+  }
+
   static Future<void> requestPermissions(Function(bool isDenied, List<String>? deniedPermissionsList) callback) async {
     Map<Permission, PermissionStatus> statuses = await Config.permissionList.request();
     List<String> deniedPermissions = [];
@@ -980,10 +993,31 @@ class CommonUtils {
     bool result = false;
     String thirtyMinutesLaterString = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceValidDateKey);
     if(thirtyMinutesLaterString != ""){
-      CommonUtils.log("i", "\ncurr:${CommonUtils.getCurrentLocalTime()}\nthir:${CommonUtils.convertStringToTime(thirtyMinutesLaterString)}");
-      CommonUtils.log("i", "isBefore : ${CommonUtils.getCurrentLocalTime().isBefore(CommonUtils.convertStringToTime(thirtyMinutesLaterString))}");
+      // CommonUtils.log("i", "\ncurr:${CommonUtils.getCurrentLocalTime()}\nthir:${CommonUtils.convertStringToTime(thirtyMinutesLaterString)}");
+      // CommonUtils.log("i", "isBefore : ${CommonUtils.getCurrentLocalTime().isBefore(CommonUtils.convertStringToTime(thirtyMinutesLaterString))}");
       result = CommonUtils.getCurrentLocalTime().isBefore(CommonUtils.convertStringToTime(thirtyMinutesLaterString));
     } else{
+      result = false;
+    }
+
+    return result;
+  }
+
+  static void logToGA(String title, String msg){
+
+  }
+
+  static bool isValidStateByInfoVersion(){
+    bool result = false;
+    String savedVersion = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceValidInfoVersion);
+    if(savedVersion != ""){
+      int infoVersionCode = Config.appInfoTextMap["info_text_version"];
+      if(infoVersionCode > int.parse(savedVersion)){
+        result = false;
+      }else{
+        result = true;
+      }
+    }else{
       result = false;
     }
 
@@ -994,10 +1028,10 @@ class CommonUtils {
     bool result = false;
     String thirtyMinutesLaterString = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceValidInfoDateKey);
     if(thirtyMinutesLaterString != ""){
-      CommonUtils.log("", "\ncurr:${CommonUtils.getCurrentLocalTime()}\nthir:${CommonUtils.convertStringToTime(thirtyMinutesLaterString)}");
-      CommonUtils.log("", "isBefore : ${CommonUtils.getCurrentLocalTime().isBefore(CommonUtils.convertStringToTime(thirtyMinutesLaterString))}");
+      // CommonUtils.log("", "\ncurr:${CommonUtils.getCurrentLocalTime()}\nthir:${CommonUtils.convertStringToTime(thirtyMinutesLaterString)}");
+      // CommonUtils.log("", "isBefore : ${CommonUtils.getCurrentLocalTime().isBefore(CommonUtils.convertStringToTime(thirtyMinutesLaterString))}");
       result = CommonUtils.getCurrentLocalTime().isBefore(CommonUtils.convertStringToTime(thirtyMinutesLaterString));
-    } else{
+    }else{
       result = false;
     }
 

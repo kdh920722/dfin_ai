@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io' as io;
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -19,11 +20,31 @@ class FireBaseController{
   static UserCredential? userCredential;
   static String fcmToken = "";
   static String pushFrom = "";
+  static FirebaseAnalytics? analytics;
+  static FirebaseAnalyticsObserver? observer;
 
   /// firebase database =========================================================================== ///
-  static Future<void> _initFirebase(Function(bool) callback) async {
+  static Future<void> initMainFirebase() async {
     try {
       firebaseApp = await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+      analytics = FirebaseAnalytics.instance;
+      observer = FirebaseAnalyticsObserver(analytics: analytics!);
+    } on FirebaseAuthException catch (e) {
+      CommonUtils.log("e", "firebase main init error : ${e.code} : ${e.toString()}");
+    }
+  }
+  static Future<void> _initFirebaseForBackgroundPush(Function(bool) callback) async {
+    try {
+      firebaseApp = await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+      userCredential = await FirebaseAuth.instance.signInAnonymously();
+      callback(true);
+    } on FirebaseAuthException catch (e) {
+      CommonUtils.log("e", "firebase background push init error : ${e.code} : ${e.toString()}");
+      callback(false);
+    }
+  }
+  static Future<void> _initFirebase(Function(bool) callback) async {
+    try {
       userCredential = await FirebaseAuth.instance.signInAnonymously();
       callback(true);
     } on FirebaseAuthException catch (e) {
@@ -91,7 +112,7 @@ class FireBaseController{
         if(isSuccess){
           CommonUtils.log("i", "firebase init");
           FirebaseMessaging messaging = FirebaseMessaging.instance;
-          Config.isAndroid? await messaging.setForegroundNotificationPresentationOptions(alert: true, badge: true, sound: true)
+          Config.isAndroid? await messaging.setForegroundNotificationPresentationOptions(alert: false, badge: false, sound: false)
               : await messaging.setForegroundNotificationPresentationOptions(alert: false, badge: false, sound: false);
           FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
           await flutterLocalNotificationsPlugin.initialize(
@@ -103,13 +124,9 @@ class FireBaseController{
             onDidReceiveBackgroundNotificationResponse: backgroundHandler,
           );
           AndroidNotificationChannel? androidNotificationChannel;
-
-          if(Config.isAndroid){
-            androidNotificationChannel = AndroidNotificationChannel(channelIdForAndroid, channelNameForAndroid, description: channelDescForAndroid, importance: Importance.max);
-            await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(androidNotificationChannel);
-          }else{
-            await messaging.requestPermission(alert: true, announcement: false, badge: true, carPlay: false, criticalAlert: false, provisional: false, sound: true);
-          }
+          androidNotificationChannel = AndroidNotificationChannel(channelIdForAndroid, channelNameForAndroid, description: channelDescForAndroid, importance: Importance.max);
+          await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(androidNotificationChannel);
+          await messaging.requestPermission(alert: true, announcement: false, badge: true, carPlay: false, criticalAlert: false, provisional: false, sound: true);
 
           // Foreground handling event
           FirebaseMessaging.onMessage.listen((RemoteMessage message) {_handlerForFirebaseMessagingOnForeground(message, flutterLocalNotificationsPlugin, androidNotificationChannel);});
@@ -146,9 +163,8 @@ class FireBaseController{
   }
 
   static Future<void> _showNotification(RemoteMessage message, FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin, AndroidNotificationChannel? channel) async {
-    if(!Config.isAndroid) {
-      await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(alert: true, badge: true, sound: true);
-    }
+    await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(alert: true, badge: true, sound: true);
+
     flutterLocalNotificationsPlugin.show(
         message.hashCode,
         message.notification?.title,
@@ -162,12 +178,14 @@ class FireBaseController{
             )
         ) : NotificationDetails(
             iOS: DarwinNotificationDetails(
+              badgeNumber: 0,
               subtitle: channelTitleForIOS,
               sound: 'slow_spring_board.aiff',
             )
         ),
         payload: _getRoomIdFromMessage(message)
     );
+
     Future.delayed(const Duration(milliseconds: 120), () async {
       FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(alert: false, badge: false, sound: false);
     });
@@ -176,26 +194,30 @@ class FireBaseController{
 
   static Future<void> _handlerForFirebaseMessagingOnForeground(RemoteMessage message,
       FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin, AndroidNotificationChannel? channel) async {
-    if(AppChatViewState.currentRoomId == ""){
-      // 채팅방 아닐때, show notification
-      CommonUtils.log("", "fore fcm currentRoomId is null");
-      await _showNotification(message, flutterLocalNotificationsPlugin, channel);
-
-    }else{
-      // 채팅방
-      if(AppChatViewState.currentRoomId != _getRoomIdFromMessage(message)){
-        // 채팅방이지만 다른 채팅방 알림일 때, show notification
-        CommonUtils.log("", "fore fcm currentRoomId is not null");
+    CommonUtils.log("", "FORE PUSH \n${message.messageId}${message.data}");
+    if(message.messageId != null){
+      if(AppChatViewState.currentRoomId == ""){
+        // 채팅방 아닐때, show notification
         await _showNotification(message, flutterLocalNotificationsPlugin, channel);
+
+      }else{
+        // 채팅방
+        if(AppChatViewState.currentRoomId != _getRoomIdFromMessage(message)){
+          // 채팅방이지만 다른 채팅방 알림일 때, show notification
+          await _showNotification(message, flutterLocalNotificationsPlugin, channel);
+        }
       }
     }
   }
 
   @pragma('vm:entry-point')
   static Future<void> _handlerForFirebaseMessagingOnBackground(RemoteMessage message) async {
-    await _initFirebase((bool isSuccess) async {
+    CommonUtils.log("", "BACK PUSH");
+    await _initFirebaseForBackgroundPush((bool isSuccess) async {
       if(isSuccess){
         CommonUtils.log("", "firebase init on background");
+        /*
+
         FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
         await flutterLocalNotificationsPlugin.initialize(
           const InitializationSettings(
@@ -210,27 +232,26 @@ class FireBaseController{
         FirebaseMessaging messaging = FirebaseMessaging.instance;
 
         Config.isAndroid? await messaging.setForegroundNotificationPresentationOptions(alert: true, badge: true, sound: true)
-            : await messaging.setForegroundNotificationPresentationOptions(alert: false, badge: false, sound: false);
+            : await messaging.setForegroundNotificationPresentationOptions(alert: true, badge: true, sound: true);
 
-        if(Config.isAndroid){
-          androidNotificationChannel = AndroidNotificationChannel(channelIdForAndroid, channelNameForAndroid,description: channelDescForAndroid, importance: Importance.max);
-          await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(androidNotificationChannel);
-        }else{
-          await messaging.requestPermission(alert: true, announcement: false, badge: true, carPlay: false, criticalAlert: false, provisional: false, sound: true);
-        }
+        androidNotificationChannel = AndroidNotificationChannel(channelIdForAndroid, channelNameForAndroid,description: channelDescForAndroid, importance: Importance.max);
+        await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(androidNotificationChannel);
+        await messaging.requestPermission(alert: true, announcement: false, badge: true, carPlay: false, criticalAlert: false, provisional: false, sound: true);
 
-        if(AppChatViewState.currentRoomId == ""){
-          // 채팅방 아닐때, show notification
-          CommonUtils.log("", "back fcm currentRoomId is null");
-          await _showNotification(message, flutterLocalNotificationsPlugin, androidNotificationChannel);
-        }else{
-          // 채팅방
-          if(AppChatViewState.currentRoomId != _getRoomIdFromMessage(message)){
-            // 채팅방이지만 다른 채팅방 알림일 때, show notification
-            CommonUtils.log("", "back fcm currentRoomId is not null");
+        if(message.messageId != null){
+          if(AppChatViewState.currentRoomId == ""){
+            // 채팅방 아닐때, show notification
             await _showNotification(message, flutterLocalNotificationsPlugin, androidNotificationChannel);
+          }else{
+            // 채팅방
+            if(AppChatViewState.currentRoomId != _getRoomIdFromMessage(message)){
+              // 채팅방이지만 다른 채팅방 알림일 때, show notification
+              await _showNotification(message, flutterLocalNotificationsPlugin, androidNotificationChannel);
+            }
           }
         }
+         */
+
       }else{
         CommonUtils.log("e", "firebase init error ");
       }

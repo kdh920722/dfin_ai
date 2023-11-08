@@ -3,7 +3,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:upfin/views/app_accident_detail_view.dart';
 import 'package:upfin/views/app_agree_detail_info_view.dart';
 import 'package:upfin/views/app_agree_detail_info_view_test.dart';
@@ -29,16 +28,10 @@ import '../views/app_login_view.dart';
 
 class Config{
   static bool isControllerLoadFinished = false;
-  static const int buildTwice = 2;
   static bool isAppMainInit = false;
-  static const double appWidth = 393;
-  static const double appHeight = 852;
-  static const int appOpenState = 10;
-  static const int appUpdateState = 44;
-  static const int appCloseState = 99;
+  static Map<String,dynamic> stateInfoMap = {};
   static int appState = 10; // 10 : open, 99: close, 44: update
-  static String appCloseText = "";
-  static String appInfoText = "";
+  static Map<String,dynamic> appInfoTextMap = {};
   static bool isWeb = kIsWeb;
   static bool isAndroid = Platform.isAndroid;
   static String deppLinkInfo = "";
@@ -72,40 +65,56 @@ class Config{
 
   static Future<void> initAppState(Function(bool isSuccess) callback) async{
     try{
+      bool isValid = true;
       final ref = FirebaseDatabase.instance.ref();
-      final snapshot = await ref.child('UPFIN/APP_STATE').get();
-      if (snapshot.exists) {
-        int androidState = 99;
-        int iosState = 99;
-        String androidVersion = "";
-        String iosVersion = "";
-        String androidStoreUrl = "";
-        String iosStoreUrl = "";
+      final appInfoSnapshot = await ref.child('UPFIN/APP_STATE/app_info').get();
+      final appSateInfoSnapshot = await ref.child('UPFIN/APP_STATE/app_info/state').get();
+      final appForDeviceInfoSnapshot = isAndroid? await ref.child('UPFIN/APP_STATE/android_state').get()
+          : await ref.child('UPFIN/APP_STATE/ios_state').get();
 
-        for(var each in snapshot.children){
+      if(appInfoSnapshot.exists){
+        for(var each in appInfoSnapshot.children){
           switch(each.key){
-            case "android_open_state" : androidState = int.parse(each.value.toString());
-            case "ios_open_state" : iosState = int.parse(each.value.toString());
-            case "android_app_version" : androidVersion = each.value.toString();
-            case "ios_app_version" : iosVersion = each.value.toString();
-            case "android_store" : androidStoreUrl = each.value.toString();
-            case "ios_store" : iosStoreUrl = each.value.toString();
-            case "app_close_text" : appCloseText = each.value.toString();
-            case "app_info_text" : appInfoText = each.value.toString();
+            case "close_text" : appInfoTextMap["close_text"] = each.value.toString();
+            case "info_text" : appInfoTextMap["info_text"] = each.value.toString();
+            case "close_version" : appInfoTextMap["close_text_version"] = int.parse(each.value.toString());
+            case "info_version" : appInfoTextMap["info_text_version"] = int.parse(each.value.toString());
           }
         }
+      }else{
+        isValid = false;
+      }
 
-        appState = isAndroid? androidState : iosState;
-        appVersion = isAndroid? androidVersion : iosVersion;
-        appStoreUrl = isAndroid? androidStoreUrl : iosStoreUrl;
-        if(await _isNeedToUpdateVersion()){
-          appState = appUpdateState;
+      if(appSateInfoSnapshot.exists){
+        for(var each in appSateInfoSnapshot.children){
+          if(each.key != null) stateInfoMap[each.key!] = int.parse(each.value.toString());
         }
+      }else{
+        isValid = false;
+      }
 
+      if(appForDeviceInfoSnapshot.exists){
+        for(var each in appForDeviceInfoSnapshot.children){
+          switch(each.key){
+            case "app_download_url" : appStoreUrl = each.value.toString();
+            case "app_state" : appState = int.parse(each.value.toString());
+            case "app_version" : appVersion = each.value.toString();
+          }
+        }
+      }else{
+        isValid = false;
+      }
+
+      if(await _isNeedToUpdateVersion()){
+        appState = stateInfoMap["update"];
+      }
+
+      if(isValid){
         callback(true);
-      } else {
+      }else{
         callback(false);
       }
+
     }catch(e){
       CommonUtils.log("e", "init app state error : ${e.toString()}");
       callback(false);
@@ -114,25 +123,9 @@ class Config{
 
   static Future<bool> _isNeedToUpdateVersion() async {
     bool result = false;
-    PackageInfo packageInfo = await PackageInfo.fromPlatform();
-
-
-    String appName = packageInfo.appName;
-    String packageName = packageInfo.packageName;
-    String version = packageInfo.version;
-    String buildNumber = packageInfo.buildNumber;
-    CommonUtils.log("", ""
-        "\nappName : $appName"
-        "\npackageName : $packageName"
-        "\nversion : $version"
-        "\nbuildNumber : $buildNumber");
-
     String yamlValue = await rootBundle.loadString("pubspec.yaml");
     var yamlDoc = loadYaml(yamlValue);
-    CommonUtils.log("", "doc : ${yamlDoc["version"]}");
-    version = yamlDoc["version"].toString();
-
-    CommonUtils.log("", "appVersion : $appVersion || $version");
+    String version = yamlDoc["version"].toString();
     if(version == appVersion){
       result = false;
     }else{

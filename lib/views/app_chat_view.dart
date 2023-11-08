@@ -356,7 +356,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
             if(htmlNormalLoadBuildCnt > 2 && !isHtmlLoading){
               htmlNormalLoadTimer!.cancel();
               isNormalLoading = false;
-              CommonUtils.log("", "html normal build finished!!");
               _scrollToBottom(false,0);
               GetController.to.updateHtmlLoad(true);
             }
@@ -1085,9 +1084,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
   void _setAutoAnswerWidgetList(){
     widgetList.clear();
     GetController.to.resetChatAutoAnswerWidgetList();
-    //List<String> answerList = ["자주하는 질문 💬", "나의정보 🔒", "대출현황 🏦", "심사결과 📑", "상담원 연결 🤓", "사진 📷", "가져오기 📤"];
     List<String> answerList = _getAnswerListMap(currentKey);
-    CommonUtils.log("", "answerList : ${answerList.length}");
     if(currentKey != ""){
       answerList.add("이전");
     }
@@ -1183,9 +1180,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
       }));
     }
 
-    //_setAutoAnswerLineHeight();
     GetController.to.updateChatAutoAnswerWidgetList(widgetList);
-    CommonUtils.log("", "updateChatAutoAnswerWidgetList : ${GetController.to.autoAnswerWidgetList.length}");
   }
 
   void _setAutoAnswerLineHeight(){
@@ -1423,7 +1418,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if(isViewHere){
-        CommonUtils.log("", "rebuild");
         await CommonUtils.saveSettingsToFile("push_from", "");
         await CommonUtils.saveSettingsToFile("push_room_id", "");
         isBuild = true;
@@ -1491,7 +1485,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
           Obx((){
             bool isWaiting = GetController.to.isAutoAnswerWaiting.value;
             bool isScrollWaiting = GetController.to.isShowScrollBottom.value;
-            CommonUtils.log("", "isShowBottom : ${_chatScrollController.position.pixels}");
 
             if(isScrollWaiting){
               isWaiting = isScrollWaiting;

@@ -15,6 +15,7 @@ class SharedPreferenceController {
   static String sharedPreferenceSnsId = "SNS_ID";
   static String sharedPreferenceSnsType = "SNS_TYPE";
   static String sharedPreferenceIsSnsLogin = "IS_SNS_LOGIN";
+  static String sharedPreferenceValidInfoVersion = "VALID_INFO_VERSION";
   static String sharedPreferenceValidInfoDateKey = "VALID_INFO_DATE";
   static SharedPreferences? sharedPreferences;
 
@@ -100,6 +101,10 @@ class SharedPreferenceController {
 
       if(sharedPreferences!.containsKey(sharedPreferenceValidDateKey)){
         sharedPreferences!.remove(sharedPreferenceValidDateKey);
+      }
+
+      if(sharedPreferences!.containsKey(sharedPreferenceValidInfoVersion)){
+        sharedPreferences!.remove(sharedPreferenceValidInfoVersion);
       }
 
       if(sharedPreferences!.containsKey(sharedPreferenceValidInfoDateKey)){

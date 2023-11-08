@@ -3,6 +3,7 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:sizer/sizer.dart';
+import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/styles/TextStyles.dart';
 import '../styles/ColorStyles.dart';
@@ -16,7 +17,8 @@ class UiUtils {
         return MaterialApp(
           theme: ThemeData(useMaterial3: true),
           initialRoute: AppView.appRootView.value,
-          routes: Config.appRoutes
+          routes: Config.appRoutes,
+          navigatorObservers: [FireBaseController.observer!],
         );
       },
     );
@@ -266,15 +268,15 @@ class UiUtils {
 
   static Widget getBackButton(VoidCallback onPressedCallback) {
     return SizedBox(
-        width : 10.w,
+        width : 15.w,
         child: IconButton(constraints: const BoxConstraints(), padding: EdgeInsets.only(right: 5.w),
             onPressed: onPressedCallback, icon: Icon(Icons.arrow_back_ios_new_sharp, color: ColorStyles.upFinDarkGray, size: 5.w)));
   }
 
   static Widget getCloseButton(Color iconColor, VoidCallback onPressedCallback) {
     return SizedBox(
-        width : 10.w,
-        child: IconButton(constraints: const BoxConstraints(), padding: EdgeInsets.only(right: 1.w, left: 5.w),
+        width : 15.w,
+        child: IconButton(constraints: const BoxConstraints(), padding: EdgeInsets.only(left: 5.w),
             onPressed: onPressedCallback, icon: Icon(Icons.close, color: iconColor, size: 7.w)));
   }
 

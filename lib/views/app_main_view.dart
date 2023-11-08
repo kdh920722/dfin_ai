@@ -51,6 +51,8 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     FireBaseController.setStateForForeground = setState;
     AppMainViewState.isStart = false;
     isViewHere = true;
+    FireBaseController.analytics!.logLogin();
+
   }
 
   @override
@@ -107,7 +109,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 0.h, bottom: 1.h), child: Row(mainAxisSize: MainAxisSize.max, children: [
               UiUtils.getTextWithFixedScale("사건기록", 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1),
               const Spacer(flex: 2),
-              MyData.idNumber == "920722-1199215" ? UiUtils.getIconButton(Icons.comments_disabled_sharp, 7.w, ColorStyles.upFinRed, () {
+              MyData.email == "lalalllaa@kakao.com" ? UiUtils.getIconButton(Icons.comments_disabled_sharp, 7.w, ColorStyles.upFinRed, () {
                 CommonUtils.moveTo(context, AppView.debugForAdminView.value, null);
               }) : UiUtils.getMarginBox(0, 0),
               UiUtils.getMarginBox(2.w, 0),
@@ -536,7 +538,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   static bool isStart = false;
   Future<void> _detectPushClickFromBack() async {
     if(!isStart){
-      CommonUtils.log("", "check..");
       isStart = true;
       UiUtils.showLoadingPop(context);
       Map<String, dynamic> map = await CommonUtils.readSettingsFromFile();
@@ -551,12 +552,11 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             const Duration intervalFoCheckSubScribe = Duration(seconds: 1);
             reSubScribeCheckTimer = Timer.periodic(intervalFoCheckSubScribe, (Timer timer) {
               if(GetController.to.isAllSubscribed.value){
-                CommonUtils.log("", "timer..");
                 if(context.mounted) UiUtils.closeLoadingPop(context);
                 if(reSubScribeCheckTimer != null){
                   reSubScribeCheckTimer!.cancel();
                 }else{
-                  CommonUtils.log("", "timer.. null");
+
                 }
                 _directGoToChatRoom(map["push_room_id"].toString());
               }
@@ -566,7 +566,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             if(reSubScribeCheckTimer != null) reSubScribeCheckTimer!.cancel();
             await CommonUtils.saveSettingsToFile("push_from", "");
             await CommonUtils.saveSettingsToFile("push_room_id", "");
-            CommonUtils.log("", "delete file");
             isStart = false;
           }
         }else if(map["push_from"] == "B"){
@@ -583,7 +582,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                 if(reSubScribeCheckTimer != null){
                   reSubScribeCheckTimer!.cancel();
                 }else{
-                  CommonUtils.log("", "timer.. null");
+
                 }
                 _directGoToChatRoom(map["push_room_id"].toString());
               }
@@ -593,25 +592,20 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             if(reSubScribeCheckTimer != null) reSubScribeCheckTimer!.cancel();
             await CommonUtils.saveSettingsToFile("push_from", "");
             await CommonUtils.saveSettingsToFile("push_room_id", "");
-            CommonUtils.log("", "delete file");
             isStart = false;
           }
         }else{
-          CommonUtils.log("", "no room number");
           if(context.mounted) UiUtils.closeLoadingPop(context);
           if(reSubScribeCheckTimer != null) reSubScribeCheckTimer!.cancel();
           await CommonUtils.saveSettingsToFile("push_from", "");
           await CommonUtils.saveSettingsToFile("push_room_id", "");
-          CommonUtils.log("", "delete file");
           isStart = false;
         }
       }else{
-        CommonUtils.log("", "no room number");
         if(context.mounted) UiUtils.closeLoadingPop(context);
         if(reSubScribeCheckTimer != null) reSubScribeCheckTimer!.cancel();
         await CommonUtils.saveSettingsToFile("push_from", "");
         await CommonUtils.saveSettingsToFile("push_room_id", "");
-        CommonUtils.log("", "delete file");
         isStart = false;
       }
     }
@@ -629,34 +623,47 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     }
   }
 
+  void _showInfoPop(){
+    UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, 30.h, 0.5, (slideContext, setState){
+      return Center(child: Column(children: [
+        UiUtils.getMarginBox(0, 1.h),
+        UiUtils.getTextWithFixedScale("📌 안내사항", 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
+        UiUtils.getMarginBox(0, 3.h),
+        UiUtils.getExpandedScrollView(Axis.vertical,
+            UiUtils.getTextWithFixedScale2(Config.appInfoTextMap["info_text"].replaceAll("@@", "\n"), 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
+        UiUtils.getMarginBox(0, 3.h),
+        UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+            UiUtils.getTextWithFixedScale("확인", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
+              SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceValidInfoVersion, Config.appInfoTextMap["info_text_version"].toString());
+              DateTime thirtyMinutesLater = CommonUtils.addTimeToTargetTime(CommonUtils.getCurrentLocalTime());
+              SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceValidInfoDateKey, CommonUtils.convertTimeToString(thirtyMinutesLater));
+              isInfoPopShow = false;
+              Navigator.pop(slideContext);
+              _detectPushClickFromBack();
+            }),
+        Config.isAndroid? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 5.h)
+      ]));
+    });
+  }
+
   double bottomBarHeight = 0;
   bool isInfoPopShow = false;
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if(isViewHere){
-
-        if(Config.appInfoText != "" && !isInfoPopShow && !CommonUtils.isValidStateByInfoExpiredDate()){
+        if(!isInfoPopShow){
           isInfoPopShow = true;
-          UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, 30.h, 0.5, (slideContext, setState){
-            return Center(child: Column(children: [
-              UiUtils.getMarginBox(0, 1.h),
-              UiUtils.getTextWithFixedScale("📌 안내사항", 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
-              UiUtils.getMarginBox(0, 3.h),
-              UiUtils.getExpandedScrollView(Axis.vertical,
-                  UiUtils.getTextWithFixedScale2(Config.appInfoText.replaceAll("@@", "\n"), 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
-              UiUtils.getMarginBox(0, 3.h),
-              UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                  UiUtils.getTextWithFixedScale("확인", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
-                    DateTime thirtyMinutesLater = CommonUtils.addTimeToTargetTime(CommonUtils.getCurrentLocalTime());
-                    SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceValidInfoDateKey, CommonUtils.convertTimeToString(thirtyMinutesLater));
-                    isInfoPopShow = false;
-                    Navigator.pop(slideContext);
-                    _detectPushClickFromBack();
-                  }),
-              Config.isAndroid? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 5.h)
-            ]));
-          });
+          if(!CommonUtils.isValidStateByInfoExpiredDate()){
+            _showInfoPop();
+          }else{
+            if(!CommonUtils.isValidStateByInfoVersion()){
+              _showInfoPop();
+            }else{
+              isInfoPopShow = false;
+              _detectPushClickFromBack();
+            }
+          }
         }else{
           isInfoPopShow = false;
           _detectPushClickFromBack();
