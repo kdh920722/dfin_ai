@@ -163,10 +163,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
         int status = data[1];
         int progress = data[2];
 
-        CommonUtils.log('d','down state : $id $status $progress');
-        if(status == 2){
-
-        }
         if(status == 3 && progress == 100){
           bool canOpen = false;
           while(!canOpen){
