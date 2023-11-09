@@ -162,14 +162,21 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
         String id = data[0];
         int status = data[1];
         int progress = data[2];
+        if(context.mounted) UiUtils.showLoadingPop(context);
+        CommonUtils.log("d", "status : $progress $status");
 
         if(status == 3 && progress == 100){
-          bool canOpen = false;
-          while(!canOpen){
-            canOpen = await FlutterDownloader.open(taskId: id);
+          if(isOpenDownloadedFile){
+            bool canOpen = false;
+            while(!canOpen){
+              canOpen = await FlutterDownloader.open(taskId: id);
+            }
+            CommonUtils.flutterToast("다운로드가 완료되었습니다.");
+            if(context.mounted) UiUtils.closeLoadingPop(context);
+          }else{
+            CommonUtils.flutterToast("다운로드가 완료되었습니다.");
+            if(context.mounted) UiUtils.closeLoadingPop(context);
           }
-          if(context.mounted) UiUtils.closeLoadingPop(context);
-          CommonUtils.flutterToast("다운로드가 완료되었습니다.");
         }
       }catch(error){
         if(context.mounted) UiUtils.closeLoadingPop(context);
@@ -435,7 +442,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                 savedDir: '$dir/',	// 저장할 dir
                 fileName: '${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_doc.$extension',	// 파일명
                 saveInPublicStorage: true,	// 동일한 파일 있을 경우 덮어쓰기 없으면 오류발생함!
-                timeout: 5,
                 showNotification: true,
                 openFileFromNotification: true,
               );
@@ -443,10 +449,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
               CommonUtils.log("w", "download url : $url");
               String fileName = "$dir/$fileRealName";
               savedFileName = fileName;
-              if(context.mounted) UiUtils.showLoadingPop(context);
-
             }catch(error){
-              if(context.mounted) UiUtils.closeLoadingPop(context);
               CommonUtils.flutterToast("문서 다운로드에 실패했습니다.");
               CommonUtils.log("e", "fail doc download $error");
             }
@@ -596,80 +599,77 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
     }
     bool isLoading = true;
     return GestureDetector(
-        child: Stack(alignment: Alignment.center, children: [
-          Container(
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.all(Radius.circular(5)),
-                color: ColorStyles.upFinBlack,
-              ),
-
-              alignment: Alignment.center,
-              constraints: BoxConstraints(maxWidth: 70.w, maxHeight: 70.w, minWidth: 20.w, minHeight: 20.w),
-              child: FutureBuilder(
-                future: _loadImageAsync(), // 이미지 로딩을 처리하는 비동기 함수
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.done) {
-                    return ExtendedImage.network(
-                      srcUrl,
-                      fit: BoxFit.contain,
-                      cache: true,
-                      cacheHeight: (40.w*devicePixelRatio).round().toInt(),
-                      cacheMaxAge: const Duration(hours: 1),
-                      shape: BoxShape.rectangle,
-                      borderRadius: const BorderRadius.all(Radius.circular(2)),
-                      loadStateChanged: (ExtendedImageState state) {
-                        switch (state.extendedImageLoadState) {
-                          case LoadState.loading:
-                            _aniController.reset();
-                            if(state.loadingProgress != null && state.loadingProgress!.expectedTotalBytes != null){
-                              int total = state.loadingProgress!.expectedTotalBytes!;
-                              int val = state.loadingProgress!.cumulativeBytesLoaded;
-                              return Center(
-                                  child: CircularProgressIndicator(
-                                      color: ColorStyles.upFinWhite,
-                                      value: val / total
-                                  )
-                              );
-                            }else{
-                              return UiUtils.getImage(8.w, 8.w, Image.asset(fit: BoxFit.fill,'assets/images/chat_loading.gif'));
-                            }
-                          case LoadState.completed:
-                            isLoading = false;
-                            _aniController.forward();
-                            if(imageLoadMap.containsKey(srcUrl)){
-                              imageLoadCnt--;
-                              imageLoadMap.remove(srcUrl);
-                            }
-                            return FadeTransition(
-                              opacity: _aniController,
-                              child: ExtendedRawImage(
-                                fit: BoxFit.contain,
-                                image: state.extendedImageInfo?.image,
-                              ),
+        child: Container(
+            decoration: const BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+              color: ColorStyles.upFinBlack,
+            ),
+            alignment: Alignment.center,
+            constraints: BoxConstraints(maxWidth: 70.w, maxHeight: 70.w, minWidth: 20.w, minHeight: 20.w),
+            child: FutureBuilder(
+              future: _loadImageAsync(), // 이미지 로딩을 처리하는 비동기 함수
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.done) {
+                  return ExtendedImage.network(
+                    srcUrl,
+                    fit: BoxFit.contain,
+                    cache: true,
+                    cacheHeight: (40.w*devicePixelRatio).round().toInt(),
+                    cacheMaxAge: const Duration(hours: 1),
+                    shape: BoxShape.rectangle,
+                    borderRadius: const BorderRadius.all(Radius.circular(2)),
+                    loadStateChanged: (ExtendedImageState state) {
+                      switch (state.extendedImageLoadState) {
+                        case LoadState.loading:
+                          _aniController.reset();
+                          if(state.loadingProgress != null && state.loadingProgress!.expectedTotalBytes != null){
+                            int total = state.loadingProgress!.expectedTotalBytes!;
+                            int val = state.loadingProgress!.cumulativeBytesLoaded;
+                            return Center(
+                                child: CircularProgressIndicator(
+                                    color: ColorStyles.upFinWhite,
+                                    value: val / total
+                                )
                             );
-                          case LoadState.failed:
-                            _aniController.reset();
-                            if(imageLoadMap.containsKey(srcUrl)){
-                              imageLoadCnt--;
-                              imageLoadMap.remove(srcUrl);
-                            }
-                            return GestureDetector(
-                              child: UiUtils.getIcon(10.w, 10.w, Icons.refresh_rounded, 10.w, ColorStyles.upFinRed),
-                              onTap: () {
-                                state.reLoadImage();
-                              },
-                            );
-                        }
-                      },
-                    );
-                  } else {
-                    // 이미지 로딩 중에 표시할 로딩 표시 등을 추가할 수 있습니다.
-                    return UiUtils.getImage(8.w, 8.w, Image.asset(fit: BoxFit.fill,'assets/images/chat_loading.gif'));
-                  }
-                },
-              )
-          )
-        ]),
+                          }else{
+                            return UiUtils.getImage(8.w, 8.w, Image.asset(fit: BoxFit.fill,'assets/images/chat_loading.gif'));
+                          }
+                        case LoadState.completed:
+                          isLoading = false;
+                          _aniController.forward();
+                          if(imageLoadMap.containsKey(srcUrl)){
+                            imageLoadCnt--;
+                            imageLoadMap.remove(srcUrl);
+                          }
+                          return FadeTransition(
+                            opacity: _aniController,
+                            child: ExtendedRawImage(
+                              fit: BoxFit.contain,
+                              image: state.extendedImageInfo?.image,
+                            ),
+                          );
+                        case LoadState.failed:
+                          _aniController.reset();
+                          if(imageLoadMap.containsKey(srcUrl)){
+                            imageLoadCnt--;
+                            imageLoadMap.remove(srcUrl);
+                          }
+                          return GestureDetector(
+                            child: UiUtils.getIcon(10.w, 10.w, Icons.refresh_rounded, 10.w, ColorStyles.upFinRed),
+                            onTap: () {
+                              state.reLoadImage();
+                            },
+                          );
+                      }
+                    },
+                  );
+                } else {
+                  // 이미지 로딩 중에 표시할 로딩 표시 등을 추가할 수 있습니다.
+                  return UiUtils.getImage(8.w, 8.w, Image.asset(fit: BoxFit.fill,'assets/images/chat_loading.gif'));
+                }
+              },
+            )
+        ),
         onTap: ()  {
           if(!isLoading){
             UiUtils.showPopMenu(context, true, 100.w, 100.h, 0.5, 0, ColorStyles.upFinBlack, (slideContext, slideSetState){
@@ -742,35 +742,34 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                         Icons.save_alt_rounded, ColorStyles.upFinWhite, 5.w), () async {
 
                       CommonUtils.log("w", "download url : $srcUrl");
-                  String dir = "";
-                  if(appConfig.Config.isAndroid){
-                    dir = '/storage/emulated/0/Download';
-                  }else{
-                    dir = (await getApplicationDocumentsDirectory()).path;
-                  }
+                      String dir = "";
+                      if(appConfig.Config.isAndroid){
+                        dir = '/storage/emulated/0/Download';
+                      }else{
+                        dir = (await getApplicationDocumentsDirectory()).path;
+                      }
                       CommonUtils.log("w", "download dir : $dir");
-                  try{
-                    isOpenDownloadedFile = appConfig.Config.isAndroid? false : true;
-                    CommonUtils.flutterToast("이미지를 다운로드합니다.");
-                    await FlutterDownloader.enqueue(
-                      url: srcUrl, 	// file url
-                      savedDir: '$dir/',	// 저장할 dir
-                      fileName: '${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_img.${srcUrl.split(".").last}',	// 파일명
-                      saveInPublicStorage: true ,	// 동일한 파일 있을 경우 덮어쓰기 없으면 오류발생함!
-                      timeout: 5,
-                      showNotification: true,
-                      openFileFromNotification: true,
-                    );
+                      try{
+                        isOpenDownloadedFile = appConfig.Config.isAndroid? false : true;
+                        CommonUtils.flutterToast("이미지를 다운로드합니다.");
+                        await FlutterDownloader.enqueue(
+                          url: srcUrl, 	// file url
+                          savedDir: '$dir/',	// 저장할 dir
+                          fileName: '${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_img.${srcUrl.split(".").last}',	// 파일명
+                          saveInPublicStorage: true ,	// 동일한 파일 있을 경우 덮어쓰기 없으면 오류발생함!
+                          showNotification: true,
+                          openFileFromNotification: true,
+                        );
 
-                    String fileRealName = "${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_img.${srcUrl.split(".").last}";
-                    String fileName = "$dir/$fileRealName";
-                    savedFileName = fileName;
+                        String fileRealName = "${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_img.${srcUrl.split(".").last}";
+                        String fileName = "$dir/$fileRealName";
+                        savedFileName = fileName;
 
-                  }catch(error){
-                    CommonUtils.flutterToast("이미지 다운로드에 실패했습니다.");
-                    CommonUtils.log("e", "fail img download $error");
-                  }
-                }),
+                      }catch(error){
+                        CommonUtils.flutterToast("이미지 다운로드에 실패했습니다.");
+                        CommonUtils.log("e", "fail img download $error");
+                      }
+                    }),
                 appConfig.Config.isAndroid? UiUtils.getMarginBox(0, 1.h) :UiUtils.getMarginBox(0, 2.h),
               ]);
               return slideWidget;
@@ -783,7 +782,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
     Widget? meInfoWidget;
     bool isImageView = false;
     if(meInfo.messageType == "text"){
-
       meInfoWidget = UiUtils.getTextWithFixedScale(meInfo.message, 13.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null);
     }else{
       String extension = meInfo.message.split('.').last.toLowerCase();

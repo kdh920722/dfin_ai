@@ -384,25 +384,25 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
             }
           }
 
-          await Future.delayed(const Duration(milliseconds: 1500), () async {
-            UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, 22.h, 0.5, (slideContext, setState) =>
-                Column(mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      UiUtils.getMarginBox(100.w, 1.h),
-                      Column(children: [
-                        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("🙏 권한이 필요합니다.",14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
-                        UiUtils.getMarginBox(0, 1.h),
-                        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("[$deniedPermissionsString]",12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null))
-                      ]),
-                      UiUtils.getExpandedScrollView(Axis.vertical, Container()),
-                      UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                          UiUtils.getTextWithFixedScale("설정 바로가기", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () async {
-                            openAppSettings();
-                          }),
-                      Config.isAndroid ? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 5.h),
-                    ]
-                ));
-          });
+          String allText = deniedPermissionsString.contains(",")? " 모두"  : "";
+
+          UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, 22.h, 0.5, (slideContext, setState) =>
+              Column(mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    UiUtils.getMarginBox(100.w, 1.h),
+                    Column(children: [
+                      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("🙏 권한이 필요합니다.",14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
+                      UiUtils.getMarginBox(0, 1.h),
+                      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("[$deniedPermissionsString]권한을$allText 허용해주세요",12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null))
+                    ]),
+                    UiUtils.getExpandedScrollView(Axis.vertical, Container()),
+                    UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+                        UiUtils.getTextWithFixedScale("설정 바로가기", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () async {
+                          openAppSettings();
+                        }),
+                    Config.isAndroid ? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 5.h),
+                  ]
+              ));
 
           CommonUtils.log("i", "denied permissions : $deniedPermissionsString");
         }

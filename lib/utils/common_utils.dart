@@ -885,7 +885,7 @@ class CommonUtils {
   static Future<void> requestPermissions(Function(bool isDenied, List<String>? deniedPermissionsList) callback) async {
     List<String> deniedPermissions = [];
     for(var each in Config.permissionList){
-      var status = await each.status;
+      var status = await each.request();
       if (status.isDenied) {
         String permissionName = each.toString().split('.').last;
         switch(permissionName){
