@@ -870,19 +870,29 @@ class CommonUtils {
     }
   }
 
+  static Future<bool> isPermissionDenied() async {
+    bool result = false;
+    for(var each in Config.permissionList){
+      var status = await each.status;
+      if (status.isDenied) {
+        result = true;
+      }
+    }
+
+    return result;
+  }
+
   static Future<void> requestPermissions(Function(bool isDenied, List<String>? deniedPermissionsList) callback) async {
-    Map<Permission, PermissionStatus> statuses = await Config.permissionList.request();
     List<String> deniedPermissions = [];
     for(var each in Config.permissionList){
-      CommonUtils.log("","permissionName1 : ${each.toString().split('.').last}");
-      if(!statuses[each]!.isGranted) {
+      var status = await each.status;
+      if (status.isDenied) {
         String permissionName = each.toString().split('.').last;
-        CommonUtils.log("","permissionName2 : $permissionName");
         switch(permissionName){
           case "notification" : permissionName = "알림";
-          case "storage" : permissionName = "내부저장소";
+          case "phone" : permissionName = "전화";
           case "camera" : permissionName = "카메라";
-          case "photos" : permissionName = "사진";
+          case "microphone" : permissionName = "마이크";
         }
         deniedPermissions.add(permissionName);
       }
@@ -997,10 +1007,6 @@ class CommonUtils {
     }
 
     return result;
-  }
-
-  static void logToGA(String title, String msg){
-
   }
 
   static bool isValidStateByInfoVersion(){

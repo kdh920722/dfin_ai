@@ -81,6 +81,26 @@ dependencies:
   amazon_cognito_identity_dart_2: ^3.5.0
   recase: ^4.1.0
   firebase_analytics: ^10.6.3
+  assets_audio_player: ^3.1.1
+  flutter_native_splash: ^2.3.5
+
+flutter_native_splash:
+  color: "#466bf7"
+  color_dark: "#466bf7"
+  icon_background_color: "#466bf7"
+  image: assets/images/upfin_splash_icon.png
+  image_dark: assets/images/upfin_splash_icon.png
+  android: true
+  ios: true
+
+  android_12:
+    color: "#466bf7"
+    color_dark: "#466bf7"
+    image: assets/images/upfin_splash_icon.png
+    image_dark: assets/images/upfin_splash_icon.png
+    android: true
+
+  web: false
 
 dev_dependencies:
   flutter_test:
@@ -106,6 +126,7 @@ flutter:
 
   assets:
     - assets/images/
+    - assets/sounds/
     - pubspec.yaml
   # To add assets to your application, add an assets section, like this:
   # assets:

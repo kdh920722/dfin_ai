@@ -1572,10 +1572,9 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         ])),
         UiUtils.getMarginBox(0, 3.w),
         SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("주소를 입력해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-        // SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
         UiUtils.getMarginBox(0, 5.h),
         SizedBox(width: 85.w, height: 10.h,
-            child: UiUtils.getTextField(80.w, TextStyles.upFinSmallTextFormFieldTextStyle, _addressInfoFocus,
+            child: UiUtils.getTextField(80.w, TextStyles.upFinTextFormFieldTextStyle, _addressInfoFocus,
                 _addressInfoTextController, TextInputType.text, UiUtils.getInputDecorationForAddress("등본상 주소", 12.sp,
                     UiUtils.getIconButton(Icons.search, 8.w, ColorStyles.upFinButtonBlue, () {
                       if(_addressInfoTextController.text.trim() != ""){
@@ -1737,7 +1736,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               UiUtils.getRoundBoxTextWithFixedScale(" 🚨 안내사항 ", 11.sp, FontWeight.w600, TextAlign.start, ColorStyles.upFinWhite, ColorStyles.upFinBlack),
               UiUtils.getMarginBox(0, 0.7.h),
               UiUtils.getTextWithFixedScale2(
-                      "1.신분증은 반드시 신분증 원본을 준비해주세요."
+                  "1.신분증은 반드시 신분증 원본을 준비해주세요."
                       "\n   신분증 사본(모니터/휴대폰 화면 촬영 등)으로 확인될 경우,\n   인식이 되지 않을 수 있습니다."
                       "\n2.신분증을 어두운 배경에 두고, 밝은곳에서 촬영해주세요."
                       "\n   신분증의 홀로그램 부분에 빛이 반사되지 않도록\n   카메라 방향을 조정해주세요.", 10.sp, FontWeight.w300, ColorStyles.upFinWhite, TextAlign.start, null),

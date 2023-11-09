@@ -33,7 +33,7 @@ class Config{
   static bool isWeb = kIsWeb;
   static bool isAndroid = Platform.isAndroid;
   static String deppLinkInfo = "";
-  static List<Permission> permissionList = [Permission.notification, Permission.camera];
+  static List<Permission> permissionList = [Permission.notification, Permission.camera, Permission.phone, Permission.microphone];
   static String appVersion = "";
   static String appStoreUrl = "";
   static BuildContext? contextForEmergencyBack;

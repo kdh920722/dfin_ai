@@ -180,7 +180,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
   Widget _getEmailAndPwInfoView(){
     return Form(key: _formKey1, child: UiUtils.getRowColumnWithAlignCenter([
       SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getBackButton(() {
+        UiUtils.getBackButtonForMainView(() {
           back();
         })
       ])),
@@ -264,7 +264,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
   Widget _getPhoneValidView(){
     return Form(key: _formKey2, child: UiUtils.getRowColumnWithAlignCenter([
       Obx(()=>!GetController.to.isConfirmed.value? SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getBackButton(() async {
+        UiUtils.getBackButtonForMainView(() async {
           back();
         }),
       ])) : UiUtils.getMarginBox(0, 7.h)),

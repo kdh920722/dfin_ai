@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:upfin/configs/app_config.dart';
 import 'package:upfin/controllers/firebase_controller.dart';
@@ -8,8 +9,10 @@ import 'package:upfin/utils/ui_utils.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 
 void main() async{
-  WidgetsFlutterBinding.ensureInitialized();
+  WidgetsBinding widgetsBinding = WidgetsFlutterBinding.ensureInitialized();
+
   if(!kIsWeb){
+    FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
     await FireBaseController.initMainFirebase();
     await SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -21,7 +24,6 @@ void main() async{
     );
     await initializeDateFormatting();
   }
-
   runApp(const MyApp());
 }
 

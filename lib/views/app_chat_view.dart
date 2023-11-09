@@ -58,6 +58,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
   bool searchNoMore = false;
   double prevScrollPos = 0.0;
   static bool isScrollMove = false;
+  bool isOpenDownloadedFile = true;
 
   int imageLoadCnt = 0;
   Map<String,bool> imageLoadMap = {};
@@ -68,9 +69,10 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
     CommonUtils.log("d", "AppChatViewState 화면 입장");
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+
     _aniController = AnimationController(
         vsync: this,
-        duration: const Duration(seconds: 1),
+        duration: const Duration(milliseconds: 500),
         lowerBound: 0.0,
         upperBound: 1.0);
     currentRoomId = GetController.to.chatMessageInfoDataList[0].chatRoomId;
@@ -160,16 +162,21 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
         String id = data[0];
         int status = data[1];
         int progress = data[2];
-        CommonUtils.log("d", "download : $status, $progress");
+
+        CommonUtils.log('d','down state : $id $status $progress');
         if(status == 2){
-          UiUtils.closeLoadingPop(context);
+
         }
         if(status == 3 && progress == 100){
-          await FlutterDownloader.open(taskId: id);
+          bool canOpen = false;
+          while(!canOpen){
+            canOpen = await FlutterDownloader.open(taskId: id);
+          }
+          if(context.mounted) UiUtils.closeLoadingPop(context);
+          CommonUtils.flutterToast("다운로드가 완료되었습니다.");
         }
       }catch(error){
-        CommonUtils.log("e", "port.listen error : $error");
-        UiUtils.closeLoadingPop(context);
+        if(context.mounted) UiUtils.closeLoadingPop(context);
       }
     });
     FlutterDownloader.registerCallback(downloadCallback);
@@ -363,14 +370,14 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
           if(element.id == 'typeMe') {
             return {
               "color" : "white",
-              "font-size": "17px",
+              "font-size": "16sp",
               "line-height" : "120%",
               "font-weight": "normal",
             };
           }else if(element.id == 'typeOther') {
             return {
               "color" : "black",
-              "font-size": "16px",
+              "font-size": "16sp",
               "line-height" : "120%",
               "font-weight": "normal",
             };
@@ -379,7 +386,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
           if(element.id == 'boldText') {
             return {
               "color" : "black",
-              "font-size": "16px",
+              "font-size": "16sp",
               "line-height" : "120%",
               "font-weight": "bold",
             };
@@ -391,11 +398,10 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                 "text-align":"center",
                 "background-color": "white", //"#3a6cff",
                 "color" : "black",
-                "font-size": "16px",
-                "line-height" : "250%",
+                "font-size": "16sp",
                 "font-weight": "normal",
                 "border-radius":"0.1em",
-                "padding":"5px 20px",
+                "padding":"13px 20px",
                 "width": "500px",
               };
             }else if(element.id == 'buttonTypeMe'){
@@ -403,11 +409,10 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                 "text-align":"center",
                 "background-color":"white",
                 "color" : "#3a6cff",
-                "font-size": "16px",
-                "line-height" : "250%",
+                "font-size": "16sp",
                 "font-weight": "normal",
                 "border-radius":"0.1em",
-                "padding":"5px 20px",
+                "padding":"13px 20px",
                 "width": "500px",
               };
             }
@@ -416,34 +421,38 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
 
         onTapUrl: (url) async {
           if(isFileType){
+            CommonUtils.log("w", "download url : $url");
             String dir = "";
             if(appConfig.Config.isAndroid){
               dir = '/storage/emulated/0/Download';
-              CommonUtils.log("", "document dir : ${(await getApplicationDocumentsDirectory()).path}");
             }else{
               dir = (await getApplicationDocumentsDirectory()).path;
-              CommonUtils.log("", "document dir : ${(await getApplicationDocumentsDirectory()).path}");
             }
             try{
-              await FlutterDownloader.enqueue(
-                url: url, 	// file url
-                savedDir: '$dir/',	// 저장할 dir
-                fileName: '${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_doc.$extension',	// 파일명
-                saveInPublicStorage: true ,	// 동일한 파일 있을 경우 덮어쓰기 없으면 오류발생함!
-                showNotification: true,
-                openFileFromNotification: true,
-              );
-              String fileRealName = "${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_doc.$extension";
-              String fileName = "$dir/$fileRealName";
-              savedFileName = fileName;
-
-              if(context.mounted) UiUtils.showLoadingPop(context);
+              isOpenDownloadedFile = true;
               if(!isImage){
                 CommonUtils.flutterToast("문서를 다운로드합니다.");
               }
 
-            }catch(e){
-              CommonUtils.log("", "fail download");
+              await FlutterDownloader.enqueue(
+                url: url, 	// file url
+                savedDir: '$dir/',	// 저장할 dir
+                fileName: '${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_doc.$extension',	// 파일명
+                saveInPublicStorage: true,	// 동일한 파일 있을 경우 덮어쓰기 없으면 오류발생함!
+                timeout: 5,
+                showNotification: true,
+                openFileFromNotification: true,
+              );
+              String fileRealName = "${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_doc.$extension";
+              CommonUtils.log("w", "download url : $url");
+              String fileName = "$dir/$fileRealName";
+              savedFileName = fileName;
+              if(context.mounted) UiUtils.showLoadingPop(context);
+
+            }catch(error){
+              if(context.mounted) UiUtils.closeLoadingPop(context);
+              CommonUtils.flutterToast("문서 다운로드에 실패했습니다.");
+              CommonUtils.log("e", "fail doc download $error");
             }
           }else{
             CommonUtils.log("", "furl : $url");
@@ -597,14 +606,13 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                 borderRadius: BorderRadius.all(Radius.circular(5)),
                 color: ColorStyles.upFinBlack,
               ),
-              padding: EdgeInsets.all(0.8.w),
+
               alignment: Alignment.center,
               constraints: BoxConstraints(maxWidth: 70.w, maxHeight: 70.w, minWidth: 20.w, minHeight: 20.w),
               child: FutureBuilder(
                 future: _loadImageAsync(), // 이미지 로딩을 처리하는 비동기 함수
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.done) {
-                    CommonUtils.log("", "done!!");
                     return ExtendedImage.network(
                       srcUrl,
                       fit: BoxFit.contain,
@@ -612,7 +620,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                       cacheHeight: (40.w*devicePixelRatio).round().toInt(),
                       cacheMaxAge: const Duration(hours: 1),
                       shape: BoxShape.rectangle,
-                      borderRadius: const BorderRadius.all(Radius.circular(4)),
+                      borderRadius: const BorderRadius.all(Radius.circular(2)),
                       loadStateChanged: (ExtendedImageState state) {
                         switch (state.extendedImageLoadState) {
                           case LoadState.loading:
@@ -632,7 +640,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                           case LoadState.completed:
                             isLoading = false;
                             _aniController.forward();
-                            CommonUtils.log("", "size..\n70.w: ${70.w} \n${(40.w*devicePixelRatio).round().toInt()} ${state.extendedImageInfo?.image.width.toDouble()}, ${state.extendedImageInfo?.image.height.toDouble()}");
                             if(imageLoadMap.containsKey(srcUrl)){
                               imageLoadCnt--;
                               imageLoadMap.remove(srcUrl);
@@ -640,8 +647,8 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                             return FadeTransition(
                               opacity: _aniController,
                               child: ExtendedRawImage(
-                                image: state.extendedImageInfo?.image,
                                 fit: BoxFit.contain,
+                                image: state.extendedImageInfo?.image,
                               ),
                             );
                           case LoadState.failed:
@@ -661,7 +668,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                     );
                   } else {
                     // 이미지 로딩 중에 표시할 로딩 표시 등을 추가할 수 있습니다.
-                    CommonUtils.log("", "loading!!");
                     return UiUtils.getImage(8.w, 8.w, Image.asset(fit: BoxFit.fill,'assets/images/chat_loading.gif'));
                   }
                 },
@@ -672,20 +678,21 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
           if(!isLoading){
             UiUtils.showPopMenu(context, true, 100.w, 100.h, 0.5, 0, ColorStyles.upFinBlack, (slideContext, slideSetState){
               Widget slideWidget = Column(children: [
-                SizedBox(width: 95.w, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                SizedBox(width: 97.w, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                   UiUtils.getCloseButton(ColorStyles.upFinWhite, () {
                     Navigator.pop(slideContext);
                   })
                 ])),
-                Container(
+                UiUtils.getMarginBox(0, 4.h),
+                Align(alignment: Alignment.bottomCenter, child: Container(
                     color:ColorStyles.upFinBlack,
-                    width: 90.w, height: appConfig.Config.isAndroid? 85.h : 80.h,
+                    width: 90.w, height: appConfig.Config.isAndroid? 75.h : 70.h,
                     child: InteractiveViewer(
                         constrained: false,
                         child: Container(
                             color:ColorStyles.upFinBlack,
                             alignment: Alignment.center,
-                            constraints: BoxConstraints(maxWidth: 90.w, maxHeight: appConfig.Config.isAndroid? 85.h : 80.h, minWidth: 20.w, minHeight: 20.w),
+                            constraints: BoxConstraints(maxWidth: 90.w, maxHeight: 75.h, minWidth: 20.w, minHeight: 20.w),
                             child: ExtendedImage.network(
                               srcUrl,
                               fit: BoxFit.contain,
@@ -732,7 +739,43 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                               },
                             )
                         )
-                    ))
+                    ))),
+                UiUtils.getExpandedScrollView(Axis.vertical, Container()),
+                UiUtils.getBorderButtonBoxWithZeroPadding(30.w, ColorStyles.upFinBlack, ColorStyles.upFinBlack,
+                    UiUtils.getBoxTextAndIconWithFixedScale("저장하기", 12.sp, FontWeight.w300, TextAlign.center, ColorStyles.upFinBlack, ColorStyles.upFinWhite,
+                        Icons.save_alt_rounded, ColorStyles.upFinWhite, 5.w), () async {
+
+                      CommonUtils.log("w", "download url : $srcUrl");
+                  String dir = "";
+                  if(appConfig.Config.isAndroid){
+                    dir = '/storage/emulated/0/Download';
+                  }else{
+                    dir = (await getApplicationDocumentsDirectory()).path;
+                  }
+                      CommonUtils.log("w", "download dir : $dir");
+                  try{
+                    isOpenDownloadedFile = appConfig.Config.isAndroid? false : true;
+                    CommonUtils.flutterToast("이미지를 다운로드합니다.");
+                    await FlutterDownloader.enqueue(
+                      url: srcUrl, 	// file url
+                      savedDir: '$dir/',	// 저장할 dir
+                      fileName: '${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_img.${srcUrl.split(".").last}',	// 파일명
+                      saveInPublicStorage: true ,	// 동일한 파일 있을 경우 덮어쓰기 없으면 오류발생함!
+                      timeout: 5,
+                      showNotification: true,
+                      openFileFromNotification: true,
+                    );
+
+                    String fileRealName = "${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_img.${srcUrl.split(".").last}";
+                    String fileName = "$dir/$fileRealName";
+                    savedFileName = fileName;
+
+                  }catch(error){
+                    CommonUtils.flutterToast("이미지 다운로드에 실패했습니다.");
+                    CommonUtils.log("e", "fail img download $error");
+                  }
+                }),
+                appConfig.Config.isAndroid? UiUtils.getMarginBox(0, 1.h) :UiUtils.getMarginBox(0, 2.h),
               ]);
               return slideWidget;
             });
@@ -872,15 +915,18 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
   }
 
   Widget _getTimelineWidget(){
-    return Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        GetController.to.chatStatusTick.value>0?_stepTick(0, true):_stepTick(0, false),
-        GetController.to.chatStatusTick.value>1? _stepLine(true) : _stepLine(false),
-        GetController.to.chatStatusTick.value>1?_stepTick(1, true):_stepTick(1, false),
-        GetController.to.chatStatusTick.value>2? _stepLine(true) : _stepLine(false),
-        GetController.to.chatStatusTick.value>2?_stepTick(2, true):_stepTick(2, false)
-      ],
-    );
+    return Column(children: [
+      Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            GetController.to.chatStatusTick.value>0?_stepTick(0, true):_stepTick(0, false),
+            GetController.to.chatStatusTick.value>1? _stepLine(true) : _stepLine(false),
+            GetController.to.chatStatusTick.value>1?_stepTick(1, true):_stepTick(1, false),
+            GetController.to.chatStatusTick.value>2? _stepLine(true) : _stepLine(false),
+            GetController.to.chatStatusTick.value>2?_stepTick(2, true):_stepTick(2, false)
+          ]),
+      UiUtils.getMarginBox(0, 1.5.h),
+      UiUtils.getMarginColoredBox(100.w, 0.15.h, ColorStyles.upFinGray)
+    ]);
   }
   Widget _stepTick(int type, bool isChecked){
     String typeString = "";
@@ -1223,7 +1269,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
     }
   }
 
-  void _sendMessage(String message, String customMessageType){
+  void _sendMessage(String message, String customMessageType) {
     CommonUtils.hideKeyBoard();
     if(!WebSocketController.isWaitingForAnswerState(currentRoomId, "ME")){
       var inputJson = {
@@ -1249,7 +1295,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
 
       GetController.to.updateAutoAnswerWaiting(true);
       if(!isScrollMove) setState(() {});
-
 
       LogfinController.callLogfinApi(LogfinApis.sendMessage, inputJson, (isSuccess, _){
         GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
@@ -1412,7 +1457,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
             Positioned(
               top: 1.h,
               left: 5.w,
-              child: UiUtils.getBackButton(() {
+              child: UiUtils.getBackButtonForMainView(() {
                 _back();
               }),
             ),
@@ -1448,13 +1493,19 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
             if(GetController.to.isShowStatus.value){
               return Column(children:[
                 UiUtils.getMarginBox(0, 3.h),
-                Obx(()=>_getTimelineWidget())
+                _getTimelineWidget()
               ]);
             }else{
               return Container();
             }
           }),
-          UiUtils.getMarginBox(0, 1.h),
+          Obx((){
+            if(GetController.to.isShowStatus.value){
+              return UiUtils.getMarginBox(0, 0);
+            }else{
+              return UiUtils.getMarginBox(0, 1.h);
+            }
+          }),
           Expanded(child: RefreshIndicator(onRefresh: ()=>_requestPrev(),color: ColorStyles.upFinButtonBlue, backgroundColor: ColorStyles.upFinWhiteSky,
               child: SingleChildScrollView(controller: _chatScrollController, scrollDirection: Axis.vertical, physics: const BouncingScrollPhysics(),
                   child: Obx(()=>Column(mainAxisAlignment: MainAxisAlignment.start, children: _getChatList()))))),

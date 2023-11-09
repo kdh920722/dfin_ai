@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:upfin/controllers/aws_controller.dart';
 import 'package:upfin/controllers/clova_controller.dart';
 import 'package:upfin/controllers/get_controller.dart';
@@ -19,7 +20,6 @@ import 'package:upfin/styles/ColorStyles.dart';
 import 'package:uni_links/uni_links.dart';
 import '../controllers/codef_controller.dart';
 import '../datas/my_data.dart';
-import '../styles/TextStyles.dart';
 import '../configs/app_config.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
@@ -32,6 +32,10 @@ class AppRootView extends StatefulWidget{
 
 class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
   bool isAutoLogin = false;
+  Timer? permissionCheckTimer;
+  bool isPermissionCheckStarted = false;
+  bool isPermissionDenied = false;
+
   @override
   void initState(){
     CommonUtils.log("i", "AppRootView 화면 입장");
@@ -54,6 +58,8 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
     WidgetsBinding.instance.removeObserver(this);
     GetController.to.resetPercent();
     Config.contextForEmergencyBack = null;
+    if(permissionCheckTimer != null) permissionCheckTimer!.cancel();
+    permissionCheckTimer = null;
     CommonUtils.saveSettingsToFile("push_from", "");
     CommonUtils.saveSettingsToFile("push_room_id", "");
     super.dispose();
@@ -369,6 +375,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
     if(Config.isAndroid){
       await CommonUtils.requestPermissions((isDenied, deniedPermissionsList) async {
         if(isDenied){
+          isPermissionDenied = true;
           String deniedPermissionsString = "";
           for(int i = 0; i < deniedPermissionsList!.length; i++){
             deniedPermissionsString += deniedPermissionsList[i];
@@ -378,16 +385,21 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
           }
 
           await Future.delayed(const Duration(milliseconds: 1500), () async {
-            UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, 18.h, 0.5, (slideContext, setState) =>
-                Column(mainAxisAlignment: MainAxisAlignment.center,
+            UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, 22.h, 0.5, (slideContext, setState) =>
+                Column(mainAxisAlignment: MainAxisAlignment.start,
                     children: [
-                      UiUtils.getStyledTextWithFixedScale("[$deniedPermissionsString] 권한이 필요합니다. ", TextStyles.upFinBasicTextStyle, TextAlign.center, null),
-                      UiUtils.getMarginBox(100.w, 2.h),
+                      UiUtils.getMarginBox(100.w, 1.h),
+                      Column(children: [
+                        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("🙏 권한이 필요합니다.",14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
+                        UiUtils.getMarginBox(0, 1.h),
+                        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("[$deniedPermissionsString]",12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null))
+                      ]),
+                      UiUtils.getExpandedScrollView(Axis.vertical, Container()),
                       UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                          UiUtils.getTextWithFixedScale("설정 바로가기", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
+                          UiUtils.getTextWithFixedScale("설정 바로가기", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () async {
                             openAppSettings();
-                            Navigator.of(slideContext).pop();
-                          })
+                          }),
+                      Config.isAndroid ? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 5.h),
                     ]
                 ));
           });
@@ -396,6 +408,18 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
         }
       });
     }
+  }
+
+  void _callInitApis(){
+    _initCodeF();
+    _initJuso();
+    _initCLOVA();
+    _initAWS();
+    _initLogfin();
+    _initHyphen();
+    _initIamport();
+    _initSnsLogin();
+    _initWebSocketForChat();
   }
 
   Future<void> _initAtFirst() async {
@@ -411,19 +435,31 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
           Config.deppLinkInfo = "";
         }
       });
-      await _requestPermissions();
       await _initSharedPreference();
-      // count..
-      //_initGPT();
-      _initCodeF();
-      _initJuso();
-      _initCLOVA();
-      _initAWS();
-      _initLogfin();
-      _initHyphen();
-      _initIamport();
-      _initSnsLogin();
-      _initWebSocketForChat();
+
+      if(Config.isAndroid){
+        isPermissionDenied = await CommonUtils.isPermissionDenied();
+        if(isPermissionDenied){
+          permissionCheckTimer ??= Timer.periodic(const Duration(milliseconds: 500), (Timer timer) async {
+            isPermissionDenied = await CommonUtils.isPermissionDenied();
+            if(isPermissionDenied && !isPermissionCheckStarted){
+              isPermissionCheckStarted = true;
+              await _requestPermissions();
+            }else if(!isPermissionDenied && isPermissionCheckStarted){
+              if(permissionCheckTimer != null) permissionCheckTimer!.cancel();
+              // count..
+              //_initGPT();
+              if(context.mounted) Navigator.pop(context);
+              _callInitApis();
+            }
+          });
+        }else{
+          _callInitApis();
+        }
+      }else{
+        _callInitApis();
+      }
+
     }else if(Config.appState == Config.stateInfoMap["update"]){
       if(context.mounted){
         UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, 18.h, 0.5, (context, setState){
@@ -525,6 +561,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
     if(!Config.isAppMainInit){
       _initAtFirst();
       view = Obx(()=>UiUtils.getInitLoadingView(GetController.to.loadingPercent.value));
+      FlutterNativeSplash.remove();
     }else{
       if(!Config.isControllerLoadFinished){
         view = Obx(()=>UiUtils.getInitLoadingView(GetController.to.loadingPercent.value));

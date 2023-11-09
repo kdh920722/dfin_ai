@@ -1045,7 +1045,7 @@ class CodeFController{
             : Column(children: [
           UiUtils.getMarginBox(0, 0.5.h),
           UiUtils.getStyledTextWithFixedScale(certName, TextStyles.upFinBasicTextStyle, TextAlign.center, null)]),
-        GetController.to.isWait.value? UiUtils.getMarginBox(0, 3.h) : UiUtils.getMarginBox(0, 0.5.h),
+        GetController.to.isWait.value? UiUtils.getMarginBox(0, 3.h) : UiUtils.getMarginBox(0, 0.8.h),
         GetController.to.isWait.value? UiUtils.getStyledTextWithFixedScale("서류를 가지고 오는중입니다.", TextStyles.upFinBasicTextStyle, TextAlign.center, null) : Container(),
         GetController.to.isWait.value? Container() : UiUtils.getStyledTextWithFixedScale("간편인증 후 확인 버튼을 눌러주세요.", TextStyles.upFinBasicTextStyle, TextAlign.center, null),
         GetController.to.isWait.value? Container() : UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),

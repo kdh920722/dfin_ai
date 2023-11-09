@@ -223,7 +223,7 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
         Stack(children: [
           Positioned(
             top: 1.h,
-            child: UiUtils.getBackButton(() {
+            child: UiUtils.getBackButtonForMainView(() {
               back();
             }),
           ),

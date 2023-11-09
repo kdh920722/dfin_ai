@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sizer/sizer.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:upfin/configs/app_config.dart';
@@ -17,6 +18,7 @@ import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import '../controllers/get_controller.dart';
 import '../controllers/sharedpreference_controller.dart';
+import '../styles/TextStyles.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
 import 'app_update_accident_view.dart';
@@ -219,7 +221,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                   child: UiUtils.getBannerButtonBox(90.w, 50.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
                       Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                         SizedBox(width: 77.w, child: UiUtils.getTextWithFixedScale("위기는 기회다! ", 22.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, 1)),
-                        // SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale("기회다!", 25.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, 1)),
                         UiUtils.getMarginBox(0, 10.h)
                       ]), () {})),
               Positioned(
@@ -318,14 +319,12 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                         await CommonUtils.moveToWithResult(context, AppView.appUpdateAccidentView.value, null);
                         isViewHere = false;
                       }else{
-                        CommonUtils.log("i", "accdient uid : ${each.accidentUid}"); // be  :m-PYw9Qm5gvLonWRrCUAbQ  af : 5L5zVL98TsNC-1uz4xednA
                         isViewHere = false;
                         await CommonUtils.moveToWithResult(context, AppView.appAccidentDetailInfoView.value, null);
                         isViewHere = false;
                       }
                     })
               ]), () async {
-                CommonUtils.log("i", "accdient uid : ${each.accidentUid}"); // be  :m-PYw9Qm5gvLonWRrCUAbQ  af : 5L5zVL98TsNC-1uz4xednA
                 MyData.selectedAccidentInfoData = each;
                 isViewHere = false;
                 await CommonUtils.moveToWithResult(context, AppView.appAccidentDetailInfoView.value, null);
@@ -364,7 +363,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
           Column(children: [
             UiUtils.getMarginBox(0, 1.5.h),
             UiUtils.getBorderButtonBoxWithZeroPadding(92.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
-                Row(mainAxisSize: MainAxisSize.max, children: [
+                Row(mainAxisSize: MainAxisSize.min, children: [
                   Expanded(flex: 2, child: each.chatRoomType == 0? UiUtils.getIcon(11.w, 11.w, Icons.account_box_rounded, 11.w, ColorStyles.upFinButtonBlue)
                       : UiUtils.getImage(11.w, 11.w, Image.asset(each.chatRoomIconPath))),
                   UiUtils.getMarginBox(1.w, 0),
@@ -378,17 +377,16 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                           UiUtils.getRoundBoxTextWithFixedScale(LoanInfoData.getDetailStatusName(each.chatRoomLoanStatus), 7.sp, FontWeight.w600, TextAlign.center,  ColorStyles.upFinWhiteSky, ColorStyles.upFinButtonBlue),
                           UiUtils.getMarginBox(2.w, 0),
                           Expanded(child: UiUtils.getTextWithFixedScaleAndOverFlow(lastMsg, 9.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, 1))
-                          //each.chatRoomType != 0? UiUtils.getTextWithFixedScale("${each.loanMinRate}  ${each.loanMaxLimit}", 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null) : Container()
                         ]),
                         UiUtils.getMarginBox(0, 0.2.h),
                       ])
                     ])
                   ])),
                   Expanded(flex: 2, child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                    UiUtils.getTextWithFixedScale(CommonUtils.getFormattedLastMsgTime(lastDateString), 8.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null),
+                   Row(children: [ UiUtils.getTextWithFixedScale(CommonUtils.getFormattedLastMsgTime(lastDateString), 8.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null), UiUtils.getMarginBox(0.5.w, 0) ],),
                     UiUtils.getMarginBox(0,1.h),
                     cnt > 0? Row(mainAxisSize: MainAxisSize.min, children: [
-                      UiUtils.getCountCircleBox(6.w, cnt, 7.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.center, 1), UiUtils.getMarginBox(0.3.w, 0)]) : Container()
+                      UiUtils.getCountCircleBox(6.w, cnt, 7.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.center, 1), UiUtils.getMarginBox(0.8.w, 0)]) : Container()
                   ]))
                 ]), () async {
                   if(WebSocketController.isSubscribe(each.chatRoomId)){
@@ -510,22 +508,22 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
           UiUtils.getMarginBox(0, 3.w),
           UiUtils.getBorderButtonBoxWithZeroPadding(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
               Row(children: [UiUtils.getTextWithFixedScale("설정", 22.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null)]), () {}),
+          UiUtils.getMarginBox(0, 3.h),
           UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
               Row(children: [UiUtils.getTextWithFixedScale("계정", 15.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)]), () async {
                 isViewHere = false;
                 await CommonUtils.moveToWithResult(context, AppView.appSignOutView.value, null);
                 isViewHere = true;
               }),
-          UiUtils.getMarginBox(0, 0.4.h),
           UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
               Row(children: [
                 UiUtils.getTextWithFixedScale("버전", 15.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null),
                 const Spacer(flex: 2),
                 UiUtils.getTextWithFixedScale("(${Config.appVersion})", 15.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)
               ]), () {}),
-          UiUtils.getMarginBox(0, 0.4.h),
           UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
               Row(children: [UiUtils.getTextWithFixedScale("로그아웃", 15.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)]), () {
+                SharedPreferenceController.deleteValidAutoLoginData();
                 CommonUtils.backToHome(context);
               })
         ])
@@ -625,7 +623,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, 30.h, 0.5, (slideContext, setState){
       return Center(child: Column(children: [
         UiUtils.getMarginBox(0, 1.h),
-        UiUtils.getTextWithFixedScale("📌 안내사항", 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
+        UiUtils.getTextWithFixedScale("📌 안내사항", 14.sp, FontWeight.w800, ColorStyles.upFinBlack, TextAlign.center, null),
         UiUtils.getMarginBox(0, 3.h),
         UiUtils.getExpandedScrollView(Axis.vertical,
             UiUtils.getTextWithFixedScale2(Config.appInfoTextMap["info_text"].replaceAll("@@", "\n"), 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
@@ -649,7 +647,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if(isViewHere){
+      if(isViewHere && viewTypeId == 2){
         if(!isInfoPopShow){
           isInfoPopShow = true;
           if(!CommonUtils.isValidStateByInfoExpiredDate()){

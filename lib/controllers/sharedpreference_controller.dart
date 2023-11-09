@@ -59,9 +59,19 @@ class SharedPreferenceController {
       }else{
         return "";
       }
-    }catch(e){
-      CommonUtils.log('e', e.toString());
+    }catch(error){
+      CommonUtils.log('e', error.toString());
       return "";
+    }
+  }
+
+  static void deleteValidAutoLoginData(){
+    try{
+      if(sharedPreferences!.containsKey(sharedPreferenceValidDateKey)){
+        sharedPreferences!.remove(sharedPreferenceValidDateKey);
+      }
+    }catch(error){
+      CommonUtils.log('e', error.toString());
     }
   }
 
@@ -111,8 +121,8 @@ class SharedPreferenceController {
         sharedPreferences!.remove(sharedPreferenceValidInfoDateKey);
       }
 
-    }catch(e){
-      CommonUtils.log('e', e.toString());
+    }catch(error){
+      CommonUtils.log('e', error.toString());
     }
   }
 

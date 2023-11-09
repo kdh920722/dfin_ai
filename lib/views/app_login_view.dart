@@ -85,7 +85,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     Form(key: _formKey,
         child: UiUtils.getRowColumnWithAlignCenter([
           SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            UiUtils.getBackButton(() async {
+            UiUtils.getBackButtonForMainView(() async {
               back();
             }),
           ])),

@@ -29,7 +29,7 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
 
   @override
   void initState(){
-    CommonUtils.log("i", "AppSignOutViewState 화면 입장");
+    CommonUtils.log("d", "AppSignOutViewState 화면 입장");
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     Config.contextForEmergencyBack = context;
@@ -39,7 +39,7 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
 
   @override
   void dispose(){
-    CommonUtils.log("i", "AppSignOutViewState 화면 파괴");
+    CommonUtils.log("d", "AppSignOutViewState 화면 파괴");
     WidgetsBinding.instance.removeObserver(this);
     _unFocusAllNodes();
     _disposeAllTextControllers();
@@ -51,17 +51,17 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
-        CommonUtils.log('i','AppSignOutView resumed');
+        CommonUtils.log('d','AppSignOutView resumed');
         break;
       case AppLifecycleState.inactive:
-        CommonUtils.log('i','AppSignOutView inactive');
+        CommonUtils.log('d','AppSignOutView inactive');
         break;
       case AppLifecycleState.detached:
-        CommonUtils.log('i','AppSignOutView detached');
+        CommonUtils.log('d','AppSignOutView detached');
         // DO SOMETHING!
         break;
       case AppLifecycleState.paused:
-        CommonUtils.log('i','AppSignOutView paused');
+        CommonUtils.log('d','AppSignOutView paused');
         break;
       default:
         break;
@@ -85,13 +85,13 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
         padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w),
         child: UiUtils.getRowColumnWithAlignCenter([
           SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            UiUtils.getBackButton(() async {
+            UiUtils.getBackButtonForMainView(() async {
               back();
             }),
           ])),
           SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             UiUtils.getMarginBox(0, 3.w),
-            UiUtils.getTextWithFixedScale("계정", 20.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
+            UiUtils.getTextWithFixedScale("계정", 22.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
             UiUtils.getMarginBox(0, 3.h)
           ])),
           UiUtils.getDisabledTextField(90.w, MyData.name, TextStyles.upFinDisabledTextFormFieldTextStyle2,
@@ -115,7 +115,7 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
                           })
                         ])),
                         UiUtils.getMarginBox(0, 3.h),
-                        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("탈퇴", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
+                        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("탈퇴", 22.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
                         UiUtils.getMarginBox(0, 1.h),
                         SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("비밀번호 입력 후 회원탈퇴가 가능합니다.", 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
                         UiUtils.getMarginBox(0, 3.h),

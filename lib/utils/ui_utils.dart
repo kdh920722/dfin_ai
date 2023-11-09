@@ -273,6 +273,13 @@ class UiUtils {
             onPressed: onPressedCallback, icon: Icon(Icons.arrow_back_ios_new_sharp, color: ColorStyles.upFinDarkGray, size: 5.w)));
   }
 
+  static Widget getBackButtonForMainView(VoidCallback onPressedCallback) {
+    return SizedBox(
+        width : 15.w,
+        child: IconButton(constraints: const BoxConstraints(), padding: EdgeInsets.only(right: 10.w),
+            onPressed: onPressedCallback, icon: Icon(Icons.arrow_back_ios_new_sharp, color: ColorStyles.upFinDarkGray, size: 5.w)));
+  }
+
   static Widget getCloseButton(Color iconColor, VoidCallback onPressedCallback) {
     return SizedBox(
         width : 15.w,
@@ -1058,7 +1065,7 @@ class UiUtils {
             UiUtils.getTextWithFixedScaleForAgreeSubTitle("서비스를 이용하기 위해 고객님의 서비스 이용약관에 동의가 필요합니다.", 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)
           ]),
           UiUtils.getMarginBox(0, 3.h),
-          GestureDetector(child: Container(color: ColorStyles.upFinWhiteGray, child: Row(
+          GestureDetector(child: Container(height: 8.h, color: ColorStyles.upFinWhiteGray, child: Row(
             children: [
               UiUtils.getCheckBox(1.2, isAllAgree(), (isChanged) {
                 thisSetState(() {
@@ -1076,7 +1083,6 @@ class UiUtils {
               }
             });
           }),
-          UiUtils.getMarginBox(0, 2.h),
           UiUtils.getExpandedScrollViewWithController(Axis.vertical, Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
             Column(crossAxisAlignment:CrossAxisAlignment.start, children: getAgreeWidgetList()),
           ]), _agreeScrollController),
