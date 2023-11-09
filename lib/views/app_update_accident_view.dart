@@ -135,7 +135,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
 
   @override
   void initState(){
-    CommonUtils.log("i", "AppSearchAccidentView 화면 입장");
+    CommonUtils.log("d", "AppSearchAccidentView 화면 입장");
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _bankAccountInfoTextController.addListener(_bankAccountInfoTextControllerListener);
@@ -187,7 +187,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
 
   @override
   void dispose(){
-    CommonUtils.log("i", "AppSearchAccidentView 화면 파괴");
+    CommonUtils.log("d", "AppSearchAccidentView 화면 파괴");
     WidgetsBinding.instance.removeObserver(this);
     _unFocusAllNodes();
     _disposeAllTextControllers();
@@ -204,17 +204,17 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
-        CommonUtils.log('i','AppSearchAccidentView resumed');
+        CommonUtils.log('d','AppSearchAccidentView resumed');
         break;
       case AppLifecycleState.inactive:
-        CommonUtils.log('i','AppSearchAccidentView inactive');
+        CommonUtils.log('d','AppSearchAccidentView inactive');
         break;
       case AppLifecycleState.detached:
-        CommonUtils.log('i','AppSearchAccidentView detached');
+        CommonUtils.log('d','AppSearchAccidentView detached');
         // DO SOMETHING!
         break;
       case AppLifecycleState.paused:
-        CommonUtils.log('i','AppSearchAccidentView paused');
+        CommonUtils.log('d','AppSearchAccidentView paused');
         break;
       default:
         break;
@@ -356,7 +356,6 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
               int lastVisibleItem2 = firstVisibleItem2+maxVisibleItemCnt2;
               if(firstVisibleItem2 <=0 ) firstVisibleItem2 = 0;
               if(lastVisibleItem2 >= LogfinController.bankList.length-1) lastVisibleItem2 = LogfinController.bankList.length-1;
-              print('보이는 아이템 ====> ${LogfinController.bankList.length} : $firstVisibleItem2 | $lastVisibleItem2');
 
               GetController.to.updateFirstIndex2_2(firstVisibleItem2);
               GetController.to.updateLastIndex2_2(lastVisibleItem2);
@@ -373,7 +372,6 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
         child: UiUtils.getExpandedScrollViewWithController(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: bankCodeList), _bankScrollController)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-        CommonUtils.log("i", "bank code : $selectedBankCodeInfo");
         if(selectedBankCodeInfo.isNotEmpty){
           isAutoScrollableForTarget = true;
           nextInputView();
@@ -404,7 +402,6 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, currentViewId == endViewId ? "수정하기" : "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
         selectedBankAccountInfo = _bankAccountInfoTextController.text.trim();
-        CommonUtils.log("i", "selectedBankAccountInfo : $selectedBankAccountInfo");
         if(selectedBankAccountInfo.isNotEmpty){
           nextInputView();
         }else{
@@ -480,7 +477,6 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: loanCountList)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-        CommonUtils.log("i", "loan count : $selectedPreLoanCountInfo");
         if(selectedPreLoanCountInfo.isNotEmpty){
           if(selectedPreLoanCountInfo.split("@")[1] == "0"){
             selectedPreLoanPriceInfo = "0";
@@ -535,7 +531,6 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
           }else{
             selectedPreLoanPriceInfo = "0";
           }
-          CommonUtils.log("i", "selectedPreLoanPriceInfo : $selectedPreLoanPriceInfo");
           nextInputView();
         })
       ])
@@ -581,7 +576,6 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
           }else{
             selectedWantLoanPriceInfo = "0";
           }
-          CommonUtils.log("i", "selectedWantLoanPriceInfo : $selectedWantLoanPriceInfo");
           nextInputView();
         })
       ])
@@ -654,7 +648,6 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: jobList)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-        CommonUtils.log("i", "selectedJobInfo : $selectedJobInfo");
         if(selectedJobInfo.isNotEmpty){
           nextInputView();
         }else{
@@ -796,7 +789,6 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
                   if(isSuccessToGetOffers){
                     String thisAccidentNum = MyData.selectedAccidentInfoData!.accidentCaseNumberYear+MyData.selectedAccidentInfoData!.accidentCaseNumberType+MyData.selectedAccidentInfoData!.accidentCaseNumberNumber;
                     String updatedAccidentUid = MyData.findUidInAccidentInfoList(thisAccidentNum);
-                    CommonUtils.log("i", "updatedAccidentUid $updatedAccidentUid");
                     for(var each in MyData.getAccidentInfoList()){
                       if(each.accidentUid == updatedAccidentUid){
                         MyData.selectedAccidentInfoData = each;

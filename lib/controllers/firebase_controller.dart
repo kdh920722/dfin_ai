@@ -55,12 +55,7 @@ class FireBaseController{
 
   static Future<void> writeLog(String type, String id, String msg) async {
     try{
-      String dbPath = "";
-      if(type == "error"){
-        dbPath = "UPFIN/LOG/error";
-      }else{
-        dbPath = "UPFIN/LOG/info";
-      }
+      String dbPath = "UPFIN/LOG/$type";
 
       final snapshot = await FirebaseDatabase.instance.ref().child("$dbPath/$fcmToken").get();
       if (snapshot.exists) {
@@ -73,9 +68,9 @@ class FireBaseController{
           }
         };
         saveRef.update(data).then((_) {
-          CommonUtils.log("i", 'Data has been written successfully.');
+          CommonUtils.log("d", 'Data has been written successfully.');
         }).catchError((error) {
-          CommonUtils.log("i", 'Failed to write data: $error');
+          CommonUtils.log("d", 'Failed to write data: $error');
         });
       }else{
         final saveRef = FirebaseDatabase.instance.ref().child(dbPath);
@@ -89,13 +84,13 @@ class FireBaseController{
           }
         };
         saveRef.update(data).then((_) {
-          CommonUtils.log("i", 'Data has been written successfully.');
+          CommonUtils.log("d", 'Data has been written successfully.');
         }).catchError((error) {
-          CommonUtils.log("i", 'Failed to write data: $error');
+          CommonUtils.log("d", 'Failed to write data: $error');
         });
       }
     }catch(error){
-      CommonUtils.log("i", "write log error : ${error.toString()}");
+      CommonUtils.log("", "write log error : ${error.toString()}");
     }
   }
 

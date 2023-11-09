@@ -238,19 +238,19 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
 
   @override
   Widget build(BuildContext context) {
-    Widget view = Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: Column(children: [
-      Row(children: [
-        const Spacer(flex: 2),
-        UiUtils.getIconButtonWithHeight(3.h, Icons.close, 25.sp, ColorStyles.upFinDarkGray, () {
+    Widget view = Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: EdgeInsets.only(top:3.w), child:
+    Column(children: [
+      SizedBox(width: 95.w, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+        UiUtils.getCloseButton(ColorStyles.upFinDarkGray, () {
           MyData.selectedAccidentInfoData = null;
           MyData.selectedPrInfoData = null;
           Navigator.pop(context);
         })
-      ]),
+      ])),
       UiUtils.getMarginBox(0, 3.w),
-      SizedBox(width: 95.w, height: 5.h , child : UiUtils.getTextWithFixedScale("대출상품", 24.sp, FontWeight.w800, ColorStyles.upFinButtonBlue, TextAlign.start, 1)),
+      SizedBox(width: 90.w, height: 5.h , child : UiUtils.getTextWithFixedScale("대출상품", 24.sp, FontWeight.w800, ColorStyles.upFinButtonBlue, TextAlign.start, 1)),
       UiUtils.getMarginBox(0, 1.h),
-      SizedBox(width: 95.w, height: 5.h, child: TabBar(
+      SizedBox(width: 90.w, height: 5.h, child: TabBar(
         unselectedLabelStyle: TextStyles.upFinUnselectedTabTextInButtonStyle,
         unselectedLabelColor: ColorStyles.upFinRealGray,
         labelStyle: TextStyles.upFinSelectedTabTextInButtonStyle,
@@ -266,7 +266,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
         ],
       )),
       UiUtils.getMarginBox(0, 2.h),
-      SizedBox(height: 6.h, child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+      SizedBox(width: 90.w, height: 6.h, child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
         UiUtils.getTextWithFixedScale("상품 ", 14.sp, FontWeight.w400, ColorStyles.upFinBlack, TextAlign.center, 1),
         UiUtils.getTextWithFixedScale("$selectedTabCount개", 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, 1),
         const Spacer(flex: 2),
@@ -280,21 +280,17 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
               _reOrderList(true);
             })
       ])),
-      SizedBox(width: 95.w, height: 60.h, child: TabBarView(
+      SizedBox(width: 90.w, height: Config.isAndroid? 65.h : 60.h, child: TabBarView(
         controller: _tabController,
         children: <Widget>[
           possiblePrCnt>0 ? Column(children: [
-            UiUtils.getMarginBox(0, 3.h),
+            UiUtils.getMarginBox(0, 2.h),
             _getPrListView(true)
-          ]) : Center(
-            child: UiUtils.getTextWithFixedScale("접수 가능한 상품이 없습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
-          ),
+          ]) : Center(child: UiUtils.getTextWithFixedScale("접수 가능한 상품이 없습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null)),
           impossiblePrCnt>0 ? Column(children: [
-            UiUtils.getMarginBox(0, 3.h),
+            UiUtils.getMarginBox(0, 2.h),
             _getPrListView(false)
-          ]) : Center(
-            child: UiUtils.getTextWithFixedScale("접수 불가능한 상품이 없습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
-          )
+          ]) : Center(child: UiUtils.getTextWithFixedScale("접수 불가능한 상품이 없습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null))
         ],
       ))
     ]));

@@ -15,7 +15,7 @@ class AppAgreeDetailInfoViewState extends State<AppAgreeDetailInfoView> with Wid
 
   @override
   void initState(){
-    CommonUtils.log("i", "AppAgreeDetailInfoView 화면 입장");
+    CommonUtils.log("d", "AppAgreeDetailInfoView 화면 입장");
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     Config.contextForEmergencyBack = context;
@@ -25,7 +25,7 @@ class AppAgreeDetailInfoViewState extends State<AppAgreeDetailInfoView> with Wid
 
   @override
   void dispose(){
-    CommonUtils.log("i", "AppAgreeDetailInfoView 화면 파괴");
+    CommonUtils.log("d", "AppAgreeDetailInfoView 화면 파괴");
     WidgetsBinding.instance.removeObserver(this);
     Config.contextForEmergencyBack = null;
     super.dispose();
@@ -35,17 +35,17 @@ class AppAgreeDetailInfoViewState extends State<AppAgreeDetailInfoView> with Wid
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
-        CommonUtils.log('i','AppAgreeDetailInfoView resumed');
+        CommonUtils.log('d','AppAgreeDetailInfoView resumed');
         break;
       case AppLifecycleState.inactive:
-        CommonUtils.log('i','AppAgreeDetailInfoView inactive');
+        CommonUtils.log('d','AppAgreeDetailInfoView inactive');
         break;
       case AppLifecycleState.detached:
-        CommonUtils.log('i','AppAgreeDetailInfoView detached');
+        CommonUtils.log('d','AppAgreeDetailInfoView detached');
         // DO SOMETHING!
         break;
       case AppLifecycleState.paused:
-        CommonUtils.log('i','AppAgreeDetailInfoView paused');
+        CommonUtils.log('d','AppAgreeDetailInfoView paused');
         break;
       default:
         break;
@@ -60,16 +60,15 @@ class AppAgreeDetailInfoViewState extends State<AppAgreeDetailInfoView> with Wid
   @override
   Widget build(BuildContext context) {
     Map<String, dynamic> agreeInfo = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>;
-    //String title = agreeInfo["title"].toString();
-    Widget subContents = agreeInfo["contents"] as Widget;
+    Widget subContents = Padding(padding: EdgeInsets.only(right: 5.w, left: 5.w), child: agreeInfo["contents"] as Widget);
 
     Widget view = Container(
         color: ColorStyles.upFinWhite,
         width: 100.w,
         height: 100.h,
-        padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w),
+        padding: EdgeInsets.only(bottom: 5.w, top: 3.w),
         child: Column(children: [
-          SizedBox(width: 90.w, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+          SizedBox(width: 95.w, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
             UiUtils.getCloseButton(ColorStyles.upFinDarkGray, () {
               Navigator.pop(context, false);
             })

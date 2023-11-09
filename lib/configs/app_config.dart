@@ -6,7 +6,6 @@ import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:upfin/views/app_accident_detail_view.dart';
 import 'package:upfin/views/app_agree_detail_info_view.dart';
 import 'package:upfin/views/app_agree_detail_info_view_test.dart';
-import 'package:upfin/views/app_apply_doc_view.dart';
 import 'package:upfin/views/app_apply_pr_view.dart';
 import 'package:upfin/views/app_detail_pr_view.dart';
 import 'package:upfin/views/app_main_view.dart';
@@ -16,7 +15,6 @@ import 'package:upfin/views/app_search_accident_view.dart';
 import 'package:upfin/views/app_signout_view.dart';
 import 'package:upfin/views/app_signup_view.dart';
 import 'package:upfin/views/app_update_accident_view.dart';
-import 'package:upfin/views/app_web_view.dart';
 import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:upfin/views/debug_for_admin_view.dart';
@@ -46,7 +44,6 @@ class Config{
     AppView.appRootView.value : (context) => AppRootView(),
     AppView.appLoginView.value : (context) => AppLoginView(),
     AppView.appCertificationView.value : (context) => AppLoginCertificationView(),
-    AppView.appWebView.value : (context) => AppWebView(),
     AppView.appSignupView.value : (context) => AppSignUpView(),
     AppView.appMainView.value : (context) => AppMainView(),
     AppView.appSearchAccidentView.value : (context) => AppSearchAccidentView(),
@@ -54,7 +51,6 @@ class Config{
     AppView.appResultPrView.value : (context) => AppResultPrView(),
     AppView.appDetailPrView.value : (context) => AppDetailPrView(),
     AppView.appApplyPrView.value : (context) => AppApplyPrView(),
-    AppView.appApplyDocView.value : (context) => AppApplyDocView(),
     AppView.appChatView.value : (context) => AppChatView(),
     AppView.appAccidentDetailInfoView.value : (context) => AppAccidentDetailView(),
     AppView.appAgreeDetailInfoView.value : (context) => AppAgreeDetailInfoView(),
@@ -137,7 +133,7 @@ class Config{
 }
 
 enum AppView {
-  appRootView, appLoginView, appCertificationView, appWebView, appSignupView, appMainView, appSearchAccidentView, appSignOutView, appApplyDocView,
+  appRootView, appLoginView, appCertificationView, appSignupView, appMainView, appSearchAccidentView, appSignOutView,
   appUpdateAccidentView, appResultPrView, appDetailPrView, appApplyPrView, appChatView, appAccidentDetailInfoView, appAgreeDetailInfoView, appAgreeDetailInfoViewTest,
   debugForAdminView
 }
@@ -151,8 +147,6 @@ extension SAppViewExtension on AppView {
         return '/loginView';
       case AppView.appCertificationView:
         return '/certification';
-      case AppView.appWebView:
-        return '/webView';
       case AppView.appSignupView:
         return '/signupView';
       case AppView.appMainView:
@@ -167,8 +161,6 @@ extension SAppViewExtension on AppView {
         return '/detailPrView';
       case AppView.appApplyPrView:
         return '/applyPrView';
-      case AppView.appApplyDocView:
-        return '/applyDocView';
       case AppView.appChatView:
         return '/appChatView';
       case AppView.appAccidentDetailInfoView:

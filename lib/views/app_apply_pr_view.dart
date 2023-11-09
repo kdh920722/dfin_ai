@@ -102,9 +102,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   String pickedFilePath = "";
   String awsUploadUrl = "";
 
-  int niceId = 94;
-  String niceName = "나이즈Key 인증";
-
   int lastId = 999;
   int confirmedId = 1000;
 
@@ -513,7 +510,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
   @override
   void initState(){
-    CommonUtils.log("i", "AppApplyPrView 화면 입장");
+    CommonUtils.log("d", "AppApplyPrView 화면 입장");
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _initDocsList();
@@ -554,7 +551,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
   @override
   void dispose(){
-    CommonUtils.log("i", "AppApplyPrView 화면 파괴");
+    CommonUtils.log("d", "AppApplyPrView 화면 파괴");
     WidgetsBinding.instance.removeObserver(this);
     _unFocusAllNodes();
     _disposeAllTextControllers();
@@ -572,17 +569,17 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
-        CommonUtils.log('i','AppApplyPrView resumed');
+        CommonUtils.log('d','AppApplyPrView resumed');
         break;
       case AppLifecycleState.inactive:
-        CommonUtils.log('i','AppApplyPrView inactive');
+        CommonUtils.log('d','AppApplyPrView inactive');
         break;
       case AppLifecycleState.detached:
-        CommonUtils.log('i','AppApplyPrView detached');
+        CommonUtils.log('d','AppApplyPrView detached');
         // DO SOMETHING!
         break;
       case AppLifecycleState.paused:
-        CommonUtils.log('i','AppApplyPrView paused');
+        CommonUtils.log('d','AppApplyPrView paused');
         break;
       default:
         break;
@@ -603,12 +600,10 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
   Future<void> backInputView() async {
     if(isInputValid){
-      CommonUtils.log("i", "current id : $currentViewId || $reUseTargetViewId");
       bool isPrevDocs = false;
       String prevDocsType = "";
       int prevDocsCount = 0;
       int prevId = _getIdFromListByViewId(currentViewId-1);
-      CommonUtils.log("i", "prev id : ${prevId}");
 
       if(reUseTargetViewId != -1){
         if(currentViewId == reUseTargetViewId){
@@ -636,7 +631,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             }
           }
 
-          CommonUtils.log("i", "prev id : ${currentViewId-1}");
           isInputValid = false;
           _unFocusAllNodes();
           CommonUtils.hideKeyBoard();
@@ -653,7 +647,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       }else{
         for(var each in addedDocsList){
           if(each["id"] == prevId && each["is_docs"]){
-            CommonUtils.log("i", " is prev");
             isPrevDocs = true;
             prevDocsType = each["docs_type"];
             if(prevDocsType == "gov24") prevDocsCount = gov24Count;
@@ -668,7 +661,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           }
         }
 
-        CommonUtils.log("i", "prev id : ${currentViewId-1}");
         isInputValid = false;
         _unFocusAllNodes();
         CommonUtils.hideKeyBoard();
@@ -696,7 +688,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
   Future<void> nextInputView() async {
     if(isInputValid){
-      CommonUtils.log("i", "current id : $currentViewId");
       if(_getIdFromListByViewId(currentViewId) == 1 || _getIdFromListByViewId(currentViewId) == 2 || _getIdFromListByViewId(currentViewId) == 15){
         if(gov24Count != 1){
           currentViewId = currentViewId+gov24Count-1;
@@ -711,7 +702,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           currentViewId = currentViewId+ntsCount-1;
         }
       }
-      CommonUtils.log("i", "next id : ${currentViewId+1}");
       isInputValid = false;
       _unFocusAllNodes();
       CommonUtils.hideKeyBoard();
@@ -1699,7 +1689,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           child: Container(
             width: 100.w,
             height: 35.4.h,
-            color: Colors.black54,
+            color: Colors.black,
           ),
         ),
         Positioned(
@@ -1707,7 +1697,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           child: Container(
             width: 100.w,
             height: 40.4.h,
-            color: Colors.black54,
+            color: Colors.black,
           ),
         ),
         Positioned(
@@ -1716,7 +1706,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           child: Container(
             width: 8.w,
             height: 24.2.h,
-            color: Colors.black54,
+            color: Colors.black,
           ),
         ),
         Positioned(
@@ -1725,21 +1715,33 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           child: Container(
             width: 8.w,
             height: 24.2.h,
-            color: Colors.black54,
+            color: Colors.black,
           ),
         ),
         Positioned(
-          top: 3.h,
-          right: 5.w,
-          child: UiUtils.getIconButton(Icons.close, 10.w, ColorStyles.upFinWhite, () {
+          top: 3.w,
+          right: 3.w,
+          child: UiUtils.getCloseButton(ColorStyles.upFinWhite, () {
             setState(() {
               currentViewId = _getViewIdFromListById(cameraId);
             });
           })
         ),
         Positioned(
-            top: 28.h,
-            child: UiUtils.getTextWithFixedScale("신분증의 인식률을 높이기 위해\n아래 영역에 신분증을 위치해주세요", 15.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null)
+            top: 31.7.h,
+            child: SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale2("아래 영역에 신분증을 위치해주세요", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null))
+        ),
+        Positioned(
+            top: 8.h,
+            child: SizedBox(width: 85.w, child: Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
+              UiUtils.getRoundBoxTextWithFixedScale(" 🚨 안내사항 ", 11.sp, FontWeight.w600, TextAlign.start, ColorStyles.upFinWhite, ColorStyles.upFinBlack),
+              UiUtils.getMarginBox(0, 0.7.h),
+              UiUtils.getTextWithFixedScale2(
+                      "1.신분증은 반드시 신분증 원본을 준비해주세요."
+                      "\n   신분증 사본(모니터/휴대폰 화면 촬영 등)으로 확인될 경우,\n   인식이 되지 않을 수 있습니다."
+                      "\n2.신분증을 어두운 배경에 두고, 밝은곳에서 촬영해주세요."
+                      "\n   신분증의 홀로그램 부분에 빛이 반사되지 않도록\n   카메라 방향을 조정해주세요.", 10.sp, FontWeight.w300, ColorStyles.upFinWhite, TextAlign.start, null),
+            ]))
         ),
         Positioned(
             top: 35.h,
@@ -2580,44 +2582,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   }
   /// nts(id:6,10,11,14) view end
 
-  /// nice key cert web view
-  Widget _getNiceKeyCertView(){
-    return UiUtils.getRowColumnWithAlignCenter([
-      UiUtils.getMarginBox(0, 10.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("마지막으로", 20.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("고객님의 민감한 정보를", 20.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("보호하기 위해", 20.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("NICE신용평가 기관을 통해", 20.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("Safe-Key를 생성해야해요!", 20.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      UiUtils.getMarginBox(0, 15.h),
-      UiUtils.getExpandedScrollView(Axis.vertical, Container(child: UiUtils.getImage(40.w, 40.w, Image.asset('assets/images/logo_nice_square.png')))),
-      UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getTextButtonBox(90.w, "Safe-Key 만들기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-        UiUtils.showLoadingPop(context);
-        Map<String, String> urlInfoMap = {
-          "url" : "${LogfinController.niceUrl}/${MyData.customerUidForNiceCert}?checklist=1"
-        };
-        bool isSuccess = false;
-        var result = await CommonUtils.moveToWithResult(context, AppView.appWebView.value, urlInfoMap);
-        if(context.mounted) UiUtils.closeLoadingPop(context);
-        if(result != null){
-          isSuccess = result as bool;
-          if(isSuccess){
-            CommonUtils.log("i", "success returned");
-            _setConfirmedToDocItemByViewId(currentViewId, true);
-            nextInputView();
-          }
-        }
-      }),
-      UiUtils.getMarginBox(0, 0.5.h),
-      UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
-          UiUtils.getTextWithFixedScale("다음에 할게요", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, null), () {
-            nextInputView();
-          })
-    ]);
-  }
-  /// nice key cert web view end
-
   /// finish view
   Widget _getFinishConfirmView(){
     List<Widget> introWidgetList = [];
@@ -3164,7 +3128,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     if(currentViewId == addedDocsInfoIntroViewId){
       Navigator.pop(context);
     }else{
-      if(_getIdFromListByViewId(currentViewId) != niceId && _getIdFromListByViewId(currentViewId) != lastId){
+      if(_getIdFromListByViewId(currentViewId) != lastId){
         backInputView();
       }
     }
@@ -3192,8 +3156,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getNhisView());
       }else if(_getIdFromListByViewId(currentViewId) == 6 || _getIdFromListByViewId(currentViewId) == 10 || _getIdFromListByViewId(currentViewId) == 11 || _getIdFromListByViewId(currentViewId) == 14){
         view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getNtsView());
-      }else if(_getIdFromListByViewId(currentViewId) == niceId){
-        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getNiceKeyCertView());
       }else if(_getIdFromListByViewId(currentViewId) == lastId){
         view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getFinishConfirmView());
       }else if(_getIdFromListByViewId(currentViewId) == confirmedId){

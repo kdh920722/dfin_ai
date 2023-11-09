@@ -452,9 +452,7 @@ class WebSocketController {
 
   static bool isSubscribe(String roomId){
     bool isAlreadySubscribe = false;
-    CommonUtils.log("i", "connected subscribe : ${subscribedRoomIds.length}");
     for(var eachSubscribeRoomId in subscribedRoomIds){
-      CommonUtils.log("i", "connected subscribe : $roomId || ${eachSubscribeRoomId["room_id"]}");
       if(eachSubscribeRoomId["room_id"] == roomId) isAlreadySubscribe = true;
     }
 

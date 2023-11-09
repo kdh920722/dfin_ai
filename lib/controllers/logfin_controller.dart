@@ -529,8 +529,6 @@ class LogfinController {
                       }
 
                       loanMessageInfoOutputJson!["last_read_message_id"] = eachLoans["pr_room"]["last_read_message_id"].toString();
-                      List<dynamic> temp = loanMessageInfoOutputJson['data'];
-                      CommonUtils.log("i", "loanMessageInfoOutputJson data ====>\n${temp.length}\n$loanMessageInfoOutputJson");
                       MyData.addToLoanInfoList(
                           LoanInfoData(eachLoans["accident_uid"].toString(), eachLoans["uid"].toString(), eachLoans["lender_pr_id"].toString(),
                               submitAmount, eachLoans["submit_offer"]["interest_rate"].toString(),

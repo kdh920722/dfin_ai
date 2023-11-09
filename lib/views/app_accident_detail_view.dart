@@ -20,7 +20,7 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
   late final TabController _tabController;
   @override
   void initState(){
-    CommonUtils.log("i", "AppAccidentDetailView 화면 입장");
+    CommonUtils.log("d", "AppAccidentDetailView 화면 입장");
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _tabController = TabController(length: 2, vsync: this);
@@ -31,7 +31,7 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
 
   @override
   void dispose(){
-    CommonUtils.log("i", "AppAccidentDetailView 화면 파괴");
+    CommonUtils.log("d", "AppAccidentDetailView 화면 파괴");
     WidgetsBinding.instance.removeObserver(this);
     MyData.selectedAccidentInfoData = null;
     _tabController.dispose();
@@ -43,17 +43,17 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
-        CommonUtils.log('i','AppAccidentDetailView resumed');
+        CommonUtils.log('d','AppAccidentDetailView resumed');
         break;
       case AppLifecycleState.inactive:
-        CommonUtils.log('i','AppAccidentDetailView inactive');
+        CommonUtils.log('d','AppAccidentDetailView inactive');
         break;
       case AppLifecycleState.detached:
-        CommonUtils.log('i','AppAccidentDetailView detached');
+        CommonUtils.log('d','AppAccidentDetailView detached');
         // DO SOMETHING!
         break;
       case AppLifecycleState.paused:
-        CommonUtils.log('i','AppAccidentDetailView paused');
+        CommonUtils.log('d','AppAccidentDetailView paused');
         break;
       default:
         break;
@@ -62,10 +62,8 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
 
   List<Widget> _getLoanWidgetList(){
     List<Widget> loanWidgetList = [];
-    CommonUtils.log("i", "MyData.getLoanInfoList size : ${MyData.getLoanInfoList().length}");
     int count = 0;
     for(var each in MyData.getLoanInfoList()){
-      CommonUtils.log("i", "accdient uid in loan : ${each.accidentUid}");
       String eachAccidentNum = "";
       for(var eachAccident in MyData.getAccidentInfoList()){
         if(eachAccident.accidentUid == each.accidentUid) eachAccidentNum = eachAccident.accidentCaseNumberYear+eachAccident.accidentCaseNumberType+eachAccident.accidentCaseNumberNumber;
@@ -73,7 +71,6 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
       String selectedAccidentNum = MyData.selectedAccidentInfoData!.accidentCaseNumberYear+MyData.selectedAccidentInfoData!.accidentCaseNumberType+MyData.selectedAccidentInfoData!.accidentCaseNumberNumber;
 
       if(eachAccidentNum == selectedAccidentNum){
-        CommonUtils.log("i", "@@@");
         loanWidgetList.add(
             UiUtils.getLoanListBorderButtonBox(90.w, ColorStyles.upFinMainGray , ColorStyles.upFinMainGray,
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -123,7 +120,6 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
       CommonUtils.flutterToast("환급계좌정보가 잘못되었습니다.\n수정해주세요.");
     }
 
-    CommonUtils.log("i", MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resAmount"]);
     return Padding(padding: EdgeInsets.only(left: 4.w, right: 4.w, top: 4.w, bottom: 4.w),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           UiUtils.getMarginBox(0, 5.h),
@@ -193,7 +189,6 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
 
   String _setUpdateDate(String targetString){
     // 문자열을 DateTime 객체로 변환
-    CommonUtils.log("i", "targetString $targetString");
     DateTime dateTime = DateTime.parse(targetString);
     // 대한민국 시간대로 설정
     dateTime = dateTime.toLocal();
@@ -213,7 +208,6 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
   }
 
   String _setUpdateDateForTitle(String targetString){
-    CommonUtils.log("i", "targetString $targetString || ${CommonUtils.convertTimeToString(CommonUtils.parseToLocalTime(targetString))}");
     String targetStringDate = CommonUtils.convertTimeToString(CommonUtils.parseToLocalTime(targetString));
     return "${targetStringDate.substring(0,4)}.${targetStringDate.substring(4,6)}.${targetStringDate.substring(6,8)} ${targetStringDate.substring(8,10)}:${targetStringDate.substring(10,12)}";
   }

@@ -163,7 +163,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
 
   @override
   void initState(){
-    CommonUtils.log("i", "AppSearchAccidentView 화면 입장");
+    CommonUtils.log("d", "AppSearchAccidentView 화면 입장");
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _accidentInfoTextController1.addListener(_accidentInfoTextController1Listener);
@@ -207,7 +207,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
 
   @override
   void dispose(){
-    CommonUtils.log("i", "AppSearchAccidentView 화면 파괴");
+    CommonUtils.log("d", "AppSearchAccidentView 화면 파괴");
     WidgetsBinding.instance.removeObserver(this);
     _unFocusAllNodes();
     _disposeAllTextControllers();
@@ -376,7 +376,6 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
           child: UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: courtList))),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-        CommonUtils.log("i", "court : $selectedCourtInfo");
         if(selectedCourtInfo.isNotEmpty){
           nextInputView();
         }else{
@@ -412,7 +411,6 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
         selectedAccidentInfo = "${_accidentInfoTextController1.text.trim()}개회${_accidentInfoTextController2.text.trim()}";
-        CommonUtils.log("i", "selectedAccidentInfo : $selectedAccidentInfo");
         if(selectedAccidentInfo != "개회" && _accidentInfoTextController1.text.trim() != "" && _accidentInfoTextController2.text.trim() != ""){
           bool isValid = true;
           for(var eachAccident in MyData.getAccidentInfoList()){
@@ -531,7 +529,6 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
               int lastVisibleItem2 = firstVisibleItem2+maxVisibleItemCnt2;
               if(firstVisibleItem2 <=0 ) firstVisibleItem2 = 0;
               if(lastVisibleItem2 >= LogfinController.bankList.length-1) lastVisibleItem2 = LogfinController.bankList.length-1;
-              print('보이는 아이템 ====> ${LogfinController.bankList.length} : $firstVisibleItem2 | $lastVisibleItem2');
 
               GetController.to.updateFirstIndex2(firstVisibleItem2);
               GetController.to.updateLastIndex2(lastVisibleItem2);
@@ -548,7 +545,6 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
           child: UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: bankCodeList))),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-        CommonUtils.log("i", "bank code : $selectedBankCodeInfo");
         if(selectedBankCodeInfo.isNotEmpty){
           nextInputView();
         }else{
@@ -577,7 +573,6 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
         selectedBankAccountInfo = _bankAccountInfoTextController.text.trim();
-        CommonUtils.log("i", "selectedBankAccountInfo : $selectedBankAccountInfo");
         if(selectedBankAccountInfo.isNotEmpty){
           nextInputView();
         }else{
@@ -654,7 +649,6 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: loanCountList)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-        CommonUtils.log("i", "loan count : $selectedPreLoanCountInfo");
         if(selectedPreLoanCountInfo.isNotEmpty){
           if(selectedPreLoanCountInfo.split("@")[1] == "0"){
             selectedPreLoanPriceInfo = "0";
@@ -682,9 +676,6 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         ])),
         UiUtils.getMarginBox(0, 3.h),
         SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("인가후 대출 총금액", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-        // SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("알려주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-        // UiUtils.getMarginBox(0, 1.h),
-        // SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력단위(*만원)", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
         UiUtils.getMarginBox(0, 5.h),
         Obx(()=>
             Row(mainAxisAlignment: MainAxisAlignment.start, children: [
@@ -712,7 +703,6 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
           }else{
             selectedPreLoanPriceInfo = "0";
           }
-          CommonUtils.log("i", "selectedPreLoanPriceInfo : $selectedPreLoanPriceInfo");
           nextInputView();
         })
       ])
@@ -736,9 +726,6 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         ])),
         UiUtils.getMarginBox(0, 3.h),
         SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("희망대출 금액", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-        // SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("알려주세요.", 2출2.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-        // UiUtils.getMarginBox(0, 1.h),
-        // SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력단위(*만원)", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
         UiUtils.getMarginBox(0, 5.h),
         Obx(()=>UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _wantLoanPriceFocus, _wantLoanPriceTextController, TextInputType.number, false,
             UiUtils.getInputDecorationForPrice("", 0.sp, GetController.to.wantLoanPrice.value), (text) {
@@ -763,7 +750,6 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
           }else{
             selectedWantLoanPriceInfo = "0";
           }
-          CommonUtils.log("i", "selectedWantLoanPriceInfo : $selectedWantLoanPriceInfo");
           nextInputView();
         })
       ])
@@ -836,7 +822,6 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: jobList)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-        CommonUtils.log("i", "selectedJobInfo : $selectedJobInfo");
         if(selectedJobInfo.isNotEmpty){
           nextInputView();
         }else{
@@ -929,7 +914,6 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                           if(isNotEmpty){
                             String thisAccidentNum = selectedAccidentInfo;
                             String updatedAccidentUid = MyData.findUidInAccidentInfoList(thisAccidentNum);
-                            CommonUtils.log("i", "updatedAccidentUid $updatedAccidentUid");
                             for(var each in MyData.getAccidentInfoList()){
                               if(each.accidentUid == updatedAccidentUid){
                                 MyData.selectedAccidentInfoData = each;
@@ -963,6 +947,9 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                   UiUtils.closeLoadingPop(context);
                   String errorMsg = outputJson!["error"];
                   CommonUtils.flutterToast(errorMsg.replaceAll("+", "").replaceAll("()", "").replaceAll(".", "\n"));
+                  setState(() {
+                    currentViewId = 1;
+                  });
                 }
               });
             }),

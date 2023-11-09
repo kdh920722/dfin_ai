@@ -25,7 +25,7 @@ import '../datas/my_data.dart';
 import '../styles/ColorStyles.dart';
 import '../styles/TextStyles.dart';
 import 'package:image/image.dart' as imglib;
-import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/data/latest.dart' as tzlocal;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:http/http.dart' as http;
 
@@ -41,15 +41,6 @@ class CommonUtils {
       if(logType.toLowerCase() == "e"){
         FireBaseController.writeLog("error", FireBaseController.fcmToken, logMessage);
       }
-      /*
-      else if(logType.toLowerCase() == ""){
-        FireBaseController.writeLog("info", FireBaseController.fcmToken, logMessage);
-      }
-      */
-    }
-
-    if(logType.toLowerCase() == "i"){
-      logType = "K";
     }
 
     var logger = Logger();
@@ -61,8 +52,10 @@ class CommonUtils {
           logger.i("long log start=======================>");
         case "e":
           logger.e("long log start=======================>");
-        case "":
+        case "w":
           logger.wtf("long log start=======================>");
+        default:
+          break;
       }
 
       for (int i = 0; i < logMessage.length; i += logMaxSize) {
@@ -74,8 +67,10 @@ class CommonUtils {
             logger.i(logMessage.substring(i, end));
           case "e":
             logger.e(logMessage.substring(i, end));
-          case "":
+          case "w":
             logger.wtf(logMessage.substring(i, end));
+          default:
+            break;
         }
       }
 
@@ -86,8 +81,10 @@ class CommonUtils {
           logger.i("long log end=======================>");
         case "e":
           logger.e("long log end=======================>");
-        case "":
+        case "w":
           logger.wtf("long log end=======================>");
+        default:
+          break;
       }
     }else{
       switch(logType.toLowerCase()){
@@ -97,8 +94,10 @@ class CommonUtils {
           return logger.i(logMessage);
         case "e":
           return logger.e(logMessage);
-        case "":
+        case "w":
           return logger.wtf(logMessage);
+        default:
+          break;
       }
     }
   }
@@ -371,7 +370,7 @@ class CommonUtils {
   }
 
   static DateTime parseToLocalTime(String targetDate){
-    tz.initializeTimeZones(); // 타임존 초기화
+    tzlocal.initializeTimeZones(); // 타임존 초기화
     final location = tz.getLocation('Asia/Seoul'); // 원하는 타임존 설정
     DateTime parsedDateTime = DateTime.parse(targetDate);
     tz.TZDateTime parsedDateTimeWithTimeZone = tz.TZDateTime.from(parsedDateTime, location);
@@ -418,9 +417,6 @@ class CommonUtils {
   static Future<XFile?> getGalleryImage() async {
     try{
       XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-      if(image != null){
-        CommonUtils.log('i', "path : ${image.path}\nname : ${image.name}");
-      }
 
       return image;
     }catch(e){

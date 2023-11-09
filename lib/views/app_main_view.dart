@@ -36,7 +36,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
 
   @override
   void initState(){
-    CommonUtils.log("i", "AppMainView 화면 입장");
+    CommonUtils.log("d", "AppMainView 화면 입장");
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     MyData.selectedAccidentInfoData = null;
@@ -57,7 +57,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
 
   @override
   void dispose() {
-    CommonUtils.log("i", "AppMainView 화면 파괴");
+    CommonUtils.log("d", "AppMainView 화면 파괴");
     WidgetsBinding.instance.removeObserver(this);
     Config.contextForEmergencyBack = null;
     WebSocketController.resetConnectWebSocketCable();
@@ -71,17 +71,17 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
-        CommonUtils.log('i','AppMainView resumed');
+        CommonUtils.log('d','AppMainView resumed');
         break;
       case AppLifecycleState.inactive:
-        CommonUtils.log('i','AppMainView inactive');
+        CommonUtils.log('d','AppMainView inactive');
         break;
       case AppLifecycleState.detached:
-        CommonUtils.log('i','AppMainView detached');
+        CommonUtils.log('d','AppMainView detached');
         // DO SOMETHING!
         break;
       case AppLifecycleState.paused:
-        CommonUtils.log('i','AppMainView paused');
+        CommonUtils.log('d','AppMainView paused');
         break;
       default:
         break;
@@ -115,9 +115,9 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               UiUtils.getMarginBox(2.w, 0),
               UiUtils.getIconButton(Icons.add, 7.w, ColorStyles.upFinDarkGray, () {
                 UiUtils.showPopMenu(context, true, 100.w, 100.h, 0.5, 0, ColorStyles.upFinButtonBlue, (slideContext, slideSetState){
-                  Widget slideWidget = Column(crossAxisAlignment: CrossAxisAlignment.start,
+                  Widget slideWidget = Column(
                       children: [
-                        SizedBox(width: 90.w, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                        SizedBox(width: 95.w, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                           UiUtils.getCloseButton(ColorStyles.upFinWhite, () {
                             Navigator.pop(slideContext);
                           })
@@ -234,7 +234,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   }
   List<Widget> _getAccidentWidgetList(){
     List<Widget> accidentWidgetList = [];
-    CommonUtils.log("i", "accident view redraw!");
     List<String> accidentList = [];
     List<String> accidentIdList = [];
     List<AccidentInfoData> accidentInfoList = [];
@@ -274,8 +273,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     }
 
     for(var each in accidentInfoList){
-      CommonUtils.log("i", "accdient uid@@@@ : ${each.accidentUid}");
-
       accidentWidgetList.add(
           UiUtils.getAccidentBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinGray,
               Column(children: [
@@ -342,13 +339,11 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
 
   List<Widget> _getLoanChatWidgetList(){
     List<Widget> loanChatRoomWidgetList = [];
-    CommonUtils.log("i", "loan view redraw!");
     int count = 0;
     for(var each in GetController.to.chatLoanInfoDataList){
       var jsonData = jsonDecode(each.chatRoomMsgInfo);
       Map<String, dynamic> msg = jsonData;
       List<dynamic> listMsg = msg["data"];
-      CommonUtils.log("i", "each msg info : \nmsg: $msg\nlistMsg: $listMsg");
       listMsg.sort((a,b) => a["id"].compareTo(b["id"]));
       String lastMsg = listMsg[listMsg.length-1]["message"].toString();
       if(lastMsg.contains(" / ")){
@@ -420,7 +415,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     }
 
     GetController.to.resetChatMessageInfoList();
-    CommonUtils.log("i", "listMsg.length : ${listMsg.length}");
     for(Map<String, dynamic> eachMsg in listMsg){
       var messageItem = ChatMessageInfoData(eachMsg["id"].toString(), eachMsg["pr_room_id"].toString(), eachMsg["message"].toString(),
           CommonUtils.convertTimeToString(CommonUtils.parseToLocalTime(eachMsg["created_at"])),
@@ -506,17 +500,16 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     }
   }
   Widget _getSettingView(){
-    return Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: EdgeInsets.all(5.w),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          SizedBox(width: 90.w, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+    return Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: EdgeInsets.only(top:3.w),
+        child: Column(children: [
+          SizedBox(width: 95.w, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
             UiUtils.getCloseButton(ColorStyles.upFinDarkGray, () {
               _back();
             })
           ])),
-          UiUtils.getMarginBox(0, 3.h),
+          UiUtils.getMarginBox(0, 3.w),
           UiUtils.getBorderButtonBoxWithZeroPadding(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
               Row(children: [UiUtils.getTextWithFixedScale("설정", 22.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null)]), () {}),
-          UiUtils.getMarginBox(0, 3.h),
           UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
               Row(children: [UiUtils.getTextWithFixedScale("계정", 15.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)]), () async {
                 isViewHere = false;

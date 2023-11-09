@@ -4,7 +4,6 @@ import 'dart:io';
 import 'dart:isolate';
 import 'dart:ui';
 import 'package:camera/camera.dart';
-import 'package:dio/dio.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -66,7 +65,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
 
   @override
   void initState(){
-    CommonUtils.log("i", "AppChatViewState 화면 입장");
+    CommonUtils.log("d", "AppChatViewState 화면 입장");
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _aniController = AnimationController(
@@ -206,7 +205,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
 
   @override
   void dispose(){
-    CommonUtils.log("i", "AppChatViewState 화면 파괴");
+    CommonUtils.log("d", "AppChatViewState 화면 파괴");
     WidgetsBinding.instance.removeObserver(this);
     _chatScrollController.dispose();
     _chatTextFocus.dispose();
@@ -234,17 +233,17 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
-        CommonUtils.log('i','AppChatViewState resumed');
+        CommonUtils.log('d','AppChatViewState resumed');
         break;
       case AppLifecycleState.inactive:
-        CommonUtils.log('i','AppChatViewState inactive');
+        CommonUtils.log('d','AppChatViewState inactive');
         break;
       case AppLifecycleState.detached:
-        CommonUtils.log('i','AppChatViewState detached');
+        CommonUtils.log('d','AppChatViewState detached');
         // DO SOMETHING!
         break;
       case AppLifecycleState.paused:
-        CommonUtils.log('i','AppChatViewState paused');
+        CommonUtils.log('d','AppChatViewState paused');
         break;
       default:
         break;
@@ -673,7 +672,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
           if(!isLoading){
             UiUtils.showPopMenu(context, true, 100.w, 100.h, 0.5, 0, ColorStyles.upFinBlack, (slideContext, slideSetState){
               Widget slideWidget = Column(children: [
-                SizedBox(width: 90.w, height: 5.h, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                SizedBox(width: 95.w, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                   UiUtils.getCloseButton(ColorStyles.upFinWhite, () {
                     Navigator.pop(slideContext);
                   })
@@ -1376,29 +1375,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
 
             });
           }
-          /*
-        for(int i = 0 ; i < MyData.getLoanInfoList().length ; i++){
-          if(MyData.getLoanInfoList()[i].loanUid == currentLoanUid){
-            Map<String, dynamic> msgInfo = jsonDecode(MyData.getLoanInfoList()[i].chatRoomMsg);
-            List<dynamic> msgList = msgInfo["data"];
-            msgList.addAll(prevMsgList);
-            msgList.sort((a,b) => b["id"].compareTo(a["id"]));
-            msgInfo.remove("data");
-            msgInfo["data"] = msgList;
-          }
-        }
-
-        for(int i = 0 ; i < MyData.getChatRoomInfoList().length ; i++){
-          if(MyData.getChatRoomInfoList()[i].chatLoanUid == currentLoanUid){
-            Map<String, dynamic> msgInfo = jsonDecode(MyData.getChatRoomInfoList()[i].chatRoomMsgInfo);
-            List<dynamic> msgList = msgInfo["data"];
-            msgList.addAll(prevMsgList);
-            msgList.sort((a,b) => b["id"].compareTo(a["id"]));
-            msgInfo.remove("data");
-            msgInfo["data"] = msgList;
-          }
-        }
-         */
         }else{
           UiUtils.closeLoadingPop(context);
           CommonUtils.flutterToast("조회에 실패했습니다.");
@@ -1518,20 +1494,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                 isWaiting ? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 0.8.h)
               ],
             ));
-            /*
-            return SizedBox(width: 100.w, height: GetController.to.chatAutoAnswerHeight.value, child: Column(children: [
-              Align(alignment: Alignment.topRight, child: Padding(padding: EdgeInsets.only(right: 5.w),
-                  child: Wrap(runSpacing: 0.4.h, spacing: 1.5.w, alignment: WrapAlignment.end, direction: Axis.horizontal, children: GetController.to.autoAnswerWidgetList))),
-              GetController.to.isShowPickedFile.value? Column(children: [
-                UiUtils.getSizedScrollView(90.w, inputHelpMinHeight+2.h, Axis.horizontal, _getPickedFilesWidget()),
-                UiUtils.getMarginBox(0, 1.3.h),
-                UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                    UiUtils.getTextWithFixedScale("전송", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () async{
-                      _sendFileToAws();
-                    }),
-              ]) : Container()
-            ]));
-             */
           }),
 
           Obx((){

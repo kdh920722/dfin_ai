@@ -107,17 +107,17 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
           UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinRealGray,
               UiUtils.getTextWithFixedScale("탈퇴하기", 12.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.center, null), () {
                 UiUtils.showPopMenu(context, true, 100.w, 100.h, 0.5, 0, ColorStyles.upFinWhite, (slideContext, slideSetState){
-                  Widget slideWidget = Padding(padding: EdgeInsets.only(bottom: 5.w), child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+                  Widget slideWidget = Column(
                       children: [
-                        SizedBox(width: 90.w, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                        SizedBox(width: 95.w, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                           UiUtils.getCloseButton(ColorStyles.upFinDarkGray, () {
                             Navigator.pop(slideContext);
                           })
                         ])),
                         UiUtils.getMarginBox(0, 3.h),
-                        UiUtils.getTextWithFixedScale("탈퇴", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null),
+                        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("탈퇴", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
                         UiUtils.getMarginBox(0, 1.h),
-                        UiUtils.getTextWithFixedScale("비밀번호 입력 후 회원탈퇴가 가능합니다.", 14.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null),
+                        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("비밀번호 입력 후 회원탈퇴가 가능합니다.", 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
                         UiUtils.getMarginBox(0, 3.h),
                         UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _pwdTextFocus, _pwdTextController, TextInputType.visiblePassword, true,
                             UiUtils.getInputDecoration("비밀번호", 12.sp, "", 0.sp), (text) {
@@ -159,7 +159,7 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
                                 }
                               });
                             }) : Container()
-                      ]));
+                      ]);
 
                   return slideWidget;
                 });

@@ -809,14 +809,6 @@ class UiUtils {
         }
       }
       agreeInfoList.sort((a,b)=>int.parse(a["detailType"].toString().split("@")[2]).compareTo(int.parse(b["detailType"].toString().split("@")[2])));
-      for(var each in agreeInfoList){
-        CommonUtils.log("i", "agree result : "
-            "\n${{"type" : each["type"].toString(),
-          "\ndetailType" : each["detailType"].toString(),
-          "\nisAgree" : each["isAgree"],
-          "\nresult" : each["result"].toString()}}"
-        );
-      }
       isInitAgree =  true;
       thisSetState(() {});
     }
@@ -900,8 +892,6 @@ class UiUtils {
               };
             }else if (element.localName == 'button') {
               return {
-                //"cursor": "pointer",
-                //"display":"inlne-block",
                 "text-align":"center",
                 "background-color":"#3a6cff",
                 "color" : "white",
@@ -914,16 +904,6 @@ class UiUtils {
             }
 
             return null;
-          },
-
-          onTapUrl: (url) async {
-            UiUtils.showLoadingPop(parentContext);
-            Map<String, String> urlInfoMap = {
-              "url" : url
-            };
-            await CommonUtils.moveToWithResult(parentContext, AppView.appWebView.value, urlInfoMap);
-            if(parentContext.mounted) UiUtils.closeLoadingPop(parentContext);
-            return true;
           },
           renderMode: RenderMode.column,
           textStyle: TextStyles.upFinHtmlTextStyle,
@@ -1407,7 +1387,7 @@ class UiUtils {
                     child: StatefulBuilder(
                         builder: (_, StateSetter popViewSetState){
                           Widget contentsWidget = createWidgetMethod(parentViewContext, popViewSetState);
-                          return Padding(padding: EdgeInsets.only(top: 5.w, left: 5.w, right: 5.w), child: Scaffold(
+                          return Padding(padding: EdgeInsets.only(top: 3.w), child: Scaffold(
                               backgroundColor: backColor,
                               body:contentsWidget
                           ));

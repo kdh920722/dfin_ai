@@ -125,28 +125,23 @@ class GetController extends GetxController {
     newList.sort((a,b) => jsonDecode(b.chatRoomMsgInfo)["data"][0]["id"].compareTo(jsonDecode(a.chatRoomMsgInfo)["data"][0]["id"]));
 
     chatLoanInfoDataList.assignAll(newList);
-    CommonUtils.log("i", "loanInfoDataList length : ${chatLoanInfoDataList.length}");
   }
   void resetChatLoanInfoList() {
     List<ChatRoomInfoData> emptyList = [];
     chatLoanInfoDataList.clear();
     chatLoanInfoDataList.assignAll(emptyList);
-    CommonUtils.log("i", "loanInfoDataList length : ${chatLoanInfoDataList.length}");
   }
 
   void addPrevChatMessageInfoList(List<ChatMessageInfoData> newItemList) {
     chatMessageInfoDataList.insertAll(0, newItemList);
-    CommonUtils.log("i", "chatMessageInfoDataList length : ${chatLoanInfoDataList.length}");
   }
   void addChatMessageInfoList(ChatMessageInfoData newItem) {
     chatMessageInfoDataList.add(newItem);
-    CommonUtils.log("i", "chatMessageInfoDataList length : ${chatLoanInfoDataList.length}");
   }
   void resetChatMessageInfoList() {
     List<ChatMessageInfoData> emptyList = [];
     chatMessageInfoDataList.clear();
     chatMessageInfoDataList.assignAll(emptyList);
-    CommonUtils.log("i", "chatMessageInfoDataList length : ${chatMessageInfoDataList.length}");
   }
 
   void updateFirstIndex1(int newValue) {
