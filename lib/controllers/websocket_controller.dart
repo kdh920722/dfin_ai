@@ -78,10 +78,10 @@ class WebSocketController {
       }else{
         if(subscribedRoomIds[i]["room_id"] == roomId){
           if(type == "UPFIN"){
-            if(!isWaiting && AppChatViewState.currentRoomId != "") assetsChatPushAudioPlayer.play();
+            if(!isWaiting && AppChatViewState.currentRoomId == roomId) assetsChatPushAudioPlayer.play();
             subscribedRoomIds[i]["isWaitingForAnswer"] = isWaiting;
           }else{
-            if(!isWaiting && AppChatViewState.currentRoomId != "") assetsChatSendAudioPlayer.play();
+            if(!isWaiting && AppChatViewState.currentRoomId == roomId) assetsChatSendAudioPlayer.play();
             subscribedRoomIds[i]["isWaitingForMe"] = isWaiting;
           }
         }

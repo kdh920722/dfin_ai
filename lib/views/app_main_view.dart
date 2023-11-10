@@ -420,12 +420,12 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
       GetController.to.addChatMessageInfoList(messageItem);
     }
 
+    await FireBaseController.setNotificationTorF(false);
     isViewHere = false;
     if(context.mounted){
       UiUtils.closeLoadingPop(context);
       await CommonUtils.moveToWithResult(context, AppView.appChatView.value, null);
     }
-
     isViewHere = true;
     if(context.mounted){
       FireBaseController.setStateForForeground = setState;

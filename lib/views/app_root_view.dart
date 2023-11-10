@@ -559,9 +559,9 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
 
     Widget? view;
     if(!Config.isAppMainInit){
+      FlutterNativeSplash.remove();
       _initAtFirst();
       view = Obx(()=>UiUtils.getInitLoadingView(GetController.to.loadingPercent.value));
-      FlutterNativeSplash.remove();
     }else{
       if(!Config.isControllerLoadFinished){
         view = Obx(()=>UiUtils.getInitLoadingView(GetController.to.loadingPercent.value));

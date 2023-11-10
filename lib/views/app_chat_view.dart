@@ -162,8 +162,9 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
         String id = data[0];
         int status = data[1];
         int progress = data[2];
-        if(context.mounted) UiUtils.showLoadingPop(context);
-        CommonUtils.log("d", "status : $progress $status");
+
+        if(isOpenDownloadedFile) UiUtils.showLoadingPop(context);
+        CommonUtils.log("d", "download status : $progress $status");
 
         if(status == 3 && progress == 100){
           if(isOpenDownloadedFile){
@@ -175,11 +176,12 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
             if(context.mounted) UiUtils.closeLoadingPop(context);
           }else{
             CommonUtils.flutterToast("다운로드가 완료되었습니다.");
-            if(context.mounted) UiUtils.closeLoadingPop(context);
           }
         }
       }catch(error){
-        if(context.mounted) UiUtils.closeLoadingPop(context);
+        CommonUtils.log("e", "download error : $error");
+        CommonUtils.flutterToast("다운로드에 실패했습니다.");
+        if(isOpenDownloadedFile && context.mounted) UiUtils.closeLoadingPop(context);
       }
     });
     FlutterDownloader.registerCallback(downloadCallback);
@@ -325,8 +327,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
         enableCaching: false,
         buildAsync: false,
         onLoadingBuilder: (htmlContext, element, progress){
-          CommonUtils.log("", "loading??");
-
           infiniteLoadTimer ??= Timer.periodic(const Duration(milliseconds: 200), (Timer timer) {
               infiniteCnt++;
               if(infiniteCnt > 24){
@@ -680,7 +680,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                   })
                 ])),
                 UiUtils.getMarginBox(0, 4.h),
-                Align(alignment: Alignment.bottomCenter, child: Container(
+                Container(
                     color:ColorStyles.upFinBlack,
                     width: 90.w, height: appConfig.Config.isAndroid? 75.h : 70.h,
                     child: InteractiveViewer(
@@ -688,7 +688,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                         child: Container(
                             color:ColorStyles.upFinBlack,
                             alignment: Alignment.center,
-                            constraints: BoxConstraints(maxWidth: 90.w, maxHeight: 75.h, minWidth: 20.w, minHeight: 20.w),
+                            constraints: BoxConstraints(maxWidth: 90.w, maxHeight: appConfig.Config.isAndroid? 75.h : 70.h, minWidth: 20.w, minHeight: 20.w),
                             child: ExtendedImage.network(
                               srcUrl,
                               fit: BoxFit.contain,
@@ -735,7 +735,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                               },
                             )
                         )
-                    ))),
+                    )),
                 UiUtils.getExpandedScrollView(Axis.vertical, Container()),
                 UiUtils.getBorderButtonBoxWithZeroPadding(30.w, ColorStyles.upFinBlack, ColorStyles.upFinBlack,
                     UiUtils.getBoxTextAndIconWithFixedScale("저장하기", 12.sp, FontWeight.w300, TextAlign.center, ColorStyles.upFinBlack, ColorStyles.upFinWhite,
@@ -750,7 +750,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                       }
                       CommonUtils.log("w", "download dir : $dir");
                       try{
-                        isOpenDownloadedFile = appConfig.Config.isAndroid? false : true;
+                        isOpenDownloadedFile = false;
                         CommonUtils.flutterToast("이미지를 다운로드합니다.");
                         await FlutterDownloader.enqueue(
                           url: srcUrl, 	// file url
@@ -874,10 +874,9 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
       UiUtils.showLoadingPop(context);
       await CommonUtils.saveSettingsToFile("push_from", "");
       await CommonUtils.saveSettingsToFile("push_room_id", "");
+      await FireBaseController.setNotificationTorF(true);
       await LogfinController.callLogfinApi(LogfinApis.checkMessage, inputJson, (isSuccess, outputJson){
-        if(isSuccess){
-
-        }else{
+        if(!isSuccess){
           CommonUtils.flutterToast("메시지를 읽는중\n오류가 발생했습니다.");
         }
       });
@@ -1182,8 +1181,8 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
             _setPickedFileFromDevice(1);
           }else{
             if(each.contains("사진")){
-              _setPickedFileFromDevice(2);
-            }else if(each.contains("문서")){
+              _setPickedFileFromDevice(1);
+            }else if(each.contains("파일")){
               _setPickedFileFromDevice(3);
             }
           }

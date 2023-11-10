@@ -540,7 +540,7 @@ class CommonUtils {
       }else if(type == 3){
         result = await FilePicker.platform.pickFiles(
           type: FileType.custom,
-          allowedExtensions: LogfinController.validDocFileTypeList,
+          allowedExtensions: LogfinController.validFileTypeList,
           allowMultiple: false,
         );
       }
@@ -1041,7 +1041,7 @@ class CommonUtils {
   }
 
   static Future<File> get _localFile async {
-    Directory directory = await getApplicationDocumentsDirectory();
+    Directory directory = await getApplicationCacheDirectory();
     return File("${directory.path}/push_settings.json");
   }
 
@@ -1120,9 +1120,9 @@ class CommonUtils {
     try {
       final contents = await file.readAsString();
       settings = jsonDecode(contents);
-      CommonUtils.log("", "print settings : ${jsonEncode(settings)}");
+      CommonUtils.log("w", "print settings : ${jsonEncode(settings)}");
     } catch (error) {
-      CommonUtils.log("", "readSettingsFromFile error : $error");
+      CommonUtils.log("w", "readSettingsFromFile error : $error");
       settings = {
         "push_from": "",
         "push_room_id": ""

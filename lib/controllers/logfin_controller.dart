@@ -207,7 +207,7 @@ class LogfinController {
           if(Config.isAndroid){
             autoAnswerMap["파일첨부 📁"] = {"카메라 📷" : "camera", "가져오기 🏞" : "files"};
           }else{
-            autoAnswerMap["파일첨부 📁"] = {"카메라 📷" : "camera", "사진 가져오기 🏞" : "imgfiles", "문서 가져오기 📄" : "docfiles"};
+            autoAnswerMap["파일첨부 📁"] = {"카메라 📷" : "camera", "사진 가져오기🏞" : "imgfiles", "파일 가져오기🗂️" : "docfiles"};
           }
         }else{
           failCount++;
