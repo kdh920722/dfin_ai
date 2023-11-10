@@ -23,6 +23,7 @@ void main() async{
         ignoreSsl: false
     );
     await initializeDateFormatting();
+    FlutterNativeSplash.remove();
   }
   runApp(const MyApp());
 }

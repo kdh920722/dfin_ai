@@ -1265,6 +1265,8 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
   void _sendMessage(String message, String customMessageType) {
     CommonUtils.hideKeyBoard();
     if(!WebSocketController.isWaitingForAnswerState(currentRoomId, "ME")){
+      GetController.to.updateAutoAnswerWaiting(true);
+
       var inputJson = {
         "loan_uid" : currentLoanUid,
         "message" : message
@@ -1286,7 +1288,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
         inputJson["type"] = "file";
       }
 
-      GetController.to.updateAutoAnswerWaiting(true);
       if(!isScrollMove) setState(() {});
 
       LogfinController.callLogfinApi(LogfinApis.sendMessage, inputJson, (isSuccess, _){

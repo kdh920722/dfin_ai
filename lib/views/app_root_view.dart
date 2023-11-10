@@ -449,7 +449,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
               if(permissionCheckTimer != null) permissionCheckTimer!.cancel();
               // count..
               //_initGPT();
-              if(context.mounted) Navigator.pop(context);
+
               _callInitApis();
             }
           });
@@ -559,7 +559,6 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
 
     Widget? view;
     if(!Config.isAppMainInit){
-      FlutterNativeSplash.remove();
       _initAtFirst();
       view = Obx(()=>UiUtils.getInitLoadingView(GetController.to.loadingPercent.value));
     }else{
