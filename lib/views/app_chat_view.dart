@@ -64,11 +64,32 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
   Map<String,bool> imageLoadMap = {};
   Timer? scrollCheckTimer;
 
+  CameraController? _cameraController;
+  GlobalKey repaintKey = GlobalKey();
+  bool _isCameraReady = false;
+
   @override
   void initState(){
     CommonUtils.log("d", "AppChatViewState 화면 입장");
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+
+    availableCameras().then((cameras) {
+      if (cameras.isNotEmpty && _cameraController == null) {
+        _cameraController = CameraController(
+            cameras.first,
+            ResolutionPreset.medium,
+            enableAudio: false
+        );
+
+        _cameraController!.initialize().then((_) {
+          _cameraController!.setFlashMode(FlashMode.off);
+          setState(() {
+            _isCameraReady = true;
+          });
+        });
+      }
+    });
 
     _aniController = AnimationController(
         vsync: this,
@@ -219,6 +240,9 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
   void dispose(){
     CommonUtils.log("d", "AppChatViewState 화면 파괴");
     WidgetsBinding.instance.removeObserver(this);
+    if(_cameraController != null){
+      _cameraController!.dispose();
+    }
     _chatScrollController.dispose();
     _chatTextFocus.dispose();
     _chatTextController.dispose();
@@ -259,6 +283,75 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
         break;
       default:
         break;
+    }
+  }
+
+  void _takeCustomCamera() {
+    UiUtils.showPopMenu(context, false, 100.w, 100.h, 0.5, 0, ColorStyles.upFinBlack, (popContext, popSetState){
+      return Stack(
+        alignment: Alignment.center,
+        children: [
+          Positioned(
+              child: SizedBox(width: 100.w, height: 100.h)
+          ),
+          Positioned(
+              child: SizedBox(width: 100.w, height: appConfig.Config.isAndroid? 70.h : 63.h, child: _cameraController != null && _isCameraReady ?
+              CameraPreview(_cameraController!) : Container(color: ColorStyles.upFinBlack))
+          ),
+          Positioned(
+              top: 3.w,
+              right: 3.w,
+              child: UiUtils.getCloseButton(ColorStyles.upFinWhite, () {
+                imageFilFromCamera = null;
+                Navigator.pop(popContext);
+              })
+          ),
+          Positioned(
+              top: appConfig.Config.isAndroid? 85.h : 80.h,
+              child: UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+                  UiUtils.getTextWithFixedScale("촬영", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
+                    if(_cameraController != null){
+                      _onTakePicture(popContext);
+                    }
+                  })
+          ),
+        ],
+      );
+    });
+  }
+  XFile? imageFilFromCamera;
+  Future<void> _onTakePicture(BuildContext popContext) async {
+    UiUtils.showLoadingPop(popContext);
+    _cameraController!.setFlashMode(FlashMode.off);
+    await _cameraController!.setFocusMode(FocusMode.locked);
+    await _cameraController!.setExposureMode(ExposureMode.locked);
+    imageFilFromCamera = await _cameraController!.takePicture();
+    await _cameraController!.setFocusMode(FocusMode.auto);
+    await _cameraController!.setExposureMode(ExposureMode.auto);
+    if(popContext.mounted){
+      XFile? image = imageFilFromCamera;
+      if(image != null){
+        isShowPickedFile = true;
+        GetController.to.updateShowPickedFile(isShowPickedFile);
+        inputHelpHeight = inputHelpPickedFileHeight;
+        GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
+        pickedFiles.add(File(image.path));
+      }else{
+        if(pickedFiles.isEmpty){
+          isShowPickedFile = false;
+          GetController.to.updateShowPickedFile(isShowPickedFile);
+          inputHelpHeight = inputHelpMinHeight;
+          GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
+        }else{
+          isShowPickedFile = true;
+          GetController.to.updateShowPickedFile(isShowPickedFile);
+          inputHelpHeight = inputHelpPickedFileHeight;
+          GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
+        }
+      }
+      UiUtils.closeLoadingPop(popContext);
+      Navigator.pop(popContext);
+      setState(() {});
     }
   }
 
@@ -972,27 +1065,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
       if(pickedFiles.length == maximumSize){
         CommonUtils.flutterToast("최대 $maximumSize개의 파일만\n전송할 수 있습니다.");
       }else{
-        XFile? image = await CommonUtils.getCameraImage();
-        if(image != null){
-          isShowPickedFile = true;
-          GetController.to.updateShowPickedFile(isShowPickedFile);
-          inputHelpHeight = inputHelpPickedFileHeight;
-          GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
-          pickedFiles.add(File(image.path));
-        }else{
-          if(pickedFiles.isEmpty){
-            isShowPickedFile = false;
-            GetController.to.updateShowPickedFile(isShowPickedFile);
-            inputHelpHeight = inputHelpMinHeight;
-            GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
-          }else{
-            isShowPickedFile = true;
-            GetController.to.updateShowPickedFile(isShowPickedFile);
-            inputHelpHeight = inputHelpPickedFileHeight;
-            GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
-          }
-        }
-        setState(() {});
+        _takeCustomCamera();
       }
     }else{
       CommonUtils.flutterToast("최대 $maximumSize개의 파일만\n전송할 수 있습니다.");
