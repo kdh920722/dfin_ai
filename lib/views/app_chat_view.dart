@@ -926,7 +926,8 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
             GetController.to.chatStatusTick.value>2?_stepTick(2, true):_stepTick(2, false)
           ]),
       UiUtils.getMarginBox(0, 1.5.h),
-      UiUtils.getMarginColoredBox(100.w, 0.15.h, ColorStyles.upFinGray)
+      UiUtils.getMarginColoredBox(100.w, 0.13.h, ColorStyles.upFinDarkGrayWithAlpha),
+      UiUtils.getMarginColoredBox(100.w, 0.4.h, ColorStyles.upFinGray)
     ]);
   }
   Widget _stepTick(int type, bool isChecked){

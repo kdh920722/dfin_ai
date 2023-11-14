@@ -620,7 +620,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   }
 
   void _showInfoPop(){
-    UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, 30.h, 0.5, (slideContext, setState){
+    UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, 40.h, 0.5, (slideContext, setState){
       return Center(child: Column(children: [
         UiUtils.getMarginBox(0, 1.h),
         UiUtils.getTextWithFixedScale("📌 안내사항", 14.sp, FontWeight.w800, ColorStyles.upFinBlack, TextAlign.center, null),
