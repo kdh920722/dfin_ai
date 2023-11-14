@@ -112,12 +112,12 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
               }
             }
           }else{
-            if(_chatScrollController.position.maxScrollExtent < deviceH){
+            if(_chatScrollController.position.maxScrollExtent < deviceH - 200){
               if(isScrollMove){
                 isScrollMove = false;
                 GetController.to.updateShowScrollBottom(false);
               }
-            }else{
+            }else if(_chatScrollController.position.maxScrollExtent > deviceH){
               if(!isScrollMove){
                 isScrollMove = true;
                 GetController.to.updateShowScrollBottom(true);
@@ -320,7 +320,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
     }
 
     String htmlString = """
-    <head></head>
+    <head><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
     <body>
     $htmlTextTag $htmlTag </div>
     </body>
@@ -619,8 +619,9 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                 if (snapshot.connectionState == ConnectionState.done) {
                   return ExtendedImage.network(
                     srcUrl,
-                    fit: BoxFit.contain,
+                    fit: BoxFit.fill,
                     cache: true,
+                    cacheWidth: (40.w*devicePixelRatio).round().toInt(),
                     cacheHeight: (40.w*devicePixelRatio).round().toInt(),
                     cacheMaxAge: const Duration(hours: 1),
                     shape: BoxShape.rectangle,
@@ -651,7 +652,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                           return FadeTransition(
                             opacity: _aniController,
                             child: ExtendedRawImage(
-                              fit: BoxFit.contain,
+                              fit: BoxFit.fill,
                               image: state.extendedImageInfo?.image,
                             ),
                           );
@@ -810,7 +811,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
             UiUtils.getMarginBox(1.w, 0),
             Container(
                 constraints: BoxConstraints(maxWidth: 73.w),
-                padding: isImageView? EdgeInsets.all(1.w) : EdgeInsets.all(3.w),
+                padding: isImageView? EdgeInsets.zero : EdgeInsets.all(3.w),
                 decoration: BoxDecoration(
                   borderRadius: isImageView? const BorderRadius.only(topRight: Radius.circular(5), topLeft: Radius.circular(5), bottomLeft: Radius.circular(5))
                       : const BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomLeft: Radius.circular(15)),
@@ -818,7 +819,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                 ),
                 child: meInfoWidget
             ),
-            CustomPaint(
+            isImageView? Container() : CustomPaint(
               painter: ChatBubbleTriangleForMe(),
             ),
           ]),
@@ -1188,7 +1189,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
             _setPickedFileFromDevice(1);
           }else{
             if(each.contains("사진")){
-              _setPickedFileFromDevice(1);
+              _setPickedFileFromDevice(2);
             }else if(each.contains("파일")){
               _setPickedFileFromDevice(3);
             }

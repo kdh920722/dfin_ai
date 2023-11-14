@@ -239,61 +239,64 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
   @override
   Widget build(BuildContext context) {
     Widget view = Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: EdgeInsets.only(top:3.w), child:
-    Column(children: [
-      SizedBox(width: 95.w, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-        UiUtils.getCloseButton(ColorStyles.upFinDarkGray, () {
-          MyData.selectedAccidentInfoData = null;
-          MyData.selectedPrInfoData = null;
-          Navigator.pop(context);
-        })
-      ])),
-      UiUtils.getMarginBox(0, 3.w),
-      SizedBox(width: 90.w, height: 5.h , child : UiUtils.getTextWithFixedScale("대출상품", 24.sp, FontWeight.w800, ColorStyles.upFinButtonBlue, TextAlign.start, 1)),
-      UiUtils.getMarginBox(0, 1.h),
-      SizedBox(width: 90.w, height: 5.h, child: TabBar(
-        unselectedLabelStyle: TextStyles.upFinUnselectedTabTextInButtonStyle,
-        unselectedLabelColor: ColorStyles.upFinRealGray,
-        labelStyle: TextStyles.upFinSelectedTabTextInButtonStyle,
-        labelColor: ColorStyles.upFinBlack,
-        indicatorSize: TabBarIndicatorSize.tab,
-        indicator: MyPrTabIndicator(),
-        indicatorColor: ColorStyles.upFinButtonBlue,
-        dividerColor: ColorStyles.upFinWhiteSky,
-        controller: _tabController,
-        tabs: const <Widget>[
-          Tab(text: "신청 가능"),
-          Tab(text: "신청 불가능"),
-        ],
-      )),
-      UiUtils.getMarginBox(0, 2.h),
-      SizedBox(width: 90.w, height: 6.h, child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-        UiUtils.getTextWithFixedScale("상품 ", 14.sp, FontWeight.w400, ColorStyles.upFinBlack, TextAlign.center, 1),
-        UiUtils.getTextWithFixedScale("$selectedTabCount개", 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, 1),
-        const Spacer(flex: 2),
-        UiUtils.getCustomTextButtonBox(22.w, "금리순", 9.sp, FontWeight.w600, isOrderByLimit? ColorStyles.upFinWhiteSky : ColorStyles.upFinButtonBlue,
-            isOrderByLimit? ColorStyles.upFinButtonBlue : ColorStyles.upFinWhiteSky, () {
-              _reOrderList(false);
-            }),
-        UiUtils.getMarginBox(1.5.w, 0),
-        UiUtils.getCustomTextButtonBox(22.w, "한도순", 9.sp, FontWeight.w600, isOrderByLimit? ColorStyles.upFinButtonBlue : ColorStyles.upFinWhiteSky,
-            isOrderByLimit? ColorStyles.upFinWhiteSky : ColorStyles.upFinButtonBlue, () {
-              _reOrderList(true);
+    MediaQuery(
+        data : MediaQuery.of(context).copyWith(textScaleFactor : 1.1),
+        child : Column(children: [
+          SizedBox(width: 95.w, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+            UiUtils.getCloseButton(ColorStyles.upFinDarkGray, () {
+              MyData.selectedAccidentInfoData = null;
+              MyData.selectedPrInfoData = null;
+              Navigator.pop(context);
             })
-      ])),
-      SizedBox(width: 90.w, height: Config.isAndroid? 65.h : 60.h, child: TabBarView(
-        controller: _tabController,
-        children: <Widget>[
-          possiblePrCnt>0 ? Column(children: [
-            UiUtils.getMarginBox(0, 2.h),
-            _getPrListView(true)
-          ]) : Center(child: UiUtils.getTextWithFixedScale("접수 가능한 상품이 없습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null)),
-          impossiblePrCnt>0 ? Column(children: [
-            UiUtils.getMarginBox(0, 2.h),
-            _getPrListView(false)
-          ]) : Center(child: UiUtils.getTextWithFixedScale("접수 불가능한 상품이 없습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null))
-        ],
-      ))
-    ]));
+          ])),
+          UiUtils.getMarginBox(0, 3.w),
+          SizedBox(width: 90.w, height: 5.h , child : UiUtils.getTextWithFixedScale("대출상품", 22.sp, FontWeight.w800, ColorStyles.upFinButtonBlue, TextAlign.start, 1)),
+          UiUtils.getMarginBox(0, 1.h),
+          SizedBox(width: 90.w, height: 5.h, child: TabBar(
+            unselectedLabelStyle: TextStyles.upFinUnselectedTabTextInButtonStyle,
+            unselectedLabelColor: ColorStyles.upFinRealGray,
+            labelStyle: TextStyles.upFinSelectedTabTextInButtonStyle,
+            labelColor: ColorStyles.upFinBlack,
+            indicatorSize: TabBarIndicatorSize.tab,
+            indicator: MyPrTabIndicator(),
+            indicatorColor: ColorStyles.upFinButtonBlue,
+            dividerColor: ColorStyles.upFinWhiteSky,
+            controller: _tabController,
+            tabs: const <Widget>[
+              Tab(text: "신청 가능"),
+              Tab(text: "신청 불가능"),
+            ],
+          )),
+          UiUtils.getMarginBox(0, 2.h),
+          SizedBox(width: 90.w, height: 6.h, child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+            UiUtils.getTextWithFixedScale("상품 ", 14.sp, FontWeight.w400, ColorStyles.upFinBlack, TextAlign.center, 1),
+            UiUtils.getTextWithFixedScale("$selectedTabCount개", 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, 1),
+            const Spacer(flex: 2),
+            UiUtils.getCustomTextButtonBox(22.w, "금리순", 9.sp, FontWeight.w600, isOrderByLimit? ColorStyles.upFinWhiteSky : ColorStyles.upFinButtonBlue,
+                isOrderByLimit? ColorStyles.upFinButtonBlue : ColorStyles.upFinWhiteSky, () {
+                  _reOrderList(false);
+                }),
+            UiUtils.getMarginBox(1.5.w, 0),
+            UiUtils.getCustomTextButtonBox(22.w, "한도순", 9.sp, FontWeight.w600, isOrderByLimit? ColorStyles.upFinButtonBlue : ColorStyles.upFinWhiteSky,
+                isOrderByLimit? ColorStyles.upFinWhiteSky : ColorStyles.upFinButtonBlue, () {
+                  _reOrderList(true);
+                })
+          ])),
+          SizedBox(width: 90.w, height: Config.isAndroid? 65.h : 60.h, child: TabBarView(
+            controller: _tabController,
+            children: <Widget>[
+              possiblePrCnt>0 ? Column(children: [
+                UiUtils.getMarginBox(0, 2.h),
+                _getPrListView(true)
+              ]) : Center(child: UiUtils.getTextWithFixedScale("접수 가능한 상품이 없습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null)),
+              impossiblePrCnt>0 ? Column(children: [
+                UiUtils.getMarginBox(0, 2.h),
+                _getPrListView(false)
+              ]) : Center(child: UiUtils.getTextWithFixedScale("접수 불가능한 상품이 없습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null))
+            ],
+          ))
+        ]))
+    );
     return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
   }
 

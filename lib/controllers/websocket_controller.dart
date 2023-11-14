@@ -413,12 +413,14 @@ class WebSocketController {
         if(isSuccess){
           GetController.to.updateAllSubScribed(true);
           if(!isNotEmpty){
+            GetController.to.updateAllSubScribed(false);
             Future.delayed(const Duration(seconds: 5), () {
               _retryToConnectNewVer(connectedKey);
             });
           }
         }else{
           // fail
+          GetController.to.updateAllSubScribed(false);
           Future.delayed(const Duration(seconds: 5), () {
             _retryToConnectNewVer(connectedKey);
           });

@@ -76,7 +76,7 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   UiUtils.getMarginBox(0, 1.h),
                   SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScaleAndOverFlow(each.companyName, 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1)),
-                  UiUtils.getMarginBox(0, 4.h),
+                  UiUtils.getMarginBox(0, 2.5.h),
                   SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("접수일", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
                   UiUtils.getMarginBox(0, 1.2.h),
                   SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(_setUpdateDate(each.createdDate), 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)),
@@ -239,37 +239,40 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
             ),
           ),
         ]),
-        SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          UiUtils.getMarginBox(0, 2.h),
-          SizedBox(width: 95.w, height: 5.h, child: TabBar(
-            unselectedLabelStyle: TextStyles.upFinUnselectedTabTextInButtonStyle,
-            unselectedLabelColor: ColorStyles.upFinRealGray,
-            labelStyle: TextStyles.upFinSelectedTabTextInButtonStyle,
-            labelColor: ColorStyles.upFinBlack,
-            indicatorSize: TabBarIndicatorSize.tab,
-            indicator: MyTabIndicator(),
-            indicatorColor: ColorStyles.upFinButtonBlue,
-            dividerColor: ColorStyles.upFinWhiteSky,
-            controller: _tabController,
-            tabs: const <Widget>[
-              Tab(text: "사건정보"),
-              Tab(text: "접수내역"),
-            ],
-          )),
-          SizedBox(width: 95.w, height: Config.isAndroid? 75.h : 70.h, child: TabBarView(
-            controller: _tabController,
-            children: <Widget>[
-              Column(children: [UiUtils.getExpandedScrollView(Axis.vertical, _getAccidentWidgetList())]),
-              MyData.getLoanInfoList().isNotEmpty ? Column(children: [
-                UiUtils.getMarginBox(0, 3.h),
-                UiUtils.getExpandedScrollView(Axis.vertical, Column(children: _getLoanWidgetList()))
-              ]) : Center(
-                child: UiUtils.getTextWithFixedScale("접수이력이 없습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
-              )
-            ],
-          )),
-        ])),
-
+        MediaQuery(
+            data : MediaQuery.of(context).copyWith(textScaleFactor : 1.1),
+            child : SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              UiUtils.getMarginBox(0, 2.h),
+              SizedBox(width: 95.w, height: 5.h,
+                  child: TabBar(
+                    unselectedLabelStyle: TextStyles.upFinUnselectedTabTextInButtonStyle,
+                    unselectedLabelColor: ColorStyles.upFinRealGray,
+                    labelStyle: TextStyles.upFinSelectedTabTextInButtonStyle,
+                    labelColor: ColorStyles.upFinBlack,
+                    indicatorSize: TabBarIndicatorSize.tab,
+                    indicator: MyTabIndicator(),
+                    indicatorColor: ColorStyles.upFinButtonBlue,
+                    dividerColor: ColorStyles.upFinWhiteSky,
+                    controller: _tabController,
+                    tabs: const <Widget>[
+                      Tab(text: "사건정보"),
+                      Tab(text: "접수내역"),
+                    ],
+                  )
+              ),
+              SizedBox(width: 95.w, height: Config.isAndroid? 75.h : 70.h, child: TabBarView(
+                controller: _tabController,
+                children: <Widget>[
+                  Column(children: [UiUtils.getExpandedScrollView(Axis.vertical, _getAccidentWidgetList())]),
+                  MyData.getLoanInfoList().isNotEmpty ? Column(children: [
+                    UiUtils.getMarginBox(0, 3.h),
+                    UiUtils.getExpandedScrollView(Axis.vertical, Column(children: _getLoanWidgetList()))
+                  ]) : Center(
+                    child: UiUtils.getTextWithFixedScale("접수이력이 없습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
+                  )
+                ],
+              )),
+            ]))),
       ]),
     );
 

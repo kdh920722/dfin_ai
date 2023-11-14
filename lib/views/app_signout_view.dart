@@ -94,13 +94,13 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
             UiUtils.getTextWithFixedScale("계정", 22.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
             UiUtils.getMarginBox(0, 3.h)
           ])),
-          UiUtils.getDisabledTextField(90.w, MyData.name, TextStyles.upFinDisabledTextFormFieldTextStyle2,
+          UiUtils.getDisabledTextField(context, 90.w, MyData.name, TextStyles.upFinDisabledTextFormFieldTextStyle2,
               UiUtils.getDisabledInputDecoration("이름", 12.sp, "", 0.sp)),
           UiUtils.getMarginBox(0, 2.h),
-          UiUtils.getDisabledTextField(90.w, MyData.email, TextStyles.upFinDisabledTextFormFieldTextStyle2,
+          UiUtils.getDisabledTextField(context, 90.w, MyData.email, TextStyles.upFinDisabledTextFormFieldTextStyle2,
               UiUtils.getDisabledInputDecoration("이메일", 12.sp, "", 0.sp)),
           UiUtils.getMarginBox(0, 2.h),
-          UiUtils.getDisabledTextField(90.w, "${MyData.phoneNumber.substring(0,3)}-${MyData.phoneNumber.substring(3,7)}-${MyData.phoneNumber.substring(7)}", TextStyles.upFinDisabledTextFormFieldTextStyle2,
+          UiUtils.getDisabledTextField(context, 90.w, "${MyData.phoneNumber.substring(0,3)}-${MyData.phoneNumber.substring(3,7)}-${MyData.phoneNumber.substring(7)}", TextStyles.upFinDisabledTextFormFieldTextStyle2,
               UiUtils.getDisabledInputDecoration("연락처", 12.sp, "", 0.sp)),
           UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
           UiUtils.getMarginBox(0, 2.h),
@@ -114,7 +114,7 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
                             Navigator.pop(slideContext);
                           })
                         ])),
-                        UiUtils.getMarginBox(0, 3.h),
+                        UiUtils.getMarginBox(0, 3.w),
                         SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("탈퇴", 22.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
                         UiUtils.getMarginBox(0, 1.h),
                         SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("비밀번호 입력 후 회원탈퇴가 가능합니다.", 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),

@@ -38,6 +38,17 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   bool isScrolling2= false;
   final ScrollController _bankScrollController = ScrollController();
 
+  final _dlNumInfoFocus1 = FocusNode();
+  final _dlNumInfoTextController1 = TextEditingController();
+  final _dlNumInfoFocus2 = FocusNode();
+  final _dlNumInfoTextController2 = TextEditingController();
+  final _dlNumInfoFocus3 = FocusNode();
+  final _dlNumInfoTextController3 = TextEditingController();
+  final _dlNumInfoFocus4 = FocusNode();
+  final _dlNumInfoTextController4 = TextEditingController();
+  final _dlNumInfoFocusSerial = FocusNode();
+  final _dlNumInfoTextControllerSerial = TextEditingController();
+
   int reUseTargetViewId = -1;
 
   CameraController? _cameraController;
@@ -517,6 +528,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     _addressInfoTextController.addListener(_addressTextControllerListener);
     _bankAccountInfoTextController.addListener(_bankAccountInfoTextControllerListener);
     _businessNumberInfoTextController.addListener(_businessNumberTextControllerListener);
+
     availableCameras().then((cameras) {
       if (cameras.isNotEmpty && _cameraController == null) {
         _cameraController = CameraController(
@@ -552,9 +564,9 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   @override
   void dispose(){
     CommonUtils.log("d", "AppApplyPrView 화면 파괴");
+    _unFocusAllNodesForDl();
+    _disposeAllTextControllersForDl();
     WidgetsBinding.instance.removeObserver(this);
-    _unFocusAllNodes();
-    _disposeAllTextControllers();
     _bankScrollController.dispose();
     Config.contextForEmergencyBack = null;
     if(_cameraController != null){
@@ -586,16 +598,20 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     }
   }
 
-  void _unFocusAllNodes(){
-    _addressInfoFocus.unfocus();
-    _bankAccountInfoFocus.unfocus();
-    _businessNumberInfoFocus.unfocus();
+  void _unFocusAllNodesForDl(){
+    _dlNumInfoFocus1.unfocus();
+    _dlNumInfoFocus2.unfocus();
+    _dlNumInfoFocus3.unfocus();
+    _dlNumInfoFocus4.unfocus();
+    _dlNumInfoFocusSerial.unfocus();
   }
 
-  void _disposeAllTextControllers(){
-    _addressInfoTextController.dispose();
-    _bankAccountInfoTextController.dispose();
-    _businessNumberInfoTextController.dispose();
+  void _disposeAllTextControllersForDl(){
+    _dlNumInfoTextController1.dispose();
+    _dlNumInfoTextController2.dispose();
+    _dlNumInfoTextController3.dispose();
+    _dlNumInfoTextController4.dispose();
+    _dlNumInfoTextControllerSerial.dispose();
   }
 
   Future<void> backInputView() async {
@@ -632,7 +648,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           }
 
           isInputValid = false;
-          _unFocusAllNodes();
           CommonUtils.hideKeyBoard();
           if(currentViewId-1 == 0){
             Navigator.pop(context);
@@ -662,7 +677,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         }
 
         isInputValid = false;
-        _unFocusAllNodes();
         CommonUtils.hideKeyBoard();
         if(currentViewId-1 == 0){
           if(isHist){
@@ -703,7 +717,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         }
       }
       isInputValid = false;
-      _unFocusAllNodes();
       CommonUtils.hideKeyBoard();
       if(_getIdFromListByViewId(currentViewId+1) != confirmedId){
         bool isAllConfirmed = true;
@@ -1807,55 +1820,156 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                     MyData.idNumber = map['personalNum'][0]["formatted"]["value"];
                     String croppedImagePath = await CommonUtils.makeCroppedImageAndGetPath(maskedImagePath, map);
 
-                    /*test
-                    _setConfirmedToDocItemByViewId(currentViewId, true);
-                    Map<String, dynamic> resultMap = {
-                      "resultValue" : croppedImagePath
-                    };
-                    _setResultToListById(cameraId, resultMap);
-                    setState(() {
-                      pickedFilePath = croppedImagePath;
-                    });
-                    if(context.mounted) UiUtils.closeLoadingPop(context);
-                    test*/
-
-                    //check real id
                     try{
                       if(map['id_type'] == "dl"){
-                        CommonUtils.log("d", "dl : infos\n${map["code"][0]["formatted"]["value"]}${map["num"][0]["formatted"]["value"]}");
+                        CommonUtils.log("d", "dl : infos\n${map["code"][0]["formatted"]["value"]} || ${map["num"][0]["formatted"]["value"]}");
                         String licenseNum = map["num"][0]["formatted"]["value"];
-                        Map<String, dynamic> inputJson = {
-                          "ownerNm": MyData.name,
-                          "juminNo": MyData.birth,
-                          "licence01": licenseNum.split("-")[0],
-                          "licence02": licenseNum.split("-")[1],
-                          "licence03": licenseNum.split("-")[2],
-                          "licence04": licenseNum.split("-")[3],
-                          "serialNo": map["code"][0]["formatted"]["value"]
-                        };
+                        List<String> licenseNumList = licenseNum.split("-");
+                        Map<String, dynamic> inputJson = {};
+                        if(licenseNumList.length == 4){
+                          inputJson = {
+                            "ownerNm": MyData.name,
+                            "juminNo": MyData.birth,
+                            "licence01": licenseNum.split("-")[0],
+                            "licence02": licenseNum.split("-")[1],
+                            "licence03": licenseNum.split("-")[2],
+                            "licence04": licenseNum.split("-")[3],
+                            "serialNo": map["code"][0]["formatted"]["value"]
+                          };
+                        }else if(licenseNumList.length == 3){
+                          inputJson = {
+                            "ownerNm": MyData.name,
+                            "juminNo": MyData.birth,
+                            "licence01": licenseNum.split(" ")[0],
+                            "licence02": licenseNum.split(" ")[1].split("-")[0],
+                            "licence03": licenseNum.split(" ")[1].split("-")[1],
+                            "licence04": licenseNum.split(" ")[1].split("-")[2],
+                            "serialNo": map["code"][0]["formatted"]["value"]
+                          };
+                        }
 
-                        HyphenController.callHyphenApiForCert(HyphenApis.driveIdCert, inputJson, (isSuccessToCertId){
+                        if(context.mounted){
                           UiUtils.closeLoadingPop(context);
-                          if(isSuccessToCertId){
-                            _setConfirmedToDocItemByViewId(currentViewId, true);
-                            Map<String, dynamic> resultMap = {
-                              "resultValue" : croppedImagePath
-                            };
-                            _setResultToListById(cameraId, resultMap);
-                            setState(() {
-                              pickedFilePath = croppedImagePath;
+                          UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, 80.h, 0.5, (slideContext, slideSetState){
+                            _dlNumInfoTextController1.addListener((){
+                              if(_dlNumInfoTextController1.text.trim().length > 2){
+                                _dlNumInfoTextController1.text = _dlNumInfoTextController1.text.trim().substring(0,2);
+                              }
                             });
-                          }else{
-                            _setConfirmedToDocItemByViewId(currentViewId, false);
-                            Map<String, dynamic> resultMap = {
-                              "resultValue" : {}
-                            };
-                            _setResultToListById(cameraId, resultMap);
-                            setState(() {
-                              pickedFilePath = "";
+                            _dlNumInfoTextController2.addListener((){
+                              if(_dlNumInfoTextController2.text.trim().length > 2){
+                                _dlNumInfoTextController2.text = _dlNumInfoTextController2.text.trim().substring(0,2);
+                              }
                             });
-                          }
-                        });
+                            _dlNumInfoTextController3.addListener((){
+                              if(_dlNumInfoTextController3.text.trim().length > 7){
+                                _dlNumInfoTextController3.text = _dlNumInfoTextController3.text.trim().substring(0,7);
+                              }
+                            });
+                            _dlNumInfoTextController4.addListener((){
+                              if(_dlNumInfoTextController4.text.trim().length > 2){
+                                _dlNumInfoTextController4.text = _dlNumInfoTextController4.text.trim().substring(0,2);
+                              }
+                            });
+
+                            _dlNumInfoTextControllerSerial.addListener((){
+                              if(_dlNumInfoTextControllerSerial.text.trim().length > 7){
+                                _dlNumInfoTextControllerSerial.text = _dlNumInfoTextControllerSerial.text.trim().substring(0,8);
+                              }
+                            });
+
+                            _dlNumInfoTextController1.text = inputJson["licence01"].toString();
+                            _dlNumInfoTextController2.text = inputJson["licence02"].toString();
+                            _dlNumInfoTextController3.text = inputJson["licence03"].toString();
+                            _dlNumInfoTextController4.text = inputJson["licence04"].toString();
+                            _dlNumInfoTextControllerSerial.text = inputJson["serialNo"].toString();
+                            return Material(
+                                child: Container(color: ColorStyles.upFinWhite,
+                                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.start, children:
+                                  [
+                                    Row(children: [
+                                      const Spacer(flex: 2),
+                                      UiUtils.getIconButton(Icons.close, 7.w, ColorStyles.upFinRealGray, () {
+                                        CommonUtils.hideKeyBoard();
+                                        _setConfirmedToDocItemByViewId(currentViewId, false);
+                                        setState(() {
+                                          pickedFilePath = "";
+                                        });
+                                        Navigator.pop(slideContext);
+                                      }),
+                                    ]),
+                                    SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("인식된 신분증 정보입니다.", 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
+                                    UiUtils.getMarginBox(0, 0.5.w),
+                                    SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("정보가 맞다면, 확인을 눌러주세요!", 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
+                                    UiUtils.getMarginBox(0, 3.h),
+                                    /*
+                                    SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("이름", 14.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null)),
+                                    UiUtils.getMarginBox(0, 1.w),
+                                    SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(MyData.name, 13.sp, FontWeight.w300, ColorStyles.upFinBlack, TextAlign.start, null)),
+                                    UiUtils.getMarginBox(0, 5.w),
+                                    SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("주민등록번호", 14.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null)),
+                                    UiUtils.getMarginBox(0, 1.w),
+                                    SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("${MyData.idNumber.substring(0,8)}******", 13.sp, FontWeight.w300, ColorStyles.upFinBlack, TextAlign.start, null)),
+                                    UiUtils.getMarginBox(0, 5.w),
+                                     */
+                                    SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("운전면허 번호", 14.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null)),
+                                    SizedBox(width: 90.w, height: 8.h, child: Row(children: [
+                                      UiUtils.getTextField(slideContext, 15.w, TextStyles.upFinTextFormFieldTextStyle, _dlNumInfoFocus1, _dlNumInfoTextController1, TextInputType.text,
+                                          UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
+                                      UiUtils.getTextWithFixedScale("-", 15.sp, FontWeight.w400, ColorStyles.upFinRealGray, TextAlign.center, null),
+                                      UiUtils.getTextField(slideContext, 13.w, TextStyles.upFinTextFormFieldTextStyle, _dlNumInfoFocus2, _dlNumInfoTextController2, TextInputType.text,
+                                          UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
+                                      UiUtils.getTextWithFixedScale("-", 15.sp, FontWeight.w400, ColorStyles.upFinRealGray, TextAlign.center, null),
+                                      UiUtils.getTextField(slideContext, 30.w, TextStyles.upFinTextFormFieldTextStyle, _dlNumInfoFocus3, _dlNumInfoTextController3, TextInputType.text,
+                                          UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
+                                      UiUtils.getTextWithFixedScale("-", 15.sp, FontWeight.w400, ColorStyles.upFinRealGray, TextAlign.center, null),
+                                      UiUtils.getTextField(slideContext, 13.w, TextStyles.upFinTextFormFieldTextStyle, _dlNumInfoFocus4, _dlNumInfoTextController4, TextInputType.text,
+                                          UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
+                                    ])),
+                                    UiUtils.getMarginBox(0, 5.w),
+                                    SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("시리얼 번호", 14.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null)),
+                                    SizedBox(width: 30.w, height: 8.h, child: UiUtils.getTextField(slideContext, 30.w, TextStyles.upFinTextFormFieldTextStyle, _dlNumInfoFocusSerial, _dlNumInfoTextControllerSerial, TextInputType.text,
+                                        UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { })),
+
+                                    UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
+                                    UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+                                        UiUtils.getTextWithFixedScale("확인", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), (){
+                                          CommonUtils.hideKeyBoard();
+                                          inputJson["licence01"] = _dlNumInfoTextController1.text.trim();
+                                          inputJson["licence02"] = _dlNumInfoTextController2.text.trim();
+                                          inputJson["licence03"] = _dlNumInfoTextController3.text.trim();
+                                          inputJson["licence04"] = _dlNumInfoTextController4.text.trim();
+                                          inputJson["serialNo"] = _dlNumInfoTextControllerSerial.text.trim();
+                                          UiUtils.showLoadingPop(slideContext);
+                                          HyphenController.callHyphenApiForCert(HyphenApis.driveIdCert, inputJson, (isSuccessToCertId){
+                                            UiUtils.closeLoadingPop(slideContext);
+                                            Navigator.pop(slideContext);
+                                            if(isSuccessToCertId){
+                                              _setConfirmedToDocItemByViewId(currentViewId, true);
+                                              Map<String, dynamic> resultMap = {
+                                                "resultValue" : croppedImagePath
+                                              };
+                                              _setResultToListById(cameraId, resultMap);
+                                              setState(() {
+                                                pickedFilePath = croppedImagePath;
+                                              });
+                                            }else{
+                                              _setConfirmedToDocItemByViewId(currentViewId, false);
+                                              Map<String, dynamic> resultMap = {
+                                                "resultValue" : {}
+                                              };
+                                              _setResultToListById(cameraId, resultMap);
+                                              setState(() {
+                                                pickedFilePath = "";
+                                              });
+                                            }
+                                          });
+                                        })
+                                  ])
+                                )
+                            );
+                          });
+                        }
                       }else{
                         CommonUtils.log("d", "ic : infos\n${map["issueDate"][0]["formatted"]["year"]}${map["issueDate"][0]["formatted"]["month"]}${map["issueDate"][0]["formatted"]["day"]}");
                         Map<String, dynamic> inputJson = {
@@ -1888,6 +2002,12 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                         });
                       }
                     }catch(imageError){
+                      if(context.mounted) UiUtils.closeLoadingPop(context);
+                      _setConfirmedToDocItemByViewId(currentViewId, false);
+                      setState(() {
+                        pickedFilePath = "";
+                      });
+                      CommonUtils.flutterToast("신분증 인식실패\n다시 시도해주세요");
                       CommonUtils.log("e", "tage imageError : $imageError");
                     }
                   }
@@ -1897,7 +2017,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                   setState(() {
                     pickedFilePath = "";
                   });
-                  CommonUtils.flutterToast("신분증을 인식실패\n다시 시도해주세요");
+                  CommonUtils.flutterToast("신분증 인식실패\n다시 시도해주세요");
                 }
               }else{
                 if(context.mounted) UiUtils.closeLoadingPop(context);
@@ -1905,7 +2025,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                 setState(() {
                   pickedFilePath = "";
                 });
-                CommonUtils.flutterToast("신분증을 인식실패\n다시 시도해주세요");
+                CommonUtils.flutterToast("신분증 인식실패\n다시 시도해주세요");
               }
             }else{
               // failed to masking

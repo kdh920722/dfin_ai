@@ -185,7 +185,7 @@ class UiUtils {
 
   static Widget getBoxTextWithFixedScale(String text, double fontSize, FontWeight fontWeight, TextAlign? textAlign, Color boxColor, Color textColor){
     return Container(color: boxColor, child: FittedBox(fit: BoxFit.contain, alignment: Alignment.center,
-    child: Padding(padding: EdgeInsets.only(left: 2.w, right: 2.w, bottom: 1.w, top: 1.w), child: Text(text, style: TextStyle(fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor)))));
+    child: Padding(padding: EdgeInsets.only(left: 2.w, right: 2.w, bottom: 1.w, top: 1.w), child: Text(textScaleFactor: 1.0, text, style: TextStyle(fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor)))));
   }
 
   static Widget getBoxTextAndIconWithFixedScale(String text, double fontSize, FontWeight fontWeight, TextAlign? textAlign, Color boxColor, Color textColor, IconData icon, Color iconColor, double iconSize){
@@ -204,7 +204,7 @@ class UiUtils {
           color: boxColor, // 배경색 설정
           borderRadius: BorderRadius.circular(20.0), // 모서리를 둥글게 하는 부분
     ),child: FittedBox(fit: BoxFit.contain, alignment: Alignment.center,
-        child: Padding(padding: EdgeInsets.only(left: 2.w, right: 2.w, bottom: 1.w, top: 1.w), child: Text(text, style: TextStyle(fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor)))));
+        child: Padding(padding: EdgeInsets.only(left: 2.w, right: 2.w, bottom: 1.w, top: 1.w), child: Text(textScaleFactor: 1.0, text, style: TextStyle(fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor)))));
   }
 
   static Widget getRoundBoxTextWithFixedScale2(String text, double fontSize, FontWeight fontWeight, TextAlign? textAlign, Color boxColor, Color textColor){
@@ -213,16 +213,16 @@ class UiUtils {
           color: boxColor, // 배경색 설정
           borderRadius: BorderRadius.circular(20.0), // 모서리를 둥글게 하는 부분
         ),child: FittedBox(fit: BoxFit.contain, alignment: Alignment.center,
-        child: Padding(padding: EdgeInsets.only(left: 3.w, right: 3.w, bottom: 2.w, top: 2.w), child: Text(text, style: TextStyle(fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor)))));
+        child: Padding(padding: EdgeInsets.only(left: 3.w, right: 3.w, bottom: 2.w, top: 2.w), child: Text(textScaleFactor: 1.0, text, style: TextStyle(fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor)))));
   }
 
 
   static SelectableText getSelectableTextWithFixedScale(String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign? textAlign, int? textMaxLine){
-    return SelectableText(text, style: TextStyle(decoration: TextDecoration.none, height: 1, fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor), textScaleFactor: 1.0, textAlign: textAlign, maxLines: textMaxLine);
+    return SelectableText(textScaleFactor: 1.0, text, style: TextStyle(decoration: TextDecoration.none, height: 1, fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor), textAlign: textAlign, maxLines: textMaxLine);
   }
 
   static SelectableText getSelectableStyledTextWithFixedScale(String text, TextStyle textStyle, TextAlign? textAlign, int? textMaxLine){
-    return SelectableText(text, style: textStyle,  textScaleFactor: 1.0, textAlign: textAlign, maxLines: textMaxLine);
+    return SelectableText(textScaleFactor: 1.0, text, style: textStyle, textAlign: textAlign, maxLines: textMaxLine);
   }
 
   static Widget getTextWithUnderline(String text, TextStyle textStyle, Color underlineColor, VoidCallback? onPressedCallback){
@@ -599,16 +599,18 @@ class UiUtils {
     return Expanded(flex:2, child: SingleChildScrollView(controller: controller, scrollDirection: scrollDir, physics: const BouncingScrollPhysics(), child: scrollChildView));
   }
 
-  static Widget getDisabledTextField(double width, String initText, TextStyle textStyle, InputDecoration inputDecoration){
-    return SizedBox(width: width, child: TextFormField(initialValue: initText, enabled: false,
-        decoration: inputDecoration, style: textStyle));
+  static Widget getDisabledTextField(BuildContext context, double width, String initText, TextStyle textStyle, InputDecoration inputDecoration){
+    return SizedBox(width: width, child: MediaQuery(
+        data : MediaQuery.of(context).copyWith(textScaleFactor : 1.1),
+        child : TextFormField(initialValue: initText, enabled: false,
+            decoration: inputDecoration, style: textStyle)));
   }
 
   static Widget getTextField(BuildContext context, double width, TextStyle textStyle, FocusNode focusNode, TextEditingController textEditingController, TextInputType textInputType,
       InputDecoration inputDecoration, ValueChanged<String> onChangedCallback){
     return SizedBox(width: width,
         child: MediaQuery(
-            data : MediaQuery.of(context).copyWith(textScaleFactor : 1.0),
+            data : MediaQuery.of(context).copyWith(textScaleFactor : 1.1),
             child : TextField(enableInteractiveSelection: true, focusNode: focusNode, cursorColor: ColorStyles.upFinBlack, controller: textEditingController,
                 keyboardType: textInputType, decoration: inputDecoration, onChanged: onChangedCallback, style: textStyle))
         );
@@ -618,7 +620,7 @@ class UiUtils {
       InputDecoration inputDecoration, ValueChanged<String> onChangedCallback){
     return SizedBox(width: width,
         child: MediaQuery(
-            data : MediaQuery.of(context).copyWith(textScaleFactor : 1.0),
+            data : MediaQuery.of(context).copyWith(textScaleFactor : 1.1),
             child : TextField(enableInteractiveSelection: true, maxLines: null, focusNode: focusNode, cursorColor: ColorStyles.upFinBlack, controller: textEditingController,
                 keyboardType: textInputType, decoration: inputDecoration, onChanged: onChangedCallback, style: textStyle)));
   }
@@ -627,7 +629,7 @@ class UiUtils {
       InputDecoration inputDecoration, ValueChanged<String> onChangedCallback, FormFieldValidator<String> validatorCallback){
     return SizedBox(width: width,
         child: MediaQuery(
-            data : MediaQuery.of(context).copyWith(textScaleFactor : 1.0),
+            data : MediaQuery.of(context).copyWith(textScaleFactor : 1.1),
             child : TextFormField(enableInteractiveSelection: true, focusNode: focusNode, obscureText : isPwd, cursorColor: ColorStyles.upFinBlack, controller: textEditingController,
                 keyboardType: textInputType, decoration: inputDecoration, onChanged: onChangedCallback, validator: validatorCallback, style: textStyle))
         );
