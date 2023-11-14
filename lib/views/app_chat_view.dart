@@ -319,187 +319,194 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
       isImage = false;
     }
 
-    String htmlString = "$htmlTextTag $htmlTag </div>";
+    String htmlString = """
+    <head></head>
+    <body>
+    $htmlTextTag $htmlTag </div>
+    </body>
+    """;
 
-    return Column(mainAxisAlignment: MainAxisAlignment.start, children: [
-      HtmlWidget(
-        htmlString,
-        enableCaching: false,
-        buildAsync: false,
-        onLoadingBuilder: (htmlContext, element, progress){
-          infiniteLoadTimer ??= Timer.periodic(const Duration(milliseconds: 200), (Timer timer) {
-              infiniteCnt++;
-              if(infiniteCnt > 24){
-                infiniteLoadTimer!.cancel();
-                infiniteLoadTimer = null;
-                isHtmlLoading = false;
-                infiniteCnt = 0;
-                GetController.to.updateHtmlLoad(true);
-              }
-            });
-
-          isHtmlLoading = true;
-          htmlBuildCnt = 0;
-          // if(GetController.to.isHtmlLoad.value){
-          //   GetController.to.updateHtmlLoad(false);
-          // }
-          if(htmlLoadTimer != null) htmlLoadTimer!.cancel();
-          htmlLoadTimer = Timer.periodic(const Duration(milliseconds: 300), (Timer timer) {
-            htmlBuildCnt++;
-            if(htmlBuildCnt > 2 && !isNormalLoading){
-              htmlLoadTimer!.cancel();
-              isHtmlLoading = false;
-              CommonUtils.log("", "html loading build finished!!");
-              _scrollToBottom(false,0);
-              GetController.to.updateHtmlLoad(true);
-              isHtmlLoadTimeOut = true;
-
-            }
-          });
-        },
-        customStylesBuilder: (element) {
-          isNormalLoading = true;
-          if(htmlNormalLoadTimer != null) htmlNormalLoadTimer!.cancel();
-          htmlNormalLoadTimer = Timer.periodic(const Duration(milliseconds: 50), (Timer timer) {
-            htmlNormalLoadBuildCnt++;
-            if(htmlNormalLoadBuildCnt > 2 && !isHtmlLoading){
-              htmlNormalLoadTimer!.cancel();
-              isNormalLoading = false;
-              _scrollToBottom(false,0);
-              GetController.to.updateHtmlLoad(true);
-            }
-          });
-
-          if(element.id == 'typeMe') {
-            return {
-              "color" : "white",
-              "font-size": "16sp",
-              "line-height" : "120%",
-              "font-weight": "normal",
-            };
-          }else if(element.id == 'typeOther') {
-            return {
-              "color" : "black",
-              "font-size": "16sp",
-              "line-height" : "120%",
-              "font-weight": "normal",
-            };
-          }
-
-          if(element.id == 'boldText') {
-            return {
-              "color" : "black",
-              "font-size": "16sp",
-              "line-height" : "120%",
-              "font-weight": "bold",
-            };
-          }
-
-          if (element.localName == 'button') {
-            if(element.id == 'buttonTypeOther') {
-              return {
-                "text-align":"center",
-                "background-color": "white", //"#3a6cff",
-                "color" : "black",
-                "font-size": "16sp",
-                "font-weight": "normal",
-                "border-radius":"0.1em",
-                "padding":"13px 20px",
-                "width": "500px",
-              };
-            }else if(element.id == 'buttonTypeMe'){
-              return {
-                "text-align":"center",
-                "background-color":"white",
-                "color" : "#3a6cff",
-                "font-size": "16sp",
-                "font-weight": "normal",
-                "border-radius":"0.1em",
-                "padding":"13px 20px",
-                "width": "500px",
-              };
-            }
-          }
-        },
-
-        onTapUrl: (url) async {
-          if(isFileType){
-            CommonUtils.log("w", "download url : $url");
-            String dir = "";
-            if(appConfig.Config.isAndroid){
-              dir = '/storage/emulated/0/Download';
-            }else{
-              dir = (await getApplicationDocumentsDirectory()).path;
-            }
-            try{
-              isOpenDownloadedFile = true;
-              if(!isImage){
-                CommonUtils.flutterToast("문서를 다운로드합니다.");
-              }
-
-              await FlutterDownloader.enqueue(
-                url: url, 	// file url
-                savedDir: '$dir/',	// 저장할 dir
-                fileName: '${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_doc.$extension',	// 파일명
-                saveInPublicStorage: true,	// 동일한 파일 있을 경우 덮어쓰기 없으면 오류발생함!
-                showNotification: true,
-                openFileFromNotification: true,
-              );
-              String fileRealName = "${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_doc.$extension";
-              CommonUtils.log("w", "download url : $url");
-              String fileName = "$dir/$fileRealName";
-              savedFileName = fileName;
-            }catch(error){
-              CommonUtils.flutterToast("문서 다운로드에 실패했습니다.");
-              CommonUtils.log("e", "fail doc download $error");
-            }
-          }else{
-            CommonUtils.log("", "furl : $url");
-            if(url.toLowerCase() == "doc"){
-              Map<String, dynamic> inputMap = {
-                "loan_uid": currentLoanUid
-              };
-
-              UiUtils.showLoadingPop(context);
-              LogfinController.callLogfinApi(LogfinApis.getRetryDocs, inputMap, (isSuccess, outputJson) async {
-                UiUtils.closeLoadingPop(context);
-                if(isSuccess){
-                  MyData.clearPrDocsInfoList();
-                  if(outputJson!["documents"] != null){
-                    for(var each in outputJson["documents"]){
-                      MyData.addToPrDocsInfoList(PrDocsInfoData(each["id"], each["name"], each["del_flg"]));
-                    }
-                    if(MyData.getPrDocsInfoList().isNotEmpty){
-                      isScrollMove = true;
-                      isViewHere = false;
-                      AppApplyPrViewState.isRetry = true;
-                      await CommonUtils.moveToWithResult(context, appConfig.AppView.appApplyPrView.value, null);
-                      isViewHere = true;
-                    }else{
-                      CommonUtils.flutterToast("서류 제출을 완료했습니다.");
-                    }
-                  }else{
-                    CommonUtils.flutterToast("서류 제출을 완료했습니다.");
-                  }
-                }else{
-                  CommonUtils.flutterToast("서류목록을 가져오는데 실패했습니다.\n다시 시도해주세요.");
+    return MediaQuery(
+        data : MediaQuery.of(context).copyWith(textScaleFactor : 1.1),
+        child : Column(mainAxisAlignment: MainAxisAlignment.start, children: [
+          HtmlWidget(
+            htmlString,
+            enableCaching: false,
+            buildAsync: false,
+            onLoadingBuilder: (htmlContext, element, progress){
+              infiniteLoadTimer ??= Timer.periodic(const Duration(milliseconds: 200), (Timer timer) {
+                infiniteCnt++;
+                if(infiniteCnt > 24){
+                  infiniteLoadTimer!.cancel();
+                  infiniteLoadTimer = null;
+                  isHtmlLoading = false;
+                  infiniteCnt = 0;
+                  GetController.to.updateHtmlLoad(true);
                 }
               });
-            }else{
-              if(await canLaunchUrl(Uri.parse(url))){
-                await launchUrl(Uri.parse(url));
-              }else{
-                CommonUtils.flutterToast("연결할 수 없습니다.");
-              }
-            }
-          }
 
-          return true;
-        },
-        renderMode: RenderMode.column,
-        textStyle: TextStyles.upFinHtmlTextStyle,
-      )
-    ]);
+              isHtmlLoading = true;
+              htmlBuildCnt = 0;
+              // if(GetController.to.isHtmlLoad.value){
+              //   GetController.to.updateHtmlLoad(false);
+              // }
+              if(htmlLoadTimer != null) htmlLoadTimer!.cancel();
+              htmlLoadTimer = Timer.periodic(const Duration(milliseconds: 300), (Timer timer) {
+                htmlBuildCnt++;
+                if(htmlBuildCnt > 2 && !isNormalLoading){
+                  htmlLoadTimer!.cancel();
+                  isHtmlLoading = false;
+                  CommonUtils.log("", "html loading build finished!!");
+                  _scrollToBottom(false,0);
+                  GetController.to.updateHtmlLoad(true);
+                  isHtmlLoadTimeOut = true;
+
+                }
+              });
+            },
+            customStylesBuilder: (element) {
+              isNormalLoading = true;
+              if(htmlNormalLoadTimer != null) htmlNormalLoadTimer!.cancel();
+              htmlNormalLoadTimer = Timer.periodic(const Duration(milliseconds: 50), (Timer timer) {
+                htmlNormalLoadBuildCnt++;
+                if(htmlNormalLoadBuildCnt > 2 && !isHtmlLoading){
+                  htmlNormalLoadTimer!.cancel();
+                  isNormalLoading = false;
+                  _scrollToBottom(false,0);
+                  GetController.to.updateHtmlLoad(true);
+                }
+              });
+
+              if(element.id == 'typeMe') {
+                return {
+                  "color" : "white",
+                  "font-size": "17sp",
+                  "line-height" : "120%",
+                  "font-weight": "normal",
+                };
+              }else if(element.id == 'typeOther') {
+                return {
+                  "color" : "black",
+                  "font-size": "17sp",
+                  "line-height" : "120%",
+                  "font-weight": "normal",
+                };
+              }
+
+              if(element.id == 'boldText') {
+                return {
+                  "color" : "black",
+                  "font-size": "17sp !important",
+                  "line-height" : "120%",
+                  "font-weight": "bold",
+                };
+              }
+
+              if (element.localName == 'button') {
+                if(element.id == 'buttonTypeOther') {
+                  return {
+                    "text-align":"center",
+                    "background-color": "white", //"#3a6cff",
+                    "color" : "black",
+                    "font-size": "17sp !important",
+                    "font-weight": "normal",
+                    "border-radius":"0.1em",
+                    "padding":"13px 20px",
+                    "width": "500px",
+                  };
+                }else if(element.id == 'buttonTypeMe'){
+                  return {
+                    "text-align":"center",
+                    "background-color":"white",
+                    "color" : "#3a6cff",
+                    "font-size": "17sp !important",
+                    "font-weight": "normal",
+                    "border-radius":"0.1em",
+                    "padding":"13px 20px",
+                    "width": "500px",
+                  };
+                }
+              }
+            },
+
+            onTapUrl: (url) async {
+              if(isFileType){
+                CommonUtils.log("w", "download url : $url");
+                String dir = "";
+                if(appConfig.Config.isAndroid){
+                  dir = '/storage/emulated/0/Download';
+                }else{
+                  dir = (await getApplicationDocumentsDirectory()).path;
+                }
+                try{
+                  isOpenDownloadedFile = true;
+                  if(!isImage){
+                    CommonUtils.flutterToast("문서를 다운로드합니다.");
+                  }
+
+                  await FlutterDownloader.enqueue(
+                    url: url, 	// file url
+                    savedDir: '$dir/',	// 저장할 dir
+                    fileName: '${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_doc.$extension',	// 파일명
+                    saveInPublicStorage: true,	// 동일한 파일 있을 경우 덮어쓰기 없으면 오류발생함!
+                    showNotification: true,
+                    openFileFromNotification: true,
+                  );
+                  String fileRealName = "${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_doc.$extension";
+                  CommonUtils.log("w", "download url : $url");
+                  String fileName = "$dir/$fileRealName";
+                  savedFileName = fileName;
+                }catch(error){
+                  CommonUtils.flutterToast("문서 다운로드에 실패했습니다.");
+                  CommonUtils.log("e", "fail doc download $error");
+                }
+              }else{
+                CommonUtils.log("", "furl : $url");
+                if(url.toLowerCase() == "doc"){
+                  Map<String, dynamic> inputMap = {
+                    "loan_uid": currentLoanUid
+                  };
+
+                  UiUtils.showLoadingPop(context);
+                  LogfinController.callLogfinApi(LogfinApis.getRetryDocs, inputMap, (isSuccess, outputJson) async {
+                    UiUtils.closeLoadingPop(context);
+                    if(isSuccess){
+                      MyData.clearPrDocsInfoList();
+                      if(outputJson!["documents"] != null){
+                        for(var each in outputJson["documents"]){
+                          MyData.addToPrDocsInfoList(PrDocsInfoData(each["id"], each["name"], each["del_flg"]));
+                        }
+                        if(MyData.getPrDocsInfoList().isNotEmpty){
+                          isScrollMove = true;
+                          isViewHere = false;
+                          AppApplyPrViewState.isRetry = true;
+                          await CommonUtils.moveToWithResult(context, appConfig.AppView.appApplyPrView.value, null);
+                          isViewHere = true;
+                        }else{
+                          CommonUtils.flutterToast("서류 제출을 완료했습니다.");
+                        }
+                      }else{
+                        CommonUtils.flutterToast("서류 제출을 완료했습니다.");
+                      }
+                    }else{
+                      CommonUtils.flutterToast("서류목록을 가져오는데 실패했습니다.\n다시 시도해주세요.");
+                    }
+                  });
+                }else{
+                  if(await canLaunchUrl(Uri.parse(url))){
+                    await launchUrl(Uri.parse(url));
+                  }else{
+                    CommonUtils.flutterToast("연결할 수 없습니다.");
+                  }
+                }
+              }
+
+              return true;
+            },
+            renderMode: RenderMode.column,
+            textStyle: TextStyles.upFinHtmlTextStyle,
+          )
+        ]));
   }
 
   Widget _getOtherView(ChatMessageInfoData otherInfo){
@@ -509,7 +516,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
       if(otherInfo.message.contains("<button") || otherInfo.message.contains("<br>")){
         otherInfoWidget = _getHtmlView(otherInfo.message, "UPFIN", otherInfo.messageType);
       }else{
-        otherInfoWidget = UiUtils.getTextWithFixedScale(otherInfo.message, 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null);
+        otherInfoWidget = UiUtils.getSelectableTextWithFixedScale(otherInfo.message, 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null);
       }
     }else{
       bool isValid = true;
@@ -782,7 +789,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
     Widget? meInfoWidget;
     bool isImageView = false;
     if(meInfo.messageType == "text"){
-      meInfoWidget = UiUtils.getTextWithFixedScale(meInfo.message, 13.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null);
+      meInfoWidget = UiUtils.getSelectableTextWithFixedScale(meInfo.message, 13.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null);
     }else{
       String extension = meInfo.message.split('.').last.toLowerCase();
       List<String> validDocExtensions = LogfinController.validDocFileTypeList;
@@ -1163,7 +1170,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
 
       if(each.contains("이전")){
         if(answerList.length != 1){
-         // widgetList.add(Container(key: UniqueKey()));
+          widgetList.add(Container(key: UniqueKey()));
         }
       }
 
@@ -1568,7 +1575,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                           Expanded(flex: 75, child: Column(children: [UiUtils.getExpandedScrollView(Axis.vertical,
                               Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
                                 UiUtils.getMarginBox(0, 0.7.h),
-                                UiUtils.getChatTextField(70.w, TextStyles.upFinTextFormFieldTextStyle, _chatTextFocus, _chatTextController, TextInputType.multiline,
+                                UiUtils.getChatTextField(context, 70.w, TextStyles.upFinTextFormFieldTextStyle, _chatTextFocus, _chatTextController, TextInputType.multiline,
                                     UiUtils.getChatInputDecoration(), (textValue) {
                                       if(textValue != ""){
                                         isTextFieldFocus = true;

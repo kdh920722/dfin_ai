@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/styles/TextStyles.dart';
+import 'package:upfin/views/app_root_view.dart';
 import '../styles/ColorStyles.dart';
 import '../configs/app_config.dart';
 import 'common_utils.dart';
@@ -173,13 +174,13 @@ class UiUtils {
   static Widget getBorderTextWithFixedScale(String text, double fontSize, FontWeight fontWeight, TextAlign? textAlign, Color borderColor, Color textColor){
     return Container(padding: EdgeInsets.all(0.1.w), // 텍스트 주위에 여백 추가
       decoration: BoxDecoration(border: Border.all(color: borderColor, width: 2.0), borderRadius: BorderRadius.circular(2.0)),
-      child: Text(text, style: TextStyle(decoration: TextDecoration.none, height: 1, fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor)));
+      child: Text(textScaleFactor: 1.0, text, style: TextStyle(decoration: TextDecoration.none, height: 1, fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor)));
   }
 
   static Widget getRoundedBoxTextWithFixedScale(String text, double fontSize, FontWeight fontWeight, TextAlign? textAlign, Color borderColor, Color fillColor, Color textColor){
     return Container(padding: EdgeInsets.only(top: 2.w, bottom: 2.w, left: 3.w, right: 3.w), // 텍스트 주위에 여백 추가
         decoration: BoxDecoration(color: fillColor, border: Border.all(color: borderColor, width: 0.4.w), borderRadius: BorderRadius.circular(20)),
-        child: Text(text, style: TextStyle(decoration: TextDecoration.none, height: 1, fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor)));
+        child: Text(textScaleFactor: 1.0, text, style: TextStyle(decoration: TextDecoration.none, height: 1, fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor)));
   }
 
   static Widget getBoxTextWithFixedScale(String text, double fontSize, FontWeight fontWeight, TextAlign? textAlign, Color boxColor, Color textColor){
@@ -192,7 +193,7 @@ class UiUtils {
         child: Padding(padding: EdgeInsets.only(left: 2.w, right: 2.5.w, bottom: 2.w, top: 2.w), child: Row(children: [
           getIcon(iconSize, iconSize, icon, iconSize, iconColor),
           getMarginBox(1.w, 0),
-          Text(text, style: TextStyle(fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor))
+          Text(textScaleFactor: 1.0, text, style: TextStyle(fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor))
         ])
         )));
   }
@@ -603,25 +604,33 @@ class UiUtils {
         decoration: inputDecoration, style: textStyle));
   }
 
-  static Widget getTextField(double width, TextStyle textStyle, FocusNode focusNode, TextEditingController textEditingController, TextInputType textInputType,
+  static Widget getTextField(BuildContext context, double width, TextStyle textStyle, FocusNode focusNode, TextEditingController textEditingController, TextInputType textInputType,
       InputDecoration inputDecoration, ValueChanged<String> onChangedCallback){
     return SizedBox(width: width,
-        child: TextField(focusNode: focusNode, cursorColor: ColorStyles.upFinBlack, controller: textEditingController,
-            keyboardType: textInputType, decoration: inputDecoration, onChanged: onChangedCallback, style: textStyle));
+        child: MediaQuery(
+            data : MediaQuery.of(context).copyWith(textScaleFactor : 1.0),
+            child : TextField(enableInteractiveSelection: true, focusNode: focusNode, cursorColor: ColorStyles.upFinBlack, controller: textEditingController,
+                keyboardType: textInputType, decoration: inputDecoration, onChanged: onChangedCallback, style: textStyle))
+        );
   }
 
-  static Widget getChatTextField(double width, TextStyle textStyle, FocusNode focusNode, TextEditingController textEditingController, TextInputType textInputType,
+  static Widget getChatTextField(BuildContext context, double width, TextStyle textStyle, FocusNode focusNode, TextEditingController textEditingController, TextInputType textInputType,
       InputDecoration inputDecoration, ValueChanged<String> onChangedCallback){
     return SizedBox(width: width,
-        child: TextField(maxLines: null, focusNode: focusNode, cursorColor: ColorStyles.upFinBlack, controller: textEditingController,
-            keyboardType: textInputType, decoration: inputDecoration, onChanged: onChangedCallback, style: textStyle));
+        child: MediaQuery(
+            data : MediaQuery.of(context).copyWith(textScaleFactor : 1.0),
+            child : TextField(enableInteractiveSelection: true, maxLines: null, focusNode: focusNode, cursorColor: ColorStyles.upFinBlack, controller: textEditingController,
+                keyboardType: textInputType, decoration: inputDecoration, onChanged: onChangedCallback, style: textStyle)));
   }
 
-  static Widget getTextFormField(double width, TextStyle textStyle, FocusNode focusNode, TextEditingController textEditingController, TextInputType textInputType, bool isPwd,
+  static Widget getTextFormField(BuildContext context, double width, TextStyle textStyle, FocusNode focusNode, TextEditingController textEditingController, TextInputType textInputType, bool isPwd,
       InputDecoration inputDecoration, ValueChanged<String> onChangedCallback, FormFieldValidator<String> validatorCallback){
     return SizedBox(width: width,
-        child: TextFormField(focusNode: focusNode, obscureText : isPwd, cursorColor: ColorStyles.upFinBlack, controller: textEditingController,
-            keyboardType: textInputType, decoration: inputDecoration, onChanged: onChangedCallback, validator: validatorCallback, style: textStyle));
+        child: MediaQuery(
+            data : MediaQuery.of(context).copyWith(textScaleFactor : 1.0),
+            child : TextFormField(enableInteractiveSelection: true, focusNode: focusNode, obscureText : isPwd, cursorColor: ColorStyles.upFinBlack, controller: textEditingController,
+                keyboardType: textInputType, decoration: inputDecoration, onChanged: onChangedCallback, validator: validatorCallback, style: textStyle))
+        );
   }
 
   static InputDecoration getInputDecoration(String labelText, double labelTextSize, String counterText, double counterTextSize){
@@ -763,6 +772,37 @@ class UiUtils {
     if(isLoadingPopOn){
       Navigator.pop(targetContext);
       isLoadingPopOn = false;
+    }
+  }
+
+  static bool isLoadingBackPopOn = false;
+  static void showLoadingBackPop(BuildContext targetContext){
+    if(!isLoadingBackPopOn){
+      isLoadingBackPopOn = true;
+      showGeneralDialog(
+        barrierDismissible: false,
+        context: targetContext,
+        pageBuilder: (context, animation, secondaryAnimation) {
+          return WillPopScope(
+              onWillPop: () async => false,
+              child: StatefulBuilder(// You need this, notice the parameters below:
+                  builder: (_, StateSetter setState) {
+                    return Container(
+                        width: 100.w,
+                        height: 100.h,
+                        color: ColorStyles.upFinDarkGrayWithAlpha
+                    );
+                  })
+          );
+        },
+      );
+    }
+  }
+
+  static void closeLoadingBackPop(BuildContext targetContext){
+    if(isLoadingBackPopOn){
+      Navigator.pop(targetContext);
+      isLoadingBackPopOn = false;
     }
   }
 

@@ -401,10 +401,10 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getExpandedScrollView(Axis.vertical,
           SizedBox(width: 85.w, child: Row(children: [
-            UiUtils.getTextField(20.w, TextStyles.upFinTextFormFieldTextStyle, _accidentInfoFocus1, _accidentInfoTextController1, TextInputType.number,
+            UiUtils.getTextField(context, 20.w, TextStyles.upFinTextFormFieldTextStyle, _accidentInfoFocus1, _accidentInfoTextController1, TextInputType.number,
                 UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
             UiUtils.getTextWithFixedScale("개회", 16.sp, FontWeight.w400, ColorStyles.upFinRealGray, TextAlign.center, null),
-            UiUtils.getTextField(32.w, TextStyles.upFinTextFormFieldTextStyle, _accidentInfoFocus2, _accidentInfoTextController2, TextInputType.number,
+            UiUtils.getTextField(context, 32.w, TextStyles.upFinTextFormFieldTextStyle, _accidentInfoFocus2, _accidentInfoTextController2, TextInputType.number,
                 UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
           ]))
       ),
@@ -567,7 +567,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("환급계좌 번호", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       // SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getTextField(90.w, TextStyles.upFinTextFormFieldTextStyle, _bankAccountInfoFocus, _bankAccountInfoTextController, TextInputType.number,
+      UiUtils.getTextField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _bankAccountInfoFocus, _bankAccountInfoTextController, TextInputType.number,
           UiUtils.getInputDecoration("계좌번호 8자리", 14.sp, "", 0.sp), (value) { }),
       UiUtils.getExpandedScrollView(Axis.vertical, Container()),
       UiUtils.getMarginBox(0, 5.h),
@@ -679,7 +679,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         UiUtils.getMarginBox(0, 5.h),
         Obx(()=>
             Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-              UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _preLoanPriceFocus, _preLoanPriceTextController, TextInputType.number, false,
+              UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _preLoanPriceFocus, _preLoanPriceTextController, TextInputType.number, false,
                   UiUtils.getInputDecorationForPrice("", 0.sp, GetController.to.preLoanPrice.value), (text) {
                     if(text.trim() != ""){
                       final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
@@ -727,7 +727,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         UiUtils.getMarginBox(0, 3.h),
         SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("희망대출 금액", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
         UiUtils.getMarginBox(0, 5.h),
-        Obx(()=>UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _wantLoanPriceFocus, _wantLoanPriceTextController, TextInputType.number, false,
+        Obx(()=>UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _wantLoanPriceFocus, _wantLoanPriceTextController, TextInputType.number, false,
             UiUtils.getInputDecorationForPrice("", 0.sp, GetController.to.wantLoanPrice.value), (text) {
               if(text.trim() != ""){
                 final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
@@ -1000,6 +1000,9 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                   UiUtils.closeLoadingPop(context);
                   String errorMsg = outputJson!["error"];
                   CommonUtils.flutterToast(errorMsg.replaceAll("+", "").replaceAll("()", "").replaceAll(".", "\n"));
+                  setState(() {
+                    currentViewId = 1;
+                  });
                 }
               });
             })

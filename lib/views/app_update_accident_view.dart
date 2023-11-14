@@ -396,7 +396,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("환급계좌번호를", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getTextField(90.w, TextStyles.upFinTextFormFieldTextStyle, _bankAccountInfoFocus, _bankAccountInfoTextController, TextInputType.number,
+      UiUtils.getTextField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _bankAccountInfoFocus, _bankAccountInfoTextController, TextInputType.number,
           UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
       UiUtils.getExpandedScrollView(Axis.vertical, Container()),
       UiUtils.getMarginBox(0, 5.h),
@@ -508,7 +508,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
         UiUtils.getMarginBox(0, 1.h),
         SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력단위(*만원)", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
         UiUtils.getMarginBox(0, 5.h),
-        Obx(()=>UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _preLoanPriceFocus, _preLoanPriceTextController, TextInputType.number, false,
+        Obx(()=>UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _preLoanPriceFocus, _preLoanPriceTextController, TextInputType.number, false,
             UiUtils.getInputDecorationForPrice("", 0.sp, GetController.to.preLoanPrice.value), (text) {
               if(text.trim() != ""){
                 final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
@@ -553,7 +553,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
         UiUtils.getMarginBox(0, 1.h),
         SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력단위(*만원)", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
         UiUtils.getMarginBox(0, 5.h),
-        Obx(()=>UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _wantLoanPriceFocus, _wantLoanPriceTextController, TextInputType.number, false,
+        Obx(()=>UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _wantLoanPriceFocus, _wantLoanPriceTextController, TextInputType.number, false,
             UiUtils.getInputDecorationForPrice("", 0.sp, GetController.to.wantLoanPrice.value), (text) {
               if(text.trim() != ""){
                 final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환

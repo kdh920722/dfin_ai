@@ -89,7 +89,7 @@ class DebugForAdminViewState extends State<DebugForAdminView> with WidgetsBindin
             UiUtils.getMarginBox(0, 1.h)
           ])),
           Row(children: [
-            UiUtils.getTextFormField(78.w, TextStyles.upFinSmallTextFormFieldTextStyle, _tokenTextFocus, _tokenTextController, TextInputType.text, false,
+            UiUtils.getTextFormField(context, 78.w, TextStyles.upFinSmallTextFormFieldTextStyle, _tokenTextFocus, _tokenTextController, TextInputType.text, false,
                 UiUtils.getInputDecoration("token", 12.sp, "", 0.sp), (text) {}, (value){}),
             UiUtils.getMarginBox(2.w,0),
             UiUtils.getBorderButtonBoxWithZeroPadding(10.w, ColorStyles.upFinRed, ColorStyles.upFinRed,
@@ -101,7 +101,7 @@ class DebugForAdminViewState extends State<DebugForAdminView> with WidgetsBindin
           ]),
           UiUtils.getMarginBox(0, 1.h),
           Row(children: [
-            UiUtils.getTextFormField(78.w, TextStyles.upFinSmallTextFormFieldTextStyle, _encTextFocus, _encTextController, TextInputType.text, false,
+            UiUtils.getTextFormField(context, 78.w, TextStyles.upFinSmallTextFormFieldTextStyle, _encTextFocus, _encTextController, TextInputType.text, false,
                 UiUtils.getInputDecoration("enc", 12.sp, "", 0.sp), (text) {}, (value){}),
             UiUtils.getMarginBox(2.w,0),
             UiUtils.getBorderButtonBoxWithZeroPadding(10.w, ColorStyles.upFinRed, ColorStyles.upFinRed,
@@ -139,7 +139,7 @@ class DebugForAdminViewState extends State<DebugForAdminView> with WidgetsBindin
               UiUtils.getMarginBox(0, 1.h)
             ])),
             Row(children: [
-              UiUtils.getTextFormField(43.w, TextStyles.upFinSmallTextFormFieldTextStyle, _tokenTextFocus, _tokenTextController, TextInputType.text, false,
+              UiUtils.getTextFormField(context, 43.w, TextStyles.upFinSmallTextFormFieldTextStyle, _tokenTextFocus, _tokenTextController, TextInputType.text, false,
                   UiUtils.getInputDecoration("token", 10.sp, "", 0.sp), (text) {}, (value){}),
               UiUtils.getMarginBox(1.w,0),
               UiUtils.getBorderButtonBoxWithZeroPadding(2.w, ColorStyles.upFinRed, ColorStyles.upFinRed,
@@ -151,7 +151,7 @@ class DebugForAdminViewState extends State<DebugForAdminView> with WidgetsBindin
             ]),
             UiUtils.getMarginBox(0, 1.h),
             Row(children: [
-              UiUtils.getTextFormField(43.w, TextStyles.upFinSmallTextFormFieldTextStyle, _encTextFocus, _encTextController, TextInputType.text, false,
+              UiUtils.getTextFormField(context, 43.w, TextStyles.upFinSmallTextFormFieldTextStyle, _encTextFocus, _encTextController, TextInputType.text, false,
                   UiUtils.getInputDecoration("enc", 10.sp, "", 0.sp), (text) {}, (value){}),
               UiUtils.getMarginBox(1.w,0),
               UiUtils.getBorderButtonBoxWithZeroPadding(2.w, ColorStyles.upFinRed, ColorStyles.upFinRed,
@@ -206,7 +206,7 @@ class DebugForAdminViewState extends State<DebugForAdminView> with WidgetsBindin
             UiUtils.getMarginBox(0, 1.h)
           ])),
           Row(children: [
-            UiUtils.getTextFormField(78.w, TextStyles.upFinSmallTextFormFieldTextStyle, _tokenTextFocus, _tokenTextController, TextInputType.text, false,
+            UiUtils.getTextFormField(context, 78.w, TextStyles.upFinSmallTextFormFieldTextStyle, _tokenTextFocus, _tokenTextController, TextInputType.text, false,
                 UiUtils.getInputDecoration("token", 12.sp, "", 0.sp), (text) {}, (value){}),
             UiUtils.getMarginBox(2.w,0),
             UiUtils.getBorderButtonBoxWithZeroPadding(10.w, ColorStyles.upFinRed, ColorStyles.upFinRed,
@@ -218,7 +218,7 @@ class DebugForAdminViewState extends State<DebugForAdminView> with WidgetsBindin
           ]),
           UiUtils.getMarginBox(0, 1.h),
           Row(children: [
-            UiUtils.getTextFormField(78.w, TextStyles.upFinSmallTextFormFieldTextStyle, _encTextFocus, _encTextController, TextInputType.text, false,
+            UiUtils.getTextFormField(context, 78.w, TextStyles.upFinSmallTextFormFieldTextStyle, _encTextFocus, _encTextController, TextInputType.text, false,
                 UiUtils.getInputDecoration("enc", 12.sp, "", 0.sp), (text) {}, (value){}),
             UiUtils.getMarginBox(2.w,0),
             UiUtils.getBorderButtonBoxWithZeroPadding(10.w, ColorStyles.upFinRed, ColorStyles.upFinRed,

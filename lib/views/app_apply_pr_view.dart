@@ -1424,7 +1424,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       SizedBox(width: 85.w,height: 4.h, child: UiUtils.getTextWithFixedScale("#개인사업자", 14.sp,  FontWeight.w500, ColorStyles.upFinTextAndBorderBlue,TextAlign.start, null)),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("주거래은행 계좌번호", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getTextField(90.w, TextStyles.upFinTextFormFieldTextStyle, _bankAccountInfoFocus,
+      UiUtils.getTextField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _bankAccountInfoFocus,
           _bankAccountInfoTextController, TextInputType.number, UiUtils.getInputDecoration("계좌번호", 14.sp, "", 0.sp), (value) { }),
       UiUtils.getExpandedScrollView(Axis.vertical, Container()),
       UiUtils.getMarginBox(0, 5.h),
@@ -1459,7 +1459,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       SizedBox(width: 85.w,height: 4.h, child: UiUtils.getTextWithFixedScale("#개인사업자", 14.sp,  FontWeight.w500, ColorStyles.upFinTextAndBorderBlue,TextAlign.start, null)),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("사업자등록번호", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getTextField(90.w, TextStyles.upFinTextFormFieldTextStyle, _businessNumberInfoFocus,
+      UiUtils.getTextField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _businessNumberInfoFocus,
           _businessNumberInfoTextController, TextInputType.number, UiUtils.getInputDecoration("사업자번호", 14.sp, "", 0.sp), (value) { }),
       UiUtils.getExpandedScrollView(Axis.vertical, Container()),
       UiUtils.getMarginBox(0, 5.h),
@@ -1563,6 +1563,9 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       addressWidgetList.add(UiUtils.getMarginBox(0, 3.h));
     }
 
+    CommonUtils.log("w", "textf : ${12.sp} || ${MediaQuery.of(context).textScaleFactor}");
+
+
     return Stack(children: [
       UiUtils.getRowColumnWithAlignCenter([
         SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -1574,7 +1577,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("주소를 입력해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
         UiUtils.getMarginBox(0, 5.h),
         SizedBox(width: 85.w, height: 10.h,
-            child: UiUtils.getTextField(80.w, TextStyles.upFinTextFormFieldTextStyle, _addressInfoFocus,
+            child: UiUtils.getTextField(context, 80.w, TextStyles.upFinTextFormFieldTextStyle, _addressInfoFocus,
                 _addressInfoTextController, TextInputType.text, UiUtils.getInputDecorationForAddress("등본상 주소", 12.sp,
                     UiUtils.getIconButton(Icons.search, 8.w, ColorStyles.upFinButtonBlue, () {
                       if(_addressInfoTextController.text.trim() != ""){
@@ -1943,10 +1946,10 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   }
   Future<void> _uploadCertImageToAwsServer(String croppedImagePath, Function(bool isSuccess) callback) async {
     try{
-      await AwsController.uploadFileToAWS(croppedImagePath,"${AwsController.maskedImageDir}/${MyData.email}/${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}",
-              (isSuccessToSave, resultUrl) async {
+      String filePath = "${AwsController.maskedImageDir}/${MyData.email}/${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}";
+      await AwsController.uploadFileToAWS(croppedImagePath,filePath, (isSuccessToSave, resultUrl) async {
         if(isSuccessToSave){
-          awsUploadUrl = "${AwsController.uploadedUrl}/${AwsController.maskedImageDir}/${resultUrl.split("/").last}";
+          awsUploadUrl = "${AwsController.uploadedUrl}/$filePath/${resultUrl.split("/").last}";
           callback(true);
         }else{
           // failed to aws s3 save

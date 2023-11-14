@@ -94,7 +94,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
             UiUtils.getTextWithFixedScale("로그인", 26.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
             UiUtils.getMarginBox(0, 3.h)
           ])),
-          UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _emailTextFocus, _emailTextController, TextInputType.emailAddress, false,
+          UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _emailTextFocus, _emailTextController, TextInputType.emailAddress, false,
               UiUtils.getInputDecoration("이메일", 12.sp, "", 0.sp), (text) { }, (value){
                 if(value != null && value.trim().isEmpty){
                   return "이메일을 입력하세요.";
@@ -103,7 +103,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
                 }
               }),
           UiUtils.getMarginBox(0, 2.h),
-          UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _pwdTextFocus, _pwdTextController, TextInputType.visiblePassword, true,
+          UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _pwdTextFocus, _pwdTextController, TextInputType.visiblePassword, true,
               UiUtils.getInputDecoration("비밀번호", 12.sp, "", 0.sp), (text) { }, (value){
                 if(value != null && value.trim().isEmpty){
                   return "비밀번호를 입력하세요.";

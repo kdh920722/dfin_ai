@@ -189,7 +189,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
         UiUtils.getTextWithFixedScale("회원가입", 26.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
         UiUtils.getMarginBox(0, 3.h)
       ])),
-      UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _emailTextFocus, _emailTextController, TextInputType.emailAddress, false,
+      UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _emailTextFocus, _emailTextController, TextInputType.emailAddress, false,
           UiUtils.getInputDecoration("이메일", 12.sp, "", 0.sp), (text) { }, (value){
             if(value == null || value.trim().isEmpty){
               return "이메일을 입력하세요.";
@@ -202,7 +202,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
             }
           }),
       UiUtils.getMarginBox(0, 2.h),
-      isPwShowValid? UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _pwdTextFocus, _pwdTextController, TextInputType.visiblePassword, true,
+      isPwShowValid? UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _pwdTextFocus, _pwdTextController, TextInputType.visiblePassword, true,
           UiUtils.getInputDecoration("비밀번호", 12.sp, "", 0.sp), (text) { }, (value){
             if(value != null && value.trim().isEmpty){
               return "비밀번호를 입력하세요.";
@@ -215,7 +215,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
             }
           }) : Container(),
       UiUtils.getMarginBox(0, 2.h),
-      isPwShowValid? UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _pwdConfirmFocus, _pwdConfirmTextController, TextInputType.visiblePassword, true,
+      isPwShowValid? UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _pwdConfirmFocus, _pwdConfirmTextController, TextInputType.visiblePassword, true,
           UiUtils.getInputDecoration("비밀번호 확인", 12.sp, "", 0.sp), (text) { }, (value){
             if(value != null && value.trim().isEmpty){
               return "비밀번호를 한번 더 입력하세요.";
@@ -273,7 +273,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
         UiUtils.getTextWithFixedScale("본인인증", 26.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
         UiUtils.getMarginBox(0, 3.h)
       ])),
-      UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _nameTextFocus, _nameTextController, TextInputType.text, false,
+      UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _nameTextFocus, _nameTextController, TextInputType.text, false,
           UiUtils.getInputDecoration("이름", 12.sp, "", 0.sp), (text) { }, (value){
             if(value != null && value.trim().isEmpty){
               return "이름을 입력하세요.";
@@ -282,7 +282,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
             }
           }),
       UiUtils.getMarginBox(0, 2.h),
-      isPhoneShowValid? UiUtils.getTextFormField(90.w, TextStyles.upFinTextFormFieldTextStyle, _phoneNumberTextFocus, _phoneNumberTextController, TextInputType.phone, false,
+      isPhoneShowValid? UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _phoneNumberTextFocus, _phoneNumberTextController, TextInputType.phone, false,
           UiUtils.getInputDecoration("휴대전화 번호", 12.sp, "", 0.sp), (text) { }, (value){
             if(value != null && value.trim().isEmpty){
               return "휴대전화 번호를 입력하세요.";
