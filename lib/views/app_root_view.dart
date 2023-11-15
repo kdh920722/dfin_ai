@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:upfin/controllers/aws_controller.dart';
 import 'package:upfin/controllers/clova_controller.dart';
 import 'package:upfin/controllers/get_controller.dart';
@@ -33,7 +32,7 @@ class AppRootView extends StatefulWidget{
 class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
   bool isAutoLogin = false;
   Timer? permissionCheckTimer;
-  bool isPermissionCheckStarted = false;
+  bool isPermissionCheckPopStarted = false;
   bool isPermissionDenied = false;
 
   @override
@@ -372,45 +371,47 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
   }
 
   Future<void> _requestPermissions() async {
-    if(Config.isAndroid){
-      await CommonUtils.requestPermissions((isDenied, deniedPermissionsList) async {
-        if(isDenied){
-          isPermissionDenied = true;
-          String deniedPermissionsString = "";
-          for(int i = 0; i < deniedPermissionsList!.length; i++){
-            deniedPermissionsString += deniedPermissionsList[i];
-            if(i != deniedPermissionsList.length-1){
-              deniedPermissionsString += ", ";
-            }
+    isPermissionCheckPopStarted = true;
+    await CommonUtils.requestPermissions((isDenied, deniedPermissionsList) async {
+      if(isDenied){
+        isPermissionDenied = true;
+        String deniedPermissionsString = "";
+        for(int i = 0; i < deniedPermissionsList!.length; i++){
+          deniedPermissionsString += deniedPermissionsList[i];
+          if(i != deniedPermissionsList.length-1){
+            deniedPermissionsString += ", ";
           }
-
-          String allText = deniedPermissionsString.contains(",")? " 모두"  : "";
-
-          UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, 22.h, 0.5, (slideContext, setState) =>
-              Column(mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    UiUtils.getMarginBox(100.w, 1.h),
-                    Column(children: [
-                      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("🙏 권한이 필요합니다.",14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
-                      UiUtils.getMarginBox(0, 1.h),
-                      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("[$deniedPermissionsString]권한을$allText 허용해주세요",12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null))
-                    ]),
-                    UiUtils.getExpandedScrollView(Axis.vertical, Container()),
-                    UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                        UiUtils.getTextWithFixedScale("설정 바로가기", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () async {
-                          openAppSettings();
-                        }),
-                    Config.isAndroid ? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 5.h),
-                  ]
-              ));
-
-          CommonUtils.log("i", "denied permissions : $deniedPermissionsString");
         }
-      });
-    }
+
+        String allText = deniedPermissionsString.contains(",")? " 모두"  : "";
+
+        UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, 22.h, 0.5, (slideContext, setState){
+          return Column(mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                UiUtils.getMarginBox(100.w, 1.h),
+                Column(children: [
+                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("🙏 권한이 필요합니다.",14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
+                  UiUtils.getMarginBox(0, 1.h),
+                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("[$deniedPermissionsString]권한을$allText 허용해주세요",12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null))
+                ]),
+                UiUtils.getExpandedScrollView(Axis.vertical, Container()),
+                UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+                    UiUtils.getTextWithFixedScale("설정 바로가기", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () async {
+                      openAppSettings();
+                    }),
+                Config.isAndroid ? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 5.h),
+              ]
+          );
+        });
+
+        CommonUtils.log("i", "denied permissions : $deniedPermissionsString");
+      }
+    });
   }
 
   void _callInitApis(){
+    // count..
+    //_initGPT();
     _initCodeF();
     _initJuso();
     _initCLOVA();
@@ -424,7 +425,6 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
 
   Future<void> _initAtFirst() async {
     Config.isAppMainInit = true;
-    Get.put(GetController());
     await _initFirebase();
     await _initAppState();
     if(Config.appState == Config.stateInfoMap["open"]){
@@ -440,16 +440,13 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
       if(Config.isAndroid){
         isPermissionDenied = await CommonUtils.isPermissionDenied();
         if(isPermissionDenied){
-          permissionCheckTimer ??= Timer.periodic(const Duration(milliseconds: 500), (Timer timer) async {
+          permissionCheckTimer ??= Timer.periodic(const Duration(seconds: 2), (Timer timer) async {
             isPermissionDenied = await CommonUtils.isPermissionDenied();
-            if(isPermissionDenied && !isPermissionCheckStarted){
-              isPermissionCheckStarted = true;
+            if(isPermissionDenied && !isPermissionCheckPopStarted){
               await _requestPermissions();
-            }else if(!isPermissionDenied && isPermissionCheckStarted){
+            }else if(!isPermissionDenied && isPermissionCheckPopStarted){
               if(permissionCheckTimer != null) permissionCheckTimer!.cancel();
-              // count..
-              //_initGPT();
-
+              if(context.mounted) Navigator.pop(context);
               _callInitApis();
             }
           });
@@ -554,12 +551,15 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
             });
           }
         }
+      }else{
+        if(!Config.isAppMainInit){
+          _initAtFirst();
+        }
       }
     });
 
     Widget? view;
     if(!Config.isAppMainInit){
-      _initAtFirst();
       view = Obx(()=>UiUtils.getInitLoadingView(GetController.to.loadingPercent.value));
     }else{
       if(!Config.isControllerLoadFinished){

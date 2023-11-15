@@ -201,7 +201,7 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
     String formattedMinute = DateFormat('m', 'ko_KR').format(dateTime);
 
     // 날짜와 시간을 원하는 형식으로 포맷팅
-    var formatter = DateFormat('yyyy.MM.dd $period$formattedHour시 $formattedMinute분', 'ko_KR');
+    var formatter = DateFormat('yyyy.MM.dd  $period$formattedHour시 $formattedMinute분', 'ko_KR');
     String formattedDate = formatter.format(dateTime);
 
     return formattedDate;
@@ -234,7 +234,7 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
                   UiUtils.getMarginBox(0, 2.5.h),
                   UiUtils.getTextWithFixedScale("개인회생", 22.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.center, 1),
                   UiUtils.getMarginBox(0, 1.h),
-                  UiUtils.getTextWithFixedScale("업데이트 : ${_setUpdateDateForTitle(MyData.selectedAccidentInfoData!.date)}", 10.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, 1),
+                  UiUtils.getTextWithFixedScale("업데이트 : ${_setUpdateDate(MyData.selectedAccidentInfoData!.date)}", 10.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, 1),
                 ])
             ),
           ),

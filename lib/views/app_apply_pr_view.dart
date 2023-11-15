@@ -20,7 +20,6 @@ import '../datas/api_info_data.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
 import 'dart:io';
-
 import 'app_chat_view.dart';
 
 class AppApplyPrView extends StatefulWidget{
@@ -1933,10 +1932,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                                         SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("시리얼 번호", 14.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null)),
                                         SizedBox(width: 30.w, height: 6.h, child: UiUtils.getTextField(slideContext, 30.w, TextStyles.upFinTextFormFieldTextStyle, _dlNumInfoFocusSerial, _dlNumInfoTextControllerSerial, TextInputType.text,
                                             UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { })),
-                                        UiUtils.getMarginBox(0, 7.w),
-                                        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("이름", 14.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null)),
-                                        UiUtils.getMarginBox(0, 2.w),
-                                        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(MyData.name, 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)),
                                         UiUtils.getMarginBox(0, 7.w),
                                         SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("주민등록번호", 14.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null)),
                                         UiUtils.getMarginBox(0, 2.w),

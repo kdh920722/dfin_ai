@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:sizer/sizer.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:upfin/configs/app_config.dart';
+import 'package:upfin/configs/string_config.dart';
 import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/controllers/websocket_controller.dart';
@@ -153,7 +153,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               })
             ])),
             Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 1.h, bottom: 1.h),
-                child: UiUtils.getTopBannerButtonBox(90.w, 8.h, ColorStyles.upFinBannerSky, ColorStyles.upFinBannerSky,
+                child: UiUtils.getTopBannerButtonBox(90.w, 8.h, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
                     Stack(
                         children: [
                           Positioned(
@@ -204,21 +204,23 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               List<Widget> loanWidgetList = _getLoanChatWidgetList();
               return loanWidgetList.isNotEmpty ? Column(children: [
                 UiUtils.getMarginBox(100.w, 2.h),
+                UiUtils.getMarginColoredBox(100.w, 0.11.h, ColorStyles.upFinGray),
                 UiUtils.getMarginColoredBox(100.w, 2.h, ColorStyles.upFinWhiteGray),
                 UiUtils.getMarginBox(100.w, 2.h),
                 Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 2.h, bottom: 1.h), child: Row(mainAxisSize: MainAxisSize.max, children: [
-                  UiUtils.getTextWithFixedScale("접수내역", 15.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, 1),
+                  UiUtils.getTextWithFixedScale("접수내역", 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1),
                   const Spacer(flex: 2)
                 ])),
                 Column(children: loanWidgetList)
               ]) : Container();
             }),
             UiUtils.getMarginBox(100.w, 2.h),
+            UiUtils.getMarginColoredBox(100.w, 0.11.h, ColorStyles.upFinGray),
             UiUtils.getMarginColoredBox(100.w, 2.h, ColorStyles.upFinWhiteGray),
             UiUtils.getMarginBox(100.w, 3.h),
             Stack(alignment: Alignment.center, children: [
               Positioned(
-                  child: UiUtils.getBannerButtonBox(90.w, 50.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+                  child: UiUtils.getBannerButtonBox(90.w, 50.w, ColorStyles.upFinBannerSky, ColorStyles.upFinBannerSky,
                       Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                         SizedBox(width: 77.w, child: UiUtils.getTextWithFixedScale("위기는 기회다! ", 22.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, 1)),
                         UiUtils.getMarginBox(0, 10.h)
@@ -227,7 +229,14 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                   right: 3.w,
                   child: UiUtils.getImage(50.w, 50.w, Image.asset(fit: BoxFit.fill,'assets/images/ani_man_search.gif'))),
             ]),
-            UiUtils.getMarginBox(0, 1.h),
+            UiUtils.getMarginBox(100.w, 3.h),
+            UiUtils.getMarginColoredBox(100.w, 0.11.h, ColorStyles.upFinGray),
+            UiUtils.getMarginColoredBox(100.w, 2.h, ColorStyles.upFinWhiteGray),
+            Container(padding: EdgeInsets.all(5.w), child: Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
+              UiUtils.getTextWithFixedScale("안내", 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1),
+              UiUtils.getMarginBox(0, 2.h),
+              UiUtils.getTextWithFixedScale2(StringConfig.appIntroduceText.replaceAll(" l ", "\n"), 8.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null)
+            ]))
           ])
       )),
 
@@ -277,17 +286,17 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
       accidentWidgetList.add(
           UiUtils.getAccidentBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinGray,
               Column(children: [
-                UiUtils.getMarginBox(0, 0.5.h),
+                UiUtils.getMarginBox(0, 1.h),
                 Row(children: [
                   Expanded(flex: 15, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Row(children: [
                       UiUtils.getMarginBox(2.w, 0 ),
                       //
-                      UiUtils.getBoxTextWithFixedScale("개인회생", 8.sp, FontWeight.w500, TextAlign.center, ColorStyles.upFinWhiteSky, ColorStyles.upFinButtonBlue),
+                      UiUtils.getBoxTextWithFixedScale("개인회생", 8.sp, FontWeight.w600, TextAlign.center, ColorStyles.upFinWhiteSky, ColorStyles.upFinButtonBlue),
                       UiUtils.getMarginBox(2.w, 0),
                       !MyData.isPossibleAccidentInfo(each)? UiUtils.getBoxTextWithFixedScale("환급계좌 오류", 8.sp, FontWeight.w500, TextAlign.start, ColorStyles.upFinWhiteRed, ColorStyles.upFinRed) : Container()
                     ]),
-                    UiUtils.getMarginBox(0, 0.2.h),
+                    UiUtils.getMarginBox(0, 0.5.h),
                     Row(mainAxisAlignment: MainAxisAlignment.start, children: [
                       UiUtils.getImage(16.w, 16.w, Image.asset('assets/images/accident_icon.png', fit: BoxFit.fill)),
                       // UiUtils.getMarginBox(0.2.w, 0),
@@ -303,7 +312,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                   Expanded(flex: 1, child: Icon(Icons.arrow_forward_ios_rounded, color: ColorStyles.upFinDarkGray, size: 5.5.w))
                 ]),
 
-                UiUtils.getMarginBox(0, 0.5.h),
+                UiUtils.getMarginBox(0, 0.8.h),
                 UiUtils.getBorderButtonBoxForSearch(80.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
                     Row(mainAxisAlignment:MainAxisAlignment.center, children: [
                       UiUtils.getIcon(5.w, 5.w, Icons.search_rounded, 5.w, ColorStyles.upFinWhite),
@@ -331,6 +340,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                 isViewHere = false;
               })
       );
+
     }
 
     return accidentWidgetList;
@@ -758,5 +768,4 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     return UiUtils.getViewWithAllowBackForAndroid(context, view, _back);
 
   }
-
 }

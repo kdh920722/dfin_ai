@@ -286,6 +286,58 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
     }
   }
 
+  void _showCapturedImage() {
+    UiUtils.showPopMenu(context, false, 100.w, 100.h, 0.5, 0, ColorStyles.upFinBlack, (popContext, popSetState){
+      return Stack(
+        alignment: Alignment.center,
+        children: [
+          Positioned(
+              child: SizedBox(width: 100.w, height: 100.h)
+          ),
+          Positioned(
+              child: SizedBox(width: 100.w, height: appConfig.Config.isAndroid? 70.h : 63.h,
+                  child: Container(color: ColorStyles.upFinBlack, child: UiUtils.getImage(80.w, 22.h, Image.file(File(imageFilFromCamera!.path)))))
+          ),
+          Positioned(
+              top: appConfig.Config.isAndroid? 85.h : 80.h,
+              child: Row(children: [
+                UiUtils.getBorderButtonBox(30.w, ColorStyles.upFinBlack, ColorStyles.upFinBlack,
+                    UiUtils.getTextWithFixedScale("확인", 13.sp, FontWeight.w300, ColorStyles.upFinWhite, TextAlign.start, null), () {
+                      XFile? image = imageFilFromCamera;
+                      if(image != null){
+                        isShowPickedFile = true;
+                        GetController.to.updateShowPickedFile(isShowPickedFile);
+                        inputHelpHeight = inputHelpPickedFileHeight;
+                        GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
+                        pickedFiles.add(File(image.path));
+                      }else{
+                        if(pickedFiles.isEmpty){
+                          isShowPickedFile = false;
+                          GetController.to.updateShowPickedFile(isShowPickedFile);
+                          inputHelpHeight = inputHelpMinHeight;
+                          GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
+                        }else{
+                          isShowPickedFile = true;
+                          GetController.to.updateShowPickedFile(isShowPickedFile);
+                          inputHelpHeight = inputHelpPickedFileHeight;
+                          GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
+                        }
+                      }
+                      Navigator.pop(popContext);
+                      setState(() {});
+                    }),
+                UiUtils.getMarginBox(20.w, 0),
+                UiUtils.getBorderButtonBox(30.w, ColorStyles.upFinBlack, ColorStyles.upFinBlack,
+                    UiUtils.getTextWithFixedScale("취소", 13.sp, FontWeight.w300, ColorStyles.upFinWhite, TextAlign.start, null), () {
+                      Navigator.pop(popContext);
+                      _takeCustomCamera();
+                    })
+              ])
+          ),
+        ],
+      );
+    });
+  }
   void _takeCustomCamera() {
     UiUtils.showPopMenu(context, false, 100.w, 100.h, 0.5, 0, ColorStyles.upFinBlack, (popContext, popSetState){
       return Stack(
@@ -308,12 +360,11 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
           ),
           Positioned(
               top: appConfig.Config.isAndroid? 85.h : 80.h,
-              child: UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                  UiUtils.getTextWithFixedScale("촬영", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
-                    if(_cameraController != null){
-                      _onTakePicture(popContext);
-                    }
-                  })
+              child: UiUtils.getIconButtonWithHeight(5.h, Icons.camera, 5.h, ColorStyles.upFinWhite, () {
+                if(_cameraController != null){
+                  _onTakePicture(popContext);
+                }
+              })
           ),
         ],
       );
@@ -329,29 +380,9 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
     await _cameraController!.setFocusMode(FocusMode.auto);
     await _cameraController!.setExposureMode(ExposureMode.auto);
     if(popContext.mounted){
-      XFile? image = imageFilFromCamera;
-      if(image != null){
-        isShowPickedFile = true;
-        GetController.to.updateShowPickedFile(isShowPickedFile);
-        inputHelpHeight = inputHelpPickedFileHeight;
-        GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
-        pickedFiles.add(File(image.path));
-      }else{
-        if(pickedFiles.isEmpty){
-          isShowPickedFile = false;
-          GetController.to.updateShowPickedFile(isShowPickedFile);
-          inputHelpHeight = inputHelpMinHeight;
-          GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
-        }else{
-          isShowPickedFile = true;
-          GetController.to.updateShowPickedFile(isShowPickedFile);
-          inputHelpHeight = inputHelpPickedFileHeight;
-          GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
-        }
-      }
       UiUtils.closeLoadingPop(popContext);
       Navigator.pop(popContext);
-      setState(() {});
+      _showCapturedImage();
     }
   }
 
@@ -637,16 +668,16 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
         child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
           Column(children: [
             Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-              CustomPaint(
+              isImageView? Container() : CustomPaint(
                 painter: ChatBubbleTriangleForOther(),
               ),
               Container(
                   constraints: BoxConstraints(maxWidth: 73.w),
-                  padding: isImageView? EdgeInsets.all(1.w) : EdgeInsets.all(3.w),
+                  padding: isImageView? EdgeInsets.zero : EdgeInsets.all(3.w),
                   decoration: BoxDecoration(
-                    borderRadius: isImageView? const BorderRadius.only(topRight: Radius.circular(5), topLeft: Radius.circular(5), bottomRight: Radius.circular(5))
+                    borderRadius: isImageView? const BorderRadius.only(topRight: Radius.circular(1), topLeft: Radius.circular(1), bottomRight: Radius.circular(1))
                       : const BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomRight: Radius.circular(15)),
-                    color: ColorStyles.upFinWhiteGray,
+                    color: isImageView? ColorStyles.upFinWhite : ColorStyles.upFinWhiteGray,
                   ),
                   child: otherInfoWidget
               ),
@@ -700,10 +731,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
     bool isLoading = true;
     return GestureDetector(
         child: Container(
-            decoration: const BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(5)),
-              color: ColorStyles.upFinBlack,
-            ),
+            color: ColorStyles.upFinWhite,
             alignment: Alignment.center,
             constraints: BoxConstraints(maxWidth: 70.w, maxHeight: 70.w, minWidth: 20.w, minHeight: 20.w),
             child: FutureBuilder(
@@ -718,7 +746,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                     cacheHeight: (40.w*devicePixelRatio).round().toInt(),
                     cacheMaxAge: const Duration(hours: 1),
                     shape: BoxShape.rectangle,
-                    borderRadius: const BorderRadius.all(Radius.circular(2)),
+                    borderRadius: const BorderRadius.all(Radius.circular(4)),
                     loadStateChanged: (ExtendedImageState state) {
                       switch (state.extendedImageLoadState) {
                         case LoadState.loading:
@@ -906,9 +934,9 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                 constraints: BoxConstraints(maxWidth: 73.w),
                 padding: isImageView? EdgeInsets.zero : EdgeInsets.all(3.w),
                 decoration: BoxDecoration(
-                  borderRadius: isImageView? const BorderRadius.only(topRight: Radius.circular(5), topLeft: Radius.circular(5), bottomLeft: Radius.circular(5))
+                  borderRadius: isImageView? const BorderRadius.only(topRight: Radius.circular(1), topLeft: Radius.circular(1), bottomLeft: Radius.circular(1))
                       : const BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomLeft: Radius.circular(15)),
-                  color: ColorStyles.upFinTextAndBorderBlue,
+                  color: isImageView? ColorStyles.upFinWhite : ColorStyles.upFinTextAndBorderBlue,
                 ),
                 child: meInfoWidget
             ),
@@ -1019,8 +1047,9 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
             GetController.to.chatStatusTick.value>2?_stepTick(2, true):_stepTick(2, false)
           ]),
       UiUtils.getMarginBox(0, 1.5.h),
-      UiUtils.getMarginColoredBox(100.w, 0.13.h, ColorStyles.upFinDarkGrayWithAlpha),
+      UiUtils.getMarginColoredBox(100.w, 0.11.h, ColorStyles.upFinDarkGrayWithAlpha),
       UiUtils.getMarginColoredBox(100.w, 0.4.h, ColorStyles.upFinGray)
+
     ]);
   }
   Widget _stepTick(int type, bool isChecked){
@@ -1429,7 +1458,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                         UiUtils.getTextWithFixedScale(fileName, 9.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null)
                   ]),
                 )),
-            Positioned(top: 0.1.h, right: -3.3.w, child: UiUtils.getIconButtonWithHeight(2.h, Icons.cancel_rounded, 2.h, ColorStyles.upFinWhiteSky, () {
+            Positioned(top: 0.1.h, right: -3.3.w, child: UiUtils.getIconButtonWithHeight(2.h, Icons.cancel_rounded, 2.h, ColorStyles.upFinGray, () {
               pickedFiles.removeAt(i);
               if(pickedFiles.isEmpty){
                 inputHelpHeight = inputHelpMinHeight;

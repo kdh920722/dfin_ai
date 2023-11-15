@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-import 'package:dio/dio.dart';
+import 'package:camera/camera.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
@@ -9,7 +9,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
@@ -412,48 +411,6 @@ class CommonUtils {
     return systemDateTime;
   }
 
-  static final ImagePicker _picker = ImagePicker();
-
-  static Future<XFile?> getGalleryImage() async {
-    try{
-      XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-
-      return image;
-    }catch(e){
-      CommonUtils.log('e', e.toString());
-      return null;
-    }
-  }
-
-  static Future<XFile?> getCameraImage() async {
-    try{
-      XFile? image = await _picker.pickImage(source: ImageSource.camera);
-      if(image != null){
-        CommonUtils.log('i', "path : ${image.path}\nname : ${image.name}");
-      }
-      return image;
-    }catch(e){
-      CommonUtils.log('e', e.toString());
-      return null;
-    }
-  }
-
-  static Future<List<XFile?>> getGalleryImageList() async {
-    List<XFile?> imageList = [];
-    try{
-      List<XFile?> imageListInMultiImage = await _picker.pickMultiImage();
-      for(var eachImage in imageListInMultiImage){
-        if(eachImage != null) {
-          imageList.add(eachImage);
-        }
-      }
-      return imageList;
-    }catch(e){
-      CommonUtils.log('e', e.toString());
-      return imageList;
-    }
-  }
-
   static Map<String, Image> cachedImageMap = {};
   static Map<String, List<double>> cachedImageSizedMap = {};
 
@@ -558,29 +515,6 @@ class CommonUtils {
     }catch(error){
       CommonUtils.log('e', 'getFile error : $error');
       return null;
-    }
-  }
-
-  static Future<void> sendFiles(List<File> files, Function(bool isSuccess) callback) async {
-    try{
-      FormData formData = FormData.fromMap({
-        "attachments": files,
-      });
-
-      var dio = Dio();
-      var response = await dio.post(
-        "url",
-        data: formData,
-      );
-      String resultString = response.data.toString();
-      if(resultString == ""){
-        callback(true);
-      }else{
-        callback(false);
-      }
-    }catch(error){
-      CommonUtils.log('e', 'sendFile error : $error');
-      callback(false);
     }
   }
 

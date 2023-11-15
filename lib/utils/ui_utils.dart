@@ -6,7 +6,6 @@ import 'package:sizer/sizer.dart';
 import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/styles/TextStyles.dart';
-import 'package:upfin/views/app_root_view.dart';
 import '../styles/ColorStyles.dart';
 import '../configs/app_config.dart';
 import 'common_utils.dart';
@@ -179,7 +178,7 @@ class UiUtils {
 
   static Widget getRoundedBoxTextWithFixedScale(String text, double fontSize, FontWeight fontWeight, TextAlign? textAlign, Color borderColor, Color fillColor, Color textColor){
     return Container(padding: EdgeInsets.only(top: 2.w, bottom: 2.w, left: 3.w, right: 3.w), // 텍스트 주위에 여백 추가
-        decoration: BoxDecoration(color: fillColor, border: Border.all(color: borderColor, width: 0.4.w), borderRadius: BorderRadius.circular(20)),
+        decoration: BoxDecoration(color: fillColor, border: Border.all(color: borderColor, width: 0.3.w), borderRadius: BorderRadius.circular(20)),
         child: Text(textScaleFactor: 1.0, text, style: TextStyle(decoration: TextDecoration.none, height: 1, fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor)));
   }
 
@@ -1147,9 +1146,9 @@ class UiUtils {
         onChanged: onChanged,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)),
         checkColor: ColorStyles.upFinWhite,
-        activeColor: ColorStyles.upFinSky,
+        activeColor: ColorStyles.upFinTextAndBorderBlue,
         side: MaterialStateBorderSide.resolveWith((states) =>
-         !checkedValue? const BorderSide(width: 2.0, color: ColorStyles.upFinGray) : const BorderSide(width: 2.0, color: ColorStyles.upFinSky))
+         !checkedValue? const BorderSide(width: 2.0, color: ColorStyles.upFinGray) : const BorderSide(width: 2.0, color: ColorStyles.upFinTextAndBorderBlue))
     ));
   }
 

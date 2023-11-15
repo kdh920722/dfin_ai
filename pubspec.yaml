@@ -49,8 +49,6 @@ dependencies:
   firebase_auth: ^4.7.2
   sizer: ^2.0.15
   visibility_detector: ^0.4.0+2
-  image_picker: ^1.0.4
-  dio: ^5.3.3
   path: ^1.8.3
   image: ^4.0.17
   http_parser: ^4.0.2

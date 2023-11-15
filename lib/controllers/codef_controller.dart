@@ -41,7 +41,7 @@ class CodeFController{
   }
 
   static String getErrorMsg(String errorCode){
-    String result = "";
+    String result = "인증요청이 취소되었습니다.";
     if(errorMsgMap.containsKey(errorCode)){
       result = errorMsgMap[errorCode]!;
       return result;
