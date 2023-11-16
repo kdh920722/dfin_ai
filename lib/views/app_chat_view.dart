@@ -158,7 +158,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
     isViewHere = true;
     _setAutoAnswerWidgetList();
     GetController.to.updateInputTextHide(true);
-    GetController.to.updateShowStatus(true);
+    GetController.to.updateShowStatus(false);
     GetController.to.updateAutoAnswerWaiting(false);
     GetController.to.updateShowScrollBottom(false);
     WebSocketController.isMessageReceived = false;
@@ -256,9 +256,8 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
     GetController.to.resetChatAutoAnswerWidgetList();
     GetController.to.updateInputTextHide(true);
     GetController.to.updateShowPickedFile(false);
-    GetController.to.updateShowStatus(true);
     WebSocketController.isMessageReceived = false;
-    appConfig.Config.contextForEmergencyBack = null;
+    appConfig.Config.contextForEmergencyBack = AppMainViewState.mainContext;
     currentKey = "";
     imageLoadMap = {};
     IsolateNameServer.removePortNameMapping('downloader_send_port');
@@ -601,10 +600,11 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                           MyData.addToPrDocsInfoList(PrDocsInfoData(each["id"], each["name"], each["del_flg"]));
                         }
                         if(MyData.getPrDocsInfoList().isNotEmpty){
-                          isScrollMove = true;
+                          isScrollMove = false;
                           isViewHere = false;
                           AppApplyPrViewState.isRetry = true;
                           await CommonUtils.moveToWithResult(context, appConfig.AppView.appApplyPrView.value, null);
+                          isScrollMove = true;
                           isViewHere = true;
                         }else{
                           CommonUtils.flutterToast("서류 제출을 완료했습니다.");
@@ -731,7 +731,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
     bool isLoading = true;
     return GestureDetector(
         child: Container(
-            color: ColorStyles.upFinWhite,
+            color: ColorStyles.upFinBlack,
             alignment: Alignment.center,
             constraints: BoxConstraints(maxWidth: 70.w, maxHeight: 70.w, minWidth: 20.w, minHeight: 20.w),
             child: FutureBuilder(
@@ -1047,8 +1047,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
             GetController.to.chatStatusTick.value>2?_stepTick(2, true):_stepTick(2, false)
           ]),
       UiUtils.getMarginBox(0, 1.5.h),
-      UiUtils.getMarginColoredBox(100.w, 0.11.h, ColorStyles.upFinDarkGrayWithAlpha),
-      UiUtils.getMarginColoredBox(100.w, 0.4.h, ColorStyles.upFinGray)
+      UiUtils.getMarginColoredBox(100.w, 0.12.h, ColorStyles.upFinGray)
 
     ]);
   }

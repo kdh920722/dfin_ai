@@ -10,6 +10,7 @@ import 'package:upfin/controllers/sharedpreference_controller.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import 'package:upfin/styles/TextStyles.dart';
+import 'package:upfin/views/app_result_pr_view.dart';
 import '../controllers/aws_controller.dart';
 import '../controllers/clova_controller.dart';
 import '../controllers/codef_controller.dart';
@@ -567,7 +568,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     _disposeAllTextControllersForDl();
     WidgetsBinding.instance.removeObserver(this);
     _bankScrollController.dispose();
-    Config.contextForEmergencyBack = null;
+    Config.contextForEmergencyBack = AppResultPrViewState.mainContext;
     if(_cameraController != null){
       _cameraController!.dispose();
     }
@@ -1837,6 +1838,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                             "serialNo": map["code"][0]["formatted"]["value"]
                           };
                         }else if(licenseNumList.length == 3){
+                          isCheckNeeded = true;
                           inputJson = {
                             "ownerNm": MyData.name,
                             "juminNo": MyData.birth,
@@ -1910,12 +1912,15 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                                             });
                                           }),
                                         ]),
-                                        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("인식된 신분증 정보입니다.", 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
-                                        UiUtils.getMarginBox(0, 0.5.w),
-                                        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("정보가 맞다면, 확인을 눌러주세요!", 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
-                                        UiUtils.getMarginBox(0, 5.h),
-                                        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("운전면허 번호", 14.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null)),
-                                        SizedBox(width: 90.w, height: 6.h, child: Row(crossAxisAlignment:CrossAxisAlignment.center, children: [
+                                        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("상세정보를 확인해주시고", 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
+                                        UiUtils.getMarginBox(0, 0.5.h),
+                                        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("맞다면, 확인을 눌러주세요!", 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
+                                        UiUtils.getMarginBox(0, 4.h),
+                                        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("면허번호", 13.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null)),
+                                        UiUtils.getMarginBox(0, 0.5.h),
+                                        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("예)'11-11-012345-67' 또는 '경남-11-012345-67'", 10.sp, FontWeight.w300, ColorStyles.upFinDarkGray, TextAlign.start, null)),
+
+                                        SizedBox(width: 90.w, height: 7.h, child: Row(crossAxisAlignment:CrossAxisAlignment.center, children: [
                                           UiUtils.getTextField(slideContext, 15.w, TextStyles.upFinTextFormFieldTextStyle, _dlNumInfoFocus1, _dlNumInfoTextController1, TextInputType.text,
                                               UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
                                           Column(mainAxisAlignment:MainAxisAlignment.center, children: [UiUtils.getMarginBox(0, 1.6.w), UiUtils.getTextWithFixedScale("-", 15.sp, FontWeight.w400, ColorStyles.upFinRealGray, TextAlign.center, null)]),
@@ -1929,13 +1934,9 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                                               UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
                                         ])),
                                         UiUtils.getMarginBox(0, 7.w),
-                                        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("시리얼 번호", 14.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null)),
-                                        SizedBox(width: 30.w, height: 6.h, child: UiUtils.getTextField(slideContext, 30.w, TextStyles.upFinTextFormFieldTextStyle, _dlNumInfoFocusSerial, _dlNumInfoTextControllerSerial, TextInputType.text,
+                                        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("일련번호", 13.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null)),
+                                        SizedBox(width: 30.w, height: 7.h, child: UiUtils.getTextField(slideContext, 30.w, TextStyles.upFinTextFormFieldTextStyle, _dlNumInfoFocusSerial, _dlNumInfoTextControllerSerial, TextInputType.text,
                                             UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { })),
-                                        UiUtils.getMarginBox(0, 7.w),
-                                        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("주민등록번호", 14.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null)),
-                                        UiUtils.getMarginBox(0, 2.w),
-                                        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("${MyData.idNumber.substring(0,8)} ••••••", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)),
                                         UiUtils.getMarginBox(0, 7.w),
                                         UiUtils.getExpandedScrollView(Axis.vertical, Container()),
                                         UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
@@ -3277,12 +3278,14 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   }
 
   void _back(){
-    CommonUtils.hideKeyBoard();
-    if(currentViewId == addedDocsInfoIntroViewId){
-      Navigator.pop(context);
-    }else{
-      if(_getIdFromListByViewId(currentViewId) != lastId){
-        backInputView();
+    if(currentViewId != cameraTakePhotoId){
+      CommonUtils.hideKeyBoard();
+      if(currentViewId == addedDocsInfoIntroViewId){
+        Navigator.pop(context);
+      }else{
+        if(_getIdFromListByViewId(currentViewId) != lastId){
+          backInputView();
+        }
       }
     }
   }

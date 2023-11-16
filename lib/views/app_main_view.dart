@@ -18,7 +18,6 @@ import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import '../controllers/get_controller.dart';
 import '../controllers/sharedpreference_controller.dart';
-import '../styles/TextStyles.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
 import 'app_update_accident_view.dart';
@@ -35,6 +34,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   int tryOut = 0;
   String retryChatRoomId = "";
   static bool isViewHere = false;
+  static BuildContext? mainContext;
 
   @override
   void initState(){
@@ -48,6 +48,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
       doCheckToSearchAccident = false;
     }
 
+    mainContext = context;
     Config.contextForEmergencyBack = context;
     Config.isEmergencyRoot = false;
     FireBaseController.setStateForForeground = setState;
@@ -230,12 +231,8 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                   child: UiUtils.getImage(50.w, 50.w, Image.asset(fit: BoxFit.fill,'assets/images/ani_man_search.gif'))),
             ]),
             UiUtils.getMarginBox(100.w, 3.h),
-            UiUtils.getMarginColoredBox(100.w, 0.11.h, ColorStyles.upFinGray),
-            UiUtils.getMarginColoredBox(100.w, 2.h, ColorStyles.upFinWhiteGray),
-            Container(padding: EdgeInsets.all(5.w), child: Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
-              UiUtils.getTextWithFixedScale("안내", 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1),
-              UiUtils.getMarginBox(0, 2.h),
-              UiUtils.getTextWithFixedScale2(StringConfig.appIntroduceText.replaceAll(" l ", "\n"), 8.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null)
+            Container(padding: EdgeInsets.only(right: 5.w, left : 5.w, bottom : 5.w), child: Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
+              UiUtils.getTextWithFixedScale2(StringConfig.appIntroduceText.replaceAll(" l ", "\n"), 10.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null)
             ]))
           ])
       )),
@@ -492,11 +489,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
           UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
           UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinButtonBlue,
               UiUtils.getTextWithFixedScale("나가기", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), (){
-                MyData.resetMyData();
-                GetController.to.resetAccdientInfoList();
-                GetController.to.resetChatLoanInfoList();
-                GetController.to.resetChatMessageInfoList();
-                WebSocketController.resetConnectWebSocketCable();
+                CommonUtils.resetData();
                 SystemNavigator.pop();
               })
         ]);

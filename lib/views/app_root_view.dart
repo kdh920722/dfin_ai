@@ -370,10 +370,12 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
     }
   }
 
+  bool isPopOn = false;
   Future<void> _requestPermissions() async {
     isPermissionCheckPopStarted = true;
     await CommonUtils.requestPermissions((isDenied, deniedPermissionsList) async {
       if(isDenied){
+        isPopOn = true;
         isPermissionDenied = true;
         String deniedPermissionsString = "";
         for(int i = 0; i < deniedPermissionsList!.length; i++){
@@ -446,7 +448,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
               await _requestPermissions();
             }else if(!isPermissionDenied && isPermissionCheckPopStarted){
               if(permissionCheckTimer != null) permissionCheckTimer!.cancel();
-              if(context.mounted) Navigator.pop(context);
+              if(context.mounted && isPopOn) Navigator.pop(context);
               _callInitApis();
             }
           });

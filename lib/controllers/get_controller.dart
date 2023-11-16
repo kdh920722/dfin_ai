@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:upfin/configs/app_config.dart';
+import 'package:upfin/controllers/codef_controller.dart';
 import 'package:upfin/datas/accident_info_data.dart';
 import 'package:upfin/datas/chat_message_info_data.dart';
 import 'package:upfin/datas/chatroom_info_data.dart';
@@ -55,6 +56,9 @@ class GetController extends GetxController {
     super.onClose();
   }
 
+  void setPercent(int newValue) {
+    loadingPercent.value = newValue;
+  }
   void updatePercent(int newValue) {
     loadingPercent.value += newValue;
   }
@@ -62,9 +66,12 @@ class GetController extends GetxController {
     loadingPercent = 0.obs;
   }
 
-
   void updateWait(bool newValue) {
     isWait.value = newValue;
+    if(!newValue){
+      resetPercent();
+      CodeFController.apiTimerCount = 0;
+    }
   }
   void resetIsWait() {
     isWait = false.obs;

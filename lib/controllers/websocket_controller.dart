@@ -27,8 +27,6 @@ class WebSocketController {
   static ActionCable? cable;
   static bool isInit = false;
   static bool isRetry = false;
-  static Timer? reSubScribeCheckTimer;
-  static Timer? reSubScribeTimer;
   static Map<String,dynamic> connectionInfoMap = {};
   static bool isMessageReceived = false;
   static final AssetsAudioPlayer assetsChatSendAudioPlayer = AssetsAudioPlayer.newPlayer();
@@ -78,7 +76,7 @@ class WebSocketController {
       }else{
         if(subscribedRoomIds[i]["room_id"] == roomId){
           if(type == "UPFIN"){
-            if(!isWaiting && AppChatViewState.currentRoomId == roomId) assetsChatPushAudioPlayer.play();
+            //if(!isWaiting && AppChatViewState.currentRoomId == roomId) assetsChatPushAudioPlayer.play();
             subscribedRoomIds[i]["isWaitingForAnswer"] = isWaiting;
           }else{
             if(!isWaiting && AppChatViewState.currentRoomId == roomId) assetsChatSendAudioPlayer.play();
@@ -108,9 +106,11 @@ class WebSocketController {
     isInit = false;
     isReSubScribe = false;
     isMessageReceived = false;
-    if(reSubScribeTimer != null) reSubScribeTimer!.cancel();
-    if(reSubScribeCheckTimer != null) reSubScribeCheckTimer!.cancel();
-    GetController.to.updateAllSubScribed(false);
+    if(retryCheckTimer != null) retryCheckTimer!.cancel();
+    retryCheckTimer = null;
+    retryTimerCount = 0;
+    isRetryStarted = false;
+    connectionInfoMap = {};
     subscribedRoomIds.clear();
     if(cable != null) cable!.disconnect();
     cable = null;
@@ -130,7 +130,7 @@ class WebSocketController {
 
       cable!.onConnected = () {
         connectionKey = CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime());
-        connectionInfoMap = {"connection_key" : connectionKey, "is_connected": true};
+        connectionInfoMap = {connectionKey : true};
         if(!isInit){
           isInit = true;
           int subCnt = 0;
@@ -381,22 +381,75 @@ class WebSocketController {
   }
   */
 
-  static void _retryToConnect(){
-    if(isInit){
-      GetController.to.updateAllSubScribed(false);
-      if(reSubScribeTimer != null) reSubScribeTimer!.cancel();
-      if(reSubScribeCheckTimer != null) reSubScribeCheckTimer!.cancel();
-      subscribedRoomIds.clear();
-      Future.delayed(const Duration(seconds: 2), () {
-        connectToWebSocketCable(); // 다시 연결
-      });
-    }else{
-      resetConnectWebSocketCable();
-    }
-  }
-
+  static Timer? retryCheckTimer;
+  static int retryTimerCount = 0;
+  static bool isRetryStarted = false;
   static void _retryToConnectNewVer(String connectedKey){
-    String key = connectionInfoMap["connection_key"];
+    if(!isRetryStarted){
+      isRetryStarted = true;
+      GetController.to.updateAllSubScribed(false);
+      if(!AppMainViewState.isViewHere){
+        AppChatViewState.isViewHere = false;
+        AppMainViewState.isViewHere = true;
+        CommonUtils.flutterToast("재접속 중입니다.\n잠시만 기다려 주세요.");
+        CommonUtils.moveWithUntil(Config.contextForEmergencyBack!, AppView.appMainView.value);
+        Config.contextForEmergencyBack = AppMainViewState.mainContext;
+      }
+
+      retryCheckTimer ??= Timer.periodic(const Duration(seconds: 1), (Timer timer) {
+        retryTimerCount++;
+        if(retryTimerCount >= 20){
+          if(retryCheckTimer != null) retryCheckTimer!.cancel();
+          retryCheckTimer = null;
+          retryTimerCount = 0;
+          isRetryStarted = false;
+          GetController.to.updateAllSubScribed(true);
+        }
+      });
+    }
+
+    if(connectionInfoMap.containsKey(connectedKey)){
+      if(connectionInfoMap[connectedKey]){
+        connectionInfoMap[connectedKey] = false;
+
+        LogfinController.getLoanInfo((isSuccess, isNotEmpty){
+          if(isSuccess){
+            if(!isNotEmpty){
+              Future.delayed(Duration(seconds: retryTimerCount >= 13? 4:1), () async {
+                if(isRetryStarted){
+                  _retryToConnectNewVer(connectedKey);
+                }else{
+                  AppChatViewState.isViewHere = false;
+                  AppMainViewState.isViewHere = false;
+                  CommonUtils.emergencyBackToHome();
+                }
+              });
+            }else{
+              connectionInfoMap[connectedKey] = true;
+              if(retryCheckTimer != null) retryCheckTimer!.cancel();
+              retryCheckTimer = null;
+              retryTimerCount = 0;
+              isRetryStarted = false;
+              connectionInfoMap = {};
+              GetController.to.updateAllSubScribed(true);
+            }
+          }else{
+            Future.delayed(Duration(seconds: retryTimerCount >= 13? 4:1), () async {
+              if(isRetryStarted){
+                _retryToConnectNewVer(connectedKey);
+              }else{
+                AppChatViewState.isViewHere = false;
+                AppMainViewState.isViewHere = false;
+                CommonUtils.emergencyBackToHome();
+              }
+            });
+          }
+        });
+      }
+    }
+
+    //String key = connectionInfoMap["connection_key"];
+    /*
     if(connectedKey != "" && connectionInfoMap["is_connected"] && key == connectedKey){
       connectionInfoMap["is_connected"] = false;
       GetController.to.updateAllSubScribed(false);
@@ -427,6 +480,7 @@ class WebSocketController {
         }
       });
     }
+    */
   }
 
   /*

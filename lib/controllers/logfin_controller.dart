@@ -544,6 +544,7 @@ class LogfinController {
 
               MyData.sortLoanInfoList();
               _setChatRoomInfoList();
+              GetController.to.updateAllSubScribed(false);
               WebSocketController.resetConnectWebSocketCable();
               Future.delayed(const Duration(seconds: 2), () {
                 WebSocketController.connectToWebSocketCable();

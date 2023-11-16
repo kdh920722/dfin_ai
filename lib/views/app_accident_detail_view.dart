@@ -4,6 +4,7 @@ import 'package:sizer/sizer.dart';
 import 'package:upfin/datas/loan_info_data.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
+import 'package:upfin/views/app_main_view.dart';
 import 'package:upfin/views/app_update_accident_view.dart';
 import '../controllers/firebase_controller.dart';
 import '../styles/TextStyles.dart';
@@ -17,6 +18,7 @@ class AppAccidentDetailView extends StatefulWidget{
 }
 
 class AppAccidentDetailViewState extends State<AppAccidentDetailView> with WidgetsBindingObserver, TickerProviderStateMixin{
+  static BuildContext? mainContext;
   late final TabController _tabController;
   @override
   void initState(){
@@ -24,6 +26,7 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _tabController = TabController(length: 2, vsync: this);
+    mainContext = context;
     Config.contextForEmergencyBack = context;
     Config.isEmergencyRoot = false;
     FireBaseController.setStateForForeground = null;
@@ -35,7 +38,7 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
     WidgetsBinding.instance.removeObserver(this);
     MyData.selectedAccidentInfoData = null;
     _tabController.dispose();
-    Config.contextForEmergencyBack = null;
+    Config.contextForEmergencyBack = AppMainViewState.mainContext;
     super.dispose();
   }
 

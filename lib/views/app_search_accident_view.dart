@@ -6,6 +6,7 @@ import 'package:sizer/sizer.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
+import 'package:upfin/views/app_main_view.dart';
 import '../configs/app_config.dart';
 import '../controllers/firebase_controller.dart';
 import '../styles/TextStyles.dart';
@@ -213,7 +214,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
     _disposeAllTextControllers();
     GetController.to.resetPreLoanPrice();
     GetController.to.resetWantLoanPrice();
-    Config.contextForEmergencyBack = null;
+    Config.contextForEmergencyBack = AppMainViewState.mainContext;
     super.dispose();
   }
 

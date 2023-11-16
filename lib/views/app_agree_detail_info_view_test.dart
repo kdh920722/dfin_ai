@@ -19,7 +19,6 @@ class AppAgreeDetailInfoViewTestState extends State<AppAgreeDetailInfoViewTest> 
     CommonUtils.log("i", "AppAgreeDetailInfoView 화면 입장");
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    Config.contextForEmergencyBack = context;
     Config.isEmergencyRoot = false;
     FireBaseController.setStateForForeground = null;
   }
@@ -28,7 +27,6 @@ class AppAgreeDetailInfoViewTestState extends State<AppAgreeDetailInfoViewTest> 
   void dispose(){
     CommonUtils.log("i", "AppAgreeDetailInfoView 화면 파괴");
     WidgetsBinding.instance.removeObserver(this);
-    Config.contextForEmergencyBack = null;
     super.dispose();
   }
 

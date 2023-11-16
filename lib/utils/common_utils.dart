@@ -13,6 +13,7 @@ import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:upfin/controllers/codef_controller.dart';
 import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:upfin/controllers/get_controller.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
@@ -668,10 +669,7 @@ class CommonUtils {
   }
 
   static Future<void> backToHome(BuildContext context) async {
-    MyData.resetMyData();
-    GetController.to.resetAccdientInfoList();
-    GetController.to.resetChatLoanInfoList();
-    WebSocketController.resetConnectWebSocketCable();
+    resetData();
     await CommonUtils.saveSettingsToFile("push_from", "");
     await CommonUtils.saveSettingsToFile("push_room_id", "");
     CommonUtils.log("", "delete file");
@@ -680,11 +678,7 @@ class CommonUtils {
 
   static Future<void> emergencyBackToHome() async {
     if(Config.contextForEmergencyBack != null){
-      MyData.resetMyData();
-      GetController.to.resetAccdientInfoList();
-      GetController.to.resetChatLoanInfoList();
-      GetController.to.resetChatMessageInfoList();
-      WebSocketController.resetConnectWebSocketCable();
+      resetData();
       await CommonUtils.saveSettingsToFile("push_from", "");
       await CommonUtils.saveSettingsToFile("push_room_id", "");
       CommonUtils.log("", "delete file");
@@ -694,6 +688,15 @@ class CommonUtils {
         CommonUtils.moveWithUntil(Config.contextForEmergencyBack!, AppView.appRootView.value);
       }
     }
+  }
+
+  static void resetData(){
+    MyData.resetMyData();
+    GetController.to.resetAccdientInfoList();
+    GetController.to.resetChatLoanInfoList();
+    GetController.to.resetChatMessageInfoList();
+    WebSocketController.resetConnectWebSocketCable();
+    if(CodeFController.apiCheckTimer != null) CodeFController.apiCheckTimer!.cancel();
   }
 
   static void goToMain(BuildContext context, String? email, String? password){

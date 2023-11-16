@@ -4,6 +4,7 @@ import 'package:upfin/configs/app_config.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
+import 'package:upfin/views/app_update_accident_view.dart';
 import '../controllers/firebase_controller.dart';
 import '../styles/TextStyles.dart';
 import '../utils/common_utils.dart';
@@ -15,6 +16,8 @@ class AppResultPrView extends StatefulWidget{
 }
 
 class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObserver, TickerProviderStateMixin{
+  static BuildContext? mainContext;
+
   late final TabController _tabController;
   int possiblePrCnt = 0;
   int impossiblePrCnt = 0;
@@ -52,6 +55,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
       });
     });
 
+    mainContext = context;
     Config.contextForEmergencyBack = context;
     Config.isEmergencyRoot = false;
     FireBaseController.setStateForForeground = null;
@@ -62,7 +66,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
     CommonUtils.log("i", "AppResultPrView 화면 파괴");
     WidgetsBinding.instance.removeObserver(this);
     _tabController.dispose();
-    Config.contextForEmergencyBack = null;
+    Config.contextForEmergencyBack = AppUpdateAccidentViewState.mainContext;
     MyData.selectedAccidentInfoData = null;
     super.dispose();
   }

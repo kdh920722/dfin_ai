@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:upfin/controllers/get_controller.dart';
 import 'package:upfin/datas/api_info_data.dart';
 import 'package:http/http.dart' as http;
@@ -337,20 +338,27 @@ class CodeFController{
   static Future<void> callApisWithCert2(BuildContext context, StateSetter setState, int certType,
       List<ApiInfoData> apiInfoDataList, Function(bool isSuccess, List<ApiInfoData>? resultApiInfoDataList) callback) async {
     _callApiWithCert2(context, setState, certType, apiInfoDataList, (isSuccess, resultApiInfoDataListFromCall) {
-      if(isSetAuthPopOn) Navigator.of(context).pop();
-      GetController.to.updateWait(false);
-      isSetAuthPopOn = false;
-
       if(isSuccess){
-        if(resultApiInfoDataListFromCall == null){
-          callback(false, apiInfoDataList);
-        }else{
-          callback(true, resultApiInfoDataListFromCall);
-        }
-      }else{
-        callback(false, resultApiInfoDataListFromCall);
+        GetController.to.setPercent(100);
       }
 
+      Future.delayed(const Duration(seconds: 1), () {
+        if(isSetAuthPopOn) Navigator.of(context).pop();
+        if(apiCheckTimer != null) apiCheckTimer!.cancel();
+        apiCheckTimer = null;
+        GetController.to.updateWait(false);
+        isSetAuthPopOn = false;
+
+        if(isSuccess){
+          if(resultApiInfoDataListFromCall == null){
+            callback(false, apiInfoDataList);
+          }else{
+            callback(true, resultApiInfoDataListFromCall);
+          }
+        }else{
+          callback(false, resultApiInfoDataListFromCall);
+        }
+      });
     });
   }
   /// ------------------------------------------------------------------------------------------------------------------------ ///
@@ -951,6 +959,8 @@ class CodeFController{
   }
 
   static bool isSetAuthPopOn = false;
+  static Timer? apiCheckTimer;
+  static int apiTimerCount = 0;
   static Future<void> _setAuthPop2(BuildContext context, Apis apiInfo, int certType, Map<String, dynamic> resultInputMap,
       Function(bool isSuccess, Map<String,dynamic>? resultMap, List<dynamic>? resultListMap, Map<String,dynamic>? fullResultMap) callback) async {
     String certName = "인증을 완료하셨다면,";
@@ -964,10 +974,60 @@ class CodeFController{
       certName = "PASS앱에서 $certName";
     }
 
+    apiTimerCount = 0;
+    GetController.to.resetPercent();
+
+    apiCheckTimer ??= Timer.periodic(const Duration(seconds: 1), (Timer timer) {
+      apiTimerCount++;
+
+      if(GetController.to.isWait.value){
+        if(GetController.to.loadingPercent.value >= 80){
+          GetController.to.updatePercent(0);
+          if(apiCheckTimer != null) apiCheckTimer!.cancel();
+          apiCheckTimer = null;
+        }else if(GetController.to.loadingPercent.value >= 50){
+          GetController.to.updatePercent(10);
+        }else if(GetController.to.loadingPercent.value >= 10){
+          GetController.to.updatePercent(6);
+        }else{
+          GetController.to.updatePercent(4);
+        }
+      }else{
+        apiTimerCount = 0;
+        GetController.to.setPercent(1);
+      }
+
+
+      if(apiTimerCount >= 100){
+        if(apiCheckTimer != null) apiCheckTimer!.cancel();
+        apiCheckTimer = null;
+      }
+    });
+
+
     UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, 40.h, 0.0, (context, setState){
       return Obx(()=>Column(mainAxisAlignment: MainAxisAlignment.start, children:[
         UiUtils.getMarginBox(0, 9.5.h),
-        GetController.to.isWait.value? UiUtils.getImage(20.w, 20.w,  Image.asset(fit: BoxFit.fill,'assets/images/doc_move.gif'))
+        GetController.to.isWait.value? Column(children: [
+          UiUtils.getImage(20.w, 20.w,  Image.asset(fit: BoxFit.fill,'assets/images/doc_move.gif')),
+          UiUtils.getMarginBox(0, 0.5.h),
+          LinearPercentIndicator(
+            animateFromLastPercent: true,
+            alignment: MainAxisAlignment.center,
+            barRadius: const Radius.circular(10),
+            animation: true,
+            center: Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.end, children: [
+              UiUtils.getTextWithFixedScale("${GetController.to.loadingPercent.value}", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
+              UiUtils.getMarginBox(0.5.w, 0),
+              UiUtils.getTextWithFixedScale("%", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
+            ]),
+            width: 60.w,
+            lineHeight: 3.h,
+            linearStrokeCap: LinearStrokeCap.round,
+            backgroundColor : ColorStyles.upFinWhite,
+            progressColor: ColorStyles.upFinWhite,
+          )
+        ])
             : Column(children: [
               UiUtils.getMarginBox(0, 0.5.h),
               UiUtils.getStyledTextWithFixedScale(certName, TextStyles.upFinBasicTextStyle, TextAlign.center, null)]),
