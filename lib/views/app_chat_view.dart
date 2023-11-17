@@ -1574,25 +1574,32 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                   child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                     UiUtils.getMarginBox(0, 2.5.h),
                     UiUtils.getTextWithFixedScale(currentCompany, 16.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.center, 1),
-                    UiUtils.getMarginBox(0, 1.h),
-                    Obx((){
-                      String statusName = LoanInfoData.getDetailStatusName(GetController.to.chatStatusTick.value.toString());
-                      return UiUtils.getTextWithFixedScale(statusName, 12.sp, FontWeight.w600, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, null);
-                    })
+                    //UiUtils.getMarginBox(0, 1.h),
                   ])
               ),
             ),
+
             Positioned(
               child: Align(
-                  alignment: Alignment.centerRight,
-                  child: Obx((){
-                    return Padding(padding: EdgeInsets.only(right: 3.w), child: Column(children: [
-                      UiUtils.getMarginBox(0, 1.8.h),
-                      UiUtils.getIconButtonWithHeight(8.w, GetController.to.isShowStatus.value? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded, 8.w, ColorStyles.upFinDarkGray, () {
-                        GetController.to.updateShowStatus(!GetController.to.isShowStatus.value);
-                      })
-                    ]));
-                  })
+                  alignment: Alignment.topRight,
+                  child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                    UiUtils.getMarginBox(0, 1.h),
+                    Row(mainAxisAlignment:MainAxisAlignment.end, children: [
+                      Obx((){
+                        String statusName = LoanInfoData.getDetailStatusName(GetController.to.chatStatusTick.value.toString());
+                        return UiUtils.getBorderButtonBoxForRound2(ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
+                            Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment:MainAxisAlignment.center, children: [
+                              UiUtils.getMarginBox(2.w, 0),
+                              UiUtils.getTextWithFixedScale(statusName, 10.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
+                              Icon(GetController.to.isShowStatus.value? Icons.keyboard_arrow_up_outlined : Icons.keyboard_arrow_down_outlined, color: ColorStyles.upFinBlack, size: 4.w)
+                            ]), () {
+                              GetController.to.updateShowStatus(!GetController.to.isShowStatus.value);
+                            });
+                      }),
+                      UiUtils.getMarginBox(3.w, 0),
+                    ])
+                    //UiUtils.getMarginBox(0, 1.h),
+                  ])
               ),
             ),
           ]),

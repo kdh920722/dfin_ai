@@ -16,6 +16,7 @@ import 'package:upfin/datas/chat_message_info_data.dart';
 import 'package:upfin/datas/loan_info_data.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../controllers/get_controller.dart';
 import '../controllers/sharedpreference_controller.dart';
 import '../utils/common_utils.dart';
@@ -232,7 +233,14 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             ]),
             UiUtils.getMarginBox(100.w, 3.h),
             Container(padding: EdgeInsets.only(right: 5.w, left : 5.w, bottom : 5.w), child: Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
-              UiUtils.getTextWithFixedScale2(StringConfig.appIntroduceText.replaceAll(" l ", "\n"), 10.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null)
+              UiUtils.getTextWithFixedScale2(Config.privacyText.replaceAll("@@", "\n"), 10.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null),
+              UiUtils.getMarginBox(0, 0.5.h),
+              UiUtils.getTextButtonWithFixedScale2("개인정보처리방침 바로가기: ${Config.privacyUrl}", 10.sp,  FontWeight.w400, ColorStyles.upFinBlack, TextAlign.start, null, () async {
+                Uri privacyLink = Uri.parse(Config.privacyUrl);
+                if(await canLaunchUrl(privacyLink)){
+                  launchUrl(privacyLink);
+                }
+              })
             ]))
           ])
       )),
@@ -383,7 +391,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                         Row(mainAxisAlignment: MainAxisAlignment.start, children: [
                           UiUtils.getRoundBoxTextWithFixedScale(LoanInfoData.getDetailStatusName(each.chatRoomLoanStatus), 7.sp, FontWeight.w600, TextAlign.center,  ColorStyles.upFinWhiteSky, ColorStyles.upFinButtonBlue),
                           UiUtils.getMarginBox(2.w, 0),
-                          Expanded(child: UiUtils.getTextWithFixedScaleAndOverFlow(lastMsg, 9.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, 1))
+                          Expanded(child: UiUtils.getTextWithFixedScaleAndOverFlow(lastMsg, 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, 1))
                         ]),
                         UiUtils.getMarginBox(0, 0.2.h),
                       ])

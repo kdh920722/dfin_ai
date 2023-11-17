@@ -1011,10 +1011,10 @@ class CodeFController{
             : Column(children: [
           UiUtils.getMarginBox(0, 0.5.h),
           UiUtils.getStyledTextWithFixedScale(certName, TextStyles.upFinBasicTextStyle, TextAlign.center, null)]),
-        GetController.to.isWait.value? UiUtils.getMarginBox(0, 3.h) : UiUtils.getMarginBox(0, 0.5.h),
+        GetController.to.isWait.value? UiUtils.getMarginBox(0, 2.h) : UiUtils.getMarginBox(0, 0.5.h),
         GetController.to.isWait.value? Column(children: [
           UiUtils.getStyledTextWithFixedScale("서류를 가지고 오는중입니다.", TextStyles.upFinBasicTextStyle, TextAlign.center, null),
-          UiUtils.getMarginBox(0, 0.5.h),
+          UiUtils.getMarginBox(0, 3.h),
           LinearPercentIndicator(
             animateFromLastPercent: true,
             alignment: MainAxisAlignment.center,

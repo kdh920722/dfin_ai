@@ -1664,10 +1664,10 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       pickedFilePath != "" ? Container() : SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("신분증을 준비해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 2.h),
 
-      pickedFilePath != "" ? SizedBox(width: 85.w,height: 2.5.h , child: UiUtils.getTextWithFixedScale("주민등록증 뒷자리가", 12.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)) :
+      pickedFilePath != "" ? SizedBox(width: 85.w,height: 2.5.h , child: UiUtils.getTextWithFixedScale("주민등록증 뒷자리는 가려져야합니다.", 12.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)) :
       SizedBox(width: 85.w,height: 2.5.h , child: UiUtils.getTextWithFixedScale("주민등록증 또는 운전면허증 중", 12.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
       pickedFilePath != "" ? UiUtils.getMarginBox(0, 0.5.h) : Container(),
-      pickedFilePath != "" ? SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("잘 가려졌는지 확인해주세요.", 12.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)) :
+      pickedFilePath != "" ? SizedBox(width: 85.w, child: Container()) :
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("하나를 촬영 해 주세요.", 12.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
 
       UiUtils.getMarginBox(0, 10.h),
@@ -1743,18 +1743,20 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           })
         ),
         Positioned(
-            top: 31.7.h,
+            top: 30.7.h,
             child: SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale2("아래 영역에 신분증을 위치해주세요", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null))
         ),
         Positioned(
             top: 8.h,
             child: SizedBox(width: 85.w, child: Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
               UiUtils.getRoundBoxTextWithFixedScale(" 🚨 안내사항 ", 11.sp, FontWeight.w600, TextAlign.start, ColorStyles.upFinWhite, ColorStyles.upFinBlack),
-              UiUtils.getMarginBox(0, 0.7.h),
+              UiUtils.getMarginBox(0, 1.h),
               UiUtils.getTextWithFixedScale2(
                   "1.신분증은 반드시 신분증 원본을 준비해주세요."
-                      "\n   신분증 사본(모니터/휴대폰 화면 촬영 등)으로 확인될 경우,\n   인식이 되지 않을 수 있습니다."
-                      "\n2.신분증을 어두운 배경에 두고, 밝은곳에서 촬영해주세요."
+                      "\n   신분증 사본(모니터/휴대폰 화면 촬영 등)으로 확인될 경우,\n   인식이 되지 않을 수 있습니다.", 10.sp, FontWeight.w300, ColorStyles.upFinWhite, TextAlign.start, null),
+              UiUtils.getMarginBox(0, 0.5.h),
+              UiUtils.getTextWithFixedScale2(
+                      "2.신분증을 어두운 배경에 두고, 밝은곳에서 촬영해주세요."
                       "\n   신분증의 홀로그램 부분에 빛이 반사되지 않도록\n   카메라 방향을 조정해주세요.", 10.sp, FontWeight.w300, ColorStyles.upFinWhite, TextAlign.start, null),
             ]))
         ),
@@ -2377,7 +2379,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                               setState(() { certType = 1; });
                             })),
                         UiUtils.getMarginBox(0, 1.h),
-                        UiUtils.getTextWithFixedScale("카카오톡", 12.sp, FontWeight.w500, certType == 1? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRealGray, TextAlign.start, null)
+                        UiUtils.getTextWithFixedScale("카카오톡", 12.sp, FontWeight.w500, certType == 1? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinBlack, TextAlign.start, null)
                       ]),
                       UiUtils.getMarginBox(5.w, 0),
                       Column(children: [
@@ -2386,7 +2388,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                               setState(() { certType = 6; });
                             })),
                         UiUtils.getMarginBox(0, 1.h),
-                        UiUtils.getTextWithFixedScale("네이버", 12.sp, FontWeight.w500, certType == 6? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRealGray, TextAlign.start, null)
+                        UiUtils.getTextWithFixedScale("네이버", 12.sp, FontWeight.w500, certType == 6? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinBlack, TextAlign.start, null)
                       ]),
                       UiUtils.getMarginBox(5.w, 0),
                       Column(children: [
@@ -2395,7 +2397,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                               setState(() { certType = 8; });
                             })),
                         UiUtils.getMarginBox(0, 1.h),
-                        UiUtils.getTextWithFixedScale("토스", 12.sp, FontWeight.w500, certType == 8? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRealGray, TextAlign.start, null)
+                        UiUtils.getTextWithFixedScale("토스", 12.sp, FontWeight.w500, certType == 8? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinBlack, TextAlign.start, null)
                       ]),
                       UiUtils.getMarginBox(5.w, 0),
                       Column(children: [
@@ -2404,13 +2406,13 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                               setState(() { certType = 5; });
                             })),
                         UiUtils.getMarginBox(0, 1.h),
-                        UiUtils.getTextWithFixedScale("PASS", 12.sp, FontWeight.w500, certType == 5? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRealGray, TextAlign.start, null)
+                        UiUtils.getTextWithFixedScale("PASS", 12.sp, FontWeight.w500, certType == 5? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinBlack, TextAlign.start, null)
                       ])
                     ])),
                     UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
                     UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinTextAndBorderBlue,
                         UiUtils.getTextWithFixedScale(_isDocsAllConfirmed(docsType) ? "인증완료" : !isErrorResult? "간편인증 진행하기" : "서류 다시 가져오기",
-                            14.sp, FontWeight.w500, !isErrorResult? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinRed, TextAlign.start, null), (){
+                            14.sp, FontWeight.w500, !isErrorResult? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null), (){
                           if(certType != 0){
                             GetController.to.updateWait(false);
                             CodeFController.isTimeOutException = false;
@@ -2432,7 +2434,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           }),
       UiUtils.getMarginBox(0, 1.2.h),
       isRetry? Container() : !_isDocsAllConfirmed(docsType)? UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
-          UiUtils.getTextWithFixedScale(isErrorResult? "다음에 할게요" : "다음에 할게요", 12.sp, FontWeight.w500, isErrorResult? ColorStyles.upFinRed : ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
+          UiUtils.getTextWithFixedScale(isErrorResult? "다음에 할게요" : "다음에 할게요", 12.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
             nextInputView();
           }) : Container()
     ]);
@@ -2511,8 +2513,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           String errorMsg = "";
           if(resultMap.containsKey("result_codef_code") && resultMap["result_codef_code"] != ""){
             errorMsg = CodeFController.getErrorMsg(resultMap["result_codef_code"]);
-            textColor = errorTextColor;
-            checkColor = errorTextColor;
+            textColor = ColorStyles.upFinBlack;
+            checkColor = ColorStyles.upFinGray;
             fontWeight = FontWeight.w500;
             name += " 실패";
             isError = true;
@@ -2533,7 +2535,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                     ]),
                     errorMsg != "" ? Row(children: [
                       UiUtils.getMarginBox(12.w, 0),
-                      UiUtils.getTextButtonWithFixedScale("* $errorMsg", 11.sp, FontWeight.w300, textColor, TextAlign.start, null, (){})
+                      UiUtils.getTextButtonWithFixedScale("$errorMsg", 12.sp, FontWeight.w300, errorTextColor, TextAlign.start, null, (){})
                     ]) : UiUtils.getMarginBox(0, 0),
                   ])
               )
@@ -2569,8 +2571,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           String errorMsg = "";
           if(resultMap.containsKey("result_codef_code") && resultMap["result_codef_code"] != ""){
             errorMsg = CodeFController.getErrorMsg(resultMap["result_codef_code"]);
-            textColor = errorTextColor;
-            checkColor = errorTextColor;
+            textColor = ColorStyles.upFinBlack;
+            checkColor = ColorStyles.upFinGray;
             fontWeight = FontWeight.w500;
             name += " 실패";
             isError = true;
@@ -2591,7 +2593,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                     ]),
                     errorMsg != "" ? Row(children: [
                       UiUtils.getMarginBox(12.w, 0),
-                      UiUtils.getTextButtonWithFixedScale("* $errorMsg", 11.sp, FontWeight.w300, textColor, TextAlign.start, null, (){})
+                      UiUtils.getTextButtonWithFixedScale("$errorMsg", 12.sp, FontWeight.w300, errorTextColor, TextAlign.start, null, (){})
                     ]) : UiUtils.getMarginBox(0, 0),
                   ])
               )
@@ -2620,8 +2622,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             checkColor = successCheckedColor;
             fontWeight = FontWeight.w600;
           }else if(_setDocResultText(each["result"]) == 2){
-            textColor = errorTextColor;
-            checkColor = errorTextColor;
+            textColor = ColorStyles.upFinBlack;
+            checkColor = ColorStyles.upFinGray;
             fontWeight = FontWeight.w500;
             name += " 실패";
             isError = true;
@@ -2653,7 +2655,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                     ]),
                     errorMsg != "" ? Row(children: [
                       UiUtils.getMarginBox(12.w, 0),
-                      UiUtils.getTextButtonWithFixedScale("* $errorMsg", 11.sp, FontWeight.w300, textColor, TextAlign.start, null, (){})
+                      UiUtils.getTextButtonWithFixedScale("$errorMsg", 12.sp, FontWeight.w300, errorTextColor, TextAlign.start, null, (){})
                     ]) : UiUtils.getMarginBox(0, 0),
                   ])
               )

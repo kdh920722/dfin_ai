@@ -36,6 +36,8 @@ class Config{
   static List<Permission> permissionList = [Permission.notification, Permission.camera, Permission.phone, Permission.microphone];
   static String appVersion = "";
   static String appStoreUrl = "";
+  static String privacyUrl = "";
+  static String privacyText = "";
   static BuildContext? contextForEmergencyBack;
   static bool isEmergencyRoot = false;
   static FlutterDownloader flutterDownloader = FlutterDownloader();
@@ -75,6 +77,8 @@ class Config{
             case "info_text" : appInfoTextMap["info_text"] = each.value.toString();
             case "close_version" : appInfoTextMap["close_text_version"] = int.parse(each.value.toString());
             case "info_version" : appInfoTextMap["info_text_version"] = int.parse(each.value.toString());
+            case "privacy_url" : privacyUrl = each.value.toString();
+            case "privacy_text" : privacyText = each.value.toString();
           }
         }
       }else{

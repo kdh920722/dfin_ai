@@ -266,6 +266,13 @@ class UiUtils {
         child: IconButton(constraints: const BoxConstraints(), padding: EdgeInsets.zero, onPressed: onPressedCallback, icon: Icon(icon, color: iconColor, size: size)));
   }
 
+  static Widget getIconButtonWithHeight2(double height, IconData icon, double size, Color iconColor, VoidCallback onPressedCallback) {
+    return SizedBox(height: height,
+        width : 6.w,
+        child: IconButton(constraints: const BoxConstraints(), padding: EdgeInsets.zero, onPressed: onPressedCallback, icon: Icon(icon, color: iconColor, size: size)));
+  }
+
+
   static Widget getBackButton(VoidCallback onPressedCallback) {
     return SizedBox(
         width : 15.w,
@@ -491,21 +498,18 @@ class UiUtils {
     );
   }
 
-  static SizedBox getBorderButtonBoxForRound2(double buttonWidth, Color buttonColor, Color borderColor, Widget childWidget, VoidCallback onPressedCallback){
-    return SizedBox(
-        width: buttonWidth,
-        child: ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            padding: EdgeInsets.only(left: 2.w, right: 2.w, top: 0, bottom: 0),
-            backgroundColor: buttonColor,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            side: BorderSide(width: 1.3, color: borderColor),
-            elevation: 0.0,
-            shadowColor: ColorStyles.upFinGray,
-          ),
-          onPressed: onPressedCallback,
-          child: childWidget,
-        )
+  static Widget getBorderButtonBoxForRound2(Color buttonColor, Color borderColor, Widget childWidget, VoidCallback onPressedCallback){
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        padding: EdgeInsets.only(left: 1.w, right: 1.w, top: 0, bottom: 0),
+        backgroundColor: buttonColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        side: BorderSide(color: borderColor),
+        elevation: 0.0,
+        shadowColor: ColorStyles.upFinGray,
+      ),
+      onPressed: onPressedCallback,
+      child: childWidget,
     );
   }
 
