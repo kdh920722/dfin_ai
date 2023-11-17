@@ -1573,7 +1573,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                   alignment: Alignment.topCenter,
                   child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                     UiUtils.getMarginBox(0, 2.5.h),
-                    UiUtils.getTextWithFixedScale(currentCompany, 16.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.center, 1),
+                    UiUtils.getTextWithFixedScale(currentCompany, 15.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.center, 1),
                     //UiUtils.getMarginBox(0, 1.h),
                   ])
               ),
@@ -1589,7 +1589,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                         String statusName = LoanInfoData.getDetailStatusName(GetController.to.chatStatusTick.value.toString());
                         return UiUtils.getBorderButtonBoxForRound2(ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
                             Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment:MainAxisAlignment.center, children: [
-                              UiUtils.getMarginBox(2.w, 0),
+                              UiUtils.getMarginBox(1.5.w, 0),
                               UiUtils.getTextWithFixedScale(statusName, 10.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
                               Icon(GetController.to.isShowStatus.value? Icons.keyboard_arrow_up_outlined : Icons.keyboard_arrow_down_outlined, color: ColorStyles.upFinBlack, size: 4.w)
                             ]), () {
