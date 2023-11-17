@@ -403,7 +403,7 @@ class WebSocketController {
           retryCheckTimer = null;
           retryTimerCount = 0;
           isRetryStarted = false;
-          GetController.to.updateAllSubScribed(true);
+          //GetController.to.updateAllSubScribed(true);
         }
       });
     }
@@ -415,34 +415,30 @@ class WebSocketController {
         LogfinController.getLoanInfo((isSuccess, isNotEmpty){
           if(isSuccess){
             if(!isNotEmpty){
-              Future.delayed(Duration(seconds: retryTimerCount >= 13? 4:1), () async {
-                if(isRetryStarted){
-                  _retryToConnectNewVer(connectedKey);
-                }else{
-                  AppChatViewState.isViewHere = false;
-                  AppMainViewState.isViewHere = false;
-                  CommonUtils.emergencyBackToHome();
-                }
-              });
-            }else{
-              connectionInfoMap[connectedKey] = true;
-              if(retryCheckTimer != null) retryCheckTimer!.cancel();
-              retryCheckTimer = null;
-              retryTimerCount = 0;
-              isRetryStarted = false;
-              connectionInfoMap = {};
-              GetController.to.updateAllSubScribed(true);
-            }
-          }else{
-            Future.delayed(Duration(seconds: retryTimerCount >= 13? 4:1), () async {
               if(isRetryStarted){
+                connectionInfoMap[connectedKey] = true;
                 _retryToConnectNewVer(connectedKey);
               }else{
                 AppChatViewState.isViewHere = false;
                 AppMainViewState.isViewHere = false;
                 CommonUtils.emergencyBackToHome();
               }
-            });
+            }else{
+              if(retryCheckTimer != null) retryCheckTimer!.cancel();
+              retryCheckTimer = null;
+              retryTimerCount = 0;
+              isRetryStarted = false;
+              connectionInfoMap = {};
+            }
+          }else{
+            if(isRetryStarted){
+              connectionInfoMap[connectedKey] = true;
+              _retryToConnectNewVer(connectedKey);
+            }else{
+              AppChatViewState.isViewHere = false;
+              AppMainViewState.isViewHere = false;
+              CommonUtils.emergencyBackToHome();
+            }
           }
         });
       }
