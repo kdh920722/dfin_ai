@@ -1827,6 +1827,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                         List<String> licenseNumList = licenseNum.split("-");
                         Map<String, dynamic> inputJson = {};
                         bool isCheckNeeded = false;
+                        bool isValid = true;
                         if(licenseNumList.length == 4){
                           inputJson = {
                             "ownerNm": MyData.name,
@@ -1838,7 +1839,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                             "serialNo": map["code"][0]["formatted"]["value"]
                           };
                         }else if(licenseNumList.length == 3){
-                          isCheckNeeded = true;
                           inputJson = {
                             "ownerNm": MyData.name,
                             "juminNo": MyData.birth,
@@ -1849,6 +1849,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                             "serialNo": map["code"][0]["formatted"]["value"]
                           };
                         }else{
+                          isValid = false;
                           isCheckNeeded = true;
                           inputJson = {
                             "ownerNm": MyData.name,
@@ -1861,126 +1862,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                           };
                         }
 
-                        if(isCheckNeeded){
-                          if(context.mounted){
-                            UiUtils.closeLoadingPop(context);
-                            UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, 80.h, 0.5, (slideContext, slideSetState){
-                              _dlNumInfoTextController1.addListener((){
-                                if(_dlNumInfoTextController1.text.trim().length > 2){
-                                  _dlNumInfoTextController1.text = _dlNumInfoTextController1.text.trim().substring(0,2);
-                                }
-                              });
-                              _dlNumInfoTextController2.addListener((){
-                                if(_dlNumInfoTextController2.text.trim().length > 2){
-                                  _dlNumInfoTextController2.text = _dlNumInfoTextController2.text.trim().substring(0,2);
-                                }
-                              });
-                              _dlNumInfoTextController3.addListener((){
-                                if(_dlNumInfoTextController3.text.trim().length > 7){
-                                  _dlNumInfoTextController3.text = _dlNumInfoTextController3.text.trim().substring(0,7);
-                                }
-                              });
-                              _dlNumInfoTextController4.addListener((){
-                                if(_dlNumInfoTextController4.text.trim().length > 2){
-                                  _dlNumInfoTextController4.text = _dlNumInfoTextController4.text.trim().substring(0,2);
-                                }
-                              });
-
-                              _dlNumInfoTextControllerSerial.addListener((){
-                                if(_dlNumInfoTextControllerSerial.text.trim().length > 7){
-                                  _dlNumInfoTextControllerSerial.text = _dlNumInfoTextControllerSerial.text.trim().substring(0,8);
-                                }
-                              });
-
-                              _dlNumInfoTextController1.text = inputJson["licence01"].toString();
-                              _dlNumInfoTextController2.text = inputJson["licence02"].toString();
-                              _dlNumInfoTextController3.text = inputJson["licence03"].toString();
-                              _dlNumInfoTextController4.text = inputJson["licence04"].toString();
-                              _dlNumInfoTextControllerSerial.text = inputJson["serialNo"].toString();
-                              return Material(
-                                  child: Container(color: ColorStyles.upFinWhite,
-                                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.start, children:
-                                      [
-                                        Row(children: [
-                                          const Spacer(flex: 2),
-                                          UiUtils.getIconButton(Icons.close, 7.w, ColorStyles.upFinRealGray, () {
-                                            CommonUtils.hideKeyBoard();
-                                            Navigator.pop(slideContext);
-                                            _setConfirmedToDocItemByViewId(currentViewId, false);
-                                            setState(() {
-                                              pickedFilePath = "";
-                                            });
-                                          }),
-                                        ]),
-                                        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("상세정보를 확인해주시고", 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
-                                        UiUtils.getMarginBox(0, 0.5.h),
-                                        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("맞다면, 확인을 눌러주세요!", 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
-                                        UiUtils.getMarginBox(0, 4.h),
-                                        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("면허번호", 13.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null)),
-                                        UiUtils.getMarginBox(0, 0.5.h),
-                                        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("예)'11-11-012345-67' 또는 '경남-11-012345-67'", 10.sp, FontWeight.w300, ColorStyles.upFinDarkGray, TextAlign.start, null)),
-
-                                        SizedBox(width: 90.w, height: 7.h, child: Row(crossAxisAlignment:CrossAxisAlignment.center, children: [
-                                          UiUtils.getTextField(slideContext, 15.w, TextStyles.upFinTextFormFieldTextStyle, _dlNumInfoFocus1, _dlNumInfoTextController1, TextInputType.text,
-                                              UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
-                                          Column(mainAxisAlignment:MainAxisAlignment.center, children: [UiUtils.getMarginBox(0, 1.6.w), UiUtils.getTextWithFixedScale("-", 15.sp, FontWeight.w400, ColorStyles.upFinRealGray, TextAlign.center, null)]),
-                                          UiUtils.getTextField(slideContext, 13.w, TextStyles.upFinTextFormFieldTextStyle, _dlNumInfoFocus2, _dlNumInfoTextController2, TextInputType.text,
-                                              UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
-                                          Column(mainAxisAlignment:MainAxisAlignment.center, children: [UiUtils.getMarginBox(0, 1.6.w), UiUtils.getTextWithFixedScale("-", 15.sp, FontWeight.w400, ColorStyles.upFinRealGray, TextAlign.center, null)]),
-                                          UiUtils.getTextField(slideContext, 30.w, TextStyles.upFinTextFormFieldTextStyle, _dlNumInfoFocus3, _dlNumInfoTextController3, TextInputType.text,
-                                              UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
-                                          Column(mainAxisAlignment:MainAxisAlignment.center, children: [UiUtils.getMarginBox(0, 1.6.w), UiUtils.getTextWithFixedScale("-", 15.sp, FontWeight.w400, ColorStyles.upFinRealGray, TextAlign.center, null)]),
-                                          UiUtils.getTextField(slideContext, 13.w, TextStyles.upFinTextFormFieldTextStyle, _dlNumInfoFocus4, _dlNumInfoTextController4, TextInputType.text,
-                                              UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
-                                        ])),
-                                        UiUtils.getMarginBox(0, 7.w),
-                                        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("일련번호", 13.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null)),
-                                        SizedBox(width: 30.w, height: 7.h, child: UiUtils.getTextField(slideContext, 30.w, TextStyles.upFinTextFormFieldTextStyle, _dlNumInfoFocusSerial, _dlNumInfoTextControllerSerial, TextInputType.text,
-                                            UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { })),
-                                        UiUtils.getMarginBox(0, 7.w),
-                                        UiUtils.getExpandedScrollView(Axis.vertical, Container()),
-                                        UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                                            UiUtils.getTextWithFixedScale("확인", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), (){
-                                              CommonUtils.hideKeyBoard();
-                                              inputJson["licence01"] = _dlNumInfoTextController1.text.trim();
-                                              inputJson["licence02"] = _dlNumInfoTextController2.text.trim();
-                                              inputJson["licence03"] = _dlNumInfoTextController3.text.trim();
-                                              inputJson["licence04"] = _dlNumInfoTextController4.text.trim();
-                                              inputJson["serialNo"] = _dlNumInfoTextControllerSerial.text.trim();
-                                              UiUtils.showLoadingPop(slideContext);
-                                              HyphenController.callHyphenApiForCert(HyphenApis.driveIdCert, inputJson, (isSuccessToCertId){
-                                                UiUtils.closeLoadingPop(slideContext);
-                                                Navigator.pop(slideContext);
-                                                if(isSuccessToCertId){
-                                                  _setConfirmedToDocItemByViewId(currentViewId, true);
-                                                  Map<String, dynamic> resultMap = {
-                                                    "resultValue" : croppedImagePath
-                                                  };
-                                                  _setResultToListById(cameraId, resultMap);
-                                                  setState(() {
-                                                    pickedFilePath = croppedImagePath;
-                                                  });
-                                                }else{
-                                                  _setConfirmedToDocItemByViewId(currentViewId, false);
-                                                  Map<String, dynamic> resultMap = {
-                                                    "resultValue" : {}
-                                                  };
-                                                  _setResultToListById(cameraId, resultMap);
-                                                  setState(() {
-                                                    pickedFilePath = "";
-                                                  });
-                                                }
-                                              });
-                                            }),
-                                        Config.isAndroid? Container() : UiUtils.getMarginBox(0, 3.h),
-                                      ])
-                                  )
-                              );
-                            });
-                          }
-                        }else{
-                          HyphenController.callHyphenApiForCert(HyphenApis.driveIdCert, inputJson, (isSuccessToCertId){
-                            UiUtils.closeLoadingPop(context);
+                        if(isValid){
+                          await HyphenController.callHyphenApiForCert(HyphenApis.driveIdCert, inputJson, (isSuccessToCertId){
                             if(isSuccessToCertId){
                               _setConfirmedToDocItemByViewId(currentViewId, true);
                               Map<String, dynamic> resultMap = {
@@ -1991,16 +1874,285 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                                 pickedFilePath = croppedImagePath;
                               });
                             }else{
-                              _setConfirmedToDocItemByViewId(currentViewId, false);
-                              Map<String, dynamic> resultMap = {
-                                "resultValue" : {}
-                              };
-                              _setResultToListById(cameraId, resultMap);
-                              setState(() {
-                                pickedFilePath = "";
-                              });
+                              CommonUtils.log("w","fff");
+                              isCheckNeeded = true;
+                            }
+
+                            if(isCheckNeeded){
+                              if(context.mounted){
+                                UiUtils.closeLoadingPop(context);
+                                UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, 80.h, 0.5, (slideContext, slideSetState){
+                                  _dlNumInfoTextController1.addListener((){
+                                    if(_dlNumInfoTextController1.text.trim().length > 2){
+                                      _dlNumInfoTextController1.text = _dlNumInfoTextController1.text.trim().substring(0,2);
+                                    }
+                                  });
+                                  _dlNumInfoTextController2.addListener((){
+                                    if(_dlNumInfoTextController2.text.trim().length > 2){
+                                      _dlNumInfoTextController2.text = _dlNumInfoTextController2.text.trim().substring(0,2);
+                                    }
+                                  });
+                                  _dlNumInfoTextController3.addListener((){
+                                    if(_dlNumInfoTextController3.text.trim().length > 7){
+                                      _dlNumInfoTextController3.text = _dlNumInfoTextController3.text.trim().substring(0,7);
+                                    }
+                                  });
+                                  _dlNumInfoTextController4.addListener((){
+                                    if(_dlNumInfoTextController4.text.trim().length > 2){
+                                      _dlNumInfoTextController4.text = _dlNumInfoTextController4.text.trim().substring(0,2);
+                                    }
+                                  });
+
+                                  _dlNumInfoTextControllerSerial.addListener((){
+                                    if(_dlNumInfoTextControllerSerial.text.trim().length > 7){
+                                      _dlNumInfoTextControllerSerial.text = _dlNumInfoTextControllerSerial.text.trim().substring(0,8);
+                                    }
+                                  });
+
+                                  _dlNumInfoTextController1.text = inputJson["licence01"].toString();
+                                  _dlNumInfoTextController2.text = inputJson["licence02"].toString();
+                                  _dlNumInfoTextController3.text = inputJson["licence03"].toString();
+                                  _dlNumInfoTextController4.text = inputJson["licence04"].toString();
+                                  _dlNumInfoTextControllerSerial.text = inputJson["serialNo"].toString();
+                                  return Material(
+                                      child: Container(color: ColorStyles.upFinWhite,
+                                          child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.start, children:
+                                          [
+                                            Row(children: [
+                                              const Spacer(flex: 2),
+                                              UiUtils.getIconButton(Icons.close, 7.w, ColorStyles.upFinRealGray, () {
+                                                CommonUtils.hideKeyBoard();
+                                                Navigator.pop(slideContext);
+                                                _setConfirmedToDocItemByViewId(currentViewId, false);
+                                                setState(() {
+                                                  pickedFilePath = "";
+                                                });
+                                              }),
+                                            ]),
+                                            SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("인식되지 않은 정보가 있습니다.", 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
+                                            UiUtils.getMarginBox(0, 0.5.h),
+                                            SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("정보를 확인 해 주세요!", 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
+                                            UiUtils.getMarginBox(0, 2.h),
+                                            SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("면허번호", 13.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null)),
+                                            UiUtils.getMarginBox(0, 0.5.h),
+                                            SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("예) '11-11-012345-67' 또는 '경남-11-012345-67'", 10.sp, FontWeight.w300, ColorStyles.upFinDarkGray, TextAlign.start, null)),
+                                            UiUtils.getMarginBox(0, 0.5.h),
+                                            SizedBox(width: 90.w, child: Row(crossAxisAlignment:CrossAxisAlignment.center, children: [
+                                              UiUtils.getTextField(slideContext, 15.w, TextStyles.upFinTextFormFieldTextStyle, _dlNumInfoFocus1, _dlNumInfoTextController1, TextInputType.text,
+                                                  UiUtils.getCertCheckInputDecoration(), (value) { }),
+                                              Column(mainAxisAlignment:MainAxisAlignment.center, children: [UiUtils.getMarginBox(0, 1.6.w), UiUtils.getTextWithFixedScale("-", 15.sp, FontWeight.w400, ColorStyles.upFinRealGray, TextAlign.center, null)]),
+                                              UiUtils.getTextField(slideContext, 13.w, TextStyles.upFinTextFormFieldTextStyle, _dlNumInfoFocus2, _dlNumInfoTextController2, TextInputType.text,
+                                                  UiUtils.getCertCheckInputDecoration(), (value) { }),
+                                              Column(mainAxisAlignment:MainAxisAlignment.center, children: [UiUtils.getMarginBox(0, 1.6.w), UiUtils.getTextWithFixedScale("-", 15.sp, FontWeight.w400, ColorStyles.upFinRealGray, TextAlign.center, null)]),
+                                              UiUtils.getTextField(slideContext, 26.w, TextStyles.upFinTextFormFieldTextStyle, _dlNumInfoFocus3, _dlNumInfoTextController3, TextInputType.text,
+                                                  UiUtils.getCertCheckInputDecoration(), (value) { }),
+                                              Column(mainAxisAlignment:MainAxisAlignment.center, children: [UiUtils.getMarginBox(0, 1.6.w), UiUtils.getTextWithFixedScale("-", 15.sp, FontWeight.w400, ColorStyles.upFinRealGray, TextAlign.center, null)]),
+                                              UiUtils.getTextField(slideContext, 13.w, TextStyles.upFinTextFormFieldTextStyle, _dlNumInfoFocus4, _dlNumInfoTextController4, TextInputType.text,
+                                                  UiUtils.getCertCheckInputDecoration(), (value) { }),
+                                            ])),
+                                            UiUtils.getMarginBox(0, 7.w),
+                                            SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("일련번호", 13.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null)),
+                                            UiUtils.getMarginBox(0, 0.5.h),
+                                            SizedBox(width: 30.w, child: UiUtils.getTextField(slideContext, 26.w, TextStyles.upFinTextFormFieldTextStyle, _dlNumInfoFocusSerial, _dlNumInfoTextControllerSerial, TextInputType.text,
+                                                UiUtils.getCertCheckInputDecoration(), (value) { })),
+                                            UiUtils.getMarginBox(0, 7.w),
+                                            UiUtils.getExpandedScrollView(Axis.vertical, Container()),
+                                            UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+                                                UiUtils.getTextWithFixedScale("확인", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), (){
+                                                  if(_dlNumInfoTextController1.text.trim() == "" || _dlNumInfoTextController2.text.trim() == ""
+                                                      || _dlNumInfoTextController3.text.trim() == "" || _dlNumInfoTextController4.text.trim() == ""){
+                                                    CommonUtils.flutterToast("정보를 확인해 주세요.");
+                                                  }else{
+                                                    CommonUtils.hideKeyBoard();
+                                                    inputJson["licence01"] = _dlNumInfoTextController1.text.trim();
+                                                    inputJson["licence02"] = _dlNumInfoTextController2.text.trim();
+                                                    inputJson["licence03"] = _dlNumInfoTextController3.text.trim();
+                                                    inputJson["licence04"] = _dlNumInfoTextController4.text.trim();
+                                                    inputJson["serialNo"] = _dlNumInfoTextControllerSerial.text.trim();
+                                                    UiUtils.showLoadingPop(slideContext);
+                                                    HyphenController.callHyphenApiForCert(HyphenApis.driveIdCert, inputJson, (isSuccessToCertId){
+                                                      UiUtils.closeLoadingPop(slideContext);
+                                                      Navigator.pop(slideContext);
+                                                      if(isSuccessToCertId){
+                                                        _setConfirmedToDocItemByViewId(currentViewId, true);
+                                                        Map<String, dynamic> resultMap = {
+                                                          "resultValue" : croppedImagePath
+                                                        };
+                                                        _setResultToListById(cameraId, resultMap);
+                                                        setState(() {
+                                                          pickedFilePath = croppedImagePath;
+                                                        });
+                                                      }else{
+                                                        _setConfirmedToDocItemByViewId(currentViewId, false);
+                                                        Map<String, dynamic> resultMap = {
+                                                          "resultValue" : {}
+                                                        };
+                                                        _setResultToListById(cameraId, resultMap);
+                                                        setState(() {
+                                                          pickedFilePath = "";
+                                                        });
+                                                      }
+                                                    });
+                                                  }
+                                                }),
+                                            Config.isAndroid? Container() : UiUtils.getMarginBox(0, 3.h),
+                                          ])
+                                      )
+                                  );
+                                });
+                              }
+                            }else{
+                              UiUtils.closeLoadingPop(context);
                             }
                           });
+                        }else{
+                          if(isCheckNeeded){
+                            if(context.mounted){
+                              UiUtils.closeLoadingPop(context);
+                              UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, 80.h, 0.5, (slideContext, slideSetState){
+                                _dlNumInfoTextController1.addListener((){
+                                  if(_dlNumInfoTextController1.text.trim().length > 2){
+                                    _dlNumInfoTextController1.text = _dlNumInfoTextController1.text.trim().substring(0,2);
+                                  }
+                                });
+                                _dlNumInfoTextController2.addListener((){
+                                  if(_dlNumInfoTextController2.text.trim().length > 2){
+                                    _dlNumInfoTextController2.text = _dlNumInfoTextController2.text.trim().substring(0,2);
+                                  }
+                                });
+                                _dlNumInfoTextController3.addListener((){
+                                  if(_dlNumInfoTextController3.text.trim().length > 7){
+                                    _dlNumInfoTextController3.text = _dlNumInfoTextController3.text.trim().substring(0,7);
+                                  }
+                                });
+                                _dlNumInfoTextController4.addListener((){
+                                  if(_dlNumInfoTextController4.text.trim().length > 2){
+                                    _dlNumInfoTextController4.text = _dlNumInfoTextController4.text.trim().substring(0,2);
+                                  }
+                                });
+
+                                _dlNumInfoTextControllerSerial.addListener((){
+                                  if(_dlNumInfoTextControllerSerial.text.trim().length > 7){
+                                    _dlNumInfoTextControllerSerial.text = _dlNumInfoTextControllerSerial.text.trim().substring(0,8);
+                                  }
+                                });
+
+                                _dlNumInfoTextController1.text = inputJson["licence01"].toString();
+                                _dlNumInfoTextController2.text = inputJson["licence02"].toString();
+                                _dlNumInfoTextController3.text = inputJson["licence03"].toString();
+                                _dlNumInfoTextController4.text = inputJson["licence04"].toString();
+                                _dlNumInfoTextControllerSerial.text = inputJson["serialNo"].toString();
+                                return Material(
+                                    child: Container(color: ColorStyles.upFinWhite,
+                                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.start, children:
+                                        [
+                                          Row(children: [
+                                            const Spacer(flex: 2),
+                                            UiUtils.getIconButton(Icons.close, 7.w, ColorStyles.upFinRealGray, () {
+                                              CommonUtils.hideKeyBoard();
+                                              Navigator.pop(slideContext);
+                                              _setConfirmedToDocItemByViewId(currentViewId, false);
+                                              setState(() {
+                                                pickedFilePath = "";
+                                              });
+                                            }),
+                                          ]),
+                                          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("인식되지 않은 정보가 있습니다.", 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
+                                          UiUtils.getMarginBox(0, 0.5.h),
+                                          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("정보를 확인 해 주세요!", 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
+                                          UiUtils.getMarginBox(0, 2.h),
+                                          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("면허번호", 13.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null)),
+                                          UiUtils.getMarginBox(0, 0.5.h),
+                                          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("예) '11-11-012345-67' 또는 '경남-11-012345-67'", 10.sp, FontWeight.w300, ColorStyles.upFinDarkGray, TextAlign.start, null)),
+                                          UiUtils.getMarginBox(0, 0.5.h),
+                                          SizedBox(width: 90.w, child: Row(crossAxisAlignment:CrossAxisAlignment.center, children: [
+                                            UiUtils.getTextField(slideContext, 15.w, TextStyles.upFinTextFormFieldTextStyle, _dlNumInfoFocus1, _dlNumInfoTextController1, TextInputType.text,
+                                                UiUtils.getCertCheckInputDecoration(), (value) { }),
+                                            Column(mainAxisAlignment:MainAxisAlignment.center, children: [UiUtils.getMarginBox(0, 1.6.w), UiUtils.getTextWithFixedScale("-", 15.sp, FontWeight.w400, ColorStyles.upFinRealGray, TextAlign.center, null)]),
+                                            UiUtils.getTextField(slideContext, 13.w, TextStyles.upFinTextFormFieldTextStyle, _dlNumInfoFocus2, _dlNumInfoTextController2, TextInputType.text,
+                                                UiUtils.getCertCheckInputDecoration(), (value) { }),
+                                            Column(mainAxisAlignment:MainAxisAlignment.center, children: [UiUtils.getMarginBox(0, 1.6.w), UiUtils.getTextWithFixedScale("-", 15.sp, FontWeight.w400, ColorStyles.upFinRealGray, TextAlign.center, null)]),
+                                            UiUtils.getTextField(slideContext, 26.w, TextStyles.upFinTextFormFieldTextStyle, _dlNumInfoFocus3, _dlNumInfoTextController3, TextInputType.text,
+                                                UiUtils.getCertCheckInputDecoration(), (value) { }),
+                                            Column(mainAxisAlignment:MainAxisAlignment.center, children: [UiUtils.getMarginBox(0, 1.6.w), UiUtils.getTextWithFixedScale("-", 15.sp, FontWeight.w400, ColorStyles.upFinRealGray, TextAlign.center, null)]),
+                                            UiUtils.getTextField(slideContext, 13.w, TextStyles.upFinTextFormFieldTextStyle, _dlNumInfoFocus4, _dlNumInfoTextController4, TextInputType.text,
+                                                UiUtils.getCertCheckInputDecoration(), (value) { }),
+                                          ])),
+                                          UiUtils.getMarginBox(0, 7.w),
+                                          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("일련번호", 13.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null)),
+                                          UiUtils.getMarginBox(0, 0.5.h),
+                                          SizedBox(width: 30.w, child: UiUtils.getTextField(slideContext, 26.w, TextStyles.upFinTextFormFieldTextStyle, _dlNumInfoFocusSerial, _dlNumInfoTextControllerSerial, TextInputType.text,
+                                              UiUtils.getCertCheckInputDecoration(), (value) { })),
+                                          UiUtils.getMarginBox(0, 7.w),
+                                          UiUtils.getExpandedScrollView(Axis.vertical, Container()),
+                                          UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+                                              UiUtils.getTextWithFixedScale("확인", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), (){
+                                                if(_dlNumInfoTextController1.text.trim() == "" || _dlNumInfoTextController2.text.trim() == ""
+                                                    || _dlNumInfoTextController3.text.trim() == "" || _dlNumInfoTextController4.text.trim() == ""){
+                                                  CommonUtils.flutterToast("정보를 확인해 주세요.");
+                                                }else{
+                                                  CommonUtils.hideKeyBoard();
+                                                  inputJson["licence01"] = _dlNumInfoTextController1.text.trim();
+                                                  inputJson["licence02"] = _dlNumInfoTextController2.text.trim();
+                                                  inputJson["licence03"] = _dlNumInfoTextController3.text.trim();
+                                                  inputJson["licence04"] = _dlNumInfoTextController4.text.trim();
+                                                  inputJson["serialNo"] = _dlNumInfoTextControllerSerial.text.trim();
+                                                  UiUtils.showLoadingPop(slideContext);
+                                                  HyphenController.callHyphenApiForCert(HyphenApis.driveIdCert, inputJson, (isSuccessToCertId){
+                                                    UiUtils.closeLoadingPop(slideContext);
+                                                    Navigator.pop(slideContext);
+                                                    if(isSuccessToCertId){
+                                                      _setConfirmedToDocItemByViewId(currentViewId, true);
+                                                      Map<String, dynamic> resultMap = {
+                                                        "resultValue" : croppedImagePath
+                                                      };
+                                                      _setResultToListById(cameraId, resultMap);
+                                                      setState(() {
+                                                        pickedFilePath = croppedImagePath;
+                                                      });
+                                                    }else{
+                                                      _setConfirmedToDocItemByViewId(currentViewId, false);
+                                                      Map<String, dynamic> resultMap = {
+                                                        "resultValue" : {}
+                                                      };
+                                                      _setResultToListById(cameraId, resultMap);
+                                                      setState(() {
+                                                        pickedFilePath = "";
+                                                      });
+                                                    }
+                                                  });
+                                                }
+                                              }),
+                                          Config.isAndroid? Container() : UiUtils.getMarginBox(0, 3.h),
+                                        ])
+                                    )
+                                );
+                              });
+                            }
+                          }else{
+                            HyphenController.callHyphenApiForCert(HyphenApis.driveIdCert, inputJson, (isSuccessToCertId){
+                              UiUtils.closeLoadingPop(context);
+                              if(isSuccessToCertId){
+                                _setConfirmedToDocItemByViewId(currentViewId, true);
+                                Map<String, dynamic> resultMap = {
+                                  "resultValue" : croppedImagePath
+                                };
+                                _setResultToListById(cameraId, resultMap);
+                                setState(() {
+                                  pickedFilePath = croppedImagePath;
+                                });
+                              }else{
+                                _setConfirmedToDocItemByViewId(currentViewId, false);
+                                Map<String, dynamic> resultMap = {
+                                  "resultValue" : {}
+                                };
+                                _setResultToListById(cameraId, resultMap);
+                                setState(() {
+                                  pickedFilePath = "";
+                                });
+                              }
+                            });
+                          }
                         }
                       }else{
                         CommonUtils.log("d", "ic : infos\n${map["issueDate"][0]["formatted"]["year"]}${map["issueDate"][0]["formatted"]["month"]}${map["issueDate"][0]["formatted"]["day"]}");

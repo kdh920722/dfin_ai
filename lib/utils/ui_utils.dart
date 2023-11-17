@@ -744,6 +744,30 @@ class UiUtils {
     );
   }
 
+  static InputDecoration getCertCheckInputDecoration(){
+    return InputDecoration(
+        floatingLabelBehavior: FloatingLabelBehavior.never,
+        labelStyle: TextStyle(fontSize: 0.sp),
+        errorStyle: TextStyle(fontSize: 0.sp),
+        counterStyle: TextStyle(fontSize: 0.sp),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(width: 0.3.w, color: ColorStyles.upFinGray),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(width: 0.3.w, color: ColorStyles.upFinGray),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(10),
+          borderSide: BorderSide(width: 0.3.w, color: ColorStyles.upFinGray),
+        ),
+        filled: true,
+        fillColor: ColorStyles.upFinWhite
+    );
+  }
+
+
   static bool isLoadingPopOn = false;
   static void showLoadingPop(BuildContext targetContext){
     if(!isLoadingPopOn){

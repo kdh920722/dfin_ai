@@ -731,8 +731,11 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
     bool isLoading = true;
     return GestureDetector(
         child: Container(
-            color: ColorStyles.upFinBlack,
             alignment: Alignment.center,
+            decoration: const BoxDecoration(
+              color: ColorStyles.upFinBlack,
+              borderRadius: BorderRadius.all(Radius.circular(5)),
+            ),
             constraints: BoxConstraints(maxWidth: 70.w, maxHeight: 70.w, minWidth: 20.w, minHeight: 20.w),
             child: FutureBuilder(
               future: _loadImageAsync(), // 이미지 로딩을 처리하는 비동기 함수
