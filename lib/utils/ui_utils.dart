@@ -224,12 +224,13 @@ class UiUtils {
     return SelectableText(textScaleFactor: 1.0, text, style: textStyle, textAlign: textAlign, maxLines: textMaxLine);
   }
 
-  static Widget getTextWithUnderline(String text, TextStyle textStyle, Color underlineColor, VoidCallback? onPressedCallback){
+  static Widget getTextWithUnderline(String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign textAlign, int? textMaxLine, Color underlineColor){
     return Column(mainAxisSize: MainAxisSize.max,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[Container(padding: EdgeInsets.only(bottom: 1.w),
-          decoration: BoxDecoration(border: Border(bottom: BorderSide(color: underlineColor, width: 0.5.w))),
-          child: GestureDetector(onTap: onPressedCallback, child: getStyledTextWithFixedScale(text,textStyle,null,null)))]);
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[Container(padding: EdgeInsets.only(bottom: 0.1.w),
+            decoration: BoxDecoration(border: Border(bottom: BorderSide(color: underlineColor, width: 0.2.w))),
+            child: getTextWithFixedScale(text, fontSize, fontWeight, textColor, textAlign, textMaxLine)
+        )]);
   }
 
   static SizedBox getMarginBox(double marginWidth, double marginHeight){
@@ -501,10 +502,10 @@ class UiUtils {
   static Widget getBorderButtonBoxForRound2(Color buttonColor, Color borderColor, Widget childWidget, VoidCallback onPressedCallback){
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
-        padding: EdgeInsets.only(left: 1.w, right: 1.w, top: 0, bottom: 0),
+        padding: EdgeInsets.only(left: 2.w, right: 2.w, top: 0, bottom: 0),
         backgroundColor: buttonColor,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        side: BorderSide(color: borderColor),
+        side: BorderSide(color: borderColor, width: 0.4.w),
         elevation: 0.0,
         shadowColor: ColorStyles.upFinGray,
       ),
@@ -586,12 +587,8 @@ class UiUtils {
     return Expanded(child: SingleChildScrollView(scrollDirection: scrollDir, physics: const BouncingScrollPhysics(), child: scrollChildView));
   }
 
-  static Widget getExpandedScrollViewFit(Axis scrollDir, Widget scrollChildView){
-    return Flexible(child: SingleChildScrollView(scrollDirection: scrollDir, physics: const BouncingScrollPhysics(), child: scrollChildView));
-  }
-
-  static Widget getExpandedScrollViewFit2(Axis scrollDir, Widget scrollChildView, ScrollController controller){
-    return Flexible(fit: FlexFit.tight, child: SingleChildScrollView(controller: controller, scrollDirection: scrollDir, physics: const BouncingScrollPhysics(), child: scrollChildView));
+  static Widget getExpandedScrollViewFit2(Axis scrollDir, Widget scrollChildView){
+    return Flexible(fit: FlexFit.tight, child: SingleChildScrollView(scrollDirection: scrollDir, physics: const BouncingScrollPhysics(), child: scrollChildView));
   }
 
   static Widget getExpandedScrollViewWithController(Axis scrollDir, Widget scrollChildView, ScrollController controller){

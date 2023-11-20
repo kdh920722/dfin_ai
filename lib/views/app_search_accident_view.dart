@@ -49,7 +49,6 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
   void _accidentInfoTextController1Listener() {
     if(_accidentInfoTextController1.text.trim().length > 4){
       _accidentInfoTextController1.text = _accidentInfoTextController1.text.trim().substring(0,4);
-    }else if(_accidentInfoTextController1.text.trim().length == 4){
       FocusScope.of(context).requestFocus(_accidentInfoFocus2);
     }
   }

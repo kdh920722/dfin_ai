@@ -108,7 +108,7 @@ class LogfinController {
       } else {
         failCount++;
       }
-      CommonUtils.log("i", "list : $jobList");
+      CommonUtils.log("", "list : $jobList");
 
       final courtSnapshot = await ref.child('UPFIN/API/logfin/list_data/court').get();
       if (courtSnapshot.exists) {
@@ -121,7 +121,7 @@ class LogfinController {
       } else {
         failCount++;
       }
-      CommonUtils.log("i", "list : $courtList");
+      CommonUtils.log("", "list : $courtList");
 
       final bankSnapshot = await ref.child('UPFIN/API/logfin/list_data/bank').get();
       if (bankSnapshot.exists) {
@@ -134,7 +134,7 @@ class LogfinController {
       } else {
         failCount++;
       }
-      CommonUtils.log("i", "list : $bankList");
+      CommonUtils.log("", "list : $bankList");
 
       final loanCountSnapshot = await ref.child('UPFIN/API/logfin/list_data/loan_count').get();
       if (loanCountSnapshot.exists) {
@@ -147,7 +147,7 @@ class LogfinController {
       } else {
         failCount++;
       }
-      CommonUtils.log("i", "list : $preLoanCountList");
+      CommonUtils.log("", "list : $preLoanCountList");
 
       final niceSnapshot = await ref.child('UPFIN/API/logfin/nice').get();
       if (niceSnapshot.exists) {
@@ -160,7 +160,7 @@ class LogfinController {
       } else {
         failCount++;
       }
-      CommonUtils.log("i", "niceUrl : $niceUrl");
+      CommonUtils.log("", "niceUrl : $niceUrl");
 
       final agreeTypeSnapshot = await ref.child('UPFIN/API/logfin/list_data/agree/agreeDetailType').get();
       if (agreeTypeSnapshot.exists) {
@@ -225,7 +225,7 @@ class LogfinController {
           cnt++;
           if(isSuccessToGetAgreeInfo){
             agreeDocsList.add({"type" : searchType, "detailType": each, "isAgree": false, "result" : outputJsonForGetAgreeInfo});
-            CommonUtils.log("i", "agree result : ${{"type" : searchType, "result" : outputJsonForGetAgreeInfo}}");
+            CommonUtils.log("", "agree result : ${{"type" : searchType, "result" : outputJsonForGetAgreeInfo}}");
           }else{
             failCount++;
           }
@@ -499,7 +499,7 @@ class LogfinController {
               MyData.clearLoanInfoList();
               for(Map eachLoans in loansList){
                 if(eachLoans.containsKey("lender_pr_id") && eachLoans.containsKey("lender_pr")){
-                  CommonUtils.log("i", "loan data ====>\n"
+                  CommonUtils.log("", "loan data ====>\n"
                       "accidentUid: ${eachLoans["accident_uid"]}\n"
                       "loanUid: ${eachLoans["uid"]}\n"
                       "lenderPrId: ${eachLoans["lender_pr_id"]}\n"
@@ -544,8 +544,8 @@ class LogfinController {
 
               MyData.sortLoanInfoList();
               _setChatRoomInfoList();
-              GetController.to.updateAllSubScribed(false);
               WebSocketController.resetConnectWebSocketCable();
+              GetController.to.updateAllSubScribed(false);
               Future.delayed(const Duration(seconds: 2), () {
                 WebSocketController.connectToWebSocketCable();
                 GetController.to.updateChatLoanInfoList(MyData.getChatRoomInfoList());

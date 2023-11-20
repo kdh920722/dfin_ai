@@ -583,30 +583,35 @@ class CodeFController{
                   }
                 }else if(certType == 6){
                   if(await canLaunchUrl(Uri.parse("naversearchapp://default?version=1"))){
-                    launchUrl(Uri.parse("market://details?id=com.nhn.android.search"));
+                    CommonUtils.flutterToast("네이버앱에서 인증해주세요.");
+                    //launchUrl(Uri.parse("naversearchapp://default?version=1"));
                   }else{
                     Config.isAndroid ? launchUrl(Uri.parse("market://details?id=com.nhn.android.search"))
                         : launchUrl(Uri.parse("https://apps.apple.com/kr/app/%EB%84%A4%EC%9D%B4%EB%B2%84-naver/id393499958"));
                   }
                 }else if(certType == 8){
-                  if(await canLaunchUrl(Uri.parse("supertoss://launch"))){
-                    launchUrl(Uri.parse("market://details?id=viva.republica.toss"));
+                  if(await canLaunchUrl(Uri.parse("supertoss://toss-cert/v2/sign/doc?"))){
+                    CommonUtils.flutterToast("Toss앱에서 인증해주세요.");
+                    //launchUrl(Uri.parse("market://details?id=viva.republica.toss"));
                   }else{
                     Config.isAndroid ? launchUrl(Uri.parse("market://details?id=viva.republica.toss"))
                         : launchUrl(Uri.parse("https://apps.apple.com/kr/app/%ED%86%A0%EC%8A%A4/id839333328"));
                   }
                 }else if(certType == 5){
+                  CommonUtils.flutterToast("PASS앱에서 인증해주세요.");
                   if(apiInfoDataList[0].inputJson.containsKey("telecom")){
                     String telecom = apiInfoDataList[0].inputJson["telecom"];
                     if(telecom == "0"){
+                      /*
                       if(await canLaunchUrl(Uri.parse("tauthlink://launch"))){
-                        //launchUrl(Uri.parse("tauthlink://launch"));
                         launchUrl(Uri.parse("market://details?id=com.sktelecom.tauth"));
                       }else{
                         Config.isAndroid ? launchUrl(Uri.parse("market://details?id=com.sktelecom.tauth"))
                             : launchUrl(Uri.parse("https://apps.apple.com/kr/app/pass-by-skt/id1141258007"));
                       }
+                       */
                     }else if(telecom == "1"){
+                      /*
                       if(await canLaunchUrl(Uri.parse("ktauthexternalcall://launch"))){
                         //launchUrl(Uri.parse("ktauthexternalcall://launch"));
                         launchUrl(Uri.parse("market://details?id=com.kt.ktauth"));
@@ -614,7 +619,9 @@ class CodeFController{
                         Config.isAndroid ? launchUrl(Uri.parse("market://details?id=com.kt.ktauth"))
                             : launchUrl(Uri.parse("https://apps.apple.com/kr/app/pass-by-kt/id1134371550"));
                       }
+                      */
                     }else{
+                      /*
                       if(await canLaunchUrl(Uri.parse("upluscorporation://launch"))){
                         //launchUrl(Uri.parse("upluscorporation://launch"));
                         launchUrl(Uri.parse("market://details?id=com.lguplus.smartotp"));
@@ -622,6 +629,7 @@ class CodeFController{
                         Config.isAndroid ? launchUrl(Uri.parse("market://details?id=com.lguplus.smartotp"))
                             : launchUrl(Uri.parse("https://apps.apple.com/kr/app/pass-by-u/id1147394645"));
                       }
+                       */
                     }
                   }
                 }

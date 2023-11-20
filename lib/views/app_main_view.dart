@@ -63,7 +63,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   void dispose() {
     CommonUtils.log("d", "AppMainView 화면 파괴");
     WidgetsBinding.instance.removeObserver(this);
-    Config.contextForEmergencyBack = null;
     WebSocketController.resetConnectWebSocketCable();
     AppMainViewState.isStart = false;
     FireBaseController.setStateForForeground = null;
@@ -234,11 +233,17 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             UiUtils.getMarginBox(100.w, 3.h),
             Container(padding: EdgeInsets.only(right: 5.w, left : 5.w, bottom : 5.w), child: Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
               UiUtils.getTextWithFixedScale2(Config.privacyText.replaceAll("@@", "\n"), 10.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null),
-              UiUtils.getMarginBox(0, 0.5.h),
-              UiUtils.getTextButtonWithFixedScale2("개인정보처리방침 바로가기: ${Config.privacyUrl}", 10.sp,  FontWeight.w400, ColorStyles.upFinBlack, TextAlign.start, null, () async {
+              UiUtils.getMarginBox(0, 1.h),
+              UiUtils.getTextWithFixedScale2(Config.privacyText2.replaceAll("@@", "\n"), 10.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null),
+              UiUtils.getMarginBox(0, 1.h),
+              GestureDetector(child: Row(children: [
+                UiUtils.getTextWithFixedScale("개인정보처리방침 바로가기:", 10.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null),
+                UiUtils.getTextWithUnderline(Config.privacyUrl, 10.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null, ColorStyles.upFinDarkGray)
+              ]),
+              onTap: () async {
                 Uri privacyLink = Uri.parse(Config.privacyUrl);
                 if(await canLaunchUrl(privacyLink)){
-                  launchUrl(privacyLink);
+                launchUrl(privacyLink);
                 }
               })
             ]))
@@ -546,11 +551,11 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   Future<void> _detectPushClickFromBack() async {
     if(!isStart){
       isStart = true;
-      UiUtils.showLoadingPop(context);
       Map<String, dynamic> map = await CommonUtils.readSettingsFromFile();
       if(map["push_room_id"] != ""){
-        CommonUtils.log("", "push_room_id: ${map["push_room_id"]}");
+        CommonUtils.log("w", "push_room_id: ${map["push_room_id"]}");
         if(map["push_from"] == "F"){
+          if(context.mounted) UiUtils.showLoadingPop(context);
           bool isHere = false;
           for(var each in MyData.getChatRoomInfoList()){
             if(each.chatRoomId == map["push_room_id"].toString()) isHere = true;
@@ -576,6 +581,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             isStart = false;
           }
         }else if(map["push_from"] == "B"){
+          if(context.mounted) UiUtils.showLoadingPop(context);
           bool isHere = false;
           for(var each in MyData.getChatRoomInfoList()){
             if(each.chatRoomId == map["push_room_id"].toString()) isHere = true;
@@ -631,14 +637,18 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   }
 
   void _showInfoPop(){
-    UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, 40.h, 0.5, (slideContext, setState){
+    int lineCnt = Config.appInfoTextMap["info_text"].toString().split("@@").length;
+    double h = lineCnt*2.3.h;
+    CommonUtils.log("w","$h, $lineCnt");
+
+    UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isAndroid? 22.h+h : 27.h+h, 0.5, (slideContext, setState){
       return Center(child: Column(children: [
         UiUtils.getMarginBox(0, 1.h),
         UiUtils.getTextWithFixedScale("📌 안내사항", 14.sp, FontWeight.w800, ColorStyles.upFinBlack, TextAlign.center, null),
         UiUtils.getMarginBox(0, 3.h),
-        UiUtils.getExpandedScrollView(Axis.vertical,
+        UiUtils.getExpandedScrollViewFit2(Axis.vertical,
             UiUtils.getTextWithFixedScale2(Config.appInfoTextMap["info_text"].replaceAll("@@", "\n"), 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
-        UiUtils.getMarginBox(0, 3.h),
+        UiUtils.getMarginBox(0, 4.h),
         UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
             UiUtils.getTextWithFixedScale("확인", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
               SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceValidInfoVersion, Config.appInfoTextMap["info_text_version"].toString());
@@ -654,7 +664,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   }
 
   double bottomBarHeight = 0;
-  bool isInfoPopShow = false;
+  static bool isInfoPopShow = false;
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
@@ -671,9 +681,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               _detectPushClickFromBack();
             }
           }
-        }else{
-          isInfoPopShow = false;
-          _detectPushClickFromBack();
         }
       }else{
         isStart = false;

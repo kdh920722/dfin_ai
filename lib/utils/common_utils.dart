@@ -677,7 +677,9 @@ class CommonUtils {
   }
 
   static Future<void> emergencyBackToHome() async {
+    CommonUtils.log("w", "em out1");
     if(Config.contextForEmergencyBack != null){
+      CommonUtils.log("w", "em out2");
       resetData();
       await CommonUtils.saveSettingsToFile("push_from", "");
       await CommonUtils.saveSettingsToFile("push_room_id", "");
@@ -692,10 +694,12 @@ class CommonUtils {
 
   static void resetData(){
     MyData.resetMyData();
+    hideKeyBoard();
     GetController.to.resetAccdientInfoList();
     GetController.to.resetChatLoanInfoList();
     GetController.to.resetChatMessageInfoList();
     WebSocketController.resetConnectWebSocketCable();
+    GetController.to.updateAllSubScribed(true);
     if(CodeFController.apiCheckTimer != null) CodeFController.apiCheckTimer!.cancel();
   }
 

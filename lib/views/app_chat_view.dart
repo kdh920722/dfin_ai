@@ -60,13 +60,13 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
   static bool isScrollMove = false;
   bool isOpenDownloadedFile = true;
 
-  int imageLoadCnt = 0;
-  Map<String,bool> imageLoadMap = {};
   Timer? scrollCheckTimer;
 
   CameraController? _cameraController;
   GlobalKey repaintKey = GlobalKey();
   bool _isCameraReady = false;
+
+  Map<String, bool> cachedImage = {};
 
   @override
   void initState(){
@@ -259,7 +259,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
     WebSocketController.isMessageReceived = false;
     appConfig.Config.contextForEmergencyBack = AppMainViewState.mainContext;
     currentKey = "";
-    imageLoadMap = {};
+    cachedImage = {};
     IsolateNameServer.removePortNameMapping('downloader_send_port');
     super.dispose();
   }
@@ -672,7 +672,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                 painter: ChatBubbleTriangleForOther(),
               ),
               Container(
-                  constraints: BoxConstraints(maxWidth: 73.w),
+                  constraints: BoxConstraints(maxWidth: 63.w),
                   padding: isImageView? EdgeInsets.zero : EdgeInsets.all(3.w),
                   decoration: BoxDecoration(
                     borderRadius: isImageView? const BorderRadius.only(topRight: Radius.circular(1), topLeft: Radius.circular(1), bottomRight: Radius.circular(1))
@@ -700,7 +700,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                 painter: ChatBubbleTriangleForOther(),
               ),
               Container(
-                  constraints: BoxConstraints(maxWidth: 73.w),
+                  constraints: BoxConstraints(maxWidth: 63.w),
                   padding: EdgeInsets.all(3.w),
                   decoration: const BoxDecoration(
                     borderRadius: BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomRight: Radius.circular(15)),
@@ -715,8 +715,9 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
     );
   }
 
-  Future<void> _loadImageAsync() async {
-    if(imageLoadCnt > 5){
+  Future<void> _loadImageAsync(String src) async {
+    if(!cachedImage.containsKey(src)){
+      CommonUtils.log("w", "load.. $src");
       await Future.delayed(const Duration(seconds: 2));
     }
   }
@@ -724,29 +725,24 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
   Widget _getImageView(String srcUrl){
     final mediaQueryData = MediaQuery.of(context);
     final devicePixelRatio = mediaQueryData.devicePixelRatio;
-    if(!imageLoadMap.containsKey(srcUrl)){
-      imageLoadCnt++;
-      imageLoadMap[srcUrl] = true;
-    }
     bool isLoading = true;
     return GestureDetector(
-        child: Container(
-            alignment: Alignment.center,
-            decoration: const BoxDecoration(
-              color: ColorStyles.upFinBlack,
-              borderRadius: BorderRadius.all(Radius.circular(5)),
-            ),
-            constraints: BoxConstraints(maxWidth: 70.w, maxHeight: 70.w, minWidth: 20.w, minHeight: 20.w),
-            child: FutureBuilder(
-              future: _loadImageAsync(), // 이미지 로딩을 처리하는 비동기 함수
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.done) {
-                  return ExtendedImage.network(
+        child: FutureBuilder(
+          future: _loadImageAsync(srcUrl), // 이미지 로딩을 처리하는 비동기 함수
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.done) {
+              return Container(
+                  alignment: Alignment.center,
+                  decoration: const BoxDecoration(
+                    color: ColorStyles.upFinWhite,
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                  ),
+                  constraints: BoxConstraints(maxWidth: 60.w, maxHeight: 60.w, minWidth: 20.w, minHeight: 20.w),
+                  child:ExtendedImage.network(
                     srcUrl,
-                    fit: BoxFit.fill,
+                    fit: BoxFit.contain,
                     cache: true,
-                    cacheWidth: (40.w*devicePixelRatio).round().toInt(),
-                    cacheHeight: (40.w*devicePixelRatio).round().toInt(),
+                    cacheHeight: (30.w*devicePixelRatio).round().toInt(),
                     cacheMaxAge: const Duration(hours: 1),
                     shape: BoxShape.rectangle,
                     borderRadius: const BorderRadius.all(Radius.circular(4)),
@@ -769,22 +765,18 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                         case LoadState.completed:
                           isLoading = false;
                           _aniController.forward();
-                          if(imageLoadMap.containsKey(srcUrl)){
-                            imageLoadCnt--;
-                            imageLoadMap.remove(srcUrl);
-                          }
+                          cachedImage[srcUrl] = true;
                           return FadeTransition(
                             opacity: _aniController,
-                            child: ExtendedRawImage(
-                              fit: BoxFit.fill,
+                            child: AspectRatio(aspectRatio: 1, child: ExtendedRawImage(
+                              fit: state.extendedImageInfo!.image.width >= state.extendedImageInfo!.image.height ? BoxFit.fitHeight : BoxFit.fitWidth,
                               image: state.extendedImageInfo?.image,
-                            ),
+                            )),
                           );
                         case LoadState.failed:
                           _aniController.reset();
-                          if(imageLoadMap.containsKey(srcUrl)){
-                            imageLoadCnt--;
-                            imageLoadMap.remove(srcUrl);
+                          if(cachedImage.containsKey(srcUrl)){
+                            cachedImage.remove(srcUrl);
                           }
                           return GestureDetector(
                             child: UiUtils.getIcon(10.w, 10.w, Icons.refresh_rounded, 10.w, ColorStyles.upFinRed),
@@ -794,13 +786,21 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                           );
                       }
                     },
-                  );
-                } else {
-                  // 이미지 로딩 중에 표시할 로딩 표시 등을 추가할 수 있습니다.
-                  return UiUtils.getImage(8.w, 8.w, Image.asset(fit: BoxFit.fill,'assets/images/chat_loading.gif'));
-                }
-              },
-            )
+                  )
+              );
+            } else {
+              // 이미지 로딩 중에 표시할 로딩 표시 등을 추가할 수 있습니다.
+              return Container(
+                  alignment: Alignment.center,
+                  decoration: const BoxDecoration(
+                    color: ColorStyles.upFinBlack,
+                    borderRadius: BorderRadius.all(Radius.circular(5)),
+                  ),
+                  constraints: BoxConstraints(maxWidth: 60.w, maxHeight: 60.w, minWidth: 20.w, minHeight: 20.w),
+                  child:UiUtils.getImage(8.w, 8.w, Image.asset(fit: BoxFit.fill,'assets/images/chat_loading.gif'))
+              );
+            }
+          },
         ),
         onTap: ()  {
           if(!isLoading){
@@ -825,7 +825,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                               srcUrl,
                               fit: BoxFit.contain,
                               cache: true,
-                              cacheWidth: (50.w*devicePixelRatio).round().toInt(),
                               cacheMaxAge: const Duration(hours: 1),
                               shape: BoxShape.rectangle,
                               borderRadius: const BorderRadius.all(Radius.circular(3)),
@@ -934,7 +933,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
             UiUtils.getTextWithFixedScale(CommonUtils.getFormattedLastMsgTime(meInfo.messageTime), 8.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null),
             UiUtils.getMarginBox(1.w, 0),
             Container(
-                constraints: BoxConstraints(maxWidth: 73.w),
+                constraints: BoxConstraints(maxWidth: 63.w),
                 padding: isImageView? EdgeInsets.zero : EdgeInsets.all(3.w),
                 decoration: BoxDecoration(
                   borderRadius: isImageView? const BorderRadius.only(topRight: Radius.circular(1), topLeft: Radius.circular(1), bottomLeft: Radius.circular(1))
@@ -958,7 +957,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
         child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
           Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
             Container(
-                constraints: BoxConstraints(maxWidth: 73.w),
+                constraints: BoxConstraints(maxWidth: 63.w),
                 padding: EdgeInsets.all(3.w),
                 decoration: const BoxDecoration(
                   borderRadius: BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomLeft: Radius.circular(15)),
@@ -1583,20 +1582,43 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
               child: Align(
                   alignment: Alignment.topRight,
                   child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    UiUtils.getMarginBox(0, 1.h),
+                    UiUtils.getMarginBox(0, 1.2.h),
                     Row(mainAxisAlignment:MainAxisAlignment.end, children: [
                       Obx((){
-                        String statusName = LoanInfoData.getDetailStatusName(GetController.to.chatStatusTick.value.toString());
-                        return UiUtils.getBorderButtonBoxForRound2(ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
-                            Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment:MainAxisAlignment.center, children: [
-                              UiUtils.getMarginBox(1.5.w, 0),
-                              UiUtils.getTextWithFixedScale(statusName, 10.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
-                              Icon(GetController.to.isShowStatus.value? Icons.keyboard_arrow_up_outlined : Icons.keyboard_arrow_down_outlined, color: ColorStyles.upFinBlack, size: 4.w)
-                            ]), () {
+                        /*
+                        //String statusName = LoanInfoData.getDetailStatusName(GetController.to.chatStatusTick.value.toString());
+                        return GestureDetector(
+                            child: Container(
+                              padding: EdgeInsets.only(top:1.2.w, bottom:1.2.w, right: 0.5.w, left:0.7.w),
+                              decoration: BoxDecoration(
+                                borderRadius: const BorderRadius.all(Radius.circular(18)),
+                                color: ColorStyles.upFinWhite,
+                                  border: Border.all(
+                                    color: ColorStyles.upFinGray,
+                                    width: 0.35.w,
+                                  )
+                              ),
+                              child: Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment:MainAxisAlignment.center, children: [
+                                UiUtils.getMarginBox(1.5.w, 0),
+                                UiUtils.getTextWithFixedScale("상태", 12.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null),
+                                Icon(GetController.to.isShowStatus.value? Icons.arrow_drop_up_outlined : Icons.arrow_drop_down_outlined, color: ColorStyles.upFinBlack, size: 5.w)
+                              ]),
+                            ),
+                            onTap: (){
                               GetController.to.updateShowStatus(!GetController.to.isShowStatus.value);
-                            });
+                            }
+                        );
+                         */
+
+                        return Column(children: [
+                          UiUtils.getMarginBox(0, 2.2.w),
+                          GestureDetector(child: Icon(Icons.signpost_outlined, color: GetController.to.isShowStatus.value? ColorStyles.upFinBlack : ColorStyles.upFinDarkGray, size: 6.w),
+                           onTap: (){
+                             GetController.to.updateShowStatus(!GetController.to.isShowStatus.value);
+                           })
+                        ]);
                       }),
-                      UiUtils.getMarginBox(3.w, 0),
+                      UiUtils.getMarginBox(5.w, 0),
                     ])
                     //UiUtils.getMarginBox(0, 1.h),
                   ])

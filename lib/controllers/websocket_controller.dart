@@ -226,16 +226,16 @@ class WebSocketController {
       };
 
       cable!.onConnectionLost = () {
-        CommonUtils.log("e", "websocket onConnectionLost error");
+        CommonUtils.log("w", "websocket onConnectionLost error");
         _retryToConnectNewVer(connectionKey);
       };
 
       cable!.onCannotConnect = () {
-        CommonUtils.log("e", "websocket onCannotConnect error");
+        CommonUtils.log("w", "websocket onCannotConnect error");
         _retryToConnectNewVer(connectionKey);
       };
     }catch(error){
-      CommonUtils.log("e", "websocket connect error : ${error.toString()}");
+      CommonUtils.log("w", "websocket connect error : ${error.toString()}");
       _retryToConnectNewVer(connectionKey);
     }
   }
@@ -384,11 +384,12 @@ class WebSocketController {
   static Timer? retryCheckTimer;
   static int retryTimerCount = 0;
   static bool isRetryStarted = false;
+  static int maxTryCnt = 20;
   static void _retryToConnectNewVer(String connectedKey){
     if(!isRetryStarted){
       isRetryStarted = true;
       GetController.to.updateAllSubScribed(false);
-      if(!AppMainViewState.isViewHere){
+      if(AppChatViewState.isViewHere){
         AppChatViewState.isViewHere = false;
         AppMainViewState.isViewHere = true;
         CommonUtils.flutterToast("재접속 중입니다.\n잠시만 기다려 주세요.");
@@ -398,7 +399,7 @@ class WebSocketController {
 
       retryCheckTimer ??= Timer.periodic(const Duration(seconds: 1), (Timer timer) {
         retryTimerCount++;
-        if(retryTimerCount >= 20){
+        if(retryTimerCount >= maxTryCnt){
           if(retryCheckTimer != null) retryCheckTimer!.cancel();
           retryCheckTimer = null;
           retryTimerCount = 0;
@@ -411,19 +412,25 @@ class WebSocketController {
     if(connectionInfoMap.containsKey(connectedKey)){
       if(connectionInfoMap[connectedKey]){
         connectionInfoMap[connectedKey] = false;
-
+        CommonUtils.log("w", "in1");
         LogfinController.getLoanInfo((isSuccess, isNotEmpty){
           if(isSuccess){
+            CommonUtils.log("w", "in2");
             if(!isNotEmpty){
               if(isRetryStarted){
-                connectionInfoMap[connectedKey] = true;
-                _retryToConnectNewVer(connectedKey);
+                CommonUtils.log("w", "in2-2");
+                if(retryTimerCount > maxTryCnt-3){
+                  _emergencyBack();
+                }else{
+                  connectionInfoMap[connectedKey] = true;
+                  _retryToConnectNewVer(connectedKey);
+                }
               }else{
-                AppChatViewState.isViewHere = false;
-                AppMainViewState.isViewHere = false;
-                CommonUtils.emergencyBackToHome();
+                CommonUtils.log("w", "in2-3");
+                _emergencyBack();
               }
             }else{
+              CommonUtils.log("w", "in2 s");
               if(retryCheckTimer != null) retryCheckTimer!.cancel();
               retryCheckTimer = null;
               retryTimerCount = 0;
@@ -431,17 +438,26 @@ class WebSocketController {
               connectionInfoMap = {};
             }
           }else{
+            CommonUtils.log("w", "in3");
             if(isRetryStarted){
-              connectionInfoMap[connectedKey] = true;
-              _retryToConnectNewVer(connectedKey);
+              CommonUtils.log("w", "in3-2");
+              if(retryTimerCount > maxTryCnt-3){
+                _emergencyBack();
+              }else{
+                connectionInfoMap[connectedKey] = true;
+                _retryToConnectNewVer(connectedKey);
+              }
             }else{
-              AppChatViewState.isViewHere = false;
-              AppMainViewState.isViewHere = false;
-              CommonUtils.emergencyBackToHome();
+              CommonUtils.log("w", "in3-3");
+              _emergencyBack();
             }
           }
         });
+      }else{
+        _emergencyBack();
       }
+    }else{
+      _emergencyBack();
     }
 
     //String key = connectionInfoMap["connection_key"];
@@ -477,6 +493,12 @@ class WebSocketController {
       });
     }
     */
+  }
+
+  static void _emergencyBack(){
+    AppChatViewState.isViewHere = false;
+    AppMainViewState.isViewHere = false;
+    CommonUtils.emergencyBackToHome();
   }
 
   /*

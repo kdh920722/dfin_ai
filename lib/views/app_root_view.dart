@@ -493,6 +493,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      CommonUtils.hideKeyBoard();
       if(Config.isControllerLoadFinished && Config.isEmergencyRoot){
         if(CommonUtils.isValidStateByApiExpiredDate() && !isAutoLogin){
           isAutoLogin = true;
