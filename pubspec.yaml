@@ -57,7 +57,7 @@ dependencies:
   flutter_local_notifications: ^15.1.0+1
   iamport_flutter: ^0.10.10
   shared_preferences: ^2.2.0
-  permission_handler: ^10.4.3
+  permission_handler: ^11.0.1
   flutter_inappwebview: ^5.7.2+3
   kakao_flutter_sdk_user: ^1.5.0
   percent_indicator: ^4.2.3
@@ -81,6 +81,7 @@ dependencies:
   firebase_analytics: ^10.6.3
   assets_audio_player: ^3.1.1
   flutter_native_splash: ^2.3.5
+  device_info_plus: ^9.1.1
 
 flutter_native_splash:
   color: "#466bf7"

@@ -23,7 +23,6 @@ class WebSocketController {
   static String wsOriginUrl = "";
   static String channelName = "";
   static List<Map<String,dynamic>> subscribedRoomIds = [];
-  static bool isReSubScribe = false;
   static ActionCable? cable;
   static bool isInit = false;
   static bool isRetry = false;
@@ -102,15 +101,19 @@ class WebSocketController {
     return isWaiting;
   }
 
-  static void resetConnectWebSocketCable(){
+  static void resetRetry(){
     isInit = false;
-    isReSubScribe = false;
     isMessageReceived = false;
     if(retryCheckTimer != null) retryCheckTimer!.cancel();
     retryCheckTimer = null;
     retryTimerCount = 0;
     isRetryStarted = false;
     connectionInfoMap = {};
+  }
+
+  static void resetConnectWebSocketCable(){
+    isInit = false;
+    isMessageReceived = false;
     subscribedRoomIds.clear();
     if(cable != null) cable!.disconnect();
     cable = null;

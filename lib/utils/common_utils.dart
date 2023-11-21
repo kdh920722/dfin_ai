@@ -29,6 +29,8 @@ import 'package:timezone/data/latest.dart' as tzlocal;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:http/http.dart' as http;
 
+import '../views/app_main_view.dart';
+
 class CommonUtils {
 
   static void logcat(){
@@ -695,10 +697,12 @@ class CommonUtils {
   static void resetData(){
     MyData.resetMyData();
     hideKeyBoard();
+    AppMainViewState.doCheckToSearchAccident = false;
     GetController.to.resetAccdientInfoList();
     GetController.to.resetChatLoanInfoList();
     GetController.to.resetChatMessageInfoList();
     WebSocketController.resetConnectWebSocketCable();
+    WebSocketController.resetRetry();
     GetController.to.updateAllSubScribed(true);
     if(CodeFController.apiCheckTimer != null) CodeFController.apiCheckTimer!.cancel();
   }
@@ -829,11 +833,14 @@ class CommonUtils {
       var status = await each.request();
       if (status.isDenied) {
         String permissionName = each.toString().split('.').last;
+        CommonUtils.log("w", "p name : $permissionName");
         switch(permissionName){
           case "notification" : permissionName = "알림";
           case "phone" : permissionName = "전화";
           case "camera" : permissionName = "카메라";
-          case "microphone" : permissionName = "마이크";
+          case "photos" : permissionName = "앨범";
+          case "storage" : permissionName = "저장소";
+          case "manageExternalStorage" : permissionName = "저장소";
         }
         deniedPermissions.add(permissionName);
       }

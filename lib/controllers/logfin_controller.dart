@@ -546,7 +546,7 @@ class LogfinController {
               _setChatRoomInfoList();
               WebSocketController.resetConnectWebSocketCable();
               GetController.to.updateAllSubScribed(false);
-              Future.delayed(const Duration(seconds: 2), () {
+              Future.delayed(const Duration(milliseconds: 500), () {
                 WebSocketController.connectToWebSocketCable();
                 GetController.to.updateChatLoanInfoList(MyData.getChatRoomInfoList());
                 callback(true, true);
@@ -575,7 +575,6 @@ class LogfinController {
           each.chatRoomMsg, each.statueId, "${each.submitRate}%",
           CommonUtils.getPriceFormattedString(double.parse(each.submitAmount))));
     }
-    WebSocketController.isReSubScribe = true;
   }
 
   static Future<void> getPrList(String accidentCase, Function(bool isSuccess, Map<String, dynamic>? outputJson) callback) async {

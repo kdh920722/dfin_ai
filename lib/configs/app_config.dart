@@ -1,3 +1,4 @@
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -33,7 +34,8 @@ class Config{
   static bool isWeb = kIsWeb;
   static bool isAndroid = Platform.isAndroid;
   static String deppLinkInfo = "";
-  static List<Permission> permissionList = [Permission.notification, Permission.camera, Permission.phone, Permission.microphone];
+  static List<Permission> permissionList = [];
+  static List<Permission> storagePermissionListForAndroid = [];
   static String appVersion = "";
   static String appStoreUrl = "";
   static String privacyUrl = "";
@@ -64,6 +66,26 @@ class Config{
 
   static Future<void> initAppState(Function(bool isSuccess) callback) async{
     try{
+      /*
+      if(isAndroid){
+        DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
+        AndroidDeviceInfo androidInfo = await deviceInfoPlugin.androidInfo;
+        if(androidInfo.version.sdkInt >= 30){
+          storagePermissionListForAndroid.add(Permission.manageExternalStorage);
+        }else{
+          storagePermissionListForAndroid.add(Permission.storage);
+        }
+        permissionList.addAll(storagePermissionListForAndroid);
+      }
+      */
+      if(isAndroid){
+        List<Permission> permissionListForAndroid = [Permission.notification, Permission.camera, Permission.phone];
+        permissionList.addAll(permissionListForAndroid);
+      }else{
+        List<Permission> permissionListForAndroid = [Permission.notification, Permission.camera, Permission.photos];
+        permissionList.addAll(permissionListForAndroid);
+      }
+
       bool isValid = true;
       final ref = FirebaseDatabase.instance.ref();
       final appInfoSnapshot = await ref.child('UPFIN/APP_STATE/app_info').get();

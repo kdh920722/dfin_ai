@@ -30,7 +30,7 @@ class AppMainView extends StatefulWidget{
 
 class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   final PageController _pageController = PageController();
-  bool doCheckToSearchAccident = false;
+  static bool doCheckToSearchAccident = false;
   int viewTypeId = 2; // 1: 대출 / 2: MY / 3: 설정
   int tryOut = 0;
   String retryChatRoomId = "";
@@ -64,6 +64,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     CommonUtils.log("d", "AppMainView 화면 파괴");
     WidgetsBinding.instance.removeObserver(this);
     WebSocketController.resetConnectWebSocketCable();
+    WebSocketController.resetRetry();
     AppMainViewState.isStart = false;
     FireBaseController.setStateForForeground = null;
     isViewHere = false;

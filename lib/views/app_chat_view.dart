@@ -10,6 +10,7 @@ import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sizer/sizer.dart';
 import 'package:upfin/controllers/aws_controller.dart';
 import 'package:upfin/controllers/firebase_controller.dart';
@@ -191,6 +192,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
           if(isOpenDownloadedFile){
             bool canOpen = false;
             while(!canOpen){
+              CommonUtils.log("w", "download id : $id");
               canOpen = await FlutterDownloader.open(taskId: id);
             }
             CommonUtils.flutterToast("다운로드가 완료되었습니다.");
@@ -557,9 +559,16 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                 CommonUtils.log("w", "download url : $url");
                 String dir = "";
                 if(appConfig.Config.isAndroid){
-                  dir = '/storage/emulated/0/Download';
+                  //dir = '/storage/emulated/0/Download';
+                  //StorageDirectory.downloads
+                  var list = await getExternalStorageDirectories();
+                  for(var each in list!){
+                    CommonUtils.log("w","${each.path}");
+                  }
+                  dir = (await getExternalStorageDirectory())!.path;
+                  //dir = (await getApplicationDocumentsDirectory()).path;
                 }else{
-                  dir = (await getApplicationDocumentsDirectory()).path;
+                  dir = (await getExternalStorageDirectory())!.path;
                 }
                 try{
                   isOpenDownloadedFile = true;
@@ -571,10 +580,11 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                     url: url, 	// file url
                     savedDir: '$dir/',	// 저장할 dir
                     fileName: '${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_doc.$extension',	// 파일명
-                    saveInPublicStorage: true,	// 동일한 파일 있을 경우 덮어쓰기 없으면 오류발생함!
+                    saveInPublicStorage: false,// 동일한 파일 있을 경우 덮어쓰기 없으면 오류발생함!
                     showNotification: true,
                     openFileFromNotification: true,
                   );
+
                   String fileRealName = "${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_doc.$extension";
                   CommonUtils.log("w", "download url : $url");
                   String fileName = "$dir/$fileRealName";
@@ -672,7 +682,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                 painter: ChatBubbleTriangleForOther(),
               ),
               Container(
-                  constraints: BoxConstraints(maxWidth: 63.w),
+                  constraints: BoxConstraints(maxWidth:  isImageView? 63.w : 73.w),
                   padding: isImageView? EdgeInsets.zero : EdgeInsets.all(3.w),
                   decoration: BoxDecoration(
                     borderRadius: isImageView? const BorderRadius.only(topRight: Radius.circular(1), topLeft: Radius.circular(1), bottomRight: Radius.circular(1))
@@ -734,7 +744,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
               return Container(
                   alignment: Alignment.center,
                   decoration: const BoxDecoration(
-                    color: ColorStyles.upFinWhite,
+                    color: ColorStyles.upFinWhiteGray,
                     borderRadius: BorderRadius.all(Radius.circular(5)),
                   ),
                   constraints: BoxConstraints(maxWidth: 60.w, maxHeight: 60.w, minWidth: 20.w, minHeight: 20.w),
@@ -875,9 +885,10 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                       CommonUtils.log("w", "download url : $srcUrl");
                       String dir = "";
                       if(appConfig.Config.isAndroid){
-                        dir = '/storage/emulated/0/Download';
+                        //dir = (await getApplicationDocumentsDirectory()).path;
+                        dir = (await getExternalStorageDirectory())!.path;
                       }else{
-                        dir = (await getApplicationDocumentsDirectory()).path;
+                        dir = (await getExternalStorageDirectory())!.path;
                       }
                       CommonUtils.log("w", "download dir : $dir");
                       try{
@@ -887,7 +898,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                           url: srcUrl, 	// file url
                           savedDir: '$dir/',	// 저장할 dir
                           fileName: '${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_img.${srcUrl.split(".").last}',	// 파일명
-                          saveInPublicStorage: true ,	// 동일한 파일 있을 경우 덮어쓰기 없으면 오류발생함!
+                          saveInPublicStorage: false,	// 동일한 파일 있을 경우 덮어쓰기 없으면 오류발생함!
                           showNotification: true,
                           openFileFromNotification: true,
                         );
@@ -933,7 +944,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
             UiUtils.getTextWithFixedScale(CommonUtils.getFormattedLastMsgTime(meInfo.messageTime), 8.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null),
             UiUtils.getMarginBox(1.w, 0),
             Container(
-                constraints: BoxConstraints(maxWidth: 63.w),
+                constraints: BoxConstraints(maxWidth: isImageView? 63.w : 73.w),
                 padding: isImageView? EdgeInsets.zero : EdgeInsets.all(3.w),
                 decoration: BoxDecoration(
                   borderRadius: isImageView? const BorderRadius.only(topRight: Radius.circular(1), topLeft: Radius.circular(1), bottomLeft: Radius.circular(1))
@@ -1290,6 +1301,23 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
           _setPickedImgFromCamera();
         }else if(each.contains("가져오기")){
           if(appConfig.Config.isAndroid){
+            /*
+            bool isDenied = false;
+            for(var eachPermission in appConfig.Config.storagePermissionListForAndroid){
+              var status = await eachPermission.request();
+              if (status.isDenied) {
+                isDenied = true;
+              }
+            }
+
+            if(isDenied){
+              openAppSettings();
+            }else{
+              _setPickedFileFromDevice(1);
+            }
+
+             */
+
             _setPickedFileFromDevice(1);
           }else{
             if(each.contains("사진")){
@@ -1582,14 +1610,15 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
               child: Align(
                   alignment: Alignment.topRight,
                   child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    UiUtils.getMarginBox(0, 1.2.h),
+                    UiUtils.getMarginBox(0, 1.7.h),
                     Row(mainAxisAlignment:MainAxisAlignment.end, children: [
                       Obx((){
-                        /*
+
                         //String statusName = LoanInfoData.getDetailStatusName(GetController.to.chatStatusTick.value.toString());
+
                         return GestureDetector(
                             child: Container(
-                              padding: EdgeInsets.only(top:1.2.w, bottom:1.2.w, right: 0.5.w, left:0.7.w),
+                              padding: EdgeInsets.only(top:1.4.w, bottom:1.2.w, right: 0.5.w, left:0.7.w),
                               decoration: BoxDecoration(
                                 borderRadius: const BorderRadius.all(Radius.circular(18)),
                                 color: ColorStyles.upFinWhite,
@@ -1600,7 +1629,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                               ),
                               child: Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment:MainAxisAlignment.center, children: [
                                 UiUtils.getMarginBox(1.5.w, 0),
-                                UiUtils.getTextWithFixedScale("상태", 12.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null),
+                                UiUtils.getTextWithFixedScale("상태", 10.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null),
                                 Icon(GetController.to.isShowStatus.value? Icons.arrow_drop_up_outlined : Icons.arrow_drop_down_outlined, color: ColorStyles.upFinBlack, size: 5.w)
                               ]),
                             ),
@@ -1608,8 +1637,9 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                               GetController.to.updateShowStatus(!GetController.to.isShowStatus.value);
                             }
                         );
-                         */
 
+
+                        /*
                         return Column(children: [
                           UiUtils.getMarginBox(0, 2.2.w),
                           GestureDetector(child: Icon(Icons.signpost_outlined, color: GetController.to.isShowStatus.value? ColorStyles.upFinBlack : ColorStyles.upFinDarkGray, size: 6.w),
@@ -1617,6 +1647,9 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                              GetController.to.updateShowStatus(!GetController.to.isShowStatus.value);
                            })
                         ]);
+
+
+                         */
                       }),
                       UiUtils.getMarginBox(5.w, 0),
                     ])
@@ -1639,7 +1672,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
             if(GetController.to.isShowStatus.value){
               return UiUtils.getMarginBox(0, 0);
             }else{
-              return UiUtils.getMarginBox(0, 1.h);
+              return UiUtils.getMarginBox(0, 2.h);
             }
           }),
           Expanded(child: RefreshIndicator(onRefresh: ()=>_requestPrev(),color: ColorStyles.upFinButtonBlue, backgroundColor: ColorStyles.upFinWhiteSky,

@@ -980,6 +980,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                       LogfinController.getAccidentInfo((isSuccessToGetAccidentInfo, isNotEmpty){
                         if(isSuccessToGetAccidentInfo){
                           if(isNotEmpty){
+                            UiUtils.closeLoadingPop(context);
                             CommonUtils.moveWithUntil(context, AppView.appMainView.value);
                           }else{
                             UiUtils.closeLoadingPop(context);

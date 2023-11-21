@@ -34,7 +34,8 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace "com.ysmeta.upfinai"
-    compileSdkVersion flutter.compileSdkVersion
+    //compileSdkVersion flutter.compileSdkVersion
+    compileSdkVersion 33
     ndkVersion flutter.ndkVersion
 
     compileOptions {

@@ -1153,7 +1153,10 @@ class UiUtils {
             Column(crossAxisAlignment:CrossAxisAlignment.start, children: getAgreeWidgetList()),
           ]), _agreeScrollController),
           UiUtils.getMarginBox(0, 1.5.h),
-          isTypeAgree("1") ? UiUtils.getTextButtonBox(90.w, "동의하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, onPressedCallback)
+          isTypeAgree("1") ? UiUtils.getTextButtonBox(90.w, "동의하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, (){
+            Navigator.pop(thisContext);
+            onPressedCallback();
+          })
               : UiUtils.getTextButtonBox(90.w, "동의하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinGray, () {}),
           Config.isAndroid? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 3.h)
         ])

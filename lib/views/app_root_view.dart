@@ -439,6 +439,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
       });
       await _initSharedPreference();
 
+      /*
       if(Config.isAndroid){
         isPermissionDenied = await CommonUtils.isPermissionDenied();
         if(isPermissionDenied){
@@ -455,6 +456,23 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
         }else{
           _callInitApis();
         }
+      }else{
+        _callInitApis();
+      }
+       */
+
+      isPermissionDenied = await CommonUtils.isPermissionDenied();
+      if(isPermissionDenied){
+        permissionCheckTimer ??= Timer.periodic(const Duration(seconds: 2), (Timer timer) async {
+          isPermissionDenied = await CommonUtils.isPermissionDenied();
+          if(isPermissionDenied && !isPermissionCheckPopStarted){
+            await _requestPermissions();
+          }else if(!isPermissionDenied && isPermissionCheckPopStarted){
+            if(permissionCheckTimer != null) permissionCheckTimer!.cancel();
+            if(context.mounted && isPopOn) Navigator.pop(context);
+            _callInitApis();
+          }
+        });
       }else{
         _callInitApis();
       }

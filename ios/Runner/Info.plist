@@ -96,13 +96,14 @@
 		</dict>
 
 		<key>PermissionGroupNotification</key>
-        <string>Notification for FCM permission is required.</string>
+        <string>푸쉬 알림을 위한 권한요청.(Notification for FCM permission is required.)</string>
 
 		<key>NSCameraUsageDescription</key>
-		<string>Camera permission is required.</string>
+		<string>사진 촬영을 위한 권한요청.(Camera permission is required.)</string>
 
 		<key>NSPhotoLibraryUsageDescription</key>
-		<string>Used to demonstrate image picker plugin</string>
+		<string>앨범 접근을 위한 권한요청.(Used to demonstrate file_picker plugin.)</string>
+
 
 		<key>UIApplicationSupportsIndirectInputEvents</key>
 		<true/>
