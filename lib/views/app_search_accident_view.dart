@@ -955,7 +955,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
             }),
         UiUtils.getMarginBox(2.w, 0),
         UiUtils.getBorderButtonBox(42.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
-            UiUtils.getTextWithFixedScale("아니오", 14.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
+            UiUtils.getTextWithFixedScale("아니오", 14.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null), () async {
               Map<String, dynamic> inputJson = {
                 "court_name": selectedCourtInfo.split("@")[0],
                 "caseNumberYear": selectedAccidentInfo.split("개회")[0],
@@ -973,26 +973,32 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
               };
               CommonUtils.log("i", "pr search info:\n$inputJson");
               UiUtils.showLoadingPop(context);
+
+              await FireBaseController.setNotificationTorF(false);
               LogfinController.callLogfinApi(LogfinApis.prSearch, inputJson, (isSuccess, outputJson){
                 if(isSuccess){
-                  LogfinController.getUserInfo((isSuccessToGetUserInfo){
+                  LogfinController.getUserInfo((isSuccessToGetUserInfo) async {
                     if(isSuccessToGetUserInfo){
-                      LogfinController.getAccidentInfo((isSuccessToGetAccidentInfo, isNotEmpty){
+                      LogfinController.getAccidentInfo((isSuccessToGetAccidentInfo, isNotEmpty) async {
                         if(isSuccessToGetAccidentInfo){
                           if(isNotEmpty){
                             UiUtils.closeLoadingPop(context);
                             CommonUtils.moveWithUntil(context, AppView.appMainView.value);
+                            await FireBaseController.setNotificationTorF(true);
                           }else{
                             UiUtils.closeLoadingPop(context);
                             CommonUtils.flutterToast("사건정보 찾기 실패\n다시 실행해주세요.");
+                            await FireBaseController.setNotificationTorF(true);
                           }
                         }else{
                           UiUtils.closeLoadingPop(context);
                           CommonUtils.flutterToast("사건정보 찾기 실패\n다시 실행해주세요.");
+                          await FireBaseController.setNotificationTorF(true);
                         }
                       });
                     }else{
                       UiUtils.closeLoadingPop(context);
+                      await FireBaseController.setNotificationTorF(true);
                       CommonUtils.flutterToast("사건정보 찾기 실패\n다시 실행해주세요.");
                     }
                   });

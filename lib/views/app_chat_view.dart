@@ -55,7 +55,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
   late AnimationController _aniController;
 
   final ReceivePort _port = ReceivePort();
-  static String savedFileName = "";
   bool searchNoMore = false;
   double prevScrollPos = 0.0;
   static bool isScrollMove = false;
@@ -560,35 +559,31 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                 String dir = "";
                 if(appConfig.Config.isAndroid){
                   //dir = '/storage/emulated/0/Download';
-                  //StorageDirectory.downloads
-                  var list = await getExternalStorageDirectories();
-                  for(var each in list!){
-                    CommonUtils.log("w","${each.path}");
-                  }
                   dir = (await getExternalStorageDirectory())!.path;
                   //dir = (await getApplicationDocumentsDirectory()).path;
                 }else{
-                  dir = (await getExternalStorageDirectory())!.path;
+                  dir = (await getApplicationDocumentsDirectory()).path;
                 }
                 try{
-                  isOpenDownloadedFile = true;
-                  if(!isImage){
-                    CommonUtils.flutterToast("문서를 다운로드합니다.");
+                  if(appConfig.Config.isAndroid || (!appConfig.Config.isAndroid && !CommonUtils.containsKorean(url))){
+                    isOpenDownloadedFile = true;
+                    if(!isImage){
+                      CommonUtils.flutterToast("문서를 다운로드합니다.");
+                    }
+                    await FlutterDownloader.enqueue(
+                      url: url, 	// file url
+                      savedDir: '$dir/',	// 저장할 dir
+                      //fileName: '${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_doc.$extension',	// 파일명
+                      fileName: "${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_${url.split("/").last}",
+                      saveInPublicStorage: appConfig.Config.isAndroid? false : true,// 동일한 파일 있을 경우 덮어쓰기 없으면 오류발생함!
+                      showNotification: true,
+                      openFileFromNotification: true,
+                    );
+                  }else{
+                    CommonUtils.flutterToast("한글이름의 파일은\n받을수 없습니다.");
+                    isOpenDownloadedFile = false;
                   }
 
-                  await FlutterDownloader.enqueue(
-                    url: url, 	// file url
-                    savedDir: '$dir/',	// 저장할 dir
-                    fileName: '${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_doc.$extension',	// 파일명
-                    saveInPublicStorage: false,// 동일한 파일 있을 경우 덮어쓰기 없으면 오류발생함!
-                    showNotification: true,
-                    openFileFromNotification: true,
-                  );
-
-                  String fileRealName = "${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_doc.$extension";
-                  CommonUtils.log("w", "download url : $url");
-                  String fileName = "$dir/$fileRealName";
-                  savedFileName = fileName;
                 }catch(error){
                   CommonUtils.flutterToast("문서 다운로드에 실패했습니다.");
                   CommonUtils.log("e", "fail doc download $error");
@@ -881,31 +876,30 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                 UiUtils.getBorderButtonBoxWithZeroPadding(30.w, ColorStyles.upFinBlack, ColorStyles.upFinBlack,
                     UiUtils.getBoxTextAndIconWithFixedScale("저장하기", 12.sp, FontWeight.w300, TextAlign.center, ColorStyles.upFinBlack, ColorStyles.upFinWhite,
                         Icons.save_alt_rounded, ColorStyles.upFinWhite, 5.w), () async {
-
                       CommonUtils.log("w", "download url : $srcUrl");
                       String dir = "";
                       if(appConfig.Config.isAndroid){
-                        //dir = (await getApplicationDocumentsDirectory()).path;
                         dir = (await getExternalStorageDirectory())!.path;
                       }else{
-                        dir = (await getExternalStorageDirectory())!.path;
+                        dir = (await getApplicationDocumentsDirectory()).path;
                       }
                       CommonUtils.log("w", "download dir : $dir");
-                      try{
-                        isOpenDownloadedFile = false;
-                        CommonUtils.flutterToast("이미지를 다운로드합니다.");
-                        await FlutterDownloader.enqueue(
-                          url: srcUrl, 	// file url
-                          savedDir: '$dir/',	// 저장할 dir
-                          fileName: '${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_img.${srcUrl.split(".").last}',	// 파일명
-                          saveInPublicStorage: false,	// 동일한 파일 있을 경우 덮어쓰기 없으면 오류발생함!
-                          showNotification: true,
-                          openFileFromNotification: true,
-                        );
 
-                        String fileRealName = "${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_img.${srcUrl.split(".").last}";
-                        String fileName = "$dir/$fileRealName";
-                        savedFileName = fileName;
+                      try{
+                        if(appConfig.Config.isAndroid || (!appConfig.Config.isAndroid && !CommonUtils.containsKorean(srcUrl))){
+                          isOpenDownloadedFile = false;
+                          CommonUtils.flutterToast("이미지를 다운로드합니다.");
+                          await FlutterDownloader.enqueue(
+                            url: srcUrl, 	// file url
+                            savedDir: '$dir/',	// 저장할 dir
+                            fileName: "${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_${srcUrl.split("/").last}",	// 파일명
+                            saveInPublicStorage: appConfig.Config.isAndroid? false : true,	// 동일한 파일 있을 경우 덮어쓰기 없으면 오류발생함!
+                            showNotification: true,
+                            openFileFromNotification: true,
+                          );
+                        }else{
+                          CommonUtils.flutterToast("한글이름의 파일는\n받을수 없습니다.");
+                        }
 
                       }catch(error){
                         CommonUtils.flutterToast("이미지 다운로드에 실패했습니다.");

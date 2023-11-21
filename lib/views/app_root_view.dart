@@ -387,7 +387,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
 
         String allText = deniedPermissionsString.contains(",")? " 모두"  : "";
 
-        UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, 22.h, 0.5, (slideContext, setState){
+        UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, Config.isAndroid ? 22.h : 27.h, 0.5, (slideContext, setState){
           return Column(mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 UiUtils.getMarginBox(100.w, 1.h),
@@ -466,6 +466,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
         permissionCheckTimer ??= Timer.periodic(const Duration(seconds: 2), (Timer timer) async {
           isPermissionDenied = await CommonUtils.isPermissionDenied();
           if(isPermissionDenied && !isPermissionCheckPopStarted){
+            CommonUtils.log("W","req");
             await _requestPermissions();
           }else if(!isPermissionDenied && isPermissionCheckPopStarted){
             if(permissionCheckTimer != null) permissionCheckTimer!.cancel();
@@ -479,7 +480,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
 
     }else if(Config.appState == Config.stateInfoMap["update"]){
       if(context.mounted){
-        UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, 18.h, 0.5, (context, setState){
+        UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isAndroid ? 18.h : 23.h, 0.5, (context, setState){
           return Center(child: Column(children: [
             UiUtils.getMarginBox(0, 1.h),
             UiUtils.getTextWithFixedScale("🔔 앱 업데이트가 필요합니다.", 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
@@ -494,7 +495,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
       }
     }else if(Config.appState == Config.stateInfoMap["close"]){
       if(context.mounted){
-        UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, 30.h, 0.5, (context, setState){
+        UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isAndroid ? 30.h : 35.h, 0.5, (context, setState){
           return Column(children: [
             UiUtils.getMarginBox(0, 3.h),
             Center(child: UiUtils.getTextWithFixedScale("🥹 시스템 점검중입니다.", 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),

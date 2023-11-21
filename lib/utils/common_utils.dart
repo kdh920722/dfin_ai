@@ -546,11 +546,20 @@ class CommonUtils {
     }
   }
 
-  static Future<void> renameFile(String targetImagePath, String newImagePath) async {
-    File originalFile = File(targetImagePath);
-    await originalFile.rename(newImagePath);
-    CommonUtils.log('i', 'after rename image file');
-    await printFileSize(File(newImagePath));
+  static Future<String> renameFile(String targetImagePath, String newFileName) async {
+    try {
+      final originalFile = File(targetImagePath);
+      final directory = originalFile.parent;
+      final ext = targetImagePath.split(".").last;
+      final destinationFile = File('${directory.path}/$newFileName.$ext');
+      await originalFile.copy(destinationFile.path);
+
+      CommonUtils.log("w","new file : ${destinationFile.path}");
+      return destinationFile.path;
+    } catch (e) {
+      CommonUtils.log("w","new file error: $e");
+      return "";
+    }
   }
 
   static String getNewImagePath(String targetImagePath){
@@ -694,6 +703,17 @@ class CommonUtils {
     }
   }
 
+  static bool containsKorean(String text) {
+    for (int i = 0; i < text.length; i++) {
+      final characterCode = text.codeUnitAt(i);
+      if ((characterCode >= 0xAC00 && characterCode <= 0xD7A3) ||
+          (characterCode >= '가'.codeUnitAt(0) && characterCode <= '힣'.codeUnitAt(0))) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   static void resetData(){
     MyData.resetMyData();
     hideKeyBoard();
@@ -803,7 +823,7 @@ class CommonUtils {
   }
 
   static bool isEmailValid(String email) {
-    if(email.length <= 5 || email.contains(" ") ||  email.contains("..")){
+    if(email == "" || email.length <= 5 || email.contains(" ") ||  email.contains("..")){
       return false;
     }else{
       // 이메일 형식을 확인하기 위한 정규 표현식
@@ -819,11 +839,23 @@ class CommonUtils {
     bool result = false;
     for(var each in Config.permissionList){
       var status = await each.status;
-      if (status.isDenied) {
-        result = true;
+      CommonUtils.log("W","status : ${status.isDenied} || ${status.isLimited} || ${status.isGranted}");
+      if(Config.isAndroid){
+        if (status.isDenied) {
+          result = true;
+        }
+      }else{
+        if(status.isDenied){
+          result = true;
+        }else{
+          if(!status.isGranted){
+            result = true;
+          }
+
+        }
       }
     }
-
+    CommonUtils.log("W","status result : $result");
     return result;
   }
 
@@ -831,18 +863,48 @@ class CommonUtils {
     List<String> deniedPermissions = [];
     for(var each in Config.permissionList){
       var status = await each.request();
-      if (status.isDenied) {
-        String permissionName = each.toString().split('.').last;
-        CommonUtils.log("w", "p name : $permissionName");
-        switch(permissionName){
-          case "notification" : permissionName = "알림";
-          case "phone" : permissionName = "전화";
-          case "camera" : permissionName = "카메라";
-          case "photos" : permissionName = "앨범";
-          case "storage" : permissionName = "저장소";
-          case "manageExternalStorage" : permissionName = "저장소";
+      if(Config.isAndroid){
+        if (status.isDenied) {
+          String permissionName = each.toString().split('.').last;
+          CommonUtils.log("w", "p name : $permissionName");
+          switch(permissionName){
+            case "notification" : permissionName = "알림";
+            case "phone" : permissionName = "전화";
+            case "camera" : permissionName = "카메라";
+            case "photos" : permissionName = "앨범";
+            case "storage" : permissionName = "저장소";
+            case "manageExternalStorage" : permissionName = "저장소";
+          }
+          deniedPermissions.add(permissionName);
         }
-        deniedPermissions.add(permissionName);
+      }else{
+        if (status.isDenied) {
+          String permissionName = each.toString().split('.').last;
+          CommonUtils.log("w", "p name : $permissionName");
+          switch(permissionName){
+            case "notification" : permissionName = "알림";
+            case "phone" : permissionName = "전화";
+            case "camera" : permissionName = "카메라";
+            case "photos" : permissionName = "앨범";
+            case "storage" : permissionName = "저장소";
+            case "manageExternalStorage" : permissionName = "저장소";
+          }
+          deniedPermissions.add(permissionName);
+        }else{
+          if (!status.isGranted) {
+            String permissionName = each.toString().split('.').last;
+            CommonUtils.log("w", "p name : $permissionName");
+            switch(permissionName){
+              case "notification" : permissionName = "알림";
+              case "phone" : permissionName = "전화";
+              case "camera" : permissionName = "카메라";
+              case "photos" : permissionName = "앨범";
+              case "storage" : permissionName = "저장소";
+              case "manageExternalStorage" : permissionName = "저장소";
+            }
+            deniedPermissions.add(permissionName);
+          }
+        }
       }
     }
 

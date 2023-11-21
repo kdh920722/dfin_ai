@@ -9,6 +9,7 @@ import 'package:upfin/views/app_agree_detail_info_view.dart';
 import 'package:upfin/views/app_agree_detail_info_view_test.dart';
 import 'package:upfin/views/app_apply_pr_view.dart';
 import 'package:upfin/views/app_detail_pr_view.dart';
+import 'package:upfin/views/app_findpw_view.dart';
 import 'package:upfin/views/app_main_view.dart';
 import 'package:upfin/views/app_result_pr_view.dart';
 import 'package:upfin/views/app_root_view.dart';
@@ -61,6 +62,7 @@ class Config{
     AppView.appAgreeDetailInfoView.value : (context) => AppAgreeDetailInfoView(),
     AppView.appSignOutView.value : (context) => AppSignOutView(),
     AppView.appAgreeDetailInfoViewTest.value : (context) => AppAgreeDetailInfoViewTest(),
+    AppView.appFindPwView.value : (context) => AppFindPwView(),
     AppView.debugForAdminView.value : (context) => DebugForAdminView(),
   };
 
@@ -82,8 +84,8 @@ class Config{
         List<Permission> permissionListForAndroid = [Permission.notification, Permission.camera, Permission.phone];
         permissionList.addAll(permissionListForAndroid);
       }else{
-        List<Permission> permissionListForAndroid = [Permission.notification, Permission.camera, Permission.photos];
-        permissionList.addAll(permissionListForAndroid);
+        List<Permission> permissionListForIos = [Permission.notification, Permission.camera, Permission.photos];
+        permissionList.addAll(permissionListForIos);
       }
 
       bool isValid = true;
@@ -163,7 +165,7 @@ class Config{
 enum AppView {
   appRootView, appLoginView, appCertificationView, appSignupView, appMainView, appSearchAccidentView, appSignOutView,
   appUpdateAccidentView, appResultPrView, appDetailPrView, appApplyPrView, appChatView, appAccidentDetailInfoView, appAgreeDetailInfoView, appAgreeDetailInfoViewTest,
-  debugForAdminView
+  appFindPwView, debugForAdminView
 }
 
 extension SAppViewExtension on AppView {
@@ -199,6 +201,8 @@ extension SAppViewExtension on AppView {
         return '/appSignOutView';
       case AppView.appAgreeDetailInfoViewTest:
         return '/appAgreeDetailInfoViewTest';
+      case AppView.appFindPwView:
+        return '/appFindPwView';
       case AppView.debugForAdminView:
         return '/debugForAdminView';
     }

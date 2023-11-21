@@ -7,18 +7,19 @@ import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import '../controllers/firebase_controller.dart';
+import '../controllers/sharedpreference_controller.dart';
 import '../styles/TextStyles.dart';
 import '../configs/app_config.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
 
-class AppSignUpView extends StatefulWidget{
+class AppFindPwView extends StatefulWidget{
   @override
-  AppSignUpViewState createState() => AppSignUpViewState();
+  AppFindPwViewState createState() => AppFindPwViewState();
 }
 
-class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserver{
-  int viewId = 1;
+class AppFindPwViewState extends State<AppFindPwView> with WidgetsBindingObserver{
+  static int viewId = 1;
   bool isPwShowValid = false;
   bool isPhoneShowValid = false;
   bool isButtonValid = false;
@@ -29,6 +30,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
   bool isEmailValid = false;
   bool isEmailViewValid = false;
   String confirmedEmail = "";
+  String foundedEmail = "";
   final _formKeyForVerify = GlobalKey<FormState>();
   bool isVerifyViewValid = false;
   final _formKeyForSignIn = GlobalKey<FormState>();
@@ -74,7 +76,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
 
   @override
   void initState(){
-    CommonUtils.log("i", "AppSignUpViewState 화면 입장");
+    CommonUtils.log("i", "AppFindPwViewState 화면 입장");
     super.initState();
     confirmedName = "X";
     confirmedPhone = "X";
@@ -93,12 +95,11 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
     GetController.to.resetConfirmed();
     Config.contextForEmergencyBack = context;
     Config.isEmergencyRoot = false;
-    FireBaseController.analytics!.logSignUp(signUpMethod: '');
   }
 
   @override
   void dispose(){
-    CommonUtils.log("i", "AppSignUpViewState 화면 파괴");
+    CommonUtils.log("i", "AppFindPwViewState 화면 파괴");
     WidgetsBinding.instance.removeObserver(this);
     _unFocusAllNodes();
     _disposeAllTextControllers();
@@ -111,17 +112,17 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
-        CommonUtils.log('i','AppSignUpView resumed');
+        CommonUtils.log('i','AppFindPwViewState resumed');
         break;
       case AppLifecycleState.inactive:
-        CommonUtils.log('i','AppSignUpView inactive');
+        CommonUtils.log('i','AppFindPwViewState inactive');
         break;
       case AppLifecycleState.detached:
-        CommonUtils.log('i','AppSignUpView detached');
+        CommonUtils.log('i','AppFindPwViewState detached');
         // DO SOMETHING!
         break;
       case AppLifecycleState.paused:
-        CommonUtils.log('i','AppSignUpView paused');
+        CommonUtils.log('i','AppFindPwViewState paused');
         break;
       default:
         break;
@@ -213,7 +214,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
       ])),
       SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         UiUtils.getMarginBox(0, 3.w),
-        UiUtils.getTextWithFixedScale("회원가입", 26.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
+        UiUtils.getTextWithFixedScale("비밀번호 찾기", 26.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
         UiUtils.getMarginBox(0, 3.h)
       ])),
       UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _emailTextFocus, _emailTextController, TextInputType.emailAddress, false,
@@ -274,7 +275,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
               };
               UiUtils.showLoadingPop(context);
               LogfinController.callLogfinApi(LogfinApis.checkMember, inputJson, (isSuccess, outputJson){
-                if(isSuccess){
+                if(!isSuccess){
                   CommonUtils.flutterToast("인증번호를 발송합니다.");
                   _verifyCodeTextController.text = "";
                   LogfinController.callLogfinApi(LogfinApis.sendEmailCode, inputJson, (isSuccess, outputJson){
@@ -300,7 +301,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                     isEmailValid = false;
                     isVerifyViewValid = false;
                   });
-                  CommonUtils.flutterToast("이미 존재하는 이메일 입니다.");
+                  CommonUtils.flutterToast("존재하지 않는 이메일 입니다.");
                 }
               });
             }else{
@@ -324,13 +325,11 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
       ])),
       SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         UiUtils.getMarginBox(0, 3.w),
-        UiUtils.getTextWithFixedScale("회원가입", 26.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
+        UiUtils.getTextWithFixedScale("비밀번호 변경", 26.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
         UiUtils.getMarginBox(0, 3.h)
       ])),
-      UiUtils.getDisabledTextField(context, 90.w, confirmedEmail, TextStyles.upFinTextFormFieldTextStyle, UiUtils.getInputDecoration("이메일", 12.sp, "", 0.sp)),
-      UiUtils.getMarginBox(0, 2.h),
       UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _pwdTextFocus, _pwdTextController, TextInputType.visiblePassword, true,
-          UiUtils.getInputDecoration("비밀번호", 12.sp, "", 0.sp), (text) { }, (value){
+          UiUtils.getInputDecoration("새로운 비밀번호", 12.sp, "", 0.sp), (text) { }, (value){
             if(value != null && value.trim().isEmpty){
               return "비밀번호를 입력하세요.";
             }else{
@@ -343,7 +342,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
       }),
       UiUtils.getMarginBox(0, 2.h),
       UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _pwdConfirmFocus, _pwdConfirmTextController, TextInputType.visiblePassword, true,
-          UiUtils.getInputDecoration("비밀번호 확인", 12.sp, "", 0.sp), (text) { }, (value){
+          UiUtils.getInputDecoration("새로운 비밀번호 확인", 12.sp, "", 0.sp), (text) { }, (value){
             if(value != null && value.trim().isEmpty){
               return "비밀번호를 한번 더 입력하세요.";
             }else{
@@ -362,8 +361,29 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
         if(_formKeyForSignIn.currentState!.validate()){
           CommonUtils.hideKeyBoard();
-          setState(() {
-            viewId = 3;
+          Map<String, dynamic> inputJson4 = {
+            "user":{
+              "email": confirmedEmail, // 사용자의 이메일 주소
+              "password": _pwdTextController.text.trim(),             // 새 비밀번호
+              "password_confirmation": _pwdConfirmTextController.text.trim() // 새 비밀번호 확인
+            }
+          };
+          UiUtils.showLoadingPop(context);
+          LogfinController.callLogfinApi(LogfinApis.updatePassword, inputJson4, (isSuccess, outputJson){
+            if(isSuccess){
+              SharedPreferenceController.deleteValidAutoLoginData();
+              DateTime thirtyMinutesLater = CommonUtils.addTimeToTargetTime(CommonUtils.getCurrentLocalTime());
+              SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceValidDateKey, CommonUtils.convertTimeToString(thirtyMinutesLater));
+              SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferencePwKey, "");
+              SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceIsSnsLogin, "N");
+              UiUtils.closeLoadingPop(context);
+              setState(() {
+                viewId = 3;
+              });
+            }else{
+              UiUtils.closeLoadingPop(context);
+              CommonUtils.flutterToast("비밀번호 변경에 실패했습니다.");
+            }
           });
         }else{
           if(_pwdTextController.text.trim() == _pwdConfirmTextController.text.trim() && _pwdTextController.text.length <= 6){
@@ -376,6 +396,36 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
     ]));
   }
 
+  Widget _getConfirmedView(){
+    return Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center, children: [
+      UiUtils.getMarginBox(0, 36.h),
+      UiUtils.getCustomCircleCheckBox(UniqueKey(),4, true, ColorStyles.upFinWhite, ColorStyles.upFinButtonBlue,
+          ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue, (checkedValue){}),
+      UiUtils.getMarginBox(0, 5.h),
+      UiUtils.getTextWithFixedScale("변경이 완료되었습니다.", 14.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.center, null),
+      UiUtils.getExpandedScrollView(Axis.vertical, Container()),
+      UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+          UiUtils.getTextWithFixedScale("확인", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
+            CommonUtils.backToHome(context);
+          })
+    ]);
+  }
+
+  Widget _getConfirmedViewForId(){
+    return UiUtils.getRowColumnWithAlignCenter([
+      SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        UiUtils.getMarginBox(0, 11.w),
+        UiUtils.getTextWithFixedScale("등록된 아이디", 26.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
+        UiUtils.getMarginBox(0, 3.h)
+      ])),
+      UiUtils.getDisabledTextField(context, 90.w, foundedEmail, TextStyles.upFinTextFormFieldTextStyle, UiUtils.getInputDecoration("이메일", 12.sp, "", 0.sp)),
+      UiUtils.getExpandedScrollView(Axis.vertical, Container()),
+      UiUtils.getTextButtonBox(90.w, "확인", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
+        CommonUtils.backToHome(context);
+      })
+    ]);
+  }
+
   Widget _getPhoneValidView(){
     return Form(key: _formKey2, child: UiUtils.getRowColumnWithAlignCenter([
       Obx(()=>!GetController.to.isConfirmed.value? SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -385,7 +435,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
       ])) : UiUtils.getMarginBox(0, 7.h)),
       SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         UiUtils.getMarginBox(0, 3.w),
-        UiUtils.getTextWithFixedScale("본인인증", 26.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
+        UiUtils.getTextWithFixedScale("아이디 찾기", 26.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
         UiUtils.getMarginBox(0, 3.h)
       ])),
       UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _nameTextFocus, _nameTextController, TextInputType.text, false,
@@ -414,80 +464,61 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                 "contact_no": _phoneNumberTextController.text.trim(),
               };
               UiUtils.showLoadingPop(context);
-              LogfinController.callLogfinApi(LogfinApis.checkMemberByPhone, inputJson4, (isSuccess, outputJson){
+              LogfinController.callLogfinApi(LogfinApis.checkMemberByPhone, inputJson4, (isSuccess, outputJson) async {
                 UiUtils.closeLoadingPop(context);
-                if(isSuccess){
-                  UiUtils.showAgreePop(context, "A", () async {
-                    Map<String, String> inputJsonForCert = {
-                      "carrier": "",
-                      "name" : _nameTextController.text.trim(),
-                      "phone" : _phoneNumberTextController.text.trim()
-                    };
-                    var result = await CommonUtils.moveToWithResult(context, AppView.appCertificationView.value, inputJsonForCert);
-                    if(result != null){
-                      CommonUtils.flutterToast("인증 성공");
-                      Map<String, dynamic> resultMap = result as Map<String, dynamic>;
-                      for(var each in IamportController.carrierList){
-                        if(each.split("@")[0] == resultMap["carrier"]){
-                          MyData.telecomTypeFromPhoneCert = each.split("@")[1];
-                        }
-                      }
+                if(!isSuccess){
+                  Map<String, String> inputJsonForCert = {
+                    "carrier": "",
+                    "name" : _nameTextController.text.trim(),
+                    "phone" : _phoneNumberTextController.text.trim()
+                  };
+                  var result = await CommonUtils.moveToWithResult(context, AppView.appCertificationView.value, inputJsonForCert);
+                  if(result != null){
+                    CommonUtils.flutterToast("인증 성공");
+                    confirmedName = _nameTextController.text.trim();
+                    confirmedPhone = _phoneNumberTextController.text.trim();
 
-                      if(resultMap["gender"] == "male"){
-                        MyData.isMaleFromPhoneCert = true;
-                      }else{
-                        MyData.isMaleFromPhoneCert = false;
-                      }
-                      MyData.birthFromPhoneCert = (resultMap["birth"] as String).split("-")[0]+(resultMap["birth"] as String).split("-")[1]+(resultMap["birth"] as String).split("-")[2];
-
-                      confirmedName = _nameTextController.text.trim();
-                      confirmedPhone = _phoneNumberTextController.text.trim();
-
-                      // 가입 & 로그인
-                      Map<String, dynamic> inputJson = {
-                        "user" : {
-                          "email": _emailTextController.text.trim(),
-                          "password": _pwdTextController.text.trim(),
-                          "password_confirmation": _pwdConfirmTextController.text.trim(),
-                          "name" : _nameTextController.text.trim(),
-                          "contact_no" : _phoneNumberTextController.text.trim(),
-                          "telecom" : MyData.telecomTypeFromPhoneCert,
-                          "birthday" : MyData.birthFromPhoneCert,
-                          "gender" : MyData.isMaleFromPhoneCert? "1" : "2",
-                        }
+                    if(context.mounted){
+                      UiUtils.showLoadingPop(context);
+                      Map<String, dynamic> inputJson1 = {
+                        "contact_no": confirmedPhone,
+                        "name": confirmedName
                       };
-                      CommonUtils.log("i", "signup input :\n$inputJson");
-                      if(context.mounted){
-                        UiUtils.showLoadingPop(context);
-                        LogfinController.callLogfinApi(LogfinApis.signUp, inputJson, (isSuccessToSignup, outputJson) async {
-                          if(isSuccessToSignup){
-                            isConfirmed = true;
-                            GetController.to.updateConfirmed(isConfirmed);
-                            CommonUtils.flutterToast("환영합니다!");
-                            // 캐시 데이터 저장
-                            await CommonUtils.saveSettingsToFile("push_from", "");
-                            await CommonUtils.saveSettingsToFile("push_room_id", "");
-                            await LogfinController.getMainViewInfo((isSuccessToGetMainInfo){
-                              UiUtils.closeLoadingPop(context);
-                              if(isSuccessToGetMainInfo){
-                                CommonUtils.goToMain(context, _emailTextController.text.trim(), _pwdTextController.text.trim());
-                              }
-                            });
-                          }else{
-                            isConfirmed = false;
-                            GetController.to.updateConfirmed(isConfirmed);
-                            UiUtils.closeLoadingPop(context);
-                            CommonUtils.flutterToast(outputJson!["error"]);
-                          }
-                        });
-                      }
-                    }else{
-                      isConfirmed = false;
-                      CommonUtils.flutterToast("본인인증에 실패했습니다.");
+                      LogfinController.callLogfinApi(LogfinApis.findEmail, inputJson1, (isSuccess, outputJson){
+                        UiUtils.closeLoadingPop(context);
+                        if(isSuccess){
+                          setState(() {
+                            String tempEmail = outputJson!["email"];
+                            List<String> tempEmailList = tempEmail.split("@");
+                            if(tempEmailList[0].length == 2){
+                              tempEmail = "${tempEmailList[0].substring(0,1)}•";
+                            }else if(tempEmailList[0].length == 3){
+                              tempEmail = "${tempEmailList[0].substring(0,1)}•${tempEmailList[0].substring(2)}";
+                            }else if(tempEmailList[0].length == 4){
+                              tempEmail = "${tempEmailList[0].substring(0,2)}•${tempEmailList[0].substring(3)}";
+                            }else if(tempEmailList[0].length == 5){
+                              tempEmail = "${tempEmailList[0].substring(0,2)}••${tempEmailList[0].substring(4)}";
+                            }else if(tempEmailList[0].length == 6){
+                              tempEmail = "${tempEmailList[0].substring(0,2)}•••${tempEmailList[0].substring(5)}";
+                            }else if(tempEmailList[0].length == 7){
+                              tempEmail = "${tempEmailList[0].substring(0,3)}•••${tempEmailList[0].substring(6)}";
+                            }else{
+                              tempEmail = "${tempEmailList[0].substring(0,3)}•••${tempEmailList[0].substring(7)}";
+                            }
+                            foundedEmail = "$tempEmail@${tempEmailList[1]}";
+                            viewId = 5;
+                          });
+                        }else{
+                          CommonUtils.flutterToast("이메일을 찾지 못했습니다.");
+                        }
+                      });
                     }
-                  });
+                  }else{
+                    isConfirmed = false;
+                    CommonUtils.flutterToast("본인인증에 실패했습니다.");
+                  }
                 }else{
-                  CommonUtils.flutterToast("이미 등록된 전화번호입니다.");
+                  CommonUtils.flutterToast("등록되지 않은 전화번호입니다.");
                 }
               });
             }else{
@@ -499,25 +530,36 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
 
   bool backValid = true;
   void back(){
-    if(backValid){
-      backValid = false;
-      CommonUtils.hideKeyBoard();
-      if(viewId == 1){
-        Navigator.pop(context);
-      }else{
-        viewId--;
-        setState(() {});
+    if(viewId < 3){
+      if(backValid){
+        backValid = false;
+        CommonUtils.hideKeyBoard();
+        if(viewId == 1){
+          Navigator.pop(context);
+        }else{
+          viewId--;
+          setState(() {});
+        }
+        Future.delayed(const Duration(milliseconds: 400), () async {
+          backValid = true;
+        });
       }
-      Future.delayed(const Duration(milliseconds: 400), () async {
-        backValid = true;
-      });
+    }else if(viewId == 4){
+      if(backValid){
+        backValid = false;
+        CommonUtils.hideKeyBoard();
+        Navigator.pop(context);
+        Future.delayed(const Duration(milliseconds: 400), () async {
+          backValid = true;
+        });
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
     Widget view = Container(width: 100.w, height: Config.isAndroid? 95.h: 90.h, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w),
-        child: viewId == 1 ? _getEmailView() : viewId == 2 ? _getPwInfoView() : _getPhoneValidView());
+        child: viewId == 1 ? _getEmailView() : viewId == 2 ? _getPwInfoView() : viewId == 3 ? _getConfirmedView() : viewId == 4 ? _getPhoneValidView() : _getConfirmedViewForId());
 
 
     return UiUtils.getScrollViewWithAllowBackForAndroid(context, view, _scrollController, back);

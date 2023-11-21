@@ -3,6 +3,7 @@ import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/controllers/sharedpreference_controller.dart';
 import 'package:sizer/sizer.dart';
 import 'package:upfin/styles/ColorStyles.dart';
+import 'package:upfin/views/app_findpw_view.dart';
 import '../styles/TextStyles.dart';
 import '../configs/app_config.dart';
 import '../utils/common_utils.dart';
@@ -158,7 +159,24 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
                 CommonUtils.flutterToast("입력하신 정보를\n다시 확인 해 주세요.");
               }
             }
-          })
+          }),
+          UiUtils.getMarginBox(0, 0.4.h),
+          UiUtils.getBorderButtonBoxWithZeroPadding(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
+              Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment:MainAxisAlignment.center, children: [
+                UiUtils.getBorderButtonBoxWithZeroPadding(30.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
+                    UiUtils.getTextWithFixedScale("아이디 찾기", 12.sp, FontWeight.w300, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, null), () {
+                      AppFindPwViewState.viewId = 4;
+                      CommonUtils.moveTo(context, AppView.appFindPwView.value, null);
+                    }),
+                UiUtils.getMarginBox(0.1.w, 0),
+                UiUtils.getMarginColoredBox(0.2.w, 5.w, ColorStyles.upFinTextAndBorderBlue),
+                UiUtils.getMarginBox(1.w, 0),
+                UiUtils.getBorderButtonBoxWithZeroPadding(30.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
+                    UiUtils.getTextWithFixedScale("비밀번호 찾기", 12.sp, FontWeight.w300, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, null), () {
+                      AppFindPwViewState.viewId = 1;
+                      CommonUtils.moveTo(context, AppView.appFindPwView.value, null);
+                    })
+              ]), () {})
         ])
     )
     );

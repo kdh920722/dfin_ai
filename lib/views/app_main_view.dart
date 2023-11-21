@@ -114,7 +114,61 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               UiUtils.getTextWithFixedScale("사건기록", 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1),
               const Spacer(flex: 2),
               MyData.email == "lalalllaa@kakao.com" ? UiUtils.getIconButton(Icons.comments_disabled_sharp, 7.w, ColorStyles.upFinRed, () {
-                CommonUtils.moveTo(context, AppView.debugForAdminView.value, null);
+                //CommonUtils.moveTo(context, AppView.debugForAdminView.value, null);
+                /*
+                CommonUtils.log("w","sdsada");
+                Map<String, dynamic> inputJson1 = {
+                  "contact_no": "01054041099",
+                  "name": "김동환"
+                };
+                LogfinController.callLogfinApi(LogfinApis.findEmail, inputJson1, (isSuccess, outputJson){
+                  if(isSuccess){
+                    CommonUtils.log("w","sdasd : ${outputJson!["email"]}");
+                  }
+                });
+
+                Map<String, dynamic> inputJson2 = {
+                  "email": "kdh920722@gmail.com",
+                };
+                LogfinController.callLogfinApi(LogfinApis.sendEmailCode, inputJson2, (isSuccess, outputJson){
+                  if(isSuccess){
+                    CommonUtils.log("w","scall");
+                  }
+                });
+
+                Map<String, dynamic> inputJson3 = {
+                  "email": "kdh920722@gmail.com",
+                  "verification_code": "455567",
+                };
+                LogfinController.callLogfinApi(LogfinApis.checkEmailCode, inputJson3, (isSuccess, outputJson){
+                  if(isSuccess){
+                    CommonUtils.log("w","scall2");
+                  }
+                });
+                Map<String, dynamic> inputJson4 = {
+                  "contact_no": "01054041099",
+                };
+                LogfinController.callLogfinApi(LogfinApis.checkMemberByPhone, inputJson4, (isSuccess, outputJson){
+                  if(isSuccess){
+                    CommonUtils.log("w","scall22");
+                  }
+                });
+
+                Map<String, dynamic> inputJson4 = {
+                  "user":{
+                    "email": 'lalalllaa@kakao.com', // 사용자의 이메일 주소
+                    "password": '2222222',             // 새 비밀번호
+                    "password_confirmation": '2222222' // 새 비밀번호 확인
+                  }
+                };
+                LogfinController.callLogfinApi(LogfinApis.updatePassword, inputJson4, (isSuccess, outputJson){
+                  if(isSuccess){
+                    CommonUtils.log("w","scall22");
+                  }
+                });
+                */
+
+
               }) : UiUtils.getMarginBox(0, 0),
               UiUtils.getMarginBox(2.w, 0),
               UiUtils.getIconButton(Icons.add, 7.w, ColorStyles.upFinDarkGray, () {
@@ -305,7 +359,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                       //
                       UiUtils.getBoxTextWithFixedScale("개인회생", 8.sp, FontWeight.w600, TextAlign.center, ColorStyles.upFinWhiteSky, ColorStyles.upFinButtonBlue),
                       UiUtils.getMarginBox(2.w, 0),
-                      !MyData.isPossibleAccidentInfo(each)? UiUtils.getBoxTextWithFixedScale("환급계좌 오류", 8.sp, FontWeight.w500, TextAlign.start, ColorStyles.upFinWhiteRed, ColorStyles.upFinRed) : Container()
+                      !MyData.isPossibleAccidentInfo(each)? UiUtils.getBoxTextWithFixedScale("환급계좌 오류", 8.sp, FontWeight.w600, TextAlign.start, ColorStyles.upFinWhiteRed, ColorStyles.upFinRed) : Container()
                     ]),
                     UiUtils.getMarginBox(0, 0.5.h),
                     Row(mainAxisAlignment: MainAxisAlignment.start, children: [

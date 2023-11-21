@@ -59,6 +59,9 @@ class AwsController {
 
   static Future<void> uploadFileToAWS(String filePath, String awsPath, Function(bool isSuccess, String resultUrl) callback) async {
     try{
+      if(CommonUtils.containsKorean(filePath)){
+        filePath = await CommonUtils.renameFile(filePath, "${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_renameForKorean");
+      }
       String? result = await AwsS3.uploadFile(
           accessKey: awsAccessKey,
           secretKey: awsSecretKey,

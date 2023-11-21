@@ -261,7 +261,9 @@ class LogfinController {
     }
 
     if(api != LogfinApis.signIn && api != LogfinApis.signUp && api != LogfinApis.socialLogin
-        && api != LogfinApis.deleteAccount && api != LogfinApis.checkMember && api != LogfinApis.getAgreeDocuments && api != LogfinApis.getFaqs){
+        && api != LogfinApis.deleteAccount && api != LogfinApis.checkMember && api != LogfinApis.getAgreeDocuments && api != LogfinApis.getFaqs
+        && api != LogfinApis.findEmail && api != LogfinApis.sendEmailCode && api != LogfinApis.checkEmailCode
+        && api != LogfinApis.checkMemberByPhone && api != LogfinApis.updatePassword){
       if(userToken != ""){
         inputJson['api_token'] = userToken;
       }else{
@@ -307,6 +309,9 @@ class LogfinController {
             return;
           }else if(api == LogfinApis.getFaqs){
             callback(true, jsonDecode(resultData['data']));
+            return;
+          }else if(api == LogfinApis.findEmail){
+            callback(true, resultData);
             return;
           }
           callback(true, resultData['data']);
@@ -654,7 +659,8 @@ enum LogfinApis {
   getAccidentInfo, getOffersInfo,
   getLoansInfo, getLoansDetailInfo,
   sendMessage, getMessage, checkMessage, getAgreeDocuments, getFaqs,
-  getRetryDocs, retryDocs
+  getRetryDocs, retryDocs,
+  findEmail, sendEmailCode, checkEmailCode, checkMemberByPhone, updatePassword
 }
 
 extension LogfinApisExtension on LogfinApis {
@@ -706,6 +712,17 @@ extension LogfinApisExtension on LogfinApis {
         return '/unsubmitted_documents.json';
       case LogfinApis.retryDocs:
         return '/add_documents.json';
+      case LogfinApis.findEmail:
+        return '/find_email.json';
+      case LogfinApis.sendEmailCode:
+        return '/send_email_verification.json';
+      case LogfinApis.checkEmailCode:
+        return '/check_email_verification.json';
+      case LogfinApis.checkMemberByPhone:
+        return '/check_member_phone.json';
+      case LogfinApis.updatePassword:
+        return '/users/update_password.json';
+
     }
   }
 }

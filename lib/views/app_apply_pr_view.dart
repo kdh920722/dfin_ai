@@ -103,7 +103,19 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   final _addressInfoFocus = FocusNode();
   final _addressInfoTextController = TextEditingController();
   void _addressTextControllerListener() {
+    if(_addressInfoTextController.text.trim() == ""){
+      _clearAddress();
+    }
+  }
 
+  void _clearAddress(){
+    setState(() {
+      CommonUtils.log("w", "sda");
+      selectedAddressKey = null;
+      selectedAddressInfo = "";
+      _addressInfoTextController.text = "";
+      addressList.clear();
+    });
   }
 
   int cameraId = 99;
@@ -1576,8 +1588,24 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       addressWidgetList.add(UiUtils.getMarginBox(0, 3.h));
     }
 
-    CommonUtils.log("w", "textf : ${12.sp} || ${MediaQuery.of(context).textScaleFactor}");
-
+    if(addressList.isEmpty){
+      addressWidgetList.add(
+          SizedBox(width: 90.w, child: Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
+            UiUtils.getRoundBoxTextWithFixedScale(" 🚨 안내사항 ", 11.sp, FontWeight.w600, TextAlign.start, ColorStyles.upFinBlack, ColorStyles.upFinWhite),
+            UiUtils.getMarginBox(0, 1.h),
+            UiUtils.getTextWithFixedScale2(
+                "1.동 이름과 지번, 도로명과 건물번호를 포함하여 검색해주세요."
+                    "\n   예시) 서초동 967, 서초대로 219", 9.sp, FontWeight.w300, ColorStyles.upFinBlack, TextAlign.start, null),
+            UiUtils.getMarginBox(0, 0.5.h),
+            UiUtils.getTextWithFixedScale2(
+                "2.동명칭이 정확하지 않은 경우 '~동'을 제외한 명칭을 입력하세요."
+                    "\n   '서초'만 입력하면 서초동, 서초1동, 서초2..등을 모두 검색합니다.", 9.sp, FontWeight.w300, ColorStyles.upFinBlack, TextAlign.start, null),
+            UiUtils.getMarginBox(0, 0.5.h),
+            UiUtils.getTextWithFixedScale2(
+                "3.집합건물인 경우, 건물명칭보다는 지번으로 검색하면, 더 정확한 결과를 얻을 수 있습니다.", 9.sp, FontWeight.w300, ColorStyles.upFinBlack, TextAlign.start, null),
+          ]))
+      );
+    }
 
     return Stack(children: [
       UiUtils.getRowColumnWithAlignCenter([
@@ -1592,33 +1620,43 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         SizedBox(width: 85.w, height: 10.h,
             child: UiUtils.getTextField(context, 80.w, TextStyles.upFinTextFormFieldTextStyle, _addressInfoFocus,
                 _addressInfoTextController, TextInputType.text, UiUtils.getInputDecorationForAddress("등본상 주소", 12.sp,
-                    UiUtils.getIconButton(Icons.search, 8.w, ColorStyles.upFinButtonBlue, () {
-                      if(_addressInfoTextController.text.trim() != ""){
-                        CommonUtils.hideKeyBoard();
-                        selectedAddressKey = null;
-                        selectedAddressInfo = "";
-                        addressList.clear();
-                        UiUtils.showLoadingPop(context);
-                        JusoController.getAddressFromJuso(_addressInfoTextController.text,(bool isSuccess, outputList){
-                          UiUtils.closeLoadingPop(context);
-                          if(isSuccess){
-                            if(outputList!.isNotEmpty){
-                              for(var eachAddress in outputList){
-                                addressList.add(<String, String>
-                                {"jibunAddr" : eachAddress["jibunAddr"],
-                                  "roadAddr" : eachAddress["roadAddr"],
-                                  "roadAddrPart1" : eachAddress["roadAddrPart1"]});
+                    Column(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.end, children: [
+
+                      UiUtils.getMarginBox(0, 1.2.h),
+                      Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.end, crossAxisAlignment: CrossAxisAlignment.end, children: [
+                        UiUtils.getIconButton(Icons.cancel_rounded, 7.w, ColorStyles.upFinGray, () {
+                          _clearAddress();
+                        }),
+                        UiUtils.getMarginBox(1.w, 0),
+                        UiUtils.getIconButton(Icons.search, 8.w, ColorStyles.upFinButtonBlue, () {
+                          if(_addressInfoTextController.text.trim() != ""){
+                            CommonUtils.hideKeyBoard();
+                            selectedAddressKey = null;
+                            selectedAddressInfo = "";
+                            addressList.clear();
+                            UiUtils.showLoadingPop(context);
+                            JusoController.getAddressFromJuso(_addressInfoTextController.text,(bool isSuccess, outputList){
+                              UiUtils.closeLoadingPop(context);
+                              if(isSuccess){
+                                if(outputList!.isNotEmpty){
+                                  for(var eachAddress in outputList){
+                                    addressList.add(<String, String>
+                                    {"jibunAddr" : eachAddress["jibunAddr"],
+                                      "roadAddr" : eachAddress["roadAddr"],
+                                      "roadAddrPart1" : eachAddress["roadAddrPart1"]});
+                                  }
+                                  setState(() {});
+                                }else{
+                                  CommonUtils.flutterToast("검색 결과가 없습니다.");
+                                }
                               }
-                              setState(() {});
-                            }else{
-                              CommonUtils.flutterToast("검색 결과가 없습니다.");
-                            }
+                            });
+                          }else{
+                            CommonUtils.flutterToast("주소를 입력해주세요.");
                           }
-                        });
-                      }else{
-                        CommonUtils.flutterToast("주소를 입력해주세요.");
-                      }
-                    })
+                        })
+                      ]),
+                    ])
                 ), (value) { })
         ),
         UiUtils.getMarginBox(0, 2.h),
