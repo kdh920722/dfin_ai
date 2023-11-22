@@ -102,9 +102,16 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   String selectedSearchCertAddressInfo = "";
   final _addressInfoFocus = FocusNode();
   final _addressInfoTextController = TextEditingController();
+  bool isXButtonShow = false;
   void _addressTextControllerListener() {
     if(_addressInfoTextController.text.trim() == ""){
-      _clearAddress();
+      setState(() {
+        isXButtonShow = false;
+      });
+    }else{
+      setState(() {
+        isXButtonShow = true;
+      });
     }
   }
 
@@ -1591,18 +1598,20 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     if(addressList.isEmpty){
       addressWidgetList.add(
           SizedBox(width: 90.w, child: Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
-            UiUtils.getRoundBoxTextWithFixedScale(" 🚨 안내사항 ", 11.sp, FontWeight.w600, TextAlign.start, ColorStyles.upFinBlack, ColorStyles.upFinWhite),
+            UiUtils.getTextWithFixedScale2(
+                "• 동 이름과 지번, 도로명과 건물번호를 포함하여 검색", 10.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
             UiUtils.getMarginBox(0, 1.h),
             UiUtils.getTextWithFixedScale2(
-                "1.동 이름과 지번, 도로명과 건물번호를 포함하여 검색해주세요."
-                    "\n   예시) 서초동 967, 서초대로 219", 9.sp, FontWeight.w300, ColorStyles.upFinBlack, TextAlign.start, null),
-            UiUtils.getMarginBox(0, 0.5.h),
+                "• 예시: 서초동 967, 서초대로 219", 10.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
+            UiUtils.getMarginBox(0, 1.h),
             UiUtils.getTextWithFixedScale2(
-                "2.동명칭이 정확하지 않은 경우 '~동'을 제외한 명칭을 입력하세요."
-                    "\n   '서초'만 입력하면 서초동, 서초1동, 서초2..등을 모두 검색합니다.", 9.sp, FontWeight.w300, ColorStyles.upFinBlack, TextAlign.start, null),
-            UiUtils.getMarginBox(0, 0.5.h),
+                "• 동명칭이 정확하지 않은 경우 '리/동'입력란에 '~동'을 제외", 10.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
+            UiUtils.getMarginBox(0, 1.h),
             UiUtils.getTextWithFixedScale2(
-                "3.집합건물인 경우, 건물명칭보다는 지번으로 검색하면, 더 정확한 결과를 얻을 수 있습니다.", 9.sp, FontWeight.w300, ColorStyles.upFinBlack, TextAlign.start, null),
+                "• '서초'만 입력시 서초동, 서초1동, 서초2동..등이 모두 검색됨", 10.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
+            UiUtils.getMarginBox(0, 1.h),
+            UiUtils.getTextWithFixedScale2(
+                "• 집합건물인 경우, 건물명칭보다는 지번으로 검색", 10.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
           ]))
       );
     }
@@ -1617,16 +1626,15 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         UiUtils.getMarginBox(0, 3.w),
         SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("주소를 입력해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
         UiUtils.getMarginBox(0, 5.h),
-        SizedBox(width: 85.w, height: 10.h,
+        SizedBox(width: 90.w, height: 10.h,
             child: UiUtils.getTextField(context, 80.w, TextStyles.upFinTextFormFieldTextStyle, _addressInfoFocus,
                 _addressInfoTextController, TextInputType.text, UiUtils.getInputDecorationForAddress("등본상 주소", 12.sp,
                     Column(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.end, children: [
-
                       UiUtils.getMarginBox(0, 1.2.h),
                       Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.end, crossAxisAlignment: CrossAxisAlignment.end, children: [
-                        UiUtils.getIconButton(Icons.cancel_rounded, 7.w, ColorStyles.upFinGray, () {
+                        isXButtonShow ? UiUtils.getIconButton(Icons.cancel_rounded, 7.w, ColorStyles.upFinGray, () {
                           _clearAddress();
-                        }),
+                        }) : UiUtils.getMarginBox(0, 0),
                         UiUtils.getMarginBox(1.w, 0),
                         UiUtils.getIconButton(Icons.search, 8.w, ColorStyles.upFinButtonBlue, () {
                           if(_addressInfoTextController.text.trim() != ""){
@@ -1782,20 +1790,20 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         ),
         Positioned(
             top: 30.7.h,
-            child: SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale2("아래 영역에 신분증을 위치해주세요", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null))
+            child: SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale2("", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null))
         ),
         Positioned(
             top: 8.h,
             child: SizedBox(width: 85.w, child: Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
-              UiUtils.getRoundBoxTextWithFixedScale(" 🚨 안내사항 ", 11.sp, FontWeight.w600, TextAlign.start, ColorStyles.upFinWhite, ColorStyles.upFinBlack),
-              UiUtils.getMarginBox(0, 1.h),
+              UiUtils.getTextWithFixedScale("파란색 영역에", 26.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, null),
+             UiUtils.getMarginBox(0, 0.5.h),
+             UiUtils.getTextWithFixedScale("신분증을 놓아주세요.", 26.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, null),
+              UiUtils.getMarginBox(0, 3.h),
               UiUtils.getTextWithFixedScale2(
-                  "1.신분증은 반드시 신분증 원본을 준비해주세요."
-                      "\n   신분증 사본(모니터/휴대폰 화면 촬영 등)으로 확인될 경우,\n   인식이 되지 않을 수 있습니다.", 10.sp, FontWeight.w300, ColorStyles.upFinWhite, TextAlign.start, null),
+                  "• 신분증은 반드시 신분증 원본을 준비해주세요.", 10.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null),
               UiUtils.getMarginBox(0, 0.5.h),
               UiUtils.getTextWithFixedScale2(
-                      "2.신분증을 어두운 배경에 두고, 밝은곳에서 촬영해주세요."
-                      "\n   신분증의 홀로그램 부분에 빛이 반사되지 않도록\n   카메라 방향을 조정해주세요.", 10.sp, FontWeight.w300, ColorStyles.upFinWhite, TextAlign.start, null),
+                      "• 신분증을 어두운 배경에 두고, 밝은곳에서 촬영해주세요.", 10.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null),
             ]))
         ),
         Positioned(

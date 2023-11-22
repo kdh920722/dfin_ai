@@ -9,6 +9,7 @@ import '../styles/TextStyles.dart';
 import '../configs/app_config.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
+import 'app_findpw_view.dart';
 
 class AppSignOutView extends StatefulWidget{
   @override
@@ -109,10 +110,12 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
                 UiUtils.showPopMenu(context, true, 100.w, 100.h, 0.5, 0, ColorStyles.upFinWhite, (slideContext, slideSetState){
                   Widget slideWidget = Column(
                       children: [
-                        SizedBox(width: 95.w, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+                        SizedBox(width: 100.w, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
                           UiUtils.getCloseButton(ColorStyles.upFinDarkGray, () {
+                            _pwdTextController.text = "";
                             Navigator.pop(slideContext);
-                          })
+                          }),
+                          UiUtils.getMarginBox(2.w, 0),
                         ])),
                         UiUtils.getMarginBox(0, 3.w),
                         SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("탈퇴", 22.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
@@ -132,33 +135,43 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
                               }
                             }, (value){}),
                         UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
-                        isValidToSignOut? UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                            UiUtils.getTextWithFixedScale("진행", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
-                              CommonUtils.hideKeyBoard();
-                              Map<String, dynamic> inputJson = {
-                                "user" : {
-                                  "email": MyData.email,
-                                  "password": _pwdTextController.text
-                                }
-                              };
-                              UiUtils.showLoadingPop(context);
-                              LogfinController.callLogfinApi(LogfinApis.deleteAccount, inputJson, (isSuccessToLogin, outputJson) async {
-                                UiUtils.closeLoadingPop(context);
-                                Navigator.pop(slideContext);
-                                if(isSuccessToLogin){
-                                  SharedPreferenceController.deleteAllData();
-                                  CommonUtils.flutterToast("회원삭제 성공");
-                                  CommonUtils.backToHome(context);
-                                }else{
-                                  if(outputJson!["error"] == "Invalid email or password"){
-                                    CommonUtils.flutterToast("비밀번호가 일치하지 않습니다.");
-                                  }else{
-                                    CommonUtils.flutterToast("회원탈퇴중 에러가 발생했습니다.");
+                        isValidToSignOut? Column(children: [
+                          UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+                              UiUtils.getTextWithFixedScale("탈퇴하기", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
+                                CommonUtils.hideKeyBoard();
+                                Map<String, dynamic> inputJson = {
+                                  "user" : {
+                                    "email": MyData.email,
+                                    "password": _pwdTextController.text
                                   }
+                                };
+                                UiUtils.showLoadingPop(context);
+                                LogfinController.callLogfinApi(LogfinApis.deleteAccount, inputJson, (isSuccessToLogin, outputJson) async {
+                                  UiUtils.closeLoadingPop(context);
+                                  Navigator.pop(slideContext);
+                                  if(isSuccessToLogin){
+                                    SharedPreferenceController.deleteAllData();
+                                    CommonUtils.flutterToast("회원삭제 성공");
+                                    CommonUtils.backToHome(context);
+                                  }else{
+                                    if(outputJson!["error"] == "Invalid email or password"){
+                                      CommonUtils.flutterToast("비밀번호가 일치하지 않습니다.");
+                                    }else{
+                                      CommonUtils.flutterToast("회원탈퇴중 에러가 발생했습니다.");
+                                    }
 
-                                }
-                              });
-                            }) : Container()
+                                  }
+                                });
+                              }),
+                          UiUtils.getMarginBox(0, 1.h),
+                          UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
+                              UiUtils.getTextWithFixedScale("비밀번호 찾기", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, null), () {
+                                CommonUtils.hideKeyBoard();
+                                AppFindPwViewState.viewId = 1;
+                                CommonUtils.moveTo(context, AppView.appFindPwView.value, null);
+                              })
+                        ]) : Container(),
+                        UiUtils.getMarginBox(0, 5.w)
                       ]);
 
                   return slideWidget;

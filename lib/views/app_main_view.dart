@@ -290,9 +290,8 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               UiUtils.getTextWithFixedScale2(Config.privacyText.replaceAll("@@", "\n"), 10.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null),
               UiUtils.getMarginBox(0, 1.h),
               UiUtils.getTextWithFixedScale2(Config.privacyText2.replaceAll("@@", "\n"), 10.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null),
-              UiUtils.getMarginBox(0, 1.h),
               GestureDetector(child: Row(children: [
-                UiUtils.getTextWithFixedScale("개인정보처리방침 바로가기:", 10.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null),
+                UiUtils.getTextWithFixedScale("• 개인정보처리방침 바로가기:", 10.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null),
                 UiUtils.getTextWithUnderline(Config.privacyUrl, 10.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null, ColorStyles.upFinDarkGray)
               ]),
               onTap: () async {
@@ -423,6 +422,16 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
       if(lastMsg.contains(" / ")){
         lastMsg = lastMsg.split(" / ")[1];
       }
+      if(lastMsg.contains("http")){
+        String ext = lastMsg.split(".").last;
+        if(LogfinController.validFileTypeList.contains(ext)){
+          if(LogfinController.validDocFileTypeList.contains(ext)){
+            lastMsg = "파일을 보냈습니다.";
+          }else{
+            lastMsg = "사진을 보냈습니다.";
+          }
+        }
+      }
       String lastDateString = CommonUtils.convertTimeToString(CommonUtils.parseToLocalTime(listMsg[listMsg.length-1]["created_at"]));
       int lastReadId = int.parse(msg["last_read_message_id"].toString());
       int cnt = 0;
@@ -482,6 +491,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   }
 
   Future<void> _goToChatRoom(List<dynamic> listMsg, String chatRoomId) async {
+    CommonUtils.log("w","chatRoomId : $chatRoomId");
     if(listMsg.length>30){
       UiUtils.showLoadingPop(context);
       await Future.delayed(const Duration(milliseconds: 200));
@@ -694,28 +704,32 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   void _showInfoPop(){
     int lineCnt = Config.appInfoTextMap["info_text"].toString().split("@@").length;
     double h = lineCnt*2.3.h;
-    CommonUtils.log("w","$h, $lineCnt");
-
-    UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isAndroid? 22.h+h : 27.h+h, 0.5, (slideContext, setState){
-      return Center(child: Column(children: [
-        UiUtils.getMarginBox(0, 1.h),
-        UiUtils.getTextWithFixedScale("📌 안내사항", 14.sp, FontWeight.w800, ColorStyles.upFinBlack, TextAlign.center, null),
-        UiUtils.getMarginBox(0, 3.h),
-        UiUtils.getExpandedScrollViewFit2(Axis.vertical,
-            UiUtils.getTextWithFixedScale2(Config.appInfoTextMap["info_text"].replaceAll("@@", "\n"), 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
-        UiUtils.getMarginBox(0, 4.h),
-        UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-            UiUtils.getTextWithFixedScale("확인", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
-              SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceValidInfoVersion, Config.appInfoTextMap["info_text_version"].toString());
-              DateTime thirtyMinutesLater = CommonUtils.addTimeToTargetTime(CommonUtils.getCurrentLocalTime());
-              SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceValidInfoDateKey, CommonUtils.convertTimeToString(thirtyMinutesLater));
-              isInfoPopShow = false;
-              Navigator.pop(slideContext);
-              _detectPushClickFromBack();
-            }),
-        Config.isAndroid? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 5.h)
-      ]));
-    });
+    CommonUtils.log("w","ver : ${Config.appInfoTextMap["info_text_version"]}");
+    if(Config.appInfoTextMap["info_text_version"].toString() != "0"){
+      UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isAndroid? 22.h+h : 27.h+h, 0.5, (slideContext, setState){
+        return Center(child: Column(children: [
+          UiUtils.getMarginBox(0, 1.h),
+          UiUtils.getTextWithFixedScale("📌 안내사항", 14.sp, FontWeight.w800, ColorStyles.upFinBlack, TextAlign.center, null),
+          UiUtils.getMarginBox(0, 3.h),
+          UiUtils.getExpandedScrollViewFit2(Axis.vertical,
+              UiUtils.getTextWithFixedScale2(Config.appInfoTextMap["info_text"].replaceAll("@@", "\n"), 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
+          UiUtils.getMarginBox(0, 4.h),
+          UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+              UiUtils.getTextWithFixedScale("확인", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
+                SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceValidInfoVersion, Config.appInfoTextMap["info_text_version"].toString());
+                DateTime thirtyMinutesLater = CommonUtils.addTimeToTargetTime(CommonUtils.getCurrentLocalTime());
+                SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceValidInfoDateKey, CommonUtils.convertTimeToString(thirtyMinutesLater));
+                isInfoPopShow = false;
+                Navigator.pop(slideContext);
+                _detectPushClickFromBack();
+              }),
+          Config.isAndroid? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 5.h)
+        ]));
+      });
+    }else{
+      isInfoPopShow = false;
+      _detectPushClickFromBack();
+    }
   }
 
   double bottomBarHeight = 0;

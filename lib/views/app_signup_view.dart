@@ -213,7 +213,12 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
       ])),
       SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         UiUtils.getMarginBox(0, 3.w),
-        UiUtils.getTextWithFixedScale("회원가입", 26.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
+        isVerifyViewValid? UiUtils.getTextWithFixedScale("이메일로 전송된", 26.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null)
+            : UiUtils.getTextWithFixedScale("회원가입", 26.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
+        isVerifyViewValid? UiUtils.getMarginBox(0, 0.5.h)
+            : UiUtils.getMarginBox(0, 0),
+        isVerifyViewValid? UiUtils.getTextWithFixedScale("인증번호를 입력하세요.", 26.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null)
+            : UiUtils.getMarginBox(0, 0),
         UiUtils.getMarginBox(0, 3.h)
       ])),
       UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _emailTextFocus, _emailTextController, TextInputType.emailAddress, false,
@@ -228,14 +233,11 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
             }),
         UiUtils.getMarginBox(0, 2.h),
         SizedBox(width: 90.w, child: Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
-          UiUtils.getRoundBoxTextWithFixedScale(" 🚨 안내사항 ", 11.sp, FontWeight.w600, TextAlign.start, ColorStyles.upFinBlack, ColorStyles.upFinWhite),
-          UiUtils.getMarginBox(0, 1.h),
           UiUtils.getTextWithFixedScale2(
-              "1.유효한 이메일을 사용해 주세요."
-                  "\n   수신이 되지 않는 경우, 스팸 메일함을 확인 해 주세요!", 10.sp, FontWeight.w300, ColorStyles.upFinBlack, TextAlign.start, null),
+              "• 인증번호 수신까지 시간이 1~2분 정도 소요될 수 있어요.", 10.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
           UiUtils.getMarginBox(0, 0.5.h),
           UiUtils.getTextWithFixedScale2(
-              "2.인증번호 수신까지 시간이 1~2분정도 소요될 수 있습니다.", 10.sp, FontWeight.w300, ColorStyles.upFinBlack, TextAlign.start, null),
+              "• 수신이 되지 않는 경우, 스팸 메일함을 확인 해 주세요.", 10.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
         ]))
       ]) : Container(),
       UiUtils.getExpandedScrollView(Axis.vertical, Container()),
@@ -508,7 +510,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
         viewId--;
         setState(() {});
       }
-      Future.delayed(const Duration(milliseconds: 400), () async {
+      Future.delayed(const Duration(milliseconds: 200), () async {
         backValid = true;
       });
     }

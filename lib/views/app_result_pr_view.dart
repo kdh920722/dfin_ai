@@ -194,6 +194,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                       CommonUtils.flutterToast("이미 신청하신 상품입니다.");
 
                       // test
+
                       MyData.selectedPrInfoData = each;
                       UiUtils.showAgreePop(context, "B", () {
                         UiUtils.showLoadingPop(context);
@@ -207,6 +208,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                           }
                         });
                       });
+
                       // test
 
                     }else{

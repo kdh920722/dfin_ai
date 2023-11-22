@@ -112,7 +112,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
                   return null;
                 }
               }),
-          UiUtils.getMarginBox(0, 5.h),
+          UiUtils.getMarginBox(0, 4.h),
           UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
           UiUtils.getTextButtonBox(90.w, "로그인", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
             if(_formKey.currentState!.validate() && Config.isControllerLoadFinished){
@@ -160,19 +160,17 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
               }
             }
           }),
-          UiUtils.getMarginBox(0, 0.4.h),
+          UiUtils.getMarginBox(0, 2.w),
           UiUtils.getBorderButtonBoxWithZeroPadding(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
               Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment:MainAxisAlignment.center, children: [
-                UiUtils.getBorderButtonBoxWithZeroPadding(30.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
-                    UiUtils.getTextWithFixedScale("아이디 찾기", 12.sp, FontWeight.w300, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, null), () {
+                UiUtils.getBorderButtonBox(44.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
+                    UiUtils.getTextWithFixedScale("아이디 찾기", 12.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, null), () {
                       AppFindPwViewState.viewId = 4;
                       CommonUtils.moveTo(context, AppView.appFindPwView.value, null);
                     }),
-                UiUtils.getMarginBox(0.1.w, 0),
-                UiUtils.getMarginColoredBox(0.2.w, 5.w, ColorStyles.upFinTextAndBorderBlue),
-                UiUtils.getMarginBox(1.w, 0),
-                UiUtils.getBorderButtonBoxWithZeroPadding(30.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
-                    UiUtils.getTextWithFixedScale("비밀번호 찾기", 12.sp, FontWeight.w300, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, null), () {
+                UiUtils.getMarginBox(2.w, 0),
+                UiUtils.getBorderButtonBox(44.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
+                    UiUtils.getTextWithFixedScale("비밀번호 찾기", 12.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, null), () {
                       AppFindPwViewState.viewId = 1;
                       CommonUtils.moveTo(context, AppView.appFindPwView.value, null);
                     })

@@ -58,7 +58,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
   bool searchNoMore = false;
   double prevScrollPos = 0.0;
   static bool isScrollMove = false;
-  bool isOpenDownloadedFile = true;
+  bool isOpenDownloadedFile = false;
 
   Timer? scrollCheckTimer;
 
@@ -168,9 +168,9 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
       if(each.messageType == "file") isFileHere = true;
     }
     if(isFileHere){
-      GetController.to.updateHtmlLoad(false);
+      //GetController.to.updateHtmlLoad(false);
     }else{
-      GetController.to.updateHtmlLoad(true);
+      //GetController.to.updateHtmlLoad(true);
     }
 
     _setAutoAnswerWaitingState();
@@ -184,18 +184,18 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
         int status = data[1];
         int progress = data[2];
 
-        if(isOpenDownloadedFile) UiUtils.showLoadingPop(context);
+        //if(isOpenDownloadedFile) UiUtils.showLoadingPop(context);
         CommonUtils.log("d", "download status : $progress $status");
 
         if(status == 3 && progress == 100){
+          CommonUtils.flutterToast("다운로드가 완료되었습니다.");
           if(isOpenDownloadedFile){
             bool canOpen = false;
             while(!canOpen){
               CommonUtils.log("w", "download id : $id");
               canOpen = await FlutterDownloader.open(taskId: id);
             }
-            CommonUtils.flutterToast("다운로드가 완료되었습니다.");
-            if(context.mounted) UiUtils.closeLoadingPop(context);
+            //if(context.mounted) UiUtils.closeLoadingPop(context);
           }else{
             CommonUtils.flutterToast("다운로드가 완료되었습니다.");
           }
@@ -203,7 +203,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
       }catch(error){
         CommonUtils.log("e", "download error : $error");
         CommonUtils.flutterToast("다운로드에 실패했습니다.");
-        if(isOpenDownloadedFile && context.mounted) UiUtils.closeLoadingPop(context);
+       // if(isOpenDownloadedFile && context.mounted) UiUtils.closeLoadingPop(context);
       }
     });
     FlutterDownloader.registerCallback(downloadCallback);
@@ -261,6 +261,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
     appConfig.Config.contextForEmergencyBack = AppMainViewState.mainContext;
     currentKey = "";
     cachedImage = {};
+    isScrollMove = false;
     IsolateNameServer.removePortNameMapping('downloader_send_port');
     super.dispose();
   }
@@ -302,6 +303,12 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
               top: appConfig.Config.isAndroid? 85.h : 80.h,
               child: Row(children: [
                 UiUtils.getBorderButtonBox(30.w, ColorStyles.upFinBlack, ColorStyles.upFinBlack,
+                    UiUtils.getTextWithFixedScale("취소", 13.sp, FontWeight.w300, ColorStyles.upFinWhite, TextAlign.start, null), () {
+                      Navigator.pop(popContext);
+                      _takeCustomCamera();
+                    }),
+                UiUtils.getMarginBox(20.w, 0),
+                UiUtils.getBorderButtonBox(30.w, ColorStyles.upFinBlack, ColorStyles.upFinBlack,
                     UiUtils.getTextWithFixedScale("확인", 13.sp, FontWeight.w300, ColorStyles.upFinWhite, TextAlign.start, null), () {
                       XFile? image = imageFilFromCamera;
                       if(image != null){
@@ -325,12 +332,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                       }
                       Navigator.pop(popContext);
                       setState(() {});
-                    }),
-                UiUtils.getMarginBox(20.w, 0),
-                UiUtils.getBorderButtonBox(30.w, ColorStyles.upFinBlack, ColorStyles.upFinBlack,
-                    UiUtils.getTextWithFixedScale("취소", 13.sp, FontWeight.w300, ColorStyles.upFinWhite, TextAlign.start, null), () {
-                      Navigator.pop(popContext);
-                      _takeCustomCamera();
                     })
               ])
           ),
@@ -396,20 +397,24 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
   bool isNormalLoading = false;
   bool isHtmlLoadTimeOut = false;
   Widget _getHtmlView(String message, String sender, String type){
+    message = message.replaceAll("*", "•");
     bool isImage = true;
     String htmlTag = "";
     String htmlTextTag = "";
     String extension = "";
     String buttonId = "";
     String fileName = "";
+    String boldTextId = "";
     bool isFileType = true;
 
     if(sender == "UPFIN") {
       htmlTextTag = "<div id='typeOther'>";
       buttonId = "buttonTypeOther";
+      boldTextId = "boldTextOther";
     }else{
       htmlTextTag = "<div id='typeMe'>";
       buttonId = "buttonTypeMe";
+      boldTextId = "boldText";
     }
 
     if(type == "file"){
@@ -431,9 +436,9 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
       }else{
         htmlTag = """
         
-        <p><text id='boldText'>${extension.toUpperCase()}문서</text><br><text>$fileName.$extension</text> </p>
-     
-        <a href='$message'><button id='$buttonId'>열어보기</button></a>
+        <p id='pType1'><text id='$boldTextId'>${extension.toUpperCase()}문서</text></p>
+        <p id='pType2'><text>$fileName.$extension</text></p>
+        <a href='$message'><button id='$buttonId'>저장하기</button></a>
         
         """;
       }
@@ -458,6 +463,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
             enableCaching: false,
             buildAsync: false,
             onLoadingBuilder: (htmlContext, element, progress){
+
               infiniteLoadTimer ??= Timer.periodic(const Duration(milliseconds: 200), (Timer timer) {
                 infiniteCnt++;
                 if(infiniteCnt > 24){
@@ -465,7 +471,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                   infiniteLoadTimer = null;
                   isHtmlLoading = false;
                   infiniteCnt = 0;
-                  GetController.to.updateHtmlLoad(true);
+                  //GetController.to.updateHtmlLoad(true);
                 }
               });
 
@@ -482,13 +488,15 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                   isHtmlLoading = false;
                   CommonUtils.log("", "html loading build finished!!");
                   _scrollToBottom(false,0);
-                  GetController.to.updateHtmlLoad(true);
+                  //GetController.to.updateHtmlLoad(true);
                   isHtmlLoadTimeOut = true;
 
                 }
               });
+
             },
             customStylesBuilder: (element) {
+
               isNormalLoading = true;
               if(htmlNormalLoadTimer != null) htmlNormalLoadTimer!.cancel();
               htmlNormalLoadTimer = Timer.periodic(const Duration(milliseconds: 50), (Timer timer) {
@@ -497,9 +505,10 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                   htmlNormalLoadTimer!.cancel();
                   isNormalLoading = false;
                   _scrollToBottom(false,0);
-                  GetController.to.updateHtmlLoad(true);
+                  //GetController.to.updateHtmlLoad(true);
                 }
               });
+
 
               if(element.id == 'typeMe') {
                 return {
@@ -519,10 +528,31 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
 
               if(element.id == 'boldText') {
                 return {
+                  "color" : "white",
+                  "font-size": "17sp !important",
+                  "line-height" : "20%",
+                  "font-weight": "bold",
+                };
+              }
+
+              if(element.id == 'boldTextOther') {
+                return {
                   "color" : "black",
                   "font-size": "17sp !important",
-                  "line-height" : "120%",
+                  "line-height" : "20%",
                   "font-weight": "bold",
+                };
+              }
+
+              if(element.id == 'pType1') {
+                return {
+                  "margin-bottom" : "0em"
+                };
+              }
+
+              if(element.id == 'pType2') {
+                return {
+                  "margin-bottom" : "0.8em"
                 };
               }
 
@@ -560,13 +590,14 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                 if(appConfig.Config.isAndroid){
                   //dir = '/storage/emulated/0/Download';
                   dir = (await getExternalStorageDirectory())!.path;
+                  CommonUtils.log("w", "download dir : $dir");
                   //dir = (await getApplicationDocumentsDirectory()).path;
                 }else{
                   dir = (await getApplicationDocumentsDirectory()).path;
                 }
                 try{
                   if(appConfig.Config.isAndroid || (!appConfig.Config.isAndroid && !CommonUtils.containsKorean(url))){
-                    isOpenDownloadedFile = true;
+                    isOpenDownloadedFile = false;
                     if(!isImage){
                       CommonUtils.flutterToast("문서를 다운로드합니다.");
                     }
@@ -575,7 +606,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                       savedDir: '$dir/',	// 저장할 dir
                       //fileName: '${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_doc.$extension',	// 파일명
                       fileName: "${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_${url.split("/").last}",
-                      saveInPublicStorage: appConfig.Config.isAndroid? false : true,// 동일한 파일 있을 경우 덮어쓰기 없으면 오류발생함!
+                      saveInPublicStorage: appConfig.Config.isAndroid? true : true,// 동일한 파일 있을 경우 덮어쓰기 없으면 오류발생함!
                       showNotification: true,
                       openFileFromNotification: true,
                     );
@@ -722,7 +753,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
 
   Future<void> _loadImageAsync(String src) async {
     if(!cachedImage.containsKey(src)){
-      CommonUtils.log("w", "load.. $src");
       await Future.delayed(const Duration(seconds: 2));
     }
   }
@@ -739,7 +769,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
               return Container(
                   alignment: Alignment.center,
                   decoration: const BoxDecoration(
-                    color: ColorStyles.upFinWhiteGray,
+                    color: ColorStyles.upFinBlack,
                     borderRadius: BorderRadius.all(Radius.circular(5)),
                   ),
                   constraints: BoxConstraints(maxWidth: 60.w, maxHeight: 60.w, minWidth: 20.w, minHeight: 20.w),
@@ -893,7 +923,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                             url: srcUrl, 	// file url
                             savedDir: '$dir/',	// 저장할 dir
                             fileName: "${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_${srcUrl.split("/").last}",	// 파일명
-                            saveInPublicStorage: appConfig.Config.isAndroid? false : true,	// 동일한 파일 있을 경우 덮어쓰기 없으면 오류발생함!
+                            saveInPublicStorage: appConfig.Config.isAndroid? true : true,	// 동일한 파일 있을 경우 덮어쓰기 없으면 오류발생함!
                             showNotification: true,
                             openFileFromNotification: true,
                           );
@@ -1015,17 +1045,17 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
         if(!isSuccess){
           CommonUtils.flutterToast("메시지를 읽는중\n오류가 발생했습니다.");
         }
-      });
 
-      if(context.mounted) {
-        if(scrollCheckTimer != null) scrollCheckTimer!.cancel();
-        isViewHere = false;
-        _chatTextFocus.unfocus();
-        CommonUtils.hideKeyBoard();
-        UiUtils.closeLoadingPop(context);
-        backPossibleFlag =true;
-        Navigator.pop(context);
-      }
+        if(context.mounted) {
+          if(scrollCheckTimer != null) scrollCheckTimer!.cancel();
+          isViewHere = false;
+          _chatTextFocus.unfocus();
+          CommonUtils.hideKeyBoard();
+          UiUtils.closeLoadingPop(context);
+          backPossibleFlag =true;
+          Navigator.pop(context);
+        }
+      });
     }
   }
 
@@ -1705,7 +1735,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                       }),
                   UiUtils.getMarginBox(0, 5.w),
                 ]) : Container(),
-                isWaiting ? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 0.8.h)
+                isWaiting ? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 2.h)
               ],
             ));
           }),
@@ -1788,6 +1818,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
           })
         ])
     ),
+      /*
       Obx((){
         if(!GetController.to.isHtmlLoad.value){
           return Container(
@@ -1800,6 +1831,8 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
           return Container();
         }
       }),
+
+       */
       Obx((){
         if(GetController.to.isShowScrollBottom.value){
           return Positioned(

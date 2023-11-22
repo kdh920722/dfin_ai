@@ -892,7 +892,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                 "caseNumberYear": selectedAccidentInfo.split("개회")[0],
                 "caseNumberType": "개회",
                 "caseNumberNumber": selectedAccidentInfo.split("개회")[1],
-                "userName": "황용진",
+                "userName": "황용진",// for test : MyData.name
                 "bankCode": selectedBankCodeInfo.split("@")[1],
                 "account": selectedBankAccountInfo,
                 "birthday": MyData.birth,
@@ -961,7 +961,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                 "caseNumberYear": selectedAccidentInfo.split("개회")[0],
                 "caseNumberType": "개회",
                 "caseNumberNumber": selectedAccidentInfo.split("개회")[1],
-                "userName": "황용진",
+                "userName": "황용진",// for test : MyData.name
                 "bankCode": selectedBankCodeInfo.split("@")[1],
                 "account": selectedBankAccountInfo,
                 "birthday": MyData.birth,
