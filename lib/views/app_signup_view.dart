@@ -104,6 +104,11 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
     _disposeAllTextControllers();
     GetController.to.resetConfirmed();
     Config.contextForEmergencyBack = null;
+    _nameTextController.text = "";
+    _emailTextController.text = "";
+    _phoneNumberTextController.text = "";
+    _pwdConfirmTextController.text = "";
+    _phoneNumberTextController.text = "";
     super.dispose();
   }
 

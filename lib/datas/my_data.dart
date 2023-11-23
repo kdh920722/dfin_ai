@@ -23,6 +23,7 @@ class MyData {
   static String nameFromSns = "";
   static String emailFromSns = "";
   static String phoneNumberFromSns = "";
+  static bool isTestUser = false;
 
   // accident data
   static final List<AccidentInfoData> _accidentInfoList = [];
@@ -261,6 +262,7 @@ class MyData {
     birthFromPhoneCert = "";
     telecomTypeFromPhoneCert = "";
     isMaleFromPhoneCert = false;
+    isTestUser = false;
     clearAccidentInfoList();
     clearLoanInfoList();
     clearPrInfoList();

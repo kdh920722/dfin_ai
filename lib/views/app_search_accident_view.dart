@@ -40,6 +40,9 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
   Key? selectedCourtKey;
   String selectedCourtInfo = "";
 
+  final _nameForTestTextFocus = FocusNode();
+  final _nameForTestTextController = TextEditingController();
+
   final int accidentViewId = 2;
   String selectedAccidentInfo = "";
   final _accidentInfoFocus1 = FocusNode();
@@ -122,6 +125,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
   bool finishedConfirmed = false;
 
   void _unFocusAllNodes(){
+    _nameForTestTextFocus.unfocus();
     _accidentInfoFocus1.unfocus();
     _accidentInfoFocus2.unfocus();
     _bankAccountInfoFocus.unfocus();
@@ -135,6 +139,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
     _bankAccountInfoTextController.dispose();
     _preLoanPriceTextController.dispose();
     _wantLoanPriceTextController.dispose();
+    _nameForTestTextController.dispose();
   }
 
   void _checkView(){
@@ -399,6 +404,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       UiUtils.getMarginBox(0, 1.h),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("예) 2023개회1234567", 14.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
+
       UiUtils.getExpandedScrollView(Axis.vertical,
           SizedBox(width: 85.w, child: Row(children: [
             UiUtils.getTextField(context, 20.w, TextStyles.upFinTextFormFieldTextStyle, _accidentInfoFocus1, _accidentInfoTextController1, TextInputType.number,
@@ -819,6 +825,16 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       UiUtils.getMarginBox(0, 3.h),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("직업 ", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
+
+      //test for input name
+      MyData.isTestUser? SizedBox(width: 85.w, child:
+      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        UiUtils.getTextWithFixedScale("테스트용) 사건번호 이름 입력", 10.sp, FontWeight.w600, ColorStyles.upFinRed, TextAlign.center, null),
+        UiUtils.getTextField(context, 30.w, TextStyles.upFinTextFormFieldTextStyle, _nameForTestTextFocus, _nameForTestTextController, TextInputType.text,
+            UiUtils.getInputDecoration("이름", 10.sp, "", 0.sp), (value) { }),
+        UiUtils.getMarginBox(0, 5.h),
+      ])) : UiUtils.getMarginBox(0, 0),
+
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: jobList)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
@@ -892,7 +908,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                 "caseNumberYear": selectedAccidentInfo.split("개회")[0],
                 "caseNumberType": "개회",
                 "caseNumberNumber": selectedAccidentInfo.split("개회")[1],
-                "userName": "황용진",// for test : MyData.name
+                "userName": MyData.isTestUser? _nameForTestTextController.text.trim() : MyData.name,
                 "bankCode": selectedBankCodeInfo.split("@")[1],
                 "account": selectedBankAccountInfo,
                 "birthday": MyData.birth,
@@ -961,7 +977,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                 "caseNumberYear": selectedAccidentInfo.split("개회")[0],
                 "caseNumberType": "개회",
                 "caseNumberNumber": selectedAccidentInfo.split("개회")[1],
-                "userName": "황용진",// for test : MyData.name
+                "userName": MyData.isTestUser? _nameForTestTextController.text.trim() : MyData.name,// for test : MyData.name
                 "bankCode": selectedBankCodeInfo.split("@")[1],
                 "account": selectedBankAccountInfo,
                 "birthday": MyData.birth,

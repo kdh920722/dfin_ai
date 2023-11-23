@@ -4,6 +4,7 @@ import 'dart:math';
 import 'package:camera/camera.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:file_picker/file_picker.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -13,6 +14,7 @@ import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:sizer/sizer.dart';
 import 'package:upfin/controllers/codef_controller.dart';
 import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:upfin/controllers/get_controller.dart';
@@ -244,8 +246,21 @@ class CommonUtils {
   }
 
   static void flutterToast(String msgString){
-    Fluttertoast.showToast(msg: msgString, gravity: ToastGravity.BOTTOM, backgroundColor: ColorStyles.upFinDarkGray,
-        fontSize: 15, textColor: Colors.white, toastLength: Toast.LENGTH_SHORT);
+    Fluttertoast.cancel();
+    Fluttertoast.showToast(msg: msgString, gravity: ToastGravity.SNACKBAR, backgroundColor: ColorStyles.upFinDarkGray, timeInSecForIosWeb : 3,
+        fontSize: 12.sp, textColor: ColorStyles.upFinWhite, toastLength: Config.isAndroid? Toast.LENGTH_SHORT : Toast.LENGTH_LONG);
+  }
+
+  static setAppLog(String eventName){
+    if(MyData.email != ""){
+      Map<String, Object> data = {
+        'id': CommonUtils.encryptData(MyData.email),
+        'time': CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime()),
+        'event' : eventName
+      };
+
+      FireBaseController.analytics!.logEvent(name: eventName, parameters: data);
+    }
   }
 
   static Size _getSize(GlobalKey key) {
@@ -385,6 +400,19 @@ class CommonUtils {
       targetDateTime.month,
       targetDateTime.day,
       targetDateTime.hour+1,
+      targetDateTime.minute,
+      targetDateTime.second,
+    );
+
+    return thirtyMinLater;
+  }
+
+  static DateTime addWeekToTargetTime(DateTime targetDateTime) {
+    DateTime thirtyMinLater = DateTime(
+      targetDateTime.year,
+      targetDateTime.month,
+      targetDateTime.day+7,
+      targetDateTime.hour,
       targetDateTime.minute,
       targetDateTime.second,
     );

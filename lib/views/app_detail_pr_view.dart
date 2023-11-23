@@ -293,7 +293,6 @@ class AppDetailPrViewState extends State<AppDetailPrView> with WidgetsBindingObs
       UiUtils.getMarginBox(0, 2.h),
       UiUtils.getTitleWithFixedScale("upfin", 75.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null),
       UiUtils.getMarginBox(0, 3.h),
-      UiUtils.getImage(90.w, 115.w, Image.asset(fit: BoxFit.fitHeight,'assets/images/img_man_welcome.png')),
       SizedBox(width: 95.w, child: Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center, children: [
         SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScaleAndOverFlow(MyData.selectedPrInfoData!.productCompanyName, 20.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.center, null)),
         UiUtils.getMarginBox(0, 1.h),

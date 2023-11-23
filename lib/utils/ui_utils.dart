@@ -220,6 +220,10 @@ class UiUtils {
     return SelectableText(textScaleFactor: 1.0, text, style: TextStyle(decoration: TextDecoration.none, height: 1, fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor), textAlign: textAlign, maxLines: textMaxLine);
   }
 
+  static SelectableText getSelectableTextWithFixedScale2(String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign? textAlign, int? textMaxLine){
+    return SelectableText(textScaleFactor: 1.0, text, style: TextStyle(decoration: TextDecoration.none, height: 1.3, fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor), textAlign: textAlign, maxLines: textMaxLine);
+  }
+
   static SelectableText getSelectableStyledTextWithFixedScale(String text, TextStyle textStyle, TextAlign? textAlign, int? textMaxLine){
     return SelectableText(textScaleFactor: 1.0, text, style: textStyle, textAlign: textAlign, maxLines: textMaxLine);
   }

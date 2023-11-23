@@ -30,6 +30,10 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
     Config.contextForEmergencyBack = context;
     Config.isEmergencyRoot = false;
     FireBaseController.setStateForForeground = null;
+
+    if(!MyData.isPossibleAccidentInfo(MyData.selectedAccidentInfoData!)){
+      CommonUtils.flutterToast("환급계좌정보가 잘못되었습니다.\n수정해주세요.");
+    }
   }
 
   @override
@@ -61,6 +65,21 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
       default:
         break;
     }
+  }
+
+  int _getLoanCnt(){
+    int cnt = 0 ;
+    for(var each in MyData.getLoanInfoList()){
+      String eachAccidentNum = "";
+      for(var eachAccident in MyData.getAccidentInfoList()){
+        if(eachAccident.accidentUid == each.accidentUid) eachAccidentNum = eachAccident.accidentCaseNumberYear+eachAccident.accidentCaseNumberType+eachAccident.accidentCaseNumberNumber;
+      }
+      String selectedAccidentNum = MyData.selectedAccidentInfoData!.accidentCaseNumberYear+MyData.selectedAccidentInfoData!.accidentCaseNumberType+MyData.selectedAccidentInfoData!.accidentCaseNumberNumber;
+      if(eachAccidentNum == selectedAccidentNum){
+        cnt++;
+      }
+    }
+    return cnt;
   }
 
   List<Widget> _getLoanWidgetList(){
@@ -102,7 +121,9 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
 
                   SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("진행상태", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
                   UiUtils.getMarginBox(0, 1.2.h),
-                  UiUtils.getRoundBoxTextWithFixedScale2(LoanInfoData.getDetailStatusName(each.statueId), 10.sp, FontWeight.w600, TextAlign.center, ColorStyles.upFinWhiteSky, ColorStyles.upFinButtonBlue),
+                  UiUtils.getRoundBoxTextWithFixedScale2(LoanInfoData.getDetailStatusName(each.statueId), 10.sp, FontWeight.w600, TextAlign.center,
+                      each.statueId == "6" || each.statueId == "7"? ColorStyles.upFinWhiteRed : ColorStyles.upFinWhiteSky,
+                      each.statueId == "6" || each.statueId == "7"? ColorStyles.upFinRed : ColorStyles.upFinButtonBlue),
                   UiUtils.getMarginBox(0, 3.h),
                   MyData.getLoanInfoList().length == 1 || (MyData.getLoanInfoList().length != 1 && count == MyData.getLoanInfoList().length-1) ?
                   Container() : UiUtils.getMarginColoredBox(90.w, 0.1.h, ColorStyles.upFinWhiteGray)
@@ -119,9 +140,6 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
 
   Widget _getAccidentWidgetList(){
     bool isSuccessToGetDetailInfo = MyData.isPossibleAccidentInfo(MyData.selectedAccidentInfoData!);
-    if(!isSuccessToGetDetailInfo){
-      CommonUtils.flutterToast("환급계좌정보가 잘못되었습니다.\n수정해주세요.");
-    }
 
     return Padding(padding: EdgeInsets.only(left: 4.w, right: 4.w, top: 4.w, bottom: 4.w),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -267,7 +285,7 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
                 controller: _tabController,
                 children: <Widget>[
                   Column(children: [UiUtils.getExpandedScrollView(Axis.vertical, _getAccidentWidgetList())]),
-                  MyData.getLoanInfoList().isNotEmpty ? Column(children: [
+                  _getLoanCnt() != 0 ? Column(children: [
                     UiUtils.getMarginBox(0, 3.h),
                     UiUtils.getExpandedScrollView(Axis.vertical, Column(children: _getLoanWidgetList()))
                   ]) : Center(

@@ -118,9 +118,7 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
                           UiUtils.getMarginBox(2.w, 0),
                         ])),
                         UiUtils.getMarginBox(0, 3.w),
-                        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("탈퇴", 22.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
-                        UiUtils.getMarginBox(0, 1.h),
-                        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("비밀번호 입력 후 회원탈퇴가 가능합니다.", 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
+                        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("탈퇴", 22.sp, FontWeight.w600, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
                         UiUtils.getMarginBox(0, 3.h),
                         UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _pwdTextFocus, _pwdTextController, TextInputType.visiblePassword, true,
                             UiUtils.getInputDecoration("비밀번호", 12.sp, "", 0.sp), (text) {

@@ -37,6 +37,10 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
   bool isInputValid = true;
   bool isViewHere = false;
 
+  final _nameForTestTextFocus = FocusNode();
+  final _nameForTestTextController = TextEditingController();
+
+
   final String errorMsg = "정보를 입력해주세요";
   int currentViewId = 1;
 
@@ -108,6 +112,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
     _bankAccountInfoFocus.unfocus();
     _preLoanPriceFocus.unfocus();
     _wantLoanPriceFocus.unfocus();
+    _nameForTestTextFocus.unfocus();
   }
 
   void _disposeAllTextControllers(){
@@ -115,6 +120,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
     _bankAccountInfoTextController.dispose();
     _preLoanPriceTextController.dispose();
     _wantLoanPriceTextController.dispose();
+    _nameForTestTextController.dispose();
   }
 
   void _checkView(){
@@ -137,22 +143,10 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
     }
   }
 
-  @override
-  void initState(){
-    CommonUtils.log("d", "AppSearchAccidentView 화면 입장");
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-    _bankAccountInfoTextController.addListener(_bankAccountInfoTextControllerListener);
-    _preLoanPriceTextController.addListener(_preLoanPriceInfoTextControllerListener);
-    _wantLoanPriceTextController.addListener(_wantLoanPriceInfoTextControllerListener);
-    _checkView();
-    GetController.to.resetPreLoanPrice();
-    GetController.to.resetWantLoanPrice();
+  void setSelectedInfo(){
     selectedBankCodeKey = Key(MyData.selectedAccidentInfoData!.accidentBankInfo);
     selectedBankCodeInfo = MyData.selectedAccidentInfoData!.accidentBankInfo;
-
     _bankAccountInfoTextController.text = MyData.selectedAccidentInfoData!.accidentBankAccount;
-
     _preLoanPriceTextController.text = MyData.selectedAccidentInfoData!.accidentLendAmount;
     final number = double.tryParse(_preLoanPriceTextController.text.trim().replaceAll(',', ''));
     GetController.to.updatePreLoanPrice(CommonUtils.getPriceFormattedString(number!));
@@ -181,8 +175,23 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
     if(lastVisibleItem2 >= LogfinController.bankList.length-1) lastVisibleItem2 = LogfinController.bankList.length-1;
     GetController.to.updateFirstIndex2_2(firstVisibleItem2);
     GetController.to.updateLastIndex2_2(lastVisibleItem2);
-    currentViewId = startViewId;
+  }
 
+  @override
+  void initState(){
+    CommonUtils.log("d", "AppSearchAccidentView 화면 입장");
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _bankAccountInfoTextController.addListener(_bankAccountInfoTextControllerListener);
+    _preLoanPriceTextController.addListener(_preLoanPriceInfoTextControllerListener);
+    _wantLoanPriceTextController.addListener(_wantLoanPriceInfoTextControllerListener);
+    _checkView();
+    GetController.to.resetPreLoanPrice();
+    GetController.to.resetWantLoanPrice();
+
+    setSelectedInfo();
+
+    currentViewId = startViewId;
     mainContext = context;
     Config.contextForEmergencyBack = context;
     Config.isEmergencyRoot = false;
@@ -654,6 +663,16 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
       UiUtils.getMarginBox(0, 3.w),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("직업 구분을 선택해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
+
+      //test for input name
+      MyData.isTestUser? SizedBox(width: 85.w, child:
+      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        UiUtils.getTextWithFixedScale("테스트용) 사건번호 이름 입력", 10.sp, FontWeight.w600, ColorStyles.upFinRed, TextAlign.center, null),
+        UiUtils.getTextField(context, 30.w, TextStyles.upFinTextFormFieldTextStyle, _nameForTestTextFocus, _nameForTestTextController, TextInputType.text,
+            UiUtils.getInputDecoration("이름", 10.sp, "", 0.sp), (value) { }),
+        UiUtils.getMarginBox(0, 5.h),
+      ])) : UiUtils.getMarginBox(0, 0),
+
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: jobList)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
@@ -668,7 +687,8 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
   /// job view end
 
   /// finish confirm view
-  Widget _getFinishConfirmView(){
+  Widget _getConfirmView(){
+    setSelectedInfo();
     List<String> confirmDataList = [];
     confirmDataList.add("•  [환급]  ${selectedBankCodeInfo.split("@")[0]} $selectedBankAccountInfo");
     confirmDataList.add("•  기대출  ${selectedPreLoanCountInfo.split("@")[0]}");
@@ -768,7 +788,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
         "caseNumberYear": MyData.selectedAccidentInfoData!.accidentCaseNumberYear,
         "caseNumberType": "개회",
         "caseNumberNumber": MyData.selectedAccidentInfoData!.accidentCaseNumberNumber,
-        "userName": "황용진",// for test : MyData.name
+        "userName": MyData.isTestUser? _nameForTestTextController.text.trim() : MyData.name,// for test : MyData.name
         "bankCode": selectedBankCodeInfo.split("@")[1],
         "account": selectedBankAccountInfo,
         "birthday": MyData.birth,
@@ -805,19 +825,19 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
                     }
                     CommonUtils.moveWithReplacementTo(context, AppView.appResultPrView.value, null);
                   }else{
-                    CommonUtils.flutterToast("에러가 발생했습니다.\n다시 실행해주세요.");
+                    CommonUtils.flutterToast("상품정보가 없습니다.");
                     Navigator.pop(context);
                   }
                 });
               }else{
                 UiUtils.closeLoadingPop(context);
-                CommonUtils.flutterToast("에러가 발생했습니다.\n다시 실행해주세요.");
+                CommonUtils.flutterToast("등록된 사건정보가 없습니다.");
                 Navigator.pop(context);
               }
             });
           }else{
             UiUtils.closeLoadingPop(context);
-            CommonUtils.flutterToast("에러가 발생했습니다.\n다시 실행해주세요.");
+            CommonUtils.flutterToast("등록된 사건정보가 없습니다.");
             Navigator.pop(context);
           }
         });
@@ -891,7 +911,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
     }else if(currentViewId == jobViewId){
       view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getJobView());
     }else{
-      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getFinishConfirmView());
+      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getConfirmView());
     }
     return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
   }

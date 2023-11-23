@@ -105,6 +105,10 @@ class AppFindPwViewState extends State<AppFindPwView> with WidgetsBindingObserve
     _disposeAllTextControllers();
     GetController.to.resetConfirmed();
     Config.contextForEmergencyBack = null;
+    _emailTextController.text = "";
+    _pwdTextController.text = "";
+    _pwdConfirmTextController.text = "";
+    _phoneNumberTextController.text = "";
     super.dispose();
   }
 

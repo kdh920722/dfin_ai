@@ -514,14 +514,14 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                 return {
                   "color" : "white",
                   "font-size": "17sp",
-                  "line-height" : "120%",
+                  "line-height" : "140%",
                   "font-weight": "normal",
                 };
               }else if(element.id == 'typeOther') {
                 return {
                   "color" : "black",
                   "font-size": "17sp",
-                  "line-height" : "120%",
+                  "line-height" : "140%",
                   "font-weight": "normal",
                 };
               }
@@ -676,7 +676,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
       if(otherInfo.message.contains("<button") || otherInfo.message.contains("<br>")){
         otherInfoWidget = _getHtmlView(otherInfo.message, "UPFIN", otherInfo.messageType);
       }else{
-        otherInfoWidget = UiUtils.getSelectableTextWithFixedScale(otherInfo.message, 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null);
+        otherInfoWidget = UiUtils.getSelectableTextWithFixedScale2(otherInfo.message, 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null);
       }
     }else{
       bool isValid = true;
@@ -948,7 +948,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
     Widget? meInfoWidget;
     bool isImageView = false;
     if(meInfo.messageType == "text"){
-      meInfoWidget = UiUtils.getSelectableTextWithFixedScale(meInfo.message, 13.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null);
+      meInfoWidget = UiUtils.getSelectableTextWithFixedScale2(meInfo.message, 13.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null);
     }else{
       String extension = meInfo.message.split('.').last.toLowerCase();
       List<String> validDocExtensions = LogfinController.validDocFileTypeList;

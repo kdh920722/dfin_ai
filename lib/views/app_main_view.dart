@@ -114,6 +114,8 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               UiUtils.getTextWithFixedScale("사건기록", 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1),
               const Spacer(flex: 2),
               MyData.email == "lalalllaa@kakao.com" ? UiUtils.getIconButton(Icons.comments_disabled_sharp, 7.w, ColorStyles.upFinRed, () {
+                _showInfoPop();
+                CommonUtils.flutterToast("이건 테스트 토스트~~");
                 //CommonUtils.moveTo(context, AppView.debugForAdminView.value, null);
                 /*
                 CommonUtils.log("w","sdsada");
@@ -216,10 +218,11 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                               top:3.h,
                               right: 5.w,
                               left: 5.w,
-                              child: UiUtils.getTextWithFixedScale("업핀! 다이렉트 대출의 시작!", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null)),
+                              child: UiUtils.getTextWithFixedScale("            "
+                                  "업핀! 다이렉트 대출의 새로운 시작!", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null)),
                           Positioned(
                               left: 1.w,
-                              child: UiUtils.getImage(25.w, 15.h, Image.asset(fit: BoxFit.fitHeight,'assets/images/img_man_banner.png'))),
+                              child: UiUtils.getImage(22.w, 15.h, Image.asset(fit: BoxFit.fitHeight,'assets/images/img_woman_coffee.png'))),
                         ]), () {})),
             UiUtils.getMarginBox(0, 1.h),
             Obx((){
@@ -458,7 +461,9 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                         UiUtils.getTextWithFixedScale(each.chatRoomTitle, 14.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null),
                         UiUtils.getMarginBox(0, 1.h),
                         Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                          UiUtils.getRoundBoxTextWithFixedScale(LoanInfoData.getDetailStatusName(each.chatRoomLoanStatus), 7.sp, FontWeight.w600, TextAlign.center,  ColorStyles.upFinWhiteSky, ColorStyles.upFinButtonBlue),
+                          UiUtils.getRoundBoxTextWithFixedScale(LoanInfoData.getDetailStatusName(each.chatRoomLoanStatus), 7.sp,
+                              FontWeight.w600, TextAlign.center,  each.chatRoomLoanStatus == "6" || each.chatRoomLoanStatus == "7"? ColorStyles.upFinWhiteRed : ColorStyles.upFinWhiteSky,
+                              each.chatRoomLoanStatus == "6" || each.chatRoomLoanStatus == "7"? ColorStyles.upFinRed : ColorStyles.upFinButtonBlue),
                           UiUtils.getMarginBox(2.w, 0),
                           Expanded(child: UiUtils.getTextWithFixedScaleAndOverFlow(lastMsg, 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, 1))
                         ]),
@@ -588,7 +593,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
           ])),
           UiUtils.getMarginBox(0, 3.w),
           UiUtils.getBorderButtonBoxWithZeroPadding(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
-              Row(children: [UiUtils.getTextWithFixedScale("설정", 22.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null)]), () {}),
+              Row(children: [UiUtils.getTextWithFixedScale("설정", 22.sp, FontWeight.w600, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)]), () {}),
           UiUtils.getMarginBox(0, 3.h),
           UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
               Row(children: [UiUtils.getTextWithFixedScale("계정", 15.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)]), () async {
@@ -702,23 +707,53 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   }
 
   void _showInfoPop(){
+    bool isRemove1week = false;
     int lineCnt = Config.appInfoTextMap["info_text"].toString().split("@@").length;
     double h = lineCnt*2.3.h;
     CommonUtils.log("w","ver : ${Config.appInfoTextMap["info_text_version"]}");
     if(Config.appInfoTextMap["info_text_version"].toString() != "0"){
-      UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isAndroid? 22.h+h : 27.h+h, 0.5, (slideContext, setState){
-        return Center(child: Column(children: [
+      UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isAndroid? 25.5.h+h : 30.5.h+h, 0.5, (slideContext, slideSetState){
+        return Center(child: Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
           UiUtils.getMarginBox(0, 1.h),
-          UiUtils.getTextWithFixedScale("📌 안내사항", 14.sp, FontWeight.w800, ColorStyles.upFinBlack, TextAlign.center, null),
+          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("📌 안내사항", 14.sp, FontWeight.w800, ColorStyles.upFinBlack, TextAlign.center, null)),
           UiUtils.getMarginBox(0, 3.h),
-          UiUtils.getExpandedScrollViewFit2(Axis.vertical,
-              UiUtils.getTextWithFixedScale2(Config.appInfoTextMap["info_text"].replaceAll("@@", "\n"), 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
-          UiUtils.getMarginBox(0, 4.h),
+          UiUtils.getExpandedScrollView(Axis.vertical,
+              Padding(padding: EdgeInsets.only(left: 2.w, right: 2.w, top: 0, bottom: 0), child: UiUtils.getTextWithFixedScale2(Config.appInfoTextMap["info_text"].replaceAll("@@", "\n"), 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null))),
+          UiUtils.getMarginBox(0, 0.5.h),
+          UiUtils.getBorderButtonBoxWithZeroPadding(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
+              Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment:CrossAxisAlignment.center, children: [
+                UiUtils.getCustomCheckBox(UniqueKey(), 1.2, isRemove1week, ColorStyles.upFinButtonBlue, ColorStyles.upFinWhiteGray,
+                    ColorStyles.upFinWhiteGray,  ColorStyles.upFinWhiteGray, (checkedValue){
+                      if(checkedValue != null){
+                        slideSetState((){
+                          isRemove1week = checkedValue;
+                        });
+                      }
+                    }),
+                Expanded(child: UiUtils.getTextButtonWithFixedScale("일주일간 보지 않기", 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null, (){
+                  slideSetState((){
+                    if(isRemove1week){
+                      isRemove1week = false;
+                    }else{
+                      isRemove1week = true;
+                    }
+                  });
+                }))
+              ])
+              , () { slideSetState((){
+                if(isRemove1week){
+                  isRemove1week = false;
+                }else{
+                  isRemove1week = true;
+                }
+              });}),
+          UiUtils.getMarginBox(0, 1.5.h),
           UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
               UiUtils.getTextWithFixedScale("확인", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
+                CommonUtils.log("w","isRemove1eek : $isRemove1week");
                 SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceValidInfoVersion, Config.appInfoTextMap["info_text_version"].toString());
-                DateTime thirtyMinutesLater = CommonUtils.addTimeToTargetTime(CommonUtils.getCurrentLocalTime());
-                SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceValidInfoDateKey, CommonUtils.convertTimeToString(thirtyMinutesLater));
+                DateTime laterDt = isRemove1week? CommonUtils.addWeekToTargetTime(CommonUtils.getCurrentLocalTime()) : CommonUtils.addTimeToTargetTime(CommonUtils.getCurrentLocalTime());
+                SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceValidInfoDateKey, CommonUtils.convertTimeToString(laterDt));
                 isInfoPopShow = false;
                 Navigator.pop(slideContext);
                 _detectPushClickFromBack();

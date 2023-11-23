@@ -49,6 +49,8 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     _unFocusAllNodes();
     _disposeAllTextControllers();
     Config.contextForEmergencyBack = null;
+    _emailTextController.text = "";
+    _pwdTextController.text = "";
     super.dispose();
   }
 
