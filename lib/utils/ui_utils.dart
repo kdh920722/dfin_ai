@@ -546,7 +546,7 @@ class UiUtils {
             padding: EdgeInsets.zero,
             backgroundColor: buttonColor,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
-            side: BorderSide(width: 1.3, color: borderColor),
+            side: const BorderSide(width: 0, color: ColorStyles.upFinWhite),
             elevation: 0.0,
             shadowColor: ColorStyles.upFinGray,
           ),

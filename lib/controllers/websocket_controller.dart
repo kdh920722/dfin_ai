@@ -266,13 +266,10 @@ class WebSocketController {
       if(connectionInfoMap.containsKey(connectedKey)){
         if(connectionInfoMap[connectedKey]){
           connectionInfoMap[connectedKey] = false;
-          CommonUtils.log("w", "in1");
           LogfinController.getLoanInfo((isSuccess, isNotEmpty){
             if(isSuccess){
-              CommonUtils.log("w", "in2");
               if(!isNotEmpty){
                 if(isRetryStarted){
-                  CommonUtils.log("w", "in2-2");
                   if(retryTimerCount > maxTryCnt-15){
                     _emergencyBack();
                   }else{
@@ -280,11 +277,9 @@ class WebSocketController {
                     _retryToConnectNewVer(connectedKey);
                   }
                 }else{
-                  CommonUtils.log("w", "in2-3");
                   _emergencyBack();
                 }
               }else{
-                CommonUtils.log("w", "in2 s");
                 connectionInfoMap[connectedKey] = true;
                 if(retryCheckTimer != null) retryCheckTimer!.cancel();
                 retryCheckTimer = null;
@@ -293,9 +288,7 @@ class WebSocketController {
                 connectionInfoMap = {};
               }
             }else{
-              CommonUtils.log("w", "in3");
               if(isRetryStarted){
-                CommonUtils.log("w", "in3-2");
                 if(retryTimerCount > maxTryCnt-15){
                   _emergencyBack();
                 }else{
@@ -303,7 +296,6 @@ class WebSocketController {
                   _retryToConnectNewVer(connectedKey);
                 }
               }else{
-                CommonUtils.log("w", "in3-3");
                 _emergencyBack();
               }
             }
