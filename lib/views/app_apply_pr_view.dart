@@ -3471,6 +3471,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             if(isRetry){
               Navigator.pop(context);
             }else{
+              CommonUtils.setAppLog("apply pr");
               CommonUtils.moveWithUntil(context, AppView.appMainView.value);
             }
           })

@@ -971,7 +971,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
             }),
         UiUtils.getMarginBox(2.w, 0),
         UiUtils.getBorderButtonBox(42.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
-            UiUtils.getTextWithFixedScale("아니오", 14.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null), () async {
+            UiUtils.getTextWithFixedScale("정보변경", 14.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null), () async {
               Map<String, dynamic> inputJson = {
                 "court_name": selectedCourtInfo.split("@")[0],
                 "caseNumberYear": selectedAccidentInfo.split("개회")[0],

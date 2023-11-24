@@ -743,7 +743,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
             }),
         UiUtils.getMarginBox(2.w, 0),
         UiUtils.getBorderButtonBox(42.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
-            UiUtils.getTextWithFixedScale("아니오", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
+            UiUtils.getTextWithFixedScale("정보변경", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
               isPassToSearch = false;
               nextInputView();
             })
@@ -770,6 +770,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
             UiUtils.closeLoadingPop(context);
             if(isSuccessToUpdate){
               Navigator.pop(context, true);
+              CommonUtils.setAppLog("update account");
               CommonUtils.flutterToast("수정 완료했어요.");
             }else{
               Navigator.pop(context, false);
@@ -802,6 +803,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
         LogfinController.getPrList("${MyData.selectedAccidentInfoData!.accidentCaseNumberYear}${MyData.selectedAccidentInfoData!.accidentCaseNumberType}${MyData.selectedAccidentInfoData!.accidentCaseNumberNumber}", (isSuccessToGetOffers, _){
           UiUtils.closeLoadingPop(context);
           if(isSuccessToGetOffers){
+            CommonUtils.setAppLog("get offers");
             CommonUtils.moveWithReplacementTo(context, AppView.appResultPrView.value, null);
           }else{
             CommonUtils.flutterToast("에러가 발생했습니다.\n다시 실행해주세요.");
@@ -823,6 +825,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
                         MyData.selectedAccidentInfoData = each;
                       }
                     }
+                    CommonUtils.setAppLog("pr search");
                     CommonUtils.moveWithReplacementTo(context, AppView.appResultPrView.value, null);
                   }else{
                     CommonUtils.flutterToast("상품정보가 없어요.");

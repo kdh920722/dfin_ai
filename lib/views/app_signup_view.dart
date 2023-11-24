@@ -93,7 +93,6 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
     GetController.to.resetConfirmed();
     Config.contextForEmergencyBack = context;
     Config.isEmergencyRoot = false;
-    FireBaseController.analytics!.logSignUp(signUpMethod: '');
   }
 
   @override
@@ -477,6 +476,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                             await LogfinController.getMainViewInfo((isSuccessToGetMainInfo){
                               UiUtils.closeLoadingPop(context);
                               if(isSuccessToGetMainInfo){
+                                CommonUtils.setAppLog("sign up");
                                 CommonUtils.goToMain(context, _emailTextController.text.trim(), _pwdTextController.text.trim());
                               }
                             });

@@ -524,7 +524,7 @@ class AppFindPwViewState extends State<AppFindPwView> with WidgetsBindingObserve
                     CommonUtils.flutterToast("본인인증에 실패했어요.");
                   }
                 }else{
-                  CommonUtils.flutterToast("등록되지 않은 전화번호에요.);
+                  CommonUtils.flutterToast("등록되지 않은 전화번호에요.");
                 }
               });
             }else{
