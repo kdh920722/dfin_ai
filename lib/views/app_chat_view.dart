@@ -1460,6 +1460,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
           CommonUtils.flutterToast("메시지 전송중\n오류가 발생했습니다.");
         }
       });
+
     }else{
       CommonUtils.flutterToast("응답을 기다리는 중입니다.");
     }

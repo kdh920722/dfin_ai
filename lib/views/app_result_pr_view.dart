@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
 import 'package:upfin/configs/app_config.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
@@ -126,6 +127,26 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
     return widgetList;
   }
 
+  String _getDateText(String targetString){
+    // 문자열을 DateTime 객체로 변환
+    DateTime dateTime = DateTime.parse(targetString);
+    // 대한민국 시간대로 설정
+    dateTime = dateTime.toLocal();
+
+    // 오전과 오후를 구분하여 표시
+    String period = dateTime.hour < 12 ? '오전' : '오후';
+
+    // 시간, 분을 0이 붙은 두 자리로 포맷팅
+    String formattedHour = DateFormat('h', 'ko_KR').format(dateTime);
+    String formattedMinute = DateFormat('m', 'ko_KR').format(dateTime);
+
+    // 날짜와 시간을 원하는 형식으로 포맷팅
+    var formatter = DateFormat('yyyy.MM.dd  $period$formattedHour시 $formattedMinute분', 'ko_KR');
+    String formattedDate = formatter.format(dateTime);
+
+    return formattedDate;
+  }
+
   Widget _getPrListView(bool isPossible){
     List<Widget> prInfoWidgetList = [];
     for(var each in MyData.getPrInfoList()){
@@ -183,34 +204,61 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                   Expanded(flex: 1, child: each.isPossible? Icon(Icons.arrow_forward_ios_rounded, color: ColorStyles.upFinDarkGray , size: 4.5.w) : Container()),
                 ]), () {
                   if(each.isPossible) {
-                    CommonUtils.log("i","${each.productOfferLenderPrId} ${each.productOfferRid} ${each.productOfferId}");
                     bool isDuplicate = false;
+                    List<String> dupleDateList = [];
                     for(var eachLoan in MyData.getLoanInfoList()){
+                      CommonUtils.log("w","${eachLoan.lenderPrId} ${eachLoan.createdDate} ${eachLoan.updatedDate}");
                       if(eachLoan.lenderPrId == each.productOfferLenderPrId){
+                        dupleDateList.add(eachLoan.createdDate);
                         isDuplicate = true;
                       }
                     }
+
                     if(isDuplicate){
-                      CommonUtils.flutterToast("이미 신청하신 상품이에요.");
-
-                      // test
-                      /*
-                      MyData.selectedPrInfoData = each;
-                      UiUtils.showAgreePop(context, "B", () {
-                        UiUtils.showLoadingPop(context);
-                        LogfinController.getPrDocsList(MyData.selectedPrInfoData!.productOfferId, MyData.selectedPrInfoData!.productOfferRid, (isSuccessToSearchDocs, _) async {
-                          UiUtils.closeLoadingPop(context);
-                          if(isSuccessToSearchDocs){
-                            CommonUtils.moveToWithResult(context, AppView.appApplyPrView.value, null);
-                          }else{
-                            CommonUtils.flutterToast("상품정보를 불러오는데\n실패했어요.");
-                            MyData.selectedPrInfoData = null;
-                          }
-                        });
+                      dupleDateList.sort((a,b) => DateTime.parse(b).compareTo(DateTime.parse(a)));
+                      UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, 100.w, Config.isAndroid ? 28.h : 32.h, 0.5, (slideContext, slideSetState){
+                        return Column(mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              UiUtils.getMarginBox(100.w, 1.h),
+                              Column(children: [
+                                SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("중복상품 신청",14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
+                                UiUtils.getMarginBox(0, 3.h),
+                                SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale2("신청하셨던 상품이에요, 다시 신청하시겠어요?",12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)),
+                              ]),
+                              UiUtils.getMarginBox(0, 0.5.h),
+                              SizedBox(width: 85.w, child: Row(children: [
+                                UiUtils.getTextWithFixedScale2("마지막 신청일자 : ",12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null),
+                                UiUtils.getTextWithFixedScale2(_getDateText(dupleDateList[0]),12.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)
+                              ])),
+                              UiUtils.getExpandedScrollView(Axis.vertical, Container()),
+                              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                                UiUtils.getBorderButtonBox(43.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+                                    UiUtils.getTextWithFixedScale("네! 신청할게요", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () async {
+                                      Navigator.pop(slideContext);
+                                      MyData.selectedPrInfoData = each;
+                                      UiUtils.showAgreePop(context, "B", () {
+                                        UiUtils.showLoadingPop(context);
+                                        LogfinController.getPrDocsList(MyData.selectedPrInfoData!.productOfferId, MyData.selectedPrInfoData!.productOfferRid, (isSuccessToSearchDocs, _) async {
+                                          UiUtils.closeLoadingPop(context);
+                                          if(isSuccessToSearchDocs){
+                                            CommonUtils.moveToWithResult(context, AppView.appApplyPrView.value, null);
+                                          }else{
+                                            CommonUtils.flutterToast("상품정보를 불러오는데\n실패했어요.");
+                                            MyData.selectedPrInfoData = null;
+                                          }
+                                        });
+                                      });
+                                    }),
+                                UiUtils.getMarginBox(2.w, 0),
+                                UiUtils.getBorderButtonBox(43.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
+                                    UiUtils.getTextWithFixedScale("아니오", 12.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null), () async {
+                                      Navigator.pop(slideContext);
+                                    })
+                              ]),
+                              Config.isAndroid ? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 5.h),
+                            ]
+                        );
                       });
-                      */
-                      // test
-
                     }else{
                       MyData.selectedPrInfoData = each;
                       UiUtils.showAgreePop(context, "B", () {
@@ -226,6 +274,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                         });
                       });
                     }
+
                   }else{
                     CommonUtils.flutterToast("신청 불가능한 상풉이에요.");
                   }

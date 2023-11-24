@@ -387,7 +387,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
               children: [
                 UiUtils.getMarginBox(100.w, 1.h),
                 Column(children: [
-                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("🙏 권한이 필요합니다.",14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
+                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("권한이 필요합니다.",14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
                   UiUtils.getMarginBox(0, 1.h),
                   SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("[$deniedPermissionsString]권한을$allText 허용해주세요",12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null))
                 ]),
@@ -478,7 +478,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
         UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isAndroid ? 18.h : 23.h, 0.5, (context, setState){
           return Center(child: Column(children: [
             UiUtils.getMarginBox(0, 1.h),
-            UiUtils.getTextWithFixedScale("🔔 앱 업데이트가 필요합니다.", 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
+            UiUtils.getTextWithFixedScale("앱 업데이트가 필요합니다!", 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
             UiUtils.getMarginBox(0, 3.h),
             UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
                 UiUtils.getTextWithFixedScale("업데이트", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
@@ -493,7 +493,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
         UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isAndroid ? 30.h : 35.h, 0.5, (context, setState){
           return Column(children: [
             UiUtils.getMarginBox(0, 3.h),
-            Center(child: UiUtils.getTextWithFixedScale("🥹 시스템 점검중입니다.", 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
+            Center(child: UiUtils.getTextWithFixedScale("시스템 점검중입니다.", 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
             UiUtils.getMarginBox(0, 3.h),
             UiUtils.getExpandedScrollView(Axis.vertical,
                 SizedBox(width : 80.w, child: UiUtils.getTextWithFixedScale2(Config.appInfoTextMap["close_text"].replaceAll("@@", "\n"), 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null))),

@@ -4,6 +4,7 @@ import 'package:upfin/controllers/sharedpreference_controller.dart';
 import 'package:sizer/sizer.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import 'package:upfin/views/app_findpw_view.dart';
+import '../controllers/firebase_controller.dart';
 import '../styles/TextStyles.dart';
 import '../configs/app_config.dart';
 import '../utils/common_utils.dart';

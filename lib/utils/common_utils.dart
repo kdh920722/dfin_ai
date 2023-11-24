@@ -709,6 +709,8 @@ class CommonUtils {
 
   static Future<void> backToHome(BuildContext context) async {
     resetData();
+    MyData.isLogout = true;
+    await FireBaseController.setNotificationTorF(false);
     await CommonUtils.saveSettingsToFile("push_from", "");
     await CommonUtils.saveSettingsToFile("push_room_id", "");
     CommonUtils.log("", "delete file");
@@ -720,6 +722,8 @@ class CommonUtils {
     if(Config.contextForEmergencyBack != null){
       CommonUtils.log("w", "em out2");
       resetData();
+      MyData.isLogout = true;
+      await FireBaseController.setNotificationTorF(false);
       await CommonUtils.saveSettingsToFile("push_from", "");
       await CommonUtils.saveSettingsToFile("push_room_id", "");
       CommonUtils.log("", "delete file");
@@ -755,7 +759,7 @@ class CommonUtils {
     if(CodeFController.apiCheckTimer != null) CodeFController.apiCheckTimer!.cancel();
   }
 
-  static void goToMain(BuildContext context, String? email, String? password){
+  static Future<void> goToMain(BuildContext context, String? email, String? password) async {
     DateTime thirtyMinutesLater = CommonUtils.addTimeToTargetTime(CommonUtils.getCurrentLocalTime());
     if(email != null && password != null){
       String prevId = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceIdKey);
@@ -770,6 +774,9 @@ class CommonUtils {
       SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceValidDateKey, CommonUtils.convertTimeToString(thirtyMinutesLater));
       CommonUtils.moveTo(context, AppView.appMainView.value, null);
     }
+
+    MyData.isLogout = false;
+    await FireBaseController.setNotificationTorF(true);
   }
 
   static Future<String> makeCroppedImageAndGetPath(String imagePath, Map<String,dynamic> infoMap) async {

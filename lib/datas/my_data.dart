@@ -24,6 +24,7 @@ class MyData {
   static String emailFromSns = "";
   static String phoneNumberFromSns = "";
   static bool isTestUser = false;
+  static bool isLogout = true;
 
   // accident data
   static final List<AccidentInfoData> _accidentInfoList = [];

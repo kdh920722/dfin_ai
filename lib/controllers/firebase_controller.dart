@@ -8,6 +8,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:upfin/configs/app_config.dart';
+import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/views/app_chat_view.dart';
 import '../configs/firebase_options.dart';
 import '../utils/common_utils.dart';
@@ -165,7 +166,7 @@ class FireBaseController{
   static Future<void> _showNotification(RemoteMessage message, FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin, AndroidNotificationChannel? channel) async {
     //await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(alert: true, badge: true, sound: true);
 
-    if(Config.isAndroid){
+    if(Config.isAndroid && !MyData.isLogout){
       flutterLocalNotificationsPlugin.show(
           message.hashCode,
           message.notification?.title,

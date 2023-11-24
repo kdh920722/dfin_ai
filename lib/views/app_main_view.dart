@@ -114,7 +114,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               UiUtils.getTextWithFixedScale("사건기록", 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1),
               const Spacer(flex: 2),
               MyData.isTestUser ? UiUtils.getIconButton(Icons.comments_disabled_sharp, 7.w, ColorStyles.upFinRed, () {
-                //_showInfoPop();
+                _showInfoPop();
                 //CommonUtils.flutterToast("이건 테스트 토스트~~");
                 //CommonUtils.moveTo(context, AppView.debugForAdminView.value, null);
                 /*
@@ -567,7 +567,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
         return Column(mainAxisAlignment: MainAxisAlignment.start, children:
         [
           UiUtils.getMarginBox(0, 3.h),
-          SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("🥹 앱을 종료할까요?", 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
+          SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("앱을 종료할까요?", 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
           UiUtils.getMarginBox(0, 3.h),
           UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
           UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinButtonBlue,
@@ -715,7 +715,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
       UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isAndroid? 25.5.h+h : 30.5.h+h, 0.5, (slideContext, slideSetState){
         return Center(child: Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
           UiUtils.getMarginBox(0, 1.h),
-          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("📌 안내사항", 14.sp, FontWeight.w800, ColorStyles.upFinBlack, TextAlign.center, null)),
+          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("안내사항", 14.sp, FontWeight.w800, ColorStyles.upFinBlack, TextAlign.center, null)),
           UiUtils.getMarginBox(0, 3.h),
           UiUtils.getExpandedScrollView(Axis.vertical,
               Padding(padding: EdgeInsets.only(left: 2.w, right: 2.w, top: 0, bottom: 0), child: UiUtils.getTextWithFixedScale2(Config.appInfoTextMap["info_text"].replaceAll("@@", "\n"), 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null))),
