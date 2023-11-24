@@ -191,7 +191,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                       }
                     }
                     if(isDuplicate){
-                      CommonUtils.flutterToast("이미 신청하신 상품입니다.");
+                      CommonUtils.flutterToast("이미 신청하신 상품이에요.");
 
                       // test
                       /*
@@ -203,7 +203,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                           if(isSuccessToSearchDocs){
                             CommonUtils.moveToWithResult(context, AppView.appApplyPrView.value, null);
                           }else{
-                            CommonUtils.flutterToast("상품정보를 불러오는데\n실패했습니다.");
+                            CommonUtils.flutterToast("상품정보를 불러오는데\n실패했어요.");
                             MyData.selectedPrInfoData = null;
                           }
                         });
@@ -220,14 +220,14 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                           if(isSuccessToSearchDocs){
                             CommonUtils.moveToWithResult(context, AppView.appApplyPrView.value, null);
                           }else{
-                            CommonUtils.flutterToast("상품정보를 불러오는데\n실패했습니다.");
+                            CommonUtils.flutterToast("상품정보를 불러오는데\n실패했어요.");
                             MyData.selectedPrInfoData = null;
                           }
                         });
                       });
                     }
                   }else{
-                    CommonUtils.flutterToast("신청 불가능한 상풉입니다.");
+                    CommonUtils.flutterToast("신청 불가능한 상풉이에요.");
                   }
                 })
         );

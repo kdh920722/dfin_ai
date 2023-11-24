@@ -110,7 +110,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
       if(isSuccess){
         CommonUtils.log("i", "firebase credential : ${FireBaseController.userCredential.toString()}");
       }else{
-        CommonUtils.flutterToast("firebase init 에러가 발생했습니다.");
+        CommonUtils.flutterToast("firebase init 에러가 발생했어요.");
       }
     });
   }
@@ -121,7 +121,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
       if(isSuccess){
         CommonUtils.log("i", "app state : ${Config.appState}");
       }else{
-        CommonUtils.flutterToast("에러가 발생했습니다.");
+        CommonUtils.flutterToast("에러가 발생했어요.");
       }
     });
   }
@@ -139,7 +139,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
           });
         }
       }else{
-        CommonUtils.flutterToast("gpt init 에러가 발생했습니다.");
+        CommonUtils.flutterToast("gpt init 에러가 발생했어요.");
       }
     });
   }
@@ -160,7 +160,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
           });
         }
       }else{
-        CommonUtils.flutterToast("codef init 에러가 발생했습니다.");
+        CommonUtils.flutterToast("codef init 에러가 발생했어요.");
       }
     });
   }
@@ -178,7 +178,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
           });
         }
       }else{
-        CommonUtils.flutterToast("juso init 에러가 발생했습니다.");
+        CommonUtils.flutterToast("juso init 에러가 발생했어요");
       }
     });
   }
@@ -196,7 +196,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
           });
         }
       }else{
-        CommonUtils.flutterToast("clova init 에러가 발생했습니다.");
+        CommonUtils.flutterToast("clova init 에러가 발생했어요");
       }
     });
   }
@@ -214,7 +214,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
           });
         }
       }else{
-        CommonUtils.flutterToast("aws init 에러가 발생했습니다.");
+        CommonUtils.flutterToast("aws init 에러가 발생했어요.");
       }
     });
   }
@@ -232,7 +232,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
           });
         }
       }else{
-        CommonUtils.flutterToast("logfin init 에러가 발생했습니다.");
+        CommonUtils.flutterToast("logfin init 에러가 발생했어요.");
       }
     });
   }
@@ -250,7 +250,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
           });
         }
       }else{
-        CommonUtils.flutterToast("hyphen init 에러가 발생했습니다.");
+        CommonUtils.flutterToast("hyphen init 에러가 발생했어요.");
       }
     });
   }
@@ -539,7 +539,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
                 });
               }else{
                 UiUtils.closeLoadingPop(context);
-                CommonUtils.flutterToast("오류가 발생했습니다.");
+                CommonUtils.flutterToast("오류가 발생했어요.");
               }
             });
           }else{
@@ -563,7 +563,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
                 });
               }else{
                 UiUtils.closeLoadingPop(context);
-                CommonUtils.flutterToast("오류가 발생했습니다.");
+                CommonUtils.flutterToast("오류가 발생했어요.");
               }
             });
           }

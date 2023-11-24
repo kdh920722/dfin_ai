@@ -32,7 +32,7 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
     FireBaseController.setStateForForeground = null;
 
     if(!MyData.isPossibleAccidentInfo(MyData.selectedAccidentInfoData!)){
-      CommonUtils.flutterToast("환급계좌정보가 잘못되었습니다.\n수정해주세요.");
+      CommonUtils.flutterToast("환급계좌정보가 잘못되었어요.\n수정해주세요.");
     }
   }
 

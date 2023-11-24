@@ -1133,17 +1133,17 @@ class CodeFController{
                       callback(false, null, null, null);
                     }else if(fullMap['result']['code'] == "CF-12835"){
                       CommonUtils.log("i","cancel");
-                      CommonUtils.flutterToast("인증서 정보가 없습니다.");
+                      CommonUtils.flutterToast("인증서 정보가 없어요.");
                       GetController.to.updateWait(false);
                       callback(false, null, null, null);
                     }else if(fullMap['result']['code'] == "CF-01004"){
                       CommonUtils.log("i","cancel");
-                      CommonUtils.flutterToast("응답 대기시간이 초과되었습니다.");
+                      CommonUtils.flutterToast("응답 대기시간이 초과되었어요.");
                       GetController.to.updateWait(false);
                       callback(false, null, null, null);
                     }else if(fullMap['result']['code'] == "CF-13000"){
                       CommonUtils.log("i","cancel");
-                      CommonUtils.flutterToast("주민.사업자등록번호 오류입니다.");
+                      CommonUtils.flutterToast("주민.사업자등록번호 오류에요.");
                       GetController.to.updateWait(false);
                       callback(false, null, null, null);
                     }else if(fullMap['result']['code'] == "CF-12100"){
@@ -1166,17 +1166,17 @@ class CodeFController{
                       callback(false, null, null, null);
                     }else if(fullMap['result']['code'] == "CF-12835"){
                       CommonUtils.log("i","cancel");
-                      CommonUtils.flutterToast("인증서 정보가 없습니다.");
+                      CommonUtils.flutterToast("인증서 정보가 없어요.");
                       GetController.to.updateWait(false);
                       callback(false, null, null, null);
                     }else if(fullMap['result']['code'] == "CF-01004"){
                       CommonUtils.log("i","cancel");
-                      CommonUtils.flutterToast("응답 대기시간이 초과되었습니다.");
+                      CommonUtils.flutterToast("응답 대기시간이 초과되었어요. ");
                       GetController.to.updateWait(false);
                       callback(false, null, null, null);
                     }else if(fullMap['result']['code'] == "CF-13000"){
                       CommonUtils.log("i","cancel");
-                      CommonUtils.flutterToast("주민.사업자등록번호 오류입니다.");
+                      CommonUtils.flutterToast("주민.사업자등록번호 오류에요.");
                       GetController.to.updateWait(false);
                       callback(false, null, null, null);
                     }else if(fullMap['result']['code'] == "CF-12100"){

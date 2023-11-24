@@ -429,7 +429,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
           if(isValid){
             nextInputView();
           }else{
-            CommonUtils.flutterToast("이미 조회하신 사건번호입니다.");
+            CommonUtils.flutterToast("이미 조회하신 사건번호에요.");
           }
         }else{
           CommonUtils.flutterToast(errorMsg);
@@ -941,7 +941,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                                 CommonUtils.moveWithReplacementTo(context, AppView.appResultPrView.value, null);
                               }else{
                                 // findUidInAccidentInfoList 실패
-                                CommonUtils.flutterToast("에러가 발생했습니다.\n다시 실행해주세요.");
+                                CommonUtils.flutterToast("에러가 발생했어요.\n다시 실행해주세요.");
                               }
                             });
                           }else{

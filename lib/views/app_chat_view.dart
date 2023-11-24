@@ -188,7 +188,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
         CommonUtils.log("d", "download status : $progress $status");
 
         if(status == 3 && progress == 100){
-          CommonUtils.flutterToast("다운로드가 완료되었습니다.");
+          CommonUtils.flutterToast("다운로드가 완료되었어요.");
           if(isOpenDownloadedFile){
             bool canOpen = false;
             while(!canOpen){
@@ -197,12 +197,12 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
             }
             //if(context.mounted) UiUtils.closeLoadingPop(context);
           }else{
-            CommonUtils.flutterToast("다운로드가 완료되었습니다.");
+            CommonUtils.flutterToast("다운로드가 완료되었어요.");
           }
         }
       }catch(error){
         CommonUtils.log("e", "download error : $error");
-        CommonUtils.flutterToast("다운로드에 실패했습니다.");
+        CommonUtils.flutterToast("다운로드에 실패했어요.");
        // if(isOpenDownloadedFile && context.mounted) UiUtils.closeLoadingPop(context);
       }
     });
@@ -599,7 +599,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                   if(appConfig.Config.isAndroid || (!appConfig.Config.isAndroid && !CommonUtils.containsKorean(url))){
                     isOpenDownloadedFile = false;
                     if(!isImage){
-                      CommonUtils.flutterToast("문서를 다운로드합니다.");
+                      CommonUtils.flutterToast("문서를 다운로드해요.");
                     }
                     await FlutterDownloader.enqueue(
                       url: url, 	// file url
@@ -611,12 +611,12 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                       openFileFromNotification: true,
                     );
                   }else{
-                    CommonUtils.flutterToast("한글이름의 파일은\n받을수 없습니다.");
+                    CommonUtils.flutterToast("한글이름의 파일은\n받을수 없어요.");
                     isOpenDownloadedFile = false;
                   }
 
                 }catch(error){
-                  CommonUtils.flutterToast("문서 다운로드에 실패했습니다.");
+                  CommonUtils.flutterToast("문서 다운로드에 실패했어요.");
                   CommonUtils.log("e", "fail doc download $error");
                 }
               }else{
@@ -643,20 +643,20 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                           isScrollMove = true;
                           isViewHere = true;
                         }else{
-                          CommonUtils.flutterToast("서류 제출을 완료했습니다.");
+                          CommonUtils.flutterToast("서류 제출을 완료했어요.");
                         }
                       }else{
-                        CommonUtils.flutterToast("서류 제출을 완료했습니다.");
+                        CommonUtils.flutterToast("서류 제출을 완료했어요.");
                       }
                     }else{
-                      CommonUtils.flutterToast("서류목록을 가져오는데 실패했습니다.\n다시 시도해주세요.");
+                      CommonUtils.flutterToast("서류목록을 가져오는데 실패했어요.\n다시 시도해주세요.");
                     }
                   });
                 }else{
                   if(await canLaunchUrl(Uri.parse(url))){
                     await launchUrl(Uri.parse(url));
                   }else{
-                    CommonUtils.flutterToast("연결할 수 없습니다.");
+                    CommonUtils.flutterToast("연결할 수 없어요.");
                   }
                 }
               }
@@ -918,7 +918,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                       try{
                         if(appConfig.Config.isAndroid || (!appConfig.Config.isAndroid && !CommonUtils.containsKorean(srcUrl))){
                           isOpenDownloadedFile = false;
-                          CommonUtils.flutterToast("이미지를 다운로드합니다.");
+                          CommonUtils.flutterToast("이미지를 다운로드해요.");
                           await FlutterDownloader.enqueue(
                             url: srcUrl, 	// file url
                             savedDir: '$dir/',	// 저장할 dir
@@ -928,11 +928,11 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                             openFileFromNotification: true,
                           );
                         }else{
-                          CommonUtils.flutterToast("한글이름의 파일는\n받을수 없습니다.");
+                          CommonUtils.flutterToast("한글이름의 파일는\n받을수 없어요.");
                         }
 
                       }catch(error){
-                        CommonUtils.flutterToast("이미지 다운로드에 실패했습니다.");
+                        CommonUtils.flutterToast("이미지 다운로드에 실패했어요.");
                         CommonUtils.log("e", "fail img download $error");
                       }
                     }),
@@ -1043,7 +1043,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
       await FireBaseController.setNotificationTorF(true);
       await LogfinController.callLogfinApi(LogfinApis.checkMessage, inputJson, (isSuccess, outputJson){
         if(!isSuccess){
-          CommonUtils.flutterToast("메시지를 읽는중\n오류가 발생했습니다.");
+          CommonUtils.flutterToast("메시지를 읽는중\n오류가 발생했어요.");
         }
 
         if(context.mounted) {
@@ -1128,7 +1128,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
   Future<void> _setPickedImgFromCamera() async {
     if(pickedFiles.length <= maximumSize){
       if(pickedFiles.length == maximumSize){
-        CommonUtils.flutterToast("최대 $maximumSize개의 파일만\n전송할 수 있습니다.");
+        CommonUtils.flutterToast("최대 $maximumSize개의 파일만\n전송할 수 있어요.");
       }else{
         _takeCustomCamera();
       }

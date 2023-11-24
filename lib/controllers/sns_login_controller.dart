@@ -87,12 +87,12 @@ class SnsLoginController{
             if(await _isMemberFromSns()){
               callback(true);
             }else{
-              CommonUtils.flutterToast("회원가입이 필요합니다.");
+              CommonUtils.flutterToast("회원가입이 필요해요. ");
               callback(false);
             }
           }else{
             MyData.isSnsLogin = false;
-            CommonUtils.flutterToast("${SnsLoginController.loginPlatform.value}로그인에 실패했습니다.");
+            CommonUtils.flutterToast("${SnsLoginController.loginPlatform.value}로그인에 실패했어요.");
             loginPlatform = LoginPlatform.none;
             callback(false);
           }
@@ -136,7 +136,7 @@ class SnsLoginController{
             if(await _isMemberFromSns()){
               callback(true);
             }else{
-              CommonUtils.flutterToast("회원가입이 필요합니다.");
+              CommonUtils.flutterToast("회원가입이 필요해요.");
               callback(false);
             }
           }
@@ -144,7 +144,7 @@ class SnsLoginController{
           CommonUtils.log("e", error.toString());
           UiUtils.closeLoadingPop(context);
           MyData.isSnsLogin = false;
-          CommonUtils.flutterToast("${SnsLoginController.loginPlatform.value}로그인에 실패했습니다.");
+          CommonUtils.flutterToast("${SnsLoginController.loginPlatform.value}로그인에 실패했어요.");
           loginPlatform = LoginPlatform.none;
           callback(false);
         }

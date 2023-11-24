@@ -153,9 +153,9 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
                                     CommonUtils.backToHome(context);
                                   }else{
                                     if(outputJson!["error"] == "Invalid email or password"){
-                                      CommonUtils.flutterToast("비밀번호가 일치하지 않습니다.");
+                                      CommonUtils.flutterToast("비밀번호가 일치하지 않아요.");
                                     }else{
-                                      CommonUtils.flutterToast("회원탈퇴중 에러가 발생했습니다.");
+                                      CommonUtils.flutterToast("회원탈퇴중 에러가 발생했어요.");
                                     }
 
                                   }

@@ -1543,7 +1543,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                             selectedAddressInfo = each["roadAddrPart1"]!;
                             _addressInfoTextController.text = selectedAddressInfo;
                             if(selectedSearchCertAddressInfo != "" && selectedSearchCertAddressInfo != selectedAddressInfo){
-                              CommonUtils.flutterToast("주소정보를 바꾸시면\n서류인증을 다시 받아야합니다.");
+                              CommonUtils.flutterToast("주소정보를 바꾸시면\n서류인증을 다시 받아야해요.");
                             }
                           }
                         }
@@ -1557,7 +1557,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                             selectedAddressInfo = each["roadAddrPart1"]!;
                             _addressInfoTextController.text = selectedAddressInfo;
                             if(selectedSearchCertAddressInfo != "" && selectedSearchCertAddressInfo != selectedAddressInfo){
-                              CommonUtils.flutterToast("주소정보를 바꾸시면\n서류인증을 다시 받아야합니다.");
+                              CommonUtils.flutterToast("주소정보를 바꾸시면\n서류인증을 다시 받아야해요.");
                             }
                           }
                         }
@@ -1572,7 +1572,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                       selectedAddressInfo = each["roadAddrPart1"]!;
                       _addressInfoTextController.text = selectedAddressInfo;
                       if(selectedSearchCertAddressInfo != "" && selectedSearchCertAddressInfo != selectedAddressInfo){
-                        CommonUtils.flutterToast("주소정보를 바꾸시면\n서류인증을 다시 받아야합니다.");
+                        CommonUtils.flutterToast("주소정보를 바꾸시면\n서류인증을 다시 받아야해요.");
                       }
                     });
                   }),
@@ -1583,7 +1583,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                       selectedAddressInfo = each["roadAddrPart1"]!;
                       _addressInfoTextController.text = selectedAddressInfo;
                       if(selectedSearchCertAddressInfo != "" && selectedSearchCertAddressInfo != selectedAddressInfo){
-                        CommonUtils.flutterToast("주소정보를 바꾸시면\n서류인증을 다시 받아야합니다.");
+                        CommonUtils.flutterToast("주소정보를 바꾸시면\n서류인증을 다시 받아야해요.");
                       }
                     });
 
@@ -1655,7 +1655,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                                   }
                                   setState(() {});
                                 }else{
-                                  CommonUtils.flutterToast("검색 결과가 없습니다.");
+                                  CommonUtils.flutterToast("검색 결과가 없어요.");
                                 }
                               }
                             });
@@ -1855,7 +1855,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
   Future<void> _checkValidCertImage(XFile image) async {
     try{
-      CommonUtils.flutterToast("신분증을 인식중입니다.");
+      CommonUtils.flutterToast("신분증을 인식중이에요.");
       await CLOVAController.uploadImageToCLOVA(image.path, (isSuccess, map) async {
         if(map != null){
           if(isSuccess){

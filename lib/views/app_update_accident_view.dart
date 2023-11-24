@@ -770,16 +770,16 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
             UiUtils.closeLoadingPop(context);
             if(isSuccessToUpdate){
               Navigator.pop(context, true);
-              CommonUtils.flutterToast("수정 완료했습니다.");
+              CommonUtils.flutterToast("수정 완료했어요.");
             }else{
               Navigator.pop(context, false);
-              CommonUtils.flutterToast("수정된정보 불러오기에\n실패했습니다.");
+              CommonUtils.flutterToast("수정된정보 불러오기에\n실패했어요.");
             }
           });
         }else{
           UiUtils.closeLoadingPop(context);
           Navigator.pop(context, false);
-          CommonUtils.flutterToast("은행코드,계좌정보가\n일치하지 않습니다.");
+          CommonUtils.flutterToast("은행코드,계좌정보가\n일치하지 않아요.");
         }
       });
     }else{
@@ -825,7 +825,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
                     }
                     CommonUtils.moveWithReplacementTo(context, AppView.appResultPrView.value, null);
                   }else{
-                    CommonUtils.flutterToast("상품정보가 없습니다.");
+                    CommonUtils.flutterToast("상품정보가 없어요.");
                     Navigator.pop(context);
                   }
                 });

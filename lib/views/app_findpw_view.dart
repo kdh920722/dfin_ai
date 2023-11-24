@@ -256,7 +256,7 @@ class AppFindPwViewState extends State<AppFindPwView> with WidgetsBindingObserve
           LogfinController.callLogfinApi(LogfinApis.checkEmailCode, inputJson3, (isSuccess, outputJson){
             UiUtils.closeLoadingPop(context);
             if(isSuccess){
-              CommonUtils.flutterToast("인증되었습니다.");
+              CommonUtils.flutterToast("인증되었어요.");
               setState(() {
                 viewId = 2;
               });
@@ -282,7 +282,7 @@ class AppFindPwViewState extends State<AppFindPwView> with WidgetsBindingObserve
               UiUtils.showLoadingPop(context);
               LogfinController.callLogfinApi(LogfinApis.checkMember, inputJson, (isSuccess, outputJson){
                 if(!isSuccess){
-                  CommonUtils.flutterToast("인증번호를 발송합니다.");
+                  CommonUtils.flutterToast("인증번호를 발송해요.");
                   _verifyCodeTextController.text = "";
                   LogfinController.callLogfinApi(LogfinApis.sendEmailCode, inputJson, (isSuccess, outputJson){
                     UiUtils.closeLoadingPop(context);
@@ -307,7 +307,7 @@ class AppFindPwViewState extends State<AppFindPwView> with WidgetsBindingObserve
                     isEmailValid = false;
                     isVerifyViewValid = false;
                   });
-                  CommonUtils.flutterToast("존재하지 않는 이메일 입니다.");
+                  CommonUtils.flutterToast("존재하지 않는 이메일이에요.");
                 }
               });
             }else{
@@ -388,12 +388,12 @@ class AppFindPwViewState extends State<AppFindPwView> with WidgetsBindingObserve
               });
             }else{
               UiUtils.closeLoadingPop(context);
-              CommonUtils.flutterToast("비밀번호 변경에 실패했습니다.");
+              CommonUtils.flutterToast("비밀번호 변경에 실패했어요.");
             }
           });
         }else{
           if(_pwdTextController.text.trim() == _pwdConfirmTextController.text.trim() && _pwdTextController.text.length <= 6){
-            CommonUtils.flutterToast("비밀번호는 6자를 넘어야 합니다.");
+            CommonUtils.flutterToast("비밀번호는 6자를 넘어야 해요.");
           }else{
             CommonUtils.flutterToast("입력하신 정보를\n다시 확인 해 주세요.");
           }
@@ -515,16 +515,16 @@ class AppFindPwViewState extends State<AppFindPwView> with WidgetsBindingObserve
                             viewId = 5;
                           });
                         }else{
-                          CommonUtils.flutterToast("이메일을 찾지 못했습니다.");
+                          CommonUtils.flutterToast("이메일을 찾지 못했어요.");
                         }
                       });
                     }
                   }else{
                     isConfirmed = false;
-                    CommonUtils.flutterToast("본인인증에 실패했습니다.");
+                    CommonUtils.flutterToast("본인인증에 실패했어요.");
                   }
                 }else{
-                  CommonUtils.flutterToast("등록되지 않은 전화번호입니다.");
+                  CommonUtils.flutterToast("등록되지 않은 전화번호에요.);
                 }
               });
             }else{
