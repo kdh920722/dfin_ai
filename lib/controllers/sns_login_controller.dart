@@ -7,6 +7,7 @@ import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:upfin/controllers/sharedpreference_controller.dart';
 import 'package:upfin/datas/my_data.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../configs/app_config.dart';
 import '../styles/ColorStyles.dart';
 import '../utils/common_utils.dart';
@@ -142,7 +143,7 @@ class SnsLoginController{
           }
         }catch(error){
           CommonUtils.log("e", error.toString());
-          UiUtils.closeLoadingPop(context);
+          if(context.mounted) UiUtils.closeLoadingPop(context);
           MyData.isSnsLogin = false;
           CommonUtils.flutterToast("${SnsLoginController.loginPlatform.value}로그인에 실패했어요.");
           loginPlatform = LoginPlatform.none;
@@ -162,11 +163,8 @@ class SnsLoginController{
       // 카카오계정으로 로그인
       OAuthToken token;
       if (await isKakaoTalkInstalled()) {
-        CommonUtils.log("", '카카오톡으로11');
         try {
-          CommonUtils.log("", '카카오톡으로22');
           token = await UserApi.instance.loginWithKakaoTalk();
-          CommonUtils.log("", '카카오톡으로33');
           await _getKakaoAgree();
           kakaoToken = token.accessToken;
           callback(true);
@@ -206,40 +204,29 @@ class SnsLoginController{
   }
 
   static Future<void> _getKakaoAgree() async {
-    if (await isKakaoTalkInstalled()) {
-      try {
-        User user = await UserApi.instance.me();
-        List<String> scopes = [];
+    User user = await UserApi.instance.me();
+    List<String> scopes = [];
 
-        if (user.kakaoAccount?.emailNeedsAgreement == true) {
-          scopes.add('account_email');
-        }
-
-        if (user.kakaoAccount?.nameNeedsAgreement == true) {
-          scopes.add('name');
-        }
-
-        if (user.kakaoAccount?.phoneNumberNeedsAgreement == true) {
-          scopes.add("phone_number");
-        }
-
-        if (scopes.isNotEmpty) {
-          OAuthToken token = await UserApi.instance.loginWithNewScopes(scopes);
-          CommonUtils.log("", '사용자에게 추가 동의 받아야 하는 항목 ${token.scopes}');
-          user = await UserApi.instance.me();
-        }else{
-          CommonUtils.log("", '카카오톡으로22');
-        }
-
-        kakaoId = user.id.toString();
-        _setUserInfoFromKakao(user);
-      } catch (error) {
-        CommonUtils.log("e", '카카오 사용자 정보 요청 실패 $error');
-        CommonUtils.flutterToast("카카오 로그인 실패\n다시 실행 해 주세요.");
-      }
-    } else {
-      CommonUtils.flutterToast("카카오톡 설치 후 진행 해 주세요.");
+    if (user.kakaoAccount?.emailNeedsAgreement == true) {
+      scopes.add('account_email');
     }
+
+    if (user.kakaoAccount?.nameNeedsAgreement == true) {
+      scopes.add('name');
+    }
+
+    if (user.kakaoAccount?.phoneNumberNeedsAgreement == true) {
+      scopes.add("phone_number");
+    }
+
+    if (scopes.isNotEmpty) {
+      OAuthToken token = await UserApi.instance.loginWithNewScopes(scopes);
+      CommonUtils.log("", '사용자에게 추가 동의 받아야 하는 항목 ${token.scopes}');
+      user = await UserApi.instance.me();
+    }
+
+    kakaoId = user.id.toString();
+    _setUserInfoFromKakao(user);
   }
 
   static void _setUserInfoFromApple(AuthorizationCredentialAppleID user) async {

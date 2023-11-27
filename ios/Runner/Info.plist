@@ -1,148 +1,136 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
-	<dict>
-		<key>CADisableMinimumFrameDurationOnPhone</key>
-		<true/>
-		<key>CFBundleDevelopmentRegion</key>
-		<string>$(DEVELOPMENT_LANGUAGE)</string>
-		<key>CFBundleDisplayName</key>
-		<string>UpFin</string>
-		<key>CFBundleExecutable</key>
-		<string>$(EXECUTABLE_NAME)</string>
-		<key>CFBundleIdentifier</key>
-		<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
-		<key>CFBundleInfoDictionaryVersion</key>
-		<string>6.0</string>
-		<key>CFBundleName</key>
-		<string>UpFin</string>
-		<key>CFBundlePackageType</key>
-		<string>APPL</string>
-		<key>CFBundleShortVersionString</key>
-		<string>$(FLUTTER_BUILD_NAME)</string>
-		<key>CFBundleSignature</key>
-		<string>????</string>
-		<key>CFBundleURLTypes</key>
-		<array>
-			<dict>
-				<key>CFBundleTypeRole</key>
-				<string>Editor</string>
-				<key>CFBundleURLSchemes</key>
-				<array>
-					<string>kakao077c95950e4c99aefd181d2cd069524a</string>
-				</array>
-			</dict>
-		</array>
-		<key>CFBundleVersion</key>
-		<string>$(FLUTTER_BUILD_NUMBER)</string>
-		<key>FDAllFilesDownloadedMessage</key>
-		<string>All files have been downloaded</string>
-		<key>FDMaximumConcurrentTasks</key>
-		<integer>5</integer>
-		<key>KAKAO_APP_KEY</key>
-		<string>077c95950e4c99aefd181d2cd069524a</string>
-		<key>LSApplicationQueriesSchemes</key>
-		<array>
-			<string>kakao077c95950e4c99aefd181d2cd069524a</string>
-			<string>kakaokompassauth</string>
-			<string>storykompassauth</string>
-			<string>kakaolink</string>
-			<string>kakaotalk-5.9.7</string>
-			<string>tel</string>
-			<string>naversearchapp</string>
-			<string>supertoss</string>
-			<string>tauthlink</string>
-			<string>ktauthexternalcall</string>
-			<string>upluscorporation</string>
-			<string>https</string>
-			<string>http</string>
-		</array>
-		<key>LSRequiresIPhoneOS</key>
-		<true/>
-		<key>NSAppTransportSecurity</key>
+<dict>
+	<key>CADisableMinimumFrameDurationOnPhone</key>
+	<true/>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleDisplayName</key>
+	<string>UpFin</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>UpFin</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(FLUTTER_BUILD_NAME)</string>
+	<key>CFBundleSignature</key>
+	<string>????</string>
+	<key>CFBundleURLTypes</key>
+	<array>
 		<dict>
-			<key>NSAllowsArbitraryLoadsInWebContent</key>
-			<true/>
-			<key>NSExceptionDomains</key>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>kakao077c95950e4c99aefd181d2cd069524a</string>
+			</array>
+		</dict>
+	</array>
+	<key>CFBundleVersion</key>
+	<string>$(FLUTTER_BUILD_NUMBER)</string>
+	<key>FDAllFilesDownloadedMessage</key>
+	<string>All files have been downloaded</string>
+	<key>FDMaximumConcurrentTasks</key>
+	<integer>5</integer>
+	<key>KAKAO_APP_KEY</key>
+	<string>077c95950e4c99aefd181d2cd069524a</string>
+	<key>LSApplicationQueriesSchemes</key>
+	<array>
+		<string>kakao077c95950e4c99aefd181d2cd069524a</string>
+		<string>kakaokompassauth</string>
+		<string>storykompassauth</string>
+		<string>kakaolink</string>
+		<string>kakaotalk-5.9.7</string>
+		<string>tel</string>
+		<string>naversearchapp</string>
+		<string>supertoss</string>
+		<string>tauthlink</string>
+		<string>ktauthexternalcall</string>
+		<string>upluscorporation</string>
+		<string>https</string>
+		<string>http</string>
+	</array>
+	<key>LSRequiresIPhoneOS</key>
+	<true/>
+	<key>LSSupportsOpeningDocumentsInPlace</key>
+	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoadsInWebContent</key>
+		<true/>
+		<key>NSExceptionDomains</key>
+		<dict>
+			<key>logfinbucket.s3.ap-northeast-2.amazonaws.com</key>
 			<dict>
-				<key>logfinbucket.s3.ap-northeast-2.amazonaws.com</key>
-				<dict>
-					<key>NSIncludesSubdomains</key>
-					<true/>
-					<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
-					<true/>
-					<key>NSTemporaryExceptionMinimumTLSVersion</key>
-					<string>TLSv1.1</string>
-				</dict>
-				<key>upfin.dwggrr.ng.0001.apn2.cache.amazonaws.com</key>
-				<dict>
-					<key>NSIncludesSubdomains</key>
-					<true/>
-					<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
-					<true/>
-					<key>NSTemporaryExceptionMinimumTLSVersion</key>
-					<string>TLSv1.1</string>
-				</dict>
-				<key>www.upfin.kr</key>
-				<dict>
-					<key>NSIncludesSubdomains</key>
-					<true/>
-					<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
-					<true/>
-					<key>NSTemporaryExceptionMinimumTLSVersion</key>
-					<string>TLSv1.1</string>
-				</dict>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+				<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSTemporaryExceptionMinimumTLSVersion</key>
+				<string>TLSv1.1</string>
+			</dict>
+			<key>upfin.dwggrr.ng.0001.apn2.cache.amazonaws.com</key>
+			<dict>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+				<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSTemporaryExceptionMinimumTLSVersion</key>
+				<string>TLSv1.1</string>
+			</dict>
+			<key>www.upfin.kr</key>
+			<dict>
+				<key>NSIncludesSubdomains</key>
+				<true/>
+				<key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+				<true/>
+				<key>NSTemporaryExceptionMinimumTLSVersion</key>
+				<string>TLSv1.1</string>
 			</dict>
 		</dict>
-
-		<key>PermissionGroupNotification</key>
-        <string>푸쉬 알림을 위한 권한요청.(Notification for FCM permission is required.)</string>
-
-		<key>NSCameraUsageDescription</key>
-		<string>사진 촬영을 위한 권한요청.(Camera permission is required.)</string>
-
-		<key>NSPhotoLibraryUsageDescription</key>
-		<string>앨범 접근을 위한 권한요청.(Used to demonstrate file_picker plugin.)</string>
-
-
-		<key>UIApplicationSupportsIndirectInputEvents</key>
-		<true/>
-		<key>UIBackgroundModes</key>
-		<array>
-			<string>fetch</string>
-			<string>processing</string>
-			<string>remote-notification</string>
-		</array>
-
-        <key>UIDocumentBrowserViewController</key>
-        <true/>
-        <key>UISupportsDocumentBrowser</key>
-        <true/>
-		<key>LSSupportsOpeningDocumentsInPlace</key>
-        <true/>
-        <key>UIFileSharingEnabled</key>
-        <true/>
-
-		<key>UILaunchStoryboardName</key>
-		<string>LaunchScreen</string>
-		<key>UIMainStoryboardFile</key>
-		<string>Main</string>
-		<key>UISupportedInterfaceOrientations</key>
-		<array>
-			<string>UIInterfaceOrientationPortrait</string>
-			<string>UIInterfaceOrientationLandscapeLeft</string>
-			<string>UIInterfaceOrientationLandscapeRight</string>
-		</array>
-		<key>UISupportedInterfaceOrientations~ipad</key>
-		<array>
-			<string>UIInterfaceOrientationPortrait</string>
-			<string>UIInterfaceOrientationPortraitUpsideDown</string>
-			<string>UIInterfaceOrientationLandscapeLeft</string>
-			<string>UIInterfaceOrientationLandscapeRight</string>
-		</array>
-		<key>UIViewControllerBasedStatusBarAppearance</key>
-		<false/>
-		<key>UIStatusBarHidden</key>
-		<false/>
 	</dict>
+	<key>NSMicrophoneUsageDescription</key>
+    <string>This app does not require access to the microphone.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>사진 촬영을 위한 권한요청.(Camera permission is required.)</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>앨범 접근을 위한 권한요청.(Used to demonstrate file_picker plugin.)</string>
+	<key>PermissionGroupNotification</key>
+	<string>푸쉬 알림을 위한 권한요청.(Notification for FCM permission is required.)</string>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
+	<key>UIDocumentBrowserViewController</key>
+	<true/>
+	<key>UIFileSharingEnabled</key>
+	<true/>
+	<key>UILaunchStoryboardName</key>
+	<string>LaunchScreen</string>
+	<key>UIMainStoryboardFile</key>
+	<string>Main</string>
+	<key>UIStatusBarHidden</key>
+	<false/>
+	<key>UISupportedInterfaceOrientations</key>
+	<array>
+		<string>UIInterfaceOrientationLandscapeLeft</string>
+		<string>UIInterfaceOrientationLandscapeRight</string>
+		<string>UIInterfaceOrientationPortrait</string>
+		<string>UIInterfaceOrientationPortraitUpsideDown</string>
+	</array>
+	<key>UISupportsDocumentBrowser</key>
+	<true/>
+	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
+</dict>
 </plist>
