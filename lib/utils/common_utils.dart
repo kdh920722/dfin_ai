@@ -187,8 +187,9 @@ class CommonUtils {
     int state = await Config.isNeedToUpdateForMain();
     CommonUtils.log("w","check update state : $state");
     if(state == 99){
-      if(context.mounted){
+      if(context.mounted && !isOutPopOn){
         CommonUtils.log("w","check update mount");
+        isOutPopOn = true;
         UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isAndroid ? 30.h : 35.h, 0.5, (context, setState){
           return Column(children: [
             UiUtils.getMarginBox(0, 3.h),
@@ -201,8 +202,9 @@ class CommonUtils {
         });
       }
     }else if(state == 44){
-      if(context.mounted){
+      if(context.mounted && !isOutPopOn){
         CommonUtils.log("w","check update mount");
+        isOutPopOn = true;
         UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isAndroid ? 18.h : 23.h, 0.5, (context, setState){
           return Center(child: Column(children: [
             UiUtils.getMarginBox(0, 1.h),
@@ -934,6 +936,8 @@ class CommonUtils {
     CommonUtils.log("W","status result : $result");
     return result;
   }
+
+  static bool isOutPopOn = false;
 
   static Future<void> requestPermissions(Function(bool isDenied, List<String>? deniedPermissionsList) callback) async {
     List<String> deniedPermissions = [];
