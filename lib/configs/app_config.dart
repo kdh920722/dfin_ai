@@ -7,7 +7,6 @@ import 'package:upfin/views/app_accident_detail_view.dart';
 import 'package:upfin/views/app_agree_detail_info_view.dart';
 import 'package:upfin/views/app_agree_detail_info_view_test.dart';
 import 'package:upfin/views/app_apply_pr_view.dart';
-import 'package:upfin/views/app_detail_pr_view.dart';
 import 'package:upfin/views/app_findpw_view.dart';
 import 'package:upfin/views/app_main_view.dart';
 import 'package:upfin/views/app_result_pr_view.dart';
@@ -41,6 +40,7 @@ class Config{
   static String privacyUrl = "";
   static String privacyText = "";
   static String privacyText2 = "";
+  static String privacyText3 = "";
   static BuildContext? contextForEmergencyBack;
   static bool isEmergencyRoot = false;
   static FlutterDownloader flutterDownloader = FlutterDownloader();
@@ -54,7 +54,6 @@ class Config{
     AppView.appSearchAccidentView.value : (context) => AppSearchAccidentView(),
     AppView.appUpdateAccidentView.value : (context) => AppUpdateAccidentView(),
     AppView.appResultPrView.value : (context) => AppResultPrView(),
-    AppView.appDetailPrView.value : (context) => AppDetailPrView(),
     AppView.appApplyPrView.value : (context) => AppApplyPrView(),
     AppView.appChatView.value : (context) => AppChatView(),
     AppView.appAccidentDetailInfoView.value : (context) => AppAccidentDetailView(),
@@ -67,18 +66,7 @@ class Config{
 
   static Future<void> initAppState(Function(bool isSuccess) callback) async{
     try{
-      /*
-      if(isAndroid){
-        DeviceInfoPlugin deviceInfoPlugin = DeviceInfoPlugin();
-        AndroidDeviceInfo androidInfo = await deviceInfoPlugin.androidInfo;
-        if(androidInfo.version.sdkInt >= 30){
-          storagePermissionListForAndroid.add(Permission.manageExternalStorage);
-        }else{
-          storagePermissionListForAndroid.add(Permission.storage);
-        }
-        permissionList.addAll(storagePermissionListForAndroid);
-      }
-      */
+
       if(isAndroid){
         List<Permission> permissionListForAndroid = [Permission.notification, Permission.camera, Permission.phone];
         permissionList.addAll(permissionListForAndroid);
@@ -104,6 +92,7 @@ class Config{
             case "privacy_url" : privacyUrl = each.value.toString();
             case "privacy_text" : privacyText = each.value.toString();
             case "privacy_text2" : privacyText2 = each.value.toString();
+            case "privacy_text3" : privacyText3 = each.value.toString();
           }
         }
       }else{
@@ -163,7 +152,7 @@ class Config{
 
 enum AppView {
   appRootView, appLoginView, appCertificationView, appSignupView, appMainView, appSearchAccidentView, appSignOutView,
-  appUpdateAccidentView, appResultPrView, appDetailPrView, appApplyPrView, appChatView, appAccidentDetailInfoView, appAgreeDetailInfoView, appAgreeDetailInfoViewTest,
+  appUpdateAccidentView, appResultPrView, appApplyPrView, appChatView, appAccidentDetailInfoView, appAgreeDetailInfoView, appAgreeDetailInfoViewTest,
   appFindPwView, debugForAdminView
 }
 
@@ -186,8 +175,6 @@ extension SAppViewExtension on AppView {
         return '/updateAccidentView';
       case AppView.appResultPrView:
         return '/resultPrView';
-      case AppView.appDetailPrView:
-        return '/detailPrView';
       case AppView.appApplyPrView:
         return '/applyPrView';
       case AppView.appChatView:

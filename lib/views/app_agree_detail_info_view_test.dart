@@ -79,8 +79,6 @@ class AppAgreeDetailInfoViewTestState extends State<AppAgreeDetailInfoViewTest> 
             };
           }else if (element.localName == 'button') {
             return {
-              //"cursor": "pointer",
-              //"display":"inlne-block",
               "text-align":"center",
               "background-color":"#3a6cff",
               "color" : "white",

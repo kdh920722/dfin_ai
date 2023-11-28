@@ -1,9 +1,7 @@
 import 'dart:convert';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:http_parser/http_parser.dart';
 import 'package:amazon_cognito_identity_dart_2/sig_v4.dart';
 import 'dart:io';
-import '../datas/s3_upload_data.dart';
 import '../utils/common_utils.dart';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
@@ -83,133 +81,6 @@ class AwsController {
       return callback(false, "");
     }
   }
-
-
-/*
-  static Future<void> uploadFileToS3(String filePath, String awsPath,
-      Function(bool isSuccess, String resultUrl) callback) async {
-
-    try{
-      // Generate a unique key for the file
-      String fileName = filePath.split('/').last;
-       /*
-       * /private/var/mobile/Containers/Data/Application/FFA33E43-F5EB-430E-8F9D-8B34216C2A3C/tmp/03711.pdf
-       * */
-      // Generate the S3 URL
-      String s3Url = 'https://$bucket.s3-$awsRegion.amazonaws.com/$awsPath/$fileName';
-
-      // Prepare the HTTP request
-      var request = http.MultipartRequest('POST', Uri.parse(s3Url));
-
-      // Set the AWS S3 headers
-      request.headers['authorization'] = 'AWS $awsAccessKey:$awsSecretKey';
-
-      String contentType = 'application/octet-stream'; // Default content type
-      if (filePath.endsWith('.jpg') || filePath.endsWith('.jpeg') || filePath.endsWith('.png') || filePath.endsWith('.bmp')) {
-        contentType = 'image/jpeg';
-      } else if (filePath.endsWith('.xlsx') || filePath.endsWith('.xlsm') || filePath.endsWith('.xlsb')) {
-        contentType = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
-      } else if (filePath.endsWith('.pdf')) {
-        contentType = 'application/pdf';
-      } else if (filePath.endsWith('.doc')) {
-        contentType = 'application/msword';
-      } else if (filePath.endsWith('.xltx')) {
-        contentType = 'application/vnd.openxmlformats-officedocument.spreadsheettemplate';
-      } else if (filePath.endsWith('.txt') || filePath.endsWith('.csv')) {
-        contentType = 'text/plain';
-      } else if (filePath.endsWith('.hwp')) {
-        contentType = 'application/x-hwp';
-      } else if (filePath.endsWith('.heic') || filePath.endsWith('.heif')) {
-        contentType = 'image/heif';
-      }
-
-      // Add the file to the request
-      var file = File(filePath);
-      var stream = http.ByteStream(file.openRead());
-      var length = await file.length();
-      request.files.add(http.MultipartFile(
-        'file',
-        stream,
-        length,
-        filename: fileName,
-        contentType: MediaType.parse(contentType), // Adjust content type based on your file type
-      ));
-
-      // Send the HTTP request and get the response
-      var response = await request.send();
-      if (response.statusCode == 200) {
-        String responseBody = await response.stream.bytesToString();
-        callback(true, responseBody);
-      } else {
-        callback(false, "");
-      }
-    }catch(error){
-      CommonUtils.log('e', error.toString());
-      callback(false, "");
-    }
-
-  }
-
-  static Future<void> uploadFileToS3_2(String filePath, String awsPath,
-      Function(bool isSuccess, String resultUrl) callback) async {
-    try{
-      String fileName = filePath.split('/').last;
-      //Network service should be injected in a real app
-      NetworkService networkService = NetworkService();
-
-      ///Sample data for uploadData, replace with your own data
-      S3UploadData uploadData = S3UploadData(
-        url: 'https://$bucket.s3.$awsRegion.amazonaws.com/$awsPath/',
-        fields: {
-          "key": awsSecretKey,
-          "AWSAccessKeyId": awsAccessKey,
-        },
-      );
-
-      final (selectedFileBytes, selectedFileName) = await CommonUtils.getFileBytesAndName(File(filePath));
-      String resultUrl = await networkService.uploadToS3(
-        uploadUrl: uploadData.url,
-        data: uploadData.fields,
-        fileAsBinary: selectedFileBytes,
-        filename: selectedFileName,
-      );
-
-      CommonUtils.log('', "resultUrl : $resultUrl");
-      if(resultUrl != ""){
-        callback(true, resultUrl);
-      }else{
-        callback(false, "");
-      }
-
-    }catch(error){
-      CommonUtils.log('e', error.toString());
-      callback(false, "");
-    }
-  }
-}
-
-class NetworkService {
-  Future<String> uploadToS3({
-    required String uploadUrl,
-    required Map<String, String> data,
-    required List<int> fileAsBinary,
-    required String filename,
-  }) async {
-    var multiPartFile = http.MultipartFile.fromBytes('file', fileAsBinary, filename: filename);
-    var uri = Uri.parse(uploadUrl);
-    var request = http.MultipartRequest('POST', uri)
-      ..fields.addAll(data)
-      ..files.add(multiPartFile);
-    http.StreamedResponse response = await request.send();
-    if (response.statusCode == 204) {
-      String responseBody = await response.stream.bytesToString();
-      return responseBody;
-    }
-    return "";
-  }
-}
-
-*/
 }
 enum ACL {
   /// Owner gets FULL_CONTROL. No one else has access rights (default).

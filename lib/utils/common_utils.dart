@@ -4,7 +4,6 @@ import 'dart:math';
 import 'package:camera/camera.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:file_picker/file_picker.dart';
-import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -46,6 +45,8 @@ class CommonUtils {
         FireBaseController.writeLog("error", FireBaseController.fcmToken, logMessage);
       }
     }
+
+    if(logType.toLowerCase() != "e") logType = "";
 
     var logger = Logger();
     if(logMessage.length > logMaxSize){
@@ -259,6 +260,7 @@ class CommonUtils {
         'event' : eventName
       };
 
+      CommonUtils.log("w","call app log");
       FireBaseController.analytics!.logEvent(name: eventName, parameters: data);
     }
   }

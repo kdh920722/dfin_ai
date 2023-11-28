@@ -1922,7 +1922,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                                 pickedFilePath = croppedImagePath;
                               });
                             }else{
-                              CommonUtils.log("w","fff");
                               isCheckNeeded = true;
                             }
 
@@ -2529,6 +2528,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   void _setDocStatus(String docType, Function(bool isSuccess, List<Widget> widgetList) callback){
     bool isError = false;
     List<Widget> docsWidgetList = [];
+    String commonErrorMsg = "";
     for(var each in addedDocsList){
       if(each["docs_type"] == docType){
         Key key = UniqueKey();
@@ -2539,6 +2539,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         Color successTextColor = ColorStyles.upFinBlack;
         Color successCheckedColor = ColorStyles.upFinButtonBlue;
         FontWeight fontWeight = FontWeight.w500;
+
         if(each["docs_type"] == "gov24"){
           if(each["id"] == 1){
             name = "주민등록등본";
@@ -2558,7 +2559,12 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           Map<String, dynamic> resultMap = each["result"];
           String errorMsg = "";
           if(resultMap.containsKey("result_codef_code") && resultMap["result_codef_code"] != ""){
-            errorMsg = CodeFController.getErrorMsg(resultMap["result_codef_code"]);
+            if(CodeFController.isCommonError(resultMap["result_codef_code"])){
+              if(commonErrorMsg == "") commonErrorMsg = CodeFController.getErrorMsg(resultMap["result_codef_code"]);
+              errorMsg = commonErrorMsg;
+            }else{
+              errorMsg = CodeFController.getErrorMsg(resultMap["result_codef_code"]);
+            }
             textColor = ColorStyles.upFinBlack;
             checkColor = ColorStyles.upFinGray;
             fontWeight = FontWeight.w500;
@@ -2598,25 +2604,16 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             checkColor = ColorStyles.upFinGray;
             textColor = ColorStyles.upFinBlack;
           }
-/*
-          if(_setDocResultText(each["result"]) == 1){
-            textColor = successTextColor;
-            checkColor = successCheckedColor;
-            fontWeight = FontWeight.w600;
-          }else if(_setDocResultText(each["result"]) == 2){
-            textColor = errorTextColor;
-            checkColor = errorTextColor;
-            fontWeight = FontWeight.w500;
-            name += " 실패";
-            isError = true;
-          }
-
- */
 
           Map<String, dynamic> resultMap = each["result"];
           String errorMsg = "";
           if(resultMap.containsKey("result_codef_code") && resultMap["result_codef_code"] != ""){
-            errorMsg = CodeFController.getErrorMsg(resultMap["result_codef_code"]);
+            if(CodeFController.isCommonError(resultMap["result_codef_code"])){
+              if(commonErrorMsg == "") commonErrorMsg = CodeFController.getErrorMsg(resultMap["result_codef_code"]);
+              errorMsg = commonErrorMsg;
+            }else{
+              errorMsg = CodeFController.getErrorMsg(resultMap["result_codef_code"]);
+            }
             textColor = ColorStyles.upFinBlack;
             checkColor = ColorStyles.upFinGray;
             fontWeight = FontWeight.w500;
@@ -2663,24 +2660,17 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             textColor = ColorStyles.upFinBlack;
           }
 
-          if(_setDocResultText(each["result"]) == 1){
-            textColor = successTextColor;
-            checkColor = successCheckedColor;
-            fontWeight = FontWeight.w600;
-          }else if(_setDocResultText(each["result"]) == 2){
-            textColor = ColorStyles.upFinBlack;
-            checkColor = ColorStyles.upFinGray;
-            fontWeight = FontWeight.w500;
-            name += " 실패";
-            isError = true;
-          }
-
           Map<String, dynamic> resultMap = each["result"];
           String errorMsg = "";
           if(resultMap.containsKey("result_codef_code") && resultMap["result_codef_code"] != ""){
-            errorMsg = CodeFController.getErrorMsg(resultMap["result_codef_code"]);
-            textColor = errorTextColor;
-            checkColor = errorTextColor;
+            if(CodeFController.isCommonError(resultMap["result_codef_code"])){
+              if(commonErrorMsg == "") commonErrorMsg = CodeFController.getErrorMsg(resultMap["result_codef_code"]);
+              errorMsg = commonErrorMsg;
+            }else{
+              errorMsg = CodeFController.getErrorMsg(resultMap["result_codef_code"]);
+            }
+            textColor = ColorStyles.upFinBlack;
+            checkColor = ColorStyles.upFinGray;
             fontWeight = FontWeight.w500;
             name += " 실패";
             isError = true;

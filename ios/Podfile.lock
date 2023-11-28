@@ -186,7 +186,7 @@ PODS:
     - GoogleUtilities/Logger
   - GoogleUtilities/UserDefaults (7.12.0):
     - GoogleUtilities/Logger
-  - GTMSessionFetcher/Core (3.1.1)
+  - GTMSessionFetcher/Core (3.2.0)
   - iamport_flutter (0.0.1):
     - Flutter
   - iamport_webview_flutter (0.0.1):
@@ -392,7 +392,7 @@ SPEC CHECKSUMS:
   GoogleAppMeasurement: 70ce9aa438cff1cfb31ea3e660bcc67734cb716e
   GoogleDataTransport: 54dee9d48d14580407f8f5fbf2f496e92437a2f2
   GoogleUtilities: 0759d1a57ebb953965c2dfe0ba4c82e95ccc2e34
-  GTMSessionFetcher: e8647203b65cee28c5f73d0f473d096653945e72
+  GTMSessionFetcher: 41b9ef0b4c08a6db4b7eb51a21ae5183ec99a2c8
   iamport_flutter: f698983444b7c0f83e356407631cfeec77a776bf
   iamport_webview_flutter: 70dbc31045e4cf7a0c829b76c6f8319dc94b299e
   just_audio: baa7252489dbcf47a4c7cc9ca663e9661c99aafa

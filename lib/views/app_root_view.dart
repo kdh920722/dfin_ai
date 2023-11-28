@@ -102,6 +102,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
     precacheImage(const AssetImage('assets/images/pass_icon.png'), context);
     precacheImage(const AssetImage('assets/images/toss_icon.png'), context);
     precacheImage(const AssetImage('assets/images/chat_loading.gif'), context);
+    precacheImage(const AssetImage('assets/images/cert_called.png'), context);
   }
 
   Future<void> _initFirebase() async {
@@ -298,7 +299,6 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
       if(isSuccess){
         GetController.to.updatePercent(5);
         CommonUtils.log("i", "kakao key : ${SnsLoginController.kakaoKey}");
-        CommonUtils.log("i", "percent : ${GetController.to.loadingPercent.value}");
         if(GetController.to.loadingPercent.value == 100){
           setState(() {
             Config.isControllerLoadFinished = true;
@@ -433,28 +433,6 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
         }
       });
       await _initSharedPreference();
-
-      /*
-      if(Config.isAndroid){
-        isPermissionDenied = await CommonUtils.isPermissionDenied();
-        if(isPermissionDenied){
-          permissionCheckTimer ??= Timer.periodic(const Duration(seconds: 2), (Timer timer) async {
-            isPermissionDenied = await CommonUtils.isPermissionDenied();
-            if(isPermissionDenied && !isPermissionCheckPopStarted){
-              await _requestPermissions();
-            }else if(!isPermissionDenied && isPermissionCheckPopStarted){
-              if(permissionCheckTimer != null) permissionCheckTimer!.cancel();
-              if(context.mounted && isPopOn) Navigator.pop(context);
-              _callInitApis();
-            }
-          });
-        }else{
-          _callInitApis();
-        }
-      }else{
-        _callInitApis();
-      }
-       */
 
       isPermissionDenied = await CommonUtils.isPermissionDenied();
       if(isPermissionDenied){

@@ -132,29 +132,6 @@ class MyData {
       _chatRoomInfoList.add(chatRoomInfoData);
     }
   }
-  /*
-  static void sortChatRoomInfoList(){
-    _chatRoomInfoList.sort((a,b){
-      int yearA = int.parse(a.chatRoomLastMsgTime.substring(0, 4));
-      int monthA = int.parse(a.chatRoomLastMsgTime.substring(4, 6));
-      int dayA = int.parse(a.chatRoomLastMsgTime.substring(6, 8));
-      int hourA = int.parse(a.chatRoomLastMsgTime.substring(8, 10));
-      int minuteA = int.parse(a.chatRoomLastMsgTime.substring(10, 12));
-      int secondA = int.parse(a.chatRoomLastMsgTime.substring(12, 14));
-      var dateA = DateTime(yearA, monthA, dayA, hourA, minuteA, secondA);
-
-      int yearB = int.parse(b.chatRoomLastMsgTime.substring(0, 4));
-      int monthB = int.parse(b.chatRoomLastMsgTime.substring(4, 6));
-      int dayB = int.parse(b.chatRoomLastMsgTime.substring(6, 8));
-      int hourB = int.parse(b.chatRoomLastMsgTime.substring(8, 10));
-      int minuteB = int.parse(b.chatRoomLastMsgTime.substring(10, 12));
-      int secondB = int.parse(b.chatRoomLastMsgTime.substring(12, 14));
-      var dateB = DateTime(yearB, monthB, dayB, hourB, minuteB, secondB);
-
-      return dateA.compareTo(dateB);
-    });
-  }
-  */
 
   static void clearChatRoomInfoList(){
     _chatRoomInfoList.clear();

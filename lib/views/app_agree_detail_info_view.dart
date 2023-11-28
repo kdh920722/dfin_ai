@@ -71,8 +71,6 @@ class AppAgreeDetailInfoViewState extends State<AppAgreeDetailInfoView> with Wid
               Navigator.pop(context, false);
             })
           ])),
-          //UiUtils.getMarginBox(0, 3.h),
-          //SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(title, 22.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
           UiUtils.getMarginBox(0, 2.h),
           UiUtils.getExpandedScrollView(Axis.vertical, subContents),
           UiUtils.getMarginBox(0, 3.h),

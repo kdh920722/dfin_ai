@@ -20,18 +20,18 @@ class CodeFController{
   factory CodeFController() => _instance;
   CodeFController._internal();
   static final Map<String,String> errorMsgMap = {
-    "CF-13000" : "사업자번호(주민등록번호) 오류입니다.",
-    "CF-12100" : "인증기관 오류입니다.",
-    "CF-12100A" : "주소정보가 일치하지 않습니다.",
-    "CF-01004" : "응답대기시간이 초과되었습니다.",
-    "CF-12872" : "인증요청이 취소되었습니다.",
-    "CF-12835" : "인증서정보가 없습니다.",
-    "error_timeout" : "응답대기시간이 초과되었습니다.",
-    "error_http" : "인터넷연결 오류입니다.",
-    "error_connection" : "서버연결 오류입니다.",
-    "error_cert" : "정보를 가져오는데 문제가 발생했습니다.",
-    "error_null" : "정보를 가져오는데 실패했습니다.",
-    };
+    "CF-13000" : "주민등록번호/사업자번호 오류",
+    "CF-12100" : "인증기관 오류",
+    "CF-12100A" : "주소정보가 일치하지 않음",
+    "CF-01004" : "응답대기시간 초과",
+    "CF-12872" : "인증요청 취소",
+    "CF-12835" : "인증서정보 없음",
+    "error_timeout" : "응답대기시간 초과",
+    "error_http" : "인터넷연결 오류",
+    "error_connection" : "서버연결 오류",
+    "error_cert" : "정보를 가져오는데 문제발생",
+    "error_null" : "정보를 가져오는데 실패",
+  };
   /// CODEF API ------------------------------------------------------------------------------------------------------------------------ ///
   static HostStatus hostStatus = HostStatus.prod;
   static String token = "";
@@ -39,6 +39,15 @@ class CodeFController{
   static bool isTimeOutException = false;
   static void setHostStatus(HostStatus host){
     hostStatus = host;
+  }
+
+  static bool isCommonError(String errorCode){
+    if(errorCode == "12872" || errorCode == "CF-01004" || errorCode == "error_timeout" || errorCode == "error_null"
+        || errorCode == "error_http" || errorCode == "error_connection" || errorCode == "error_cert"){
+      return true;
+    }else{
+      return false;
+    }
   }
 
   static String getErrorMsg(String errorCode){
@@ -97,106 +106,6 @@ class CodeFController{
     } catch (e) {
       CommonUtils.log('e', e.toString());
       callback(false);
-    }
-  }
-
-  static Future<void> _getDataFromApi(Apis apiInfo, Map<String, dynamic> inputJson,
-      void Function(bool isSuccess, bool is2WayProcess, Map<String, dynamic>? outputJson, List<dynamic>? outputJsonArray, Map<String, dynamic>? fullOutPut) callback) async {
-    final baseUrl = hostStatus.value == HostStatus.prod.value ? Host.baseUrl.value : HostDev.baseUrl.value;
-    final endPoint = apiInfo.value;
-    CommonUtils.log("i", "call api : $endPoint");
-    CommonUtils.log("i", "call input json : \n$inputJson");
-    final url = baseUrl + endPoint;
-    var targetUrl = "";
-    if(Config.isWeb){
-      targetUrl = 'https://corsproxy.io/?${Uri.encodeComponent(url)}';
-    }else{
-      targetUrl = url;
-    }
-
-    final tokenHeader = 'Bearer $token';
-
-    try {
-      final response = await http.post(Uri.parse(targetUrl),
-          headers: {
-            'Authorization': tokenHeader,
-            'Content-Type': 'application/json'
-          },
-          body: jsonEncode(inputJson)
-      ).timeout(const Duration(seconds: 120));
-
-      if(response.statusCode == 200) {
-        final decodedResponseBody = Uri.decodeFull(response.body);
-        final json = jsonDecode(decodedResponseBody);
-        if(json.containsKey('result') && json.containsKey('data')){
-          final result = json['result'];
-          final resultCode = result['code'];
-          CommonUtils.log('', 'out full : \n$json');
-
-          // CF-00000 : 성공, CF-03002 : 추가 인증 필요
-          final msg = result['message'];
-          if(resultCode == 'CF-00000' || resultCode == 'CF-03002'){
-            final resultData = json['data'];
-            if (resultData is Map<String, dynamic>) {
-              if(resultData.isNotEmpty){
-                resultData['result_code'] = resultCode;
-                resultData['result_codef_code'] = resultCode;
-                if(resultCode == 'CF-03002') {
-                  callback(true, true, resultData, null, json);
-                } else {
-                  callback(true, false, resultData, null, json);
-                }
-              }else{
-                final Map<String, dynamic> resultData = {};
-                resultData['result_code'] = errorCodeKey;
-                resultData['result_codef_code'] = resultCode;
-                resultData['result_msg'] = msg;
-                CommonUtils.log('e', 'out resultCode error : $resultCode');
-                callback(true, false, resultData, null, json);
-              }
-            } else if (resultData is List<dynamic>) {
-              if(resultData.isNotEmpty){
-                resultData[0]['result_code'] = resultCode;
-                resultData[0]['result_codef_code'] = resultCode;
-                if(resultCode == 'CF-03002') {
-                  callback(true, true, null, resultData, json);
-                } else {
-                  callback(true, false, null, resultData, json);
-                }
-              }else{
-                final Map<String, dynamic> resultData = {};
-                resultData['result_code'] = errorCodeKey;
-                resultData['result_codef_code'] = resultCode;
-                resultData['result_msg'] = msg;
-                CommonUtils.log('e', 'out resultCode error : $resultCode');
-                callback(true, false, resultData, null, json);
-              }
-            }
-          } else {
-            final Map<String, dynamic> resultData = {};
-            resultData['result_code'] = errorCodeKey;
-            resultData['result_codef_code'] = resultCode;
-            resultData['result_msg'] = msg;
-            CommonUtils.log('e', 'out resultCode error : $resultCode');
-            callback(true, false, resultData, null, json);
-          }
-        }
-      } else {
-        CommonUtils.log('e', 'http error code : ${response.statusCode}');
-        final Map<String, dynamic> resultData = {};
-        resultData['result_code'] = errorCodeKey;
-        resultData['result_codef_code'] = "error_http";
-        resultData['result_msg'] = "인터넷 연결에러가 발생했습니다.";
-        callback(true, false, resultData, null, null);
-      }
-    } catch (e) {
-      isTimeOutException = true;
-      CommonUtils.log('e', e.toString());
-      final Map<String, dynamic> resultData = {};
-      resultData['result_code'] = errorCodeKey;
-      resultData['result_codef_code'] = "error_timeout";
-      resultData['result_msg'] = "에러가 발생했습니다.";
-      callback(true, false, resultData, null, null);
     }
   }
 
@@ -362,183 +271,6 @@ class CodeFController{
     });
   }
   /// ------------------------------------------------------------------------------------------------------------------------ ///
-  static Future<void> callApisWithCert(BuildContext context, StateSetter setState, int certType,
-      List<ApiInfoData> apiInfoDataList, Function(bool isSuccess, List<ApiInfoData>? resultApiInfoDataList) callback) async {
-    int callCount = 0;
-    bool isFirstCalledOnCert = false;
-    for(var each in apiInfoDataList){
-      if(each.isCallWithCert){
-        if(!isFirstCalledOnCert){
-          isFirstCalledOnCert = true;
-          _callApiWithCert(context, setState, certType, each.api, each.inputJson, (isSuccess, resultMap, resultListMap, fullMap) {
-            if(isSuccess){
-              if(resultMap != null){
-                if(resultMap["result_code"] == errorCodeKey){
-                  each.isResultSuccess = false;
-                  CommonUtils.log("e", "error api 1: ${each.api.value}");
-                  String errorMsg = resultMap["result_msg"];
-                  if(errorMsg == "성공"){
-                    errorMsg = "조회결과가 없습니다.";
-                  }
-                  each.resultMap = null;
-                  each.resultFullMap = fullMap;
-                  //CommonUtils.flutterToast(errorMsg.replaceAll("+", " "));
-                }else{
-                  if(fullMap == null){
-                    CommonUtils.log("e", "error api 2: ${each.api.value}");
-                    each.isResultSuccess = false;
-                    resultMap["result_msg"] = "조회에 실패했습니다.";
-                    each.resultMap = null;
-                    each.resultFullMap = fullMap;
-                  }else{
-                    if(fullMap["result"]["code"] == "CF-03002"){
-                      CommonUtils.log("e", "error api 3: ${each.api.value}");
-                      resultMap["result_msg"] = "인증에 실패했습니다.";
-                      each.isResultSuccess = false;
-                      each.resultMap = null;
-                      each.resultFullMap = fullMap;
-                    }else{
-                      each.isResultSuccess = true;
-                      each.resultMap = resultMap;
-                      each.resultFullMap = fullMap;
-                    }
-                  }
-                }
-              }else{
-                each.isResultSuccess = true;
-                each.resultListMap = resultListMap;
-                each.resultFullMap = fullMap;
-              }
-
-              callCount++;
-              if(callCount >= apiInfoDataList.length){
-                GetController.to.updateWait(false);
-                isSetAuthPopOn = false;
-                Navigator.of(context).pop();
-                callback(true, apiInfoDataList);
-              }
-            }else{
-              if(isSetAuthPopOn){
-                GetController.to.updateWait(false);
-                isSetAuthPopOn = false;
-                Navigator.of(context).pop();
-              }
-              each.isResultSuccess = false;
-              each.resultMap = null;
-              each.resultListMap = null;
-              each.resultFullMap = null;
-              callback(false, apiInfoDataList);
-            }
-          });
-          await Future.delayed(const Duration(milliseconds: 1000), () async {});
-        }else{
-          _callApiWithOutCert(context, each.api, each.inputJson, (isSuccess, resultMap, resultListMap, fullMap){
-            if(isSuccess){
-              if(resultMap != null){
-                if(resultMap["result_code"] == errorCodeKey){
-                  each.isResultSuccess = false;
-                  CommonUtils.log("e", "error api 1: ${each.api.value}");
-                  String errorMsg = resultMap["result_msg"];
-                  if(errorMsg == "성공"){
-                    errorMsg = "조회결과가 없습니다.";
-                  }
-                  each.resultMap = null;
-                  each.resultFullMap = fullMap;
-                  //CommonUtils.flutterToast(errorMsg.replaceAll("+", " "));
-                }else{
-                  if(fullMap == null){
-                    CommonUtils.log("e", "error api 2: ${each.api.value}");
-                    each.isResultSuccess = false;
-                    resultMap["result_msg"] = "조회에 실패했습니다.";
-                    each.resultMap = null;
-                    each.resultFullMap = fullMap;
-                  }else{
-                    if(fullMap["result"]["code"] == "CF-03002"){
-                      CommonUtils.log("e", "error api 3: ${each.api.value}");
-                      resultMap["result_msg"] = "인증에 실패했습니다.";
-                      each.isResultSuccess = false;
-                      each.resultMap = null;
-                      each.resultFullMap = fullMap;
-                    }else{
-                      each.isResultSuccess = true;
-                      each.resultMap = resultMap;
-                      each.resultFullMap = fullMap;
-                    }
-                  }
-                }
-              }else{
-                each.isResultSuccess = true;
-                each.resultListMap = resultListMap;
-                each.resultFullMap = fullMap;
-              }
-
-              callCount++;
-              if(callCount >= apiInfoDataList.length){
-                if(isSetAuthPopOn){
-                  GetController.to.updateWait(false);
-                  isSetAuthPopOn = false;
-                  Navigator.of(context).pop();
-                }
-                callback(true, apiInfoDataList);
-              }
-            }
-          });
-        }
-      }
-    }
-  }
-
-  static Future<void> callApisWithOutCert(BuildContext context, List<ApiInfoData> apiInfoDataList,
-      Function(bool isSuccess, List<ApiInfoData>? resultApiInfoDataList) callback) async {
-    int callCount = 0;
-    for(var each in apiInfoDataList){
-      if(!each.isCallWithCert){
-        _callApiWithOutCert(context, each.api, each.inputJson, (isSuccess, resultMap, resultListMap, fullMap){
-          if(isSuccess){
-            if(resultMap != null){
-              if(resultMap["result_code"] == errorCodeKey){
-                each.isResultSuccess = false;
-                CommonUtils.log("e", "error api : ${each.api.value}");
-                String errorMsg = resultMap["result_msg"];
-                if(errorMsg == "성공"){
-                  errorMsg = "조회결과가 없습니다.";
-                }
-                each.resultMap = null;
-                each.resultFullMap = fullMap;
-              }else{
-                each.isResultSuccess = true;
-                each.resultMap = resultMap;
-                each.resultFullMap = fullMap;
-              }
-            }else{
-              each.isResultSuccess = true;
-              each.resultListMap = resultListMap;
-              each.resultFullMap = fullMap;
-            }
-
-            callCount++;
-            if(callCount == apiInfoDataList.length){
-              callback(true, apiInfoDataList);
-            }
-          }
-        });
-      }
-    }
-  }
-
-  static Future<void> _callApiWithOutCert(BuildContext context, Apis api, Map<String, dynamic> inputJson,
-      Function(bool isSuccess, Map<String,dynamic>? resultMap, List<dynamic>? resultListMap, Map<String,dynamic>? fullMap) callback) async {
-    CodeFController._getDataFromApi(api, inputJson, (isSuccess, _, map, listMap, fullResultMap) {
-      if(isSuccess){
-        if(map != null){
-          callback(true, map, null, fullResultMap);
-        }else{
-          callback(true, null, listMap, fullResultMap);
-        }
-      }
-    });
-  }
-
   static Future<void> _callApiWithOutCert2(BuildContext context, Apis api, Map<String, dynamic> inputJson,
       Function(bool isSuccess, Map<String,dynamic>? resultMap, List<dynamic>? resultListMap, Map<String,dynamic>? fullMap) callback) async {
     CodeFController._getDataFromApi2(api, inputJson, (isSuccess, _, map, listMap, fullResultMap) {
@@ -847,91 +579,6 @@ class CodeFController{
     });
   }
 
-  static Future<void> _callApiWithCert(BuildContext context, StateSetter setState, int certType, Apis representApi, Map<String, dynamic> inputJson,
-      Function(bool isSuccess, Map<String,dynamic>? resultMap, List<dynamic>? resultListMap, Map<String,dynamic>? fullMap) callback) async {
-    await CodeFController._getDataFromApi(representApi, inputJson, (isSuccess, is2WayProcess, map, listMap, fullResultMap) async {
-      if(isSuccess){
-        if(map != null){
-          if(is2WayProcess){
-            Map<String, dynamic>? resultMap = _set2WayMap(inputJson, map);
-            if(resultMap != null){
-              if(certType == 1){
-                if(await canLaunchUrl(Uri.parse("kakaotalk://launch"))){
-                  launchUrl(Uri.parse("kakaotalk://launch"));
-                }else{
-                  Config.isAndroid ? launchUrl(Uri.parse("market://details?id=com.kakao.talk"))
-                      : launchUrl(Uri.parse("https://apps.apple.com/kr/app/kakaotalk/id869223134?mt=12"));
-                }
-              }else if(certType == 6){
-                if(await canLaunchUrl(Uri.parse("naversearchapp://default?version=1"))){
-                  launchUrl(Uri.parse("market://details?id=com.nhn.android.search"));
-                }else{
-                  Config.isAndroid ? launchUrl(Uri.parse("market://details?id=com.nhn.android.search"))
-                      : launchUrl(Uri.parse("https://apps.apple.com/kr/app/%EB%84%A4%EC%9D%B4%EB%B2%84-naver/id393499958"));
-                }
-              }else if(certType == 8){
-                if(await canLaunchUrl(Uri.parse("supertoss://launch"))){
-                  launchUrl(Uri.parse("market://details?id=viva.republica.toss"));
-                }else{
-                  Config.isAndroid ? launchUrl(Uri.parse("market://details?id=viva.republica.toss"))
-                      : launchUrl(Uri.parse("https://apps.apple.com/kr/app/%ED%86%A0%EC%8A%A4/id839333328"));
-                }
-              }else if(certType == 5){
-                if(inputJson.containsKey("telecom")){
-                  String telecom = inputJson["telecom"];
-                  if(telecom == "0"){
-                    if(await canLaunchUrl(Uri.parse("tauthlink://launch"))){
-                      //launchUrl(Uri.parse("tauthlink://launch"));
-                      launchUrl(Uri.parse("market://details?id=com.sktelecom.tauth"));
-                    }else{
-                      Config.isAndroid ? launchUrl(Uri.parse("market://details?id=com.sktelecom.tauth"))
-                          : launchUrl(Uri.parse("https://apps.apple.com/kr/app/pass-by-skt/id1141258007"));
-                    }
-                  }else if(telecom == "1"){
-                    if(await canLaunchUrl(Uri.parse("ktauthexternalcall://launch"))){
-                      //launchUrl(Uri.parse("ktauthexternalcall://launch"));
-                      launchUrl(Uri.parse("market://details?id=com.kt.ktauth"));
-                    }else{
-                      Config.isAndroid ? launchUrl(Uri.parse("market://details?id=com.kt.ktauth"))
-                          : launchUrl(Uri.parse("https://apps.apple.com/kr/app/pass-by-kt/id1134371550"));
-                    }
-                  }else{
-                    if(await canLaunchUrl(Uri.parse("upluscorporation://launch"))){
-                      //launchUrl(Uri.parse("upluscorporation://launch"));
-                      launchUrl(Uri.parse("market://details?id=com.lguplus.smartotp"));
-                    }else{
-                      Config.isAndroid ? launchUrl(Uri.parse("market://details?id=com.lguplus.smartotp"))
-                          : launchUrl(Uri.parse("https://apps.apple.com/kr/app/pass-by-u/id1147394645"));
-                    }
-                  }
-                }
-              }
-              isSetAuthPopOn = true;
-              if(context.mounted){
-                _setAuthPop(context, representApi, certType, resultMap,(isAuthSuccess, authMap, authListMap, fullMap) async {
-                  if(isAuthSuccess){
-                    if(authMap != null){
-                      callback(true, authMap, null, fullMap);
-                    }else{
-                      callback(true, null, authListMap, fullMap);
-                    }
-                  }else{
-                    callback(false, null, null, null);
-                  }
-                });
-              }
-              setState(() {});
-            }else{
-
-            }
-          }else{
-            callback(true, map, null, fullResultMap);
-          }
-        }
-      }
-    });
-  }
-
   static Map<String, dynamic>? _set2WayMap(Map<String, dynamic> originInputMap, Map<String, dynamic> continue2WayResultMap) {
     Map<String, dynamic>? resultMap;
     bool is2way = continue2WayResultMap["continue2Way"] as bool;
@@ -971,7 +618,7 @@ class CodeFController{
   static int apiTimerCount = 0;
   static Future<void> _setAuthPop2(BuildContext context, Apis apiInfo, int certType, Map<String, dynamic> resultInputMap,
       Function(bool isSuccess, Map<String,dynamic>? resultMap, List<dynamic>? resultListMap, Map<String,dynamic>? fullResultMap) callback) async {
-    String certName = "인증을 완료하셨다면,";
+    String certName = "간편인증을 진행해주세요!";
     if(certType == 1){
       certName = "카카오앱에서 $certName";
     }else if(certType == 6){
@@ -1012,17 +659,18 @@ class CodeFController{
       }
     });
 
-    UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, 40.h, 0.0, (context, setState){
+    UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, 45.h, 0.0, (context, setState){
       return Obx(()=>Column(mainAxisAlignment: MainAxisAlignment.start, children:[
-        UiUtils.getMarginBox(0, 9.5.h),
-        GetController.to.isWait.value? UiUtils.getImage(20.w, 20.w,  Image.asset(fit: BoxFit.fill,'assets/images/doc_move.gif'))
+        GetController.to.isWait.value? UiUtils.getMarginBox(0, 8.h) : UiUtils.getMarginBox(0, 3.h),
+        GetController.to.isWait.value? UiUtils.getImage(25.w, 25.w,  Image.asset(fit: BoxFit.fill,'assets/images/doc_move.gif'))
             : Column(children: [
-          UiUtils.getMarginBox(0, 0.5.h),
+          UiUtils.getImage(100.w, 30.w,  Image.asset(fit: BoxFit.fitWidth,'assets/images/cert_called.png')),
+          UiUtils.getMarginBox(0, 4.h),
           UiUtils.getStyledTextWithFixedScale(certName, TextStyles.upFinBasicTextStyle, TextAlign.center, null)]),
         GetController.to.isWait.value? UiUtils.getMarginBox(0, 2.h) : UiUtils.getMarginBox(0, 0.5.h),
         GetController.to.isWait.value? Column(children: [
           UiUtils.getStyledTextWithFixedScale("서류를 가지고 오는중입니다.", TextStyles.upFinBasicTextStyle, TextAlign.center, null),
-          UiUtils.getMarginBox(0, 3.h),
+          UiUtils.getMarginBox(0, 1.h),
           LinearPercentIndicator(
             animateFromLastPercent: true,
             alignment: MainAxisAlignment.center,
@@ -1041,7 +689,7 @@ class CodeFController{
           )
         ])
             : Container(),
-        GetController.to.isWait.value? Container() : UiUtils.getStyledTextWithFixedScale("간편인증 후 확인 버튼을 눌러주세요.", TextStyles.upFinBasicTextStyle, TextAlign.center, null),
+        GetController.to.isWait.value? Container() : UiUtils.getStyledTextWithFixedScale("인증 후 확인 버튼을 눌러주세요.", TextStyles.upFinBasicTextStyle, TextAlign.center, null),
         GetController.to.isWait.value? Container() : UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
         GetController.to.isWait.value? Container() : UiUtils.getBorderButtonBox(85.w, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinTextAndBorderBlue,
             UiUtils.getTextWithFixedScale("확인", 15.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
@@ -1085,110 +733,6 @@ class CodeFController{
                   }
                 }else{
                   callback(false, map, listMap, fullMap);
-                }
-              });
-            }),
-        Config.isAndroid? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 3.h)
-      ]));
-    });
-  }
-
-  static Future<void> _setAuthPop(BuildContext context, Apis apiInfo, int certType, Map<String, dynamic> resultInputMap,
-      Function(bool isSuccess, Map<String,dynamic>? resultMap, List<dynamic>? resultListMap, Map<String,dynamic>? fullResultMap) callback) async {
-    String certName = "인증을 완료하셨다면,";
-    if(certType == 1){
-      certName = "카카오앱에서 $certName";
-    }else if(certType == 6){
-      certName = "네이버앱에서 $certName";
-    }else if(certType == 8){
-      certName = "토스앱에서 $certName";
-    }else if(certType == 5){
-      certName = "PASS앱에서 $certName";
-    }
-
-    UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, 40.h, 0.0, (context, setState){
-      return Obx(()=>Column(mainAxisAlignment: MainAxisAlignment.start, children:[
-        UiUtils.getMarginBox(0, 9.5.h),
-        GetController.to.isWait.value? UiUtils.getImage(20.w, 20.w,  Image.asset(fit: BoxFit.fill,'assets/images/doc_move.gif'))
-            : Column(children: [
-          UiUtils.getMarginBox(0, 0.5.h),
-          UiUtils.getStyledTextWithFixedScale(certName, TextStyles.upFinBasicTextStyle, TextAlign.center, null)]),
-        GetController.to.isWait.value? UiUtils.getMarginBox(0, 3.h) : UiUtils.getMarginBox(0, 0.8.h),
-        GetController.to.isWait.value? UiUtils.getStyledTextWithFixedScale("서류를 가지고 오는중입니다.", TextStyles.upFinBasicTextStyle, TextAlign.center, null) : Container(),
-        GetController.to.isWait.value? Container() : UiUtils.getStyledTextWithFixedScale("간편인증 후 확인 버튼을 눌러주세요.", TextStyles.upFinBasicTextStyle, TextAlign.center, null),
-        GetController.to.isWait.value? Container() : UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
-        GetController.to.isWait.value? Container() : UiUtils.getBorderButtonBox(85.w, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinTextAndBorderBlue,
-            UiUtils.getTextWithFixedScale("확인", 15.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
-              GetController.to.updateWait(true);
-              CodeFController._getDataFromApi(apiInfo, resultInputMap, (isSuccess, _, map, listMap, fullMap){
-                if(isSuccess){
-                  if(map != null){
-                    if(map['result_code'] == "CF-03002"){
-                      CommonUtils.flutterToast("인증을 진행해주세요.");
-                      GetController.to.updateWait(false);
-                    }else if(fullMap!['result']['code'] == "CF-12872"){
-                      CommonUtils.log("i","cancel");
-                      CommonUtils.flutterToast("인증에 실패했습니다.\n다시 시도해주세요.");
-                      GetController.to.updateWait(false);
-                      callback(false, null, null, null);
-                    }else if(fullMap['result']['code'] == "CF-12835"){
-                      CommonUtils.log("i","cancel");
-                      CommonUtils.flutterToast("인증서 정보가 없어요.");
-                      GetController.to.updateWait(false);
-                      callback(false, null, null, null);
-                    }else if(fullMap['result']['code'] == "CF-01004"){
-                      CommonUtils.log("i","cancel");
-                      CommonUtils.flutterToast("응답 대기시간이 초과되었어요.");
-                      GetController.to.updateWait(false);
-                      callback(false, null, null, null);
-                    }else if(fullMap['result']['code'] == "CF-13000"){
-                      CommonUtils.log("i","cancel");
-                      CommonUtils.flutterToast("주민.사업자등록번호 오류에요.");
-                      GetController.to.updateWait(false);
-                      callback(false, null, null, null);
-                    }else if(fullMap['result']['code'] == "CF-12100"){
-                      CommonUtils.log("i","cancel");
-                      CommonUtils.flutterToast("입력하신 정보를\n확인해주세요.");
-                      GetController.to.updateWait(false);
-                      callback(false, null, null, null);
-                    }else{
-                      CommonUtils.log("i","no cancel");
-                      callback(true, map, null, fullMap);
-                    }
-                  }else{
-                    if(listMap?[0]['result_code'] == "CF-03002"){
-                      CommonUtils.flutterToast("인증을 진행해주세요.");
-                      GetController.to.updateWait(false);
-                    }else if(fullMap!['result']['code'] == "CF-12872"){
-                      CommonUtils.log("i","cancel");
-                      CommonUtils.flutterToast("인증에 실패했습니다.\n다시 시도해주세요.");
-                      GetController.to.updateWait(false);
-                      callback(false, null, null, null);
-                    }else if(fullMap['result']['code'] == "CF-12835"){
-                      CommonUtils.log("i","cancel");
-                      CommonUtils.flutterToast("인증서 정보가 없어요.");
-                      GetController.to.updateWait(false);
-                      callback(false, null, null, null);
-                    }else if(fullMap['result']['code'] == "CF-01004"){
-                      CommonUtils.log("i","cancel");
-                      CommonUtils.flutterToast("응답 대기시간이 초과되었어요. ");
-                      GetController.to.updateWait(false);
-                      callback(false, null, null, null);
-                    }else if(fullMap['result']['code'] == "CF-13000"){
-                      CommonUtils.log("i","cancel");
-                      CommonUtils.flutterToast("주민.사업자등록번호 오류에요.");
-                      GetController.to.updateWait(false);
-                      callback(false, null, null, null);
-                    }else if(fullMap['result']['code'] == "CF-12100"){
-                      CommonUtils.log("i","cancel");
-                      CommonUtils.flutterToast("입력하신 정보를\n확인해주세요.");
-                      GetController.to.updateWait(false);
-                      callback(false, null, null, null);
-                    }else{
-                      CommonUtils.log("i","no cancel");
-                      callback(true, null, listMap, fullMap);
-                    }
-                  }
                 }
               });
             }),
@@ -1286,23 +830,14 @@ class CodeFController{
       return inputJsonForNhisIdConfirm;
     }else if(api == Apis.nhisConfirmation){
       DateTime now = CommonUtils.getCurrentLocalTime();
-      DateTime oneMonthAgo = DateTime(
-        now.year,
-        now.month - 1,
-        now.day,
-        now.hour,
-        now.minute,
-        now.second,
-      );
-
-      String oneMonthAgoString = CommonUtils.convertTimeToString(oneMonthAgo);
-      DateTime lastYearDate = DateTime(oneMonthAgo.year - 1, 12, 31);
-      String targetMonth = oneMonthAgoString.substring(4,6);
-      String oneMonthAgoYearString = oneMonthAgoString.substring(0,4);
+      String nowString = CommonUtils.convertTimeToString(now);
+      DateTime lastYearDate = DateTime(now.year - 1, 12, 31);
+      String targetMonth = nowString.substring(4,6);
+      String nowYearString = nowString.substring(0,4);
       String lastYearString = CommonUtils.convertTimeToString(lastYearDate).substring(0,4);
 
       String startDate = "$lastYearString$targetMonth";
-      String endDate = "$oneMonthAgoYearString$targetMonth";
+      String endDate = "$nowYearString$targetMonth";
       CommonUtils.log("i", "$startDate ~ $endDate");
 
       Map<String, dynamic> inputJsonForNhisConfirm = {
@@ -1378,15 +913,10 @@ class CodeFController{
       return inputJsonForNtsPoorfIssue;
     }else if(api == Apis.ntsProofAdditionalTasStandard){
       DateTime now = CommonUtils.getCurrentLocalTime();
-      DateTime julyFirst = DateTime(now.year, 7, 1);
-      bool isBeforeJuly = now.isBefore(julyFirst);
-      DateTime lastYearDate = isBeforeJuly
-          ? DateTime(now.year - 2, 12, 31) // 7월 1일 이전이면 재작년 날짜
-          : DateTime(now.year - 1, 12, 31); // 7월 1일 이후이면 작년 날짜
-
+      DateTime lastYearDate = DateTime(now.year - 1, 12, 31); // 7월 1일 이후이면 작년 날짜
       String lastYearString = CommonUtils.convertTimeToString(lastYearDate).substring(0,4);
-      String startDate = isBeforeJuly? "${lastYearString}07" : "${lastYearString}01";
-      String endDate = isBeforeJuly? "${CommonUtils.convertTimeToString(DateTime(now.year - 1, 12, 31)).substring(0,4)}06" : "${lastYearString}12";
+      String startDate = "${lastYearString}01";
+      String endDate = "${CommonUtils.convertTimeToString(now).substring(0,4)}12";
       CommonUtils.log("i", "last year : $lastYearString $startDate $endDate");
 
       Map<String, dynamic> inputJsonForNtsProofAdditionalTasStandard = {

@@ -2,11 +2,9 @@ import 'package:upfin/controllers/get_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
-import 'package:upfin/controllers/iamport_controller.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
-import '../controllers/firebase_controller.dart';
 import '../controllers/sharedpreference_controller.dart';
 import '../styles/TextStyles.dart';
 import '../configs/app_config.dart';
@@ -31,12 +29,10 @@ class AppFindPwViewState extends State<AppFindPwView> with WidgetsBindingObserve
   bool isEmailViewValid = false;
   String confirmedEmail = "";
   String foundedEmail = "";
-  final _formKeyForVerify = GlobalKey<FormState>();
   bool isVerifyViewValid = false;
   final _formKeyForSignIn = GlobalKey<FormState>();
   bool isSignInViewValid = false;
 
-  final _formKey1 = GlobalKey<FormState>();
   final _formKey2 = GlobalKey<FormState>();
   final _nameTextController = TextEditingController();
   final _verifyCodeTextController = TextEditingController();
@@ -63,6 +59,15 @@ class AppFindPwViewState extends State<AppFindPwView> with WidgetsBindingObserve
     _phoneNumberTextFocus.unfocus();
     _pwdTextFocus.unfocus();
     _pwdConfirmFocus.unfocus();
+  }
+
+  void _setEmpty(){
+    _nameTextController.text = "";
+    _emailTextController.text = "";
+    _phoneNumberTextController.text = "";
+    _pwdConfirmTextController.text = "";
+    _verifyCodeTextController.text = "";
+    _pwdTextController.text = "";
   }
 
   void _disposeAllTextControllers(){
@@ -105,10 +110,6 @@ class AppFindPwViewState extends State<AppFindPwView> with WidgetsBindingObserve
     _disposeAllTextControllers();
     GetController.to.resetConfirmed();
     Config.contextForEmergencyBack = null;
-    _emailTextController.text = "";
-    _pwdTextController.text = "";
-    _pwdConfirmTextController.text = "";
-    _phoneNumberTextController.text = "";
     super.dispose();
   }
 
@@ -133,9 +134,37 @@ class AppFindPwViewState extends State<AppFindPwView> with WidgetsBindingObserve
     }
   }
 
+  bool isCalled = false;
   void _verifyCodeListener() {
-    if(_verifyCodeTextController.text.trim() != ""){
-
+    if(_verifyCodeTextController.text.length >= 6){
+      if(_verifyCodeTextController.text.length == 6){
+        if(!isCalled){
+          CommonUtils.hideKeyBoard();
+          isCalled = true;
+          Map<String, dynamic> inputJson3 = {
+            "email": _emailTextController.text.trim(),
+            "verification_code": _verifyCodeTextController.text.trim(),
+          };
+          UiUtils.showLoadingPop(context);
+          LogfinController.callLogfinApi(LogfinApis.checkEmailCode, inputJson3, (isSuccess, outputJson){
+            UiUtils.closeLoadingPop(context);
+            isCalled = false;
+            if(isSuccess){
+              CommonUtils.flutterToast("인증되었어요.");
+              setState(() {
+                viewId = 2;
+              });
+            }else{
+              setState(() {
+                _verifyCodeTextController.text = "";
+              });
+              CommonUtils.flutterToast("인증번호를 확인해주세요.");
+            }
+          });
+        }
+      }else{
+        _verifyCodeTextController.text = _verifyCodeTextController.text.substring(0,6);
+      }
     }
   }
 
@@ -213,7 +242,7 @@ class AppFindPwViewState extends State<AppFindPwView> with WidgetsBindingObserve
     return Form(key: _formKeyForEmail, child: UiUtils.getRowColumnWithAlignCenter([
       SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         UiUtils.getBackButtonForMainView(() {
-          back();
+          _back();
         })
       ])),
       SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -246,29 +275,6 @@ class AppFindPwViewState extends State<AppFindPwView> with WidgetsBindingObserve
         ]))
       ]) : Container(),
       UiUtils.getExpandedScrollView(Axis.vertical, Container()),
-      isEmailValid? UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
-        if(_verifyCodeTextController.text.trim() != "" && _verifyCodeTextController.text.trim().length >=5){
-          Map<String, dynamic> inputJson3 = {
-            "email": _emailTextController.text.trim(),
-            "verification_code": _verifyCodeTextController.text.trim(),
-          };
-          UiUtils.showLoadingPop(context);
-          LogfinController.callLogfinApi(LogfinApis.checkEmailCode, inputJson3, (isSuccess, outputJson){
-            UiUtils.closeLoadingPop(context);
-            if(isSuccess){
-              CommonUtils.flutterToast("인증되었어요.");
-              setState(() {
-                viewId = 2;
-              });
-            }else{
-              CommonUtils.flutterToast("인증번호를 확인해주세요.");
-            }
-          });
-        }else{
-          CommonUtils.flutterToast("인증번호를 확인해주세요.");
-        }
-
-      }) : Container(),
       UiUtils.getMarginBox(0, 1.h),
       isEmailViewValid? UiUtils.getBorderButtonBox(90.w, isEmailValid? ColorStyles.upFinWhiteSky : ColorStyles.upFinButtonBlue,
           isEmailValid? ColorStyles.upFinWhiteSky : ColorStyles.upFinButtonBlue,
@@ -326,7 +332,7 @@ class AppFindPwViewState extends State<AppFindPwView> with WidgetsBindingObserve
     return Form(key: _formKeyForSignIn, child: UiUtils.getRowColumnWithAlignCenter([
       SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         UiUtils.getBackButtonForMainView(() {
-          back();
+          _back();
         })
       ])),
       SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -436,7 +442,7 @@ class AppFindPwViewState extends State<AppFindPwView> with WidgetsBindingObserve
     return Form(key: _formKey2, child: UiUtils.getRowColumnWithAlignCenter([
       Obx(()=>!GetController.to.isConfirmed.value? SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         UiUtils.getBackButtonForMainView(() async {
-          back();
+          _back();
         }),
       ])) : UiUtils.getMarginBox(0, 7.h)),
       SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -496,7 +502,9 @@ class AppFindPwViewState extends State<AppFindPwView> with WidgetsBindingObserve
                           setState(() {
                             String tempEmail = outputJson!["email"];
                             List<String> tempEmailList = tempEmail.split("@");
-                            if(tempEmailList[0].length == 2){
+                            if(tempEmailList[0].length == 1){
+                              tempEmail = tempEmailList[0];
+                            }else if(tempEmailList[0].length == 2){
                               tempEmail = "${tempEmailList[0].substring(0,1)}•";
                             }else if(tempEmailList[0].length == 3){
                               tempEmail = "${tempEmailList[0].substring(0,1)}•${tempEmailList[0].substring(2)}";
@@ -511,6 +519,7 @@ class AppFindPwViewState extends State<AppFindPwView> with WidgetsBindingObserve
                             }else{
                               tempEmail = "${tempEmailList[0].substring(0,3)}•••${tempEmailList[0].substring(7)}";
                             }
+
                             foundedEmail = "$tempEmail@${tempEmailList[1]}";
                             viewId = 5;
                           });
@@ -535,12 +544,13 @@ class AppFindPwViewState extends State<AppFindPwView> with WidgetsBindingObserve
   }
 
   bool backValid = true;
-  void back(){
+  void _back(){
     if(viewId < 3){
       if(backValid){
         backValid = false;
         CommonUtils.hideKeyBoard();
         if(viewId == 1){
+          _setEmpty();
           Navigator.pop(context);
         }else{
           viewId--;
@@ -554,6 +564,7 @@ class AppFindPwViewState extends State<AppFindPwView> with WidgetsBindingObserve
       if(backValid){
         backValid = false;
         CommonUtils.hideKeyBoard();
+        _setEmpty();
         Navigator.pop(context);
         Future.delayed(const Duration(milliseconds: 200), () async {
           backValid = true;
@@ -568,7 +579,7 @@ class AppFindPwViewState extends State<AppFindPwView> with WidgetsBindingObserve
         child: viewId == 1 ? _getEmailView() : viewId == 2 ? _getPwInfoView() : viewId == 3 ? _getConfirmedView() : viewId == 4 ? _getPhoneValidView() : _getConfirmedViewForId());
 
 
-    return UiUtils.getScrollViewWithAllowBackForAndroid(context, view, _scrollController, back);
+    return UiUtils.getScrollViewWithAllowBackForAndroid(context, view, _scrollController, _back);
   }
 
 }

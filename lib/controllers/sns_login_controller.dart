@@ -7,7 +7,6 @@ import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 import 'package:upfin/controllers/sharedpreference_controller.dart';
 import 'package:upfin/datas/my_data.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../configs/app_config.dart';
 import '../styles/ColorStyles.dart';
 import '../utils/common_utils.dart';
@@ -285,7 +284,6 @@ class SnsLoginController{
         "provider": SnsLoginController.loginPlatform.value
       };
 
-      CommonUtils.log("i", "social login :\n$inputJson");
       await LogfinController.callLogfinApi(LogfinApis.socialLogin, inputJson, (isSuccess, outputJson) {
         SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceSnsToken, token);
         SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceSnsId, id);

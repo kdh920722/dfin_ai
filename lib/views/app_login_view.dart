@@ -4,7 +4,6 @@ import 'package:upfin/controllers/sharedpreference_controller.dart';
 import 'package:sizer/sizer.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import 'package:upfin/views/app_findpw_view.dart';
-import '../controllers/firebase_controller.dart';
 import '../styles/TextStyles.dart';
 import '../configs/app_config.dart';
 import '../utils/common_utils.dart';
@@ -25,6 +24,11 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
   void _unFocusAllNodes(){
     _emailTextFocus.unfocus();
     _pwdTextFocus.unfocus();
+  }
+
+  void _setEmpty(){
+    _emailTextController.text = "";
+    _pwdTextController.text = "";
   }
 
   void _disposeAllTextControllers(){
@@ -50,8 +54,6 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     _unFocusAllNodes();
     _disposeAllTextControllers();
     Config.contextForEmergencyBack = null;
-    _emailTextController.text = "";
-    _pwdTextController.text = "";
     super.dispose();
   }
 
@@ -76,9 +78,10 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     }
   }
 
-  void back(){
+  void _back(){
     CommonUtils.hideKeyBoard();
     Future.delayed(const Duration(milliseconds: 400), () async {
+      _setEmpty();
       Navigator.pop(context);
     });
   }
@@ -90,7 +93,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
         child: UiUtils.getRowColumnWithAlignCenter([
           SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             UiUtils.getBackButtonForMainView(() async {
-              back();
+              _back();
             }),
           ])),
           SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -182,7 +185,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     )
     );
 
-    return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
+    return UiUtils.getViewWithAllowBackForAndroid(context, view, _back);
   }
 
 }

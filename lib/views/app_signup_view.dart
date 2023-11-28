@@ -6,7 +6,6 @@ import 'package:upfin/controllers/iamport_controller.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
-import '../controllers/firebase_controller.dart';
 import '../styles/TextStyles.dart';
 import '../configs/app_config.dart';
 import '../utils/common_utils.dart';
@@ -29,12 +28,10 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
   bool isEmailValid = false;
   bool isEmailViewValid = false;
   String confirmedEmail = "";
-  final _formKeyForVerify = GlobalKey<FormState>();
   bool isVerifyViewValid = false;
   final _formKeyForSignIn = GlobalKey<FormState>();
   bool isSignInViewValid = false;
 
-  final _formKey1 = GlobalKey<FormState>();
   final _formKey2 = GlobalKey<FormState>();
   final _nameTextController = TextEditingController();
   final _verifyCodeTextController = TextEditingController();
@@ -61,6 +58,15 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
     _phoneNumberTextFocus.unfocus();
     _pwdTextFocus.unfocus();
     _pwdConfirmFocus.unfocus();
+  }
+  
+  void _setEmpty(){
+    _nameTextController.text = "";
+    _emailTextController.text = "";
+    _phoneNumberTextController.text = "";
+    _pwdConfirmTextController.text = "";
+    _verifyCodeTextController.text = "";
+    _pwdTextController.text = "";
   }
 
   void _disposeAllTextControllers(){
@@ -103,11 +109,6 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
     _disposeAllTextControllers();
     GetController.to.resetConfirmed();
     Config.contextForEmergencyBack = null;
-    _nameTextController.text = "";
-    _emailTextController.text = "";
-    _phoneNumberTextController.text = "";
-    _pwdConfirmTextController.text = "";
-    _phoneNumberTextController.text = "";
     super.dispose();
   }
 
@@ -132,9 +133,37 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
     }
   }
 
+  bool isCalled = false;
   void _verifyCodeListener() {
-    if(_verifyCodeTextController.text.trim() != ""){
-
+    if(_verifyCodeTextController.text.length >= 6){
+      if(_verifyCodeTextController.text.length == 6){
+        if(!isCalled){
+          CommonUtils.hideKeyBoard();
+          isCalled = true;
+          Map<String, dynamic> inputJson3 = {
+            "email": _emailTextController.text.trim(),
+            "verification_code": _verifyCodeTextController.text.trim(),
+          };
+          UiUtils.showLoadingPop(context);
+          LogfinController.callLogfinApi(LogfinApis.checkEmailCode, inputJson3, (isSuccess, outputJson){
+            UiUtils.closeLoadingPop(context);
+            isCalled = false;
+            if(isSuccess){
+              CommonUtils.flutterToast("인증되었어요.");
+              setState(() {
+                viewId = 2;
+              });
+            }else{
+              setState(() {
+                _verifyCodeTextController.text = "";
+              });
+              CommonUtils.flutterToast("인증번호를 확인해주세요.");
+            }
+          });
+        }
+      }else{
+        _verifyCodeTextController.text = _verifyCodeTextController.text.substring(0,6);
+      }
     }
   }
 
@@ -212,7 +241,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
     return Form(key: _formKeyForEmail, child: UiUtils.getRowColumnWithAlignCenter([
       SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         UiUtils.getBackButtonForMainView(() {
-          back();
+          _back();
         })
       ])),
       SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -245,29 +274,6 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
         ]))
       ]) : Container(),
       UiUtils.getExpandedScrollView(Axis.vertical, Container()),
-      isEmailValid? UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
-        if(_verifyCodeTextController.text.trim() != "" && _verifyCodeTextController.text.trim().length >=5){
-          Map<String, dynamic> inputJson3 = {
-            "email": _emailTextController.text.trim(),
-            "verification_code": _verifyCodeTextController.text.trim(),
-          };
-          UiUtils.showLoadingPop(context);
-          LogfinController.callLogfinApi(LogfinApis.checkEmailCode, inputJson3, (isSuccess, outputJson){
-            UiUtils.closeLoadingPop(context);
-            if(isSuccess){
-              CommonUtils.flutterToast("인증되었어요.");
-              setState(() {
-                viewId = 2;
-              });
-            }else{
-              CommonUtils.flutterToast("인증번호를 확인해주세요.");
-            }
-          });
-        }else{
-          CommonUtils.flutterToast("인증번호를 확인해주세요.");
-        }
-
-      }) : Container(),
       UiUtils.getMarginBox(0, 1.h),
       isEmailViewValid? UiUtils.getBorderButtonBox(90.w, isEmailValid? ColorStyles.upFinWhiteSky : ColorStyles.upFinButtonBlue,
           isEmailValid? ColorStyles.upFinWhiteSky : ColorStyles.upFinButtonBlue,
@@ -325,7 +331,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
     return Form(key: _formKeyForSignIn, child: UiUtils.getRowColumnWithAlignCenter([
       SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         UiUtils.getBackButtonForMainView(() {
-          back();
+          _back();
         })
       ])),
       SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -386,7 +392,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
     return Form(key: _formKey2, child: UiUtils.getRowColumnWithAlignCenter([
       Obx(()=>!GetController.to.isConfirmed.value? SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         UiUtils.getBackButtonForMainView(() async {
-          back();
+          _back();
         }),
       ])) : UiUtils.getMarginBox(0, 7.h)),
       SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -413,7 +419,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
           }): Container(),
       UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
       isButtonValid? UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-          UiUtils.getTextWithFixedScale("다음", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () async {
+          UiUtils.getTextWithFixedScale("다음", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () async {
             CommonUtils.hideKeyBoard();
             if(_phoneNumberTextController.text.trim() != ""){
               Map<String, dynamic> inputJson4 = {
@@ -505,11 +511,12 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
   }
 
   bool backValid = true;
-  void back(){
+  void _back(){
     if(backValid){
       backValid = false;
       CommonUtils.hideKeyBoard();
       if(viewId == 1){
+        _setEmpty();
         Navigator.pop(context);
       }else{
         viewId--;
@@ -527,7 +534,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
         child: viewId == 1 ? _getEmailView() : viewId == 2 ? _getPwInfoView() : _getPhoneValidView());
 
 
-    return UiUtils.getScrollViewWithAllowBackForAndroid(context, view, _scrollController, back);
+    return UiUtils.getScrollViewWithAllowBackForAndroid(context, view, _scrollController, _back);
   }
 
 }

@@ -7,10 +7,8 @@ import 'package:camera/camera.dart';
 import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:sizer/sizer.dart';
 import 'package:upfin/controllers/aws_controller.dart';
 import 'package:upfin/controllers/firebase_controller.dart';
@@ -1819,21 +1817,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
           })
         ])
     ),
-      /*
-      Obx((){
-        if(!GetController.to.isHtmlLoad.value){
-          return Container(
-              width: 100.w,
-              height: 100.h,
-              color: Colors.black54,
-              child: SpinKitWave(color: ColorStyles.upFinTextAndBorderBlue, size: 15.w)
-          );
-        }else{
-          return Container();
-        }
-      }),
-
-       */
       Obx((){
         if(GetController.to.isShowScrollBottom.value){
           return Positioned(
