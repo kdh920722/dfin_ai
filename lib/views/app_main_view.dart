@@ -73,10 +73,11 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
     switch (state) {
       case AppLifecycleState.resumed:
         CommonUtils.log('d','AppMainView resumed');
+        await CommonUtils.checkUpdate(context);
         break;
       case AppLifecycleState.inactive:
         CommonUtils.log('d','AppMainView inactive');
@@ -891,17 +892,12 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             return Container();
           }else{
             if(MyData.getChatRoomInfoList().isNotEmpty){
-              if(!UiUtils.isLoadingPopOn){
-                UiUtils.closeLoadingPop(context);
-                return Container(
-                    width: 100.w,
-                    height: 100.h,
-                    color: Colors.black54,
-                    child: SpinKitWave(color: ColorStyles.upFinTextAndBorderBlue, size: 15.w)
-                );
-              }else{
-                return Container();
-              }
+              return Container(
+                  width: 100.w,
+                  height: 100.h,
+                  color: Colors.black54,
+                  child: SpinKitWave(color: ColorStyles.upFinTextAndBorderBlue, size: 15.w)
+              );
             }else{
               return Container();
             }

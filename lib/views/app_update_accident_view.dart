@@ -219,9 +219,10 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
     switch (state) {
       case AppLifecycleState.resumed:
+        await CommonUtils.checkUpdate(context);
         CommonUtils.log('d','AppSearchAccidentView resumed');
         break;
       case AppLifecycleState.inactive:

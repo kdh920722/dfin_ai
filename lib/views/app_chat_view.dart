@@ -265,9 +265,10 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
     switch (state) {
       case AppLifecycleState.resumed:
+        await CommonUtils.checkUpdate(context);
         CommonUtils.log('d','AppChatViewState resumed');
         break;
       case AppLifecycleState.inactive:

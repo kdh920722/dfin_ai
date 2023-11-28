@@ -5,7 +5,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:upfin/views/app_accident_detail_view.dart';
 import 'package:upfin/views/app_agree_detail_info_view.dart';
-import 'package:upfin/views/app_agree_detail_info_view_test.dart';
 import 'package:upfin/views/app_apply_pr_view.dart';
 import 'package:upfin/views/app_findpw_view.dart';
 import 'package:upfin/views/app_main_view.dart';
@@ -59,7 +58,6 @@ class Config{
     AppView.appAccidentDetailInfoView.value : (context) => AppAccidentDetailView(),
     AppView.appAgreeDetailInfoView.value : (context) => AppAgreeDetailInfoView(),
     AppView.appSignOutView.value : (context) => AppSignOutView(),
-    AppView.appAgreeDetailInfoViewTest.value : (context) => AppAgreeDetailInfoViewTest(),
     AppView.appFindPwView.value : (context) => AppFindPwView(),
     AppView.debugForAdminView.value : (context) => DebugForAdminView(),
   };
@@ -135,6 +133,30 @@ class Config{
     }
   }
 
+  static Future<int> isNeedToUpdateForMain() async {
+    int stateCode = 10;
+    final ref = FirebaseDatabase.instance.ref();
+    final appForDeviceInfoSnapshot = isAndroid? await ref.child('UPFIN/APP_STATE/android_state').get()
+        : await ref.child('UPFIN/APP_STATE/ios_state').get();
+
+    if(appForDeviceInfoSnapshot.exists){
+      for(var each in appForDeviceInfoSnapshot.children){
+        switch(each.key){
+          case "app_state" : appState = int.parse(each.value.toString());
+          case "app_version" : appVersion = each.value.toString();
+        }
+      }
+    }
+
+    stateCode = appState;
+
+    if(await _isNeedToUpdateVersion()){
+      stateCode = 44;
+    }
+
+    return stateCode;
+  }
+
   static Future<bool> _isNeedToUpdateVersion() async {
     bool result = false;
     String yamlValue = await rootBundle.loadString("pubspec.yaml");
@@ -152,7 +174,7 @@ class Config{
 
 enum AppView {
   appRootView, appLoginView, appCertificationView, appSignupView, appMainView, appSearchAccidentView, appSignOutView,
-  appUpdateAccidentView, appResultPrView, appApplyPrView, appChatView, appAccidentDetailInfoView, appAgreeDetailInfoView, appAgreeDetailInfoViewTest,
+  appUpdateAccidentView, appResultPrView, appApplyPrView, appChatView, appAccidentDetailInfoView, appAgreeDetailInfoView,
   appFindPwView, debugForAdminView
 }
 
@@ -185,8 +207,6 @@ extension SAppViewExtension on AppView {
         return '/agreeDetailInfoView';
       case AppView.appSignOutView:
         return '/appSignOutView';
-      case AppView.appAgreeDetailInfoViewTest:
-        return '/appAgreeDetailInfoViewTest';
       case AppView.appFindPwView:
         return '/appFindPwView';
       case AppView.debugForAdminView:
