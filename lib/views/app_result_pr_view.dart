@@ -73,9 +73,10 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
+  Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
     switch (state) {
       case AppLifecycleState.resumed:
+        await CommonUtils.checkUpdate(context);
         CommonUtils.log('i','AppResultPrView resumed');
         break;
       case AppLifecycleState.inactive:

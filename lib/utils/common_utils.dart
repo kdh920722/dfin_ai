@@ -48,7 +48,7 @@ class CommonUtils {
       }
     }
 
-    if(logType.toLowerCase() != "e") logType = "";
+    //if(logType.toLowerCase() != "e") logType = "";
 
     var logger = Logger();
     if(logMessage.length > logMaxSize){

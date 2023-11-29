@@ -118,7 +118,6 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
                   return null;
                 }
               }),
-          UiUtils.getMarginBox(0, 4.h),
           UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
           UiUtils.getTextButtonBox(90.w, "로그인", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
             if(_formKey.currentState!.validate() && Config.isControllerLoadFinished){
@@ -149,12 +148,16 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
                   });
                 }else{
                   UiUtils.closeLoadingPop(context);
-                  CommonUtils.flutterToast(outputJson!["error"]);
-                  if(outputJson["error"] == "회원가입이 필요합니다."){
-                    SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceSnsToken, "");
-                    SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceSnsId, "");
-                    SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceIsSnsLogin, "N");
-                    CommonUtils.moveWithReplacementTo(context, AppView.appSignupView.value, null);
+                  if(outputJson!["error"] == "Invalid email or password"){
+                    CommonUtils.flutterToast("잘못된 비밀번호입니다.");
+                  }else{
+                    CommonUtils.flutterToast(outputJson["error"]);
+                    if(outputJson["error"] == "회원가입이 필요합니다."){
+                      SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceSnsToken, "");
+                      SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceSnsId, "");
+                      SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceIsSnsLogin, "N");
+                      CommonUtils.moveWithReplacementTo(context, AppView.appSignupView.value, null);
+                    }
                   }
                 }
               });

@@ -322,6 +322,8 @@ class LogfinController {
         final resultData = json;
         if(resultData["error"] == "Invalid Email or password."){
           callback(false, <String,dynamic>{"error":"회원가입이 필요합니다."});
+        }else if(resultData["error"] == "해당 이메일로 가입되지 않았거나 잘못된 비밀번호입니다."){
+          callback(false, <String,dynamic>{"error":"잘못된 비밀번호입니다."});
         }else{
           CommonUtils.log('e', 'http error code : ${response.statusCode}');
           callback(false, <String,dynamic>{"error":"http연결에\n에러가 발생했습니다."});

@@ -139,6 +139,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
       if(_verifyCodeTextController.text.length == 6){
         if(!isCalled){
           CommonUtils.hideKeyBoard();
+          backValid = false;
           isCalled = true;
           Map<String, dynamic> inputJson3 = {
             "email": _emailTextController.text.trim(),
@@ -147,14 +148,22 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
           UiUtils.showLoadingPop(context);
           LogfinController.callLogfinApi(LogfinApis.checkEmailCode, inputJson3, (isSuccess, outputJson){
             UiUtils.closeLoadingPop(context);
+            Future.delayed(const Duration(seconds: 1), () {
+              backValid = true;
+            });
             isCalled = false;
             if(isSuccess){
               CommonUtils.flutterToast("인증되었어요.");
               setState(() {
+                _verifyCodeTextController.text = "";
+                confirmedEmail = _emailTextController.text.trim();
+                isEmailValid = true;
                 viewId = 2;
               });
             }else{
               setState(() {
+                confirmedEmail = "";
+                isEmailValid = false;
                 _verifyCodeTextController.text = "";
               });
               CommonUtils.flutterToast("인증번호를 확인해주세요.");
@@ -293,8 +302,6 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                     UiUtils.closeLoadingPop(context);
                     if(isSuccess){
                       setState(() {
-                        confirmedEmail = _emailTextController.text.trim();
-                        isEmailValid = true;
                         isVerifyViewValid = true;
                       });
                     }else{
@@ -324,6 +331,13 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
               CommonUtils.flutterToast("이메일을 확인해주세요.");
             }
           }) : Container(),
+      UiUtils.getMarginBox(0, 1.h),
+      isEmailValid ? UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
+        setState(() {
+          _verifyCodeTextController.text = "";
+          viewId = 2;
+        });
+      }) : Container()
     ]));
   }
 
@@ -439,6 +453,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                     if(result != null){
                       CommonUtils.flutterToast("인증 성공");
                       Map<String, dynamic> resultMap = result as Map<String, dynamic>;
+                      CommonUtils.log("w", "resultMap : $resultMap");
                       for(var each in IamportController.carrierList){
                         if(each.split("@")[0] == resultMap["carrier"]){
                           MyData.telecomTypeFromPhoneCert = each.split("@")[1];

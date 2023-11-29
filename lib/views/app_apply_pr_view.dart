@@ -2743,6 +2743,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         String phoneNo = MyData.phoneNumber;
         String identity = MyData.idNumber.split("-")[0]+MyData.idNumber.split("-")[1];
         String address = selectedAddressInfo;
+        CommonUtils.log("w","tMyData.telecom : ${MyData.telecom}");
         String telecom = (int.parse(MyData.telecom)-1).toString();
         if(int.parse(telecom) >= 3){
           telecom = (int.parse(telecom)-3).toString();
