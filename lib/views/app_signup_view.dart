@@ -148,7 +148,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
           UiUtils.showLoadingPop(context);
           LogfinController.callLogfinApi(LogfinApis.checkEmailCode, inputJson3, (isSuccess, outputJson){
             UiUtils.closeLoadingPop(context);
-            Future.delayed(const Duration(seconds: 1), () {
+            Future.delayed(const Duration(seconds: 2), () {
               backValid = true;
             });
             isCalled = false;
