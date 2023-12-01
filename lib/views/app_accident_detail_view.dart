@@ -163,7 +163,7 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
                   14.sp, FontWeight.w500, isSuccessToGetDetailInfo? ColorStyles.upFinBlack : ColorStyles.upFinRed, TextAlign.start, null)),
             ]),
             const Spacer(flex: 2),
-            UiUtils.getBorderButtonBoxWithZeroPadding(16.w, isSuccessToGetDetailInfo? ColorStyles.upFinButtonBlue: ColorStyles.upFinWhiteRed, isSuccessToGetDetailInfo? ColorStyles.upFinButtonBlue: ColorStyles.upFinWhiteRed,
+            UiUtils.getBorderButtonBox(16.w, isSuccessToGetDetailInfo? ColorStyles.upFinButtonBlue: ColorStyles.upFinWhiteRed, isSuccessToGetDetailInfo? ColorStyles.upFinButtonBlue: ColorStyles.upFinWhiteRed,
                 UiUtils.getTextWithFixedScale("변경", 10.sp, FontWeight.w600, isSuccessToGetDetailInfo? ColorStyles.upFinWhite : ColorStyles.upFinRed, TextAlign.start, null), () async {
                   AppUpdateAccidentViewState.isAccountEditMode = true;
                   AppUpdateAccidentViewState.startViewId = AppUpdateAccidentViewState.bankCodeViewId;

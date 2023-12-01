@@ -659,7 +659,7 @@ class CodeFController{
       }
     });
 
-    UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, 45.h, 0.0, (context, setState){
+    UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, Config.isPad()? 65.h : 45.h, 0.0, (context, setState){
       return Obx(()=>Column(mainAxisAlignment: MainAxisAlignment.start, children:[
         GetController.to.isWait.value? UiUtils.getMarginBox(0, 8.h) : UiUtils.getMarginBox(0, 3.h),
         GetController.to.isWait.value? UiUtils.getImage(25.w, 25.w,  Image.asset(fit: BoxFit.fill,'assets/images/doc_move.gif'))

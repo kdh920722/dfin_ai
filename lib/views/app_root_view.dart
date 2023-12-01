@@ -382,7 +382,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
 
         String allText = deniedPermissionsString.contains(",")? " 모두"  : "";
 
-        UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, Config.isAndroid ? 22.h : 27.h, 0.5, (slideContext, setState){
+        UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, Config.isAndroid ? Config.isPad()? 32.h : 22.h : Config.isPad()? 37.h : 27.h, 0.5, (slideContext, setState){
           return Column(mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 UiUtils.getMarginBox(100.w, 1.h),
@@ -453,7 +453,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
 
     }else if(Config.appState == Config.stateInfoMap["update"]){
       if(context.mounted){
-        UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isAndroid ? 18.h : 23.h, 0.5, (context, setState){
+        UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isAndroid ? Config.isPad()? 28.h : 18.h : Config.isPad()? 33.h : 23.h, 0.5, (context, setState){
           return Center(child: Column(children: [
             UiUtils.getMarginBox(0, 1.h),
             UiUtils.getTextWithFixedScale("앱 업데이트가 필요합니다!", 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
@@ -468,7 +468,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
       }
     }else if(Config.appState == Config.stateInfoMap["close"]){
       if(context.mounted){
-        UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isAndroid ? 30.h : 35.h, 0.5, (context, setState){
+        UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isAndroid ? Config.isPad()? 40.h : 30.h : Config.isPad()? 45.h : 35.h, 0.5, (context, setState){
           return Column(children: [
             UiUtils.getMarginBox(0, 3.h),
             Center(child: UiUtils.getTextWithFixedScale("시스템 점검중입니다.", 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
@@ -563,13 +563,13 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
         view = Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: EdgeInsets.all(5.w), child:
         Column(children: [
           SizedBox(width: 100.w, child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-            UiUtils.getMarginBox(0, 15.h),
-            UiUtils.getTitleWithFixedScale("upfin", 75.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
+            UiUtils.getMarginBox(0, Config.isPad()? 5.h : 15.h),
+            UiUtils.getTitleWithFixedScale("upfin", Config.isPad()? 55.sp : 75.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
             UiUtils.getMarginBox(0, 10.h),
             UiUtils.getTextWithFixedScale("나에게 꼭 맞는", 24.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
             UiUtils.getMarginBox(0, 0.5.h),
-            UiUtils.getTextWithFixedScale("다이렉트 대출신는청!", 24.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
-            UiUtils.getMarginBox(0, 10.h)
+            UiUtils.getTextWithFixedScale("다이렉트 대출신청!", 24.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
+            UiUtils.getMarginBox(0, Config.isPad()? 5.h : 10.h)
           ])),
           UiUtils.getExpandedScrollView(Axis.vertical, SizedBox(width: 100.w, child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
             UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,

@@ -15,6 +15,7 @@ class UiUtils {
     return Sizer(
       builder: (BuildContext context, Orientation orientation, DeviceType deviceType) {
         return MaterialApp(
+          debugShowCheckedModeBanner: false,
           theme: ThemeData(useMaterial3: true),
           initialRoute: AppView.appRootView.value,
           routes: Config.appRoutes,
@@ -348,7 +349,7 @@ class UiUtils {
           ),
           onPressed: onPressedCallback,
           child: Padding(
-              padding: EdgeInsets.zero,
+              padding: EdgeInsets.only(top: 2.w, bottom: 2.w),
               child: getStyledTextWithFixedScale(buttonText,TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: fontSize, color: textColor, fontWeight: fontWeight, decoration: TextDecoration.none, decorationThickness: 0.0, height: 1), TextAlign.start,1)
           ),
         )
@@ -1514,8 +1515,8 @@ class UiUtils {
               bottom: 0,
               child: UiUtils.getImage(90.w, 90.w, Image.asset(fit: BoxFit.fill,'assets/images/img_man_searcher.png'))),
           Positioned(
-              top: 35.h,
-              child: UiUtils.getTitleWithFixedScale("upfin", 75.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null))
+              top: Config.isPad()? 15.h : 35.h,
+              child: UiUtils.getTitleWithFixedScale("upfin", Config.isPad()? 55.sp : 75.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null))
         ])
     );
       /*

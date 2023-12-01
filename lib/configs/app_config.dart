@@ -42,6 +42,7 @@ class Config{
   static String privacyText3 = "";
   static BuildContext? contextForEmergencyBack;
   static bool isEmergencyRoot = false;
+  static bool isTablet = false;
   static FlutterDownloader flutterDownloader = FlutterDownloader();
 
   static Map<String, WidgetBuilder> appRoutes = {
@@ -61,6 +62,11 @@ class Config{
     AppView.appFindPwView.value : (context) => AppFindPwView(),
     AppView.debugForAdminView.value : (context) => DebugForAdminView(),
   };
+
+  static bool isPad(){
+    final data = MediaQueryData.fromView(WidgetsBinding.instance.window);
+    return data.size.shortestSide < 600 ? false :true;
+  }
 
   static Future<void> initAppState(Function(bool isSuccess) callback) async{
     try{

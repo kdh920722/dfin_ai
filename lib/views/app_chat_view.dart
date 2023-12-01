@@ -565,7 +565,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                     "font-weight": "normal",
                     "border-radius":"0.1em",
                     "padding":"13px 20px",
-                    "width": "500px",
+                    "width": "100%",
                   };
                 }else if(element.id == 'buttonTypeMe'){
                   return {
@@ -576,7 +576,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                     "font-weight": "normal",
                     "border-radius":"0.1em",
                     "padding":"13px 20px",
-                    "width": "500px",
+                    "width": "100%",
                   };
                 }
               }

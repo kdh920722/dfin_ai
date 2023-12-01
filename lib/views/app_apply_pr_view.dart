@@ -1711,7 +1711,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       UiUtils.getMarginBox(0, 2.h),
 
       pickedFilePath != "" ? SizedBox(width: 85.w,height: 2.5.h , child: UiUtils.getTextWithFixedScale("주민등록증 뒷자리는 가려져야합니다.", 12.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)) :
-      SizedBox(width: 85.w,height: 2.5.h , child: UiUtils.getTextWithFixedScale("주민등록증 또는 운전면허증 중", 12.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("주민등록증 또는 운전면허증 중", 12.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
+      UiUtils.getMarginBox(0, 0.5.h),
       pickedFilePath != "" ? UiUtils.getMarginBox(0, 0.5.h) : Container(),
       pickedFilePath != "" ? SizedBox(width: 85.w, child: Container()) :
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("하나를 촬영 해 주세요.", 12.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
@@ -1928,7 +1929,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                             if(isCheckNeeded){
                               if(context.mounted){
                                 UiUtils.closeLoadingPop(context);
-                                UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, 80.h, 0.5, (slideContext, slideSetState){
+                                UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isPad()? 100.h: 80.h, 0.5, (slideContext, slideSetState){
                                   _dlNumInfoTextController1.addListener((){
                                     if(_dlNumInfoTextController1.text.trim().length > 2){
                                       _dlNumInfoTextController1.text = _dlNumInfoTextController1.text.trim().substring(0,2);
@@ -2403,7 +2404,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           UiUtils.getTextWithFixedScale(!_isDocsAllConfirmed(docsType)? "인증하기" : "다음", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
             if(!_isDocsAllConfirmed(docsType)){
               if(certType == 0){
-                UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, 40.h, 0.5, (slideContext, setState){
+                UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, Config.isPad()? 60.h : 40.h, 0.5, (slideContext, setState){
                   return Column(mainAxisAlignment: MainAxisAlignment.start, children:
                   [
                     Row(children: [
@@ -3497,7 +3498,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       }else if(_getIdFromListByViewId(currentViewId) == addressId){
         view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getAddressView());
       }else if(_getIdFromListByViewId(currentViewId) == cameraId){
-        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getCameraForIdCheckView());
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getCameraForIdCheckView()); // _getCameraForIdCheckView()
       }else if(_getIdFromListByViewId(currentViewId) == 1 || _getIdFromListByViewId(currentViewId) == 2 || _getIdFromListByViewId(currentViewId) == 15){
         view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getGov24View());
       }else if(_getIdFromListByViewId(currentViewId) == 3 || _getIdFromListByViewId(currentViewId) == 4){

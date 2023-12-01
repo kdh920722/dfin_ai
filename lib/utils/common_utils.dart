@@ -941,6 +941,8 @@ class CommonUtils {
 
   static Future<void> requestPermissions(Function(bool isDenied, List<String>? deniedPermissionsList) callback) async {
     List<String> deniedPermissions = [];
+    var pushPermission = Permission.notification;
+    await pushPermission.request();
     for(var each in Config.permissionList){
       var status = await each.request();
       if(Config.isAndroid){

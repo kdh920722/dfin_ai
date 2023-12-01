@@ -217,7 +217,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
 
                     if(isDuplicate){
                       dupleDateList.sort((a,b) => DateTime.parse(b).compareTo(DateTime.parse(a)));
-                      UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, 100.w, Config.isAndroid ? 28.h : 32.h, 0.5, (slideContext, slideSetState){
+                      UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, 100.w, Config.isAndroid ? Config.isPad()? 38.h : 28.h : Config.isPad()? 42.h : 32.h, 0.5, (slideContext, slideSetState){
                         return Column(mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               UiUtils.getMarginBox(100.w, 1.h),
@@ -306,7 +306,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
             })
           ])),
           UiUtils.getMarginBox(0, 3.w),
-          SizedBox(width: 90.w, height: 5.h , child : UiUtils.getTextWithFixedScale("대출상품", 22.sp, FontWeight.w800, ColorStyles.upFinButtonBlue, TextAlign.start, 1)),
+          SizedBox(width: 90.w, child : UiUtils.getTextWithFixedScale("대출상품", 22.sp, FontWeight.w800, ColorStyles.upFinButtonBlue, TextAlign.start, 1)),
           UiUtils.getMarginBox(0, 1.h),
           SizedBox(width: 90.w, height: 5.h, child: TabBar(
             unselectedLabelStyle: TextStyles.upFinUnselectedTabTextInButtonStyle,

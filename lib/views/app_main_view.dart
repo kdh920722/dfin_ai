@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
-import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:sizer/sizer.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:upfin/configs/app_config.dart';
@@ -117,37 +116,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               const Spacer(flex: 2),
               MyData.isTestUser ? UiUtils.getIconButton(Icons.comments_disabled_sharp, 7.w, ColorStyles.upFinRed, () {
 
-                UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, null, 45.h, 0.5, (context, setState){
-                  return Column(mainAxisAlignment: MainAxisAlignment.start, children:[
-                    UiUtils.getMarginBox(0, 8.h),
-                    UiUtils.getImage(25.w, 25.w,  Image.asset(fit: BoxFit.fill,'assets/images/doc_move.gif')),
-                    UiUtils.getMarginBox(0, 2.h),
-                    Column(children: [
-                      UiUtils.getStyledTextWithFixedScale("서류를 가지고 오는중입니다.", TextStyles.upFinBasicTextStyle, TextAlign.center, null),
-                      UiUtils.getMarginBox(0, 1.h),
-                      LinearPercentIndicator(
-                        animateFromLastPercent: true,
-                        alignment: MainAxisAlignment.center,
-                        barRadius: const Radius.circular(10),
-                        animation: true,
-                        center: Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.end, children: [
-                          UiUtils.getTextWithFixedScale("${GetController.to.loadingPercent.value}", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
-                          UiUtils.getMarginBox(0.5.w, 0),
-                          UiUtils.getTextWithFixedScale("%", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
-                        ]),
-                        width: 60.w,
-                        lineHeight: 3.h,
-                        linearStrokeCap: LinearStrokeCap.round,
-                        backgroundColor : ColorStyles.upFinWhite,
-                        progressColor: ColorStyles.upFinWhite,
-                      )
-                    ]),
-                    UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
-                    Config.isAndroid? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 3.h)
-                  ]);
-                });
-
-
                 //CommonUtils.flutterToast("이건 테스트 토스트~~");
                 //CommonUtils.moveTo(context, AppView.debugForAdminView.value, null);
                 /*
@@ -228,7 +196,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                               isViewHere = true;
                             }),
                         UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
-                        Align(alignment: Alignment.bottomCenter, child: Image.asset(fit: BoxFit.fitHeight,'assets/images/img_woman_searcher_01.png')),
+                        Align(alignment: Alignment.bottomCenter, child: Image.asset(fit: BoxFit.fitHeight,'assets/images/img_woman_searcher_01.png', height: 50.h)),
                       ]);
 
                   return slideWidget;
@@ -244,7 +212,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               })
             ])),
             Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 1.h, bottom: 1.h),
-                child: UiUtils.getTopBannerButtonBox(90.w, 8.h, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+                child: UiUtils.getTopBannerButtonBox(90.w, Config.isPad()? 9.h : 8.h, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
                     Stack(
                         children: [
                           Positioned(
@@ -259,12 +227,12 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                         ]), () {})),
             UiUtils.getMarginBox(0, 1.h),
             Obx((){
-              List<Widget> accidentWidgetList = _getAccidentWidgetList();
-              return SizedBox(width: 90.w, height: accidentWidgetList.isEmpty ? 8.h : accidentWidgetList.length > 1 ? 25.h : 22.h,
+              List<Widget> accidentWidgetList = _getAccidentWidgetList(); // Config.isPad()?
+              return SizedBox(width: 90.w, height: accidentWidgetList.isEmpty ? 10.h : accidentWidgetList.length > 1 ? Config.isPad() ? 35.h : 25.h : Config.isPad() ? 32.h : 22.h,
                   child: accidentWidgetList.isNotEmpty ? Column(
                     children: <Widget>[
                       // PageView
-                      SizedBox(width: 90.w, height: 22.h,
+                      SizedBox(width: 90.w, height: Config.isPad() ? 32.h : 22.h,
                         child: PageView(
                           controller: _pageController,
                           children: accidentWidgetList,
@@ -442,7 +410,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                 isViewHere = false;
               })
       );
-
     }
 
     return accidentWidgetList;
@@ -746,7 +713,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     double h = lineCnt*2.3.h;
     CommonUtils.log("w","ver : ${Config.appInfoTextMap["info_text_version"]}");
     if(Config.appInfoTextMap["info_text_version"].toString() != "0"){
-      UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isAndroid? 25.5.h+h : 30.5.h+h, 0.5, (slideContext, slideSetState){
+      UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isAndroid? Config.isPad()? 35.5.h+h : 25.5.h+h : Config.isPad()? 40.5.h+h : 30.5.h+h, 0.5, (slideContext, slideSetState){
         return Center(child: Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
           UiUtils.getMarginBox(0, 1.h),
           SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("안내사항", 14.sp, FontWeight.w800, ColorStyles.upFinBlack, TextAlign.center, null)),
