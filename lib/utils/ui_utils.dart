@@ -207,6 +207,15 @@ class UiUtils {
         child: Padding(padding: EdgeInsets.only(left: 2.w, right: 2.w, bottom: 1.w, top: 1.w), child: Text(textScaleFactor: 1.0, text, style: TextStyle(fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor)))));
   }
 
+  static Widget getRoundBoxTextWithFixedScale3(Widget child, Color boxColor){
+    return Container(
+        decoration: BoxDecoration(
+          color: boxColor, // 배경색 설정
+          borderRadius: BorderRadius.circular(20.0), // 모서리를 둥글게 하는 부분
+        ),child: FittedBox(fit: BoxFit.contain, alignment: Alignment.center,
+        child: Padding(padding: EdgeInsets.only(left: 4.w, right: 4.w, bottom: 2.w, top: 2.w), child: child)));
+  }
+
   static Widget getRoundBoxTextWithFixedScale2(String text, double fontSize, FontWeight fontWeight, TextAlign? textAlign, Color boxColor, Color textColor){
     return Container(
         decoration: BoxDecoration(

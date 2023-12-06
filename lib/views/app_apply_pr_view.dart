@@ -1631,11 +1631,11 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                 _addressInfoTextController, TextInputType.text, UiUtils.getInputDecorationForAddress("등본상 주소", 12.sp,
                     Column(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.end, children: [
                       UiUtils.getMarginBox(0, 1.2.h),
-                      Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment: MainAxisAlignment.end, crossAxisAlignment: CrossAxisAlignment.end, children: [
-                        isXButtonShow ? UiUtils.getIconButton(Icons.cancel_rounded, 7.w, ColorStyles.upFinGray, () {
+                      Row(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.center, children: [
+                        isXButtonShow ? UiUtils.getIconButton(Icons.cancel_rounded, 4.3.w, ColorStyles.upFinGray, () {
                           _clearAddress();
                         }) : UiUtils.getMarginBox(0, 0),
-                        UiUtils.getMarginBox(1.w, 0),
+                        UiUtils.getMarginBox(2.w, 0),
                         UiUtils.getIconButton(Icons.search, 8.w, ColorStyles.upFinButtonBlue, () {
                           if(_addressInfoTextController.text.trim() != ""){
                             CommonUtils.hideKeyBoard();
@@ -2369,14 +2369,17 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
   Widget _getCertWidget(String docsType, String title1, String title2, String title3, String subTitle, List<Widget> docsWidgetList, bool isErrorResult, VoidCallback onPressedCallback){
     subTitle = subTitle.replaceAll("'", "");
-    double depWidth = 0.0;
-    if(docsType == "gov24"){
-      depWidth = 42.w;
-    }else if(docsType == "nhis"){
-      depWidth = 54.w;
-    }else if(docsType == "nts"){
-      depWidth = 41.w;
-    }
+    bool isCertCmpWidgetEmpty = false;
+    List<Widget> certCmpWidgetList = [];
+    int kakaoCode = Config.certCmpInfoMap["cert_cmp_code"]["kakao"];
+    int naverCode = Config.certCmpInfoMap["cert_cmp_code"]["naver"];
+    int tossCode = Config.certCmpInfoMap["cert_cmp_code"]["toss"];
+    int passCode = Config.certCmpInfoMap["cert_cmp_code"]["pass"];
+    String kakaoInfo = Config.certCmpInfoMap["cmp_info"][docsType]["kakao_1"].toString();
+    String naverInfo = Config.certCmpInfoMap["cmp_info"][docsType]["naver_2"].toString();
+    String tossInfo = Config.certCmpInfoMap["cmp_info"][docsType]["toss_3"].toString();
+    String passInfo = Config.certCmpInfoMap["cmp_info"][docsType]["pass_4"].toString();
+
     return UiUtils.getRowColumnWithAlignCenter([
       SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start,children: [
         UiUtils.getBackButton(() async {
@@ -2391,11 +2394,11 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale(title3, 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 1.h),
       SizedBox(width: 85.w, child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getBorderButtonBoxForRound(depWidth, ColorStyles.upFinBlack, ColorStyles.upFinBlack,
+        UiUtils.getRoundBoxTextWithFixedScale3(
             Row(children: [
-              UiUtils.getTextWithFixedScale("제공기관: ", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null),
+              UiUtils.getTextWithFixedScale("제공기관 : ", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null),
               UiUtils.getTextWithFixedScale(subTitle, 14.sp, FontWeight.w500, ColorStyles.upFinKakaoYellow, TextAlign.start, null)
-            ]), () { })
+            ]), ColorStyles.upFinBlack)
       ])),
       UiUtils.getMarginBox(0, 2.h),
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: docsWidgetList)),
@@ -2403,8 +2406,102 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
           UiUtils.getTextWithFixedScale(!_isDocsAllConfirmed(docsType)? "인증하기" : "다음", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
             if(!_isDocsAllConfirmed(docsType)){
+
+              if(certType == kakaoCode){
+                if(kakaoInfo != "y"){
+                  certType = 0;
+                  isCertTypeSelected = false;
+                }
+              }else if(certType == naverCode){
+                if(naverInfo != "y"){
+                  certType = 0;
+                  isCertTypeSelected = false;
+                }
+              }else if(certType == tossCode){
+                if(tossInfo != "y"){
+                  certType = 0;
+                  isCertTypeSelected = false;
+                }
+              }else if(certType == passCode){
+                if(passInfo != "y"){
+                  certType = 0;
+                  isCertTypeSelected = false;
+                }
+              }else{
+                certType = 0;
+                isCertTypeSelected = false;
+              }
+
               if(certType == 0){
                 UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, Config.isPad()? 60.h : 40.h, 0.5, (slideContext, setState){
+                  certCmpWidgetList.clear();
+
+                  if(kakaoInfo == "y"){
+                    certCmpWidgetList.add(
+                        Column(children: [
+                          Container(padding: EdgeInsets.zero, decoration: BoxDecoration(color: certType == kakaoCode? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, borderRadius: BorderRadius.circular(15)),
+                              child: UiUtils.getImageButton(Image.asset('assets/images/kakao_icon.png'), 16.w, ColorStyles.upFinBlack, () async {
+                                setState(() { certType = kakaoCode; });
+                              })),
+                          UiUtils.getMarginBox(0, 1.h),
+                          UiUtils.getTextWithFixedScale("카카오톡", 12.sp, FontWeight.w500, certType == kakaoCode? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinBlack, TextAlign.start, null)
+                        ])
+                    );
+                    certCmpWidgetList.add(UiUtils.getMarginBox(5.w, 0));
+                  }
+
+                  if(naverInfo == "y"){
+                    certCmpWidgetList.add(
+                        Column(children: [
+                          Container(padding: EdgeInsets.zero, decoration: BoxDecoration(color: certType == naverCode? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, borderRadius: BorderRadius.circular(15)),
+                              child: UiUtils.getRoundImageButton(Image.asset('assets/images/naver_icon.png', fit: BoxFit.cover), 16.w, ColorStyles.upFinBlack, () async {
+                                setState(() { certType = naverCode; });
+                              })),
+                          UiUtils.getMarginBox(0, 1.h),
+                          UiUtils.getTextWithFixedScale("네이버", 12.sp, FontWeight.w500, certType == naverCode? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinBlack, TextAlign.start, null)
+                        ])
+                    );
+                    certCmpWidgetList.add(UiUtils.getMarginBox(5.w, 0));
+                  }
+
+                  if(tossInfo == "y"){
+                    certCmpWidgetList.add(
+                        Column(children: [
+                          Container(padding: EdgeInsets.zero, decoration: BoxDecoration(color: certType == tossCode? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, borderRadius: BorderRadius.circular(15)),
+                              child: UiUtils.getRoundImageButton(Image.asset('assets/images/toss_icon.png', fit: BoxFit.cover), 16.w, ColorStyles.upFinBlack, () async {
+                                setState(() { certType = tossCode; });
+                              })),
+                          UiUtils.getMarginBox(0, 1.h),
+                          UiUtils.getTextWithFixedScale("토스", 12.sp, FontWeight.w500, certType == tossCode? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinBlack, TextAlign.start, null)
+                        ])
+                    );
+                    certCmpWidgetList.add(UiUtils.getMarginBox(5.w, 0));
+                  }
+
+                  if(passInfo == "y"){
+                    certCmpWidgetList.add(
+                        Column(children: [
+                          Container(padding: EdgeInsets.zero, decoration: BoxDecoration(color: certType == passCode? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, borderRadius: BorderRadius.circular(15)),
+                              child: UiUtils.getRoundImageButton(Image.asset('assets/images/pass_icon.png', fit: BoxFit.cover), 16.w, ColorStyles.upFinBlack, () async {
+                                setState(() { certType = passCode; });
+                              })),
+                          UiUtils.getMarginBox(0, 1.h),
+                          UiUtils.getTextWithFixedScale("PASS", 12.sp, FontWeight.w500, certType == passCode? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinBlack, TextAlign.start, null)
+                        ])
+                    );
+                  }
+
+                  if(certCmpWidgetList.isEmpty){
+                    isCertCmpWidgetEmpty = true;
+                    certCmpWidgetList.add(
+                        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          UiUtils.getTextWithFixedScale("현재 해당기관에서 인증을 진행할 수 없습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null),
+                          UiUtils.getMarginBox(0, 0.5.h),
+                          UiUtils.getTextWithFixedScale("이 인증기관의 서류는 나중에 제출해주세요.", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null),
+                        ])
+                    );
+                  }
+
                   return Column(mainAxisAlignment: MainAxisAlignment.start, children:
                   [
                     Row(children: [
@@ -2416,47 +2513,11 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                       }),
                     ]),
                     UiUtils.getMarginBox(0, 1.5.h),
-                    SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("민간 인증서를 선택하세요", 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
+                    SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale(isCertCmpWidgetEmpty? "지금은 인증할 수 없어요" : "민간 인증서를 선택하세요", 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
                     UiUtils.getMarginBox(0, 3.h),
-                    SizedBox(width: 85.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                      Column(children: [
-                        Container(padding: EdgeInsets.zero, decoration: BoxDecoration(color: certType == 1? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, borderRadius: BorderRadius.circular(15)),
-                            child: UiUtils.getImageButton(Image.asset('assets/images/kakao_icon.png'), 16.w, ColorStyles.upFinBlack, () async {
-                              setState(() { certType = 1; });
-                            })),
-                        UiUtils.getMarginBox(0, 1.h),
-                        UiUtils.getTextWithFixedScale("카카오톡", 12.sp, FontWeight.w500, certType == 1? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinBlack, TextAlign.start, null)
-                      ]),
-                      UiUtils.getMarginBox(5.w, 0),
-                      Column(children: [
-                        Container(padding: EdgeInsets.zero, decoration: BoxDecoration(color: certType == 6? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, borderRadius: BorderRadius.circular(15)),
-                            child: UiUtils.getRoundImageButton(Image.asset('assets/images/naver_icon.png', fit: BoxFit.cover), 16.w, ColorStyles.upFinBlack, () async {
-                              setState(() { certType = 6; });
-                            })),
-                        UiUtils.getMarginBox(0, 1.h),
-                        UiUtils.getTextWithFixedScale("네이버", 12.sp, FontWeight.w500, certType == 6? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinBlack, TextAlign.start, null)
-                      ]),
-                      UiUtils.getMarginBox(5.w, 0),
-                      Column(children: [
-                        Container(padding: EdgeInsets.zero, decoration: BoxDecoration(color: certType == 8? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, borderRadius: BorderRadius.circular(15)),
-                            child: UiUtils.getRoundImageButton(Image.asset('assets/images/toss_icon.png', fit: BoxFit.cover), 16.w, ColorStyles.upFinBlack, () async {
-                              setState(() { certType = 8; });
-                            })),
-                        UiUtils.getMarginBox(0, 1.h),
-                        UiUtils.getTextWithFixedScale("토스", 12.sp, FontWeight.w500, certType == 8? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinBlack, TextAlign.start, null)
-                      ]),
-                      UiUtils.getMarginBox(5.w, 0),
-                      Column(children: [
-                        Container(padding: EdgeInsets.zero, decoration: BoxDecoration(color: certType == 5? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinWhite, borderRadius: BorderRadius.circular(15)),
-                            child: UiUtils.getRoundImageButton(Image.asset('assets/images/pass_icon.png', fit: BoxFit.cover), 16.w, ColorStyles.upFinBlack, () async {
-                              setState(() { certType = 5; });
-                            })),
-                        UiUtils.getMarginBox(0, 1.h),
-                        UiUtils.getTextWithFixedScale("PASS", 12.sp, FontWeight.w500, certType == 5? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinBlack, TextAlign.start, null)
-                      ])
-                    ])),
+                    SizedBox(width: 85.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: certCmpWidgetList)),
                     UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
-                    UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinTextAndBorderBlue,
+                    isCertCmpWidgetEmpty? Container() : UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinTextAndBorderBlue,
                         UiUtils.getTextWithFixedScale(_isDocsAllConfirmed(docsType) ? "인증완료" : !isErrorResult? "간편인증 진행하기" : "서류 다시 가져오기",
                             14.sp, FontWeight.w500, !isErrorResult? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null), (){
                           if(certType != 0){

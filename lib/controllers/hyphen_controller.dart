@@ -115,7 +115,20 @@ class HyphenController {
           }
         }
       }else{
-        CommonUtils.flutterToast("신분증 확인 실패\n더 정확한 사진이 필요해요.");
+        if(outputJsonForCertId != null){
+          if(outputJsonForCertId.containsKey("error")){
+            if(outputJsonForCertId["error"].toString().contains("재처리")){
+              CommonUtils.flutterToast("진위확인 기관오류입니다.\n약 3분뒤에 다시 시도해주세요.");
+            }else{
+              CommonUtils.flutterToast(outputJsonForCertId["error"]);
+            }
+          }else{
+            CommonUtils.flutterToast("신분증 진위확인에 실패\n유효한 신분증이 아니에요.");
+          }
+        }else{
+          CommonUtils.flutterToast("신분증 진위확인에 실패했어요.");
+        }
+
         callback(false);
       }
     });

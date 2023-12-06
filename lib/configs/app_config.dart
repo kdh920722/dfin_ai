@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -44,6 +46,7 @@ class Config{
   static bool isEmergencyRoot = false;
   static bool isTablet = false;
   static FlutterDownloader flutterDownloader = FlutterDownloader();
+  static Map<String,dynamic> certCmpInfoMap = {};
 
   static Map<String, WidgetBuilder> appRoutes = {
     AppView.appRootView.value : (context) => AppRootView(),
@@ -97,6 +100,7 @@ class Config{
             case "privacy_text" : privacyText = each.value.toString();
             case "privacy_text2" : privacyText2 = each.value.toString();
             case "privacy_text3" : privacyText3 = each.value.toString();
+            case "cert_cmp_info" : certCmpInfoMap = jsonDecode(jsonEncode(each.value));
           }
         }
       }else{
