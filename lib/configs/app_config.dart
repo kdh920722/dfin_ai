@@ -1,10 +1,8 @@
 import 'dart:convert';
-
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:upfin/views/app_accident_detail_view.dart';
 import 'package:upfin/views/app_agree_detail_info_view.dart';
 import 'package:upfin/views/app_apply_pr_view.dart';
@@ -45,7 +43,6 @@ class Config{
   static BuildContext? contextForEmergencyBack;
   static bool isEmergencyRoot = false;
   static bool isTablet = false;
-  static FlutterDownloader flutterDownloader = FlutterDownloader();
   static Map<String,dynamic> certCmpInfoMap = {};
 
   static Map<String, WidgetBuilder> appRoutes = {
@@ -78,7 +75,7 @@ class Config{
         List<Permission> permissionListForAndroid = [Permission.camera, Permission.phone];
         permissionList.addAll(permissionListForAndroid);
       }else{
-        List<Permission> permissionListForIos = [Permission.camera, Permission.photos];
+        List<Permission> permissionListForIos = [Permission.camera];
         permissionList.addAll(permissionListForIos);
       }
 

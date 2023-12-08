@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:action_cable/action_cable.dart';
-import 'package:assets_audio_player/assets_audio_player.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:upfin/controllers/get_controller.dart';
 import 'package:upfin/datas/my_data.dart';
@@ -27,7 +26,6 @@ class WebSocketController {
   static bool isRetry = false;
   static Map<String,dynamic> connectionInfoMap = {};
   static bool isMessageReceived = false;
-  static final AssetsAudioPlayer assetsChatSendAudioPlayer = AssetsAudioPlayer.newPlayer();
 
   static Future<void> initWebSocket(Function(bool isSuccess) callback) async{
     try{
@@ -41,13 +39,6 @@ class WebSocketController {
             case "channel_name" : channelName = each.value.toString();
           }
         }
-
-        assetsChatSendAudioPlayer.open(
-          Audio("assets/sounds/msg_send.mp3"),
-          loopMode: LoopMode.none, //반복 여부 (LoopMode.none : 없음)
-          autoStart: false, //자동 시작 여부
-          showNotification: false, //스마트폰 알림 창에 띄울지 여부
-        );
 
         callback(true);
       } else {
@@ -69,7 +60,6 @@ class WebSocketController {
           if(type == "UPFIN"){
             subscribedRoomIds[i]["isWaitingForAnswer"] = isWaiting;
           }else{
-            if(!isWaiting && AppChatViewState.currentRoomId == roomId) assetsChatSendAudioPlayer.play();
             subscribedRoomIds[i]["isWaitingForMe"] = isWaiting;
           }
         }

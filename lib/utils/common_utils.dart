@@ -3,7 +3,6 @@ import 'dart:io';
 import 'dart:math';
 import 'package:camera/camera.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -48,7 +47,7 @@ class CommonUtils {
       }
     }
 
-    //if(logType.toLowerCase() != "e") logType = "";
+    if(logType.toLowerCase() != "e") logType = "";
 
     var logger = Logger();
     if(logMessage.length > logMaxSize){
@@ -547,47 +546,6 @@ class CommonUtils {
       }
     }catch(error){
       CommonUtils.log('e', 'set cached image error : $error');
-      return null;
-    }
-  }
-
-  static Future<List<File>?> getFiles(int type) async {
-    try{
-      // type 1: android all
-      // type 2: ios img
-      // type 3: ios doc
-      FilePickerResult? result;
-      if(type == 1){
-        result = await FilePicker.platform.pickFiles(
-          type: FileType.custom,
-          allowedExtensions: LogfinController.validFileTypeList,
-          allowMultiple: false,
-        );
-      }else if(type == 2){
-        result = await FilePicker.platform.pickFiles(
-          type: FileType.image,
-          allowMultiple: false,
-        );
-      }else if(type == 3){
-        result = await FilePicker.platform.pickFiles(
-          type: FileType.custom,
-          allowedExtensions: LogfinController.validFileTypeList,
-          allowMultiple: false,
-        );
-      }
-
-      if(result != null) {
-        List<File> pickFiles = result.paths.map((path) => File(path!)).toList();
-        if(pickFiles.isNotEmpty){
-          return pickFiles;
-        }else{
-          return null;
-        }
-      } else {
-        return null;
-      }
-    }catch(error){
-      CommonUtils.log('e', 'getFile error : $error');
       return null;
     }
   }
@@ -1169,40 +1127,6 @@ class CommonUtils {
     await file.writeAsString(
       jsonEncode(settings),
     );
-  }
-
-  static Future<(List<int>, String)> getFileBytesAndName(Object? file) async {
-    List<int> bytes;
-    String fileName;
-
-    if (file is XFile) {
-      bytes = await file.readAsBytes();
-      fileName = file.name;
-    } else if (file is File) {
-      bytes = await file.readAsBytes();
-      fileName = file.path.split('/').last;
-    } else if (file is PlatformFile) {
-      if (kIsWeb) {
-        bytes = file.bytes!;
-      } else {
-        bytes = await _getFileBytes(file);
-      }
-      fileName = file.name;
-    } else {
-      throw Exception('Invalid file type');
-    }
-    return (bytes, fileName);
-  }
-
-  static Future<List<int>> _getFileBytes(PlatformFile platformFile) async {
-    // Get the file path from the PlatformFile object
-    String? filePath = platformFile.path;
-
-    // Read the file as bytes, File is from the dart:io library
-    File file = File(filePath!);
-    List<int> fileBytes = await file.readAsBytes();
-
-    return fileBytes;
   }
 
   static Future<void> printSettingsFromFile() async {

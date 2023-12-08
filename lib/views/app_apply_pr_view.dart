@@ -1217,10 +1217,16 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
             }
           }),
-      UiUtils.getMarginBox(0, 0.5.h),
+      UiUtils.getMarginBox(0, 1.5.h),
       UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
           UiUtils.getTextWithFixedScale("다시 입력할게요", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, null), () {
             setState(() {
+              certType = 0;
+              isCertTypeSelected = false;
+              selectedBusinessNumberInfo = "";
+              _businessNumberInfoTextController.text = "";
+              _clearAddress();
+
               if(isRetry){
                 currentViewId = _getViewIdFromListById(addressId);
               }else{
@@ -1718,7 +1724,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("하나를 촬영 해 주세요.", 12.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
 
       UiUtils.getMarginBox(0, 10.h),
-      pickedFilePath != "" ? Container(decoration: BoxDecoration(color: ColorStyles.upFinBlack, borderRadius: BorderRadius.circular(10)), child: UiUtils.getImage(80.w, 22.h, Image.file(File(pickedFilePath))))
+      pickedFilePath != "" ? Container(decoration: BoxDecoration(color: ColorStyles.upFinBlack, borderRadius: BorderRadius.circular(8)),
+          child: Image.file(File(pickedFilePath), fit: BoxFit.fitWidth, width: 80.w, height: 24.h,))
           : UiUtils.getImage(85.w, 24.h, Image.asset(fit: BoxFit.fitHeight,'assets/images/img_id_card.png')),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getExpandedScrollView(Axis.vertical, Container()),
@@ -2805,7 +2812,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         String phoneNo = MyData.phoneNumber;
         String identity = MyData.idNumber.split("-")[0]+MyData.idNumber.split("-")[1];
         String address = selectedAddressInfo;
-        CommonUtils.log("w","tMyData.telecom : ${MyData.telecom}");
         String telecom = (int.parse(MyData.telecom)-1).toString();
         if(int.parse(telecom) >= 3){
           telecom = (int.parse(telecom)-3).toString();

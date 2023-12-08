@@ -27,7 +27,6 @@ import '../configs/app_config.dart' as appConfig;
 import '../datas/pr_docs_info_data.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:path_provider/path_provider.dart';
 
 class AppChatView extends StatefulWidget{
@@ -52,7 +51,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
   double deviceH = 100.h;
   late AnimationController _aniController;
 
-  final ReceivePort _port = ReceivePort();
   bool searchNoMore = false;
   double prevScrollPos = 0.0;
   static bool isScrollMove = false;
@@ -174,37 +172,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
     _setAutoAnswerWaitingState();
     isScrollMove = false;
     currentKey = "";
-
-    IsolateNameServer.registerPortWithName(_port.sendPort, 'downloader_send_port');
-    _port.listen((dynamic data) async {
-      try{
-        String id = data[0];
-        int status = data[1];
-        int progress = data[2];
-
-        //if(isOpenDownloadedFile) UiUtils.showLoadingPop(context);
-        CommonUtils.log("d", "download status : $progress $status");
-
-        if(status == 3 && progress == 100){
-          CommonUtils.flutterToast("다운로드가 완료되었어요.");
-          if(isOpenDownloadedFile){
-            bool canOpen = false;
-            while(!canOpen){
-              CommonUtils.log("w", "download id : $id");
-              canOpen = await FlutterDownloader.open(taskId: id);
-            }
-            //if(context.mounted) UiUtils.closeLoadingPop(context);
-          }else{
-            CommonUtils.flutterToast("다운로드가 완료되었어요.");
-          }
-        }
-      }catch(error){
-        CommonUtils.log("e", "download error : $error");
-        CommonUtils.flutterToast("다운로드에 실패했어요.");
-       // if(isOpenDownloadedFile && context.mounted) UiUtils.closeLoadingPop(context);
-      }
-    });
-    FlutterDownloader.registerCallback(downloadCallback);
   }
 
   @pragma('vm:entry-point')
@@ -437,7 +404,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
         
         <p id='pType1'><text id='$boldTextId'>${extension.toUpperCase()}문서</text></p>
         <p id='pType2'><text>$fileName.$extension</text></p>
-        <a href='$message'><button id='$buttonId'>저장하기</button></a>
         
         """;
       }
@@ -461,46 +427,12 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
             htmlString,
             enableCaching: false,
             buildAsync: false,
-            onLoadingBuilder: (htmlContext, element, progress){
-
-              infiniteLoadTimer ??= Timer.periodic(const Duration(milliseconds: 200), (Timer timer) {
-                infiniteCnt++;
-                if(infiniteCnt > 24){
-                  infiniteLoadTimer!.cancel();
-                  infiniteLoadTimer = null;
-                  isHtmlLoading = false;
-                  infiniteCnt = 0;
-                  //GetController.to.updateHtmlLoad(true);
-                }
-              });
-
-              isHtmlLoading = true;
-              htmlBuildCnt = 0;
-              // if(GetController.to.isHtmlLoad.value){
-              //   GetController.to.updateHtmlLoad(false);
-              // }
-              if(htmlLoadTimer != null) htmlLoadTimer!.cancel();
-              htmlLoadTimer = Timer.periodic(const Duration(milliseconds: 300), (Timer timer) {
-                htmlBuildCnt++;
-                if(htmlBuildCnt > 2 && !isNormalLoading){
-                  htmlLoadTimer!.cancel();
-                  isHtmlLoading = false;
-                  CommonUtils.log("", "html loading build finished!!");
-                  _scrollToBottom(false,0);
-                  //GetController.to.updateHtmlLoad(true);
-                  isHtmlLoadTimeOut = true;
-
-                }
-              });
-
-            },
             customStylesBuilder: (element) {
-
               isNormalLoading = true;
               if(htmlNormalLoadTimer != null) htmlNormalLoadTimer!.cancel();
-              htmlNormalLoadTimer = Timer.periodic(const Duration(milliseconds: 50), (Timer timer) {
+              htmlNormalLoadTimer = Timer.periodic(const Duration(milliseconds: 150), (Timer timer) {
                 htmlNormalLoadBuildCnt++;
-                if(htmlNormalLoadBuildCnt > 2 && !isHtmlLoading){
+                if(htmlNormalLoadBuildCnt > 2){
                   htmlNormalLoadTimer!.cancel();
                   isNormalLoading = false;
                   _scrollToBottom(false,0);
@@ -584,40 +516,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
 
             onTapUrl: (url) async {
               if(isFileType){
-                CommonUtils.log("w", "download url : $url");
-                String dir = "";
-                if(appConfig.Config.isAndroid){
-                  //dir = '/storage/emulated/0/Download';
-                  dir = (await getExternalStorageDirectory())!.path;
-                  CommonUtils.log("w", "download dir : $dir");
-                  //dir = (await getApplicationDocumentsDirectory()).path;
-                }else{
-                  dir = (await getApplicationDocumentsDirectory()).path;
-                }
-                try{
-                  if(appConfig.Config.isAndroid || (!appConfig.Config.isAndroid && !CommonUtils.containsKorean(url))){
-                    isOpenDownloadedFile = false;
-                    if(!isImage){
-                      CommonUtils.flutterToast("문서를 다운로드해요.");
-                    }
-                    await FlutterDownloader.enqueue(
-                      url: url, 	// file url
-                      savedDir: '$dir/',	// 저장할 dir
-                      //fileName: '${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_doc.$extension',	// 파일명
-                      fileName: "${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_${url.split("/").last}",
-                      saveInPublicStorage: appConfig.Config.isAndroid? true : true,// 동일한 파일 있을 경우 덮어쓰기 없으면 오류발생함!
-                      showNotification: true,
-                      openFileFromNotification: true,
-                    );
-                  }else{
-                    CommonUtils.flutterToast("한글이름의 파일은\n받을수 없어요.");
-                    isOpenDownloadedFile = false;
-                  }
 
-                }catch(error){
-                  CommonUtils.flutterToast("문서 다운로드에 실패했어요.");
-                  CommonUtils.log("e", "fail doc download $error");
-                }
               }else{
                 CommonUtils.log("", "furl : $url");
                 if(url.toLowerCase() == "doc"){
@@ -902,39 +801,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                         )
                     )),
                 UiUtils.getExpandedScrollView(Axis.vertical, Container()),
-                UiUtils.getBorderButtonBoxWithZeroPadding(30.w, ColorStyles.upFinBlack, ColorStyles.upFinBlack,
-                    UiUtils.getBoxTextAndIconWithFixedScale("저장하기", 12.sp, FontWeight.w300, TextAlign.center, ColorStyles.upFinBlack, ColorStyles.upFinWhite,
-                        Icons.save_alt_rounded, ColorStyles.upFinWhite, 5.w), () async {
-                      CommonUtils.log("w", "download url : $srcUrl");
-                      String dir = "";
-                      if(appConfig.Config.isAndroid){
-                        dir = (await getExternalStorageDirectory())!.path;
-                      }else{
-                        dir = (await getApplicationDocumentsDirectory()).path;
-                      }
-                      CommonUtils.log("w", "download dir : $dir");
-
-                      try{
-                        if(appConfig.Config.isAndroid || (!appConfig.Config.isAndroid && !CommonUtils.containsKorean(srcUrl))){
-                          isOpenDownloadedFile = false;
-                          CommonUtils.flutterToast("이미지를 다운로드해요.");
-                          await FlutterDownloader.enqueue(
-                            url: srcUrl, 	// file url
-                            savedDir: '$dir/',	// 저장할 dir
-                            fileName: "${CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime())}_${srcUrl.split("/").last}",	// 파일명
-                            saveInPublicStorage: appConfig.Config.isAndroid? true : true,	// 동일한 파일 있을 경우 덮어쓰기 없으면 오류발생함!
-                            showNotification: true,
-                            openFileFromNotification: true,
-                          );
-                        }else{
-                          CommonUtils.flutterToast("한글이름의 파일는\n받을수 없어요.");
-                        }
-
-                      }catch(error){
-                        CommonUtils.flutterToast("이미지 다운로드에 실패했어요.");
-                        CommonUtils.log("e", "fail img download $error");
-                      }
-                    }),
                 appConfig.Config.isAndroid? UiUtils.getMarginBox(0, 1.h) :UiUtils.getMarginBox(0, 2.h),
               ]);
               return slideWidget;
@@ -1136,60 +1002,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
     }
   }
 
-  Future<void> _setPickedFileFromDevice(int type) async {
-    if(pickedFiles.length <= maximumSize){
-      if(pickedFiles.length == maximumSize){
-        CommonUtils.flutterToast("최대 $maximumSize개의 파일만\n전송할 수 있습니다.");
-      }else{
-        List<File>? files = await CommonUtils.getFiles(type);
-        if(files != null){
-          if(files.length <= maximumSize){
-            if(files.length+pickedFiles.length <= maximumSize){
-              String inValidExt = "";
-              for(var each in files){
-                String extension = each.path.split('.').last.toLowerCase();
-                List<String> validExtensions = LogfinController.validFileTypeList;
-                if (!validExtensions.contains(extension)) {
-                  inValidExt = extension;
-                }
-              }
-              if(inValidExt == ""){
-                isShowPickedFile = true;
-                GetController.to.updateShowPickedFile(isShowPickedFile);
-                inputHelpHeight = inputHelpPickedFileHeight;
-                GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
-                for(var each in files){
-                  pickedFiles.add(each);
-                }
-              }else{
-                CommonUtils.flutterToast("$inValidExt 파일은\n전송할수 없습니다.");
-              }
-            }else{
-              CommonUtils.flutterToast("최대 $maximumSize개의 파일만\n전송할 수 있습니다.");
-            }
-          }else{
-            CommonUtils.flutterToast("최대 $maximumSize개의 파일만\n전송할 수 있습니다.");
-          }
-        }else{
-          if(pickedFiles.isEmpty){
-            isShowPickedFile = false;
-            GetController.to.updateShowPickedFile(isShowPickedFile);
-            inputHelpHeight = inputHelpMinHeight;
-            GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
-          }else{
-            isShowPickedFile = true;
-            GetController.to.updateShowPickedFile(isShowPickedFile);
-            inputHelpHeight = inputHelpPickedFileHeight;
-            GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
-          }
-        }
-        setState(() {});
-      }
-    }else{
-      CommonUtils.flutterToast("최대 $maximumSize개의 파일만\n전송할 수 있습니다.");
-    }
-  }
-
   String currentKey = "";
   String _findValueForKey(Map<String, dynamic> map, String targetKey) {
     String resultValue = "";
@@ -1322,34 +1134,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
         _scrollToBottom(false, 0);
         if(each.contains("카메라")){
           _setPickedImgFromCamera();
-        }else if(each.contains("가져오기")){
-          if(appConfig.Config.isAndroid){
-            /*
-            bool isDenied = false;
-            for(var eachPermission in appConfig.Config.storagePermissionListForAndroid){
-              var status = await eachPermission.request();
-              if (status.isDenied) {
-                isDenied = true;
-              }
-            }
-
-            if(isDenied){
-              openAppSettings();
-            }else{
-              _setPickedFileFromDevice(1);
-            }
-
-             */
-
-            _setPickedFileFromDevice(1);
-          }else{
-            if(each.contains("사진")){
-              _setPickedFileFromDevice(2);
-            }else if(each.contains("파일")){
-              _setPickedFileFromDevice(3);
-            }
-          }
-
         }else if(each.contains("채팅")){
           inputTextHide = false;
           GetController.to.updateInputTextHide(inputTextHide);
@@ -1382,19 +1166,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
     }
 
     GetController.to.updateChatAutoAnswerWidgetList(widgetList);
-  }
-
-  void _setAutoAnswerLineHeight(){
-    if(_getLineFromAutoAnswerWidgetList(widgetList) == 1){
-      inputHelpHeight = 6.h;
-      GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
-    }else if(_getLineFromAutoAnswerWidgetList(widgetList) == 2){
-      inputHelpHeight = 12.h;
-      GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
-    }else{
-      inputHelpHeight = 17.5.h;
-      GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
-    }
   }
 
   Future<void> _sendFileToAws() async {

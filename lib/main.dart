@@ -7,7 +7,6 @@ import 'package:intl/date_symbol_data_local.dart';
 import 'package:upfin/configs/app_config.dart';
 import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:upfin/utils/ui_utils.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
 import 'controllers/get_controller.dart';
 
 void main() async{
@@ -20,10 +19,6 @@ void main() async{
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,
     ]);
-    await FlutterDownloader.initialize(
-        debug: false,
-        ignoreSsl: false
-    );
     await initializeDateFormatting();
     FlutterNativeSplash.remove();
   }
