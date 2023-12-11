@@ -39,6 +39,7 @@ class CommonUtils {
 
   }
 
+  static bool logValid = false;
   static const int logMaxSize = 600;
   static void log(String logType, String logMessage){
     if(FireBaseController.fcmToken != ""){
@@ -47,7 +48,9 @@ class CommonUtils {
       }
     }
 
-    if(logType.toLowerCase() != "e") logType = "";
+    if(!logValid){
+      if(logType.toLowerCase() != "e") logType = "";
+    }
 
     var logger = Logger();
     if(logMessage.length > logMaxSize){

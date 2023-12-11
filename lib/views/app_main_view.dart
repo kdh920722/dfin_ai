@@ -114,7 +114,47 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 0.h, bottom: 1.h), child: Row(mainAxisSize: MainAxisSize.max, children: [
               UiUtils.getTextWithFixedScale("사건기록", 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1),
               const Spacer(flex: 2),
-              MyData.isTestUser ? UiUtils.getIconButton(Icons.comments_disabled_sharp, 7.w, ColorStyles.upFinRed, () {
+              !MyData.isTestUser ? UiUtils.getIconButton(Icons.comments_disabled_sharp, 7.w, ColorStyles.upFinRed, () {
+                /*
+                getMyCarInfo ==> {success: true, data: {cars: [ *addAndSearchCar 'car_info' output... ]}}
+
+                addAndSearchCar ==> {success: true, price: 15040000, search_uid: jz5VxeCNRt44WgeAaZDJHA, car_info: {id: 163, user_id: 241,
+                                      owner_name: 이용석, carno: 40서9456, amount: 15040000, memo: null, del_flg: 10,
+                                      created_at: 2023-12-11T14:37:30.000+09:00, updated_at: 2023-12-11T14:37:30.000+09:00, sise_response: null,
+                                      job_type_id: 1, sconditions: 0;0;0;0;0;0;0;0;0;0;0;0;0;0;, uid: jz5VxeCNRt44WgeAaZDJHA, ...}
+
+                searchCar ==> {success: true, car_info: {id: 163, user_id: 241,
+                                      owner_name: 이용석, carno: 40서9456, amount: 15040000, memo: null, del_flg: 10,
+                                      created_at: 2023-12-11T14:37:30.000+09:00, updated_at: 2023-12-11T14:37:30.000+09:00, sise_response: null,
+                                      job_type_id: 1, sconditions: 0;0;0;0;0;0;0;0;0;0;0;0;0;0;, uid: jz5VxeCNRt44WgeAaZDJHA, ...}
+
+                searchCarProduct ==> {success: true, data: {documents: [
+                          {lender_car_id: 1, result: true, msg: , rid: hMZxC0lQwBkT01ydKpTzrQ, limit: 1504, product_name: 도이치모터스 오토론, lender_name: (주)도이치파이낸셜, description: null, lender_id: 6, min_rate: 15.9, max_rate: 19.9},
+                          {lender_car_id: 3, result: true, msg: , rid: RdZeS36EZZXQWf38NDUbCg, limit: 1654, product_name: 오토론테스트, lender_name: (주)아침해파이낸셜대부, description: null, lender_id: 2, min_rate: 19.9, max_rate: 19.9}]}
+
+                getCarDocs ==> {success: true, data: {documents: [
+                          {id: 2, name: 주민등록등본, type1_check: 1, type2_check: 1, type3_check: 1, del_flg: 0, created_at: null, updated_at: null, job_id: 0,
+                          method_name: get_reg, view_link: view_get_reg, bankflag: 0, online_request: 1, organization_id: 1,
+                          api_endpoint: https://api.codef.io/v1/kr/public/mw/resident-registration-copy/issuance,
+                          view_link_new: view_get_reg_, lender_price: 1000},
+                          {id: 3, name: 주민등록초본, type1_check: 1, type2_check: 1, type3_check: 1, del_flg: 0, created_at: null, updated_at: null, job_id: 0,
+                          method_name: get_reg2, view_link: view_get_reg2, bankflag : 0, online_request: 1, organization_id: 1,
+                          api_endpoint: https://api.codef.io/v1/kr/public/mw/resident-registration-abstract/issuance,
+                          view_link_new: view_get_reg2_, lender_price: 1000},
+                          {id: 4, name: 건강보험납부확인서, type1_check: 1, type2_check: 1, type3_check: 1, del_flg: 0, created_at: null, updated_at: null, job_id: 0,
+                          method_name: get_ggbh_pay, view_link: view_ggbh_pay, bankflag: 0, online_request: 1, organization_id: 2,
+                          api_endpoint: https://api.codef.io/v1/kr/public/pp/nhis-insurance-payment/confirmation, view_link_new: view_ggbh_pay_, lender_price: 1000}, ...]}}
+                */
+
+
+                Map<String, dynamic> inputJson1 = {
+                  "car_uid": "bu_nD2XOQHaINJ6ezrmdVg"
+                };
+                LogfinController.callLogfinApi(LogfinApis.searchCarProduct, inputJson1, (isSuccess, outputJson){
+                  CommonUtils.logValid = true;
+                  CommonUtils.log("w","kdh output : $outputJson");
+                  CommonUtils.logValid = false;
+                });
 
                 //CommonUtils.flutterToast("이건 테스트 토스트~~");
                 //CommonUtils.moveTo(context, AppView.debugForAdminView.value, null);
@@ -249,7 +289,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                     UiUtils.getMarginBox(0, 1.h),
                     UiUtils.getBorderButtonBoxWithZeroPadding(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
                         Row(children: [
-                          UiUtils.getTextWithFixedScale("현재 등록된 사건이 없습니다.", 13.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.center, null),
+                          UiUtils.getTextWithFixedScale("현재 등록된 사건이 없습니다.", 13.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null),
                           const Spacer(flex: 2),
                           UiUtils.getBorderButtonBox(22.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
                               UiUtils.getTextWithFixedScale("등록하기", 10.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.end, null), () async {
@@ -850,8 +890,9 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                 ]),
               )),
               Positioned(
-                  top: 50.h,
-                  child: UiUtils.getImage(150.w, 150.w, Image.asset(fit: BoxFit.fitWidth,'assets/images/img_woman_coffee.png')))
+                  top: Config.isPad()? 60.h : 50.h,
+                  child: Config.isPad()? UiUtils.getImage(100.w, 100.w, Image.asset(fit: BoxFit.fitHeight,'assets/images/img_woman_coffee.png')) :
+                  UiUtils.getImage(150.w, 150.w, Image.asset(fit: BoxFit.fitWidth,'assets/images/img_woman_coffee.png')))
             ]) : Container()
         ),
         Positioned(child: Obx((){

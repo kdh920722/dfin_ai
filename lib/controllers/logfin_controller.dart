@@ -259,7 +259,7 @@ class LogfinController {
     if(api != LogfinApis.signIn && api != LogfinApis.signUp && api != LogfinApis.socialLogin
         && api != LogfinApis.deleteAccount && api != LogfinApis.checkMember && api != LogfinApis.getAgreeDocuments && api != LogfinApis.getFaqs
         && api != LogfinApis.findEmail && api != LogfinApis.sendEmailCode && api != LogfinApis.checkEmailCode
-        && api != LogfinApis.checkMemberByPhone && api != LogfinApis.updatePassword){
+        && api != LogfinApis.checkMemberByPhone && api != LogfinApis.updatePassword && api != LogfinApis.getCarDocs){
       if(userToken != ""){
         inputJson['api_token'] = userToken;
       }else{
@@ -308,6 +308,12 @@ class LogfinController {
             return;
           }else if(api == LogfinApis.findEmail){
             callback(true, resultData);
+            return;
+          }else if(api == LogfinApis.addAndSearchCar){
+            callback(true, resultData['car_info']);
+            return;
+          }else if(api == LogfinApis.searchCar){
+            callback(true, resultData['car_info']);
             return;
           }
           callback(true, resultData['data']);
@@ -662,7 +668,8 @@ enum LogfinApis {
   getLoansInfo, getLoansDetailInfo,
   sendMessage, getMessage, checkMessage, getAgreeDocuments, getFaqs,
   getRetryDocs, retryDocs,
-  findEmail, sendEmailCode, checkEmailCode, checkMemberByPhone, updatePassword
+  findEmail, sendEmailCode, checkEmailCode, checkMemberByPhone, updatePassword,
+  getMyCarInfo, addAndSearchCar, searchCar, searchCarProduct, getCarDocs, submitCarProduct
 }
 
 extension LogfinApisExtension on LogfinApis {
@@ -725,6 +732,19 @@ extension LogfinApisExtension on LogfinApis {
       case LogfinApis.updatePassword:
         return '/users/update_password.json';
 
+        /// auto loan
+      case LogfinApis.getMyCarInfo:
+        return '/get_cars.json';
+      case LogfinApis.addAndSearchCar:
+        return '/add_car.json';
+      case LogfinApis.searchCar:
+        return '/get_carinfo.json';
+      case LogfinApis.searchCarProduct:
+        return '/search_auto_products.json';
+      case LogfinApis.getCarDocs:
+        return '/get_auto_documents.json';
+      case LogfinApis.submitCarProduct:
+        return '/submit_auto_product.json';
     }
   }
 }
