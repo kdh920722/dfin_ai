@@ -65,7 +65,7 @@
 
     </queries>
     <application
-        android:label="UpFin"
+        android:label="업핀"
         android:name="${applicationName}"
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"

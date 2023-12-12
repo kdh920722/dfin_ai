@@ -145,17 +145,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                           method_name: get_ggbh_pay, view_link: view_ggbh_pay, bankflag: 0, online_request: 1, organization_id: 2,
                           api_endpoint: https://api.codef.io/v1/kr/public/pp/nhis-insurance-payment/confirmation, view_link_new: view_ggbh_pay_, lender_price: 1000}, ...]}}
                 */
-
-
-                Map<String, dynamic> inputJson1 = {
-                  "car_uid": "bu_nD2XOQHaINJ6ezrmdVg"
-                };
-                LogfinController.callLogfinApi(LogfinApis.searchCarProduct, inputJson1, (isSuccess, outputJson){
-                  CommonUtils.logValid = true;
-                  CommonUtils.log("w","kdh output : $outputJson");
-                  CommonUtils.logValid = false;
-                });
-
                 //CommonUtils.flutterToast("이건 테스트 토스트~~");
                 //CommonUtils.moveTo(context, AppView.debugForAdminView.value, null);
                 /*
