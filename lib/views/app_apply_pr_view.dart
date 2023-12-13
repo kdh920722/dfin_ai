@@ -1751,12 +1751,12 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                 }
               }else{
                 if(context.mounted){
-                  UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, Config.isAndroid ? Config.isPad()? 32.h : 22.h : Config.isPad()? 37.h : 27.h, 0.5, (slideContext, setState){
+                  UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, null, Config.isAndroid ? Config.isPad()? 32.h : 22.h : Config.isPad()? 37.h : 27.h, 0.5, (slideContext, setState){
                     return Column(mainAxisAlignment: MainAxisAlignment.start,
                         children: [
                           UiUtils.getMarginBox(100.w, 1.h),
                           Column(children: [
-                            SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("촬영을 위해, 카메라 권한이 필요해요.",14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
+                            SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("촬영을위한 카메라 권한이 필요해요.",14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
                             UiUtils.getMarginBox(0, 1.h),
                             SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("설정에서 카메라 권한을 허용 해주세요",12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null))
                           ]),
