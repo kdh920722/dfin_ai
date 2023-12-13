@@ -72,10 +72,10 @@ class Config{
     try{
 
       if(isAndroid){
-        List<Permission> permissionListForAndroid = [Permission.camera, Permission.phone];
+        List<Permission> permissionListForAndroid = [Permission.phone];
         permissionList.addAll(permissionListForAndroid);
       }else{
-        List<Permission> permissionListForIos = [Permission.camera];
+        List<Permission> permissionListForIos = [];
         permissionList.addAll(permissionListForIos);
       }
 

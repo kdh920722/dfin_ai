@@ -114,7 +114,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 0.h, bottom: 1.h), child: Row(mainAxisSize: MainAxisSize.max, children: [
               UiUtils.getTextWithFixedScale("사건기록", 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1),
               const Spacer(flex: 2),
-              !MyData.isTestUser ? UiUtils.getIconButton(Icons.comments_disabled_sharp, 7.w, ColorStyles.upFinRed, () {
+              MyData.isTestUser ? UiUtils.getIconButton(Icons.comments_disabled_sharp, 7.w, ColorStyles.upFinRed, () {
                 /*
                 getMyCarInfo ==> {success: true, data: {cars: [ *addAndSearchCar 'car_info' output... ]}}
 

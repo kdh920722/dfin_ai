@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sizer/sizer.dart';
 import 'package:upfin/controllers/aws_controller.dart';
 import 'package:upfin/controllers/firebase_controller.dart';
@@ -24,6 +25,7 @@ import 'package:upfin/views/app_apply_pr_view.dart';
 import 'package:upfin/views/app_main_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../configs/app_config.dart' as appConfig;
+import '../configs/app_config.dart';
 import '../datas/pr_docs_info_data.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
@@ -69,24 +71,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
     CommonUtils.log("d", "AppChatViewState 화면 입장");
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-
-    availableCameras().then((cameras) {
-      if (cameras.isNotEmpty && _cameraController == null) {
-        _cameraController = CameraController(
-            cameras.first,
-            ResolutionPreset.medium,
-            enableAudio: false
-        );
-
-        _cameraController!.initialize().then((_) {
-          _cameraController!.setFlashMode(FlashMode.off);
-          setState(() {
-            _isCameraReady = true;
-          });
-        });
-      }
-    });
-
     _aniController = AnimationController(
         vsync: this,
         duration: const Duration(milliseconds: 500),
@@ -1133,7 +1117,53 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
         isScrollMove = false;
         _scrollToBottom(false, 0);
         if(each.contains("카메라")){
-          _setPickedImgFromCamera();
+          var cameraPermission = Permission.camera;
+          var cameraStatus = await cameraPermission.request();
+          if(cameraStatus.isGranted){
+            if(!_isCameraReady){
+              availableCameras().then((cameras) {
+                if (cameras.isNotEmpty && _cameraController == null) {
+                  _cameraController = CameraController(
+                      cameras.first,
+                      ResolutionPreset.medium,
+                      enableAudio: false
+                  );
+
+                  _cameraController!.initialize().then((_) {
+                    _cameraController!.setFlashMode(FlashMode.off);
+                    setState(() {
+                      _isCameraReady = true;
+                      _setPickedImgFromCamera();
+                    });
+                  });
+                }
+              });
+            }else{
+              _setPickedImgFromCamera();
+            }
+          }else{
+            if(context.mounted){
+              UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, Config.isAndroid ? Config.isPad()? 32.h : 22.h : Config.isPad()? 37.h : 27.h, 0.5, (slideContext, setState){
+                return Column(mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      UiUtils.getMarginBox(100.w, 1.h),
+                      Column(children: [
+                        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("촬영을 위해, 카메라 권한이 필요해요.",14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
+                        UiUtils.getMarginBox(0, 1.h),
+                        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("설정에서 카메라 권한을 허용 해주세요",12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null))
+                      ]),
+                      UiUtils.getExpandedScrollView(Axis.vertical, Container()),
+                      UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+                          UiUtils.getTextWithFixedScale("설정 바로가기", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () async {
+                            Navigator.pop(slideContext);
+                            openAppSettings();
+                          }),
+                      Config.isAndroid ? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 5.h),
+                    ]
+                );
+              });
+            }
+          }
         }else if(each.contains("채팅")){
           inputTextHide = false;
           GetController.to.updateInputTextHide(inputTextHide);

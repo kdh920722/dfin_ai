@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sizer/sizer.dart';
 import 'package:upfin/configs/app_config.dart';
 import 'package:upfin/controllers/juso_controller.dart';
@@ -547,23 +548,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     _addressInfoTextController.addListener(_addressTextControllerListener);
     _bankAccountInfoTextController.addListener(_bankAccountInfoTextControllerListener);
     _businessNumberInfoTextController.addListener(_businessNumberTextControllerListener);
-
-    availableCameras().then((cameras) {
-      if (cameras.isNotEmpty && _cameraController == null) {
-        _cameraController = CameraController(
-          cameras.first,
-          ResolutionPreset.medium,
-          enableAudio: false
-        );
-
-        _cameraController!.initialize().then((_) {
-          _cameraController!.setFlashMode(FlashMode.off);
-          setState(() {
-            _isCameraReady = true;
-          });
-        });
-      }
-    });
 
     itemFullHeight2 = scrollScreenHeight*2;
     itemHeight2 = itemFullHeight2/LogfinController.bankList.length;
@@ -1740,8 +1724,54 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       UiUtils.getMarginBox(0, 1.5.h),
       SizedBox(width: 90.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
         UiUtils.getBorderButtonBox(90.w, pickedFilePath != "" ? ColorStyles.upFinWhiteSky : ColorStyles.upFinButtonBlue, pickedFilePath != "" ? ColorStyles.upFinWhiteSky : ColorStyles.upFinButtonBlue,
-            UiUtils.getTextWithFixedScale(pickedFilePath != "" ? "다시 촬영하기" : "촬영하기", 14.sp, FontWeight.w500, pickedFilePath != "" ? ColorStyles.upFinButtonBlue : ColorStyles.upFinWhite, TextAlign.start, null), () {
-              setState(() { currentViewId = cameraTakePhotoId; });
+            UiUtils.getTextWithFixedScale(pickedFilePath != "" ? "다시 촬영하기" : "촬영하기", 14.sp, FontWeight.w500, pickedFilePath != "" ? ColorStyles.upFinButtonBlue : ColorStyles.upFinWhite, TextAlign.start, null), () async {
+              var cameraPermission = Permission.camera;
+              var cameraStatus = await cameraPermission.request();
+              if(cameraStatus.isGranted){
+                if(!_isCameraReady){
+                  availableCameras().then((cameras) {
+                    if (cameras.isNotEmpty && _cameraController == null) {
+                      _cameraController = CameraController(
+                          cameras.first,
+                          ResolutionPreset.medium,
+                          enableAudio: false
+                      );
+
+                      _cameraController!.initialize().then((_) {
+                        _cameraController!.setFlashMode(FlashMode.off);
+                        setState(() {
+                          _isCameraReady = true;
+                          currentViewId = cameraTakePhotoId;
+                        });
+                      });
+                    }
+                  });
+                }else{
+                  setState(() { currentViewId = cameraTakePhotoId; });
+                }
+              }else{
+                if(context.mounted){
+                  UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, Config.isAndroid ? Config.isPad()? 32.h : 22.h : Config.isPad()? 37.h : 27.h, 0.5, (slideContext, setState){
+                    return Column(mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          UiUtils.getMarginBox(100.w, 1.h),
+                          Column(children: [
+                            SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("촬영을 위해, 카메라 권한이 필요해요.",14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
+                            UiUtils.getMarginBox(0, 1.h),
+                            SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("설정에서 카메라 권한을 허용 해주세요",12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null))
+                          ]),
+                          UiUtils.getExpandedScrollView(Axis.vertical, Container()),
+                          UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+                              UiUtils.getTextWithFixedScale("설정 바로가기", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () async {
+                                Navigator.pop(slideContext);
+                                openAppSettings();
+                              }),
+                          Config.isAndroid ? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 5.h),
+                        ]
+                    );
+                  });
+                }
+              }
             }),
       ])),
     ]);
