@@ -16,7 +16,6 @@ import 'package:sizer/sizer.dart';
 import 'package:upfin/controllers/codef_controller.dart';
 import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:upfin/controllers/get_controller.dart';
-import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/controllers/sharedpreference_controller.dart';
 import 'package:upfin/controllers/websocket_controller.dart';
 import 'package:upfin/utils/ui_utils.dart';
@@ -35,11 +34,7 @@ import '../views/app_main_view.dart';
 
 class CommonUtils {
 
-  static void logcat(){
-
-  }
-
-  static bool logValid = false;
+  static bool isLogValid = true;
   static const int logMaxSize = 600;
   static void log(String logType, String logMessage){
     if(FireBaseController.fcmToken != ""){
@@ -48,8 +43,12 @@ class CommonUtils {
       }
     }
 
-    if(!logValid){
+    if(kReleaseMode){
       if(logType.toLowerCase() != "e") logType = "";
+    }else{
+      if(!isLogValid){
+        if(logType.toLowerCase() != "e") logType = "";
+      }
     }
 
     var logger = Logger();
@@ -295,23 +294,22 @@ class CommonUtils {
         fontSize: 12.sp, textColor: ColorStyles.upFinWhite, toastLength: Config.isAndroid? Toast.LENGTH_SHORT : Toast.LENGTH_LONG);
   }
 
-  static setAppLog(String eventName){
+  static setAppLog(String eventName) async {
     if(MyData.email != ""){
-      Map<String, Object> data = {
-        'id': MyData.email,
-        'time': CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime()),
-        'os' : Config.isAndroid? "android" : "ios"
-      };
+      String appVersion = await Config.getAppVersion();
+      String currTime = CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime());
+      if(currTime.length == 14){
+        Map<String, Object> data = {
+          'id': MyData.email,
+          'time': "${currTime.substring(0,4)}.${currTime.substring(4,6)}.${currTime.substring(6,8)}-${currTime.substring(8,10)}:${currTime.substring(10,12)}:${currTime.substring(12)}",
+          'os' : Config.isAndroid? "2" : "1",
+          'version' : appVersion,
+          'event_name' : eventName
+        };
 
-      FireBaseController.analytics!.logEvent(name: eventName, parameters: data);
+        FireBaseController.analytics!.logEvent(name: eventName, parameters: data);
+      }
     }
-  }
-
-  static Size _getSize(GlobalKey key) {
-    final RenderBox renderBox =
-    key.currentContext!.findRenderObject() as RenderBox;
-    Size size = renderBox.size;
-    return size;
   }
 
   static List<double> safeSize(BuildContext context){
@@ -492,7 +490,6 @@ class CommonUtils {
   static void setCachedImage(String url) async {
     try{
       var response = await http.get(Uri.parse(url));
-      String responseString = String.fromCharCodes(response.bodyBytes);
       Image image = Image.memory(response.bodyBytes);
       image.fittedBox(fit:BoxFit.contain);
       image.image.resolve(const ImageConfiguration()).addListener(
@@ -615,18 +612,6 @@ class CommonUtils {
     double sizeInKB = sizeInBytes / 1024; // Convert bytes to kilobytes
     double sizeInMB = sizeInKB / 1024;    // Convert kilobytes to megabytes
     CommonUtils.log('i','XFile Size \nKB : $sizeInKB kb \nMB :  $sizeInMB mb');
-  }
-
-  static Future<String> _remakeFileAndGetPath(String filePath) async {
-    CommonUtils.log('i', 'before convert to JPG');
-    await printFileSize(File(filePath));
-    await convertImageFileToJpg(filePath);
-    String newPath = getNewImagePath(filePath);
-    CommonUtils.log('i', 'before rename image file');
-    await renameFile(filePath, newPath);
-    await printXFileSize(XFile(newPath));
-
-    return newPath;
   }
 
   static Future<String> makeMaskingImageAndGetPath(String imagePath, Map<String,dynamic> maskingInfoMap) async {

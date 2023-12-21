@@ -164,11 +164,15 @@ class Config{
     return stateCode;
   }
 
-  static Future<bool> _isNeedToUpdateVersion() async {
-    bool result = false;
+  static Future<String> getAppVersion() async {
     String yamlValue = await rootBundle.loadString("pubspec.yaml");
     var yamlDoc = loadYaml(yamlValue);
-    String version = yamlDoc["version"].toString();
+    return yamlDoc["version"].toString();
+  }
+
+  static Future<bool> _isNeedToUpdateVersion() async {
+    bool result = false;
+    String version = await getAppVersion();
     if(version == appVersion){
       result = false;
     }else{

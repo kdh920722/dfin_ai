@@ -252,8 +252,10 @@ class LogfinController {
 
     if(api == LogfinApis.signIn || api == LogfinApis.signUp){
       inputJson['user']['fcm_token'] = FireBaseController.fcmToken;
+      inputJson['user']['device_type'] = Config.isAndroid? "2" : "1";
     }else if(api == LogfinApis.socialLogin){
       inputJson['fcm_token'] = FireBaseController.fcmToken;
+      inputJson['device_type'] = Config.isAndroid? "2" : "1";
     }
 
     if(api != LogfinApis.signIn && api != LogfinApis.signUp && api != LogfinApis.socialLogin

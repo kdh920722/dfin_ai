@@ -740,7 +740,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     bool isRemove1week = false;
     int lineCnt = Config.appInfoTextMap["info_text"].toString().split("@@").length;
     double h = lineCnt*2.3.h;
-    CommonUtils.log("w","ver : ${Config.appInfoTextMap["info_text_version"]}");
     if(Config.appInfoTextMap["info_text_version"].toString() != "0"){
       UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isAndroid? Config.isPad()? 35.5.h+h : 25.5.h+h : Config.isPad()? 40.5.h+h : 30.5.h+h, 0.5, (slideContext, slideSetState){
         return Center(child: Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
@@ -780,7 +779,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
           UiUtils.getMarginBox(0, 1.5.h),
           UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
               UiUtils.getTextWithFixedScale("확인", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
-                CommonUtils.log("w","isRemove1eek : $isRemove1week");
                 SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceValidInfoVersion, Config.appInfoTextMap["info_text_version"].toString());
                 DateTime laterDt = isRemove1week? CommonUtils.addWeekToTargetTime(CommonUtils.getCurrentLocalTime()) : CommonUtils.addTimeToTargetTime(CommonUtils.getCurrentLocalTime());
                 SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceValidInfoDateKey, CommonUtils.convertTimeToString(laterDt));
