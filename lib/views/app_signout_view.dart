@@ -148,7 +148,7 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
                                   UiUtils.closeLoadingPop(context);
                                   Navigator.pop(slideContext);
                                   if(isSuccessToLogin){
-                                    CommonUtils.setAppLog("sign out");
+                                    CommonUtils.setAppLog("sign_out");
                                     SharedPreferenceController.deleteAllData();
                                     CommonUtils.flutterToast("회원삭제 성공");
                                     CommonUtils.backToHome(context);

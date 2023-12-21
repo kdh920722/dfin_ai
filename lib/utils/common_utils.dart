@@ -298,12 +298,11 @@ class CommonUtils {
   static setAppLog(String eventName){
     if(MyData.email != ""){
       Map<String, Object> data = {
-        'id': CommonUtils.encryptData(MyData.email),
+        'id': MyData.email,
         'time': CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime()),
-        'event' : eventName
+        'os' : Config.isAndroid? "android" : "ios"
       };
 
-      CommonUtils.log("w","call app log");
       FireBaseController.analytics!.logEvent(name: eventName, parameters: data);
     }
   }

@@ -497,7 +497,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                             await LogfinController.getMainViewInfo((isSuccessToGetMainInfo){
                               UiUtils.closeLoadingPop(context);
                               if(isSuccessToGetMainInfo){
-                                CommonUtils.setAppLog("sign up");
+                                CommonUtils.setAppLog("sign_up");
                                 CommonUtils.goToMain(context, _emailTextController.text.trim(), _pwdTextController.text.trim());
                               }
                             });
