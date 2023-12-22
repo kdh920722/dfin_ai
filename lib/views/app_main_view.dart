@@ -18,7 +18,7 @@ import 'package:upfin/styles/ColorStyles.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../controllers/get_controller.dart';
 import '../controllers/sharedpreference_controller.dart';
-import '../styles/TextStyles.dart';
+import '../datas/car_info_data.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
 import 'app_update_accident_view.dart';
@@ -93,6 +93,65 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     }
   }
 
+  void _showChoicePop(){
+    UiUtils.showPopMenu(context, true, 100.w, 100.h, 0.5, 0, ColorStyles.upFinButtonBlue, (slideContext, slideSetState){
+      Widget slideWidget = Column(
+          children: [
+            SizedBox(width: 95.w, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+              UiUtils.getCloseButton(ColorStyles.upFinWhite, () {
+                Navigator.pop(slideContext);
+              })
+            ])),
+            UiUtils.getMarginBox(0, 5.h),
+            Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              UiUtils.getBorderButtonBoxForChoiceType(41.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
+                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    UiUtils.getMarginBox(0, 0.5.h),
+                    UiUtils.getBoxTextWithFixedScale("개인회생", 8.sp, FontWeight.w600, TextAlign.start, ColorStyles.upFinWhiteSky, ColorStyles.upFinButtonBlue),
+                    UiUtils.getMarginBox(0, 1.h),
+                    Icon(Icons.accessibility_sharp, color: ColorStyles.upFinGray, size: 30.w),
+                    UiUtils.getMarginBox(0, 2.h),
+                    UiUtils.getTextWithFixedScale("사건번호 추가하기", 11.sp, FontWeight.w800, ColorStyles.upFinButtonBlue, TextAlign.center, null),
+                    UiUtils.getMarginBox(0, 1.h),
+                    Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      UiUtils.getTextWithFixedScale2("개인회생 대출을 위해", 9.sp, FontWeight.w300, ColorStyles.upFinDarkGray, TextAlign.center, null),
+                      UiUtils.getTextWithFixedScale2("사건정보를 찾아보세요.", 9.sp, FontWeight.w300, ColorStyles.upFinDarkGray, TextAlign.center, null)
+                    ])
+                  ]), () async {
+                    Navigator.pop(slideContext);
+                    isViewHere = false;
+                    await CommonUtils.moveToWithResult(context, AppView.appSearchAccidentView.value, null);
+                    isViewHere = true;
+                  }),
+              UiUtils.getMarginBox(2.w, 0),
+              UiUtils.getBorderButtonBoxForChoiceType(41.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
+                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    UiUtils.getMarginBox(0, 0.5.h),
+                    UiUtils.getBoxTextWithFixedScale("자동차", 8.sp, FontWeight.w600, TextAlign.start, ColorStyles.upFinWhiteYellow, ColorStyles.upFinOrange),
+                    UiUtils.getMarginBox(0, 1.h),
+                    Icon(Icons.car_repair_rounded, color: ColorStyles.upFinGray, size: 30.w),
+                    UiUtils.getMarginBox(0, 2.h),
+                    UiUtils.getTextWithFixedScale("차량정보 추가하기", 11.sp, FontWeight.w800, ColorStyles.upFinOrange, TextAlign.center, null),
+                    UiUtils.getMarginBox(0, 1.h),
+                    Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      UiUtils.getTextWithFixedScale2("자동차담보 대출을 위해", 9.sp, FontWeight.w300, ColorStyles.upFinDarkGray, TextAlign.center, null),
+                      UiUtils.getTextWithFixedScale2("시세정보를 찾아보세요.", 9.sp, FontWeight.w300, ColorStyles.upFinDarkGray, TextAlign.center, null)
+                    ])
+                  ]), () async {
+                    Navigator.pop(slideContext);
+                    isViewHere = false;
+                    await CommonUtils.moveToWithResult(context, AppView.appSearchAccidentView.value, null);
+                    isViewHere = true;
+                  }),
+            ]),
+            UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
+            Align(alignment: Alignment.bottomCenter, child: Image.asset(fit: BoxFit.fitHeight,'assets/images/img_woman_searcher_01.png', height: 50.h)),
+          ]);
+
+      return slideWidget;
+    });
+  }
+
   bool isScrolling = false;
   Widget _getMyView(){
     return Column(children: [
@@ -112,7 +171,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
           child: ListView(shrinkWrap: true,physics: const BouncingScrollPhysics(),children: [
             UiUtils.getMarginBox(0, 3.h),
             Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 0.h, bottom: 1.h), child: Row(mainAxisSize: MainAxisSize.max, children: [
-              UiUtils.getTextWithFixedScale("사건기록", 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1),
+              UiUtils.getTextWithFixedScale("나의기록", 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1),
               const Spacer(flex: 2),
               MyData.isTestUser ? UiUtils.getIconButton(Icons.comments_disabled_sharp, 7.w, ColorStyles.upFinRed, () {
                 /*
@@ -204,32 +263,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               }) : UiUtils.getMarginBox(0, 0),
               UiUtils.getMarginBox(2.w, 0),
               UiUtils.getIconButton(Icons.add, 7.w, ColorStyles.upFinDarkGray, () {
-                UiUtils.showPopMenu(context, true, 100.w, 100.h, 0.5, 0, ColorStyles.upFinButtonBlue, (slideContext, slideSetState){
-                  Widget slideWidget = Column(
-                      children: [
-                        SizedBox(width: 95.w, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                          UiUtils.getCloseButton(ColorStyles.upFinWhite, () {
-                            Navigator.pop(slideContext);
-                          })
-                        ])),
-                        UiUtils.getMarginBox(0, 5.h),
-                        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("새로운", 22.sp, FontWeight.w800, ColorStyles.upFinWhite, TextAlign.start, null)),
-                        UiUtils.getMarginBox(0, 1.h),
-                        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("개인회생사건 등록", 22.sp, FontWeight.w800, ColorStyles.upFinWhite, TextAlign.start, null)),
-                        UiUtils.getMarginBox(0, 5.h),
-                        UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
-                            UiUtils.getTextWithFixedScale("✚ 추가하기", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, null), () async {
-                              Navigator.pop(slideContext);
-                              isViewHere = false;
-                              await CommonUtils.moveToWithResult(context, AppView.appSearchAccidentView.value, null);
-                              isViewHere = true;
-                            }),
-                        UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
-                        Align(alignment: Alignment.bottomCenter, child: Image.asset(fit: BoxFit.fitHeight,'assets/images/img_woman_searcher_01.png', height: 50.h)),
-                      ]);
-
-                  return slideWidget;
-                });
+                _showChoicePop();
               }),
               UiUtils.getMarginBox(2.w, 0),
               UiUtils.getIconButton(Icons.refresh_outlined, 7.w, ColorStyles.upFinDarkGray, () {
@@ -256,21 +290,21 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                         ]), () {})),
             UiUtils.getMarginBox(0, 1.h),
             Obx((){
-              List<Widget> accidentWidgetList = _getAccidentWidgetList(); // Config.isPad()?
-              return SizedBox(width: 90.w, height: accidentWidgetList.isEmpty ? 10.h : accidentWidgetList.length > 1 ? Config.isPad() ? 35.h : 25.h : Config.isPad() ? 32.h : 22.h,
-                  child: accidentWidgetList.isNotEmpty ? Column(
+              List<Widget> myInfoWidgetList = _getMyInfoWidgetList(); // Config.isPad()?
+              return SizedBox(width: 90.w, height: myInfoWidgetList.isEmpty ? 10.h : myInfoWidgetList.length > 1 ? Config.isPad() ? 35.h : 25.h : Config.isPad() ? 32.h : 22.h,
+                  child: myInfoWidgetList.isNotEmpty ? Column(
                     children: <Widget>[
                       // PageView
                       SizedBox(width: 90.w, height: Config.isPad() ? 32.h : 22.h,
                         child: PageView(
                           controller: _pageController,
-                          children: accidentWidgetList,
+                          children: myInfoWidgetList,
                         ),
                       ),
-                      accidentWidgetList.length>1? UiUtils.getMarginBox(0, 2.h) : Container(),
-                      accidentWidgetList.length>1? SmoothPageIndicator(
+                      myInfoWidgetList.length>1? UiUtils.getMarginBox(0, 2.h) : Container(),
+                      myInfoWidgetList.length>1? SmoothPageIndicator(
                         controller: _pageController,
-                        count: accidentWidgetList.length, // 페이지 수
+                        count: myInfoWidgetList.length, // 페이지 수
                         effect: WormEffect(dotWidth: 1.h, dotHeight: 1.h, dotColor: ColorStyles.upFinWhiteSky, activeDotColor: ColorStyles.upFinTextAndBorderBlue), // 페이지 인디케이터 스타일
                       ):Container(),
                     ],
@@ -278,13 +312,11 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                     UiUtils.getMarginBox(0, 1.h),
                     UiUtils.getBorderButtonBoxWithZeroPadding(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
                         Row(children: [
-                          UiUtils.getTextWithFixedScale("현재 등록된 사건이 없습니다.", 13.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null),
+                          UiUtils.getTextWithFixedScale("대출상품 검색을 위해 정보가 필요해요.", 11.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null),
                           const Spacer(flex: 2),
                           UiUtils.getBorderButtonBox(22.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
                               UiUtils.getTextWithFixedScale("등록하기", 10.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.end, null), () async {
-                                isViewHere = false;
-                                await CommonUtils.moveToWithResult(context, AppView.appSearchAccidentView.value, null);
-                                isViewHere = false;
+                                _showChoicePop();
                               })
                         ]), () { })
                   ]));
@@ -341,8 +373,10 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
 
     ]);
   }
-  List<Widget> _getAccidentWidgetList(){
-    List<Widget> accidentWidgetList = [];
+  List<Widget> _getMyInfoWidgetList(){
+    List<Widget> myInfoWidgetList = [];
+
+    // 사건정보
     List<String> accidentList = [];
     List<String> accidentIdList = [];
     List<AccidentInfoData> accidentInfoList = [];
@@ -382,7 +416,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     }
 
     for(var each in accidentInfoList){
-      accidentWidgetList.add(
+      myInfoWidgetList.add(
           UiUtils.getAccidentBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinGray,
               Column(children: [
                 UiUtils.getMarginBox(0, 1.h),
@@ -390,7 +424,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                   Expanded(flex: 15, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Row(children: [
                       UiUtils.getMarginBox(2.w, 0 ),
-                      //
                       UiUtils.getBoxTextWithFixedScale("개인회생", 8.sp, FontWeight.w600, TextAlign.center, ColorStyles.upFinWhiteSky, ColorStyles.upFinButtonBlue),
                       UiUtils.getMarginBox(2.w, 0),
                       !MyData.isPossibleAccidentInfo(each)? UiUtils.getBoxTextWithFixedScale("환급계좌 오류", 8.sp, FontWeight.w600, TextAlign.start, ColorStyles.upFinWhiteRed, ColorStyles.upFinRed) : Container()
@@ -406,7 +439,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                             FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null),
                       ])
                     ]),
-                    //UiUtils.getTextWithFixedScale("${each.accidentBankInfo.split("@")[0]} ${each.accidentBankAccount} / ${each.resData["resRepaymentList"][0]["resRoundNo2"]}회 납부", 10.sp, FontWeight.w600, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, 1),
                   ])),
                   Expanded(flex: 1, child: Icon(Icons.arrow_forward_ios_rounded, color: ColorStyles.upFinDarkGray, size: 5.5.w))
                 ]),
@@ -418,6 +450,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                       UiUtils.getMarginBox(0.5.w, 0),
                       UiUtils.getTextWithFixedScale("대출상품 찾기", 12.sp, FontWeight.w700, ColorStyles.upFinWhite, TextAlign.center, null)
                     ]), () async {
+                      MyData.selectedCarInfoData = null;
                       MyData.selectedAccidentInfoData = each;
                       if(MyData.isPossibleAccidentInfo(each)){
                         AppUpdateAccidentViewState.isAccountEditMode = false;
@@ -433,6 +466,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                       }
                     })
               ]), () async {
+                MyData.selectedCarInfoData = null;
                 MyData.selectedAccidentInfoData = each;
                 isViewHere = false;
                 await CommonUtils.moveToWithResult(context, AppView.appAccidentDetailInfoView.value, null);
@@ -441,7 +475,98 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
       );
     }
 
-    return accidentWidgetList;
+    // 자동차정보
+    List<String> carList = [];
+    List<String> carIdList = [];
+    List<CarInfoData> carInfoList = [];
+    for(var each in GetController.to.carInfoDataList){
+      String eachCarNum = each.carNum;
+      for(var each2 in GetController.to.carInfoDataList){
+        String each2CarNum = each2.carNum;
+        if(eachCarNum == each2CarNum){
+          bool isHere = false;
+          for(var eachTemp in carList){
+            if(eachTemp == eachCarNum) isHere = true;
+          }
+          if(!isHere) carList.add(eachCarNum);
+        }
+      }
+    }
+
+    for(var eachTemp in carList){
+      int maxId = -1;
+      for(var each in GetController.to.carInfoDataList){
+        String eachCarNum = each.carNum;
+        if(eachTemp == eachCarNum){
+          int eachId = int.parse(each.id);
+          if(eachId > maxId) maxId = eachId;
+        }
+      }
+      carIdList.add("$eachTemp@$maxId");
+    }
+
+    for(var eachIdTemp in carIdList){
+      String carNum = eachIdTemp.split("@")[0];
+      String id = eachIdTemp.split("@")[1];
+      for(var each in GetController.to.carInfoDataList){
+        String eachCarNum = each.carNum;
+        if(carNum == eachCarNum && id == each.id) carInfoList.add(each);
+      }
+    }
+
+    for(var each in carInfoList){
+      myInfoWidgetList.add(
+          UiUtils.getAccidentBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinGray,
+              Column(children: [
+                UiUtils.getMarginBox(0, 1.h),
+                Row(children: [
+                  Expanded(flex: 15, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Row(children: [
+                      UiUtils.getMarginBox(2.w, 0 ),
+                      UiUtils.getBoxTextWithFixedScale("자동차", 8.sp, FontWeight.w600, TextAlign.center, ColorStyles.upFinWhiteYellow, ColorStyles.upFinOrange),
+                    ]),
+                    UiUtils.getMarginBox(0, 0.5.h),
+                    Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                      UiUtils.getImage(16.w, 16.w, Image.asset('assets/images/accident_icon.png', fit: BoxFit.fill)),
+                      // UiUtils.getMarginBox(0.2.w, 0),
+                      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        UiUtils.getTextWithFixedScale("차량소유자 : ${each.carOwnerName}", 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.center, 1),
+                        UiUtils.getMarginBox(0, 0.5.h),
+                        UiUtils.getTextWithFixedScale(each.carNum, 16.sp,
+                            FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null),
+                      ])
+                    ]),
+                  ])),
+                  Expanded(flex: 1, child: Icon(Icons.arrow_forward_ios_rounded, color: ColorStyles.upFinDarkGray, size: 5.5.w))
+                ]),
+
+                UiUtils.getMarginBox(0, 0.8.h),
+                UiUtils.getBorderButtonBoxForSearch(80.w, ColorStyles.upFinOrange, ColorStyles.upFinOrange,
+                    Row(mainAxisAlignment:MainAxisAlignment.center, children: [
+                      UiUtils.getIcon(5.w, 5.w, Icons.search_rounded, 5.w, ColorStyles.upFinWhite),
+                      UiUtils.getMarginBox(0.5.w, 0),
+                      UiUtils.getTextWithFixedScale("대출상품 찾기", 12.sp, FontWeight.w700, ColorStyles.upFinWhite, TextAlign.center, null)
+                    ]), () async {
+                      MyData.selectedAccidentInfoData = null;
+                      MyData.selectedCarInfoData = each;
+                      AppUpdateAccidentViewState.isAccountEditMode = false;
+                      AppUpdateAccidentViewState.startViewId = AppUpdateAccidentViewState.confirmedViewId;
+                      AppUpdateAccidentViewState.endViewId = AppUpdateAccidentViewState.jobViewId;
+                      isViewHere = false;
+                      await CommonUtils.moveToWithResult(context, AppView.appUpdateAccidentView.value, null);
+                      isViewHere = false;
+                    })
+              ]), () async {
+                MyData.selectedAccidentInfoData = null;
+                MyData.selectedCarInfoData = each;
+                isViewHere = false;
+                await CommonUtils.moveToWithResult(context, AppView.appAccidentDetailInfoView.value, null);
+                isViewHere = false;
+              })
+      );
+    }
+
+    return myInfoWidgetList;
   }
 
   List<Widget> _getLoanChatWidgetList(){
@@ -854,18 +979,14 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                   UiUtils.getMarginBox(0, 1.h),
                   SizedBox(width: 80.w, child: UiUtils.getTextWithFixedScale("가입이 완료되었네요.", 22.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, null)),
                   UiUtils.getMarginBox(0, 1.h),
-                  SizedBox(width: 80.w, child: UiUtils.getTextWithFixedScale("이제 개인회생 대출상품을", 22.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, null)),
-                  UiUtils.getMarginBox(0, 1.h),
-                  SizedBox(width: 80.w, child: UiUtils.getTextWithFixedScale("찾으실 수 있어요~ ", 22.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, null)),
+                  SizedBox(width: 80.w, child: UiUtils.getTextWithFixedScale("대출상품을 찾아볼까요?", 22.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, null)),
                   UiUtils.getMarginBox(0, 3.h),
                   UiUtils.getBorderButtonBox(80.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
                       UiUtils.getTextWithFixedScale("시작하기", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, null), () async {
-                        isViewHere = false;
-                        await CommonUtils.moveToWithResult(context, AppView.appSearchAccidentView.value, null);
-                        isViewHere = true;
                         setState(() {
                           doCheckToSearchAccident = false;
                         });
+                        _showChoicePop();
                       }),
                   UiUtils.getMarginBox(0, 2.5.h),
                   SizedBox(width: 80.w, child: UiUtils.getTextButtonWithFixedScale("넘어가기", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null, (){

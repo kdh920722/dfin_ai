@@ -422,6 +422,25 @@ class UiUtils {
     );
   }
 
+  static SizedBox getBorderButtonBoxForChoiceType(double buttonWidth, Color buttonColor, Color borderColor, Widget childWidget, VoidCallback onPressedCallback){
+    return SizedBox(
+        width: buttonWidth,
+        height: 32.h,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.only(left: 4.w, right: 4.w, top: 4.w, bottom: 4.w),
+            backgroundColor: buttonColor,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+            side: BorderSide(width: 1, color: borderColor),
+            elevation: 0.0,
+            shadowColor: ColorStyles.upFinGray,
+          ),
+          onPressed: onPressedCallback,
+          child: childWidget,
+        )
+    );
+  }
+
   static SizedBox getLoanListBorderButtonBox(double buttonWidth, Color buttonColor, Color borderColor, Widget childWidget, VoidCallback onPressedCallback){
     return SizedBox(
         width: buttonWidth,

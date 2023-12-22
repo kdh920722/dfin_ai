@@ -5,6 +5,7 @@ import 'package:upfin/controllers/codef_controller.dart';
 import 'package:upfin/datas/accident_info_data.dart';
 import 'package:upfin/datas/chat_message_info_data.dart';
 import 'package:upfin/datas/chatroom_info_data.dart';
+import '../datas/car_info_data.dart';
 import '../utils/common_utils.dart';
 import 'package:get/get.dart';
 
@@ -19,6 +20,7 @@ class GetController extends GetxController {
   RxString wantLoanPrice = "만원".obs;
 
   RxList<AccidentInfoData> accidentInfoDataList = <AccidentInfoData>[].obs;
+  RxList<CarInfoData> carInfoDataList = <CarInfoData>[].obs;
   RxList<ChatRoomInfoData> chatLoanInfoDataList = <ChatRoomInfoData>[].obs;
   RxList<ChatMessageInfoData> chatMessageInfoDataList = <ChatMessageInfoData>[].obs;
 
@@ -113,6 +115,17 @@ class GetController extends GetxController {
     List<AccidentInfoData> emptyList = [];
     accidentInfoDataList.clear();
     accidentInfoDataList.assignAll(emptyList);
+  }
+
+  void updateCarInfoList(List<CarInfoData> newList) {
+    carInfoDataList.clear();
+    carInfoDataList.assignAll(newList);
+    carInfoDataList.sort((a,b) => int.parse(b.id).compareTo(int.parse(a.id)));
+  }
+  void resetCarInfoList() {
+    List<CarInfoData> emptyList = [];
+    carInfoDataList.clear();
+    carInfoDataList.assignAll(emptyList);
   }
 
   void updateChatLoanInfoList(List<ChatRoomInfoData> newList) {

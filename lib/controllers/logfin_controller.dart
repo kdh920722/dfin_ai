@@ -4,6 +4,7 @@ import 'package:http/http.dart' as http;
 import 'package:upfin/controllers/get_controller.dart';
 import 'package:upfin/controllers/websocket_controller.dart';
 import 'package:upfin/datas/accident_info_data.dart';
+import 'package:upfin/datas/car_info_data.dart';
 import 'package:upfin/datas/loan_info_data.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/datas/pr_docs_info_data.dart';
@@ -344,9 +345,20 @@ class LogfinController {
       // 1) 유저정보 가져오기
       getUserInfo((isSuccessToGetUserInfo){
         if(isSuccessToGetUserInfo){
+          int callCnt = 0;
+          bool isFailed = false;
+
+          // 사건정보 가져오기
           getAccidentInfo((isSuccessToGetAccidentInfo, isAccidentInfoNotEmpty){
-            if(isSuccessToGetAccidentInfo){
-              if(isAccidentInfoNotEmpty){
+            callCnt++;
+            if(!isSuccessToGetAccidentInfo){
+              isFailed = true;
+            }
+
+            if(callCnt == 2){
+              if(isFailed){
+                callback(false);
+              }else{
                 getLoanInfo((isSuccessToGetLoanInfo, isLoanInfoNotEmpty){
                   if(isSuccessToGetLoanInfo){
                     if(isLoanInfoNotEmpty){
@@ -357,13 +369,32 @@ class LogfinController {
                     }
                   }
                 });
-              }else{
-                // 사건이력 가져오기 실패는 아니나, 데이터 없음.
-                callback(true);
               }
-            }else{
-              // 사건이력 가져오기 실패
-              callback(false);
+            }
+          });
+
+          // 차량정보 가져오기
+          getCarInfo((isSuccessToGetCarInfo, isCarInfoNotEmpty){
+            callCnt++;
+            if(!isSuccessToGetCarInfo){
+              isFailed = true;
+            }
+
+            if(callCnt == 2){
+              if(isFailed){
+                callback(false);
+              }else{
+                getLoanInfo((isSuccessToGetLoanInfo, isLoanInfoNotEmpty){
+                  if(isSuccessToGetLoanInfo){
+                    if(isLoanInfoNotEmpty){
+                      callback(true);
+                    }else{
+                      // 대출이력 가져오기 실패는 아니나, 데이터 없음.
+                      callback(true);
+                    }
+                  }
+                });
+              }
             }
           });
         }else{
@@ -497,6 +528,79 @@ class LogfinController {
       });
     }catch(error){
       GetController.to.resetAccdientInfoList();
+      callback(false, false);
+    }
+  }
+
+  static Future<void> getCarInfo(Function(bool isSuccess, bool isNotEmpty) callback) async{
+    try{
+      callLogfinApi(LogfinApis.getMyCarInfo, <String, dynamic>{}, (isSuccessToGetCarInfo, carInfoOutputJson){
+        if(isSuccessToGetCarInfo){
+          if(carInfoOutputJson != null){
+            List<dynamic> carList = carInfoOutputJson["cars"];
+            if(carList.isEmpty){
+              GetController.to.resetCarInfoList();
+              callback(true, false);
+            }else {
+              MyData.clearCarInfoList();
+              String lendCountInfo = "";
+              for(var eachCarInfo in carList){
+                Map<String, dynamic> dataResult = eachCarInfo;
+
+                if(dataResult.containsKey("lend_count")){
+                  String lendCount = dataResult["lend_count"].toString() == ""? "0" : dataResult["lend_count"].toString();
+                  int count = int.parse(lendCount);
+                  if(count == 0){
+                    lendCountInfo = preLoanCountList[0];
+                  }else if(count == 1){
+                    lendCountInfo = preLoanCountList[1];
+                  }else{
+                    lendCountInfo = preLoanCountList[2];
+                  }
+                }else{
+                  lendCountInfo = preLoanCountList[0];
+                }
+
+                String lendAmount = "0";
+                if(dataResult.containsKey("lend_amount")){
+                  lendAmount = dataResult["lend_amount"].toString() == ""? "0" : dataResult["lend_amount"].toString();
+                }
+
+                String wishAmount = "0";
+                if(dataResult.containsKey("wish_amount")){
+                  wishAmount = dataResult["wish_amount"].toString() == ""? "0" : dataResult["wish_amount"].toString();
+                }
+
+                String carNum = dataResult["carno"];
+                String date = dataResult["created_at"].toString();
+
+                CommonUtils.log("i", "car data ====>\n"
+                    "date: ${dataResult["created_at"]}\n"
+                    "carId: ${dataResult["id"]}\n"
+                    "carUid: ${dataResult["uid"]}\n"
+                    "carNum: $carNum\n"
+                    "carOwnerName: ${dataResult["owner_name"]}\n"
+                    "lendCountInfo: $lendCountInfo\n"
+                    "lend_amount: $lendAmount\n"
+                    "wish_amount: $wishAmount\n");
+                MyData.addToCarInfoList(CarInfoData(dataResult["id"].toString(), dataResult["uid"].toString(), carNum, dataResult["owner_name"].toString(),
+                    dataResult["amount"].toString(), lendCountInfo, lendAmount, wishAmount, date, eachCarInfo));
+              }
+
+              GetController.to.updateCarInfoList(MyData.getCarInfoList());
+              callback(true, true);
+            }
+          }else{
+            GetController.to.resetCarInfoList();
+            callback(false, false);
+          }
+        }else{
+          GetController.to.resetCarInfoList();
+          callback(false, false);
+        }
+      });
+    }catch(error){
+      GetController.to.resetCarInfoList();
       callback(false, false);
     }
   }

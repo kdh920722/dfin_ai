@@ -3,6 +3,7 @@ import 'package:upfin/datas/loan_info_data.dart';
 import 'package:upfin/datas/pr_docs_info_data.dart';
 import 'package:upfin/datas/pr_info_data.dart';
 import '../utils/common_utils.dart';
+import 'car_info_data.dart';
 import 'chatroom_info_data.dart';
 
 class MyData {
@@ -96,6 +97,42 @@ class MyData {
       _loanInfoList.add(loanInfoData);
     }
   }
+
+  // accident data
+  static final List<CarInfoData> _carInfoList = [];
+  static List<CarInfoData> getCarInfoList(){
+    return _carInfoList;
+  }
+  static void addToCarInfoList(CarInfoData carInfoData){
+    bool isHere = false;
+    for(var each in _carInfoList){
+      if(carInfoData.carUid == each.carUid){
+        isHere = true;
+      }
+    }
+    if(!isHere){
+      _carInfoList.add(carInfoData);
+    }
+  }
+  static String findUidInCarInfoList(String targetCarNum){
+    String resultUid = "";
+
+    int maxId = -1;
+    for(var each in _carInfoList){
+      if(targetCarNum == each.carNum){
+        if(maxId < int.parse(each.id)){
+          maxId = int.parse(each.id);
+          resultUid = each.carUid;
+        }
+      }
+    }
+
+    return resultUid;
+  }
+  static void clearCarInfoList(){
+    _carInfoList.clear();
+  }
+
   static void sortLoanInfoList(){
     _loanInfoList.sort((a,b) => DateTime.parse(b.createdDate).compareTo(DateTime.parse(a.createdDate)));
   }
@@ -194,6 +231,7 @@ class MyData {
 
   static PrInfoData? selectedPrInfoData;
   static AccidentInfoData? selectedAccidentInfoData;
+  static CarInfoData? selectedCarInfoData;
 
   static void printData(){
     String selectedPrInfoDataCheck = "";
@@ -203,6 +241,10 @@ class MyData {
     String selectedAccidentInfoDataCheck = "";
     if(selectedAccidentInfoData != null){
       selectedAccidentInfoDataCheck = selectedAccidentInfoData!.accidentUid.toString();
+    }
+    String selectedCarInfoDataCheck = "";
+    if(selectedCarInfoData != null){
+      selectedCarInfoDataCheck = selectedCarInfoData!.carUid.toString();
     }
     CommonUtils.log("", "\n"
         "name:$name\n"
@@ -221,6 +263,7 @@ class MyData {
         "prDocsInfoList: ${_prDocsInfoList.length}\n"
         "selectedPrInfoData: $selectedPrInfoDataCheck\n"
         "selectedAccidentInfoData: $selectedAccidentInfoDataCheck\n"
+        "selectedCarInfoData: $selectedCarInfoDataCheck\n"
     );
   }
 
@@ -242,6 +285,7 @@ class MyData {
     isMaleFromPhoneCert = false;
     isTestUser = false;
     clearAccidentInfoList();
+    clearCarInfoList();
     clearLoanInfoList();
     clearPrInfoList();
     clearPrDocsInfoList();

@@ -288,6 +288,41 @@ class CommonUtils {
     return resultString;
   }
 
+  static String getPriceFormattedStringForFullPrice(double price){
+    if(price.toInt().toString().length < 5){
+      return "${getPriceCommaFormattedString(price)} 원";
+    }else{
+      String resultString = "";
+      String targetPriceString = price.toInt().toString();
+      targetPriceString = targetPriceString.substring(0, targetPriceString.length - 4);
+      String frontValue = "";
+      String backValue = "";
+
+      if(targetPriceString.length <= 4){
+        backValue = targetPriceString;
+      }else{
+        backValue = targetPriceString.substring(targetPriceString.length - 4);
+        frontValue = targetPriceString.substring(0, targetPriceString.length - 4);
+      }
+
+      if(frontValue != ""){
+        for(int i = 0 ; i < 4 ; i++){
+          backValue = _removeFirstLetterIfZero(backValue);
+        }
+
+        if(backValue == ""){
+          resultString = "${getPriceCommaFormattedString(double.parse(frontValue))}억원";
+        }else{
+          resultString = "${getPriceCommaFormattedString(double.parse(frontValue))}억 ${getPriceCommaFormattedString(double.parse(backValue))} 만원";
+        }
+      }else{
+        resultString = "${getPriceCommaFormattedString(double.parse(backValue))} 만원";
+      }
+
+      return resultString;
+    }
+  }
+
   static void flutterToast(String msgString){
     Fluttertoast.cancel();
     Fluttertoast.showToast(msg: msgString, gravity: ToastGravity.SNACKBAR, backgroundColor: ColorStyles.upFinDarkGray, timeInSecForIosWeb : 3,
@@ -739,6 +774,7 @@ class CommonUtils {
     hideKeyBoard();
     AppMainViewState.doCheckToSearchAccident = false;
     GetController.to.resetAccdientInfoList();
+    GetController.to.resetCarInfoList();
     GetController.to.resetChatLoanInfoList();
     GetController.to.resetChatMessageInfoList();
     WebSocketController.resetConnectWebSocketCable();
