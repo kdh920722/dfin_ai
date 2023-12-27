@@ -13,73 +13,41 @@ import '../styles/TextStyles.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
 
-class AppSearchAccidentView extends StatefulWidget{
+class AppSearchCarView extends StatefulWidget{
   @override
-  AppSearchAccidentViewState createState() => AppSearchAccidentViewState();
+  AppSearchCarViewState createState() => AppSearchCarViewState();
 }
 
-class AppSearchAccidentViewState extends State<AppSearchAccidentView> with WidgetsBindingObserver{
-  double scrollScreenHeight = 57.h;
-  double itemHeight1 = 0;
-  double itemHeight2 = 0;
-  double itemFullHeight1 = 0;
-  double itemFullHeight2 = 0;
-  int maxVisibleItemCnt1 = 0;
-  int maxVisibleItemCnt2 = 0;
-  int firstVisibleItem1 = 0;
-  int lastVisibleItem1 = 0;
-  bool isScrolling1 = false;
-  bool isScrolling2= false;
-
+class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingObserver{
   bool isInputValid = true;
 
   final String errorMsg = "정보를 입력해주세요";
   int currentViewId = 1;
 
-  final int courtViewId = 1;
-  Key? selectedCourtKey;
-  String selectedCourtInfo = "";
-
-  final _nameForTestTextFocus = FocusNode();
-  final _nameForTestTextController = TextEditingController();
-
-  final int accidentViewId = 2;
-  String selectedAccidentInfo = "";
-  final _accidentInfoFocus1 = FocusNode();
-  final _accidentInfoFocus2 = FocusNode();
-  final _accidentInfoTextController1 = TextEditingController();
-  final _accidentInfoTextController2 = TextEditingController();
-  void _accidentInfoTextController1Listener() {
-    if(_accidentInfoTextController1.text.trim().length > 4){
-      _accidentInfoTextController1.text = _accidentInfoTextController1.text.trim().substring(0,4);
-      FocusScope.of(context).requestFocus(_accidentInfoFocus2);
+  final int carViewId = 1;
+  final int carOwnerViewId = 2;
+  String selectedCarNum = "";
+  String selectedCarOwner = "";
+  final _carInfoFocus1 = FocusNode();
+  final _carInfoFocus2 = FocusNode();
+  final _carInfoTextController1 = TextEditingController();
+  final _carInfoTextController2 = TextEditingController();
+  void _carInfoTextController1Listener() {
+    if(_carInfoTextController1.text.trim().length >= 9){
+      _carInfoTextController1.text = _carInfoTextController1.text.substring(0,8);
     }
   }
-  void _accidentInfoTextController2Listener() {
-    if(_accidentInfoTextController2.text.trim().length > 7){
-      _accidentInfoTextController2.text = _accidentInfoTextController2.text.trim().substring(0,7);
+  void _carInfoTextController2Listener() {
+    if(_carInfoTextController2.text.trim().length >= 18){
+      _carInfoTextController2.text = _carInfoTextController1.text.substring(0,17);
     }
   }
 
-  final int bankCodeViewId = 3;
-  Key? selectedBankCodeKey;
-  String selectedBankCodeInfo = "";
-
-  final int bankAccountViewId = 4;
-  String selectedBankAccountInfo = "";
-  final _bankAccountInfoFocus = FocusNode();
-  final _bankAccountInfoTextController = TextEditingController();
-  void _bankAccountInfoTextControllerListener() {
-    if(_bankAccountInfoTextController.text.trim().length > 8){
-      _bankAccountInfoTextController.text = _bankAccountInfoTextController.text.trim().substring(0,8);
-    }
-  }
-
-  final int preLoanCountViewId = 5;
+  final int preLoanCountViewId = 3;
   Key? selectedPreLoanCountKey;
   String selectedPreLoanCountInfo = "";
 
-  final int preLoanPriceViewId = 6;
+  final int preLoanPriceViewId = 4;
   String selectedPreLoanPriceInfo = "";
   final _preLoanPriceFocus = FocusNode();
   final _preLoanPriceTextController = TextEditingController();
@@ -98,7 +66,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
     }
   }
 
-  final int wantLoanPriceViewId = 7;
+  final int wantLoanPriceViewId = 5;
   String selectedWantLoanPriceInfo = "";
   final _wantLoanPriceFocus = FocusNode();
   final _wantLoanPriceTextController = TextEditingController();
@@ -117,41 +85,33 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
     }
   }
 
-  final int jobViewId = 8;
+  final int jobViewId = 6;
   Key? selectedJobKey;
   String selectedJobInfo = "";
 
-  final int finishedViewId = 9;
+  final int finishedViewId = 7;
   bool finishedConfirmed = false;
 
   void _unFocusAllNodes(){
-    _nameForTestTextFocus.unfocus();
-    _accidentInfoFocus1.unfocus();
-    _accidentInfoFocus2.unfocus();
-    _bankAccountInfoFocus.unfocus();
+    _carInfoFocus1.unfocus();
+    _carInfoFocus2.unfocus();
     _preLoanPriceFocus.unfocus();
     _wantLoanPriceFocus.unfocus();
   }
 
   void _disposeAllTextControllers(){
-    _accidentInfoTextController1.dispose();
-    _accidentInfoTextController2.dispose();
-    _bankAccountInfoTextController.dispose();
+    _carInfoTextController1.dispose();
+    _carInfoTextController2.dispose();
     _preLoanPriceTextController.dispose();
     _wantLoanPriceTextController.dispose();
-    _nameForTestTextController.dispose();
   }
 
   void _checkView(){
     if(!finishedConfirmed){
-      if(selectedCourtInfo.isEmpty){
-        currentViewId = courtViewId;
-      }else if(selectedAccidentInfo.isEmpty){
-        currentViewId = accidentViewId;
-      }else if(selectedBankCodeInfo.isEmpty){
-        currentViewId = bankCodeViewId;
-      }else if(selectedBankAccountInfo.isEmpty){
-        currentViewId = bankAccountViewId;
+      if(selectedCarNum.isEmpty){
+        currentViewId = carViewId;
+      }else if(selectedCarOwner.isEmpty){
+        currentViewId = carOwnerViewId;
       }else if(selectedPreLoanCountInfo.isEmpty){
         currentViewId = preLoanCountViewId;
       }else if(selectedPreLoanPriceInfo.isEmpty){
@@ -168,42 +128,17 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
 
   @override
   void initState(){
-    CommonUtils.log("d", "AppSearchAccidentView 화면 입장");
+    CommonUtils.log("d", "AppSearchCarView 화면 입장");
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _accidentInfoTextController1.addListener(_accidentInfoTextController1Listener);
-    _accidentInfoTextController2.addListener(_accidentInfoTextController2Listener);
-    _bankAccountInfoTextController.addListener(_bankAccountInfoTextControllerListener);
+    _carInfoTextController1.addListener(_carInfoTextController1Listener);
+    _carInfoTextController2.addListener(_carInfoTextController2Listener);
     _preLoanPriceTextController.addListener(_preLoanPriceInfoTextControllerListener);
     _wantLoanPriceTextController.addListener(_wantLoanPriceInfoTextControllerListener);
 
     _checkView();
     GetController.to.resetPreLoanPrice();
     GetController.to.resetWantLoanPrice();
-    GetController.to.resetFirstIndex1();
-    GetController.to.resetLastIndex1();
-    GetController.to.resetFirstIndex2();
-    GetController.to.resetLastIndex2();
-
-    itemFullHeight1 = scrollScreenHeight*2;
-    itemHeight1 = itemFullHeight1/LogfinController.courtList.length;
-    maxVisibleItemCnt1 = (scrollScreenHeight/itemHeight1).ceil();
-    int firstVisibleItem1 = 0;
-    int lastVisibleItem1 = firstVisibleItem1+maxVisibleItemCnt1;
-    if(firstVisibleItem1 <=0 ) firstVisibleItem1 = 0;
-    if(lastVisibleItem1 >= LogfinController.courtList.length-1) lastVisibleItem1 = LogfinController.courtList.length-1;
-    GetController.to.updateFirstIndex1(firstVisibleItem1);
-    GetController.to.updateLastIndex1(lastVisibleItem1);
-
-    itemFullHeight2 = scrollScreenHeight*2;
-    itemHeight2 = itemFullHeight2/LogfinController.bankList.length;
-    maxVisibleItemCnt2 = (scrollScreenHeight/itemHeight2).ceil();
-    int firstVisibleItem2 = 0;
-    int lastVisibleItem2 = firstVisibleItem2+maxVisibleItemCnt2;
-    if(firstVisibleItem2 <=0 ) firstVisibleItem2 = 0;
-    if(lastVisibleItem2 >= LogfinController.bankList.length-1) lastVisibleItem2 = LogfinController.bankList.length-1;
-    GetController.to.updateFirstIndex2(firstVisibleItem2);
-    GetController.to.updateLastIndex2(lastVisibleItem2);
 
     Config.contextForEmergencyBack = context;
     Config.isEmergencyRoot = false;
@@ -212,14 +147,14 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
 
   @override
   void dispose(){
-    CommonUtils.log("d", "AppSearchAccidentView 화면 파괴");
+    CommonUtils.log("d", "AppSearchCarView 화면 파괴");
     WidgetsBinding.instance.removeObserver(this);
     _unFocusAllNodes();
     _disposeAllTextControllers();
     GetController.to.resetPreLoanPrice();
     GetController.to.resetWantLoanPrice();
     Config.contextForEmergencyBack = AppMainViewState.mainContext;
-    MyData.selectedAccidentInfoData = null;
+    MyData.selectedCarInfoData = null;
     super.dispose();
   }
 
@@ -227,17 +162,17 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
   void didChangeAppLifecycleState(AppLifecycleState state) {
     switch (state) {
       case AppLifecycleState.resumed:
-        CommonUtils.log('i','AppSearchAccidentView resumed');
+        CommonUtils.log('i','AppSearchCarView resumed');
         break;
       case AppLifecycleState.inactive:
-        CommonUtils.log('i','AppSearchAccidentView inactive');
+        CommonUtils.log('i','AppSearchCarView inactive');
         break;
       case AppLifecycleState.detached:
-        CommonUtils.log('i','AppSearchAccidentView detached');
+        CommonUtils.log('i','AppSearchCarView detached');
         // DO SOMETHING!
         break;
       case AppLifecycleState.paused:
-        CommonUtils.log('i','AppSearchAccidentView paused');
+        CommonUtils.log('i','AppSearchCarView paused');
         break;
       default:
         break;
@@ -246,6 +181,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
 
   Future<void> backInputView() async {
     if(isInputValid) {
+      CommonUtils.log("w", "curr view id : $currentViewId");
       isInputValid = false;
       _unFocusAllNodes();
       CommonUtils.hideKeyBoard();
@@ -270,159 +206,34 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
     }
   }
 
-  /// court view
-  Widget _getCourtView(){
-    List<Widget> courtList = [];
-    Color textColor = ColorStyles.upFinBlack;
-    FontWeight fontWeight = FontWeight.w500;
-    for(int i=0; i<LogfinController.courtList.length ; i++){
-      Key key = Key(LogfinController.courtList[i]);
-      if(selectedCourtKey == key){
-        textColor = ColorStyles.upFinBlack;
-        fontWeight = FontWeight.w600;
-      }else{
-        textColor = ColorStyles.upFinBlack;
-        fontWeight = FontWeight.w500;
-        if(GetController.to.firstVisibleItem1.value >= 3){
-          if(GetController.to.firstVisibleItem1.value-2 <= i && i <= GetController.to.firstVisibleItem1.value+1){
-            textColor = Colors.black12;
-            if(GetController.to.firstVisibleItem1.value+1 <= i && i <= GetController.to.firstVisibleItem1.value+1){
-              textColor = Colors.black38;
-            }
-          }
-        }
-
-        if(GetController.to.lastVisibleItem1.value <= LogfinController.courtList.length-3){
-          if(GetController.to.lastVisibleItem1.value-3 <= i && i <= GetController.to.lastVisibleItem1.value-1){
-            textColor = Colors.black12;
-            if(GetController.to.lastVisibleItem1.value-3 <= i && i <= GetController.to.lastVisibleItem1.value-3){
-              textColor = Colors.black38;
-            }
-          }
-        }
-      }
-      courtList.add(
-          SizedBox(width: 90.w,
-              child: Row(children: [
-                selectedCourtKey == key? UiUtils.getCustomCheckBox(key, 1.5, selectedCourtKey == key, ColorStyles.upFinButtonBlue, ColorStyles.upFinWhite,
-                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
-                  setState(() {
-                    if(checkedValue != null){
-                      if(checkedValue) {
-                        selectedCourtKey = key;
-                        selectedCourtInfo = LogfinController.courtList[i];
-                      }
-                    }
-                  });
-                }) : UiUtils.getCustomCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
-                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
-                      setState(() {
-                        if(checkedValue != null){
-                          if(!checkedValue) {
-                            selectedCourtKey = key;
-                            selectedCourtInfo = LogfinController.courtList[i];
-                          }
-                        }
-                      });
-                    }),
-                Expanded(child: UiUtils.getTextButtonWithFixedScale(LogfinController.courtList[i].split("@")[0], 15.sp, fontWeight, textColor, TextAlign.start, null, (){
-                  setState(() {
-                    selectedCourtKey = key;
-                    selectedCourtInfo = LogfinController.courtList[i];
-                  });
-                }))
-              ])
-          )
-      );
-      courtList.add(
-          UiUtils.getMarginBox(0, 0.8.h),
-      );
-    }
-
-    return UiUtils.getRowColumnWithAlignCenter([
-      SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getBackButton(() {
-          Navigator.pop(context, "back");
-        }),
-      ])),
-      UiUtils.getMarginBox(0, 3.w),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("우선  ", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("사건정보가 필요합니다.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("해당 법원을 선택해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      UiUtils.getMarginBox(0, 5.h),
-      NotificationListener<ScrollNotification>(
-          onNotification: (scrollNotification) {
-            if (scrollNotification is ScrollUpdateNotification) {
-              if(!isScrolling1){
-                isScrolling1 = true;
-                itemFullHeight1 = scrollNotification.metrics.maxScrollExtent+scrollScreenHeight;
-                itemHeight1 = itemFullHeight1/LogfinController.courtList.length;
-                maxVisibleItemCnt1 = (scrollScreenHeight/itemHeight1).ceil();
-              }
-
-              double scrollPosition = scrollNotification.metrics.pixels.abs();
-              int firstVisibleItem1 = (scrollPosition/itemHeight1).ceil();
-              int lastVisibleItem1 = firstVisibleItem1+maxVisibleItemCnt1;
-              if(firstVisibleItem1 <=0 ) firstVisibleItem1 = 0;
-              if(lastVisibleItem1 >= LogfinController.courtList.length-1) lastVisibleItem1 = LogfinController.courtList.length-1;
-              print('보이는 아이템 ====> ${LogfinController.courtList.length} : $firstVisibleItem1 | $lastVisibleItem1');
-
-              GetController.to.updateFirstIndex1(firstVisibleItem1);
-              GetController.to.updateLastIndex1(lastVisibleItem1);
-            } else if (scrollNotification is ScrollEndNotification) {
-              if(isScrolling1){
-                isScrolling1 = false;
-                itemFullHeight1 = scrollNotification.metrics.maxScrollExtent+scrollScreenHeight;
-                itemHeight1 = scrollNotification.metrics.maxScrollExtent/LogfinController.courtList.length;
-                maxVisibleItemCnt1 = (scrollScreenHeight/itemHeight1).ceil();
-              }
-            }
-            return true;
-          },
-          child: UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: courtList))),
-      UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-        if(selectedCourtInfo.isNotEmpty){
-          nextInputView();
-        }else{
-          CommonUtils.flutterToast(errorMsg);
-        }
-      })
-    ]);
-  }
-  /// court view end
-
-  /// accident view
-  Widget _getAccidentView(){
+  /// car view
+  Widget _getCarView(){
     return UiUtils.getRowColumnWithAlignCenter([
       SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         UiUtils.getBackButton(() async {
-          backInputView();
+          _back();
         }),
       ])),
       UiUtils.getMarginBox(0, 3.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("사건번호 ", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("차량번호를 입력하세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 1.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("예) 2023개회1234567", 14.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("예) 12가3456", 14.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
 
       UiUtils.getExpandedScrollView(Axis.vertical,
           SizedBox(width: 85.w, child: Row(children: [
-            UiUtils.getTextField(context, 20.w, TextStyles.upFinTextFormFieldTextStyle, _accidentInfoFocus1, _accidentInfoTextController1, TextInputType.number,
-                UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
-            UiUtils.getTextWithFixedScale("개회", 16.sp, FontWeight.w400, ColorStyles.upFinRealGray, TextAlign.center, null),
-            UiUtils.getTextField(context, 32.w, TextStyles.upFinTextFormFieldTextStyle, _accidentInfoFocus2, _accidentInfoTextController2, TextInputType.number,
+            UiUtils.getTextField(context, 35.w, TextStyles.upFinTextFormFieldTextStyle, _carInfoFocus1, _carInfoTextController1, TextInputType.text,
                 UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
           ]))
       ),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-        selectedAccidentInfo = "${_accidentInfoTextController1.text.trim()}개회${_accidentInfoTextController2.text.trim()}";
-        if(selectedAccidentInfo != "개회" && _accidentInfoTextController1.text.trim() != "" && _accidentInfoTextController2.text.trim() != ""){
+        if(_carInfoTextController1.text.trim() != ""){
+          selectedCarNum = _carInfoTextController1.text.trim();
           bool isValid = true;
-          for(var eachAccident in MyData.getAccidentInfoList()){
-            if(eachAccident.accidentCaseNumberYear+eachAccident.accidentCaseNumberType+eachAccident.accidentCaseNumberNumber == selectedAccidentInfo){
-              selectedAccidentInfo = "";
+          for(var eachCar in MyData.getCarInfoList()){
+            if(eachCar.carNum == selectedCarNum){
+              selectedCarNum = "";
               isValid = false;
             }
           }
@@ -430,7 +241,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
           if(isValid){
             nextInputView();
           }else{
-            CommonUtils.flutterToast("이미 조회하신 사건번호에요.");
+            CommonUtils.flutterToast("이미 조회하신 차량번호에요.");
           }
         }else{
           CommonUtils.flutterToast(errorMsg);
@@ -438,77 +249,10 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       })
     ]);
   }
-  /// accident view end
+  /// car view end
 
-  /// bank code view
-  Widget _getBankCodeView(){
-    List<Widget> bankCodeList = [];
-    Color textColor = ColorStyles.upFinBlack;
-    FontWeight fontWeight = FontWeight.w500;
-    for(int i=0 ; i<LogfinController.bankList.length ; i++){
-      Key key = Key(LogfinController.bankList[i]);
-      if(selectedBankCodeKey == key){
-        textColor = ColorStyles.upFinBlack;
-        fontWeight = FontWeight.w600;
-      }else{
-        textColor = ColorStyles.upFinBlack;
-        fontWeight = FontWeight.w500;
-        if(GetController.to.firstVisibleItem2.value >= 3){
-          if(GetController.to.firstVisibleItem2.value-2 <= i && i <= GetController.to.firstVisibleItem2.value+1){
-            textColor = Colors.black12;
-            if(GetController.to.firstVisibleItem2.value+1 <= i && i <= GetController.to.firstVisibleItem2.value+1){
-              textColor = Colors.black38;
-            }
-          }
-        }
-
-        if(GetController.to.lastVisibleItem2.value <= LogfinController.bankList.length-3){
-          if(GetController.to.lastVisibleItem2.value-3 <= i && i <= GetController.to.lastVisibleItem2.value-1){
-            textColor = Colors.black12;
-            if(GetController.to.lastVisibleItem2.value-3 <= i && i <= GetController.to.lastVisibleItem2.value-3){
-              textColor = Colors.black38;
-            }
-          }
-        }
-      }
-      bankCodeList.add(
-          SizedBox(width: 90.w,
-              child: Row(children: [
-                selectedBankCodeKey == key? UiUtils.getCustomCheckBox(key, 1.5, selectedBankCodeKey == key, ColorStyles.upFinButtonBlue, ColorStyles.upFinWhite,
-                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
-                      setState(() {
-                        if(checkedValue != null){
-                          if(checkedValue) {
-                            selectedBankCodeKey = key;
-                            selectedBankCodeInfo = LogfinController.bankList[i];
-                          }
-                        }
-                      });
-                    }) : UiUtils.getCustomCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
-                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
-                      setState(() {
-                        if(checkedValue != null){
-                          if(!checkedValue) {
-                            selectedBankCodeKey = key;
-                            selectedBankCodeInfo = LogfinController.bankList[i];
-                          }
-                        }
-                      });
-                    }),
-                Expanded(child: UiUtils.getTextButtonWithFixedScale(LogfinController.bankList[i].split("@")[0], 15.sp, fontWeight, textColor, TextAlign.start, null, (){
-                  setState(() {
-                    selectedBankCodeKey = key;
-                    selectedBankCodeInfo = LogfinController.bankList[i];
-                  });
-                }))
-              ])
-          )
-      );
-      bankCodeList.add(
-          UiUtils.getMarginBox(0, 0.8.h)
-      );
-    }
-
+  /// car owner view
+  Widget _getCarOwnerView(){
     return UiUtils.getRowColumnWithAlignCenter([
       SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         UiUtils.getBackButton(() async {
@@ -516,43 +260,21 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         }),
       ])),
       UiUtils.getMarginBox(0, 3.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("환급계좌 은행 ", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      // SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("선택해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("차량 소유자를 입력하세요. ", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 1.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("개인회생 신청시 제출했던 본인의 계좌", 14.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("예) 홍길동", 14.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
-      NotificationListener<ScrollNotification>(
-          onNotification: (scrollNotification) {
-            if (scrollNotification is ScrollUpdateNotification) {
-              if(!isScrolling2){
-                isScrolling2 = true;
-                itemFullHeight2 = scrollNotification.metrics.maxScrollExtent+scrollScreenHeight;
-                itemHeight2 = itemFullHeight2/LogfinController.bankList.length;
-                maxVisibleItemCnt2 = (scrollScreenHeight/itemHeight2).ceil();
-              }
 
-              double scrollPosition = scrollNotification.metrics.pixels.abs();
-              int firstVisibleItem2 = (scrollPosition/itemHeight2).ceil();
-              int lastVisibleItem2 = firstVisibleItem2+maxVisibleItemCnt2;
-              if(firstVisibleItem2 <=0 ) firstVisibleItem2 = 0;
-              if(lastVisibleItem2 >= LogfinController.bankList.length-1) lastVisibleItem2 = LogfinController.bankList.length-1;
-
-              GetController.to.updateFirstIndex2(firstVisibleItem2);
-              GetController.to.updateLastIndex2(lastVisibleItem2);
-            } else if (scrollNotification is ScrollEndNotification) {
-              if(isScrolling2){
-                isScrolling2 = false;
-                itemFullHeight2 = scrollNotification.metrics.maxScrollExtent+scrollScreenHeight;
-                itemHeight2 = scrollNotification.metrics.maxScrollExtent/LogfinController.bankList.length;
-                maxVisibleItemCnt2 = (scrollScreenHeight/itemHeight2).ceil();
-              }
-            }
-            return true;
-          },
-          child: UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: bankCodeList))),
+      UiUtils.getExpandedScrollView(Axis.vertical,
+          SizedBox(width: 85.w, child: Row(children: [
+            UiUtils.getTextField(context, 35.w, TextStyles.upFinTextFormFieldTextStyle, _carInfoFocus2, _carInfoTextController2, TextInputType.text,
+                UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
+          ]))
+      ),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-        if(selectedBankCodeInfo.isNotEmpty){
+        if(_carInfoTextController2.text.trim() != ""){
+          selectedCarOwner = _carInfoTextController2.text.trim();
           nextInputView();
         }else{
           CommonUtils.flutterToast(errorMsg);
@@ -560,35 +282,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       })
     ]);
   }
-  /// bank code view end
-
-  /// bank account view
-  Widget _getBankAccountView(){
-    return UiUtils.getRowColumnWithAlignCenter([
-      SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getBackButton(() async {
-          backInputView();
-        }),
-      ])),
-      UiUtils.getMarginBox(0, 3.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("환급계좌 번호", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      // SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getTextField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _bankAccountInfoFocus, _bankAccountInfoTextController, TextInputType.number,
-          UiUtils.getInputDecoration("계좌번호 8자리", 14.sp, "", 0.sp), (value) { }),
-      UiUtils.getExpandedScrollView(Axis.vertical, Container()),
-      UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-        selectedBankAccountInfo = _bankAccountInfoTextController.text.trim();
-        if(selectedBankAccountInfo.isNotEmpty){
-          nextInputView();
-        }else{
-          CommonUtils.flutterToast(errorMsg);
-        }
-      })
-    ]);
-  }
-  /// bank account view end
+  /// car owner view end
 
   /// pre loan count view
   Widget _getPreLoanCountView(){
@@ -827,15 +521,6 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("직업 ", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
 
-      //test for input name
-      MyData.isTestUser? SizedBox(width: 85.w, child:
-      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getTextWithFixedScale("테스트용) 사건번호 이름 입력", 10.sp, FontWeight.w600, ColorStyles.upFinRed, TextAlign.center, null),
-        UiUtils.getTextField(context, 30.w, TextStyles.upFinTextFormFieldTextStyle, _nameForTestTextFocus, _nameForTestTextController, TextInputType.text,
-            UiUtils.getInputDecoration("이름", 10.sp, "", 0.sp), (value) { }),
-        UiUtils.getMarginBox(0, 5.h),
-      ])) : UiUtils.getMarginBox(0, 0),
-
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: jobList)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
@@ -863,7 +548,8 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
     List<String> confirmDataList = [];
     confirmDataList.add("•  ${MyData.name}");
     confirmDataList.add("•  ${MyData.birth.substring(0,4)}년 $birthMonth월 $birthDay일");
-    confirmDataList.add("•  [환급]  ${selectedBankCodeInfo.split("@")[0]} $selectedBankAccountInfo");
+    confirmDataList.add("•  [차량번호]  $selectedCarNum");
+    confirmDataList.add("•  [소유자]  $selectedCarOwner");
     confirmDataList.add("•  기대출  ${selectedPreLoanCountInfo.split("@")[0]}");
     if(selectedPreLoanPriceInfo != "0"){
       confirmDataList.add("•  인가후 대출금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedPreLoanPriceInfo))}");
@@ -905,38 +591,34 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         UiUtils.getBorderButtonBox(42.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
             UiUtils.getTextWithFixedScale("네 좋아요!", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
               Map<String, dynamic> inputJson = {
-                "court_name": selectedCourtInfo.split("@")[0],
-                "caseNumberYear": selectedAccidentInfo.split("개회")[0],
-                "caseNumberType": "개회",
-                "caseNumberNumber": selectedAccidentInfo.split("개회")[1],
-                "userName": MyData.isTestUser? _nameForTestTextController.text.trim() : MyData.name,
-                "bankCode": selectedBankCodeInfo.split("@")[1],
-                "account": selectedBankAccountInfo,
+                "car_no": selectedCarNum,
+                "owner_name": selectedCarOwner,
+                /*
                 "birthday": MyData.birth,
                 "job": selectedJobInfo.split("@")[1],
                 "lend_count": selectedPreLoanCountInfo.split("@")[1],
                 "lend_amount": selectedPreLoanPriceInfo,
                 "wish_amount": selectedWantLoanPriceInfo,
-
+                 */
               };
-              CommonUtils.log("i", "pr search info:\n$inputJson");
+              CommonUtils.log("i", "car pr search info:\n$inputJson");
 
               UiUtils.showLoadingPop(context);
-              LogfinController.callLogfinApi(LogfinApis.prSearch, inputJson, (isSuccess, outputJson){
+              LogfinController.callLogfinApi(LogfinApis.addAndSearchCar, inputJson, (isSuccess, outputJson){
                 if(isSuccess){
                   LogfinController.getUserInfo((isSuccessToGetUserInfo){
                     if(isSuccessToGetUserInfo){
-                      LogfinController.getAccidentInfo((isSuccessToGetAccidentInfo, isNotEmpty){
-                        if(isSuccessToGetAccidentInfo){
+                      LogfinController.getCarInfo((isSuccessToGetCarInfo, isNotEmpty){
+                        if(isSuccessToGetCarInfo){
                           if(isNotEmpty){
-                            String thisAccidentNum = selectedAccidentInfo;
-                            String updatedAccidentUid = MyData.findUidInAccidentInfoList(thisAccidentNum);
-                            for(var each in MyData.getAccidentInfoList()){
-                              if(each.accidentUid == updatedAccidentUid){
-                                MyData.selectedAccidentInfoData = each;
+                            String thisCarNum = selectedCarNum;
+                            String updatedCarUid = MyData.findUidInCarInfoList(thisCarNum);
+                            for(var each in MyData.getCarInfoList()){
+                              if(each.carUid == updatedCarUid){
+                                MyData.selectedCarInfoData = each;
                               }
                             }
-                            LogfinController.getAccidentPrList("${MyData.selectedAccidentInfoData!.accidentCaseNumberYear}${MyData.selectedAccidentInfoData!.accidentCaseNumberType}${MyData.selectedAccidentInfoData!.accidentCaseNumberNumber}", (isSuccessToGetOffers, _){
+                            LogfinController.getCarPrList(MyData.selectedCarInfoData!.carNum, (isSuccessToGetOffers, _){
                               UiUtils.closeLoadingPop(context);
                               if(isSuccessToGetOffers){
                                 CommonUtils.moveWithReplacementTo(context, AppView.appResultPrView.value, null);
@@ -947,23 +629,27 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                             });
                           }else{
                             UiUtils.closeLoadingPop(context);
-                            CommonUtils.flutterToast("사건정보 찾기 실패\n다시 실행해주세요.");
+                            CommonUtils.flutterToast("차량정보 찾기 실패\n다시 실행해주세요.");
                           }
                         }else{
                           UiUtils.closeLoadingPop(context);
-                          CommonUtils.flutterToast("사건정보 찾기 실패\n다시 실행해주세요.");
+                          CommonUtils.flutterToast("차량정보 찾기 실패\n다시 실행해주세요.");
                         }
                       });
                     }else{
                       UiUtils.closeLoadingPop(context);
-                      CommonUtils.flutterToast("사건정보 찾기 실패\n다시 실행해주세요.");
+                      CommonUtils.flutterToast("차량정보 찾기 실패\n다시 실행해주세요.");
                     }
                   });
                 }else{
                   // prSearch 실패
                   UiUtils.closeLoadingPop(context);
                   String errorMsg = outputJson!["error"];
-                  CommonUtils.flutterToast(errorMsg.replaceAll("+", "").replaceAll("()", "").replaceAll(".", "\n"));
+                  if(errorMsg == "no implicit conversion of String into Integer"){
+                    CommonUtils.flutterToast("차량정보를 확인해주세요.");
+                  }else{
+                    CommonUtils.flutterToast(errorMsg.replaceAll("+", "").replaceAll("()", "").replaceAll(".", "\n"));
+                  }
                   setState(() {
                     currentViewId = 1;
                   });
@@ -974,30 +660,27 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         UiUtils.getBorderButtonBox(42.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
             UiUtils.getTextWithFixedScale("아니오", 14.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null), () async {
               Map<String, dynamic> inputJson = {
-                "court_name": selectedCourtInfo.split("@")[0],
-                "caseNumberYear": selectedAccidentInfo.split("개회")[0],
-                "caseNumberType": "개회",
-                "caseNumberNumber": selectedAccidentInfo.split("개회")[1],
-                "userName": MyData.isTestUser? _nameForTestTextController.text.trim() : MyData.name,// for test : MyData.name
-                "bankCode": selectedBankCodeInfo.split("@")[1],
-                "account": selectedBankAccountInfo,
+                "car_no": selectedCarNum,
+                "owner_name": selectedCarOwner,
+                /*
                 "birthday": MyData.birth,
                 "job": selectedJobInfo.split("@")[1],
                 "lend_count": selectedPreLoanCountInfo.split("@")[1],
                 "lend_amount": selectedPreLoanPriceInfo,
                 "wish_amount": selectedWantLoanPriceInfo,
+                 */
 
               };
-              CommonUtils.log("i", "pr search info:\n$inputJson");
+              CommonUtils.log("i", "car pr search info:\n$inputJson");
               UiUtils.showLoadingPop(context);
 
               await FireBaseController.setNotificationTorF(false);
-              LogfinController.callLogfinApi(LogfinApis.prSearch, inputJson, (isSuccess, outputJson){
+              LogfinController.callLogfinApi(LogfinApis.addAndSearchCar, inputJson, (isSuccess, outputJson){
                 if(isSuccess){
                   LogfinController.getUserInfo((isSuccessToGetUserInfo) async {
                     if(isSuccessToGetUserInfo){
-                      LogfinController.getAccidentInfo((isSuccessToGetAccidentInfo, isNotEmpty) async {
-                        if(isSuccessToGetAccidentInfo){
+                      LogfinController.getCarInfo((isSuccessToGetCarInfo, isNotEmpty) async {
+                        if(isSuccessToGetCarInfo){
                           if(isNotEmpty){
                             UiUtils.closeLoadingPop(context);
                             CommonUtils.moveWithUntil(context, AppView.appMainView.value);
@@ -1005,26 +688,30 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                             await FireBaseController.setNotificationTorF(true);
                           }else{
                             UiUtils.closeLoadingPop(context);
-                            CommonUtils.flutterToast("사건정보 찾기 실패\n다시 실행해주세요.");
+                            CommonUtils.flutterToast("차량정보 찾기 실패\n다시 실행해주세요.");
                             await FireBaseController.setNotificationTorF(true);
                           }
                         }else{
                           UiUtils.closeLoadingPop(context);
-                          CommonUtils.flutterToast("사건정보 찾기 실패\n다시 실행해주세요.");
+                          CommonUtils.flutterToast("차량정보 찾기 실패\n다시 실행해주세요.");
                           await FireBaseController.setNotificationTorF(true);
                         }
                       });
                     }else{
                       UiUtils.closeLoadingPop(context);
                       await FireBaseController.setNotificationTorF(true);
-                      CommonUtils.flutterToast("사건정보 찾기 실패\n다시 실행해주세요.");
+                      CommonUtils.flutterToast("차량정보 찾기 실패\n다시 실행해주세요.");
                     }
                   });
                 }else{
                   // prSearch 실패
                   UiUtils.closeLoadingPop(context);
                   String errorMsg = outputJson!["error"];
-                  CommonUtils.flutterToast(errorMsg.replaceAll("+", "").replaceAll("()", "").replaceAll(".", "\n"));
+                  if(errorMsg == "no implicit conversion of String into Integer"){
+                    CommonUtils.flutterToast("차량정보를 확인해주세요.");
+                  }else{
+                    CommonUtils.flutterToast(errorMsg.replaceAll("+", "").replaceAll("()", "").replaceAll(".", "\n"));
+                  }
                   setState(() {
                     currentViewId = 1;
                   });
@@ -1038,7 +725,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
 
   void _back(){
     CommonUtils.hideKeyBoard();
-    if(currentViewId == courtViewId){
+    if(currentViewId == carViewId){
       Navigator.pop(context);
     }else{
       backInputView();
@@ -1049,14 +736,10 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
   @override
   Widget build(BuildContext context) {
     Widget? view;
-    if(currentViewId == courtViewId){
-      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: Obx(()=>_getCourtView()));
-    }else if(currentViewId == accidentViewId){
-      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getAccidentView());
-    }else if(currentViewId == bankCodeViewId){
-      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: Obx(()=>_getBankCodeView()));
-    }else if(currentViewId == bankAccountViewId){
-      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getBankAccountView());
+    if(currentViewId == carViewId){
+      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getCarView());
+    }else if(currentViewId == carOwnerViewId){
+      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getCarOwnerView());
     }else if(currentViewId == preLoanCountViewId){
       view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getPreLoanCountView());
     }else if(currentViewId == preLoanPriceViewId){

@@ -4,12 +4,12 @@ class CarInfoData {
   String carNum;
   String carOwnerName;
   String carPrice;
-  String accidentLendCount;
-  String accidentLendAmount;
-  String accidentWishAmount;
+  String carLendCount;
+  String carLendAmount;
+  String carWishAmount;
   String date;
   Map<String, dynamic> resData;
 
   CarInfoData(this.id, this.carUid, this.carNum, this.carOwnerName, this.carPrice,
-      this.accidentLendCount, this.accidentLendAmount, this.accidentWishAmount, this.date, this.resData);
+      this.carLendCount, this.carLendAmount, this.carWishAmount, this.date, this.resData);
 }

@@ -1,5 +1,6 @@
 class LoanInfoData {
-  String accidentUid;
+  String uid;
+  String uidType; // 1 : accident,  2 : car
   String loanUid;
   String lenderPrId;
   String submitAmount;
@@ -14,11 +15,11 @@ class LoanInfoData {
   String chatRoomId;
   String chatRoomMsg;
 
-  LoanInfoData(this.accidentUid, this.loanUid, this.lenderPrId, this.submitAmount, this.submitRate,
+  LoanInfoData(this.uid, this.uidType, this.loanUid, this.lenderPrId, this.submitAmount, this.submitRate,
       this.companyName, this.companyLogo, this.productName,  this.contactNo, this.createdDate,
       this.updatedDate, this.statueId, this.chatRoomId, this.chatRoomMsg);
   String printLoanData(){
-    return "\naccidentUid: $accidentUid\nloanUid: $loanUid\nlenderPrId: $lenderPrId\nsubmitAmount: $submitAmount"
+    return "\naccidentUid: $uid\nloanUid: $loanUid\nlenderPrId: $lenderPrId\nsubmitAmount: $submitAmount"
         "\nsubmitRate: $submitRate\ncompanyName: $companyName\ncompanyLogo: $companyLogo\nproductName: $productName\ncompanyCallNum: $contactNo"
         "\ncreatedDate: $createdDate\nupdatedDate: $updatedDate\nstatueId: $statueId\nchatRoomId: $chatRoomId";
   }

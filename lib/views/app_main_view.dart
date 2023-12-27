@@ -22,6 +22,7 @@ import '../datas/car_info_data.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
 import 'app_update_accident_view.dart';
+import 'app_update_car_view.dart';
 
 class AppMainView extends StatefulWidget{
   @override
@@ -43,6 +44,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     MyData.selectedAccidentInfoData = null;
+    MyData.selectedCarInfoData = null;
     if(MyData.getAccidentInfoList().isEmpty){
       doCheckToSearchAccident = true;
     }else{
@@ -104,43 +106,41 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             ])),
             UiUtils.getMarginBox(0, 5.h),
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              UiUtils.getBorderButtonBoxForChoiceType(41.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
-                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              UiUtils.getBorderButtonBoxForChoiceType(43.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
+                  Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
                     UiUtils.getMarginBox(0, 0.5.h),
-                    UiUtils.getBoxTextWithFixedScale("개인회생", 8.sp, FontWeight.w600, TextAlign.start, ColorStyles.upFinWhiteSky, ColorStyles.upFinButtonBlue),
+                    SizedBox(width: 40.w, child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      UiUtils.getBoxTextWithFixedScale("개인회생", 8.sp, FontWeight.w600, TextAlign.start, ColorStyles.upFinWhiteSky, ColorStyles.upFinButtonBlue)
+                    ])),
                     UiUtils.getMarginBox(0, 1.h),
                     Icon(Icons.accessibility_sharp, color: ColorStyles.upFinGray, size: 30.w),
                     UiUtils.getMarginBox(0, 2.h),
                     UiUtils.getTextWithFixedScale("사건번호 추가하기", 11.sp, FontWeight.w800, ColorStyles.upFinButtonBlue, TextAlign.center, null),
                     UiUtils.getMarginBox(0, 1.h),
-                    Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      UiUtils.getTextWithFixedScale2("개인회생 대출을 위해", 9.sp, FontWeight.w300, ColorStyles.upFinDarkGray, TextAlign.center, null),
-                      UiUtils.getTextWithFixedScale2("사건정보를 찾아보세요.", 9.sp, FontWeight.w300, ColorStyles.upFinDarkGray, TextAlign.center, null)
-                    ])
+                    UiUtils.getTextWithFixedScale2("개인회생 대출을 위해", 9.sp, FontWeight.w300, ColorStyles.upFinDarkGray, TextAlign.center, null),
+                    UiUtils.getTextWithFixedScale2("사건정보를 찾아보세요.", 9.sp, FontWeight.w300, ColorStyles.upFinDarkGray, TextAlign.center, null)
                   ]), () async {
-                    Navigator.pop(slideContext);
                     isViewHere = false;
                     await CommonUtils.moveToWithResult(context, AppView.appSearchAccidentView.value, null);
                     isViewHere = true;
                   }),
               UiUtils.getMarginBox(2.w, 0),
-              UiUtils.getBorderButtonBoxForChoiceType(41.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
-                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              UiUtils.getBorderButtonBoxForChoiceType(43.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
+                  Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
                     UiUtils.getMarginBox(0, 0.5.h),
-                    UiUtils.getBoxTextWithFixedScale("자동차", 8.sp, FontWeight.w600, TextAlign.start, ColorStyles.upFinWhiteYellow, ColorStyles.upFinOrange),
+                    SizedBox(width: 40.w, child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      UiUtils.getBoxTextWithFixedScale("오토론", 8.sp, FontWeight.w600, TextAlign.start, ColorStyles.upFinWhiteYellow, ColorStyles.upFinOrange)
+                    ])),
                     UiUtils.getMarginBox(0, 1.h),
                     Icon(Icons.car_repair_rounded, color: ColorStyles.upFinGray, size: 30.w),
                     UiUtils.getMarginBox(0, 2.h),
                     UiUtils.getTextWithFixedScale("차량정보 추가하기", 11.sp, FontWeight.w800, ColorStyles.upFinOrange, TextAlign.center, null),
                     UiUtils.getMarginBox(0, 1.h),
-                    Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      UiUtils.getTextWithFixedScale2("자동차담보 대출을 위해", 9.sp, FontWeight.w300, ColorStyles.upFinDarkGray, TextAlign.center, null),
-                      UiUtils.getTextWithFixedScale2("시세정보를 찾아보세요.", 9.sp, FontWeight.w300, ColorStyles.upFinDarkGray, TextAlign.center, null)
-                    ])
+                    UiUtils.getTextWithFixedScale2("자동차담보 대출을 위해", 9.sp, FontWeight.w300, ColorStyles.upFinDarkGray, TextAlign.start, null),
+                    UiUtils.getTextWithFixedScale2("시세정보를 찾아보세요.", 9.sp, FontWeight.w300, ColorStyles.upFinDarkGray, TextAlign.start, null),
                   ]), () async {
-                    Navigator.pop(slideContext);
                     isViewHere = false;
-                    await CommonUtils.moveToWithResult(context, AppView.appSearchAccidentView.value, null);
+                    await CommonUtils.moveToWithResult(context, AppView.appSearchCarView.value, null);
                     isViewHere = true;
                   }),
             ]),
@@ -174,6 +174,13 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               UiUtils.getTextWithFixedScale("나의기록", 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1),
               const Spacer(flex: 2),
               MyData.isTestUser ? UiUtils.getIconButton(Icons.comments_disabled_sharp, 7.w, ColorStyles.upFinRed, () {
+
+                Map<String, dynamic> inputJson1 = {
+                  "car_uid": MyData.getCarInfoList().last.carUid,
+                };
+                LogfinController.callLogfinApi(LogfinApis.searchCarProduct, inputJson1, (isSuccess, outputJson){
+
+                });
                 /*
                 getMyCarInfo ==> {success: true, data: {cars: [ *addAndSearchCar 'car_info' output... ]}}
 
@@ -187,9 +194,9 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                                       created_at: 2023-12-11T14:37:30.000+09:00, updated_at: 2023-12-11T14:37:30.000+09:00, sise_response: null,
                                       job_type_id: 1, sconditions: 0;0;0;0;0;0;0;0;0;0;0;0;0;0;, uid: jz5VxeCNRt44WgeAaZDJHA, ...}
 
-                searchCarProduct ==> {success: true, data: {documents: [
-                          {lender_car_id: 1, result: true, msg: , rid: hMZxC0lQwBkT01ydKpTzrQ, limit: 1504, product_name: 도이치모터스 오토론, lender_name: (주)도이치파이낸셜, description: null, lender_id: 6, min_rate: 15.9, max_rate: 19.9},
-                          {lender_car_id: 3, result: true, msg: , rid: RdZeS36EZZXQWf38NDUbCg, limit: 1654, product_name: 오토론테스트, lender_name: (주)아침해파이낸셜대부, description: null, lender_id: 2, min_rate: 19.9, max_rate: 19.9}]}
+                searchCarProduct ==> {success: true, offer_id: 115, data: [
+                                           {lender_car_id: 1, result: true, msg: , rid: KbzbCfct7PBdQMqOGqQbYg, limit: 1860, product_name: 도이치모터스 오토론, lender_name: (주)도이치파이낸셜, description: null, lender_id: 6, min_rate: 15.9, max_rate: 19.9},
+                                           {lender_car_id: 3, result: true, msg: , rid: DyJb0MrfGFXPyq3qE27ZCg, limit: 2046, product_name: 오토론테스트, lender_name: (주)아침해파이낸셜대부, description: null, lender_id: 2, min_rate: 19.9, max_rate: 19.9}]}
 
                 getCarDocs ==> {success: true, data: {documents: [
                           {id: 2, name: 주민등록등본, type1_check: 1, type2_check: 1, type3_check: 1, del_flg: 0, created_at: null, updated_at: null, job_id: 0,
@@ -305,7 +312,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                       myInfoWidgetList.length>1? SmoothPageIndicator(
                         controller: _pageController,
                         count: myInfoWidgetList.length, // 페이지 수
-                        effect: WormEffect(dotWidth: 1.h, dotHeight: 1.h, dotColor: ColorStyles.upFinWhiteSky, activeDotColor: ColorStyles.upFinTextAndBorderBlue), // 페이지 인디케이터 스타일
+                        effect: WormEffect(dotWidth: 1.h, dotHeight: 1.h, dotColor: ColorStyles.upFinGray, activeDotColor: ColorStyles.upFinDarkGray), // 페이지 인디케이터 스타일
                       ):Container(),
                     ],
                   ) : Column(children: [
@@ -523,7 +530,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                   Expanded(flex: 15, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Row(children: [
                       UiUtils.getMarginBox(2.w, 0 ),
-                      UiUtils.getBoxTextWithFixedScale("자동차", 8.sp, FontWeight.w600, TextAlign.center, ColorStyles.upFinWhiteYellow, ColorStyles.upFinOrange),
+                      UiUtils.getBoxTextWithFixedScale("오토론", 8.sp, FontWeight.w600, TextAlign.center, ColorStyles.upFinWhiteYellow, ColorStyles.upFinOrange),
                     ]),
                     UiUtils.getMarginBox(0, 0.5.h),
                     Row(mainAxisAlignment: MainAxisAlignment.start, children: [
@@ -549,18 +556,17 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                     ]), () async {
                       MyData.selectedAccidentInfoData = null;
                       MyData.selectedCarInfoData = each;
-                      AppUpdateAccidentViewState.isAccountEditMode = false;
-                      AppUpdateAccidentViewState.startViewId = AppUpdateAccidentViewState.confirmedViewId;
-                      AppUpdateAccidentViewState.endViewId = AppUpdateAccidentViewState.jobViewId;
+                      AppUpdateCarViewState.startViewId = AppUpdateCarViewState.confirmedViewId;
+                      AppUpdateCarViewState.endViewId = AppUpdateCarViewState.jobViewId;
                       isViewHere = false;
-                      await CommonUtils.moveToWithResult(context, AppView.appUpdateAccidentView.value, null);
+                      await CommonUtils.moveToWithResult(context, AppView.appUpdateCarView.value, null);
                       isViewHere = false;
                     })
               ]), () async {
                 MyData.selectedAccidentInfoData = null;
                 MyData.selectedCarInfoData = each;
                 isViewHere = false;
-                await CommonUtils.moveToWithResult(context, AppView.appAccidentDetailInfoView.value, null);
+                await CommonUtils.moveToWithResult(context, AppView.appCarDetailInfoView.value, null);
                 isViewHere = false;
               })
       );

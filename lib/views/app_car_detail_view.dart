@@ -5,24 +5,23 @@ import 'package:upfin/datas/loan_info_data.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import 'package:upfin/views/app_main_view.dart';
-import 'package:upfin/views/app_update_accident_view.dart';
 import '../controllers/firebase_controller.dart';
 import '../styles/TextStyles.dart';
 import '../configs/app_config.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
 
-class AppAccidentDetailView extends StatefulWidget{
+class AppCarDetailView extends StatefulWidget{
   @override
-  AppAccidentDetailViewState createState() => AppAccidentDetailViewState();
+  AppCarDetailViewState createState() => AppCarDetailViewState();
 }
 
-class AppAccidentDetailViewState extends State<AppAccidentDetailView> with WidgetsBindingObserver, TickerProviderStateMixin{
+class AppCarDetailViewState extends State<AppCarDetailView> with WidgetsBindingObserver, TickerProviderStateMixin{
   static BuildContext? mainContext;
   late final TabController _tabController;
   @override
   void initState(){
-    CommonUtils.log("d", "AppAccidentDetailView 화면 입장");
+    CommonUtils.log("d", "AppCarDetailView 화면 입장");
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _tabController = TabController(length: 2, vsync: this);
@@ -30,17 +29,13 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
     Config.contextForEmergencyBack = context;
     Config.isEmergencyRoot = false;
     FireBaseController.setStateForForeground = null;
-
-    if(!MyData.isPossibleAccidentInfo(MyData.selectedAccidentInfoData!)){
-      CommonUtils.flutterToast("환급계좌정보가 잘못되었어요.\n수정해주세요.");
-    }
   }
 
   @override
   void dispose(){
-    CommonUtils.log("d", "AppAccidentDetailView 화면 파괴");
+    CommonUtils.log("d", "AppCarDetailView 화면 파괴");
     WidgetsBinding.instance.removeObserver(this);
-    MyData.selectedAccidentInfoData = null;
+    MyData.selectedCarInfoData = null;
     _tabController.dispose();
     Config.contextForEmergencyBack = AppMainViewState.mainContext;
     super.dispose();
@@ -51,17 +46,17 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
     switch (state) {
       case AppLifecycleState.resumed:
         await CommonUtils.checkUpdate(context);
-        CommonUtils.log('d','AppAccidentDetailView resumed');
+        CommonUtils.log('d','AppCarDetailView resumed');
         break;
       case AppLifecycleState.inactive:
-        CommonUtils.log('d','AppAccidentDetailView inactive');
+        CommonUtils.log('d','AppCarDetailView inactive');
         break;
       case AppLifecycleState.detached:
-        CommonUtils.log('d','AppAccidentDetailView detached');
+        CommonUtils.log('d','AppCarDetailView detached');
         // DO SOMETHING!
         break;
       case AppLifecycleState.paused:
-        CommonUtils.log('d','AppAccidentDetailView paused');
+        CommonUtils.log('d','AppCarDetailView paused');
         break;
       default:
         break;
@@ -71,12 +66,12 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
   int _getLoanCnt(){
     int cnt = 0 ;
     for(var each in MyData.getLoanInfoList()){
-      String eachAccidentNum = "";
-      for(var eachAccident in MyData.getAccidentInfoList()){
-        if(eachAccident.accidentUid == each.uid) eachAccidentNum = eachAccident.accidentCaseNumberYear+eachAccident.accidentCaseNumberType+eachAccident.accidentCaseNumberNumber;
+      String eachCarNum = "";
+      for(var eachCar in MyData.getCarInfoList()){
+        if(eachCar.carUid == each.uid) eachCarNum = eachCar.carNum;
       }
-      String selectedAccidentNum = MyData.selectedAccidentInfoData!.accidentCaseNumberYear+MyData.selectedAccidentInfoData!.accidentCaseNumberType+MyData.selectedAccidentInfoData!.accidentCaseNumberNumber;
-      if(eachAccidentNum == selectedAccidentNum){
+      String selectedCarNum = MyData.selectedCarInfoData!.carNum;
+      if(eachCarNum == selectedCarNum){
         cnt++;
       }
     }
@@ -87,13 +82,13 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
     List<Widget> loanWidgetList = [];
     int count = 0;
     for(var each in MyData.getLoanInfoList()){
-      String eachAccidentNum = "";
-      for(var eachAccident in MyData.getAccidentInfoList()){
-        if(eachAccident.accidentUid == each.uid) eachAccidentNum = eachAccident.accidentCaseNumberYear+eachAccident.accidentCaseNumberType+eachAccident.accidentCaseNumberNumber;
+      String eachCarNum = "";
+      for(var eachCar in MyData.getCarInfoList()){
+        if(eachCar.carUid == each.uid) eachCarNum = eachCar.carNum;
       }
-      String selectedAccidentNum = MyData.selectedAccidentInfoData!.accidentCaseNumberYear+MyData.selectedAccidentInfoData!.accidentCaseNumberType+MyData.selectedAccidentInfoData!.accidentCaseNumberNumber;
+      String selectedCarNum = MyData.selectedCarInfoData!.carNum;
 
-      if(eachAccidentNum == selectedAccidentNum){
+      if(eachCarNum == selectedCarNum){
         loanWidgetList.add(
             UiUtils.getLoanListBorderButtonBox(90.w, ColorStyles.upFinMainGray , ColorStyles.upFinMainGray,
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -139,73 +134,29 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
     return loanWidgetList;
   }
 
-  Widget _getAccidentWidgetList(){
-    bool isSuccessToGetDetailInfo = MyData.isPossibleAccidentInfo(MyData.selectedAccidentInfoData!);
-
+  Widget _getCarWidgetList(){
     return Padding(padding: EdgeInsets.only(left: 4.w, right: 4.w, top: 4.w, bottom: 4.w),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           UiUtils.getMarginBox(0, 5.h),
-          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("사건번호", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha , TextAlign.start, null)),
+          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("차량번호", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha , TextAlign.start, null)),
           UiUtils.getMarginBox(0, 2.h),
-          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(MyData.selectedAccidentInfoData!.accidentCaseNumberYear+
-              MyData.selectedAccidentInfoData!.accidentCaseNumberType+MyData.selectedAccidentInfoData!.accidentCaseNumberNumber, 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)),
+          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(MyData.selectedCarInfoData!.carNum, 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)),
           UiUtils.getMarginBox(0, 4.h),
-
-          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("법원", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
+          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("소유자", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
           UiUtils.getMarginBox(0, 2.h),
-          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(MyData.selectedAccidentInfoData!.accidentCourtInfo.split("@")[0], 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)),
+          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(MyData.selectedCarInfoData!.carOwnerName, 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)),
           UiUtils.getMarginBox(0, 4.h),
-          Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-            Column(children: [
-              SizedBox(width: 61.w, child: UiUtils.getTextWithFixedScale("환급계좌", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
-              UiUtils.getMarginBox(0, 2.h),
-              SizedBox(width: 61.w, child: UiUtils.getTextWithFixedScale("${MyData.selectedAccidentInfoData!.accidentBankInfo.split("@")[0]} / ${MyData.selectedAccidentInfoData!.accidentBankAccount}",
-                  14.sp, FontWeight.w500, isSuccessToGetDetailInfo? ColorStyles.upFinBlack : ColorStyles.upFinRed, TextAlign.start, null)),
-            ]),
-            const Spacer(flex: 2),
-            UiUtils.getBorderButtonBox(16.w, isSuccessToGetDetailInfo? ColorStyles.upFinButtonBlue: ColorStyles.upFinWhiteRed, isSuccessToGetDetailInfo? ColorStyles.upFinButtonBlue: ColorStyles.upFinWhiteRed,
-                UiUtils.getTextWithFixedScale("변경", 10.sp, FontWeight.w600, isSuccessToGetDetailInfo? ColorStyles.upFinWhite : ColorStyles.upFinRed, TextAlign.start, null), () async {
-                  AppUpdateAccidentViewState.isAccountEditMode = true;
-                  AppUpdateAccidentViewState.startViewId = AppUpdateAccidentViewState.bankCodeViewId;
-                  AppUpdateAccidentViewState.endViewId = AppUpdateAccidentViewState.bankAccountViewId;
-                  var result = await CommonUtils.moveToWithResult(context, AppView.appUpdateAccidentView.value, null) as bool;
-                  if(result){
-                    String thisAccidentNum = MyData.selectedAccidentInfoData!.accidentCaseNumberYear+MyData.selectedAccidentInfoData!.accidentCaseNumberType+MyData.selectedAccidentInfoData!.accidentCaseNumberNumber;
-                    String updatedAccidentUid = MyData.findUidInAccidentInfoList(thisAccidentNum);
-                    CommonUtils.log("i", "updatedAccidentUid $updatedAccidentUid");
-                    for(var each in MyData.getAccidentInfoList()){
-                      CommonUtils.log("i", "updatedAccidentInfo ===> ${each.id} ${each.accidentUid} ${each.accidentBankAccount}");
-                      if(each.accidentUid == updatedAccidentUid){
-                        MyData.selectedAccidentInfoData = each;
-                      }
-                    }
-                    setState(() {});
-                  }
-                }),
-          ]),
-          UiUtils.getMarginBox(0, 4.h),
-          isSuccessToGetDetailInfo? Column(children: [
-            SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("변제정보", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
-            UiUtils.getMarginBox(0, 2.h),
-            SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("•  월 변제금액 : ${CommonUtils.getPriceCommaFormattedString(double.parse(MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resAmount"]))}원", 14.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
-            UiUtils.getMarginBox(0, 1.5.h),
-            SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("•  납입회차 : ${MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resRoundNo2"]}/${MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resRoundNo1"]}", 14.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
-            UiUtils.getMarginBox(0, 1.5.h),
-            SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("•  총입금액 : ${CommonUtils.getPriceCommaFormattedString(double.parse(MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resTotalAmt"]))}원", 14.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
-            UiUtils.getMarginBox(0, 1.5.h),
-            SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("•  상환주기 : ${MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resRepaymentCycle"].toString().trim()} ${MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resRepaymentDate"].toString().trim()}", 14.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
-            UiUtils.getMarginBox(0, 1.5.h),
-            SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("•  미납회차 : ${double.parse(MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resRoundNo"]).toInt()}회", 14.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
-            UiUtils.getMarginBox(0, 1.5.h),
-            SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("•  미납금액 : ${CommonUtils.getPriceCommaFormattedString(double.parse(MyData.selectedAccidentInfoData!.resData["resRepaymentList"][0]["resUnpaidAmt"]))}원", 14.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
-          ]) : Container(),
+          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("차량 시세금액", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
+          UiUtils.getMarginBox(0, 2.h),
+          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(CommonUtils.getPriceFormattedStringForFullPrice(double.parse(MyData.selectedCarInfoData!.carPrice)), 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)),
+          UiUtils.getMarginBox(0, 4.h)
         ])
     );
   }
 
   void back(){
     CommonUtils.hideKeyBoard();
-    MyData.selectedAccidentInfoData = null;
+    MyData.selectedCarInfoData = null;
     Navigator.pop(context);
   }
 
@@ -254,9 +205,9 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
                 alignment: Alignment.topCenter,
                 child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                   UiUtils.getMarginBox(0, 2.5.h),
-                  UiUtils.getTextWithFixedScale("개인회생", 22.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.center, 1),
+                  UiUtils.getTextWithFixedScale("오토론", 22.sp, FontWeight.w600, ColorStyles.upFinOrange, TextAlign.center, 1),
                   UiUtils.getMarginBox(0, 1.h),
-                  UiUtils.getTextWithFixedScale("업데이트 : ${_setUpdateDate(MyData.selectedAccidentInfoData!.date)}", 10.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, 1),
+                  UiUtils.getTextWithFixedScale("업데이트 : ${_setUpdateDate(MyData.selectedCarInfoData!.date)}", 10.sp, FontWeight.w500, ColorStyles.upFinOrange, TextAlign.center, 1),
                 ])
             ),
           ),
@@ -273,11 +224,11 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
                     labelColor: ColorStyles.upFinBlack,
                     indicatorSize: TabBarIndicatorSize.tab,
                     indicator: MyTabIndicator(),
-                    indicatorColor: ColorStyles.upFinButtonBlue,
-                    dividerColor: ColorStyles.upFinWhiteSky,
+                    indicatorColor: ColorStyles.upFinOrange,
+                    dividerColor: ColorStyles.upFinWhiteYellow,
                     controller: _tabController,
                     tabs: const <Widget>[
-                      Tab(text: "사건정보"),
+                      Tab(text: "차량정보"),
                       Tab(text: "접수내역"),
                     ],
                   )
@@ -285,7 +236,7 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
               SizedBox(width: 95.w, height: Config.isAndroid? 75.h : 70.h, child: TabBarView(
                 controller: _tabController,
                 children: <Widget>[
-                  Column(children: [UiUtils.getExpandedScrollView(Axis.vertical, _getAccidentWidgetList())]),
+                  Column(children: [UiUtils.getExpandedScrollView(Axis.vertical, _getCarWidgetList())]),
                   _getLoanCnt() != 0 ? Column(children: [
                     UiUtils.getMarginBox(0, 3.h),
                     UiUtils.getExpandedScrollView(Axis.vertical, Column(children: _getLoanWidgetList()))
@@ -318,7 +269,7 @@ class _MyTabIndicatorPainter extends BoxPainter {
   void paint(Canvas canvas, Offset offset, ImageConfiguration configuration) {
     final Rect rect = offset & configuration.size!;
     final Paint paint = Paint();
-    paint.color = ColorStyles.upFinButtonBlue; // 인디케이터 색상
+    paint.color = ColorStyles.upFinOrange; // 인디케이터 색상
     paint.style = PaintingStyle.fill;
     paint.strokeCap = StrokeCap.round; // 둥글게 된 모서리
 

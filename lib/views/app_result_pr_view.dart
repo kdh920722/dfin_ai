@@ -5,7 +5,7 @@ import 'package:upfin/configs/app_config.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
-import 'package:upfin/views/app_update_accident_view.dart';
+import 'package:upfin/views/app_main_view.dart';
 import '../controllers/firebase_controller.dart';
 import '../styles/TextStyles.dart';
 import '../utils/common_utils.dart';
@@ -67,8 +67,9 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
     CommonUtils.log("i", "AppResultPrView 화면 파괴");
     WidgetsBinding.instance.removeObserver(this);
     _tabController.dispose();
-    Config.contextForEmergencyBack = AppUpdateAccidentViewState.mainContext;
+    Config.contextForEmergencyBack = AppMainViewState.mainContext;
     MyData.selectedAccidentInfoData = null;
+    MyData.selectedCarInfoData = null;
     super.dispose();
   }
 
@@ -208,10 +209,11 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                     bool isDuplicate = false;
                     List<String> dupleDateList = [];
                     for(var eachLoan in MyData.getLoanInfoList()){
-                      CommonUtils.log("w","${eachLoan.lenderPrId} ${eachLoan.createdDate} ${eachLoan.updatedDate}");
-                      if(eachLoan.lenderPrId == each.productOfferLenderPrId){
-                        dupleDateList.add(eachLoan.createdDate);
-                        isDuplicate = true;
+                      if(each.uidType == eachLoan.uidType){
+                        if(eachLoan.lenderPrId == each.productOfferLenderPrId){
+                          dupleDateList.add(eachLoan.createdDate);
+                          isDuplicate = true;
+                        }
                       }
                     }
 
@@ -239,15 +241,27 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                                       MyData.selectedPrInfoData = each;
                                       UiUtils.showAgreePop(context, "B", () {
                                         UiUtils.showLoadingPop(context);
-                                        LogfinController.getPrDocsList(MyData.selectedPrInfoData!.productOfferId, MyData.selectedPrInfoData!.productOfferRid, (isSuccessToSearchDocs, _) async {
-                                          UiUtils.closeLoadingPop(context);
-                                          if(isSuccessToSearchDocs){
-                                            CommonUtils.moveToWithResult(context, AppView.appApplyPrView.value, null);
-                                          }else{
-                                            CommonUtils.flutterToast("상품정보를 불러오는데\n실패했어요.");
-                                            MyData.selectedPrInfoData = null;
-                                          }
-                                        });
+                                        if(each.uidType == "1"){
+                                          LogfinController.getPrDocsList(MyData.selectedPrInfoData!.productOfferId, MyData.selectedPrInfoData!.productOfferRid, (isSuccessToSearchDocs, _) async {
+                                            UiUtils.closeLoadingPop(context);
+                                            if(isSuccessToSearchDocs){
+                                              CommonUtils.moveToWithResult(context, AppView.appApplyPrView.value, null);
+                                            }else{
+                                              CommonUtils.flutterToast("상품정보를 불러오는데\n실패했어요.");
+                                              MyData.selectedPrInfoData = null;
+                                            }
+                                          });
+                                        }else{
+                                          LogfinController.getCarPrDocsList((isSuccessToSearchDocs, _) async {
+                                            UiUtils.closeLoadingPop(context);
+                                            if(isSuccessToSearchDocs){
+                                              CommonUtils.moveToWithResult(context, AppView.appApplyPrView.value, null);
+                                            }else{
+                                              CommonUtils.flutterToast("상품정보를 불러오는데\n실패했어요.");
+                                              MyData.selectedPrInfoData = null;
+                                            }
+                                          });
+                                        }
                                       });
                                     }),
                                 UiUtils.getMarginBox(2.w, 0),
@@ -262,17 +276,31 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                       });
                     }else{
                       MyData.selectedPrInfoData = each;
+                      CommonUtils.log("w", "${each.uidType}");
                       UiUtils.showAgreePop(context, "B", () {
                         UiUtils.showLoadingPop(context);
-                        LogfinController.getPrDocsList(MyData.selectedPrInfoData!.productOfferId, MyData.selectedPrInfoData!.productOfferRid, (isSuccessToSearchDocs, _) async {
-                          UiUtils.closeLoadingPop(context);
-                          if(isSuccessToSearchDocs){
-                            CommonUtils.moveToWithResult(context, AppView.appApplyPrView.value, null);
-                          }else{
-                            CommonUtils.flutterToast("상품정보를 불러오는데\n실패했어요.");
-                            MyData.selectedPrInfoData = null;
-                          }
-                        });
+                        if(each.uidType == "1"){
+                          LogfinController.getPrDocsList(MyData.selectedPrInfoData!.productOfferId, MyData.selectedPrInfoData!.productOfferRid, (isSuccessToSearchDocs, _) async {
+                            UiUtils.closeLoadingPop(context);
+                            if(isSuccessToSearchDocs){
+                              CommonUtils.moveToWithResult(context, AppView.appApplyPrView.value, null);
+                            }else{
+                              CommonUtils.flutterToast("상품정보를 불러오는데\n실패했어요.");
+                              MyData.selectedPrInfoData = null;
+                            }
+                          });
+                        }else{
+                          LogfinController.getCarPrDocsList((isSuccessToSearchDocs, _) async {
+                            UiUtils.closeLoadingPop(context);
+                            if(isSuccessToSearchDocs){
+                              CommonUtils.moveToWithResult(context, AppView.appApplyPrView.value, null);
+                            }else{
+                              CommonUtils.flutterToast("상품정보를 불러오는데\n실패했어요.");
+                              MyData.selectedPrInfoData = null;
+                            }
+                          });
+                        }
+
                       });
                     }
 
@@ -301,6 +329,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
           SizedBox(width: 95.w, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
             UiUtils.getCloseButton(ColorStyles.upFinDarkGray, () {
               MyData.selectedAccidentInfoData = null;
+              MyData.selectedCarInfoData = null;
               MyData.selectedPrInfoData = null;
               Navigator.pop(context);
             })

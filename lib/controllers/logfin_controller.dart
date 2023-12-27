@@ -315,6 +315,9 @@ class LogfinController {
           }else if(api == LogfinApis.addAndSearchCar){
             callback(true, resultData['car_info']);
             return;
+          }else if(api == LogfinApis.searchCarProduct){
+            callback(true, resultData);
+            return;
           }else if(api == LogfinApis.searchCar){
             callback(true, resultData['car_info']);
             return;
@@ -618,8 +621,22 @@ class LogfinController {
               MyData.clearLoanInfoList();
               for(Map eachLoans in loansList){
                 if(eachLoans.containsKey("lender_pr_id") && eachLoans.containsKey("lender_pr")){
+                  String uid = "";
+                  String uidType = "";
+                  if(eachLoans.containsKey("accident_uid")){
+                    if(eachLoans["accident_uid"] == null || eachLoans["accident_uid"].toString() == ""){
+                      uidType = "2";
+                      uid = eachLoans["search_car_result_uid"].toString();
+                    }else{
+                      uidType = "1";
+                      uid = eachLoans["accident_uid"].toString();
+                    }
+                  }else{
+                    uidType = "2";
+                    uid = eachLoans["search_car_result_uid"].toString();
+                  }
                   CommonUtils.log("", "loan data ====>\n"
-                      "accidentUid: ${eachLoans["accident_uid"]}\n"
+                      "accidentUid: $uid\n"
                       "loanUid: ${eachLoans["uid"]}\n"
                       "lenderPrId: ${eachLoans["lender_pr_id"]}\n"
                       "submitAmount: ${eachLoans["submit_offer"]["amount"]}\n"
@@ -649,7 +666,7 @@ class LogfinController {
 
                       loanMessageInfoOutputJson!["last_read_message_id"] = eachLoans["pr_room"]["last_read_message_id"].toString();
                       MyData.addToLoanInfoList(
-                          LoanInfoData(eachLoans["accident_uid"].toString(), eachLoans["uid"].toString(), eachLoans["lender_pr_id"].toString(),
+                          LoanInfoData(uid, uidType, eachLoans["uid"].toString(), eachLoans["lender_pr_id"].toString(),
                               submitAmount, eachLoans["submit_offer"]["interest_rate"].toString(),
                               eachLoans["lender_pr"]["lender"]["name"].toString(),
                               eachLoans["lender_pr"]["lender"]["name"].toString() == "(주)안전대부"? "assets/images/bank_logo_safe.png" : "assets/images/bank_logo_default.png",
@@ -696,7 +713,7 @@ class LogfinController {
     }
   }
 
-  static Future<void> getPrList(String accidentCase, Function(bool isSuccess, Map<String, dynamic>? outputJson) callback) async {
+  static Future<void> getAccidentPrList(String accidentCase, Function(bool isSuccess, Map<String, dynamic>? outputJson) callback) async {
     try{
       String accidentUid = MyData.findUidInAccidentInfoList(accidentCase);
       if(accidentUid != ""){
@@ -709,11 +726,49 @@ class LogfinController {
             String offerId = outputJsonForGetOffers!["offer_id"].toString();
             List<dynamic> offerPrList = outputJsonForGetOffers["data"];
             for(var each in offerPrList){
-              MyData.addToPrInfoList(PrInfoData(accidentUid, offerId, each["rid"], each["lender_pr_id"].toString(), each["lender_name"], each["lender_id"].toString(),
+              MyData.addToPrInfoList(PrInfoData(accidentUid, "1", offerId, each["rid"], each["lender_pr_id"].toString(), each["lender_name"], each["lender_id"].toString(),
                   each["product_name"], each["rid"], each["min_rate"].toString(), each["max_rate"].toString(),
                   each["limit"].toString(),
                   each["lender_name"] == "(주)안전대부"? "assets/images/bank_logo_safe.png" : "assets/images/bank_logo_default.png",
-                  each["result"] as bool, each["msg"]));
+                  each["result"] as bool, each["msg"] is List ? each["msg"] : []));
+            }
+
+            if(MyData.getPrInfoList().isNotEmpty){
+              MyData.sortPrInfoListBy(false);
+              callback(true, outputJsonForGetOffers);
+            }else{
+              callback(false, null);
+            }
+          }else{
+            callback(false, null);
+          }
+        });
+      }else{
+        callback(false, null);
+      }
+    }catch(error){
+      callback(false, null);
+    }
+  }
+
+  static Future<void> getCarPrList(String carNum, Function(bool isSuccess, Map<String, dynamic>? outputJson) callback) async {
+    try{
+      String carUid = MyData.findUidInCarInfoList(carNum);
+      if(carUid != ""){
+        Map<String, dynamic> inputJsonForGetOffers= {
+          "car_uid": carUid
+        };
+        callLogfinApi(LogfinApis.searchCarProduct, inputJsonForGetOffers, (isSuccessToGetOffers, outputJsonForGetOffers){
+          if(isSuccessToGetOffers){
+            MyData.clearPrInfoList();
+            String offerId = outputJsonForGetOffers!["offer_id"].toString();
+            List<dynamic> offerPrList = outputJsonForGetOffers['data'];
+            for(var each in offerPrList){
+              MyData.addToPrInfoList(PrInfoData(carUid, "2", offerId, each["rid"].toString(), each["lender_car_id"].toString(), each["lender_name"].toString(), each["lender_id"].toString(),
+                  each["product_name"].toString(), each["rid"].toString(), each["min_rate"].toString(), each["max_rate"].toString(),
+                  each["limit"].toString(),
+                  each["lender_name"] == "(주)안전대부"? "assets/images/bank_logo_safe.png" : "assets/images/bank_logo_default.png",
+                  each["result"] as bool, each["msg"] is List ? each["msg"] : []));
             }
 
             if(MyData.getPrInfoList().isNotEmpty){
@@ -742,6 +797,33 @@ class LogfinController {
         "offer_rid": offerRid,
       };
       LogfinController.callLogfinApi(LogfinApis.applyProductDocSearch, inputJson, (isSuccessToSearchDocs, outputJsonForSearchDocs){
+        if(isSuccessToSearchDocs){
+          for(var each in outputJsonForSearchDocs!["documents"]){
+            MyData.addToPrDocsInfoList(PrDocsInfoData(each["id"], each["name"], each["del_flg"]));
+          }
+
+          if(MyData.getPrDocsInfoList().isNotEmpty){
+            for(var eachInList in MyData.getPrDocsInfoList()){
+              CommonUtils.log("i", "${eachInList.productDocsId}\n${eachInList.productDocsName}\n");
+            }
+            callback(true, outputJsonForSearchDocs);
+          }else{
+            callback(false, null);
+          }
+        }else{
+          callback(false, null);
+        }
+      });
+    }catch(error){
+      callback(false, null);
+    }
+  }
+
+  static Future<void> getCarPrDocsList(Function(bool isSuccess, Map<String, dynamic>? outputJson) callback) async {
+    try{
+      MyData.clearPrDocsInfoList();
+      Map<String, dynamic> inputJson = {};
+      LogfinController.callLogfinApi(LogfinApis.getCarDocs, inputJson, (isSuccessToSearchDocs, outputJsonForSearchDocs){
         if(isSuccessToSearchDocs){
           for(var each in outputJsonForSearchDocs!["documents"]){
             MyData.addToPrDocsInfoList(PrDocsInfoData(each["id"], each["name"], each["del_flg"]));

@@ -6,16 +6,19 @@ import 'package:flutter/services.dart';
 import 'package:upfin/views/app_accident_detail_view.dart';
 import 'package:upfin/views/app_agree_detail_info_view.dart';
 import 'package:upfin/views/app_apply_pr_view.dart';
+import 'package:upfin/views/app_car_detail_view.dart';
 import 'package:upfin/views/app_findpw_view.dart';
 import 'package:upfin/views/app_main_view.dart';
 import 'package:upfin/views/app_result_pr_view.dart';
 import 'package:upfin/views/app_root_view.dart';
 import 'package:upfin/views/app_search_accident_view.dart';
+import 'package:upfin/views/app_search_car_view.dart';
 import 'package:upfin/views/app_signout_view.dart';
 import 'package:upfin/views/app_signup_view.dart';
 import 'package:upfin/views/app_update_accident_view.dart';
 import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:upfin/views/app_update_car_view.dart';
 import 'package:upfin/views/debug_for_admin_view.dart';
 import 'package:yaml/yaml.dart';
 import '../utils/common_utils.dart';
@@ -61,6 +64,9 @@ class Config{
     AppView.appSignOutView.value : (context) => AppSignOutView(),
     AppView.appFindPwView.value : (context) => AppFindPwView(),
     AppView.debugForAdminView.value : (context) => DebugForAdminView(),
+    AppView.appCarDetailInfoView.value : (context) => AppCarDetailView(),
+    AppView.appSearchCarView.value : (context) => AppSearchCarView(),
+    AppView.appUpdateCarView.value : (context) => AppUpdateCarView(),
   };
 
   static bool isPad(){
@@ -186,7 +192,7 @@ class Config{
 enum AppView {
   appRootView, appLoginView, appCertificationView, appSignupView, appMainView, appSearchAccidentView, appSignOutView,
   appUpdateAccidentView, appResultPrView, appApplyPrView, appChatView, appAccidentDetailInfoView, appAgreeDetailInfoView,
-  appFindPwView, debugForAdminView
+  appFindPwView, debugForAdminView, appCarDetailInfoView, appSearchCarView, appUpdateCarView
 }
 
 extension SAppViewExtension on AppView {
@@ -222,6 +228,12 @@ extension SAppViewExtension on AppView {
         return '/appFindPwView';
       case AppView.debugForAdminView:
         return '/debugForAdminView';
+      case AppView.appCarDetailInfoView:
+        return '/appCarDetailInfoView';
+      case AppView.appSearchCarView:
+        return '/appSearchCarView';
+      case AppView.appUpdateCarView:
+        return '/appUpdateCarView';
     }
   }
 }
