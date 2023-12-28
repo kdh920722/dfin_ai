@@ -3,6 +3,8 @@ import 'dart:io';
 import 'dart:math';
 import 'package:camera/camera.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
+import 'package:facebook_app_events/facebook_app_events.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -329,8 +331,32 @@ class CommonUtils {
         fontSize: 12.sp, textColor: ColorStyles.upFinWhite, toastLength: Config.isAndroid? Toast.LENGTH_SHORT : Toast.LENGTH_LONG);
   }
 
+  static bool isAppLogInit = false;
+  static setAppLogInit() async {
+    try{
+      // GA4 init
+      FireBaseController.observer = FirebaseAnalyticsObserver(analytics: FireBaseController.analytics!);
+
+      // meta(facebook) pixel init
+      FireBaseController.facebookAppEvents = FacebookAppEvents();
+      await FireBaseController.facebookAppEvents!.setAutoLogAppEventsEnabled(true);
+
+      // appsflyer init
+      FireBaseController.appsFlyerSdk = FireBaseController.getAppsFlyerInitOptions();
+      FireBaseController.appsFlyerSdk!.initSdk(
+          registerConversionDataCallback: true,
+          registerOnAppOpenAttributionCallback: true,
+          registerOnDeepLinkingCallback: true
+      );
+
+      isAppLogInit = true;
+    }catch(error){
+      CommonUtils.log("e", "app log init error : $error");
+    }
+  }
+
   static setAppLog(String eventName) async {
-    if(MyData.email != ""){
+    if(MyData.email != "" && isAppLogInit){
       String appVersion = await Config.getAppVersion();
       String currTime = CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime());
       if(currTime.length == 14){
@@ -342,7 +368,13 @@ class CommonUtils {
           'event_name' : eventName
         };
 
-        FireBaseController.analytics!.logEvent(name: eventName, parameters: data);
+        try{
+          FireBaseController.analytics!.logEvent(name: eventName, parameters: data);
+          FireBaseController.facebookAppEvents!.logEvent(name: eventName, parameters: data);
+          FireBaseController.appsFlyerSdk!.logEvent(eventName, data);
+        }catch(error){
+          CommonUtils.log("d", "app log init error : $error");
+        }
       }
     }
   }

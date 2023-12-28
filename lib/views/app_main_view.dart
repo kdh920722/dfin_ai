@@ -145,7 +145,9 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                   }),
             ]),
             UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
-            Align(alignment: Alignment.bottomCenter, child: Image.asset(fit: BoxFit.fitHeight,'assets/images/img_woman_searcher_01.png', height: 50.h)),
+            Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+              Image.asset(fit: BoxFit.fitHeight,'assets/images/img_woman_searcher_01.png', height: 45.h)
+            ])
           ]);
 
       return slideWidget;

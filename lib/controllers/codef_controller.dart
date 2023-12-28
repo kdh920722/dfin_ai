@@ -742,7 +742,7 @@ class CodeFController{
   }
 
   static Map<String, dynamic> makeInputJsonForCertApis(Apis api, String loginIdentity, String identity, String birth, String name, String phoneNo, String telecom,
-      String address, String loginCertType, String randomKey){
+      String address, String loginCertType, String randomKey, String carNum, String carOwnerName){
     if(api == Apis.gov24residentRegistrationAbstract){
       Map<String, dynamic> inputJsonForAbstract = {
         "organization": "0001",
@@ -811,6 +811,44 @@ class CodeFController{
       };
 
       return inputJsonForlocalTaxPaymentCert;
+    }else if(api == Apis.gov24CarRegistrationA){
+      Map<String, dynamic> inputJsonForCarRegistrationA = {
+        "organization": "0001",
+        "loginType": "6",
+        "userName": name,
+        "identity": loginIdentity,
+        "id": randomKey,
+        "loginTypeLevel": loginCertType,
+        "phoneNo": phoneNo,
+        "address": address,
+        "isIdentityViewYn": "1",
+        "telecom": telecom,
+        "birthDate": "",
+        "carNo": carNum,
+        "ownerName": carOwnerName,
+        "displyed": "1",
+      };
+
+      return inputJsonForCarRegistrationA;
+    }else if(api == Apis.gov24CarRegistrationB){
+      Map<String, dynamic> inputJsonForCarRegistrationB = {
+        "organization": "0001",
+        "loginType": "6",
+        "userName": name,
+        "identity": loginIdentity,
+        "id": randomKey,
+        "loginTypeLevel": loginCertType,
+        "phoneNo": phoneNo,
+        "address": address,
+        "isIdentityViewYn": "1",
+        "telecom": telecom,
+        "birthDate": "",
+        "carNo": carNum,
+        "ownerName": carOwnerName,
+        "displyed": "1",
+      };
+
+      return inputJsonForCarRegistrationB;
     }else if(api == Apis.nhisIdentifyConfirmation){
 
       Map<String, dynamic> inputJsonForNhisIdConfirm = {
@@ -1043,27 +1081,15 @@ extension HostDevExtension on HostDev {
 }
 
 enum Apis {
-  addressApi1, addressApi2, carRegistration1Api, carRegistration2Api, bankruptApi1, bankruptApi2,
-  gov24residentRegistrationAbstract, gov24residentRegistrationCopy, gov24localTaxPaymentCert,
+  gov24residentRegistrationAbstract, gov24residentRegistrationCopy, gov24localTaxPaymentCert, gov24CarRegistrationA, gov24CarRegistrationB,
   nhisIdentifyConfirmation, nhisConfirmation,
   ntsProofCorporateRegistration, ntsProofIssue, ntsProofAdditionalTasStandard, ntsTaxCert
+
 }
 
 extension ApisExtension on Apis {
   String get value {
     switch (this) {
-      case Apis.addressApi1:
-        return '/v1/kr/etc/ld/kb/serial-number';
-      case Apis.addressApi2:
-        return '/v1/kr/etc/ld/kb/market-price-information';
-      case Apis.carRegistration1Api:
-        return '/v1/kr/public/mw/car-registration-a/issuance';
-      case Apis.carRegistration2Api:
-        return '/v1/kr/public/mw/car-registration-b/issuance';
-      case Apis.bankruptApi1:
-        return '/v1/kr/public/ck/rehab-bankruptcy/list';
-      case Apis.bankruptApi2:
-        return '/v1/kr/public/ck/scourt-events/search';
       case Apis.gov24residentRegistrationAbstract:
         return '/v1/kr/public/mw/resident-registration-abstract/issuance';
       case Apis.gov24residentRegistrationCopy:
@@ -1082,6 +1108,10 @@ extension ApisExtension on Apis {
         return '/v1/kr/public/nt/proof-issue/additional-tax-standard';
       case Apis.ntsTaxCert:
         return '/v1/kr/public/nt/proof-issue/tax-cert-all';
+      case Apis.gov24CarRegistrationA:
+        return '/v1/kr/public/mw/car-registration-a/issuance';
+      case Apis.gov24CarRegistrationB:
+        return '/v1/kr/public/mw/car-registration-b/issuance';
       default:
         throw Exception('Unknown host value');
     }

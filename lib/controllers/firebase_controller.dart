@@ -1,4 +1,6 @@
 import 'dart:io' as io;
+import 'package:appsflyer_sdk/appsflyer_sdk.dart';
+import 'package:facebook_app_events/facebook_app_events.dart';
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -22,14 +24,27 @@ class FireBaseController{
   static String fcmToken = "";
   static String pushFrom = "";
   static FirebaseAnalytics? analytics;
+  static FacebookAppEvents? facebookAppEvents;
   static FirebaseAnalyticsObserver? observer;
+  static AppsflyerSdk? appsFlyerSdk;
+  static AppsFlyerOptions appsFlyerOptions = AppsFlyerOptions(
+      afDevKey: "afDevKey",
+      appId: "appId",
+      showDebug: true,
+      timeToWaitForATTUserAuthorization: 50, // for iOS 14.5
+      appInviteOneLink: "oneLinkID", // Optional field
+      disableAdvertisingIdentifier: false, // Optional field
+      disableCollectASA: false); // Optional field
+  static AppsflyerSdk getAppsFlyerInitOptions(){
+    return AppsflyerSdk(appsFlyerOptions);
+  }
 
   /// firebase database =========================================================================== ///
   static Future<void> initMainFirebase() async {
     try {
       firebaseApp = await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
       analytics = FirebaseAnalytics.instance;
-      observer = FirebaseAnalyticsObserver(analytics: analytics!);
+
     } on FirebaseAuthException catch (e) {
       CommonUtils.log("e", "firebase main init error : ${e.code} : ${e.toString()}");
     }

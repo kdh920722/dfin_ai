@@ -911,19 +911,21 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           SizedBox(width: 90.w,
               child: Row(children: [
                 UiUtils.getMarginBox(3.w, 0),
-                UiUtils.getTextButtonWithFixedScale("•  기대출 ${MyData.selectedAccidentInfoData!.accidentLendCount.split("@")[0]}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                UiUtils.getTextButtonWithFixedScale("•  기대출 ${MyData.selectedAccidentInfoData != null ?
+                MyData.selectedAccidentInfoData!.accidentLendCount.split("@")[0] : MyData.selectedCarInfoData!.carLendCount.split("@")[0]}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
               ])
           )
       );
       introWidgetList.add(
           UiUtils.getMarginBox(0, 3.h)
       );
-      if(MyData.selectedAccidentInfoData!.accidentLendAmount != "0"){
+      if(MyData.selectedAccidentInfoData != null ? MyData.selectedAccidentInfoData!.accidentLendAmount != "0" : MyData.selectedCarInfoData!.carLendAmount != "0"){
         introWidgetList.add(
             SizedBox(width: 90.w,
                 child: Row(children: [
                   UiUtils.getMarginBox(3.w, 0),
-                  UiUtils.getTextButtonWithFixedScale("•  인가후대출금액 ${CommonUtils.getPriceFormattedString(double.parse(MyData.selectedAccidentInfoData!.accidentLendAmount))}",
+                  UiUtils.getTextButtonWithFixedScale("•  인가후대출금액 ${CommonUtils.getPriceFormattedString(double.parse(
+                      MyData.selectedAccidentInfoData != null ? MyData.selectedAccidentInfoData!.accidentLendAmount : MyData.selectedCarInfoData!.carLendAmount))}",
                       13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
                 ])
@@ -943,18 +945,22 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       introWidgetList.add(
           UiUtils.getMarginBox(0, 3.h)
       );
-      introWidgetList.add(
-          SizedBox(width: 90.w,
-              child: Row(children: [
-                UiUtils.getMarginBox(3.w, 0),
-                UiUtils.getTextButtonWithFixedScale("•  [환급] ${MyData.selectedAccidentInfoData!.accidentBankInfo.split("@")[0]} ${MyData.selectedAccidentInfoData!.accidentBankAccount}",
-                    13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
-              ])
-          )
-      );
-      introWidgetList.add(
-          UiUtils.getMarginBox(0, 3.h)
-      );
+
+      if(MyData.selectedAccidentInfoData != null){
+        introWidgetList.add(
+            SizedBox(width: 90.w,
+                child: Row(children: [
+                  UiUtils.getMarginBox(3.w, 0),
+                  UiUtils.getTextButtonWithFixedScale("•  [환급] ${MyData.selectedAccidentInfoData!.accidentBankInfo.split("@")[0]} ${MyData.selectedAccidentInfoData!.accidentBankAccount}",
+                      13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                ])
+            )
+        );
+        introWidgetList.add(
+            UiUtils.getMarginBox(0, 3.h)
+        );
+      }
+
       introWidgetList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
@@ -996,12 +1002,12 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       introWidgetList.add(
           UiUtils.getMarginBox(0, 3.h)
       );
-      if(MyData.selectedAccidentInfoData!.accidentWishAmount != "0"){
+      if(MyData.selectedAccidentInfoData != null? MyData.selectedAccidentInfoData!.accidentWishAmount != "0" : MyData.selectedCarInfoData!.carWishAmount != "0"){
         introWidgetList.add(
             SizedBox(width: 90.w,
                 child: Row(children: [
                   UiUtils.getMarginBox(3.w, 0),
-                  UiUtils.getTextButtonWithFixedScale("•  대출희망금액 ${CommonUtils.getPriceFormattedString(double.parse(MyData.selectedAccidentInfoData!.accidentWishAmount))}",
+                  UiUtils.getTextButtonWithFixedScale("•  대출희망금액 ${CommonUtils.getPriceFormattedString(double.parse(MyData.selectedAccidentInfoData != null? MyData.selectedAccidentInfoData!.accidentWishAmount : MyData.selectedCarInfoData!.carWishAmount))}",
                       13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
                 ])
@@ -2855,17 +2861,17 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             if(each["id"] == 1){
               // 등본
               Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.gov24residentRegistrationCopy,
-                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
+                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey, "", "");
               apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.gov24residentRegistrationCopy, true));
             }else if(each["id"] == 2){
               // 초본
               Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.gov24residentRegistrationAbstract,
-                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
+                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey, "", "");
               apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.gov24residentRegistrationAbstract, true));
             }else if(each["id"] == 15){
               // 지방세
               Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.gov24localTaxPaymentCert,
-                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
+                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey, "", "");
               apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.gov24localTaxPaymentCert, true));
             }
           }
@@ -2929,12 +2935,12 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             if(each["id"] == 3){
               // 건강보험자격득실확인서
               Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.nhisIdentifyConfirmation,
-                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
+                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey, "", "");
               apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.nhisIdentifyConfirmation, true));
             }else if(each["id"] == 4){
               // 건강보험납부확인서
               Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.nhisConfirmation,
-                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
+                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey, "", "");
               apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.nhisConfirmation, true));
             }
           }
@@ -2998,22 +3004,22 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             if(each["id"] == 6){
               // 사업자등록증
               Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.ntsProofCorporateRegistration,
-                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
+                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey, "", "");
               apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.ntsProofCorporateRegistration, true));
             }else if(each["id"] == 10){
               // 소득금액증명
               Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.ntsProofIssue,
-                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
+                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey, "", "");
               apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.ntsProofIssue, true));
             }else if(each["id"] == 11){
               // 부가세과세표준증명원
               Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.ntsProofAdditionalTasStandard,
-                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
+                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey, "", "");
               apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.ntsProofAdditionalTasStandard, true));
             }else if(each["id"] == 14){
               // 국세납세증명서
               Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.ntsTaxCert,
-                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey);
+                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey, "", "");
               apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.ntsTaxCert, true));
             }
           }
@@ -3117,19 +3123,20 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           SizedBox(width: 90.w,
               child: Row(children: [
                 UiUtils.getMarginBox(3.w, 0),
-                UiUtils.getTextButtonWithFixedScale("•  기대출 ${MyData.selectedAccidentInfoData!.accidentLendCount.split("@")[0]}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                UiUtils.getTextButtonWithFixedScale("•  기대출 ${MyData.selectedAccidentInfoData != null ?
+                  MyData.selectedAccidentInfoData!.accidentLendCount.split("@")[0] : MyData.selectedCarInfoData!.carLendCount.split("@")[0]}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
               ])
           )
       );
       introWidgetList.add(
           UiUtils.getMarginBox(0, 3.h)
       );
-      if(MyData.selectedAccidentInfoData!.accidentLendAmount != "0"){
+      if(MyData.selectedAccidentInfoData != null ? MyData.selectedAccidentInfoData!.accidentLendAmount != "0" : MyData.selectedCarInfoData!.carLendAmount != "0"){
         introWidgetList.add(
             SizedBox(width: 90.w,
                 child: Row(children: [
                   UiUtils.getMarginBox(3.w, 0),
-                  UiUtils.getTextButtonWithFixedScale("•  인가후대출금액 ${CommonUtils.getPriceFormattedString(double.parse(MyData.selectedAccidentInfoData!.accidentLendAmount))}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                  UiUtils.getTextButtonWithFixedScale("•  인가후대출금액 ${CommonUtils.getPriceFormattedString(double.parse(MyData.selectedAccidentInfoData != null ? MyData.selectedAccidentInfoData!.accidentLendAmount : MyData.selectedCarInfoData!.carLendAmount))}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
                 ])
             )
@@ -3148,17 +3155,21 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       introWidgetList.add(
           UiUtils.getMarginBox(0, 3.h)
       );
-      introWidgetList.add(
-          SizedBox(width: 90.w,
-              child: Row(children: [
-                UiUtils.getMarginBox(3.w, 0),
-                UiUtils.getTextButtonWithFixedScale("•  [환급] ${MyData.selectedAccidentInfoData!.accidentBankInfo.split("@")[0]} ${MyData.selectedAccidentInfoData!.accidentBankAccount}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
-              ])
-          )
-      );
-      introWidgetList.add(
-          UiUtils.getMarginBox(0, 3.h)
-      );
+
+      if(MyData.selectedAccidentInfoData != null){
+        introWidgetList.add(
+            SizedBox(width: 90.w,
+                child: Row(children: [
+                  UiUtils.getMarginBox(3.w, 0),
+                  UiUtils.getTextButtonWithFixedScale("•  [환급] ${MyData.selectedAccidentInfoData!.accidentBankInfo.split("@")[0]} ${MyData.selectedAccidentInfoData!.accidentBankAccount}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                ])
+            )
+        );
+        introWidgetList.add(
+            UiUtils.getMarginBox(0, 3.h)
+        );
+      }
+
       introWidgetList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
@@ -3196,12 +3207,12 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       introWidgetList.add(
           UiUtils.getMarginBox(0, 3.h)
       );
-      if(MyData.selectedAccidentInfoData!.accidentWishAmount != "0"){
+      if(MyData.selectedAccidentInfoData != null ? MyData.selectedAccidentInfoData!.accidentWishAmount != "0" : MyData.selectedCarInfoData!.carWishAmount != "0"){
         introWidgetList.add(
             SizedBox(width: 90.w,
                 child: Row(children: [
                   UiUtils.getMarginBox(3.w, 0),
-                  UiUtils.getTextButtonWithFixedScale("•  대출희망금액 ${CommonUtils.getPriceFormattedString(double.parse(MyData.selectedAccidentInfoData!.accidentWishAmount))}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                  UiUtils.getTextButtonWithFixedScale("•  대출희망금액 ${CommonUtils.getPriceFormattedString(double.parse(MyData.selectedAccidentInfoData != null ? MyData.selectedAccidentInfoData!.accidentWishAmount : MyData.selectedCarInfoData!.carWishAmount))}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
                 ])
             )

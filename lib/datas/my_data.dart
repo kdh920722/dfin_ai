@@ -174,7 +174,6 @@ class MyData {
     _chatRoomInfoList.clear();
   }
 
-  //12:신분증  13:개인회생사건조회  1:주민등록등본  2:주민등록초본  3:건강보험자격득실확인서  4:건강보험납부확인서
   static final List<PrInfoData> _prInfoList = [];
   static List<PrInfoData> getPrInfoList(){
     return _prInfoList;
