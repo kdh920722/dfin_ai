@@ -332,26 +332,13 @@ class CommonUtils {
   }
 
   static bool isAppLogInit = false;
-  static setAppLogInit() async {
+  static Future<void> setAppLogInit() async {
     try{
-      // GA4 init
-      FireBaseController.observer = FirebaseAnalyticsObserver(analytics: FireBaseController.analytics!);
-
-      // meta(facebook) pixel init
-      FireBaseController.facebookAppEvents = FacebookAppEvents();
-      await FireBaseController.facebookAppEvents!.setAutoLogAppEventsEnabled(true);
-
-      // appsflyer init
-      FireBaseController.appsFlyerSdk = FireBaseController.getAppsFlyerInitOptions();
-      FireBaseController.appsFlyerSdk!.initSdk(
-          registerConversionDataCallback: true,
-          registerOnAppOpenAttributionCallback: true,
-          registerOnDeepLinkingCallback: true
-      );
-
+      await FireBaseController.setAppLogInit();
       isAppLogInit = true;
     }catch(error){
       CommonUtils.log("e", "app log init error : $error");
+      isAppLogInit = false;
     }
   }
 
@@ -370,8 +357,8 @@ class CommonUtils {
 
         try{
           FireBaseController.analytics!.logEvent(name: eventName, parameters: data);
-          FireBaseController.facebookAppEvents!.logEvent(name: eventName, parameters: data);
-          FireBaseController.appsFlyerSdk!.logEvent(eventName, data);
+         // FireBaseController.facebookAppEvents!.logEvent(name: eventName, parameters: data);
+         // FireBaseController.appsFlyerSdk!.logEvent(eventName, data);
         }catch(error){
           CommonUtils.log("d", "app log init error : $error");
         }

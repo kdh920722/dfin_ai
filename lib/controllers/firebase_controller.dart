@@ -27,24 +27,47 @@ class FireBaseController{
   static FacebookAppEvents? facebookAppEvents;
   static FirebaseAnalyticsObserver? observer;
   static AppsflyerSdk? appsFlyerSdk;
-  static AppsFlyerOptions appsFlyerOptions = AppsFlyerOptions(
-      afDevKey: "afDevKey",
-      appId: "appId",
-      showDebug: true,
-      timeToWaitForATTUserAuthorization: 50, // for iOS 14.5
-      appInviteOneLink: "oneLinkID", // Optional field
-      disableAdvertisingIdentifier: false, // Optional field
-      disableCollectASA: false); // Optional field
-  static AppsflyerSdk getAppsFlyerInitOptions(){
-    return AppsflyerSdk(appsFlyerOptions);
+
+  static Future<void> setAppLogInit() async {
+    // GA init
+    analytics = FirebaseAnalytics.instance;
+    observer = FirebaseAnalyticsObserver(analytics: analytics!);
+
+    /*
+    // META(facebook) pixel init
+    facebookAppEvents = FacebookAppEvents();
+    await facebookAppEvents!.setAutoLogAppEventsEnabled(true);
+
+    // appsflyer init
+    appsFlyerSdk = Config.isAndroid? AppsflyerSdk(
+        AppsFlyerOptions(
+        afDevKey: "Rk39mpxEWJu2vZxBRYw3mM",
+        showDebug: false,
+        timeToWaitForATTUserAuthorization: 50, // for iOS 14.5
+        disableAdvertisingIdentifier: false, // Optional field
+        disableCollectASA: false)
+    ) : AppsflyerSdk(
+        AppsFlyerOptions(
+            afDevKey: "Rk39mpxEWJu2vZxBRYw3mM",
+            appId: "6472978139",
+            showDebug: false,
+            timeToWaitForATTUserAuthorization: 50, // for iOS 14.5
+            disableAdvertisingIdentifier: false, // Optional field
+            disableCollectASA: false)
+    );
+    appsFlyerSdk!.initSdk(
+        registerConversionDataCallback: true,
+        registerOnAppOpenAttributionCallback: true,
+        registerOnDeepLinkingCallback: true
+    );
+     */
+
   }
 
   /// firebase database =========================================================================== ///
   static Future<void> initMainFirebase() async {
     try {
       firebaseApp = await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-      analytics = FirebaseAnalytics.instance;
-
     } on FirebaseAuthException catch (e) {
       CommonUtils.log("e", "firebase main init error : ${e.code} : ${e.toString()}");
     }

@@ -507,9 +507,10 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
   Widget _getConfirmView(){
     setSelectedInfo();
     List<String> confirmDataList = [];
-    confirmDataList.add("•  차량번호  ${MyData.selectedCarInfoData!.carNum}");
-    confirmDataList.add("•  소유주  ${MyData.selectedCarInfoData!.carOwnerName}");
-    confirmDataList.add("•  차량 시세금액  ${CommonUtils.getPriceFormattedStringForFullPrice(double.parse(MyData.selectedCarInfoData!.carPrice))}");
+    confirmDataList.add("•  [차량번호] ${MyData.selectedCarInfoData!.carNum}");
+    confirmDataList.add("•  [소유주] ${MyData.selectedCarInfoData!.carOwnerName}");
+    confirmDataList.add("•  [차량 시세금액] ${CommonUtils.getPriceFormattedStringForFullPrice(double.parse(MyData.selectedCarInfoData!.carPrice))}");
+    /*
     confirmDataList.add("•  기대출  ${selectedPreLoanCountInfo.split("@")[0]}");
     if(selectedPreLoanPriceInfo != "0"){
       confirmDataList.add("•  인가후 대출금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedPreLoanPriceInfo))}");
@@ -522,6 +523,7 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
       confirmDataList.add("•  희망 대출금액  0원");
     }
     confirmDataList.add("•  ${selectedJobInfo.split("@")[0]}");
+     */
 
     List<Widget> confirmWidgetList = [];
     Color textColor = ColorStyles.upFinBlack;
@@ -555,17 +557,20 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: confirmWidgetList)),
       UiUtils.getMarginBox(0, 5.h),
       Row(children: [
-        UiUtils.getBorderButtonBox(42.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+        UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
             UiUtils.getTextWithFixedScale("네 좋아요!", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
               isPassToSearch = true;
               _updateData();
             }),
+        /*
         UiUtils.getMarginBox(2.w, 0),
         UiUtils.getBorderButtonBox(42.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
             UiUtils.getTextWithFixedScale("정보변경", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
               isPassToSearch = false;
               nextInputView();
             })
+
+         */
       ])
     ]);
   }
@@ -593,6 +598,7 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
       };
       // 1.정보변경
       // 2.조회
+      UiUtils.closeLoadingPop(context);
     }
   }
 

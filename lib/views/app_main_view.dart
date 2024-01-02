@@ -539,10 +539,15 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                       UiUtils.getImage(16.w, 16.w, Image.asset('assets/images/accident_icon.png', fit: BoxFit.fill)),
                       // UiUtils.getMarginBox(0.2.w, 0),
                       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        UiUtils.getTextWithFixedScale("차량소유자 : ${each.carOwnerName}", 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.center, 1),
+                        UiUtils.getTextWithFixedScale("시세금액 : ${CommonUtils.getPriceFormattedStringForFullPrice(double.parse(each.carPrice))}", 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.center, 1),
                         UiUtils.getMarginBox(0, 0.5.h),
-                        UiUtils.getTextWithFixedScale(each.carNum, 16.sp,
-                            FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null),
+                        Row(children: [
+                          UiUtils.getTextWithFixedScale(each.carNum, 16.sp,
+                              FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null),
+                          UiUtils.getMarginBox(0.5.w, 0),
+                          UiUtils.getTextWithFixedScale("(${each.carOwnerName})", 13.sp,
+                              FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null),
+                        ]),
                       ])
                     ]),
                   ])),
@@ -933,6 +938,10 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
+      if(isViewHere){
+        await CommonUtils.checkUpdate(context);
+      }
+
       if(isViewHere && viewTypeId == 2){
         if(!isInfoPopShow){
           isInfoPopShow = true;

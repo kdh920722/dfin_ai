@@ -783,7 +783,7 @@ class CodeFController{
         "relationWithHHYN": "1",
         "changeDateYN": "0",
         "compositionReasonYN": "0",
-        "isIdentityViewYn": "1",
+        "isIdentityViewYn": "0",
         "isNameViewYn": "1",
         "originDataYN": "0",
         "telecom": telecom
@@ -806,7 +806,7 @@ class CodeFController{
         "proofType": "",
         "contents": "",
         "date": "",
-        "isIdentityViewYn": "1",
+        "isIdentityViewYn": "0",
         "telecom": telecom
       };
 
@@ -821,7 +821,7 @@ class CodeFController{
         "loginTypeLevel": loginCertType,
         "phoneNo": phoneNo,
         "address": address,
-        "isIdentityViewYn": "1",
+        "isIdentityViewYn": "0",
         "telecom": telecom,
         "birthDate": "",
         "carNo": carNum,
@@ -840,7 +840,7 @@ class CodeFController{
         "loginTypeLevel": loginCertType,
         "phoneNo": phoneNo,
         "address": address,
-        "isIdentityViewYn": "1",
+        "isIdentityViewYn": "0",
         "telecom": telecom,
         "birthDate": "",
         "carNo": carNum,
@@ -938,7 +938,7 @@ class CodeFController{
         "endYear": lastYearString,
         "usePurposes": "01",
         "submitTargets": "02",
-        "isIdentityViewYn": "1",
+        "isIdentityViewYn": "0",
         "isAddrViewYn": "0",
         "originDataYN": "0",
         "applicationType": "",

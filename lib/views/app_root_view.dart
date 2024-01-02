@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'package:android_play_install_referrer/android_play_install_referrer.dart';
+import 'package:install_referrer/install_referrer.dart';
 import 'package:upfin/controllers/aws_controller.dart';
 import 'package:upfin/controllers/clova_controller.dart';
 import 'package:upfin/controllers/get_controller.dart';
@@ -406,6 +408,67 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
     });
   }
 
+  static String testUtmParam = "";
+  static String testUtmParamAndroid = "";
+  Future<void> _extractUtmParameters() async {
+    if(Config.isAndroid){
+      testUtmParamAndroid = await initAndroidReferrerDetails();
+    }
+
+    try {
+      InstallationApp app = await InstallReferrer.app;
+      testUtmParam = referrerToReadableString(app.referrer);
+    } catch (e) {
+      testUtmParam = 'F';
+    }
+
+    if (!mounted) return;
+
+    setState(() {});
+  }
+
+  static String referrerToReadableString(InstallationAppReferrer referrer) {
+    switch (referrer) {
+      case InstallationAppReferrer.iosAppStore:
+        return "Apple - App Store";
+      case InstallationAppReferrer.iosTestFlight:
+        return "Apple - Test Flight";
+      case InstallationAppReferrer.iosDebug:
+        return "Apple - Debug";
+      case InstallationAppReferrer.androidGooglePlay:
+        return "Android - Google Play";
+      case InstallationAppReferrer.androidAmazonAppStore:
+        return "Android - Amazon App Store";
+      case InstallationAppReferrer.androidHuaweiAppGallery:
+        return "Android - Huawei App Gallery";
+      case InstallationAppReferrer.androidOppoAppMarket:
+        return "Android - Oppo App Market";
+      case InstallationAppReferrer.androidSamsungAppShop:
+        return "Android - Samsung App Shop";
+      case InstallationAppReferrer.androidVivoAppStore:
+        return "Android - Vivo App Store";
+      case InstallationAppReferrer.androidXiaomiAppStore:
+        return "Android - Xiaomi App Store";
+      case InstallationAppReferrer.androidManually:
+        return "Android - Manual installation";
+      case InstallationAppReferrer.androidDebug:
+        return "Android - Debug";
+    }
+  }
+
+  static Future<String> initAndroidReferrerDetails() async {
+    String referrerDetailsString = "";
+    try {
+      ReferrerDetails referrerDetails = await AndroidPlayInstallReferrer.installReferrer;
+      referrerDetailsString = referrerDetails.installReferrer.toString();
+    } catch (e) {
+      referrerDetailsString = 'Failed';
+      return referrerDetailsString;
+    }
+
+    return referrerDetailsString;
+  }
+
   void _callInitApis(){
     // count..
     //_initGPT();
@@ -418,6 +481,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
     _initIamport();
     _initSnsLogin();
     _initWebSocketForChat();
+    _extractUtmParameters();
   }
 
   Future<void> _initAtFirst() async {
@@ -568,7 +632,8 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
             UiUtils.getMarginBox(0, 10.h),
             UiUtils.getTextWithFixedScale("나에게 꼭 맞는", 24.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
             UiUtils.getMarginBox(0, 0.5.h),
-            UiUtils.getTextWithFixedScale("다이렉트 대출신청!", 24.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
+            // UiUtils.getTextWithFixedScale("다이렉트 대출신청!", 24.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
+            UiUtils.getTextWithFixedScale(testUtmParamAndroid, 24.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
             UiUtils.getMarginBox(0, Config.isPad()? 5.h : 10.h)
           ])),
           UiUtils.getExpandedScrollView(Axis.vertical, SizedBox(width: 100.w, child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [

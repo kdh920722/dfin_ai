@@ -3,6 +3,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/views/app_accident_detail_view.dart';
 import 'package:upfin/views/app_agree_detail_info_view.dart';
 import 'package:upfin/views/app_apply_pr_view.dart';
@@ -38,6 +39,7 @@ class Config{
   static List<Permission> permissionList = [];
   static List<Permission> storagePermissionListForAndroid = [];
   static String appVersion = "";
+  static String appTestVersion = "";
   static String appStoreUrl = "";
   static String privacyUrl = "";
   static String privacyText = "";
@@ -123,16 +125,18 @@ class Config{
           switch(each.key){
             case "app_download_url" : appStoreUrl = each.value.toString();
             case "app_state" : appState = int.parse(each.value.toString());
-            case "app_version" : appVersion = each.value.toString();
+            //case "app_version" : appVersion = each.value.toString();
           }
         }
       }else{
         isValid = false;
       }
 
+      /*
       if(await _isNeedToUpdateVersion()){
         appState = stateInfoMap["update"];
       }
+       */
 
       if(isValid){
         callback(true);
@@ -157,6 +161,7 @@ class Config{
         switch(each.key){
           case "app_state" : appState = int.parse(each.value.toString());
           case "app_version" : appVersion = each.value.toString();
+          case "app_test_version" : appTestVersion = each.value.toString();
         }
       }
     }
@@ -179,7 +184,8 @@ class Config{
   static Future<bool> _isNeedToUpdateVersion() async {
     bool result = false;
     String version = await getAppVersion();
-    if(version == appVersion){
+    String checkVersion = MyData.isTestUser? appTestVersion : appVersion;
+    if(version == checkVersion){
       result = false;
     }else{
       result = true;
