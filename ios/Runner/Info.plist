@@ -138,5 +138,9 @@
     <key>FacebookDisplayName</key>
     <string>upfn</string>
 
+    <key>com.apple.developer.associated-domains</key>
+    <array>
+        <string>applinks:upfin.onelink.me</string>
+    </array>
 </dict>
 </plist>

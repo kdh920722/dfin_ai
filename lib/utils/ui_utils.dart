@@ -19,7 +19,7 @@ class UiUtils {
           theme: ThemeData(useMaterial3: true),
           initialRoute: AppView.appRootView.value,
           routes: Config.appRoutes,
-          navigatorObservers: [FireBaseController.observer!],
+          navigatorObservers: [FireBaseController.faGaObserver!],
         );
       },
     );

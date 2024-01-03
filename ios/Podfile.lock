@@ -9,6 +9,8 @@ PODS:
     - Flutter
   - camera_avfoundation (0.0.1):
     - Flutter
+  - device_info (0.0.1):
+    - Flutter
   - facebook_app_events (0.0.1):
     - FBAudienceNetwork (~> 6.12)
     - FBSDKCoreKit (~> 16.0)
@@ -168,6 +170,8 @@ PODS:
     - Flutter
   - iamport_webview_flutter (0.0.1):
     - Flutter
+  - install_referrer (1.0.0):
+    - Flutter
   - just_audio (0.0.1):
     - Flutter
   - kakao_flutter_sdk_common (1.7.0):
@@ -212,6 +216,7 @@ DEPENDENCIES:
   - appsflyer_sdk (from `.symlinks/plugins/appsflyer_sdk/ios`)
   - audio_session (from `.symlinks/plugins/audio_session/ios`)
   - camera_avfoundation (from `.symlinks/plugins/camera_avfoundation/ios`)
+  - device_info (from `.symlinks/plugins/device_info/ios`)
   - facebook_app_events (from `.symlinks/plugins/facebook_app_events/ios`)
   - firebase_analytics (from `.symlinks/plugins/firebase_analytics/ios`)
   - firebase_auth (from `.symlinks/plugins/firebase_auth/ios`)
@@ -225,6 +230,7 @@ DEPENDENCIES:
   - fluttertoast (from `.symlinks/plugins/fluttertoast/ios`)
   - iamport_flutter (from `.symlinks/plugins/iamport_flutter/ios`)
   - iamport_webview_flutter (from `.symlinks/plugins/iamport_webview_flutter/ios`)
+  - install_referrer (from `.symlinks/plugins/install_referrer/ios`)
   - just_audio (from `.symlinks/plugins/just_audio/ios`)
   - kakao_flutter_sdk_common (from `.symlinks/plugins/kakao_flutter_sdk_common/ios`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
@@ -274,6 +280,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/audio_session/ios"
   camera_avfoundation:
     :path: ".symlinks/plugins/camera_avfoundation/ios"
+  device_info:
+    :path: ".symlinks/plugins/device_info/ios"
   facebook_app_events:
     :path: ".symlinks/plugins/facebook_app_events/ios"
   firebase_analytics:
@@ -300,6 +308,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/iamport_flutter/ios"
   iamport_webview_flutter:
     :path: ".symlinks/plugins/iamport_webview_flutter/ios"
+  install_referrer:
+    :path: ".symlinks/plugins/install_referrer/ios"
   just_audio:
     :path: ".symlinks/plugins/just_audio/ios"
   kakao_flutter_sdk_common:
@@ -332,6 +342,7 @@ SPEC CHECKSUMS:
   AppsFlyerFramework: 6eb4d89d2eb9a6632317f1055b359d9fd85fd5ff
   audio_session: 4f3e461722055d21515cf3261b64c973c062f345
   camera_avfoundation: 3125e8cd1a4387f6f31c6c63abb8a55892a9eeeb
+  device_info: d7d233b645a32c40dfdc212de5cf646ca482f175
   facebook_app_events: deb163f1f7fa13213192532bbc84ff0b0d798bc2
   FBAEMKit: 6c7b5eb77c96861bb59e040842c6e55bf39512ce
   FBAudienceNetwork: 4d6223a9a88a22e9dca8c9e6c1829a8745b86228
@@ -364,6 +375,7 @@ SPEC CHECKSUMS:
   GTMSessionFetcher: 41b9ef0b4c08a6db4b7eb51a21ae5183ec99a2c8
   iamport_flutter: f698983444b7c0f83e356407631cfeec77a776bf
   iamport_webview_flutter: 70dbc31045e4cf7a0c829b76c6f8319dc94b299e
+  install_referrer: 1bde9acf8b1bfd372706454234444a01b5732bcf
   just_audio: baa7252489dbcf47a4c7cc9ca663e9661c99aafa
   kakao_flutter_sdk_common: 5d20368c3526ba5eb2e598f85704d6a23c6c9e9e
   leveldb-library: f03246171cce0484482ec291f88b6d563699ee06

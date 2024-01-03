@@ -20,7 +20,6 @@ void main() async{
       DeviceOrientation.portraitDown,
     ]);
     await initializeDateFormatting();
-    await FireBaseController.setAppLogInit();
     FlutterNativeSplash.remove();
   }
   runApp(const MyApp());

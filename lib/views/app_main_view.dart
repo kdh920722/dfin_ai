@@ -178,9 +178,9 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               MyData.isTestUser ? UiUtils.getIconButton(Icons.comments_disabled_sharp, 7.w, ColorStyles.upFinRed, () {
 
                 Map<String, dynamic> inputJson1 = {
-                  "car_uid": MyData.getCarInfoList().last.carUid,
+
                 };
-                LogfinController.callLogfinApi(LogfinApis.searchCarProduct, inputJson1, (isSuccess, outputJson){
+                LogfinController.callLogfinApi(LogfinApis.getCarDocs, inputJson1, (isSuccess, outputJson){
 
                 });
                 /*
@@ -541,13 +541,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         UiUtils.getTextWithFixedScale("시세금액 : ${CommonUtils.getPriceFormattedStringForFullPrice(double.parse(each.carPrice))}", 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.center, 1),
                         UiUtils.getMarginBox(0, 0.5.h),
-                        Row(children: [
-                          UiUtils.getTextWithFixedScale(each.carNum, 16.sp,
-                              FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null),
-                          UiUtils.getMarginBox(0.5.w, 0),
-                          UiUtils.getTextWithFixedScale("(${each.carOwnerName})", 13.sp,
-                              FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null),
-                        ]),
+                        UiUtils.getTextWithFixedScale(each.carNum, 16.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, null),
                       ])
                     ]),
                   ])),

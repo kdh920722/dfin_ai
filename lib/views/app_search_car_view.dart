@@ -25,7 +25,6 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
   int currentViewId = 1;
 
   final int carViewId = 1;
-  final int carOwnerViewId = 2;
   String selectedCarNum = "";
   String selectedCarOwner = "";
   final _carInfoFocus1 = FocusNode();
@@ -43,11 +42,11 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
     }
   }
 
-  final int preLoanCountViewId = 3;
+  final int preLoanCountViewId = 2;
   Key? selectedPreLoanCountKey;
   String selectedPreLoanCountInfo = "";
 
-  final int preLoanPriceViewId = 4;
+  final int preLoanPriceViewId = 3;
   String selectedPreLoanPriceInfo = "";
   final _preLoanPriceFocus = FocusNode();
   final _preLoanPriceTextController = TextEditingController();
@@ -66,7 +65,7 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
     }
   }
 
-  final int wantLoanPriceViewId = 5;
+  final int wantLoanPriceViewId = 4;
   String selectedWantLoanPriceInfo = "";
   final _wantLoanPriceFocus = FocusNode();
   final _wantLoanPriceTextController = TextEditingController();
@@ -85,11 +84,11 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
     }
   }
 
-  final int jobViewId = 6;
+  final int jobViewId = 5;
   Key? selectedJobKey;
   String selectedJobInfo = "";
 
-  final int finishedViewId = 7;
+  final int finishedViewId = 6;
   bool finishedConfirmed = false;
 
   void _unFocusAllNodes(){
@@ -110,8 +109,6 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
     if(!finishedConfirmed){
       if(selectedCarNum.isEmpty){
         currentViewId = carViewId;
-      }else if(selectedCarOwner.isEmpty){
-        currentViewId = carOwnerViewId;
       }else if(selectedPreLoanCountInfo.isEmpty){
         currentViewId = preLoanCountViewId;
       }else if(selectedPreLoanPriceInfo.isEmpty){
@@ -220,16 +217,28 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("예) 12가3456", 14.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
 
+      //test for input name
+      MyData.isTestUser? SizedBox(width: 85.w, child:
+      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        UiUtils.getTextWithFixedScale("테스트용) 차량 소유자 입력", 10.sp, FontWeight.w600, ColorStyles.upFinRed, TextAlign.center, null),
+        UiUtils.getTextField(context, 30.w, TextStyles.upFinTextFormFieldTextStyle, _carInfoFocus2, _carInfoTextController2, TextInputType.text,
+            UiUtils.getInputDecoration("이름", 10.sp, "", 0.sp), (value) { }),
+        UiUtils.getMarginBox(0, 5.h),
+      ])) : UiUtils.getMarginBox(0, 0),
+
       UiUtils.getExpandedScrollView(Axis.vertical,
           SizedBox(width: 85.w, child: Row(children: [
             UiUtils.getTextField(context, 35.w, TextStyles.upFinTextFormFieldTextStyle, _carInfoFocus1, _carInfoTextController1, TextInputType.text,
                 UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
           ]))
       ),
+
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
         if(_carInfoTextController1.text.trim() != ""){
           selectedCarNum = _carInfoTextController1.text.trim();
+          selectedCarOwner = MyData.isTestUser? _carInfoTextController2.text.trim() : "";
+
           bool isValid = true;
           for(var eachCar in MyData.getCarInfoList()){
             if(eachCar.carNum == selectedCarNum){
@@ -592,7 +601,7 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
             UiUtils.getTextWithFixedScale("네 좋아요!", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
               Map<String, dynamic> inputJson = {
                 "car_no": selectedCarNum,
-                "owner_name": selectedCarOwner,
+                "owner_name": MyData.isTestUser? selectedCarOwner : MyData.name,
                 /*
                 "birthday": MyData.birth,
                 "job": selectedJobInfo.split("@")[1],
@@ -661,7 +670,7 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
             UiUtils.getTextWithFixedScale("아니오", 14.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null), () async {
               Map<String, dynamic> inputJson = {
                 "car_no": selectedCarNum,
-                "owner_name": selectedCarOwner,
+                "owner_name": MyData.isTestUser? selectedCarOwner : MyData.name,
                 /*
                 "birthday": MyData.birth,
                 "job": selectedJobInfo.split("@")[1],
@@ -738,8 +747,6 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
     Widget? view;
     if(currentViewId == carViewId){
       view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getCarView());
-    }else if(currentViewId == carOwnerViewId){
-      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getCarOwnerView());
     }else if(currentViewId == preLoanCountViewId){
       view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getPreLoanCountView());
     }else if(currentViewId == preLoanPriceViewId){

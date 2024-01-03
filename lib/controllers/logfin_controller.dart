@@ -254,7 +254,7 @@ class LogfinController {
     if(api == LogfinApis.signIn || api == LogfinApis.signUp){
       inputJson['user']['fcm_token'] = FireBaseController.fcmToken;
       inputJson['user']['device_type'] = Config.isAndroid? "2" : "1";
-    }else if(api == LogfinApis.socialLogin){
+    }else if(api == LogfinApis.socialLogin || api == LogfinApis.installTracking){
       inputJson['fcm_token'] = FireBaseController.fcmToken;
       inputJson['device_type'] = Config.isAndroid? "2" : "1";
     }
@@ -262,7 +262,7 @@ class LogfinController {
     if(api != LogfinApis.signIn && api != LogfinApis.signUp && api != LogfinApis.socialLogin
         && api != LogfinApis.deleteAccount && api != LogfinApis.checkMember && api != LogfinApis.getAgreeDocuments && api != LogfinApis.getFaqs
         && api != LogfinApis.findEmail && api != LogfinApis.sendEmailCode && api != LogfinApis.checkEmailCode
-        && api != LogfinApis.checkMemberByPhone && api != LogfinApis.updatePassword && api != LogfinApis.getCarDocs){
+        && api != LogfinApis.checkMemberByPhone && api != LogfinApis.updatePassword && api != LogfinApis.getCarDocs && api != LogfinApis.installTracking){
       if(userToken != ""){
         inputJson['api_token'] = userToken;
       }else{
@@ -620,23 +620,26 @@ class LogfinController {
             }else{
               MyData.clearLoanInfoList();
               for(Map eachLoans in loansList){
-                if(eachLoans.containsKey("lender_pr_id") && eachLoans.containsKey("lender_pr")){
-                  String uid = "";
-                  String uidType = "";
-                  if(eachLoans.containsKey("accident_uid")){
-                    if(eachLoans["accident_uid"] == null || eachLoans["accident_uid"].toString() == ""){
-                      uidType = "2";
-                      uid = eachLoans["search_car_result_uid"].toString();
-                    }else{
-                      uidType = "1";
-                      uid = eachLoans["accident_uid"].toString();
-                    }
-                  }else{
-                    uidType = "2";
-                    uid = eachLoans["search_car_result_uid"].toString();
-                  }
-                  CommonUtils.log("", "loan data ====>\n"
-                      "accidentUid: $uid\n"
+                CommonUtils.log("i", "each loans : $eachLoans");
+                String uid = "";
+                String uidType = "";
+                String lenderId = "";
+                String companyName = "";
+                String productName = "";
+                String contactNo = "";
+
+                if(eachLoans.containsKey("lender_pr")){
+                  CommonUtils.log("i", "accident loan ==>");
+                  uidType = "1";
+                  uid = eachLoans["accident_uid"].toString();
+                  lenderId = eachLoans["lender_pr_id"].toString();
+                  companyName = eachLoans["lender_pr"]["lender"]["name"].toString();
+                  productName = eachLoans["lender_pr"]["lender"]["product_name"].toString();
+                  contactNo = eachLoans["lender_pr"]["lender"]["contact_no"].toString();
+
+                  CommonUtils.log("w", "loan data ====>\n"
+                      "uidType: $uidType\n"
+                      "uid: $uid\n"
                       "loanUid: ${eachLoans["uid"]}\n"
                       "lenderPrId: ${eachLoans["lender_pr_id"]}\n"
                       "submitAmount: ${eachLoans["submit_offer"]["amount"]}\n"
@@ -648,34 +651,56 @@ class LogfinController {
                       "updatedDate: ${eachLoans["submit_offer"]["updated_at"]}\n"
                       "statueId: ${eachLoans["status_info"]["id"]}\n"
                       "roomId: ${eachLoans["pr_room"]["id"]}\n");
+                }else if(eachLoans.containsKey("lender_car")){
+                  CommonUtils.log("i", "car loan ==>");
+                  uidType = "2";
+                  uid = eachLoans["search_car_result_uid"].toString();
+                  lenderId = eachLoans["lender_car_id"].toString();
+                  companyName = eachLoans["lender_car"]["lender"]["name"].toString();
+                  productName = eachLoans["lender_car"]["lender"]["product_name"].toString();
+                  contactNo = eachLoans["lender_car"]["lender"]["contact_no"].toString();
 
-                  var inputJson = {
-                    "loan_uid" : eachLoans["uid"],
-                    "last_message_id" : 0,
-                    "length" : 100
-                  };
-                  await callLogfinApi(LogfinApis.getMessage, inputJson, (isSuccessToGetLoanMessageInfo, loanMessageInfoOutputJson){
-                    if(isSuccessToGetLoanMessageInfo){
-                      String tempAmount = eachLoans["submit_offer"]["amount"].toString();
-                      String submitAmount = "0";
-                      if(tempAmount.length < 5){
-                        CommonUtils.log("e", "submitAmount error $tempAmount");
-                      }else{
-                        submitAmount = eachLoans["submit_offer"]["amount"].toString().substring(0, eachLoans["submit_offer"]["amount"].toString().length-4);
-                      }
-
-                      loanMessageInfoOutputJson!["last_read_message_id"] = eachLoans["pr_room"]["last_read_message_id"].toString();
-                      MyData.addToLoanInfoList(
-                          LoanInfoData(uid, uidType, eachLoans["uid"].toString(), eachLoans["lender_pr_id"].toString(),
-                              submitAmount, eachLoans["submit_offer"]["interest_rate"].toString(),
-                              eachLoans["lender_pr"]["lender"]["name"].toString(),
-                              eachLoans["lender_pr"]["lender"]["name"].toString() == "(주)안전대부"? "assets/images/bank_logo_safe.png" : "assets/images/bank_logo_default.png",
-                              eachLoans["lender_pr"]["lender"]["product_name"].toString(), eachLoans["lender_pr"]["lender"]["contact_no"].toString(),
-                              eachLoans["submit_offer"]["created_at"].toString(), eachLoans["submit_offer"]["updated_at"].toString(),
-                              eachLoans["status_info"]["id"].toString(), eachLoans["pr_room"]["id"].toString(), jsonEncode(loanMessageInfoOutputJson)));
-                    }
-                  });
+                  CommonUtils.log("w", "loan data ====>\n"
+                      "uidType: $uidType\n"
+                      "uid: $uid\n"
+                      "loanUid: ${eachLoans["uid"]}\n"
+                      "lenderPrId: ${eachLoans["lender_car_id"]}\n"
+                      "submitAmount: ${eachLoans["submit_offer"]["amount"]}\n"
+                      "submitRate: ${eachLoans["submit_offer"]["interest_rate"]}\n"
+                      "companyName: ${eachLoans["lender_car"]["lender"]["name"]}\n"
+                      "productName: ${eachLoans["lender_car"]["lender"]["product_name"]}\n"
+                      "contactNo: ${eachLoans["lender_car"]["lender"]["contact_no"]}\n"
+                      "createdDate: ${eachLoans["submit_offer"]["created_at"]}\n"
+                      "updatedDate: ${eachLoans["submit_offer"]["updated_at"]}\n"
+                      "statueId: ${eachLoans["status_info"]["id"]}\n"
+                      "roomId: ${eachLoans["pr_room"]["id"]}\n");
                 }
+
+                var inputJson = {
+                  "loan_uid" : eachLoans["uid"],
+                  "last_message_id" : 0,
+                  "length" : 100
+                };
+                await callLogfinApi(LogfinApis.getMessage, inputJson, (isSuccessToGetLoanMessageInfo, loanMessageInfoOutputJson){
+                  if(isSuccessToGetLoanMessageInfo){
+                    String tempAmount = eachLoans["submit_offer"]["amount"].toString();
+                    String submitAmount = "0";
+                    if(tempAmount.length < 5){
+                      CommonUtils.log("e", "submitAmount error $tempAmount");
+                    }else{
+                      submitAmount = eachLoans["submit_offer"]["amount"].toString().substring(0, eachLoans["submit_offer"]["amount"].toString().length-4);
+                    }
+
+                    loanMessageInfoOutputJson!["last_read_message_id"] = eachLoans["pr_room"]["last_read_message_id"].toString();
+                    MyData.addToLoanInfoList(
+                        LoanInfoData(uid, uidType, eachLoans["uid"].toString(), lenderId,
+                            submitAmount, eachLoans["submit_offer"]["interest_rate"].toString(),
+                            companyName, companyName == "(주)안전대부"? "assets/images/bank_logo_safe.png" : "assets/images/bank_logo_default.png",
+                            productName, contactNo,
+                            eachLoans["submit_offer"]["created_at"].toString(), eachLoans["submit_offer"]["updated_at"].toString(),
+                            eachLoans["status_info"]["id"].toString(), eachLoans["pr_room"]["id"].toString(), jsonEncode(loanMessageInfoOutputJson)));
+                  }
+                });
               }
 
               MyData.sortLoanInfoList();
@@ -857,7 +882,7 @@ enum LogfinApis {
   sendMessage, getMessage, checkMessage, getAgreeDocuments, getFaqs,
   getRetryDocs, retryDocs,
   findEmail, sendEmailCode, checkEmailCode, checkMemberByPhone, updatePassword,
-  getMyCarInfo, addAndSearchCar, searchCar, searchCarProduct, getCarDocs, submitCarProduct
+  getMyCarInfo, addAndSearchCar, searchCar, searchCarProduct, getCarDocs, applyCarProduct, installTracking
 }
 
 extension LogfinApisExtension on LogfinApis {
@@ -931,8 +956,11 @@ extension LogfinApisExtension on LogfinApis {
         return '/search_auto_products.json';
       case LogfinApis.getCarDocs:
         return '/get_auto_documents.json';
-      case LogfinApis.submitCarProduct:
+      case LogfinApis.applyCarProduct:
         return '/submit_auto_product.json';
+
+      case LogfinApis.installTracking:
+        return '/first_launch.json';
     }
   }
 }

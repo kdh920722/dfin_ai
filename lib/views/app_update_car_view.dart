@@ -179,8 +179,6 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
     GetController.to.resetPreLoanPrice();
     GetController.to.resetWantLoanPrice();
     Config.contextForEmergencyBack = AppCarDetailViewState.mainContext;
-    MyData.selectedCarInfoData = null;
-    MyData.selectedAccidentInfoData = null;
     startViewId = 0;
     endViewId = 0;
     isViewHere = false;

@@ -10,6 +10,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:upfin/configs/app_config.dart';
+import 'package:upfin/controllers/appsflyer_controller.dart';
+import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/views/app_chat_view.dart';
 import '../configs/firebase_options.dart';
@@ -25,49 +27,73 @@ class FireBaseController{
   static String pushFrom = "";
   static FirebaseAnalytics? analytics;
   static FacebookAppEvents? facebookAppEvents;
-  static FirebaseAnalyticsObserver? observer;
+  static FirebaseAnalyticsObserver? faGaObserver;
   static AppsflyerSdk? appsFlyerSdk;
+  static String appsFlyerOneLink = "";
+  static int appsFlyerOneLinkCnt = 0;
 
-  static Future<void> setAppLogInit() async {
-    // GA init
-    analytics = FirebaseAnalytics.instance;
-    observer = FirebaseAnalyticsObserver(analytics: analytics!);
-
+  static Future<void> setMetaAndAppsflyerLogInit() async {
     /*
     // META(facebook) pixel init
     facebookAppEvents = FacebookAppEvents();
     await facebookAppEvents!.setAutoLogAppEventsEnabled(true);
+     */
 
     // appsflyer init
-    appsFlyerSdk = Config.isAndroid? AppsflyerSdk(
+    appsFlyerSdk = Config.isAndroid?
+    AppsflyerSdk(
         AppsFlyerOptions(
-        afDevKey: "Rk39mpxEWJu2vZxBRYw3mM",
-        showDebug: false,
-        timeToWaitForATTUserAuthorization: 50, // for iOS 14.5
-        disableAdvertisingIdentifier: false, // Optional field
-        disableCollectASA: false)
-    ) : AppsflyerSdk(
-        AppsFlyerOptions(
-            afDevKey: "Rk39mpxEWJu2vZxBRYw3mM",
-            appId: "6472978139",
+            afDevKey: AppsflyerController.devKey,
+            appInviteOneLink : AppsflyerController.inviteKey,
             showDebug: false,
-            timeToWaitForATTUserAuthorization: 50, // for iOS 14.5
+            disableAdvertisingIdentifier: false, // Optional field
+            disableCollectASA: false)
+    ) :
+    AppsflyerSdk(
+        AppsFlyerOptions(
+            appId: AppsflyerController.appIdForIos,
+            afDevKey: AppsflyerController.devKey,
+            appInviteOneLink : AppsflyerController.inviteKey,
+            showDebug: false,
             disableAdvertisingIdentifier: false, // Optional field
             disableCollectASA: false)
     );
+    appsFlyerSdk!.onAppOpenAttribution((res){
+      // 이미 설치 된 후, 링크 열었을 때
+    });
+    appsFlyerSdk!.onInstallConversionData((res){
+      // 설치 된 후, 링크 열었을 때
+      appsFlyerOneLink = res.toString();
+      appsFlyerOneLinkCnt++;
+      if(appsFlyerOneLinkCnt == 3){
+        sendInfoForInstallTracking();
+      }
+
+    });
     appsFlyerSdk!.initSdk(
         registerConversionDataCallback: true,
         registerOnAppOpenAttributionCallback: true,
         registerOnDeepLinkingCallback: true
     );
-     */
+  }
 
+  static void sendInfoForInstallTracking(){
+    if(appsFlyerOneLink != ""){
+      Map<String, dynamic> inputJson = {
+        "response" : appsFlyerOneLink,
+      };
+      LogfinController.callLogfinApi(LogfinApis.installTracking, inputJson, (isSuccess, outputJson){});
+    }
   }
 
   /// firebase database =========================================================================== ///
   static Future<void> initMainFirebase() async {
     try {
       firebaseApp = await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+      // GA init
+      analytics = FirebaseAnalytics.instance;
+      faGaObserver = FirebaseAnalyticsObserver(analytics: analytics!);
     } on FirebaseAuthException catch (e) {
       CommonUtils.log("e", "firebase main init error : ${e.code} : ${e.toString()}");
     }
@@ -175,6 +201,10 @@ class FireBaseController{
           String? firebaseToken = await messaging.getToken();
           if(firebaseToken != null){
             fcmToken = firebaseToken;
+            appsFlyerOneLinkCnt++;
+            if(appsFlyerOneLinkCnt == 3){
+              sendInfoForInstallTracking();
+            }
             CommonUtils.log("d", "fcm token : $firebaseToken");
             messaging.onTokenRefresh.listen((event) {
               //TODO : 서버에 해당 토큰을 저장하는 로직 구현

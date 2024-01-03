@@ -255,16 +255,16 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       addedDocsList.add(businessNumberInfo);
     }
 
-    //gov24 : 1:주민등록등본           2:주민등록초본        15:지방세납세증명서
+    //gov24 : 1:주민등록등본           2:주민등록초본        15:지방세납세증명서        16:자동차등록원부(갑)       17:자동차등록원부(을)
     //nhis  : 3:건강보험자격득실확인서    4:건강보험납부확인서
     //nts   : 6:사업자등록증(*테스트불가) 10:소득금액증명       11:부가세과세표준증명원(*테스트불가)      14:납세증명서
     for(var each in MyData.getPrDocsInfoList()){
       CommonUtils.log("", "each docs : ${each.productDocsId}  ${each.productDocsName}");
-      if(each.productDocsId == 1 || each.productDocsId == 2 || each.productDocsId == 15
+      if(each.productDocsId == 1 || each.productDocsId == 2 || each.productDocsId == 15 || each.productDocsId == 16 || each.productDocsId == 17
           || each.productDocsId == 3 || each.productDocsId == 4
           || each.productDocsId == 6 || each.productDocsId == 10 || each.productDocsId == 11 || each.productDocsId == 14){
         String docsType = "";
-        if(each.productDocsId == 1 || each.productDocsId == 2 || each.productDocsId == 15){
+        if(each.productDocsId == 1 || each.productDocsId == 2 || each.productDocsId == 15 || each.productDocsId == 16 || each.productDocsId == 17){
           docsType = "gov24";
         }else if(each.productDocsId == 3 || each.productDocsId == 4){
           docsType = "nhis";
@@ -294,6 +294,12 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         addedIndexId++;
         each["view_id"] = addedIndexId;
       }else if(each["id"] == 15){
+        addedIndexId++;
+        each["view_id"] = addedIndexId;
+      }else if(each["id"] == 16){
+        addedIndexId++;
+        each["view_id"] = addedIndexId;
+      }else if(each["id"] == 17){
         addedIndexId++;
         each["view_id"] = addedIndexId;
       }
@@ -383,6 +389,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     if(_isIdHereFromListById(1)) gov24Count++;
     if(_isIdHereFromListById(2)) gov24Count++;
     if(_isIdHereFromListById(15)) gov24Count++;
+    if(_isIdHereFromListById(16)) gov24Count++;
+    if(_isIdHereFromListById(17)) gov24Count++;
     if(_isIdHereFromListById(3)) nhisCount++;
     if(_isIdHereFromListById(4)) nhisCount++;
     if(_isIdHereFromListById(6)) ntsCount++;
@@ -642,7 +650,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               if(prevDocsType == "nhis") prevDocsCount = nhisCount;
               if(prevDocsType == "nts") prevDocsCount = ntsCount;
 
-              if(prevId == 1 || prevId == 2 || prevId == 15 || prevId == 3 || prevId == 4 || prevId == 6 || prevId == 10 || prevId == 11 || prevId == 14){
+              if(prevId == 1 || prevId == 2 || prevId == 15 || prevId == 16 || prevId == 17 || prevId == 3 || prevId == 4 || prevId == 6 || prevId == 10 || prevId == 11 || prevId == 14){
                 if(isPrevDocs){
                   currentViewId = currentViewId-prevDocsCount+1;
                 }
@@ -671,7 +679,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             if(prevDocsType == "nhis") prevDocsCount = nhisCount;
             if(prevDocsType == "nts") prevDocsCount = ntsCount;
 
-            if(prevId == 1 || prevId == 2 || prevId == 15 || prevId == 3 || prevId == 4 || prevId == 6 || prevId == 10 || prevId == 11 || prevId == 14){
+            if(prevId == 1 || prevId == 2 || prevId == 15 || prevId == 16 || prevId == 17  || prevId == 3 || prevId == 4 || prevId == 6 || prevId == 10 || prevId == 11 || prevId == 14){
               if(isPrevDocs){
                 currentViewId = currentViewId-prevDocsCount+1;
               }
@@ -705,7 +713,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
   Future<void> nextInputView() async {
     if(isInputValid){
-      if(_getIdFromListByViewId(currentViewId) == 1 || _getIdFromListByViewId(currentViewId) == 2 || _getIdFromListByViewId(currentViewId) == 15){
+      if(_getIdFromListByViewId(currentViewId) == 1 || _getIdFromListByViewId(currentViewId) == 2 || _getIdFromListByViewId(currentViewId) == 15
+          || _getIdFromListByViewId(currentViewId) == 16 || _getIdFromListByViewId(currentViewId) == 17){
         if(gov24Count != 1){
           currentViewId = currentViewId+gov24Count-1;
         }
@@ -907,46 +916,47 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       introWidgetList.add(
           UiUtils.getMarginBox(0, 3.h)
       );
-      introWidgetList.add(
-          SizedBox(width: 90.w,
-              child: Row(children: [
-                UiUtils.getMarginBox(3.w, 0),
-                UiUtils.getTextButtonWithFixedScale("•  기대출 ${MyData.selectedAccidentInfoData != null ?
-                MyData.selectedAccidentInfoData!.accidentLendCount.split("@")[0] : MyData.selectedCarInfoData!.carLendCount.split("@")[0]}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
-              ])
-          )
-      );
-      introWidgetList.add(
-          UiUtils.getMarginBox(0, 3.h)
-      );
-      if(MyData.selectedAccidentInfoData != null ? MyData.selectedAccidentInfoData!.accidentLendAmount != "0" : MyData.selectedCarInfoData!.carLendAmount != "0"){
+      if(MyData.selectedPrInfoData!.uidType == "1"){
         introWidgetList.add(
             SizedBox(width: 90.w,
                 child: Row(children: [
                   UiUtils.getMarginBox(3.w, 0),
-                  UiUtils.getTextButtonWithFixedScale("•  인가후대출금액 ${CommonUtils.getPriceFormattedString(double.parse(
-                      MyData.selectedAccidentInfoData != null ? MyData.selectedAccidentInfoData!.accidentLendAmount : MyData.selectedCarInfoData!.carLendAmount))}",
-                      13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
-
+                  UiUtils.getTextButtonWithFixedScale("•  기대출 ${MyData.selectedPrInfoData!.uidType == "1" ?
+                  MyData.selectedAccidentInfoData!.accidentLendCount.split("@")[0] : MyData.selectedCarInfoData!.carLendCount.split("@")[0]}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
                 ])
             )
         );
-      }else{
         introWidgetList.add(
-            SizedBox(width: 90.w,
-                child: Row(children: [
-                  UiUtils.getMarginBox(3.w, 0),
-                  UiUtils.getTextButtonWithFixedScale("•  인가후대출금액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
-
-                ])
-            )
+            UiUtils.getMarginBox(0, 3.h)
         );
-      }
-      introWidgetList.add(
-          UiUtils.getMarginBox(0, 3.h)
-      );
 
-      if(MyData.selectedAccidentInfoData != null){
+        if(MyData.selectedPrInfoData!.uidType == "1" ? MyData.selectedAccidentInfoData!.accidentLendAmount != "0" : MyData.selectedCarInfoData!.carLendAmount != "0"){
+          introWidgetList.add(
+              SizedBox(width: 90.w,
+                  child: Row(children: [
+                    UiUtils.getMarginBox(3.w, 0),
+                    UiUtils.getTextButtonWithFixedScale("•  인가후대출금액 ${CommonUtils.getPriceFormattedString(double.parse(
+                        MyData.selectedPrInfoData!.uidType == "1" ? MyData.selectedAccidentInfoData!.accidentLendAmount : MyData.selectedCarInfoData!.carLendAmount))}",
+                        13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+
+                  ])
+              )
+          );
+        }else{
+          introWidgetList.add(
+              SizedBox(width: 90.w,
+                  child: Row(children: [
+                    UiUtils.getMarginBox(3.w, 0),
+                    UiUtils.getTextButtonWithFixedScale("•  인가후대출금액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+
+                  ])
+              )
+          );
+        }
+        introWidgetList.add(
+            UiUtils.getMarginBox(0, 3.h)
+        );
+
         introWidgetList.add(
             SizedBox(width: 90.w,
                 child: Row(children: [
@@ -1002,27 +1012,30 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       introWidgetList.add(
           UiUtils.getMarginBox(0, 3.h)
       );
-      if(MyData.selectedAccidentInfoData != null? MyData.selectedAccidentInfoData!.accidentWishAmount != "0" : MyData.selectedCarInfoData!.carWishAmount != "0"){
-        introWidgetList.add(
-            SizedBox(width: 90.w,
-                child: Row(children: [
-                  UiUtils.getMarginBox(3.w, 0),
-                  UiUtils.getTextButtonWithFixedScale("•  대출희망금액 ${CommonUtils.getPriceFormattedString(double.parse(MyData.selectedAccidentInfoData != null? MyData.selectedAccidentInfoData!.accidentWishAmount : MyData.selectedCarInfoData!.carWishAmount))}",
-                      13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
-                ])
-            )
-        );
-      }else{
-        introWidgetList.add(
-            SizedBox(width: 90.w,
-                child: Row(children: [
-                  UiUtils.getMarginBox(3.w, 0),
-                  UiUtils.getTextButtonWithFixedScale("•  대출희망금액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+      if(MyData.selectedPrInfoData!.uidType == "1"){
+        if(MyData.selectedPrInfoData!.uidType == "1" ? MyData.selectedAccidentInfoData!.accidentWishAmount != "0" : MyData.selectedCarInfoData!.carWishAmount != "0"){
+          introWidgetList.add(
+              SizedBox(width: 90.w,
+                  child: Row(children: [
+                    UiUtils.getMarginBox(3.w, 0),
+                    UiUtils.getTextButtonWithFixedScale("•  대출희망금액 ${CommonUtils.getPriceFormattedString(double.parse(MyData.selectedPrInfoData!.uidType == "1" ? MyData.selectedAccidentInfoData!.accidentWishAmount : MyData.selectedCarInfoData!.carWishAmount))}",
+                        13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
-                ])
-            )
-        );
+                  ])
+              )
+          );
+        }else{
+          introWidgetList.add(
+              SizedBox(width: 90.w,
+                  child: Row(children: [
+                    UiUtils.getMarginBox(3.w, 0),
+                    UiUtils.getTextButtonWithFixedScale("•  대출희망금액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+
+                  ])
+              )
+          );
+        }
       }
 
       if(unSavedDocsList.isNotEmpty){
@@ -1271,10 +1284,11 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               addedDocsList[eachAddedDocIdx]["result"] = eachSavedDoc["result"];
             }
           }
-          //gov24 : 1:주민등록등본           2:주민등록초본        15:지방세납세증명서
+          //gov24 : 1:주민등록등본           2:주민등록초본        15:지방세납세증명서      16:자동차등록원부(갑)     17:자동차등록원부(을)
           //nhis  : 3:건강보험자격득실확인서    4:건강보험납부확인서
           //nts   : 6:사업자등록증(*테스트불가) 10:소득금액증명       11:부가세과세표준증명원(*테스트불가)
           else if(addedDocsList[eachAddedDocIdx]["id"] == 1 || addedDocsList[eachAddedDocIdx]["id"] == 2 || addedDocsList[eachAddedDocIdx]["id"] == 15 ||
+              addedDocsList[eachAddedDocIdx]["id"] == 16 || addedDocsList[eachAddedDocIdx]["id"] == 17 ||
               addedDocsList[eachAddedDocIdx]["id"] == 3 || addedDocsList[eachAddedDocIdx]["id"] == 4
               || addedDocsList[eachAddedDocIdx]["id"] == 6 || addedDocsList[eachAddedDocIdx]["id"] == 10
               || addedDocsList[eachAddedDocIdx]["id"] == 11 || addedDocsList[eachAddedDocIdx]["id"] == 14){
@@ -1408,7 +1422,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               int lastVisibleItem2 = firstVisibleItem2+maxVisibleItemCnt2;
               if(firstVisibleItem2 <=0 ) firstVisibleItem2 = 0;
               if(lastVisibleItem2 >= LogfinController.bankList.length-1) lastVisibleItem2 = LogfinController.bankList.length-1;
-              print('보이는 아이템 ====> ${LogfinController.bankList.length} : $firstVisibleItem2 | $lastVisibleItem2');
 
               GetController.to.updateFirstIndex2_3(firstVisibleItem2);
               GetController.to.updateLastIndex2_3(lastVisibleItem2);
@@ -2655,6 +2668,12 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           if(each["id"] == 15){
             name = "지방세납세증명서";
           }
+          if(each["id"] == 16){
+            name = "자동차등록원부(갑)";
+          }
+          if(each["id"] == 17){
+            name = "자동차등록원부(을)";
+          }
 
           if(docType == "gov24"){
             checkColor = ColorStyles.upFinGray;
@@ -2808,7 +2827,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     callback(isError, docsWidgetList);
   }
 
-  /// gov24(id:1,2,15) view
+  /// gov24(id:1,2,15,16,17) view
   Widget _getGov24View(){
     String subTitle = "'정부24'";
     String title1 = "금융사가 요청하는";
@@ -2873,6 +2892,16 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.gov24localTaxPaymentCert,
                   identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey, "", "");
               apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.gov24localTaxPaymentCert, true));
+            }else if(each["id"] == 16){
+              // 자동차등록원부(갑)
+              Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.gov24CarRegistrationA,
+                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey, "", "");
+              apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.gov24CarRegistrationA, true));
+            }else if(each["id"] == 17){
+              // 자동차등록원부(을)
+              Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.gov24CarRegistrationB,
+                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey, "", "");
+              apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.gov24CarRegistrationB, true));
             }
           }
         }
@@ -2881,7 +2910,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       }
     });
   }
-  /// gov24(id:1,2,15) view end
+  /// gov24(id:1,2,15,16,17) view end
 
   /// nhis(id:3,4) view
   Widget _getNhisView(){
@@ -3119,44 +3148,45 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       introWidgetList.add(
           UiUtils.getMarginBox(0, 3.h)
       );
-      introWidgetList.add(
-          SizedBox(width: 90.w,
-              child: Row(children: [
-                UiUtils.getMarginBox(3.w, 0),
-                UiUtils.getTextButtonWithFixedScale("•  기대출 ${MyData.selectedAccidentInfoData != null ?
+      if(MyData.selectedPrInfoData!.uidType == "1"){
+        introWidgetList.add(
+            SizedBox(width: 90.w,
+                child: Row(children: [
+                  UiUtils.getMarginBox(3.w, 0),
+                  UiUtils.getTextButtonWithFixedScale("•  기대출 ${MyData.selectedPrInfoData!.uidType == "1" ?
                   MyData.selectedAccidentInfoData!.accidentLendCount.split("@")[0] : MyData.selectedCarInfoData!.carLendCount.split("@")[0]}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
-              ])
-          )
-      );
-      introWidgetList.add(
-          UiUtils.getMarginBox(0, 3.h)
-      );
-      if(MyData.selectedAccidentInfoData != null ? MyData.selectedAccidentInfoData!.accidentLendAmount != "0" : MyData.selectedCarInfoData!.carLendAmount != "0"){
-        introWidgetList.add(
-            SizedBox(width: 90.w,
-                child: Row(children: [
-                  UiUtils.getMarginBox(3.w, 0),
-                  UiUtils.getTextButtonWithFixedScale("•  인가후대출금액 ${CommonUtils.getPriceFormattedString(double.parse(MyData.selectedAccidentInfoData != null ? MyData.selectedAccidentInfoData!.accidentLendAmount : MyData.selectedCarInfoData!.carLendAmount))}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
-
                 ])
             )
         );
-      }else{
         introWidgetList.add(
-            SizedBox(width: 90.w,
-                child: Row(children: [
-                  UiUtils.getMarginBox(3.w, 0),
-                  UiUtils.getTextButtonWithFixedScale("•  인가후대출금액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
-
-                ])
-            )
+            UiUtils.getMarginBox(0, 3.h)
         );
-      }
-      introWidgetList.add(
-          UiUtils.getMarginBox(0, 3.h)
-      );
 
-      if(MyData.selectedAccidentInfoData != null){
+        if(MyData.selectedPrInfoData!.uidType == "1" ? MyData.selectedAccidentInfoData!.accidentLendAmount != "0" : MyData.selectedCarInfoData!.carLendAmount != "0"){
+          introWidgetList.add(
+              SizedBox(width: 90.w,
+                  child: Row(children: [
+                    UiUtils.getMarginBox(3.w, 0),
+                    UiUtils.getTextButtonWithFixedScale("•  인가후대출금액 ${CommonUtils.getPriceFormattedString(double.parse(MyData.selectedPrInfoData!.uidType == "1" ? MyData.selectedAccidentInfoData!.accidentLendAmount : MyData.selectedCarInfoData!.carLendAmount))}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+
+                  ])
+              )
+          );
+        }else{
+          introWidgetList.add(
+              SizedBox(width: 90.w,
+                  child: Row(children: [
+                    UiUtils.getMarginBox(3.w, 0),
+                    UiUtils.getTextButtonWithFixedScale("•  인가후대출금액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+
+                  ])
+              )
+          );
+        }
+        introWidgetList.add(
+            UiUtils.getMarginBox(0, 3.h)
+        );
+
         introWidgetList.add(
             SizedBox(width: 90.w,
                 child: Row(children: [
@@ -3207,26 +3237,29 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       introWidgetList.add(
           UiUtils.getMarginBox(0, 3.h)
       );
-      if(MyData.selectedAccidentInfoData != null ? MyData.selectedAccidentInfoData!.accidentWishAmount != "0" : MyData.selectedCarInfoData!.carWishAmount != "0"){
-        introWidgetList.add(
-            SizedBox(width: 90.w,
-                child: Row(children: [
-                  UiUtils.getMarginBox(3.w, 0),
-                  UiUtils.getTextButtonWithFixedScale("•  대출희망금액 ${CommonUtils.getPriceFormattedString(double.parse(MyData.selectedAccidentInfoData != null ? MyData.selectedAccidentInfoData!.accidentWishAmount : MyData.selectedCarInfoData!.carWishAmount))}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
-                ])
-            )
-        );
-      }else{
-        introWidgetList.add(
-            SizedBox(width: 90.w,
-                child: Row(children: [
-                  UiUtils.getMarginBox(3.w, 0),
-                  UiUtils.getTextButtonWithFixedScale("•  대출희망금액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+      if(MyData.selectedPrInfoData!.uidType == "1"){
+        if(MyData.selectedPrInfoData!.uidType == "1" ? MyData.selectedAccidentInfoData!.accidentWishAmount != "0" : MyData.selectedCarInfoData!.carWishAmount != "0"){
+          introWidgetList.add(
+              SizedBox(width: 90.w,
+                  child: Row(children: [
+                    UiUtils.getMarginBox(3.w, 0),
+                    UiUtils.getTextButtonWithFixedScale("•  대출희망금액 ${CommonUtils.getPriceFormattedString(double.parse(MyData.selectedPrInfoData!.uidType == "1" ? MyData.selectedAccidentInfoData!.accidentWishAmount : MyData.selectedCarInfoData!.carWishAmount))}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
-                ])
-            )
-        );
+                  ])
+              )
+          );
+        }else{
+          introWidgetList.add(
+              SizedBox(width: 90.w,
+                  child: Row(children: [
+                    UiUtils.getMarginBox(3.w, 0),
+                    UiUtils.getTextButtonWithFixedScale("•  대출희망금액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+
+                  ])
+              )
+          );
+        }
       }
 
       introWidgetList.add(
@@ -3309,7 +3342,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       for(var each in addedDocsList){
         if(each["is_docs"] && each["is_confirmed"]){
           var resultMap  =  each["result"]["resultValue"]["data"];
-          //gov24 : 1:주민등록등본           2:주민등록초본        15:지방세납세증명서
+          //gov24 : 1:주민등록등본           2:주민등록초본        15:지방세납세증명서      16:자동차등록원부(갑)     17:자동차등록원부(을)
           //nhis  : 3:건강보험자격득실확인서    4:건강보험납부확인서
           //nts   : 6:사업자등록증(*테스트불가) 10:소득금액증명       11:부가세과세표준증명원(*테스트불가)      14:국세납세증명서
           if(each["id"] == 3 || each["id"] == 4){
@@ -3421,7 +3454,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             for(var each in addedDocsList){
               if(each["is_docs"] && each["is_confirmed"]){
                 var resultMap  =  each["result"]["resultValue"]["data"];
-                //gov24 : 1:주민등록등본           2:주민등록초본        15:지방세납세증명서
+                //gov24 : 1:주민등록등본           2:주민등록초본        15:지방세납세증명서      16:자동차등록원부(갑)     17:자동차등록원부(을)
                 //nhis  : 3:건강보험자격득실확인서    4:건강보험납부확인서
                 //nts   : 6:사업자등록증(*테스트불가) 10:소득금액증명       11:부가세과세표준증명원(*테스트불가)      14:국세납세증명서
                 if(each["id"] == 3 || each["id"] == 4){
@@ -3458,21 +3491,38 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               }
             }
             String address = _getResultFromListById(addressId)["resultValue"];
-            Map<String, dynamic> applyInputMap = {
-              "offer_id": MyData.selectedPrInfoData!.productOfferId,
-              "offer_rid": MyData.selectedPrInfoData!.productOfferRid,
-              "lender_pr_id": MyData.selectedPrInfoData!.productOfferLenderPrId,
-              "address": address,
-              "contact_no1": MyData.phoneNumber.substring(0,3),
-              "contact_no2": MyData.phoneNumber.substring(3,7),
-              "contact_no3": MyData.phoneNumber.substring(7),
-              "jumin_no1": MyData.idNumber.split("-")[0],
-              "jumin_no2": MyData.idNumber.split("-")[1],
-              "memo": '모바일 신청',
-              "documents": docResultList
-            };
+            Map<String, dynamic>? applyInputMap;
+            if(MyData.selectedPrInfoData!.uidType == "1"){
+              applyInputMap = {
+                "offer_id": MyData.selectedPrInfoData!.productOfferId,
+                "offer_rid": MyData.selectedPrInfoData!.productOfferRid,
+                "lender_pr_id": MyData.selectedPrInfoData!.productOfferLenderPrId,
+                "address": address,
+                "contact_no1": MyData.phoneNumber.substring(0,3),
+                "contact_no2": MyData.phoneNumber.substring(3,7),
+                "contact_no3": MyData.phoneNumber.substring(7),
+                "jumin_no1": MyData.idNumber.split("-")[0],
+                "jumin_no2": MyData.idNumber.split("-")[1],
+                "memo": '모바일 신청(개인회생)',
+                "documents": docResultList
+              };
+            }else{
+              applyInputMap = {
+                "offer_id": MyData.selectedPrInfoData!.productOfferId,
+                "offer_rid": MyData.selectedPrInfoData!.productOfferRid,
+                "lender_car_id": MyData.selectedPrInfoData!.productOfferLenderPrId,
+                "address": address,
+                "contact_no1": MyData.phoneNumber.substring(0,3),
+                "contact_no2": MyData.phoneNumber.substring(3,7),
+                "contact_no3": MyData.phoneNumber.substring(7),
+                "jumin_no1": MyData.idNumber.split("-")[0],
+                "jumin_no2": MyData.idNumber.split("-")[1],
+                "memo": '모바일 신청(오토론)',
+                "documents": docResultList
+              };
+            }
 
-            LogfinController.callLogfinApi(LogfinApis.applyProduct, applyInputMap, (isSuccess, outputJson){
+            LogfinController.callLogfinApi(MyData.selectedPrInfoData!.uidType == "1" ? LogfinApis.applyProduct : LogfinApis.applyCarProduct, applyInputMap, (isSuccess, outputJson){
               if(isSuccess){
                 LogfinController.getLoanInfo((isSuccessToGetLoanInfo, isNotEmpty){
                   if(isSuccessToGetLoanInfo){

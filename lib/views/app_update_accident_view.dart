@@ -209,8 +209,6 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
     GetController.to.resetWantLoanPrice();
     if(startViewId != bankCodeViewId){
       Config.contextForEmergencyBack = AppMainViewState.mainContext;
-      MyData.selectedCarInfoData = null;
-      MyData.selectedAccidentInfoData = null;
     }else{
       Config.contextForEmergencyBack = AppAccidentDetailViewState.mainContext;
     }

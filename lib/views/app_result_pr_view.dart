@@ -276,7 +276,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                       });
                     }else{
                       MyData.selectedPrInfoData = each;
-                      CommonUtils.log("w", "${each.uidType}");
+                      CommonUtils.log("w","${MyData.selectedPrInfoData!.productOfferId}  ${MyData.selectedPrInfoData!.productOfferRid}");
                       UiUtils.showAgreePop(context, "B", () {
                         UiUtils.showLoadingPop(context);
                         if(each.uidType == "1"){

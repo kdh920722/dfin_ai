@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
 import 'package:camera/camera.dart';
+import 'package:device_info/device_info.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:facebook_app_events/facebook_app_events.dart';
 import 'package:firebase_analytics/observer.dart';
@@ -334,7 +335,7 @@ class CommonUtils {
   static bool isAppLogInit = false;
   static Future<void> setAppLogInit() async {
     try{
-      await FireBaseController.setAppLogInit();
+      await FireBaseController.setMetaAndAppsflyerLogInit();
       isAppLogInit = true;
     }catch(error){
       CommonUtils.log("e", "app log init error : $error");
@@ -357,8 +358,8 @@ class CommonUtils {
 
         try{
           FireBaseController.analytics!.logEvent(name: eventName, parameters: data);
-         // FireBaseController.facebookAppEvents!.logEvent(name: eventName, parameters: data);
-         // FireBaseController.appsFlyerSdk!.logEvent(eventName, data);
+          //FireBaseController.facebookAppEvents!.logEvent(name: eventName, parameters: data);
+          FireBaseController.appsFlyerSdk!.logEvent(eventName, data);
         }catch(error){
           CommonUtils.log("d", "app log init error : $error");
         }
@@ -410,6 +411,25 @@ class CommonUtils {
 
   static Future<void> moveWithReplacementTo(BuildContext fromContext, String toRoute, Object? arguments) async {
     await Navigator.of(fromContext).pushReplacementNamed(toRoute, arguments: arguments);
+  }
+
+  static Future<String> getDeviceId() async {
+    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+    String deviceId = "";
+    try {
+      if(Config.isAndroid){
+        AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
+        deviceId = androidInfo.androidId;
+      }else{
+        IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
+        deviceId = iosInfo.identifierForVendor;
+      }
+
+      return deviceId;
+    } catch (e) {
+      deviceId = 'Error';
+      return deviceId;
+    }
   }
 
   static bool isKeyboardUp = false;
