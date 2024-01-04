@@ -259,7 +259,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     //nhis  : 3:건강보험자격득실확인서    4:건강보험납부확인서
     //nts   : 6:사업자등록증(*테스트불가) 10:소득금액증명       11:부가세과세표준증명원(*테스트불가)      14:납세증명서
     for(var each in MyData.getPrDocsInfoList()){
-      CommonUtils.log("", "each docs : ${each.productDocsId}  ${each.productDocsName}");
+      CommonUtils.log("w", "each docs : ${each.productDocsId}  ${each.productDocsName}");
       if(each.productDocsId == 1 || each.productDocsId == 2 || each.productDocsId == 15 || each.productDocsId == 16 || each.productDocsId == 17
           || each.productDocsId == 3 || each.productDocsId == 4
           || each.productDocsId == 6 || each.productDocsId == 10 || each.productDocsId == 11 || each.productDocsId == 14){
@@ -1213,7 +1213,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                 }else{
                   reUseTargetViewId = targetDoc["view_id"];
                 }
-
+                CommonUtils.log("w","view id : $reUseTargetViewId");
                 currentViewId = reUseTargetViewId;
               });
               CommonUtils.flutterToast("미제출 정보를\n입력해야합니다.");
@@ -2895,12 +2895,12 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             }else if(each["id"] == 16){
               // 자동차등록원부(갑)
               Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.gov24CarRegistrationA,
-                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey, "", "");
+                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey, MyData.selectedCarInfoData!.carNum, MyData.selectedCarInfoData!.carOwnerName);
               apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.gov24CarRegistrationA, true));
             }else if(each["id"] == 17){
               // 자동차등록원부(을)
               Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.gov24CarRegistrationB,
-                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey, "", "");
+                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey, MyData.selectedCarInfoData!.carNum, MyData.selectedCarInfoData!.carOwnerName);
               apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.gov24CarRegistrationB, true));
             }
           }
@@ -3621,7 +3621,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             if(isRetry){
               Navigator.pop(context);
             }else{
-              CommonUtils.setAppLog("apply_pr");
               CommonUtils.moveWithUntil(context, AppView.appMainView.value);
             }
           })
@@ -3657,7 +3656,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getAddressView());
       }else if(_getIdFromListByViewId(currentViewId) == cameraId){
         view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getCameraForIdCheckView()); // _getCameraForIdCheckView()
-      }else if(_getIdFromListByViewId(currentViewId) == 1 || _getIdFromListByViewId(currentViewId) == 2 || _getIdFromListByViewId(currentViewId) == 15){
+      }else if(_getIdFromListByViewId(currentViewId) == 1 || _getIdFromListByViewId(currentViewId) == 2
+          || _getIdFromListByViewId(currentViewId) == 15 || _getIdFromListByViewId(currentViewId) == 16 || _getIdFromListByViewId(currentViewId) == 17){
         view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getGov24View());
       }else if(_getIdFromListByViewId(currentViewId) == 3 || _getIdFromListByViewId(currentViewId) == 4){
         view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getNhisView());

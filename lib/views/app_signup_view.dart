@@ -296,7 +296,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
               UiUtils.showLoadingPop(context);
               LogfinController.callLogfinApi(LogfinApis.checkMember, inputJson, (isSuccess, outputJson){
                 if(isSuccess){
-                  CommonUtils.flutterToast("인증번호를 발송해요.");
+                  CommonUtils.flutterToast("인증번호를 발송했어요.");
                   _verifyCodeTextController.text = "";
                   LogfinController.callLogfinApi(LogfinApis.sendEmailCode, inputJson, (isSuccess, outputJson){
                     UiUtils.closeLoadingPop(context);
@@ -497,7 +497,6 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
                             await LogfinController.getMainViewInfo((isSuccessToGetMainInfo){
                               UiUtils.closeLoadingPop(context);
                               if(isSuccessToGetMainInfo){
-                                CommonUtils.setAppLog("sign_up");
                                 CommonUtils.goToMain(context, _emailTextController.text.trim(), _pwdTextController.text.trim());
                               }
                             });

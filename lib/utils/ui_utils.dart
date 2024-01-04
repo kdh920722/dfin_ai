@@ -225,6 +225,15 @@ class UiUtils {
         child: Padding(padding: EdgeInsets.only(left: 3.w, right: 3.w, bottom: 2.w, top: 2.w), child: Text(textScaleFactor: 1.0, text, style: TextStyle(fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor)))));
   }
 
+  static Widget getRoundBoxTextWithFixedScale4(String text, double fontSize, FontWeight fontWeight, TextAlign? textAlign, Color boxColor, Color textColor){
+    return Container(
+        decoration: BoxDecoration(
+          color: boxColor, // 배경색 설정
+          borderRadius: BorderRadius.circular(20.0), // 모서리를 둥글게 하는 부분
+        ),child: FittedBox(fit: BoxFit.contain, alignment: Alignment.center,
+        child: Padding(padding: EdgeInsets.only(left: 5.w, right: 5.w, bottom: 2.w, top: 2.w), child: Text(textScaleFactor: 1.0, text, style: TextStyle(fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor)))));
+  }
+
 
   static SelectableText getSelectableTextWithFixedScale(String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign? textAlign, int? textMaxLine){
     return SelectableText(textScaleFactor: 1.0, text, style: TextStyle(decoration: TextDecoration.none, height: 1, fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor), textAlign: textAlign, maxLines: textMaxLine);
@@ -425,12 +434,12 @@ class UiUtils {
   static SizedBox getBorderButtonBoxForChoiceType(double buttonWidth, Color buttonColor, Color borderColor, Widget childWidget, VoidCallback onPressedCallback){
     return SizedBox(
         width: buttonWidth,
-        height: 32.h,
+        height: 33.h,
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
-            padding: EdgeInsets.only(left: 4.w, right: 4.w, top: 4.w, bottom: 4.w),
+            padding: EdgeInsets.only(left: 4.w, right: 4.w, top: 4.w, bottom: 2.w),
             backgroundColor: buttonColor,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             side: BorderSide(width: 1, color: borderColor),
             elevation: 0.0,
             shadowColor: ColorStyles.upFinGray,

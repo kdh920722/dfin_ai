@@ -112,7 +112,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                     SizedBox(width: 40.w, child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       UiUtils.getBoxTextWithFixedScale("개인회생", 8.sp, FontWeight.w600, TextAlign.start, ColorStyles.upFinWhiteSky, ColorStyles.upFinButtonBlue)
                     ])),
-                    UiUtils.getMarginBox(0, 1.h),
+                    UiUtils.getMarginBox(0, 2.h),
                     Icon(Icons.accessibility_sharp, color: ColorStyles.upFinGray, size: 30.w),
                     UiUtils.getMarginBox(0, 2.h),
                     UiUtils.getTextWithFixedScale("사건번호 추가하기", 11.sp, FontWeight.w800, ColorStyles.upFinButtonBlue, TextAlign.center, null),
@@ -129,12 +129,12 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                   Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
                     UiUtils.getMarginBox(0, 0.5.h),
                     SizedBox(width: 40.w, child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      UiUtils.getBoxTextWithFixedScale("오토론", 8.sp, FontWeight.w600, TextAlign.start, ColorStyles.upFinWhiteYellow, ColorStyles.upFinOrange)
+                      UiUtils.getBoxTextWithFixedScale("오토론", 8.sp, FontWeight.w600, TextAlign.start, ColorStyles.upFinWhiteSky, ColorStyles.upFinButtonBlue)
                     ])),
-                    UiUtils.getMarginBox(0, 1.h),
+                    UiUtils.getMarginBox(0, 2.h),
                     Icon(Icons.car_repair_rounded, color: ColorStyles.upFinGray, size: 30.w),
                     UiUtils.getMarginBox(0, 2.h),
-                    UiUtils.getTextWithFixedScale("차량정보 추가하기", 11.sp, FontWeight.w800, ColorStyles.upFinOrange, TextAlign.center, null),
+                    UiUtils.getTextWithFixedScale("차량정보 추가하기", 11.sp, FontWeight.w800, ColorStyles.upFinButtonBlue, TextAlign.center, null),
                     UiUtils.getMarginBox(0, 1.h),
                     UiUtils.getTextWithFixedScale2("자동차담보 대출을 위해", 9.sp, FontWeight.w300, ColorStyles.upFinDarkGray, TextAlign.start, null),
                     UiUtils.getTextWithFixedScale2("시세정보를 찾아보세요.", 9.sp, FontWeight.w300, ColorStyles.upFinDarkGray, TextAlign.start, null),
@@ -173,7 +173,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
           child: ListView(shrinkWrap: true,physics: const BouncingScrollPhysics(),children: [
             UiUtils.getMarginBox(0, 3.h),
             Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 0.h, bottom: 1.h), child: Row(mainAxisSize: MainAxisSize.max, children: [
-              UiUtils.getTextWithFixedScale("나의기록", 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1),
+              UiUtils.getTextWithFixedScale("대출정보", 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1),
               const Spacer(flex: 2),
               MyData.isTestUser ? UiUtils.getIconButton(Icons.comments_disabled_sharp, 7.w, ColorStyles.upFinRed, () {
 
@@ -314,7 +314,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                       myInfoWidgetList.length>1? SmoothPageIndicator(
                         controller: _pageController,
                         count: myInfoWidgetList.length, // 페이지 수
-                        effect: WormEffect(dotWidth: 1.h, dotHeight: 1.h, dotColor: ColorStyles.upFinGray, activeDotColor: ColorStyles.upFinDarkGray), // 페이지 인디케이터 스타일
+                        effect: WormEffect(dotWidth: 1.h, dotHeight: 1.h, dotColor: ColorStyles.upFinGray, activeDotColor: ColorStyles.upFinButtonBlue), // 페이지 인디케이터 스타일
                       ):Container(),
                     ],
                   ) : Column(children: [
@@ -532,7 +532,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                   Expanded(flex: 15, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Row(children: [
                       UiUtils.getMarginBox(2.w, 0 ),
-                      UiUtils.getBoxTextWithFixedScale("오토론", 8.sp, FontWeight.w600, TextAlign.center, ColorStyles.upFinWhiteYellow, ColorStyles.upFinOrange),
+                      UiUtils.getBoxTextWithFixedScale("오토론", 8.sp, FontWeight.w600, TextAlign.center, ColorStyles.upFinWhiteSky, ColorStyles.upFinButtonBlue),
                     ]),
                     UiUtils.getMarginBox(0, 0.5.h),
                     Row(mainAxisAlignment: MainAxisAlignment.start, children: [
@@ -549,7 +549,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                 ]),
 
                 UiUtils.getMarginBox(0, 0.8.h),
-                UiUtils.getBorderButtonBoxForSearch(80.w, ColorStyles.upFinOrange, ColorStyles.upFinOrange,
+                UiUtils.getBorderButtonBoxForSearch(80.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
                     Row(mainAxisAlignment:MainAxisAlignment.center, children: [
                       UiUtils.getIcon(5.w, 5.w, Icons.search_rounded, 5.w, ColorStyles.upFinWhite),
                       UiUtils.getMarginBox(0.5.w, 0),
@@ -614,8 +614,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             UiUtils.getMarginBox(0, 1.5.h),
             UiUtils.getBorderButtonBoxWithZeroPadding(92.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
                 Row(mainAxisSize: MainAxisSize.min, children: [
-                  Expanded(flex: 2, child: each.chatRoomType == 0? UiUtils.getIcon(11.w, 11.w, Icons.account_box_rounded, 11.w, ColorStyles.upFinButtonBlue)
-                      : UiUtils.getImage(11.w, 11.w, Image.asset(each.chatRoomIconPath))),
+                  Expanded(flex: 2, child:  UiUtils.getImage(11.w, 11.w, Image.asset(each.chatRoomIconPath))),
                   UiUtils.getMarginBox(1.w, 0),
                   Expanded(flex: 10, child: Column(mainAxisSize: MainAxisSize.max, crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Column(mainAxisSize: MainAxisSize.max, crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -676,6 +675,16 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     await FireBaseController.setNotificationTorF(false);
     isViewHere = false;
     if(context.mounted){
+      for(var each in GetController.to.chatLoanInfoDataList){
+        if(each.chatRoomId == chatRoomId){
+          if(each.chatRoomType == "1"){
+            LogfinController.autoAnswerMap = LogfinController.autoAnswerMapForAccident;
+          }else{
+            LogfinController.autoAnswerMap = LogfinController.autoAnswerMapForCar;
+          }
+        }
+      }
+
       UiUtils.closeLoadingPop(context);
       await CommonUtils.moveToWithResult(context, AppView.appChatView.value, null);
     }
@@ -704,6 +713,9 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     UiUtils.showLoadingPop(context);
     LogfinController.getMainViewInfo((isSuccessToGetMainInfo){
       UiUtils.closeLoadingPop(context);
+      setState(() {
+
+      });
     });
   }
 

@@ -42,11 +42,11 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
     }
   }
 
-  final int preLoanCountViewId = 2;
+  final int preLoanCountViewId = 999;
   Key? selectedPreLoanCountKey;
   String selectedPreLoanCountInfo = "";
 
-  final int preLoanPriceViewId = 3;
+  final int preLoanPriceViewId = 999;
   String selectedPreLoanPriceInfo = "";
   final _preLoanPriceFocus = FocusNode();
   final _preLoanPriceTextController = TextEditingController();
@@ -65,7 +65,7 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
     }
   }
 
-  final int wantLoanPriceViewId = 4;
+  final int wantLoanPriceViewId = 999;
   String selectedWantLoanPriceInfo = "";
   final _wantLoanPriceFocus = FocusNode();
   final _wantLoanPriceTextController = TextEditingController();
@@ -84,11 +84,11 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
     }
   }
 
-  final int jobViewId = 5;
+  final int jobViewId = 2;
   Key? selectedJobKey;
   String selectedJobInfo = "";
 
-  final int finishedViewId = 6;
+  final int finishedViewId = 3;
   bool finishedConfirmed = false;
 
   void _unFocusAllNodes(){
@@ -559,6 +559,8 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
     confirmDataList.add("•  ${MyData.birth.substring(0,4)}년 $birthMonth월 $birthDay일");
     confirmDataList.add("•  [차량번호]  $selectedCarNum");
     confirmDataList.add("•  [소유자]  $selectedCarOwner");
+    confirmDataList.add("•  ${selectedJobInfo.split("@")[0]}");
+    /*
     confirmDataList.add("•  기대출  ${selectedPreLoanCountInfo.split("@")[0]}");
     if(selectedPreLoanPriceInfo != "0"){
       confirmDataList.add("•  인가후 대출금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedPreLoanPriceInfo))}");
@@ -570,7 +572,7 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
     }else{
       confirmDataList.add("•  희망 대출금액  0원");
     }
-    confirmDataList.add("•  ${selectedJobInfo.split("@")[0]}");
+    */
 
     List<Widget> confirmWidgetList = [];
     Color textColor = ColorStyles.upFinBlack;
@@ -600,7 +602,7 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
         UiUtils.getBorderButtonBox(42.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
             UiUtils.getTextWithFixedScale("네 좋아요!", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
               Map<String, dynamic> inputJson = {
-                "car_no": selectedCarNum,
+                "car_no": selectedCarNum.replaceAll(" ", "").trim(),
                 "owner_name": MyData.isTestUser? selectedCarOwner : MyData.name,
                 /*
                 "birthday": MyData.birth,
@@ -615,36 +617,36 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
               UiUtils.showLoadingPop(context);
               LogfinController.callLogfinApi(LogfinApis.addAndSearchCar, inputJson, (isSuccess, outputJson){
                 if(isSuccess){
-                  LogfinController.getUserInfo((isSuccessToGetUserInfo){
-                    if(isSuccessToGetUserInfo){
-                      LogfinController.getCarInfo((isSuccessToGetCarInfo, isNotEmpty){
-                        if(isSuccessToGetCarInfo){
-                          if(isNotEmpty){
-                            String thisCarNum = selectedCarNum;
-                            String updatedCarUid = MyData.findUidInCarInfoList(thisCarNum);
-                            for(var each in MyData.getCarInfoList()){
-                              if(each.carUid == updatedCarUid){
-                                MyData.selectedCarInfoData = each;
-                              }
-                            }
-                            LogfinController.getCarPrList(MyData.selectedCarInfoData!.carNum, (isSuccessToGetOffers, _){
+                  LogfinController.getCarInfo((isSuccessToGetCarInfo, isNotEmpty){
+                    if(isSuccessToGetCarInfo){
+                      if(isNotEmpty){
+                        String thisCarNum = selectedCarNum;
+                        String updatedCarUid = MyData.findUidInCarInfoList(thisCarNum);
+                        for(var each in MyData.getCarInfoList()){
+                          if(each.carUid == updatedCarUid){
+                            MyData.selectedCarInfoData = each;
+                          }
+                        }
+
+                        LogfinController.getCarPrList(MyData.selectedCarInfoData!.carNum, selectedJobInfo.split("@")[1], (isSuccessToGetOffers, _){
+                          if(isSuccessToGetOffers){
+                            LogfinController.getUserInfo((isSuccessToGetUserInfo){
                               UiUtils.closeLoadingPop(context);
-                              if(isSuccessToGetOffers){
+                              if(isSuccessToGetUserInfo){
                                 CommonUtils.moveWithReplacementTo(context, AppView.appResultPrView.value, null);
                               }else{
-                                // findUidInAccidentInfoList 실패
-                                CommonUtils.flutterToast("에러가 발생했어요.\n다시 실행해주세요.");
+                                CommonUtils.flutterToast("차량정보 찾기 실패\n다시 실행해주세요.");
                               }
                             });
                           }else{
                             UiUtils.closeLoadingPop(context);
                             CommonUtils.flutterToast("차량정보 찾기 실패\n다시 실행해주세요.");
                           }
-                        }else{
-                          UiUtils.closeLoadingPop(context);
-                          CommonUtils.flutterToast("차량정보 찾기 실패\n다시 실행해주세요.");
-                        }
-                      });
+                        });
+                      }else{
+                        UiUtils.closeLoadingPop(context);
+                        CommonUtils.flutterToast("차량정보 찾기 실패\n다시 실행해주세요.");
+                      }
                     }else{
                       UiUtils.closeLoadingPop(context);
                       CommonUtils.flutterToast("차량정보 찾기 실패\n다시 실행해주세요.");
@@ -669,7 +671,7 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
         UiUtils.getBorderButtonBox(42.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
             UiUtils.getTextWithFixedScale("아니오", 14.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null), () async {
               Map<String, dynamic> inputJson = {
-                "car_no": selectedCarNum,
+                "car_no": selectedCarNum.replaceAll(" ", "").trim(),
                 "owner_name": MyData.isTestUser? selectedCarOwner : MyData.name,
                 /*
                 "birthday": MyData.birth,
@@ -686,30 +688,37 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
               await FireBaseController.setNotificationTorF(false);
               LogfinController.callLogfinApi(LogfinApis.addAndSearchCar, inputJson, (isSuccess, outputJson){
                 if(isSuccess){
-                  LogfinController.getUserInfo((isSuccessToGetUserInfo) async {
-                    if(isSuccessToGetUserInfo){
-                      LogfinController.getCarInfo((isSuccessToGetCarInfo, isNotEmpty) async {
-                        if(isSuccessToGetCarInfo){
-                          if(isNotEmpty){
-                            UiUtils.closeLoadingPop(context);
-                            CommonUtils.moveWithUntil(context, AppView.appMainView.value);
-                            await Future.delayed(const Duration(seconds: 2), () async {});
-                            await FireBaseController.setNotificationTorF(true);
+                  LogfinController.getCarInfo((isSuccessToGetCarInfo, isNotEmpty) async {
+                    if(isSuccessToGetCarInfo){
+                      if(isNotEmpty){
+                        LogfinController.getCarPrList(MyData.selectedCarInfoData!.carNum, selectedJobInfo.split("@")[1], (isSuccessToGetOffers, _) async {
+                          if(isSuccessToGetOffers){
+                            LogfinController.getUserInfo((isSuccessToGetUserInfo) async {
+                              UiUtils.closeLoadingPop(context);
+                              if(isSuccessToGetUserInfo){
+                                CommonUtils.moveWithUntil(context, AppView.appMainView.value);
+                                await Future.delayed(const Duration(seconds: 2), () async {});
+                                await FireBaseController.setNotificationTorF(true);
+                              }else{
+                                await FireBaseController.setNotificationTorF(true);
+                                CommonUtils.flutterToast("차량정보 찾기 실패\n다시 실행해주세요.");
+                              }
+                            });
                           }else{
                             UiUtils.closeLoadingPop(context);
                             CommonUtils.flutterToast("차량정보 찾기 실패\n다시 실행해주세요.");
                             await FireBaseController.setNotificationTorF(true);
                           }
-                        }else{
-                          UiUtils.closeLoadingPop(context);
-                          CommonUtils.flutterToast("차량정보 찾기 실패\n다시 실행해주세요.");
-                          await FireBaseController.setNotificationTorF(true);
-                        }
-                      });
+                        });
+                      }else{
+                        UiUtils.closeLoadingPop(context);
+                        CommonUtils.flutterToast("차량정보 찾기 실패\n다시 실행해주세요.");
+                        await FireBaseController.setNotificationTorF(true);
+                      }
                     }else{
                       UiUtils.closeLoadingPop(context);
-                      await FireBaseController.setNotificationTorF(true);
                       CommonUtils.flutterToast("차량정보 찾기 실패\n다시 실행해주세요.");
+                      await FireBaseController.setNotificationTorF(true);
                     }
                   });
                 }else{

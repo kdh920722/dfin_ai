@@ -142,7 +142,7 @@ class AppCarDetailViewState extends State<AppCarDetailView> with WidgetsBindingO
           UiUtils.getMarginBox(0, 2.h),
           SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(MyData.selectedCarInfoData!.carNum, 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)),
           UiUtils.getMarginBox(0, 4.h),
-          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("소유자", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
+          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("소유주", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
           UiUtils.getMarginBox(0, 2.h),
           SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(MyData.selectedCarInfoData!.carOwnerName, 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)),
           UiUtils.getMarginBox(0, 4.h),
@@ -205,9 +205,9 @@ class AppCarDetailViewState extends State<AppCarDetailView> with WidgetsBindingO
                 alignment: Alignment.topCenter,
                 child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                   UiUtils.getMarginBox(0, 2.5.h),
-                  UiUtils.getTextWithFixedScale("오토론", 22.sp, FontWeight.w600, ColorStyles.upFinOrange, TextAlign.center, 1),
+                  UiUtils.getTextWithFixedScale("오토론", 22.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.center, 1),
                   UiUtils.getMarginBox(0, 1.h),
-                  UiUtils.getTextWithFixedScale("업데이트 : ${_setUpdateDate(MyData.selectedCarInfoData!.date)}", 10.sp, FontWeight.w500, ColorStyles.upFinOrange, TextAlign.center, 1),
+                  UiUtils.getTextWithFixedScale("업데이트 : ${_setUpdateDate(MyData.selectedCarInfoData!.date)}", 10.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, 1),
                 ])
             ),
           ),
@@ -224,8 +224,8 @@ class AppCarDetailViewState extends State<AppCarDetailView> with WidgetsBindingO
                     labelColor: ColorStyles.upFinBlack,
                     indicatorSize: TabBarIndicatorSize.tab,
                     indicator: MyTabIndicator(),
-                    indicatorColor: ColorStyles.upFinOrange,
-                    dividerColor: ColorStyles.upFinWhiteYellow,
+                    indicatorColor: ColorStyles.upFinButtonBlue,
+                    dividerColor: ColorStyles.upFinWhiteSky,
                     controller: _tabController,
                     tabs: const <Widget>[
                       Tab(text: "차량정보"),
@@ -269,7 +269,7 @@ class _MyTabIndicatorPainter extends BoxPainter {
   void paint(Canvas canvas, Offset offset, ImageConfiguration configuration) {
     final Rect rect = offset & configuration.size!;
     final Paint paint = Paint();
-    paint.color = ColorStyles.upFinOrange; // 인디케이터 색상
+    paint.color = ColorStyles.upFinButtonBlue; // 인디케이터 색상
     paint.style = PaintingStyle.fill;
     paint.strokeCap = StrokeCap.round; // 둥글게 된 모서리
 

@@ -77,10 +77,12 @@ class FireBaseController{
     );
   }
 
-  static void sendInfoForInstallTracking(){
-    if(appsFlyerOneLink != ""){
+  static Future<void> sendInfoForInstallTracking() async {
+    if(appsFlyerOneLink != "" && fcmToken != ""){
+      String deviceId = await CommonUtils.getDeviceId();
       Map<String, dynamic> inputJson = {
         "response" : appsFlyerOneLink,
+        "device_id" : deviceId,
       };
       LogfinController.callLogfinApi(LogfinApis.installTracking, inputJson, (isSuccess, outputJson){});
     }

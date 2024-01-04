@@ -1,6 +1,6 @@
 class LoanInfoData {
   String uid;
-  String uidType; // 1 : accident,  2 : car
+  String uidType; // 1 : accident,  3 : car
   String loanUid;
   String lenderPrId;
   String submitAmount;

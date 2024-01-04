@@ -190,6 +190,7 @@ class CommonUtils {
     CommonUtils.log("w","check update");
     int state = await Config.isNeedToUpdateForMain();
     CommonUtils.log("w","check update state : $state");
+    state = 10;
     if(state == 99){
       if(context.mounted && !isOutPopOn){
         CommonUtils.log("w","check update mount");
@@ -359,9 +360,10 @@ class CommonUtils {
         try{
           FireBaseController.analytics!.logEvent(name: eventName, parameters: data);
           //FireBaseController.facebookAppEvents!.logEvent(name: eventName, parameters: data);
+          CommonUtils.log("d", "app log : $eventName");
           FireBaseController.appsFlyerSdk!.logEvent(eventName, data);
         }catch(error){
-          CommonUtils.log("d", "app log init error : $error");
+          CommonUtils.log("d", "app log error : $error");
         }
       }
     }
@@ -427,8 +429,32 @@ class CommonUtils {
 
       return deviceId;
     } catch (e) {
-      deviceId = 'Error';
+      deviceId = 'id_error';
       return deviceId;
+    }
+  }
+
+  static Future<String> getDeviceIp() async {
+    String deviceIp = "";
+    try {
+      // 검색할 네트워크 인터페이스 목록
+      List<NetworkInterface> interfaces = await NetworkInterface.list();
+
+      for (NetworkInterface interface in interfaces) {
+        // 루프백 인터페이스 제외하고 첫 번째로 발견되는 IPv4 주소 반환
+        if (!interface.name.contains("lo")) {
+          for (InternetAddress address in interface.addresses) {
+            if (address.type == InternetAddressType.IPv4) {
+              deviceIp =  address.address;
+            }
+          }
+        }
+      }
+
+      return deviceIp;
+    } catch (e) {
+      deviceIp = 'ip_error';
+      return deviceIp;
     }
   }
 

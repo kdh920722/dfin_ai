@@ -33,6 +33,8 @@ class LogfinController {
   static List<String> validDocFileTypeList = [];
   static List<Map<String,dynamic>> agreeDocsList = [];
   static List<String> agreeDocsDetailTypeInfoList = [];
+  static Map<String,dynamic> autoAnswerMapForAccident = {};
+  static Map<String,dynamic> autoAnswerMapForCar = {};
   static Map<String,dynamic> autoAnswerMap = {};
   static String getAgreeContents(String type){
     String result = "";
@@ -202,10 +204,19 @@ class LogfinController {
         failCount++;
       }
 
-      await LogfinController.callLogfinApi(LogfinApis.getFaqs, {}, (isSuccessToGetMap, outputJsonMap){
+      await LogfinController.callLogfinApi(LogfinApis.getFaqs, {"loan_type_id": "1"}, (isSuccessToGetMap, outputJsonMap){
         if(isSuccessToGetMap){
-          autoAnswerMap = outputJsonMap!;
-          autoAnswerMap["파일첨부 📁"] = {"카메라 📷" : "camera"};
+          autoAnswerMapForAccident = outputJsonMap!;
+          autoAnswerMapForAccident["파일첨부 📁"] = {"카메라 📷" : "camera"};
+        }else{
+          failCount++;
+        }
+      });
+
+      await LogfinController.callLogfinApi(LogfinApis.getFaqs, {"loan_type_id": "3"}, (isSuccessToGetMap, outputJsonMap){
+        if(isSuccessToGetMap){
+          autoAnswerMapForCar = outputJsonMap!;
+          autoAnswerMapForCar["파일첨부 📁"] = {"카메라 📷" : "camera"};
         }else{
           failCount++;
         }
@@ -243,6 +254,17 @@ class LogfinController {
     }
   }
 
+  static void _setAppLogByApi(LogfinApis api){
+    try{
+      String logValue = api.value;
+      logValue = logValue.replaceAll("/", "");
+      logValue = logValue.replaceAll(".json", "");
+      CommonUtils.setAppLog(logValue);
+    }catch(error){
+      CommonUtils.log("d", error.toString());
+    }
+  }
+
   static Future<void> callLogfinApi(LogfinApis api, Map<String, dynamic> inputJson, Function(bool isSuccess, Map<String, dynamic>? outputJson) callback) async {
     var targetUrl = "";
     if(Config.isWeb){
@@ -262,7 +284,7 @@ class LogfinController {
     if(api != LogfinApis.signIn && api != LogfinApis.signUp && api != LogfinApis.socialLogin
         && api != LogfinApis.deleteAccount && api != LogfinApis.checkMember && api != LogfinApis.getAgreeDocuments && api != LogfinApis.getFaqs
         && api != LogfinApis.findEmail && api != LogfinApis.sendEmailCode && api != LogfinApis.checkEmailCode
-        && api != LogfinApis.checkMemberByPhone && api != LogfinApis.updatePassword && api != LogfinApis.getCarDocs && api != LogfinApis.installTracking){
+        && api != LogfinApis.checkMemberByPhone && api != LogfinApis.updatePassword && api != LogfinApis.installTracking){
       if(userToken != ""){
         inputJson['api_token'] = userToken;
       }else{
@@ -291,6 +313,13 @@ class LogfinController {
       if (response.statusCode == 200) { // HTTP_OK
         final resultData = json;
         if(resultData["success"]){
+          if(api != LogfinApis.getMessage && api != LogfinApis.installTracking && api != LogfinApis.getCarDocs
+              && api != LogfinApis.getRetryDocs && api != LogfinApis.getAgreeDocuments && api != LogfinApis.applyProductDocSearch && api != LogfinApis.getFaqs
+              && api != LogfinApis.checkMemberByPhone && api != LogfinApis.checkMember && api != LogfinApis.checkEmailCode && api != LogfinApis.checkMessage){
+            _setAppLogByApi(api);
+          }
+
+
           if(api == LogfinApis.signUp){
             LogfinController.userToken = resultData["data"]["user"]['api_token'];
             CommonUtils.log('i', "userToken : ${LogfinController.userToken}");
@@ -429,12 +458,14 @@ class LogfinController {
             MyData.isMale =  userInfoOutputJson["user"]["gender"] == "1"? true : false;
             if(userInfoOutputJson.containsKey("customer")){
               Map<String, dynamic> customerMap = userInfoOutputJson["customer"];
+              CommonUtils.log("w","customer : $customerMap");
               if(userInfoOutputJson["user"]["telecom"] == null && customerMap["telecom"] != null){
                 MyData.telecom = customerMap["telecom"].toString();
               }
               if(customerMap.containsKey("uid")) MyData.customerUidForNiceCert = customerMap["uid"].toString();
               if(customerMap.containsKey("registration_no")) MyData.idNumber = customerMap["registration_no"] == null? "" : customerMap["registration_no"].toString();
               if(customerMap.containsKey("job_type_id")){
+                CommonUtils.log("w","customer : ${customerMap['job_type_id']}");
                 for(var eachJob in jobList){
                   if(eachJob.split("@")[1] == customerMap["job_type_id"].toString()){
                     MyData.jobInfo = eachJob;
@@ -500,7 +531,6 @@ class LogfinController {
                 var resData = jsonDecode(dataResult["res_data"]);
                 String date = dataResult["created_at"].toString();
 
-                //created_at: 2023-10-20T13:21:19.000+09:00, updated_at:
                 CommonUtils.log("i", "accident data ====>\n"
                     "date: ${dataResult["created_at"]} || ${dataResult["updated_at"]}\n"
                     "accidentUid: ${dataResult["id"]}\n"
@@ -653,7 +683,7 @@ class LogfinController {
                       "roomId: ${eachLoans["pr_room"]["id"]}\n");
                 }else if(eachLoans.containsKey("lender_car")){
                   CommonUtils.log("i", "car loan ==>");
-                  uidType = "2";
+                  uidType = "3";
                   uid = eachLoans["search_car_result_uid"].toString();
                   lenderId = eachLoans["lender_car_id"].toString();
                   companyName = eachLoans["lender_car"]["lender"]["name"].toString();
@@ -731,7 +761,7 @@ class LogfinController {
   static void _setChatRoomInfoList() {
     MyData.clearChatRoomInfoList();
     for(var each in MyData.getLoanInfoList()){
-      MyData.addToChatRoomInfoList(ChatRoomInfoData(each.chatRoomId, each.loanUid, 1,
+      MyData.addToChatRoomInfoList(ChatRoomInfoData(each.chatRoomId, each.loanUid, each.uidType,
           each.companyLogo, each.companyName, each.productName,
           each.chatRoomMsg, each.statueId, "${each.submitRate}%",
           CommonUtils.getPriceFormattedString(double.parse(each.submitAmount))));
@@ -776,12 +806,13 @@ class LogfinController {
     }
   }
 
-  static Future<void> getCarPrList(String carNum, Function(bool isSuccess, Map<String, dynamic>? outputJson) callback) async {
+  static Future<void> getCarPrList(String carNum, String jobInfo, Function(bool isSuccess, Map<String, dynamic>? outputJson) callback) async {
     try{
       String carUid = MyData.findUidInCarInfoList(carNum);
       if(carUid != ""){
         Map<String, dynamic> inputJsonForGetOffers= {
-          "car_uid": carUid
+          "car_uid": carUid,
+          "job" : jobInfo
         };
         callLogfinApi(LogfinApis.searchCarProduct, inputJsonForGetOffers, (isSuccessToGetOffers, outputJsonForGetOffers){
           if(isSuccessToGetOffers){
@@ -789,7 +820,7 @@ class LogfinController {
             String offerId = outputJsonForGetOffers!["offer_id"].toString();
             List<dynamic> offerPrList = outputJsonForGetOffers['data'];
             for(var each in offerPrList){
-              MyData.addToPrInfoList(PrInfoData(carUid, "2", offerId, each["rid"].toString(), each["lender_car_id"].toString(), each["lender_name"].toString(), each["lender_id"].toString(),
+              MyData.addToPrInfoList(PrInfoData(carUid, "3", offerId, each["rid"].toString(), each["lender_car_id"].toString(), each["lender_name"].toString(), each["lender_id"].toString(),
                   each["product_name"].toString(), each["rid"].toString(), each["min_rate"].toString(), each["max_rate"].toString(),
                   each["limit"].toString(),
                   each["lender_name"] == "(주)안전대부"? "assets/images/bank_logo_safe.png" : "assets/images/bank_logo_default.png",

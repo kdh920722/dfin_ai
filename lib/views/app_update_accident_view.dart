@@ -143,7 +143,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
     }
   }
 
-  void setSelectedInfo(){
+  void _setSelectedInfo(){
     selectedBankCodeKey = Key(MyData.selectedAccidentInfoData!.accidentBankInfo);
     selectedBankCodeInfo = MyData.selectedAccidentInfoData!.accidentBankInfo;
     _bankAccountInfoTextController.text = MyData.selectedAccidentInfoData!.accidentBankAccount;
@@ -189,7 +189,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
     GetController.to.resetPreLoanPrice();
     GetController.to.resetWantLoanPrice();
 
-    setSelectedInfo();
+    _setSelectedInfo();
 
     currentViewId = startViewId;
     mainContext = context;
@@ -689,7 +689,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
 
   /// finish confirm view
   Widget _getConfirmView(){
-    setSelectedInfo();
+    _setSelectedInfo();
     List<String> confirmDataList = [];
     confirmDataList.add("•  [환급]  ${selectedBankCodeInfo.split("@")[0]} $selectedBankAccountInfo");
     confirmDataList.add("•  기대출  ${selectedPreLoanCountInfo.split("@")[0]}");
@@ -771,7 +771,6 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
             UiUtils.closeLoadingPop(context);
             if(isSuccessToUpdate){
               Navigator.pop(context, true);
-              CommonUtils.setAppLog("update_account");
               CommonUtils.flutterToast("수정 완료했어요.");
             }else{
               Navigator.pop(context, false);
@@ -804,7 +803,6 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
         LogfinController.getAccidentPrList("${MyData.selectedAccidentInfoData!.accidentCaseNumberYear}${MyData.selectedAccidentInfoData!.accidentCaseNumberType}${MyData.selectedAccidentInfoData!.accidentCaseNumberNumber}", (isSuccessToGetOffers, _){
           UiUtils.closeLoadingPop(context);
           if(isSuccessToGetOffers){
-            CommonUtils.setAppLog("get_offers");
             CommonUtils.moveWithReplacementTo(context, AppView.appResultPrView.value, null);
           }else{
             CommonUtils.flutterToast("에러가 발생했습니다.\n다시 실행해주세요.");
@@ -826,7 +824,6 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
                         MyData.selectedAccidentInfoData = each;
                       }
                     }
-                    CommonUtils.setAppLog("pr_search");
                     CommonUtils.moveWithReplacementTo(context, AppView.appResultPrView.value, null);
                   }else{
                     CommonUtils.flutterToast("상품정보가 없어요.");

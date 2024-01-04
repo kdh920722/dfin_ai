@@ -23,7 +23,6 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
 
   static int startViewId = 0;
   static int endViewId = 0;
-  bool isPassToSearch = true;
 
   double scrollScreenHeight = 57.h;
   double itemHeight2 = 0;
@@ -42,11 +41,11 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
   final String errorMsg = "정보를 입력해주세요";
   int currentViewId = 0;
 
-  static const  int preLoanCountViewId = 4;
+  static const  int preLoanCountViewId = 99;
   Key? selectedPreLoanCountKey;
   String selectedPreLoanCountInfo = "";
 
-  static const  int preLoanPriceViewId = 5;
+  static const  int preLoanPriceViewId = 99;
   String selectedPreLoanPriceInfo = "";
   final _preLoanPriceFocus = FocusNode();
   final _preLoanPriceTextController = TextEditingController();
@@ -65,7 +64,7 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
     }
   }
 
-  static const  int wantLoanPriceViewId = 6;
+  static const  int wantLoanPriceViewId = 99;
   String selectedWantLoanPriceInfo = "";
   final _wantLoanPriceFocus = FocusNode();
   final _wantLoanPriceTextController = TextEditingController();
@@ -84,7 +83,7 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
     }
   }
 
-  static const  int jobViewId = 7;
+  static const  int jobViewId = 4;
   Key? selectedJobKey;
   String selectedJobInfo = "";
 
@@ -119,7 +118,7 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
     }
   }
 
-  void setSelectedInfo(){
+  void _setSelectedInfo(){
     _preLoanPriceTextController.text = MyData.selectedCarInfoData!.carLendAmount;
     final number = double.tryParse(_preLoanPriceTextController.text.trim().replaceAll(',', ''));
     GetController.to.updatePreLoanPrice(CommonUtils.getPriceFormattedString(number!));
@@ -160,7 +159,7 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
     GetController.to.resetPreLoanPrice();
     GetController.to.resetWantLoanPrice();
 
-    setSelectedInfo();
+    _setSelectedInfo();
 
     currentViewId = startViewId;
     mainContext = context;
@@ -503,11 +502,12 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
 
   /// finish confirm view
   Widget _getConfirmView(){
-    setSelectedInfo();
+    _setSelectedInfo();
     List<String> confirmDataList = [];
     confirmDataList.add("•  [차량번호] ${MyData.selectedCarInfoData!.carNum}");
     confirmDataList.add("•  [소유주] ${MyData.selectedCarInfoData!.carOwnerName}");
     confirmDataList.add("•  [차량 시세금액] ${CommonUtils.getPriceFormattedStringForFullPrice(double.parse(MyData.selectedCarInfoData!.carPrice))}");
+    confirmDataList.add("•  ${selectedJobInfo.split("@")[0]}");
     /*
     confirmDataList.add("•  기대출  ${selectedPreLoanCountInfo.split("@")[0]}");
     if(selectedPreLoanPriceInfo != "0"){
@@ -520,7 +520,7 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
     }else{
       confirmDataList.add("•  희망 대출금액  0원");
     }
-    confirmDataList.add("•  ${selectedJobInfo.split("@")[0]}");
+
      */
 
     List<Widget> confirmWidgetList = [];
@@ -555,20 +555,15 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: confirmWidgetList)),
       UiUtils.getMarginBox(0, 5.h),
       Row(children: [
-        UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+        UiUtils.getBorderButtonBox(42.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
             UiUtils.getTextWithFixedScale("네 좋아요!", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
-              isPassToSearch = true;
               _updateData();
             }),
-        /*
         UiUtils.getMarginBox(2.w, 0),
         UiUtils.getBorderButtonBox(42.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
             UiUtils.getTextWithFixedScale("정보변경", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
-              isPassToSearch = false;
               nextInputView();
             })
-
-         */
       ])
     ]);
   }
@@ -576,28 +571,23 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
 
   void _updateData(){
     UiUtils.showLoadingPop(context);
-    if(isPassToSearch){
-      LogfinController.getCarPrList(MyData.selectedCarInfoData!.carNum, (isSuccessToGetOffers, _){
+    LogfinController.getCarPrList(MyData.selectedCarInfoData!.carNum, selectedJobInfo.split("@")[1], (isSuccessToGetOffers, _){
+      if(isSuccessToGetOffers){
+        LogfinController.getUserInfo((isSuccessToGetUserInfo){
+          UiUtils.closeLoadingPop(context);
+          if(isSuccessToGetUserInfo){
+            CommonUtils.moveWithReplacementTo(context, AppView.appResultPrView.value, null);
+          }else{
+            CommonUtils.flutterToast("에러가 발생했습니다.\n다시 실행해주세요.");
+            Navigator.pop(context);
+          }
+        });
+      }else{
         UiUtils.closeLoadingPop(context);
-        if(isSuccessToGetOffers){
-          CommonUtils.setAppLog("get_offers");
-          CommonUtils.moveWithReplacementTo(context, AppView.appResultPrView.value, null);
-        }else{
-          CommonUtils.flutterToast("에러가 발생했습니다.\n다시 실행해주세요.");
-          Navigator.pop(context);
-        }
-      });
-    }else{
-      Map<String, dynamic> inputJsonForTest = {
-        "job": selectedJobInfo.split("@")[1],
-        "lend_count": selectedPreLoanCountInfo.split("@")[1],
-        "lend_amount": selectedPreLoanPriceInfo,
-        "wish_amount": selectedWantLoanPriceInfo,
-      };
-      // 1.정보변경
-      // 2.조회
-      UiUtils.closeLoadingPop(context);
-    }
+        CommonUtils.flutterToast("에러가 발생했습니다.\n다시 실행해주세요.");
+        Navigator.pop(context);
+      }
+    });
   }
 
   void _back(){

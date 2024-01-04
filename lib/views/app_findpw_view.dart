@@ -297,7 +297,7 @@ class AppFindPwViewState extends State<AppFindPwView> with WidgetsBindingObserve
               UiUtils.showLoadingPop(context);
               LogfinController.callLogfinApi(LogfinApis.checkMember, inputJson, (isSuccess, outputJson){
                 if(!isSuccess){
-                  CommonUtils.flutterToast("인증번호를 발송해요.");
+                  CommonUtils.flutterToast("인증번호를 발송했어요.");
                   _verifyCodeTextController.text = "";
                   LogfinController.callLogfinApi(LogfinApis.sendEmailCode, inputJson, (isSuccess, outputJson){
                     UiUtils.closeLoadingPop(context);

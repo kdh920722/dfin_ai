@@ -209,7 +209,9 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                     bool isDuplicate = false;
                     List<String> dupleDateList = [];
                     for(var eachLoan in MyData.getLoanInfoList()){
+                      CommonUtils.log("w","${each.uidType}  ${eachLoan.uidType}");
                       if(each.uidType == eachLoan.uidType){
+
                         if(eachLoan.lenderPrId == each.productOfferLenderPrId){
                           dupleDateList.add(eachLoan.createdDate);
                           isDuplicate = true;

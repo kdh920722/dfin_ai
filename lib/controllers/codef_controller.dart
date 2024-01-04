@@ -140,7 +140,7 @@ class CodeFController{
         if(json.containsKey('result') && json.containsKey('data')){
           final result = json['result'];
           var resultCode = result['code'];
-          CommonUtils.log('', 'out full : \n$json');
+          CommonUtils.log('w', '$endPoint\nout full : \n$json');
 
           // CF-00000 : 성공, CF-03002 : 추가 인증 필요
           final msg = result['message'];
@@ -760,7 +760,7 @@ class CodeFController{
         "nameRelationYN": "1",
         "militaryServiceYN": "1",
         "overseasKoreansIDYN": "0",
-        "isIdentityViewYn": "0",
+        "isIdentityViewYn": "1",
         "originDataYN": "0",
         "telecom": telecom
       };
@@ -783,7 +783,7 @@ class CodeFController{
         "relationWithHHYN": "1",
         "changeDateYN": "0",
         "compositionReasonYN": "0",
-        "isIdentityViewYn": "0",
+        "isIdentityViewYn": "1",
         "isNameViewYn": "1",
         "originDataYN": "0",
         "telecom": telecom
@@ -806,7 +806,7 @@ class CodeFController{
         "proofType": "",
         "contents": "",
         "date": "",
-        "isIdentityViewYn": "0",
+        "isIdentityViewYn": "1",
         "telecom": telecom
       };
 
@@ -816,12 +816,15 @@ class CodeFController{
         "organization": "0001",
         "loginType": "6",
         "userName": name,
+        //"userName": "김영일",
         "identity": loginIdentity,
+        //"identity": "5810221144516",
+        "phoneNo": phoneNo,
+        //"phoneNo": "01062277376",
         "id": randomKey,
         "loginTypeLevel": loginCertType,
-        "phoneNo": phoneNo,
         "address": address,
-        "isIdentityViewYn": "0",
+        "isIdentityViewYn": "1",
         "telecom": telecom,
         "birthDate": "",
         "carNo": carNum,
@@ -835,12 +838,15 @@ class CodeFController{
         "organization": "0001",
         "loginType": "6",
         "userName": name,
-        "identity": loginIdentity,
+        //"userName": "김영일",
+        "loginIdentity": loginIdentity,
+        //"identity": "5810221144516",
+        "phoneNo": phoneNo,
+        //"phoneNo": "01062277376",
         "id": randomKey,
         "loginTypeLevel": loginCertType,
-        "phoneNo": phoneNo,
         "address": address,
-        "isIdentityViewYn": "0",
+        "isIdentityViewYn": "1",
         "telecom": telecom,
         "birthDate": "",
         "carNo": carNum,
@@ -859,7 +865,7 @@ class CodeFController{
         "userName": name,
         "phoneNo": phoneNo,
         "useType": "0",
-        "isIdentityViewYN": "0",
+        "isIdentityViewYN": "1",
         "id": randomKey,
         "originDataYN": "0",
         "telecom": telecom
@@ -904,7 +910,7 @@ class CodeFController{
         "id": randomKey,
         "usePurposes": "01",
         "submitTargets": "01",
-        "isIdentityViewYN": "0",
+        "isIdentityViewYN": "1",
         "originDataYN": "0",
         "applicationType": "01",
         "identity": identity,
