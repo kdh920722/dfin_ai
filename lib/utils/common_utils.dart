@@ -359,7 +359,7 @@ class CommonUtils {
 
         try{
           FireBaseController.analytics!.logEvent(name: eventName, parameters: data);
-          //FireBaseController.facebookAppEvents!.logEvent(name: eventName, parameters: data);
+          FireBaseController.facebookAppEvents!.logEvent(name: eventName, parameters: data);
           CommonUtils.log("d", "app log : $eventName");
           FireBaseController.appsFlyerSdk!.logEvent(eventName, data);
         }catch(error){

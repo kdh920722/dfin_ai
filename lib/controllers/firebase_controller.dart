@@ -33,11 +33,10 @@ class FireBaseController{
   static int appsFlyerOneLinkCnt = 0;
 
   static Future<void> setMetaAndAppsflyerLogInit() async {
-    /*
     // META(facebook) pixel init
-    facebookAppEvents = FacebookAppEvents();
-    await facebookAppEvents!.setAutoLogAppEventsEnabled(true);
-     */
+    facebookAppEvents!.setAutoLogAppEventsEnabled(true);
+    facebookAppEvents!.setAdvertiserTracking(enabled: true);
+
 
     // appsflyer init
     appsFlyerSdk = Config.isAndroid?

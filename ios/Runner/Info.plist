@@ -30,7 +30,7 @@
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>kakao077c95950e4c99aefd181d2cd069524a</string>
-				<string>fb1312326329483579</string>
+				<string>fb780305570800959</string>
 			</array>
 		</dict>
 	</array>
@@ -132,11 +132,11 @@
 	<false/>
 
     <key>FacebookClientToken</key>
-    <string>281126f733da46b9cc386707fbfa3832</string>
+    <string>bc10dc12c8ff6c250204b2638197b185</string>
     <key>FacebookAppID</key>
-    <string>1312326329483579</string>
+    <string>780305570800959</string>
     <key>FacebookDisplayName</key>
-    <string>upfn</string>
+    <string>업핀</string>
 
     <key>com.apple.developer.associated-domains</key>
     <array>

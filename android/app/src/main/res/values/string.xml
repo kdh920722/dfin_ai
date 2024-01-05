@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="facebook_app_id">1312326329483579</string>
-    <string name="fb_login_protocol_scheme">fb1312326329483579</string>
-    <string name="facebook_client_token">281126f733da46b9cc386707fbfa3832</string>
+    <string name="facebook_app_id">780305570800959</string>
+    <string name="fb_login_protocol_scheme">fb780305570800959</string>
+    <string name="facebook_client_token">bc10dc12c8ff6c250204b2638197b185</string>
     <string name="app_name">업핀</string>
 
 

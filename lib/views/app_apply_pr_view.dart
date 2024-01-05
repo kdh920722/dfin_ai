@@ -264,26 +264,46 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           || each.productDocsId == 3 || each.productDocsId == 4
           || each.productDocsId == 6 || each.productDocsId == 10 || each.productDocsId == 11 || each.productDocsId == 14){
         String docsType = "";
-        if(each.productDocsId == 1 || each.productDocsId == 2 || each.productDocsId == 15 || each.productDocsId == 16 || each.productDocsId == 17){
+
+        // car_no 중복 확인
+        if(each.productDocsId == 16 || each.productDocsId == 17){
           docsType = "gov24";
-        }else if(each.productDocsId == 3 || each.productDocsId == 4){
-          docsType = "nhis";
+          Map<String, dynamic> addedDocsInfo = {
+            "id" : 0,
+            "name" : "",
+            "result" : <String, dynamic>{},
+            "view_id" : 0,
+            "is_confirmed" : false,
+            "is_docs" : true,
+            "docs_type" : docsType,
+            "car_no" : MyData.selectedCarInfoData!.carNum
+          };
+          addedDocsInfo["id"] = each.productDocsId;
+          addedDocsInfo["name"] = each.productDocsName;
+          addedDocsInfo["is_confirmed"] = false;
+          addedDocsList.add(addedDocsInfo);
         }else{
-          docsType = "nts";
+          if(each.productDocsId == 1 || each.productDocsId == 2 || each.productDocsId == 15){
+            docsType = "gov24";
+          }else if(each.productDocsId == 3 || each.productDocsId == 4){
+            docsType = "nhis";
+          }else{
+            docsType = "nts";
+          }
+          Map<String, dynamic> addedDocsInfo = {
+            "id" : 0,
+            "name" : "",
+            "result" : <String, dynamic>{},
+            "view_id" : 0,
+            "is_confirmed" : false,
+            "is_docs" : true,
+            "docs_type" : docsType
+          };
+          addedDocsInfo["id"] = each.productDocsId;
+          addedDocsInfo["name"] = each.productDocsName;
+          addedDocsInfo["is_confirmed"] = false;
+          addedDocsList.add(addedDocsInfo);
         }
-        Map<String, dynamic> addedDocsInfo = {
-          "id" : 0,
-          "name" : "",
-          "result" : <String, dynamic>{},
-          "view_id" : 0,
-          "is_confirmed" : false,
-          "is_docs" : true,
-          "docs_type" : docsType
-        };
-        addedDocsInfo["id"] = each.productDocsId;
-        addedDocsInfo["name"] = each.productDocsName;
-        addedDocsInfo["is_confirmed"] = false;
-        addedDocsList.add(addedDocsInfo);
       }
     }
     for(var each in addedDocsList){
@@ -417,7 +437,17 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         bool isSaved = false;
         for(int savedDocIndex = 0 ; savedDocIndex < savedDocsList.length ; savedDocIndex++){
           if(addedDocsList[addedDocIndex]["id"] == savedDocsList[savedDocIndex]["id"]){
-            isSaved = true;
+
+            // car_no 중복 확인
+            if(addedDocsList[addedDocIndex]["id"] == 16 || addedDocsList[addedDocIndex]["id"] == 17){
+              if(addedDocsList[addedDocIndex].containsKey("car_no") && savedDocsList[savedDocIndex].containsKey("car_no")){
+                if(addedDocsList[addedDocIndex]["car_no"] == savedDocsList[savedDocIndex]["car_no"]){
+                  isSaved = true;
+                }
+              }
+            }else{
+              isSaved = true;
+            }
           }
         }
 
@@ -1287,13 +1317,18 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           //gov24 : 1:주민등록등본           2:주민등록초본        15:지방세납세증명서      16:자동차등록원부(갑)     17:자동차등록원부(을)
           //nhis  : 3:건강보험자격득실확인서    4:건강보험납부확인서
           //nts   : 6:사업자등록증(*테스트불가) 10:소득금액증명       11:부가세과세표준증명원(*테스트불가)
-          else if(addedDocsList[eachAddedDocIdx]["id"] == 1 || addedDocsList[eachAddedDocIdx]["id"] == 2 || addedDocsList[eachAddedDocIdx]["id"] == 15 ||
-              addedDocsList[eachAddedDocIdx]["id"] == 16 || addedDocsList[eachAddedDocIdx]["id"] == 17 ||
-              addedDocsList[eachAddedDocIdx]["id"] == 3 || addedDocsList[eachAddedDocIdx]["id"] == 4
+          else if(addedDocsList[eachAddedDocIdx]["id"] == 1 || addedDocsList[eachAddedDocIdx]["id"] == 2 || addedDocsList[eachAddedDocIdx]["id"] == 15
+              || addedDocsList[eachAddedDocIdx]["id"] == 3 || addedDocsList[eachAddedDocIdx]["id"] == 4
               || addedDocsList[eachAddedDocIdx]["id"] == 6 || addedDocsList[eachAddedDocIdx]["id"] == 10
               || addedDocsList[eachAddedDocIdx]["id"] == 11 || addedDocsList[eachAddedDocIdx]["id"] == 14){
             addedDocsList[eachAddedDocIdx]["is_confirmed"] = true;
             addedDocsList[eachAddedDocIdx]["result"] = eachSavedDoc["result"];
+          }else if(addedDocsList[eachAddedDocIdx]["id"] == 16 || addedDocsList[eachAddedDocIdx]["id"] == 17){
+            // car_no 중복 확인
+            if(addedDocsList[eachAddedDocIdx]["car_no"] == eachSavedDoc["car_no"]){
+              addedDocsList[eachAddedDocIdx]["is_confirmed"] = true;
+              addedDocsList[eachAddedDocIdx]["result"] = eachSavedDoc["result"];
+            }
           }
         }
       }
@@ -3393,7 +3428,16 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             if(eachAdded["is_confirmed"] && eachAdded["id"] != 1000 && eachAdded["id"] != 999){
               for(var each in savedDocsList){
                 if(each["id"] == eachAdded["id"]){
-                  addedDupleDocsListForSave.add(eachAdded);
+                  // car_no 중복 확인
+                  if(eachAdded["id"] == 16 || eachAdded["id"] == 17){
+                    if(each.containsKey("'car_no'") && eachAdded.containsKey("'car_no'")){
+                      if(each['car_no'] == eachAdded['car_no']){
+                        addedDupleDocsListForSave.add(eachAdded);
+                      }
+                    }
+                  }else{
+                    addedDupleDocsListForSave.add(eachAdded);
+                  }
                 }
               }
             }
@@ -3408,7 +3452,16 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               bool isDuple = false;
               for(var eachDuple in addedDupleDocsListForSave){
                 if(each["id"] == eachDuple["id"]){
-                  isDuple = true;
+                  // car_no 중복 확인
+                  if(each["id"] == 16 || each["id"] == 17){
+                    if(each.containsKey("'car_no'") && eachDuple.containsKey("'car_no'")){
+                      if(each['car_no'] == eachDuple['car_no']){
+                        isDuple = true;
+                      }
+                    }
+                  }else{
+                    isDuple = true;
+                  }
                 }
               }
               if(!isDuple){
@@ -3533,7 +3586,16 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                         if(eachAdded["is_confirmed"] && eachAdded["id"] != 1000 && eachAdded["id"] != 999){
                           for(var each in savedDocsList){
                             if(each["id"] == eachAdded["id"]){
-                              addedDupleDocsListForSave.add(eachAdded);
+                              // car_no 중복 확인
+                              if(eachAdded["id"] == 16 || eachAdded["id"] == 17){
+                                if(each.containsKey("'car_no'") && eachAdded.containsKey("'car_no'")){
+                                  if(each['car_no'] == eachAdded['car_no']){
+                                    addedDupleDocsListForSave.add(eachAdded);
+                                  }
+                                }
+                              }else{
+                                addedDupleDocsListForSave.add(eachAdded);
+                              }
                             }
                           }
                         }
@@ -3548,7 +3610,16 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                           bool isDuple = false;
                           for(var eachDuple in addedDupleDocsListForSave){
                             if(each["id"] == eachDuple["id"]){
-                              isDuple = true;
+                              // car_no 중복 확인
+                              if(each["id"] == 16 || each["id"] == 17){
+                                if(each.containsKey("'car_no'") && eachDuple.containsKey("'car_no'")){
+                                  if(each['car_no'] == eachDuple['car_no']){
+                                    isDuple = true;
+                                  }
+                                }
+                              }else{
+                                isDuple = true;
+                              }
                             }
                           }
                           if(!isDuple){
