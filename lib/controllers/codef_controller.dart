@@ -444,6 +444,17 @@ class CodeFController{
                           }else if(resultListMap != null){
                             apiInfoDataList[i].errorCode = resultListMap[0]["result_codef_code"];
                           }
+
+                          if(apiInfoDataList[i].errorCode == "CF-12872"){
+                            for(var each in apiInfoDataList){
+                              each.isResultSuccess = false;
+                              each.resultMap = null;
+                              each.resultListMap = null;
+                              each.resultFullMap = fullMap;
+                              each.errorCode = "CF-12872";
+                            }
+                            callback(false, apiInfoDataList);
+                          }
                         }
 
                         if(callCount == apiInfoDataList.length){
@@ -462,9 +473,7 @@ class CodeFController{
                         apiInfoDataList[0].resultMap = null;
                         apiInfoDataList[0].resultListMap = null;
                         apiInfoDataList[0].resultFullMap = null;
-                        if(fullMap != null){
-                          apiInfoDataList[0].errorCode = fullMap["result_codef_code"];
-                        }else if(authListMap != null){
+                        if(authListMap != null){
                           apiInfoDataList[0].errorCode = authListMap[0]["result_codef_code"];
                         }
                       }else{
@@ -527,6 +536,17 @@ class CodeFController{
                         apiInfoDataList[0].errorCode = authMap["result_codef_code"];
                       }else if(authListMap != null){
                         apiInfoDataList[0].errorCode = "error_cert";
+                      }
+
+                      if(apiInfoDataList[0].errorCode == "CF-12872"){
+                        for(var each in apiInfoDataList){
+                          each.isResultSuccess = false;
+                          each.resultMap = null;
+                          each.resultListMap = null;
+                          each.resultFullMap = fullMap;
+                          each.errorCode = "CF-12872";
+                        }
+                        callback(false, apiInfoDataList);
                       }
                     }
 

@@ -420,10 +420,17 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
     for(var each in savedDocsList){
       Map<String, dynamic> resultMap = each["result"];
-      CommonUtils.log("", "!!!!saved check\n"
+      String carNo = "";
+      if(each['id'] == 16 || each['id'] == 17){
+        if(each.containsKey('car_no')){
+          carNo =  each['car_no'];
+        }
+      }
+      CommonUtils.log("w", "!!!!saved check\n"
           "view_id:${each["view_id"]}\n"
           "id:${each["id"]}\n"
           "name:${each["name"]}\n"
+          "car_no:$carNo\n"
           "is_confirmed:${each["is_confirmed"]}\n"
           "is_docs:${each["is_docs"]}\n"
           "docs_type:${each["docs_type"]}\n"
@@ -1082,12 +1089,18 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         );
         for(int i = 0 ; i < unSavedDocsList.length ; i++){
           Key key = UniqueKey();
+
+          String carNo = "";
+          if(unSavedDocsList[i]['id'] == 16 || unSavedDocsList[i]['id'] == 17){
+            carNo = unSavedDocsList[i]['car_no'];
+          }
+
           introWidgetList.add(
               SizedBox(width: 90.w,
                   child: Row(children: [
                     UiUtils.getCustomCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
                         ColorStyles.upFinGray,  ColorStyles.upFinWhite, (checkedValue){}),
-                    UiUtils.getTextButtonWithFixedScale(unSavedDocsList[i]["name"], 13.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.center, null, (){})
+                    UiUtils.getTextButtonWithFixedScale(carNo != ""? "'$carNo' ${unSavedDocsList[i]["name"]}" : unSavedDocsList[i]["name"], 13.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.center, null, (){})
                   ])
               )
           );
@@ -1111,18 +1124,32 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           bool isSaved = false;
           for(var each in savedDocsList){
             if(addedDocsList[i]["id"] == each["id"]){
-              isSaved = true;
+              // car_no 중복 확인
+              if(addedDocsList[i]["id"] == 16 || addedDocsList[i]["id"] == 17){
+                if(addedDocsList[i].containsKey("car_no") && each.containsKey("car_no")){
+                  if(addedDocsList[i]["car_no"] == each["car_no"]){
+                    isSaved = true;
+                  }
+                }
+              }else{
+                isSaved = true;
+              }
             }
           }
 
           if(isSaved){
             Key key = UniqueKey();
+            String carNo = "";
+            if(addedDocsList[i]['id'] == 16 || addedDocsList[i]['id'] == 17){
+              carNo = addedDocsList[i]['car_no'];
+            }
+
             introWidgetList.add(
                 SizedBox(width: 90.w,
                     child: Row(children: [
                       UiUtils.getCustomCheckBox(key, 1.2, true, ColorStyles.upFinBlack, ColorStyles.upFinWhite,
                           ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-                      UiUtils.getTextButtonWithFixedScale(addedDocsList[i]["name"], 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                      UiUtils.getTextButtonWithFixedScale(carNo != ""? "'$carNo' ${addedDocsList[i]["name"]}" : addedDocsList[i]["name"], 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
                     ])
                 )
             );
@@ -1150,18 +1177,32 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           bool isSaved = false;
           for(var each in savedDocsList){
             if(addedDocsList[i]["id"] == each["id"]){
-              isSaved = true;
+              // car_no 중복 확인
+              if(addedDocsList[i]["id"] == 16 || addedDocsList[i]["id"] == 17){
+                if(addedDocsList[i].containsKey("car_no") && each.containsKey("car_no")){
+                  if(addedDocsList[i]["car_no"] == each["car_no"]){
+                    isSaved = true;
+                  }
+                }
+              }else{
+                isSaved = true;
+              }
             }
           }
 
           if(isSaved){
             Key key = UniqueKey();
+            String carNo = "";
+            if(addedDocsList[i]['id'] == 16 || addedDocsList[i]['id'] == 17){
+              carNo = addedDocsList[i]['car_no'];
+            }
+
             introWidgetList.add(
                 SizedBox(width: 90.w,
                     child: Row(children: [
                       UiUtils.getCustomCheckBox(key, 1.2, true, ColorStyles.upFinBlack, ColorStyles.upFinWhite,
                           ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-                      UiUtils.getTextButtonWithFixedScale(addedDocsList[i]["name"], 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                      UiUtils.getTextButtonWithFixedScale(carNo != ""? "'$carNo' ${addedDocsList[i]["name"]}" : addedDocsList[i]["name"], 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
                     ])
                 )
             );
@@ -1183,13 +1224,17 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       for(var eachDoc in MyData.getPrDocsInfoList()){
         for(int i = 0 ; i < addedDocsList.length ; i++){
           if(eachDoc.productDocsId == addedDocsList[i]["id"]){
+            String carNo = "";
+            if(addedDocsList[i]['id'] == 16 || addedDocsList[i]['id'] == 17){
+              carNo = MyData.selectedCarInfoData!.carNum;
+            }
             Key key = UniqueKey();
             introWidgetList.add(
                 SizedBox(width: 90.w,
                     child: Row(children: [
                       UiUtils.getCustomCheckBox(key, 1.2, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
                           ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-                      UiUtils.getTextButtonWithFixedScale(addedDocsList[i]["name"], 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                      UiUtils.getTextButtonWithFixedScale(carNo != ""? "'$carNo' ${addedDocsList[i]["name"]}" : addedDocsList[i]["name"], 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
                     ])
                 )
             );
@@ -3430,7 +3475,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                 if(each["id"] == eachAdded["id"]){
                   // car_no 중복 확인
                   if(eachAdded["id"] == 16 || eachAdded["id"] == 17){
-                    if(each.containsKey("'car_no'") && eachAdded.containsKey("'car_no'")){
+                    if(each.containsKey("car_no") && eachAdded.containsKey("car_no")){
                       if(each['car_no'] == eachAdded['car_no']){
                         addedDupleDocsListForSave.add(eachAdded);
                       }
@@ -3454,7 +3499,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                 if(each["id"] == eachDuple["id"]){
                   // car_no 중복 확인
                   if(each["id"] == 16 || each["id"] == 17){
-                    if(each.containsKey("'car_no'") && eachDuple.containsKey("'car_no'")){
+                    if(each.containsKey("car_no") && eachDuple.containsKey("car_no")){
                       if(each['car_no'] == eachDuple['car_no']){
                         isDuple = true;
                       }
@@ -3556,7 +3601,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                 "contact_no3": MyData.phoneNumber.substring(7),
                 "jumin_no1": MyData.idNumber.split("-")[0],
                 "jumin_no2": MyData.idNumber.split("-")[1],
-                "memo": '모바일 신청(개인회생)',
+                "memo": '모바일 신청(개인회생) ${Config.isAndroid ? "android" : "ios"}',
                 "documents": docResultList
               };
             }else{
@@ -3570,7 +3615,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                 "contact_no3": MyData.phoneNumber.substring(7),
                 "jumin_no1": MyData.idNumber.split("-")[0],
                 "jumin_no2": MyData.idNumber.split("-")[1],
-                "memo": '모바일 신청(오토론)',
+                "memo": '모바일 신청(오토론) ${Config.isAndroid ? "android" : "ios"}',
                 "documents": docResultList
               };
             }
@@ -3588,7 +3633,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                             if(each["id"] == eachAdded["id"]){
                               // car_no 중복 확인
                               if(eachAdded["id"] == 16 || eachAdded["id"] == 17){
-                                if(each.containsKey("'car_no'") && eachAdded.containsKey("'car_no'")){
+                                if(each.containsKey("car_no'") && eachAdded.containsKey("'car_no")){
                                   if(each['car_no'] == eachAdded['car_no']){
                                     addedDupleDocsListForSave.add(eachAdded);
                                   }
@@ -3612,7 +3657,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                             if(each["id"] == eachDuple["id"]){
                               // car_no 중복 확인
                               if(each["id"] == 16 || each["id"] == 17){
-                                if(each.containsKey("'car_no'") && eachDuple.containsKey("'car_no'")){
+                                if(each.containsKey("car_no") && eachDuple.containsKey("car_no")){
                                   if(each['car_no'] == eachDuple['car_no']){
                                     isDuple = true;
                                   }
