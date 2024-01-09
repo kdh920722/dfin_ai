@@ -860,7 +860,7 @@ class LogfinController {
 
           if(MyData.getPrDocsInfoList().isNotEmpty){
             for(var eachInList in MyData.getPrDocsInfoList()){
-              CommonUtils.log("i", "${eachInList.productDocsId}\n${eachInList.productDocsName}\n");
+              CommonUtils.log("i", "doc list : ${eachInList.productDocsId}\n${eachInList.productDocsName}\n");
             }
             callback(true, outputJsonForSearchDocs);
           }else{
@@ -887,7 +887,7 @@ class LogfinController {
 
           if(MyData.getPrDocsInfoList().isNotEmpty){
             for(var eachInList in MyData.getPrDocsInfoList()){
-              CommonUtils.log("i", "${eachInList.productDocsId}\n${eachInList.productDocsName}\n");
+              CommonUtils.log("i", "doc list : ${eachInList.productDocsId}\n${eachInList.productDocsName}\n");
             }
             callback(true, outputJsonForSearchDocs);
           }else{

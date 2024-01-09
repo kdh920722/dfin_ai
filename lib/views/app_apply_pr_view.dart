@@ -438,7 +438,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       );
     }
 
-
     for(int addedDocIndex = 0 ; addedDocIndex < addedDocsList.length ; addedDocIndex++){
       if(addedDocsList[addedDocIndex]["id"] != 999 && addedDocsList[addedDocIndex]["id"] != 1000){
         bool isSaved = false;
@@ -2974,14 +2973,26 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.gov24localTaxPaymentCert, true));
             }else if(each["id"] == 16){
               // 자동차등록원부(갑)
+              /*
               Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.gov24CarRegistrationA,
                   identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey, MyData.selectedCarInfoData!.carNum, MyData.selectedCarInfoData!.carOwnerName);
               apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.gov24CarRegistrationA, true));
+
+               */
+              Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.gov24residentRegistrationCopy,
+                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey, "", "");
+              apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.gov24residentRegistrationCopy, true));
             }else if(each["id"] == 17){
               // 자동차등록원부(을)
+              /*
               Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.gov24CarRegistrationB,
                   identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey, MyData.selectedCarInfoData!.carNum, MyData.selectedCarInfoData!.carOwnerName);
               apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.gov24CarRegistrationB, true));
+
+               */
+              Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.gov24localTaxPaymentCert,
+                  identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey, "", "");
+              apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.gov24localTaxPaymentCert, true));
             }
           }
         }
