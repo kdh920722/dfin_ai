@@ -29,7 +29,6 @@ import '../configs/app_config.dart';
 import '../datas/pr_docs_info_data.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
-import 'package:path_provider/path_provider.dart';
 
 class AppChatView extends StatefulWidget{
   @override

@@ -19,7 +19,7 @@ class LoanInfoData {
       this.companyName, this.companyLogo, this.productName,  this.contactNo, this.createdDate,
       this.updatedDate, this.statueId, this.chatRoomId, this.chatRoomMsg);
   String printLoanData(){
-    return "\naccidentUid: $uid\nloanUid: $loanUid\nlenderPrId: $lenderPrId\nsubmitAmount: $submitAmount"
+    return "\nuid: $uid\nloanUid: $loanUid\nlenderPrId: $lenderPrId\nsubmitAmount: $submitAmount"
         "\nsubmitRate: $submitRate\ncompanyName: $companyName\ncompanyLogo: $companyLogo\nproductName: $productName\ncompanyCallNum: $contactNo"
         "\ncreatedDate: $createdDate\nupdatedDate: $updatedDate\nstatueId: $statueId\nchatRoomId: $chatRoomId";
   }

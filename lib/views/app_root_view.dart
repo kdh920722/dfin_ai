@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'package:android_play_install_referrer/android_play_install_referrer.dart';
-import 'package:install_referrer/install_referrer.dart';
 import 'package:upfin/controllers/appsflyer_controller.dart';
 import 'package:upfin/controllers/aws_controller.dart';
 import 'package:upfin/controllers/clova_controller.dart';
@@ -213,7 +211,8 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
         CommonUtils.log("i", "appsflyer devkey : ${AppsflyerController.devKey}\nappsflyer inviteKey : ${AppsflyerController.inviteKey}\nappsflyer iosAppId : ${AppsflyerController.appIdForIos}");
         CommonUtils.log("i", "percent : ${GetController.to.loadingPercent.value}");
 
-        CommonUtils.setAppLogInit();
+        AppsflyerController.initAppsflyerEventLog();
+        CommonUtils.isAppLogInit = true;
 
         if(GetController.to.loadingPercent.value == 100){
           setState(() {
@@ -251,9 +250,9 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
         GetController.to.updatePercent(10);
         CommonUtils.log("i", "logfin url : ${LogfinController.url}");
         CommonUtils.log("i", "percent : ${GetController.to.loadingPercent.value}");
-        FireBaseController.appsFlyerOneLinkCnt++;
-        if(FireBaseController.appsFlyerOneLinkCnt == 3){
-          FireBaseController.sendInfoForInstallTracking();
+        AppsflyerController.appsFlyerOneLinkCnt++;
+        if(AppsflyerController.appsFlyerOneLinkCnt == 3){
+          AppsflyerController.sendInfoForInstallTracking();
         }
 
         if(GetController.to.loadingPercent.value == 100){

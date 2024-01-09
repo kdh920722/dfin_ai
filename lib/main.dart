@@ -1,4 +1,3 @@
-import 'package:facebook_app_events/facebook_app_events.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -6,6 +5,7 @@ import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:upfin/configs/app_config.dart';
+import 'package:upfin/controllers/facebook_controller.dart';
 import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:upfin/utils/ui_utils.dart';
 import 'controllers/get_controller.dart';
@@ -15,8 +15,11 @@ void main() async{
 
   if(!kIsWeb){
     FlutterNativeSplash.preserve(widgetsBinding: widgetsBinding);
-    FireBaseController.facebookAppEvents = FacebookAppEvents();
     await FireBaseController.initMainFirebase();
+    FireBaseController.initFirebaseAnalyticsEventLog();
+    await FacebookController.initFacebookEventLog();
+    // init appsflyer later..
+
     await SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
       DeviceOrientation.portraitDown,

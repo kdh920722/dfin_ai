@@ -4,8 +4,6 @@ import 'dart:math';
 import 'package:camera/camera.dart';
 import 'package:device_info/device_info.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
-import 'package:facebook_app_events/facebook_app_events.dart';
-import 'package:firebase_analytics/observer.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
@@ -16,7 +14,9 @@ import 'package:logger/logger.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sizer/sizer.dart';
+import 'package:upfin/controllers/appsflyer_controller.dart';
 import 'package:upfin/controllers/codef_controller.dart';
+import 'package:upfin/controllers/facebook_controller.dart';
 import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:upfin/controllers/get_controller.dart';
 import 'package:upfin/controllers/sharedpreference_controller.dart';
@@ -334,16 +334,6 @@ class CommonUtils {
   }
 
   static bool isAppLogInit = false;
-  static Future<void> setAppLogInit() async {
-    try{
-      await FireBaseController.setMetaAndAppsflyerLogInit();
-      isAppLogInit = true;
-    }catch(error){
-      CommonUtils.log("e", "app log init error : $error");
-      isAppLogInit = false;
-    }
-  }
-
   static setAppLog(String eventName) async {
     if(MyData.email != "" && isAppLogInit){
       String appVersion = await Config.getAppVersion();
@@ -359,9 +349,9 @@ class CommonUtils {
 
         try{
           FireBaseController.analytics!.logEvent(name: eventName, parameters: data);
-          FireBaseController.facebookAppEvents!.logEvent(name: eventName, parameters: data);
+          FacebookController.facebookAppEvents!.logEvent(name: eventName, parameters: data);
+          AppsflyerController.appsFlyerSdk!.logEvent(eventName, data);
           CommonUtils.log("d", "app log : $eventName");
-          FireBaseController.appsFlyerSdk!.logEvent(eventName, data);
         }catch(error){
           CommonUtils.log("d", "app log error : $error");
         }
@@ -837,7 +827,7 @@ class CommonUtils {
   static void resetData(){
     MyData.resetMyData();
     hideKeyBoard();
-    AppMainViewState.doCheckToSearchAccident = false;
+    AppMainViewState.doCheckToSearchPr = false;
     GetController.to.resetAccdientInfoList();
     GetController.to.resetCarInfoList();
     GetController.to.resetChatLoanInfoList();

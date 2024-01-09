@@ -31,7 +31,7 @@ class AppMainView extends StatefulWidget{
 
 class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   final PageController _pageController = PageController();
-  static bool doCheckToSearchAccident = false;
+  static bool doCheckToSearchPr = false;
   int viewTypeId = 2; // 1: 대출 / 2: MY / 3: 설정
   int tryOut = 0;
   String retryChatRoomId = "";
@@ -45,10 +45,10 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     WidgetsBinding.instance.addObserver(this);
     MyData.selectedAccidentInfoData = null;
     MyData.selectedCarInfoData = null;
-    if(MyData.getAccidentInfoList().isEmpty){
-      doCheckToSearchAccident = true;
+    if(MyData.getAccidentInfoList().isEmpty && MyData.getCarInfoList().isEmpty){
+      doCheckToSearchPr = true;
     }else{
-      doCheckToSearchAccident = false;
+      doCheckToSearchPr = false;
     }
 
     mainContext = context;
@@ -177,12 +177,8 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               const Spacer(flex: 2),
               MyData.isTestUser ? UiUtils.getIconButton(Icons.comments_disabled_sharp, 7.w, ColorStyles.upFinRed, () {
 
-                Map<String, dynamic> inputJson1 = {
-
-                };
-                LogfinController.callLogfinApi(LogfinApis.getCarDocs, inputJson1, (isSuccess, outputJson){
-
-                });
+                CommonUtils.log("w","uid : ${MyData.getLoanInfoList()[0].uid}");
+                CommonUtils.log("w","uid : ${MyData.getCarInfoList()[0].carUid}");
                 /*
                 getMyCarInfo ==> {success: true, data: {cars: [ *addAndSearchCar 'car_info' output... ]}}
 
@@ -681,6 +677,17 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             LogfinController.autoAnswerMap = LogfinController.autoAnswerMapForAccident;
           }else{
             LogfinController.autoAnswerMap = LogfinController.autoAnswerMapForCar;
+            for(var eachLoan in MyData.getLoanInfoList()){
+              if(each.chatLoanUid == eachLoan.loanUid){
+                for(var eachCar in MyData.getCarInfoList()){
+                  if(eachLoan.uid == eachCar.carUid){
+                    CommonUtils.log("w","uid : ${MyData.getLoanInfoList()[0].uid}");
+                    CommonUtils.log("w","uid : ${MyData.getCarInfoList()[0].carUid}");
+                    MyData.selectedCarInfoData = eachCar;
+                  }
+                }
+              }
+            }
           }
         }
       }
@@ -991,7 +998,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             ]))
         ),
         Positioned(
-            child: doCheckToSearchAccident? Stack(alignment: Alignment.center, children: [
+            child: doCheckToSearchPr? Stack(alignment: Alignment.center, children: [
               Positioned(child: Container(
                 width: 100.w,
                 height: 100.h,
@@ -1007,7 +1014,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                   UiUtils.getBorderButtonBox(80.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
                       UiUtils.getTextWithFixedScale("시작하기", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, null), () async {
                         setState(() {
-                          doCheckToSearchAccident = false;
+                          doCheckToSearchPr = false;
                         });
                         _showChoicePop();
                       }),
@@ -1015,7 +1022,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                   SizedBox(width: 80.w, child: UiUtils.getTextButtonWithFixedScale("넘어가기", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null, (){
                     isViewHere = true;
                     setState(() {
-                      doCheckToSearchAccident = false;
+                      doCheckToSearchPr = false;
                     });
                   })),
                 ]),
