@@ -146,6 +146,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   int gov24Count = 0;
   int nhisCount = 0;
   int ntsCount = 0;
+  bool isCameraNeeded = true;
 
   Future<void> _initDocsList() async {
     currentViewId = 1;
@@ -167,7 +168,36 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       }
     }
 
-    if(!isRetry){
+    if(isRetry){
+      bool isCameraIdHere = false;
+      for(var each in MyData.getPrDocsInfoList()){
+        if(each.productDocsId == 12) isCameraIdHere = true;
+      }
+
+      if(isCameraIdHere){
+        isCameraNeeded = true;
+      }else{
+        isCameraNeeded = false;
+      }
+
+      if(isCameraNeeded){
+        Map<String, dynamic> cameraInfo = {
+          "id" : 0,
+          "name" : "",
+          "view_id" : 0,
+          "result" : <String, dynamic>{},
+          "is_confirmed" : false,
+          "is_docs" : false,
+          "docs_type" : ""
+        };
+        cameraInfo["id"] = cameraId;
+        cameraInfo["name"] = cameraName;
+        cameraInfo["view_id"] = addedIndexId;
+        cameraInfo["is_confirmed"] = false;
+        addedDocsList.add(cameraInfo);
+        addedIndexId++;
+      }
+    }else{
       Map<String, dynamic> cameraInfo = {
         "id" : 0,
         "name" : "",
@@ -463,9 +493,13 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       }
     }
 
+    unSavedDocsList.sort((a,b)=>a["view_id"].compareTo(b["view_id"]));
+    for(var each in unSavedDocsList){
+      CommonUtils.log("i", "each unSavedDocsList doc :  ${each["view_id"]} ${each["id"]} ${each["name"]}");
+    }
     for(var each in unSavedDocsList){
       Map<String, dynamic> resultMap = each["result"];
-      CommonUtils.log("", "!!!!unsaved check\n"
+      CommonUtils.log("w", "!!!!unsaved check\n"
           "view_id:${each["view_id"]}\n"
           "id:${each["id"]}\n"
           "name:${each["name"]}\n"
@@ -504,6 +538,10 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             each["result"] = <String, dynamic>{};
             unSavedDocsList.add(each);
           }
+        }
+        unSavedDocsList.sort((a,b)=>a["view_id"].compareTo(b["view_id"]));
+        for(var each in unSavedDocsList){
+          CommonUtils.log("i", "each unSavedDocsList doc :  ${each["view_id"]} ${each["id"]} ${each["name"]}");
         }
       }
     }
@@ -953,6 +991,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           UiUtils.getMarginBox(0, 3.h)
       );
       if(MyData.selectedPrInfoData!.uidType == "1"){
+        CommonUtils.log("w","asads : ${MyData.selectedAccidentInfoData!.accidentCaseNumberYear}");
         introWidgetList.add(
             SizedBox(width: 90.w,
                 child: Row(children: [
@@ -1161,83 +1200,94 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       introWidgetList.add(
           UiUtils.getMarginBox(0, 1.h)
       );
-
-      introWidgetList.add(
-          SizedBox(width: 90.w,
-              child: UiUtils.getTextWithFixedScale("저장된 정보", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)
-          )
-      );
-      introWidgetList.add(
-          UiUtils.getMarginBox(0, 1.h)
-      );
-      for(int i = 0 ; i < addedDocsList.length ; i++){
-        // 95~99
-        if(addedDocsList[i]["id"] != 999 && addedDocsList[i]["id"] != 1000){
-          bool isSaved = false;
-          for(var each in savedDocsList){
-            if(addedDocsList[i]["id"] == each["id"]){
-              // car_no 중복 확인
-              if(addedDocsList[i]["id"] == 16 || addedDocsList[i]["id"] == 17){
-                if(addedDocsList[i].containsKey("car_no") && each.containsKey("car_no")){
-                  if(addedDocsList[i]["car_no"] == each["car_no"]){
-                    isSaved = true;
-                  }
-                }
-              }else{
-                isSaved = true;
-              }
-            }
-          }
-
-          if(isSaved){
+      if(savedDocsList.isNotEmpty){
+        introWidgetList.add(
+            SizedBox(width: 90.w,
+                child: UiUtils.getTextWithFixedScale("저장된 정보", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)
+            )
+        );
+        introWidgetList.add(
+            UiUtils.getMarginBox(0, 1.h)
+        );
+        for(int i = 0 ; i < savedDocsList.length ; i++){
+          if(savedDocsList[i]["id"] == 95 || savedDocsList[i]["id"] == 99){
             Key key = UniqueKey();
-            String carNo = "";
-            if(addedDocsList[i]['id'] == 16 || addedDocsList[i]['id'] == 17){
-              carNo = addedDocsList[i]['car_no'];
-            }
-
             introWidgetList.add(
                 SizedBox(width: 90.w,
                     child: Row(children: [
                       UiUtils.getCustomCheckBox(key, 1.2, true, ColorStyles.upFinBlack, ColorStyles.upFinWhite,
                           ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-                      UiUtils.getTextButtonWithFixedScale(carNo != ""? "'$carNo' ${addedDocsList[i]["name"]}" : addedDocsList[i]["name"], 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                      UiUtils.getTextButtonWithFixedScale(savedDocsList[i]["name"], 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
                     ])
                 )
             );
+          }else{
+            bool isSaved = false;
+            for(var each in addedDocsList){
+              if(savedDocsList[i]["id"] == each["id"]){
+                // car_no 중복 확인
+                if(savedDocsList[i]["id"] == 16 || savedDocsList[i]["id"] == 17){
+                  if(savedDocsList[i].containsKey("car_no") && each.containsKey("car_no")){
+                    if(savedDocsList[i]["car_no"] == each["car_no"]){
+                      isSaved = true;
+                    }
+                  }
+                }else{
+                  isSaved = true;
+                }
+              }
+            }
+
+            if(isSaved){
+              Key key = UniqueKey();
+              String carNo = "";
+              if(savedDocsList[i]['id'] == 16 || savedDocsList[i]['id'] == 17){
+                carNo = savedDocsList[i]['car_no'];
+              }
+
+              introWidgetList.add(
+                  SizedBox(width: 90.w,
+                      child: Row(children: [
+                        UiUtils.getCustomCheckBox(key, 1.2, true, ColorStyles.upFinBlack, ColorStyles.upFinWhite,
+                            ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
+                        UiUtils.getTextButtonWithFixedScale(carNo != ""? "'$carNo' ${savedDocsList[i]["name"]}" : savedDocsList[i]["name"], 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                      ])
+                  )
+              );
+            }
           }
         }
       }
 
-      introWidgetList.add(
-          UiUtils.getMarginBox(0, 5.h)
-      );
-      introWidgetList.add(
-          SizedBox(width: 90.w,
-              child: UiUtils.getTextWithFixedScale("미제출정보", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)
-          )
-      );
-      introWidgetList.add(
-          UiUtils.getMarginBox(0, 1.h)
-      );
-      for(var eachDoc in MyData.getPrDocsInfoList()){
-        for(int i = 0 ; i < addedDocsList.length ; i++){
-          if(eachDoc.productDocsId == addedDocsList[i]["id"]){
-            String carNo = "";
-            if(addedDocsList[i]['id'] == 16 || addedDocsList[i]['id'] == 17){
-              carNo = MyData.selectedCarInfoData!.carNum;
-            }
-            Key key = UniqueKey();
-            introWidgetList.add(
-                SizedBox(width: 90.w,
-                    child: Row(children: [
-                      UiUtils.getCustomCheckBox(key, 1.2, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
-                          ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){}),
-                      UiUtils.getTextButtonWithFixedScale(carNo != ""? "'$carNo' ${addedDocsList[i]["name"]}" : addedDocsList[i]["name"], 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
-                    ])
-                )
-            );
+      if(unSavedDocsList.isNotEmpty){
+        introWidgetList.add(
+            UiUtils.getMarginBox(0, 5.h)
+        );
+        introWidgetList.add(
+            SizedBox(width: 90.w,
+                child: UiUtils.getTextWithFixedScale("미제출정보", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)
+            )
+        );
+        introWidgetList.add(
+            UiUtils.getMarginBox(0, 1.h)
+        );
+        for(int i = 0 ; i < unSavedDocsList.length ; i++){
+          Key key = UniqueKey();
+
+          String carNo = "";
+          if(unSavedDocsList[i]['id'] == 16 || unSavedDocsList[i]['id'] == 17){
+            carNo = unSavedDocsList[i]['car_no'];
           }
+
+          introWidgetList.add(
+              SizedBox(width: 90.w,
+                  child: Row(children: [
+                    UiUtils.getCustomCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
+                        ColorStyles.upFinGray,  ColorStyles.upFinWhite, (checkedValue){}),
+                    UiUtils.getTextButtonWithFixedScale(carNo != ""? "'$carNo' ${unSavedDocsList[i]["name"]}" : unSavedDocsList[i]["name"], 13.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.center, null, (){})
+                  ])
+              )
+          );
         }
       }
     }
@@ -1259,39 +1309,58 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
           UiUtils.getTextWithFixedScale("네 좋아요!", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () async {
             await _setSavedData();
-            if(unSavedDocsList.isEmpty){
-              _applyPr();
+
+            bool isAuthCertError = false;
+            for(var each in savedDocsList){
+              if(each['id'] == cameraId){
+                String imgFilePath = _getSavedData(cameraId);
+                if(imgFilePath != ""){
+                  bool isAuthCert = await CommonUtils.isFileExists(imgFilePath);
+                  isAuthCertError = !isAuthCert;
+                  CommonUtils.log("w", "imgFilePath : $isAuthCertError $imgFilePath");
+                }
+              }
+            }
+
+            if(isAuthCertError){
+              CommonUtils.flutterToast("신분증정보가 만료되었습니다.\n다시 시도해주세요.");
+              await _setValidImg();
+              setState(() {});
             }else{
-              setState(() {
-                var targetDoc = unSavedDocsList[0];
-                if(targetDoc["is_docs"]){
-                  if(targetDoc["docs_type"] == "gov24"){
-                    for(int i = addedDocsList.length-1 ; i >= 0 ; i--){
-                      if(addedDocsList[i]["docs_type"] == "gov24"){
-                        reUseTargetViewId = addedDocsList[i]["view_id"];
+              if(unSavedDocsList.isEmpty){
+                _applyPr();
+              }else{
+                setState(() {
+                  var targetDoc = unSavedDocsList[0];
+                  if(targetDoc["is_docs"]){
+                    if(targetDoc["docs_type"] == "gov24"){
+                      for(int i = addedDocsList.length-1 ; i >= 0 ; i--){
+                        if(addedDocsList[i]["docs_type"] == "gov24"){
+                          reUseTargetViewId = addedDocsList[i]["view_id"];
+                        }
                       }
-                    }
-                  }else if(targetDoc["docs_type"] == "nhis"){
-                    for(int i = addedDocsList.length-1 ; i >= 0 ; i--){
-                      if(addedDocsList[i]["docs_type"] == "nhis"){
-                        reUseTargetViewId = addedDocsList[i]["view_id"];
+                    }else if(targetDoc["docs_type"] == "nhis"){
+                      for(int i = addedDocsList.length-1 ; i >= 0 ; i--){
+                        if(addedDocsList[i]["docs_type"] == "nhis"){
+                          reUseTargetViewId = addedDocsList[i]["view_id"];
+                        }
+                      }
+                    }else{
+                      for(int i = addedDocsList.length-1 ; i >= 0 ; i--){
+                        if(addedDocsList[i]["docs_type"] == "nts"){
+                          reUseTargetViewId = addedDocsList[i]["view_id"];
+                        }
                       }
                     }
                   }else{
-                    for(int i = addedDocsList.length-1 ; i >= 0 ; i--){
-                      if(addedDocsList[i]["docs_type"] == "nts"){
-                        reUseTargetViewId = addedDocsList[i]["view_id"];
-                      }
-                    }
+                    reUseTargetViewId = targetDoc["view_id"];
                   }
-                }else{
-                  reUseTargetViewId = targetDoc["view_id"];
-                }
-                CommonUtils.log("w","view id : $reUseTargetViewId");
-                currentViewId = reUseTargetViewId;
-              });
-              CommonUtils.flutterToast("미제출 정보를\n입력해야합니다.");
+                  CommonUtils.log("w","view id : $reUseTargetViewId");
+                  currentViewId = reUseTargetViewId;
+                });
+                CommonUtils.flutterToast("미제출 정보를\n입력해야합니다.");
 
+              }
             }
           }),
       UiUtils.getMarginBox(0, 1.5.h),
@@ -1305,7 +1374,12 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               _clearAddress();
 
               if(isRetry){
-                currentViewId = _getViewIdFromListById(addressId);
+                if(isCameraNeeded){
+                  currentViewId = _getViewIdFromListById(cameraId);
+                }else{
+                  currentViewId = _getViewIdFromListById(addressId);
+                }
+
               }else{
                 currentViewId = _getViewIdFromListById(cameraId);
               }
@@ -3429,308 +3503,312 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
     if(isRetry){
       UiUtils.showLoadingPop(context);
-      List<dynamic> docResultList = [];
-      for(var each in addedDocsList){
-        if(each["is_docs"] && each["is_confirmed"]){
-          var resultMap  =  each["result"]["resultValue"]["data"];
-          //gov24 : 1:주민등록등본           2:주민등록초본        15:지방세납세증명서      16:자동차등록원부(갑)     17:자동차등록원부(을)
-          //nhis  : 3:건강보험자격득실확인서    4:건강보험납부확인서
-          //nts   : 6:사업자등록증(*테스트불가) 10:소득금액증명       11:부가세과세표준증명원(*테스트불가)      14:국세납세증명서
-          if(each["id"] == 3 || each["id"] == 4){
-            if(resultMap is List<dynamic>){
-              Map<String, dynamic> eachMap = {
-                "pr_document_id" : each["id"],
-                "response_data" : json.encode(resultMap)
-              };
-              docResultList.add(eachMap);
-            }else{
-              List<dynamic> wrapListMap = [];
-              wrapListMap.add(resultMap);
-              Map<String, dynamic> eachMap = {
-                "pr_document_id" : each["id"],
-                "response_data" : json.encode(wrapListMap)
-              };
-              docResultList.add(eachMap);
-            }
-          }else{
-            if(resultMap is List<dynamic>){
-              Map<String, dynamic> eachMap = {
-                "pr_document_id" : each["id"],
-                "response_data" : json.encode(resultMap)
-              };
-              docResultList.add(eachMap);
-            }else{
-              Map<String, dynamic> eachMap = {
-                "pr_document_id" : each["id"],
-                "response_data" : resultMap
-              };
-              docResultList.add(eachMap);
+      _uploadCertImageToAwsServer(pickedFilePath, (isSuccessToUpload){
+        if(isSuccessToUpload){
+          List<dynamic> docResultList = [];
+          Map<String, dynamic> eachMap = {
+            "pr_document_id" : "12",
+            "response_data" : awsUploadUrl
+          };
+          docResultList.add(eachMap);
+
+          for(var each in addedDocsList){
+            if(each["is_docs"] && each["is_confirmed"]){
+              var resultMap  =  each["result"]["resultValue"]["data"];
+              //gov24 : 1:주민등록등본           2:주민등록초본        15:지방세납세증명서      16:자동차등록원부(갑)     17:자동차등록원부(을)
+              //nhis  : 3:건강보험자격득실확인서    4:건강보험납부확인서
+              //nts   : 6:사업자등록증(*테스트불가) 10:소득금액증명       11:부가세과세표준증명원(*테스트불가)      14:국세납세증명서
+              if(each["id"] == 3 || each["id"] == 4){
+                if(resultMap is List<dynamic>){
+                  Map<String, dynamic> eachMap = {
+                    "pr_document_id" : each["id"],
+                    "response_data" : json.encode(resultMap)
+                  };
+                  docResultList.add(eachMap);
+                }else{
+                  List<dynamic> wrapListMap = [];
+                  wrapListMap.add(resultMap);
+                  Map<String, dynamic> eachMap = {
+                    "pr_document_id" : each["id"],
+                    "response_data" : json.encode(wrapListMap)
+                  };
+                  docResultList.add(eachMap);
+                }
+              }else{
+                if(resultMap is List<dynamic>){
+                  Map<String, dynamic> eachMap = {
+                    "pr_document_id" : each["id"],
+                    "response_data" : json.encode(resultMap)
+                  };
+                  docResultList.add(eachMap);
+                }else{
+                  Map<String, dynamic> eachMap = {
+                    "pr_document_id" : each["id"],
+                    "response_data" : resultMap
+                  };
+                  docResultList.add(eachMap);
+                }
+              }
             }
           }
-        }
-      }
 
-      Map<String, dynamic> applyInputMap = {
-        "loan_uid": AppChatViewState.currentLoanUid,
-        "documents": docResultList
-      };
+          Map<String, dynamic> applyInputMap = {
+            "loan_uid": AppChatViewState.currentLoanUid,
+            "documents": docResultList
+          };
 
-      LogfinController.callLogfinApi(LogfinApis.retryDocs, applyInputMap, (isSuccess, outputJson){
-        UiUtils.closeLoadingPop(context);
-        if(isSuccess){
-          List<Map<String, dynamic>> addedDocsListForSave = [];
-          List<Map<String, dynamic>> addedDupleDocsListForSave = [];
-          for(var eachAdded in addedDocsList){
-            if(eachAdded["is_confirmed"] && eachAdded["id"] != 1000 && eachAdded["id"] != 999){
-              for(var each in savedDocsList){
-                if(each["id"] == eachAdded["id"]){
-                  // car_no 중복 확인
-                  if(eachAdded["id"] == 16 || eachAdded["id"] == 17){
-                    if(each.containsKey("car_no") && eachAdded.containsKey("car_no")){
-                      if(each['car_no'] == eachAdded['car_no']){
+          LogfinController.callLogfinApi(LogfinApis.retryDocs, applyInputMap, (isSuccess, outputJson){
+            UiUtils.closeLoadingPop(context);
+            if(isSuccess){
+              List<Map<String, dynamic>> addedDocsListForSave = [];
+              List<Map<String, dynamic>> addedDupleDocsListForSave = [];
+              for(var eachAdded in addedDocsList){
+                if(eachAdded["is_confirmed"] && eachAdded["id"] != 1000 && eachAdded["id"] != 999){
+                  for(var each in savedDocsList){
+                    if(each["id"] == eachAdded["id"]){
+                      // car_no 중복 확인
+                      if(eachAdded["id"] == 16 || eachAdded["id"] == 17){
+                        if(each.containsKey("car_no") && eachAdded.containsKey("car_no")){
+                          if(each['car_no'] == eachAdded['car_no']){
+                            addedDupleDocsListForSave.add(eachAdded);
+                          }
+                        }
+                      }else{
                         addedDupleDocsListForSave.add(eachAdded);
                       }
                     }
-                  }else{
-                    addedDupleDocsListForSave.add(eachAdded);
                   }
                 }
               }
-            }
-          }
-          for(var eachAdded in addedDocsList){
-            if(eachAdded["is_confirmed"] && eachAdded["id"] != 1000 && eachAdded["id"] != 999){
-              addedDocsListForSave.add(eachAdded);
-            }
-          }
-          if(addedDupleDocsListForSave.isNotEmpty){
-            for(var each in savedDocsList){
-              bool isDuple = false;
-              for(var eachDuple in addedDupleDocsListForSave){
-                if(each["id"] == eachDuple["id"]){
-                  // car_no 중복 확인
-                  if(each["id"] == 16 || each["id"] == 17){
-                    if(each.containsKey("car_no") && eachDuple.containsKey("car_no")){
-                      if(each['car_no'] == eachDuple['car_no']){
+              for(var eachAdded in addedDocsList){
+                if(eachAdded["is_confirmed"] && eachAdded["id"] != 1000 && eachAdded["id"] != 999){
+                  addedDocsListForSave.add(eachAdded);
+                }
+              }
+              if(addedDupleDocsListForSave.isNotEmpty){
+                for(var each in savedDocsList){
+                  bool isDuple = false;
+                  for(var eachDuple in addedDupleDocsListForSave){
+                    if(each["id"] == eachDuple["id"]){
+                      // car_no 중복 확인
+                      if(each["id"] == 16 || each["id"] == 17){
+                        if(each.containsKey("car_no") && eachDuple.containsKey("car_no")){
+                          if(each['car_no'] == eachDuple['car_no']){
+                            isDuple = true;
+                          }
+                        }
+                      }else{
                         isDuple = true;
                       }
                     }
-                  }else{
-                    isDuple = true;
+                  }
+                  if(!isDuple){
+                    addedDocsListForSave.add(each);
                   }
                 }
+              }else{
+                addedDocsListForSave.addAll(savedDocsList);
               }
-              if(!isDuple){
-                addedDocsListForSave.add(each);
+
+              for(var each in addedDocsListForSave){
+                Map<String, dynamic> resultMap = each["result"];
+                CommonUtils.log("", "docs cache save!!! ===============================>\n"
+                    "view_id:${each["view_id"]}\n"
+                    "id:${each["id"]}\n"
+                    "name:${each["name"]}\n"
+                    "is_confirmed:${each["is_confirmed"]}\n"
+                    "is_docs:${each["is_docs"]}\n"
+                    "docs_type:${each["docs_type"]}\n"
+                    "result:${resultMap.isEmpty? "" : each["result"]["resultValue"]}\n"
+                );
               }
+
+              SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceApplyPrKey, jsonEncode(addedDocsListForSave));
+              setState(() {
+                currentViewId = _getViewIdFromListById(confirmedId);
+              });
+            }else{
+              CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
             }
-          }else{
-            addedDocsListForSave.addAll(savedDocsList);
-          }
-
-          for(var each in addedDocsListForSave){
-            Map<String, dynamic> resultMap = each["result"];
-            CommonUtils.log("", "docs cache save!!! ===============================>\n"
-                "view_id:${each["view_id"]}\n"
-                "id:${each["id"]}\n"
-                "name:${each["name"]}\n"
-                "is_confirmed:${each["is_confirmed"]}\n"
-                "is_docs:${each["is_docs"]}\n"
-                "docs_type:${each["docs_type"]}\n"
-                "result:${resultMap.isEmpty? "" : each["result"]["resultValue"]}\n"
-            );
-          }
-
-          SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceApplyPrKey, jsonEncode(addedDocsListForSave));
-          setState(() {
-            currentViewId = _getViewIdFromListById(confirmedId);
           });
         }else{
+          UiUtils.closeLoadingPop(context);
           CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
         }
       });
     }else{
       UiUtils.showLoadingPop(context);
-      if(await CommonUtils.isFileExists(pickedFilePath)){
-        _uploadCertImageToAwsServer(pickedFilePath, (isSuccessToUpload){
-          if(isSuccessToUpload){
-            List<dynamic> docResultList = [];
-            Map<String, dynamic> eachMap = {
-              "pr_document_id" : "12",
-              "response_data" : awsUploadUrl
-            };
-            docResultList.add(eachMap);
-            for(var each in addedDocsList){
-              if(each["is_docs"] && each["is_confirmed"]){
-                var resultMap  =  each["result"]["resultValue"]["data"];
-                //gov24 : 1:주민등록등본           2:주민등록초본        15:지방세납세증명서      16:자동차등록원부(갑)     17:자동차등록원부(을)
-                //nhis  : 3:건강보험자격득실확인서    4:건강보험납부확인서
-                //nts   : 6:사업자등록증(*테스트불가) 10:소득금액증명       11:부가세과세표준증명원(*테스트불가)      14:국세납세증명서
-                if(each["id"] == 3 || each["id"] == 4){
-                  if(resultMap is List<dynamic>){
-                    Map<String, dynamic> eachMap = {
-                      "pr_document_id" : each["id"],
-                      "response_data" : json.encode(resultMap)
-                    };
-                    docResultList.add(eachMap);
-                  }else{
-                    List<dynamic> wrapListMap = [];
-                    wrapListMap.add(resultMap);
-                    Map<String, dynamic> eachMap = {
-                      "pr_document_id" : each["id"],
-                      "response_data" : json.encode(wrapListMap)
-                    };
-                    docResultList.add(eachMap);
-                  }
+      _uploadCertImageToAwsServer(pickedFilePath, (isSuccessToUpload){
+        if(isSuccessToUpload){
+          List<dynamic> docResultList = [];
+          Map<String, dynamic> eachMap = {
+            "pr_document_id" : "12",
+            "response_data" : awsUploadUrl
+          };
+          docResultList.add(eachMap);
+          for(var each in addedDocsList){
+            if(each["is_docs"] && each["is_confirmed"]){
+              var resultMap  =  each["result"]["resultValue"]["data"];
+              //gov24 : 1:주민등록등본           2:주민등록초본        15:지방세납세증명서      16:자동차등록원부(갑)     17:자동차등록원부(을)
+              //nhis  : 3:건강보험자격득실확인서    4:건강보험납부확인서
+              //nts   : 6:사업자등록증(*테스트불가) 10:소득금액증명       11:부가세과세표준증명원(*테스트불가)      14:국세납세증명서
+              if(each["id"] == 3 || each["id"] == 4){
+                if(resultMap is List<dynamic>){
+                  Map<String, dynamic> eachMap = {
+                    "pr_document_id" : each["id"],
+                    "response_data" : json.encode(resultMap)
+                  };
+                  docResultList.add(eachMap);
                 }else{
-                  if(resultMap is List<dynamic>){
-                    Map<String, dynamic> eachMap = {
-                      "pr_document_id" : each["id"],
-                      "response_data" : json.encode(resultMap)
-                    };
-                    docResultList.add(eachMap);
-                  }else{
-                    Map<String, dynamic> eachMap = {
-                      "pr_document_id" : each["id"],
-                      "response_data" : resultMap
-                    };
-                    docResultList.add(eachMap);
-                  }
+                  List<dynamic> wrapListMap = [];
+                  wrapListMap.add(resultMap);
+                  Map<String, dynamic> eachMap = {
+                    "pr_document_id" : each["id"],
+                    "response_data" : json.encode(wrapListMap)
+                  };
+                  docResultList.add(eachMap);
+                }
+              }else{
+                if(resultMap is List<dynamic>){
+                  Map<String, dynamic> eachMap = {
+                    "pr_document_id" : each["id"],
+                    "response_data" : json.encode(resultMap)
+                  };
+                  docResultList.add(eachMap);
+                }else{
+                  Map<String, dynamic> eachMap = {
+                    "pr_document_id" : each["id"],
+                    "response_data" : resultMap
+                  };
+                  docResultList.add(eachMap);
                 }
               }
             }
-            String address = _getResultFromListById(addressId)["resultValue"];
-            Map<String, dynamic>? applyInputMap;
-            if(MyData.selectedPrInfoData!.uidType == "1"){
-              applyInputMap = {
-                "offer_id": MyData.selectedPrInfoData!.productOfferId,
-                "offer_rid": MyData.selectedPrInfoData!.productOfferRid,
-                "lender_pr_id": MyData.selectedPrInfoData!.productOfferLenderPrId,
-                "address": address,
-                "contact_no1": MyData.phoneNumber.substring(0,3),
-                "contact_no2": MyData.phoneNumber.substring(3,7),
-                "contact_no3": MyData.phoneNumber.substring(7),
-                "jumin_no1": MyData.idNumber.split("-")[0],
-                "jumin_no2": MyData.idNumber.split("-")[1],
-                "memo": '모바일 신청(개인회생) ${Config.isAndroid ? "android" : "ios"}',
-                "documents": docResultList
-              };
-            }else{
-              applyInputMap = {
-                "offer_id": MyData.selectedPrInfoData!.productOfferId,
-                "offer_rid": MyData.selectedPrInfoData!.productOfferRid,
-                "lender_car_id": MyData.selectedPrInfoData!.productOfferLenderPrId,
-                "address": address,
-                "contact_no1": MyData.phoneNumber.substring(0,3),
-                "contact_no2": MyData.phoneNumber.substring(3,7),
-                "contact_no3": MyData.phoneNumber.substring(7),
-                "jumin_no1": MyData.idNumber.split("-")[0],
-                "jumin_no2": MyData.idNumber.split("-")[1],
-                "memo": '모바일 신청(오토론) ${Config.isAndroid ? "android" : "ios"}',
-                "documents": docResultList
-              };
-            }
+          }
+          String address = _getResultFromListById(addressId)["resultValue"];
+          Map<String, dynamic>? applyInputMap;
+          if(MyData.selectedPrInfoData!.uidType == "1"){
+            applyInputMap = {
+              "offer_id": MyData.selectedPrInfoData!.productOfferId,
+              "offer_rid": MyData.selectedPrInfoData!.productOfferRid,
+              "lender_pr_id": MyData.selectedPrInfoData!.productOfferLenderPrId,
+              "address": address,
+              "contact_no1": MyData.phoneNumber.substring(0,3),
+              "contact_no2": MyData.phoneNumber.substring(3,7),
+              "contact_no3": MyData.phoneNumber.substring(7),
+              "jumin_no1": MyData.idNumber.split("-")[0],
+              "jumin_no2": MyData.idNumber.split("-")[1],
+              "memo": '모바일 신청(개인회생) ${Config.isAndroid ? "android" : "ios"}',
+              "documents": docResultList
+            };
+          }else{
+            applyInputMap = {
+              "offer_id": MyData.selectedPrInfoData!.productOfferId,
+              "offer_rid": MyData.selectedPrInfoData!.productOfferRid,
+              "lender_car_id": MyData.selectedPrInfoData!.productOfferLenderPrId,
+              "address": address,
+              "contact_no1": MyData.phoneNumber.substring(0,3),
+              "contact_no2": MyData.phoneNumber.substring(3,7),
+              "contact_no3": MyData.phoneNumber.substring(7),
+              "jumin_no1": MyData.idNumber.split("-")[0],
+              "jumin_no2": MyData.idNumber.split("-")[1],
+              "memo": '모바일 신청(오토론) ${Config.isAndroid ? "android" : "ios"}',
+              "documents": docResultList
+            };
+          }
 
-            LogfinController.callLogfinApi(MyData.selectedPrInfoData!.uidType == "1" ? LogfinApis.applyProduct : LogfinApis.applyCarProduct, applyInputMap, (isSuccess, outputJson){
-              if(isSuccess){
-                LogfinController.getLoanInfo((isSuccessToGetLoanInfo, isNotEmpty){
-                  if(isSuccessToGetLoanInfo){
-                    if(isNotEmpty){
-                      List<Map<String, dynamic>> addedDocsListForSave = [];
-                      List<Map<String, dynamic>> addedDupleDocsListForSave = [];
-                      for(var eachAdded in addedDocsList){
-                        if(eachAdded["is_confirmed"] && eachAdded["id"] != 1000 && eachAdded["id"] != 999){
-                          for(var each in savedDocsList){
-                            if(each["id"] == eachAdded["id"]){
-                              // car_no 중복 확인
-                              if(eachAdded["id"] == 16 || eachAdded["id"] == 17){
-                                if(each.containsKey("car_no'") && eachAdded.containsKey("'car_no")){
-                                  if(each['car_no'] == eachAdded['car_no']){
-                                    addedDupleDocsListForSave.add(eachAdded);
-                                  }
-                                }
-                              }else{
-                                addedDupleDocsListForSave.add(eachAdded);
-                              }
-                            }
-                          }
-                        }
-                      }
-                      for(var eachAdded in addedDocsList){
-                        if(eachAdded["is_confirmed"] && eachAdded["id"] != 1000 && eachAdded["id"] != 999){
-                          addedDocsListForSave.add(eachAdded);
-                        }
-                      }
-                      if(addedDupleDocsListForSave.isNotEmpty){
+          LogfinController.callLogfinApi(MyData.selectedPrInfoData!.uidType == "1" ? LogfinApis.applyProduct : LogfinApis.applyCarProduct, applyInputMap, (isSuccess, outputJson){
+            if(isSuccess){
+              LogfinController.getLoanInfo((isSuccessToGetLoanInfo, isNotEmpty){
+                if(isSuccessToGetLoanInfo){
+                  if(isNotEmpty){
+                    List<Map<String, dynamic>> addedDocsListForSave = [];
+                    List<Map<String, dynamic>> addedDupleDocsListForSave = [];
+                    for(var eachAdded in addedDocsList){
+                      if(eachAdded["is_confirmed"] && eachAdded["id"] != 1000 && eachAdded["id"] != 999){
                         for(var each in savedDocsList){
-                          bool isDuple = false;
-                          for(var eachDuple in addedDupleDocsListForSave){
-                            if(each["id"] == eachDuple["id"]){
-                              // car_no 중복 확인
-                              if(each["id"] == 16 || each["id"] == 17){
-                                if(each.containsKey("car_no") && eachDuple.containsKey("car_no")){
-                                  if(each['car_no'] == eachDuple['car_no']){
-                                    isDuple = true;
-                                  }
+                          if(each["id"] == eachAdded["id"]){
+                            // car_no 중복 확인
+                            if(eachAdded["id"] == 16 || eachAdded["id"] == 17){
+                              if(each.containsKey("car_no'") && eachAdded.containsKey("'car_no")){
+                                if(each['car_no'] == eachAdded['car_no']){
+                                  addedDupleDocsListForSave.add(eachAdded);
                                 }
-                              }else{
-                                isDuple = true;
                               }
+                            }else{
+                              addedDupleDocsListForSave.add(eachAdded);
                             }
                           }
-                          if(!isDuple){
-                            addedDocsListForSave.add(each);
+                        }
+                      }
+                    }
+                    for(var eachAdded in addedDocsList){
+                      if(eachAdded["is_confirmed"] && eachAdded["id"] != 1000 && eachAdded["id"] != 999){
+                        addedDocsListForSave.add(eachAdded);
+                      }
+                    }
+                    if(addedDupleDocsListForSave.isNotEmpty){
+                      for(var each in savedDocsList){
+                        bool isDuple = false;
+                        for(var eachDuple in addedDupleDocsListForSave){
+                          if(each["id"] == eachDuple["id"]){
+                            // car_no 중복 확인
+                            if(each["id"] == 16 || each["id"] == 17){
+                              if(each.containsKey("car_no") && eachDuple.containsKey("car_no")){
+                                if(each['car_no'] == eachDuple['car_no']){
+                                  isDuple = true;
+                                }
+                              }
+                            }else{
+                              isDuple = true;
+                            }
                           }
                         }
-                      }else{
-                        addedDocsListForSave.addAll(savedDocsList);
+                        if(!isDuple){
+                          addedDocsListForSave.add(each);
+                        }
                       }
-
-                      for(var each in addedDocsListForSave){
-                        Map<String, dynamic> resultMap = each["result"];
-                        CommonUtils.log("", "apply cache save!!! ===============================>\n"
-                            "view_id:${each["view_id"]}\n"
-                            "id:${each["id"]}\n"
-                            "name:${each["name"]}\n"
-                            "is_confirmed:${each["is_confirmed"]}\n"
-                            "is_docs:${each["is_docs"]}\n"
-                            "docs_type:${each["docs_type"]}\n"
-                            "result:${resultMap.isEmpty? "" : each["result"]["resultValue"]}\n"
-                        );
-                      }
-
-                      SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceApplyPrKey, jsonEncode(addedDocsListForSave));
-                      UiUtils.closeLoadingPop(context);
-                      setState(() {
-                        currentViewId = _getViewIdFromListById(confirmedId);
-                      });
                     }else{
-                      UiUtils.closeLoadingPop(context);
-                      CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
+                      addedDocsListForSave.addAll(savedDocsList);
                     }
+
+                    for(var each in addedDocsListForSave){
+                      Map<String, dynamic> resultMap = each["result"];
+                      CommonUtils.log("", "apply cache save!!! ===============================>\n"
+                          "view_id:${each["view_id"]}\n"
+                          "id:${each["id"]}\n"
+                          "name:${each["name"]}\n"
+                          "is_confirmed:${each["is_confirmed"]}\n"
+                          "is_docs:${each["is_docs"]}\n"
+                          "docs_type:${each["docs_type"]}\n"
+                          "result:${resultMap.isEmpty? "" : each["result"]["resultValue"]}\n"
+                      );
+                    }
+
+                    SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceApplyPrKey, jsonEncode(addedDocsListForSave));
+                    UiUtils.closeLoadingPop(context);
+                    setState(() {
+                      currentViewId = _getViewIdFromListById(confirmedId);
+                    });
                   }else{
                     UiUtils.closeLoadingPop(context);
                     CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
                   }
-                });
-              }else{
-                UiUtils.closeLoadingPop(context);
-                CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
-              }
-            });
-          }else{
-            UiUtils.closeLoadingPop(context);
-            CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
-          }
-        });
-      }else{
-        if(context.mounted) {
+                }else{
+                  UiUtils.closeLoadingPop(context);
+                  CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
+                }
+              });
+            }else{
+              UiUtils.closeLoadingPop(context);
+              CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
+            }
+          });
+        }else{
           UiUtils.closeLoadingPop(context);
-          CommonUtils.flutterToast("신분증정보가 만료되었습니다.\n다시 시도해주세요.");
-          await _setValidImg();
-          setState(() {});
+          CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
         }
-      }
+      });
     }
   }
   /// finish view end

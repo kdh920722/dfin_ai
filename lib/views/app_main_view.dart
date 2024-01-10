@@ -177,8 +177,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               const Spacer(flex: 2),
               MyData.isTestUser ? UiUtils.getIconButton(Icons.comments_disabled_sharp, 7.w, ColorStyles.upFinRed, () {
 
-                CommonUtils.log("w","uid : ${MyData.getLoanInfoList()[0].uid}");
-                CommonUtils.log("w","uid : ${MyData.getCarInfoList()[0].carUid}");
                 /*
                 getMyCarInfo ==> {success: true, data: {cars: [ *addAndSearchCar 'car_info' output... ]}}
 
@@ -716,13 +714,15 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     }
   }
 
+  static void refreshMain(){
+    LogfinController.getMainViewInfo((isSuccessToGetMainInfo){});
+  }
+
   void _refreshMyView(BuildContext context) {
     UiUtils.showLoadingPop(context);
     LogfinController.getMainViewInfo((isSuccessToGetMainInfo){
       UiUtils.closeLoadingPop(context);
-      setState(() {
-
-      });
+      setState(() {});
     });
   }
 

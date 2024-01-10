@@ -151,7 +151,6 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
     GetController.to.resetPreLoanPrice();
     GetController.to.resetWantLoanPrice();
     Config.contextForEmergencyBack = AppMainViewState.mainContext;
-    MyData.selectedCarInfoData = null;
     super.dispose();
   }
 

@@ -8,8 +8,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:upfin/configs/app_config.dart';
 import 'package:upfin/controllers/appsflyer_controller.dart';
+import 'package:upfin/controllers/websocket_controller.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/views/app_chat_view.dart';
+import 'package:upfin/views/app_main_view.dart';
 import '../configs/firebase_options.dart';
 import '../utils/common_utils.dart';
 
@@ -208,13 +210,26 @@ class FireBaseController{
       FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin, AndroidNotificationChannel? channel) async {
     CommonUtils.log("w", "FORE PUSH \n${message.messageId}${message.data}");
     if(message.messageId != null){
+      String roomId = _getRoomIdFromMessage(message);
+      if(roomId != ""){
+        bool isRoomIdHere = false;
+        for(var each in WebSocketController.subscribedRoomIds){
+          if(each["room_id"] == roomId) isRoomIdHere = true;
+        }
+
+        if(!isRoomIdHere){
+          CommonUtils.log("w", "FORE PUSH refresh");
+          AppMainViewState.refreshMain();
+        }
+      }
+
       if(AppChatViewState.currentRoomId == ""){
         // 채팅방 아닐때, show notification
         await _showNotification(message, flutterLocalNotificationsPlugin, channel);
 
       }else{
         // 채팅방
-        if(AppChatViewState.currentRoomId != _getRoomIdFromMessage(message)){
+        if(AppChatViewState.currentRoomId != roomId){
           // 채팅방이지만 다른 채팅방 알림일 때, show notification
           await _showNotification(message, flutterLocalNotificationsPlugin, channel);
         }else{

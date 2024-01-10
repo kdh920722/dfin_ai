@@ -219,7 +219,6 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
     GetController.to.resetPreLoanPrice();
     GetController.to.resetWantLoanPrice();
     Config.contextForEmergencyBack = AppMainViewState.mainContext;
-    MyData.selectedAccidentInfoData = null;
     super.dispose();
   }
 
