@@ -147,55 +147,56 @@ class AppCarDetailViewState extends State<AppCarDetailView> with WidgetsBindingO
     return Padding(padding: EdgeInsets.only(left: 4.w, right: 4.w, top: 4.w, bottom: 4.w),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           UiUtils.getMarginBox(0, 5.h),
-          Container(
-              color:ColorStyles.upFinWhite,
-              alignment: Alignment.center,
-              constraints: BoxConstraints(maxWidth: 90.w, maxHeight: 20.h, minWidth: 20.w, minHeight: 20.w),
-              child: ExtendedImage.network(
-                MyData.selectedCarInfoData!.carImage,
-                fit: BoxFit.contain,
-                cache: true,
-                cacheMaxAge: const Duration(hours: 1),
-                shape: BoxShape.rectangle,
-                borderRadius: const BorderRadius.all(Radius.circular(3)),
-                loadStateChanged: (ExtendedImageState state) {
-                  switch (state.extendedImageLoadState) {
-                    case LoadState.loading:
-                      _aniController.reset();
-                      if(state.loadingProgress != null && state.loadingProgress!.expectedTotalBytes != null){
-                        int total = state.loadingProgress!.expectedTotalBytes!;
-                        int val = state.loadingProgress!.cumulativeBytesLoaded;
-                        return Center(
-                            child: CircularProgressIndicator(
-                                color: ColorStyles.upFinWhite,
-                                value: val / total
-                            )
-                        );
-                      }else{
-                        return UiUtils.getImage(8.w, 8.w, Image.asset(fit: BoxFit.fill,'assets/images/chat_loading.gif'));
-                      }
-                    case LoadState.completed:
-                      _aniController.forward();
+          SizedBox(width: 90.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment:CrossAxisAlignment.center, children: [
+            Container(
+                width: 55.w,
+                color:ColorStyles.upFinWhite,
+                alignment: Alignment.center,
+                child: ExtendedImage.network(
+                  MyData.selectedCarInfoData!.carImage,
+                  fit: BoxFit.contain,
+                  cache: true,
+                  cacheMaxAge: const Duration(hours: 1),
+                  shape: BoxShape.rectangle,
+                  loadStateChanged: (ExtendedImageState state) {
+                    switch (state.extendedImageLoadState) {
+                      case LoadState.loading:
+                        _aniController.reset();
+                        if(state.loadingProgress != null && state.loadingProgress!.expectedTotalBytes != null){
+                          int total = state.loadingProgress!.expectedTotalBytes!;
+                          int val = state.loadingProgress!.cumulativeBytesLoaded;
+                          return Center(
+                              child: CircularProgressIndicator(
+                                  color: ColorStyles.upFinWhite,
+                                  value: val / total
+                              )
+                          );
+                        }else{
+                          return UiUtils.getImage(8.w, 8.w, Image.asset(fit: BoxFit.fill,'assets/images/chat_loading.gif'));
+                        }
+                      case LoadState.completed:
+                        _aniController.forward();
 
-                      return FadeTransition(
-                        opacity: _aniController,
-                        child: ExtendedRawImage(
-                          image: state.extendedImageInfo?.image,
-                          fit: BoxFit.contain,
-                        ),
-                      );
-                    case LoadState.failed:
-                      _aniController.reset();
-                      return GestureDetector(
-                        child: UiUtils.getIcon(10.w, 10.w, Icons.refresh_rounded, 10.w, ColorStyles.upFinRed),
-                        onTap: () {
-                          state.reLoadImage();
-                        },
-                      );
-                  }
-                },
-              )
-          ),
+                        return FadeTransition(
+                          opacity: _aniController,
+                          child: ExtendedRawImage(
+                            image: state.extendedImageInfo?.image,
+                            fit: BoxFit.contain,
+                          ),
+                        );
+                      case LoadState.failed:
+                        _aniController.reset();
+                        return GestureDetector(
+                          child: UiUtils.getIcon(10.w, 10.w, Icons.refresh_rounded, 10.w, ColorStyles.upFinRed),
+                          onTap: () {
+                            state.reLoadImage();
+                          },
+                        );
+                    }
+                  },
+                )
+            )
+          ])),
           UiUtils.getMarginBox(0, 4.h),
           SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("차량번호", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha , TextAlign.start, null)),
           UiUtils.getMarginBox(0, 2.h),

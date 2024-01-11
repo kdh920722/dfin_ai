@@ -176,100 +176,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               UiUtils.getTextWithFixedScale("대출정보", 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1),
               const Spacer(flex: 2),
               MyData.isTestUser ? UiUtils.getIconButton(Icons.comments_disabled_sharp, 7.w, ColorStyles.upFinRed, () {
-                Map<String, dynamic> input = {
-                  "car_uid": 'Xzr15xgdz7G8QSz6AkPG6w'
-                };
-                LogfinController.callLogfinApi(LogfinApis.searchCar, input, (isSuccess, outputJson){
-                  if(isSuccess){
-                    CommonUtils.log("i","\n${outputJson!['car_name']}, ${outputJson!['car_name_detail']}, ${outputJson!['car_image']}");
-                  }
-                });
-                /*
-                getMyCarInfo ==> {success: true, data: {cars: [ *addAndSearchCar 'car_info' output... ]}}
-
-                addAndSearchCar ==> {success: true, price: 15040000, search_uid: jz5VxeCNRt44WgeAaZDJHA, car_info: {id: 163, user_id: 241,
-                                      owner_name: 이용석, carno: 40서9456, amount: 15040000, memo: null, del_flg: 10,
-                                      created_at: 2023-12-11T14:37:30.000+09:00, updated_at: 2023-12-11T14:37:30.000+09:00, sise_response: null,
-                                      job_type_id: 1, sconditions: 0;0;0;0;0;0;0;0;0;0;0;0;0;0;, uid: jz5VxeCNRt44WgeAaZDJHA, ...}
-
-                searchCar ==> {success: true, car_info: {id: 163, user_id: 241,
-                                      owner_name: 이용석, carno: 40서9456, amount: 15040000, memo: null, del_flg: 10,
-                                      created_at: 2023-12-11T14:37:30.000+09:00, updated_at: 2023-12-11T14:37:30.000+09:00, sise_response: null,
-                                      job_type_id: 1, sconditions: 0;0;0;0;0;0;0;0;0;0;0;0;0;0;, uid: jz5VxeCNRt44WgeAaZDJHA, ...}
-
-                searchCarProduct ==> {success: true, offer_id: 115, data: [
-                                           {lender_car_id: 1, result: true, msg: , rid: KbzbCfct7PBdQMqOGqQbYg, limit: 1860, product_name: 도이치모터스 오토론, lender_name: (주)도이치파이낸셜, description: null, lender_id: 6, min_rate: 15.9, max_rate: 19.9},
-                                           {lender_car_id: 3, result: true, msg: , rid: DyJb0MrfGFXPyq3qE27ZCg, limit: 2046, product_name: 오토론테스트, lender_name: (주)아침해파이낸셜대부, description: null, lender_id: 2, min_rate: 19.9, max_rate: 19.9}]}
-
-                getCarDocs ==> {success: true, data: {documents: [
-                          {id: 2, name: 주민등록등본, type1_check: 1, type2_check: 1, type3_check: 1, del_flg: 0, created_at: null, updated_at: null, job_id: 0,
-                          method_name: get_reg, view_link: view_get_reg, bankflag: 0, online_request: 1, organization_id: 1,
-                          api_endpoint: https://api.codef.io/v1/kr/public/mw/resident-registration-copy/issuance,
-                          view_link_new: view_get_reg_, lender_price: 1000},
-                          {id: 3, name: 주민등록초본, type1_check: 1, type2_check: 1, type3_check: 1, del_flg: 0, created_at: null, updated_at: null, job_id: 0,
-                          method_name: get_reg2, view_link: view_get_reg2, bankflag : 0, online_request: 1, organization_id: 1,
-                          api_endpoint: https://api.codef.io/v1/kr/public/mw/resident-registration-abstract/issuance,
-                          view_link_new: view_get_reg2_, lender_price: 1000},
-                          {id: 4, name: 건강보험납부확인서, type1_check: 1, type2_check: 1, type3_check: 1, del_flg: 0, created_at: null, updated_at: null, job_id: 0,
-                          method_name: get_ggbh_pay, view_link: view_ggbh_pay, bankflag: 0, online_request: 1, organization_id: 2,
-                          api_endpoint: https://api.codef.io/v1/kr/public/pp/nhis-insurance-payment/confirmation, view_link_new: view_ggbh_pay_, lender_price: 1000}, ...]}}
-                */
-                //CommonUtils.flutterToast("이건 테스트 토스트~~");
-                //CommonUtils.moveTo(context, AppView.debugForAdminView.value, null);
-                /*
-                CommonUtils.log("w","sdsada");
-                Map<String, dynamic> inputJson1 = {
-                  "contact_no": "01054041099",
-                  "name": "김동환"
-                };
-                LogfinController.callLogfinApi(LogfinApis.findEmail, inputJson1, (isSuccess, outputJson){
-                  if(isSuccess){
-                    CommonUtils.log("w","sdasd : ${outputJson!["email"]}");
-                  }
-                });
-
-                Map<String, dynamic> inputJson2 = {
-                  "email": "kdh920722@gmail.com",
-                };
-                LogfinController.callLogfinApi(LogfinApis.sendEmailCode, inputJson2, (isSuccess, outputJson){
-                  if(isSuccess){
-                    CommonUtils.log("w","scall");
-                  }
-                });
-
-                Map<String, dynamic> inputJson3 = {
-                  "email": "kdh920722@gmail.com",
-                  "verification_code": "455567",
-                };
-                LogfinController.callLogfinApi(LogfinApis.checkEmailCode, inputJson3, (isSuccess, outputJson){
-                  if(isSuccess){
-                    CommonUtils.log("w","scall2");
-                  }
-                });
-                Map<String, dynamic> inputJson4 = {
-                  "contact_no": "01054041099",
-                };
-                LogfinController.callLogfinApi(LogfinApis.checkMemberByPhone, inputJson4, (isSuccess, outputJson){
-                  if(isSuccess){
-                    CommonUtils.log("w","scall22");
-                  }
-                });
-
-                Map<String, dynamic> inputJson4 = {
-                  "user":{
-                    "email": 'lalalllaa@kakao.com', // 사용자의 이메일 주소
-                    "password": '2222222',             // 새 비밀번호
-                    "password_confirmation": '2222222' // 새 비밀번호 확인
-                  }
-                };
-                LogfinController.callLogfinApi(LogfinApis.updatePassword, inputJson4, (isSuccess, outputJson){
-                  if(isSuccess){
-                    CommonUtils.log("w","scall22");
-                  }
-                });
-                */
-
-
+                // test
               }) : UiUtils.getMarginBox(0, 0),
               UiUtils.getMarginBox(2.w, 0),
               UiUtils.getIconButton(Icons.add, 7.w, ColorStyles.upFinDarkGray, () {
@@ -462,18 +369,12 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                     ]), () async {
                       MyData.selectedCarInfoData = null;
                       MyData.selectedAccidentInfoData = each;
-                      if(MyData.isPossibleAccidentInfo(each)){
-                        AppUpdateAccidentViewState.isAccountEditMode = false;
-                        AppUpdateAccidentViewState.startViewId = AppUpdateAccidentViewState.confirmedViewId;
-                        AppUpdateAccidentViewState.endViewId = AppUpdateAccidentViewState.jobViewId;
-                        isViewHere = false;
-                        await CommonUtils.moveToWithResult(context, AppView.appUpdateAccidentView.value, null);
-                        isViewHere = false;
-                      }else{
-                        isViewHere = false;
-                        await CommonUtils.moveToWithResult(context, AppView.appAccidentDetailInfoView.value, null);
-                        isViewHere = false;
-                      }
+                      AppUpdateAccidentViewState.isAccountEditMode = false;
+                      AppUpdateAccidentViewState.startViewId = AppUpdateAccidentViewState.confirmedViewId;
+                      AppUpdateAccidentViewState.endViewId = AppUpdateAccidentViewState.jobViewId;
+                      isViewHere = false;
+                      await CommonUtils.moveToWithResult(context, AppView.appUpdateAccidentView.value, null);
+                      isViewHere = false;
                     })
               ]), () async {
                 MyData.selectedCarInfoData = null;

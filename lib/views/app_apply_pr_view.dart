@@ -1310,6 +1310,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           UiUtils.getTextWithFixedScale("네 좋아요!", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () async {
             await _setSavedData();
 
+
             bool isAuthCertError = false;
             for(var each in savedDocsList){
               if(each['id'] == cameraId){
@@ -3502,6 +3503,17 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     }
 
     if(isRetry){
+      bool isAddedFileHere = false;
+      for(var each in addedDocsList){
+        if(each['id'] == cameraId){
+          isAddedFileHere = true;
+        }
+      }
+
+      if(!isAddedFileHere){
+        pickedFilePath = _getSavedData(cameraId);
+      }
+
       UiUtils.showLoadingPop(context);
       _uploadCertImageToAwsServer(pickedFilePath, (isSuccessToUpload){
         if(isSuccessToUpload){
