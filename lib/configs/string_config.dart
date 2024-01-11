@@ -41,7 +41,7 @@ class StringConfig{
 
           "@안내전체주의사항안내여기에@안내" //(*전체의 맨 마지막에 위치)
   ;
-  static Widget getAgreeContents(String agreeText){
+  static Widget getAgreeContents2(String agreeText){
     List<Widget> widgetList = [];
     try{
       List<String> textList = agreeText.split("@제목");

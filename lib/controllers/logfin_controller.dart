@@ -36,6 +36,20 @@ class LogfinController {
   static Map<String,dynamic> autoAnswerMapForAccident = {};
   static Map<String,dynamic> autoAnswerMapForCar = {};
   static Map<String,dynamic> autoAnswerMap = {};
+  static void addAgreeInfo(String type, Map<String,dynamic> agreeInfo){
+    int targetIdx = -1;
+    for(int i = 0 ; i < agreeDocsList.length ; i++){
+      if(agreeDocsList[i]["type"] == type){
+        targetIdx = i;
+      }
+    }
+
+    if(targetIdx != -1){
+      agreeDocsList.removeAt(targetIdx);
+    }
+
+    agreeDocsList.add(agreeInfo);
+  }
   static String getAgreeContents(String type){
     String result = "";
     for(var each in agreeDocsList){
@@ -617,7 +631,8 @@ class LogfinController {
                     "lend_amount: $lendAmount\n"
                     "wish_amount: $wishAmount\n");
                 MyData.addToCarInfoList(CarInfoData(dataResult["id"].toString(), dataResult["uid"].toString(), carNum, dataResult["owner_name"].toString(),
-                    dataResult["amount"].toString(), lendCountInfo, lendAmount, wishAmount, date, eachCarInfo));
+                    dataResult["amount"].toString(), lendCountInfo, lendAmount, wishAmount,
+                    date, dataResult["car_name"].toString(), dataResult["car_name_detail"].toString(), dataResult["car_image"].toString(), eachCarInfo));
               }
 
               GetController.to.updateCarInfoList(MyData.getCarInfoList());
@@ -782,8 +797,7 @@ class LogfinController {
             List<dynamic> offerPrList = outputJsonForGetOffers["data"];
             for(var each in offerPrList){
               MyData.addToPrInfoList(PrInfoData(accidentUid, "1", offerId, each["rid"], each["lender_pr_id"].toString(), each["lender_name"], each["lender_id"].toString(),
-                  each["product_name"], each["rid"], each["min_rate"].toString(), each["max_rate"].toString(),
-                  each["limit"].toString(),
+                  each["lender_doc"].toString(), each["product_name"], each["rid"], each["min_rate"].toString(), each["max_rate"].toString(), each["limit"].toString(),
                   each["lender_name"] == "(주)안전대부"? "assets/images/bank_logo_safe.png" : "assets/images/bank_logo_default.png",
                   each["result"] as bool, each["msg"] is List ? each["msg"] : []));
             }
@@ -821,9 +835,8 @@ class LogfinController {
             List<dynamic> offerPrList = outputJsonForGetOffers['data'];
             for(var each in offerPrList){
               MyData.addToPrInfoList(PrInfoData(carUid, "3", offerId, each["rid"].toString(), each["lender_car_id"].toString(), each["lender_name"].toString(), each["lender_id"].toString(),
-                  each["product_name"].toString(), each["rid"].toString(), each["min_rate"].toString(), each["max_rate"].toString(),
-                  each["limit"].toString(),
-                  each["lender_name"] == "(주)안전대부"? "assets/images/bank_logo_safe.png" : "assets/images/bank_logo_default.png",
+                  each["lender_doc"].toString(), each["product_name"].toString(), each["rid"].toString(), each["min_rate"].toString(), each["max_rate"].toString(),
+                  each["limit"].toString(), each["lender_name"] == "(주)안전대부"? "assets/images/bank_logo_safe.png" : "assets/images/bank_logo_default.png",
                   each["result"] as bool, each["msg"] is List ? each["msg"] : []));
             }
 

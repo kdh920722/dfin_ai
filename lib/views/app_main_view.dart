@@ -176,7 +176,14 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               UiUtils.getTextWithFixedScale("대출정보", 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1),
               const Spacer(flex: 2),
               MyData.isTestUser ? UiUtils.getIconButton(Icons.comments_disabled_sharp, 7.w, ColorStyles.upFinRed, () {
-
+                Map<String, dynamic> input = {
+                  "car_uid": 'Xzr15xgdz7G8QSz6AkPG6w'
+                };
+                LogfinController.callLogfinApi(LogfinApis.searchCar, input, (isSuccess, outputJson){
+                  if(isSuccess){
+                    CommonUtils.log("i","\n${outputJson!['car_name']}, ${outputJson!['car_name_detail']}, ${outputJson!['car_image']}");
+                  }
+                });
                 /*
                 getMyCarInfo ==> {success: true, data: {cars: [ *addAndSearchCar 'car_info' output... ]}}
 

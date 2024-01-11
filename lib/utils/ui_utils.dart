@@ -911,18 +911,30 @@ class UiUtils {
     }
   }
 
-  static void showAgreePop(BuildContext parentContext, String type, VoidCallback onPressedCallback){
+  static void showAgreePop(BuildContext parentContext, String type, String companyDocCode, VoidCallback onPressedCallback){
     _resetAgreeInfo();
-    _showSlideMenuForAgreePop(parentContext, SlideMenuMoveType.bottomToTop, true, 100.w, 65.h, 0.5, type, onPressedCallback, _makeAgreeWidget);
+    _showSlideMenuForAgreePop(parentContext, SlideMenuMoveType.bottomToTop, true, 100.w, 65.h, 0.5, type, companyDocCode, onPressedCallback, _makeAgreeWidget);
   }
 
-  static Widget _makeAgreeWidget(String type, BuildContext parentContext, BuildContext thisContext, StateSetter thisSetState, VoidCallback onPressedCallback){
+  static Widget _makeAgreeWidget(String type, String companyDocCode, BuildContext parentContext, BuildContext thisContext, StateSetter thisSetState, VoidCallback onPressedCallback){
     if(!isInitAgree){
       for(var each in LogfinController.agreeDocsList){
-        if(each["type"].toString().contains(type)){
-          agreeInfoList.add(each);
+
+        if(type == "B"){
+          if(each["type"].toString().contains(type)){
+            agreeInfoList.add(each);
+          }
+          if(each["type"].toString() == companyDocCode){
+            agreeInfoList.add(each);
+          }
+        }else{
+          if(each["type"].toString().contains(type)){
+            agreeInfoList.add(each);
+          }
         }
       }
+
+      CommonUtils.log("w","agreeInfoList length : ${agreeInfoList.length}");
       agreeInfoList.sort((a,b)=>int.parse(a["detailType"].toString().split("@")[2]).compareTo(int.parse(b["detailType"].toString().split("@")[2])));
       isInitAgree =  true;
       thisSetState(() {});
@@ -1358,7 +1370,7 @@ class UiUtils {
   }
 
   static void _showSlideMenuForAgreePop(BuildContext parentViewContext, SlideMenuMoveType slideType, bool isDismissible, double? width, double? height, double opacity,
-      String type, VoidCallback onPressedCallback, Widget Function(String type, BuildContext parentContext, BuildContext thisContext, StateSetter thisSetState, VoidCallback onPressedCallback) createWidgetMethod){
+      String type, String companyDocCode, VoidCallback onPressedCallback, Widget Function(String type, String companyName, BuildContext parentContext, BuildContext thisContext, StateSetter thisSetState, VoidCallback onPressedCallback) createWidgetMethod){
     double popWidth = 0.0;
     double popHeight = 0.0;
     if(width == null) {
@@ -1423,7 +1435,7 @@ class UiUtils {
                 child: SizedBox.expand(
                     child: StatefulBuilder(
                         builder: (_, StateSetter popViewSetState){
-                          Widget contentsWidget = createWidgetMethod(type, parentViewContext, parentViewContext, popViewSetState, onPressedCallback);
+                          Widget contentsWidget = createWidgetMethod(type, companyDocCode, parentViewContext, parentViewContext, popViewSetState, onPressedCallback);
                           return Padding(padding: EdgeInsets.all(5.w), child: contentsWidget);
                         }
                     )

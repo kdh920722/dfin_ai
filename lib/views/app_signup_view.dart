@@ -443,7 +443,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
               LogfinController.callLogfinApi(LogfinApis.checkMemberByPhone, inputJson4, (isSuccess, outputJson){
                 UiUtils.closeLoadingPop(context);
                 if(isSuccess){
-                  UiUtils.showAgreePop(context, "A", () async {
+                  UiUtils.showAgreePop(context, "A", "", () async {
                     Map<String, String> inputJsonForCert = {
                       "carrier": "",
                       "name" : _nameTextController.text.trim(),

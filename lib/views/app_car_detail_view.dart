@@ -1,3 +1,4 @@
+import 'package:extended_image/extended_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
@@ -19,6 +20,8 @@ class AppCarDetailView extends StatefulWidget{
 class AppCarDetailViewState extends State<AppCarDetailView> with WidgetsBindingObserver, TickerProviderStateMixin{
   static BuildContext? mainContext;
   late final TabController _tabController;
+  late AnimationController _aniController;
+
   @override
   void initState(){
     CommonUtils.log("d", "AppCarDetailView 화면 입장");
@@ -29,6 +32,11 @@ class AppCarDetailViewState extends State<AppCarDetailView> with WidgetsBindingO
     Config.contextForEmergencyBack = context;
     Config.isEmergencyRoot = false;
     FireBaseController.setStateForForeground = null;
+    _aniController = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 500),
+        lowerBound: 0.0,
+        upperBound: 1.0);
   }
 
   @override
@@ -38,6 +46,7 @@ class AppCarDetailViewState extends State<AppCarDetailView> with WidgetsBindingO
     MyData.selectedCarInfoData = null;
     _tabController.dispose();
     Config.contextForEmergencyBack = AppMainViewState.mainContext;
+    _aniController.dispose();
     super.dispose();
   }
 
@@ -138,6 +147,56 @@ class AppCarDetailViewState extends State<AppCarDetailView> with WidgetsBindingO
     return Padding(padding: EdgeInsets.only(left: 4.w, right: 4.w, top: 4.w, bottom: 4.w),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           UiUtils.getMarginBox(0, 5.h),
+          Container(
+              color:ColorStyles.upFinWhite,
+              alignment: Alignment.center,
+              constraints: BoxConstraints(maxWidth: 90.w, maxHeight: 20.h, minWidth: 20.w, minHeight: 20.w),
+              child: ExtendedImage.network(
+                MyData.selectedCarInfoData!.carImage,
+                fit: BoxFit.contain,
+                cache: true,
+                cacheMaxAge: const Duration(hours: 1),
+                shape: BoxShape.rectangle,
+                borderRadius: const BorderRadius.all(Radius.circular(3)),
+                loadStateChanged: (ExtendedImageState state) {
+                  switch (state.extendedImageLoadState) {
+                    case LoadState.loading:
+                      _aniController.reset();
+                      if(state.loadingProgress != null && state.loadingProgress!.expectedTotalBytes != null){
+                        int total = state.loadingProgress!.expectedTotalBytes!;
+                        int val = state.loadingProgress!.cumulativeBytesLoaded;
+                        return Center(
+                            child: CircularProgressIndicator(
+                                color: ColorStyles.upFinWhite,
+                                value: val / total
+                            )
+                        );
+                      }else{
+                        return UiUtils.getImage(8.w, 8.w, Image.asset(fit: BoxFit.fill,'assets/images/chat_loading.gif'));
+                      }
+                    case LoadState.completed:
+                      _aniController.forward();
+
+                      return FadeTransition(
+                        opacity: _aniController,
+                        child: ExtendedRawImage(
+                          image: state.extendedImageInfo?.image,
+                          fit: BoxFit.contain,
+                        ),
+                      );
+                    case LoadState.failed:
+                      _aniController.reset();
+                      return GestureDetector(
+                        child: UiUtils.getIcon(10.w, 10.w, Icons.refresh_rounded, 10.w, ColorStyles.upFinRed),
+                        onTap: () {
+                          state.reLoadImage();
+                        },
+                      );
+                  }
+                },
+              )
+          ),
+          UiUtils.getMarginBox(0, 4.h),
           SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("차량번호", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha , TextAlign.start, null)),
           UiUtils.getMarginBox(0, 2.h),
           SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(MyData.selectedCarInfoData!.carNum, 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)),
@@ -149,7 +208,13 @@ class AppCarDetailViewState extends State<AppCarDetailView> with WidgetsBindingO
           SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("차량 시세금액", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
           UiUtils.getMarginBox(0, 2.h),
           SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(CommonUtils.getPriceFormattedStringForFullPrice(double.parse(MyData.selectedCarInfoData!.carPrice)), 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)),
-          UiUtils.getMarginBox(0, 4.h)
+          UiUtils.getMarginBox(0, 4.h),
+          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("모델명", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
+          UiUtils.getMarginBox(0, 2.h),
+          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(MyData.selectedCarInfoData!.carModel, 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)),
+          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2(MyData.selectedCarInfoData!.carModelDetail, 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
+          UiUtils.getMarginBox(0, 4.h),
+
         ])
     );
   }
