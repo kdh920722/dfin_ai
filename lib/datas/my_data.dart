@@ -63,19 +63,28 @@ class MyData {
   }
   static bool isPossibleAccidentInfo(AccidentInfoData selectedInfo){
     bool isSuccessToGetDetailInfo = true;
-    if(selectedInfo.resData.isNotEmpty && selectedInfo.resData.containsKey("resRepaymentList")){
-      if(selectedInfo.resData["resRepaymentList"][0]["resAmount"] == ""
-          || selectedInfo.resData["resRepaymentList"][0]["resRoundNo"] == ""
-          || selectedInfo.resData["resRepaymentList"][0]["resUnpaidAmt"] == ""
-          || selectedInfo.resData["resRepaymentList"][0]["resRoundNo2"] == ""
-          || selectedInfo.resData["resRepaymentList"][0]["resRoundNo1"] == ""
-          || selectedInfo.resData["resRepaymentList"][0]["resTotalAmt"] == ""
-          || selectedInfo.resData["resRepaymentList"][0]["resRepaymentCycle"] == ""){
+    CommonUtils.log("w","${selectedInfo.resData}");
+    if(selectedInfo.resData.containsKey("resRepaymentList")){
+      List<dynamic> tempList = selectedInfo.resData["resRepaymentList"];
+      if(tempList.isEmpty){
         isSuccessToGetDetailInfo = false;
+      }else{
+
+        if(selectedInfo.resData["resRepaymentList"][0]["resAmount"] == ""
+            || selectedInfo.resData["resRepaymentList"][0]["resRoundNo"] == ""
+            || selectedInfo.resData["resRepaymentList"][0]["resUnpaidAmt"] == ""
+            || selectedInfo.resData["resRepaymentList"][0]["resRoundNo2"] == ""
+            || selectedInfo.resData["resRepaymentList"][0]["resRoundNo1"] == ""
+            || selectedInfo.resData["resRepaymentList"][0]["resTotalAmt"] == ""
+            || selectedInfo.resData["resRepaymentList"][0]["resRepaymentCycle"] == ""){
+          isSuccessToGetDetailInfo = false;
+        }
       }
     }else{
       isSuccessToGetDetailInfo = false;
     }
+
+
 
     return isSuccessToGetDetailInfo;
   }

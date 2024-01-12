@@ -31,6 +31,7 @@ class AppRootView extends StatefulWidget{
 }
 
 class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
+  bool isInitRootView = false;
   bool isAutoLogin = false;
   Timer? permissionCheckTimer;
   bool isPermissionCheckPopStarted = false;
@@ -44,7 +45,11 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
     MyData.resetMyData();
     _initDeepLinkHandling();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _setImagePreLoad();
+      if(!isInitRootView){
+        isInitRootView = true;
+        _setImagePreLoad();
+        if(!Config.isAndroid) CommonUtils.initAttForIos(context);
+      }
     });
     Config.contextForEmergencyBack = context;
     Config.isEmergencyRoot = true;

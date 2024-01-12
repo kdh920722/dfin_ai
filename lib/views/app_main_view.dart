@@ -177,6 +177,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               const Spacer(flex: 2),
               MyData.isTestUser ? UiUtils.getIconButton(Icons.comments_disabled_sharp, 7.w, ColorStyles.upFinRed, () {
                 // test
+
               }) : UiUtils.getMarginBox(0, 0),
               UiUtils.getMarginBox(2.w, 0),
               UiUtils.getIconButton(Icons.add, 7.w, ColorStyles.upFinDarkGray, () {
@@ -225,7 +226,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                         effect: WormEffect(dotWidth: 1.h, dotHeight: 1.h, dotColor: ColorStyles.upFinGray, activeDotColor: ColorStyles.upFinButtonBlue), // 페이지 인디케이터 스타일
                       ):Container(),
                     ],
-                  ) : Column(children: [
+                  ) : GetController.to.chatLoanInfoDataList.isEmpty? Column(children: [
                     UiUtils.getMarginBox(0, 1.h),
                     UiUtils.getBorderButtonBoxWithZeroPadding(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
                         Row(children: [
@@ -234,6 +235,17 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                           UiUtils.getBorderButtonBox(22.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
                               UiUtils.getTextWithFixedScale("등록하기", 10.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.end, null), () async {
                                 _showChoicePop();
+                              })
+                        ]), () { })
+                  ]) : Column(children: [
+                    UiUtils.getMarginBox(0, 1.h),
+                    UiUtils.getBorderButtonBoxWithZeroPadding(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
+                        Row(children: [
+                          UiUtils.getTextWithFixedScale("새로고침을 눌러주세요!", 11.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null),
+                          const Spacer(flex: 2),
+                          UiUtils.getBorderButtonBox(22.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+                              UiUtils.getTextWithFixedScale("새로고침", 10.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.end, null), () async {
+                                _refreshMyView(context);
                               })
                         ]), () { })
                   ]));
@@ -369,12 +381,27 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                     ]), () async {
                       MyData.selectedCarInfoData = null;
                       MyData.selectedAccidentInfoData = each;
-                      AppUpdateAccidentViewState.isAccountEditMode = false;
-                      AppUpdateAccidentViewState.startViewId = AppUpdateAccidentViewState.confirmedViewId;
-                      AppUpdateAccidentViewState.endViewId = AppUpdateAccidentViewState.jobViewId;
-                      isViewHere = false;
-                      await CommonUtils.moveToWithResult(context, AppView.appUpdateAccidentView.value, null);
-                      isViewHere = false;
+                      if(MyData.selectedAccidentInfoData!.igDate != ""){
+                        if(MyData.isPossibleAccidentInfo(each)){
+                          AppUpdateAccidentViewState.isAccountEditMode = false;
+                          AppUpdateAccidentViewState.startViewId = AppUpdateAccidentViewState.confirmedViewId;
+                          AppUpdateAccidentViewState.endViewId = AppUpdateAccidentViewState.jobViewId;
+                          isViewHere = false;
+                          await CommonUtils.moveToWithResult(context, AppView.appUpdateAccidentView.value, null);
+                          isViewHere = false;
+                        }else{
+                          isViewHere = false;
+                          await CommonUtils.moveToWithResult(context, AppView.appAccidentDetailInfoView.value, null);
+                          isViewHere = false;
+                        }
+                      }else{
+                        AppUpdateAccidentViewState.isAccountEditMode = false;
+                        AppUpdateAccidentViewState.startViewId = AppUpdateAccidentViewState.confirmedViewId;
+                        AppUpdateAccidentViewState.endViewId = AppUpdateAccidentViewState.jobViewId;
+                        isViewHere = false;
+                        await CommonUtils.moveToWithResult(context, AppView.appUpdateAccidentView.value, null);
+                        isViewHere = false;
+                      }
                     })
               ]), () async {
                 MyData.selectedCarInfoData = null;

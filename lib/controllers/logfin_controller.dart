@@ -545,8 +545,11 @@ class LogfinController {
                 var resData = jsonDecode(dataResult["res_data"]);
                 String date = dataResult["created_at"].toString();
 
+                String igDate = dataResult["ig_date"] ?? "";
+
                 CommonUtils.log("i", "accident data ====>\n"
                     "date: ${dataResult["created_at"]} || ${dataResult["updated_at"]}\n"
+                    "igDate : $igDate\n"
                     "accidentUid: ${dataResult["id"]}\n"
                     "accidentUid: ${dataResult["uid"]}\n"
                     "accidentCaseNo: $accidentNo\n"
@@ -558,7 +561,7 @@ class LogfinController {
                     "wish_amount: ${dataResult["wish_amount"]}\n"
                     "res_data: ${resData["data"]["resRepaymentList"]}\n");
                 MyData.addToAccidentInfoList(AccidentInfoData(dataResult["id"].toString(), dataResult["uid"], accidentNo.substring(0,4), accidentNo.substring(4,6), accidentNo.substring(6),
-                    courtInfo, bankInfo, dataResult["refund_account"].toString(), lendCountInfo, lendAmount, wishAmount, date, resData["data"]));
+                    courtInfo, bankInfo, dataResult["refund_account"].toString(), lendCountInfo, lendAmount, wishAmount, date, igDate, resData["data"]));
               }
 
               GetController.to.updateAccidentInfoList(MyData.getAccidentInfoList());

@@ -935,15 +935,36 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                                 MyData.selectedAccidentInfoData = each;
                               }
                             }
-                            LogfinController.getAccidentPrList("${MyData.selectedAccidentInfoData!.accidentCaseNumberYear}${MyData.selectedAccidentInfoData!.accidentCaseNumberType}${MyData.selectedAccidentInfoData!.accidentCaseNumberNumber}", (isSuccessToGetOffers, _){
-                              UiUtils.closeLoadingPop(context);
-                              if(isSuccessToGetOffers){
-                                CommonUtils.moveWithReplacementTo(context, AppView.appResultPrView.value, null);
+                            if(MyData.selectedAccidentInfoData!.igDate != ""){
+                              CommonUtils.log("w","HERE1");
+                              if(MyData.isPossibleAccidentInfo(MyData.selectedAccidentInfoData!)){
+                                CommonUtils.log("w","HERE2");
+                                LogfinController.getAccidentPrList("${MyData.selectedAccidentInfoData!.accidentCaseNumberYear}${MyData.selectedAccidentInfoData!.accidentCaseNumberType}${MyData.selectedAccidentInfoData!.accidentCaseNumberNumber}", (isSuccessToGetOffers, _){
+                                  UiUtils.closeLoadingPop(context);
+                                  if(isSuccessToGetOffers){
+                                    CommonUtils.moveWithReplacementTo(context, AppView.appResultPrView.value, null);
+                                  }else{
+                                    // findUidInAccidentInfoList 실패
+                                    CommonUtils.flutterToast("에러가 발생했어요.\n다시 실행해주세요.");
+                                  }
+                                });
                               }else{
-                                // findUidInAccidentInfoList 실패
-                                CommonUtils.flutterToast("에러가 발생했어요.\n다시 실행해주세요.");
+                                CommonUtils.log("w","HERE3");
+                                UiUtils.closeLoadingPop(context);
+                                CommonUtils.moveWithReplacementTo(context, AppView.appAccidentDetailInfoView.value, null);
                               }
-                            });
+                            }else{
+                              CommonUtils.log("w","HERE4");
+                              LogfinController.getAccidentPrList("${MyData.selectedAccidentInfoData!.accidentCaseNumberYear}${MyData.selectedAccidentInfoData!.accidentCaseNumberType}${MyData.selectedAccidentInfoData!.accidentCaseNumberNumber}", (isSuccessToGetOffers, _){
+                                UiUtils.closeLoadingPop(context);
+                                if(isSuccessToGetOffers){
+                                  CommonUtils.moveWithReplacementTo(context, AppView.appResultPrView.value, null);
+                                }else{
+                                  // findUidInAccidentInfoList 실패
+                                  CommonUtils.flutterToast("에러가 발생했어요.\n다시 실행해주세요.");
+                                }
+                              });
+                            }
                           }else{
                             UiUtils.closeLoadingPop(context);
                             CommonUtils.flutterToast("사건정보 찾기 실패\n다시 실행해주세요.");

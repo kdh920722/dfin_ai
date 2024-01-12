@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:camera/camera.dart';
 import 'package:device_info/device_info.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
@@ -421,6 +422,59 @@ class CommonUtils {
     } catch (e) {
       deviceId = 'id_error';
       return deviceId;
+    }
+  }
+
+  static void _showAttIntroPopForIos(BuildContext context, bool isDismiss){
+    bool isSecond = isDismiss;
+    UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, isDismiss, 100.w, 30.h, 0.5, (slideContext, setState){
+      return Column(mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            UiUtils.getMarginBox(100.w, 1.h),
+            Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center, children: [
+              SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("사용자 맞춤 광고표시를 위한 설정 안내",13.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
+              UiUtils.getMarginBox(0, 1.h),
+              SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale2("사용자 맞춤 광고표시를 위해\n사용자활동 추적 허용이 필요해요.",12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)),
+              SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale2("설정에서 '추적 허용'을 활성화 해주세요.",12.sp, FontWeight.w300, ColorStyles.upFinDarkGray, TextAlign.start, null))
+            ]),
+            UiUtils.getExpandedScrollView(Axis.vertical, Container()),
+            isSecond ? Row(children: [
+              UiUtils.getBorderButtonBox(44.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+                  UiUtils.getTextWithFixedScale("설정", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () async {
+                    Navigator.pop(slideContext);
+                    openAppSettings();
+                  }),
+              UiUtils.getMarginBox(2.w, 0),
+              UiUtils.getBorderButtonBox(44.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
+                  UiUtils.getTextWithFixedScale("닫기", 12.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null), () async {
+                    Navigator.pop(slideContext);
+                  }),
+            ]) :
+            UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+                UiUtils.getTextWithFixedScale("다음", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () async {
+                  Navigator.pop(slideContext);
+                  await AppTrackingTransparency.requestTrackingAuthorization();
+                }),
+           UiUtils.getMarginBox(0, 5.h),
+          ]
+      );
+    });
+  }
+
+  static Future<void> initAttForIos(BuildContext context) async {
+    try{
+      final TrackingStatus status = await AppTrackingTransparency.trackingAuthorizationStatus;
+      if(status == TrackingStatus.notDetermined){
+        if(context.mounted){
+          _showAttIntroPopForIos(context, false);
+        }
+      }else if(status == TrackingStatus.denied){
+        if(context.mounted){
+          _showAttIntroPopForIos(context, true);
+        }
+      }
+    }catch(error){
+      CommonUtils.log("w", "error : $error");
     }
   }
 
