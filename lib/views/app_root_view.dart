@@ -48,7 +48,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
       if(!isInitRootView){
         isInitRootView = true;
         _setImagePreLoad();
-        if(!Config.isAndroid) CommonUtils.initAttForIos(context);
+        //if(!Config.isAndroid) CommonUtils.initAttForIos(context);
       }
     });
     Config.contextForEmergencyBack = context;
@@ -109,6 +109,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
     precacheImage(const AssetImage('assets/images/toss_icon.png'), context);
     precacheImage(const AssetImage('assets/images/chat_loading.gif'), context);
     precacheImage(const AssetImage('assets/images/cert_called.png'), context);
+    precacheImage(const AssetImage('assets/images/icon_car.png'), context);
   }
 
   Future<void> _initFirebase() async {

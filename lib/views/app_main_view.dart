@@ -105,7 +105,42 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               })
             ])),
             UiUtils.getMarginBox(0, 5.h),
+
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              Column(children: [
+                UiUtils.getTextWithFixedScale("새로운 등록을 시작하세요!", 22.sp, FontWeight.w800, ColorStyles.upFinWhite, TextAlign.start, null),
+                UiUtils.getMarginBox(0, 1.h),
+                UiUtils.getTextWithFixedScale2("정보를 등록하시면 조건에 맞는 대출상품을 보여드립니다.", 10.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null),
+                UiUtils.getMarginBox(0, 4.h),
+                Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                  UiUtils.getBorderButtonBoxWithZeroPadding(90.w,  ColorStyles.upFinWhite,  ColorStyles.upFinWhite, Row(children: [
+                    UiUtils.getMarginBox(4.w, 0),
+                    UiUtils.getImage(16.w, 16.w, Image.asset('assets/images/accident_icon.png', fit: BoxFit.fill)),
+                    UiUtils.getMarginBox(5.6.w, 0),
+                    UiUtils.getTextWithFixedScale("개인회생사건 등록", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, null),
+                  ]), () async {
+                    isViewHere = false;
+                    await CommonUtils.moveToWithResult(context, AppView.appSearchAccidentView.value, null);
+                    isViewHere = true;
+                  }),
+                  UiUtils.getMarginBox(0, 1.h),
+                  UiUtils.getBorderButtonBoxWithZeroPadding(90.w,  ColorStyles.upFinWhite,  ColorStyles.upFinWhite, Row(children: [
+                    UiUtils.getMarginBox(6.w, 0),
+                    UiUtils.getImage(16.w, 16.w, Image.asset('assets/images/icon_car.png', fit: BoxFit.fill)),
+                    UiUtils.getMarginBox(4.w, 0),
+                    UiUtils.getTextWithFixedScale("자동차 정보 등록", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, null),
+                  ]), () async {
+                    if(Config.isAutoOpen){
+                      isViewHere = false;
+                      await CommonUtils.moveToWithResult(context, AppView.appSearchCarView.value, null);
+                      isViewHere = true;
+                    }else{
+                      CommonUtils.flutterToast("오토론 상품은 준비중입니다.!");
+                    }
+                  })
+                ]),
+              ])
+              /*
               UiUtils.getBorderButtonBoxForChoiceType(43.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
                   Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
                     UiUtils.getMarginBox(0, 0.5.h),
@@ -143,10 +178,12 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                     await CommonUtils.moveToWithResult(context, AppView.appSearchCarView.value, null);
                     isViewHere = true;
                   }),
+              */
             ]),
+
             UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
             Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-              Image.asset(fit: BoxFit.fitHeight,'assets/images/img_woman_searcher_01.png', height: 45.h)
+              Image.asset(fit: BoxFit.fitHeight,'assets/images/img_woman_searcher_01.png', height: 50.h)
             ])
           ]);
 
@@ -355,7 +392,8 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                       UiUtils.getMarginBox(2.w, 0 ),
                       UiUtils.getBoxTextWithFixedScale("개인회생", 8.sp, FontWeight.w600, TextAlign.center, ColorStyles.upFinWhiteSky, ColorStyles.upFinButtonBlue),
                       UiUtils.getMarginBox(2.w, 0),
-                      !MyData.isPossibleAccidentInfo(each)? UiUtils.getBoxTextWithFixedScale("환급계좌 오류", 8.sp, FontWeight.w600, TextAlign.start, ColorStyles.upFinWhiteRed, ColorStyles.upFinRed) : Container()
+                      each.accidentAccountValidType == AccidentInfoData.needToCheckAccount1 || each.accidentAccountValidType == AccidentInfoData.needToCheckAccount2 ?
+                        UiUtils.getBoxTextWithFixedScale("환급계좌 오류", 8.sp, FontWeight.w600, TextAlign.start, ColorStyles.upFinWhiteRed, ColorStyles.upFinRed) : Container()
                     ]),
                     UiUtils.getMarginBox(0, 0.5.h),
                     Row(mainAxisAlignment: MainAxisAlignment.start, children: [
@@ -381,19 +419,11 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                     ]), () async {
                       MyData.selectedCarInfoData = null;
                       MyData.selectedAccidentInfoData = each;
-                      if(MyData.selectedAccidentInfoData!.igDate != ""){
-                        if(MyData.isPossibleAccidentInfo(each)){
-                          AppUpdateAccidentViewState.isAccountEditMode = false;
-                          AppUpdateAccidentViewState.startViewId = AppUpdateAccidentViewState.confirmedViewId;
-                          AppUpdateAccidentViewState.endViewId = AppUpdateAccidentViewState.jobViewId;
-                          isViewHere = false;
-                          await CommonUtils.moveToWithResult(context, AppView.appUpdateAccidentView.value, null);
-                          isViewHere = false;
-                        }else{
-                          isViewHere = false;
-                          await CommonUtils.moveToWithResult(context, AppView.appAccidentDetailInfoView.value, null);
-                          isViewHere = false;
-                        }
+                      if(MyData.selectedAccidentInfoData!.accidentAccountValidType == AccidentInfoData.needToCheckAccount1 ||
+                          MyData.selectedAccidentInfoData!.accidentAccountValidType == AccidentInfoData.needToCheckAccount2){
+                        isViewHere = false;
+                        await CommonUtils.moveToWithResult(context, AppView.appAccidentDetailInfoView.value, null);
+                        isViewHere = false;
                       }else{
                         AppUpdateAccidentViewState.isAccountEditMode = false;
                         AppUpdateAccidentViewState.startViewId = AppUpdateAccidentViewState.confirmedViewId;
@@ -465,8 +495,9 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                     ]),
                     UiUtils.getMarginBox(0, 0.5.h),
                     Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                      UiUtils.getImage(16.w, 16.w, Image.asset('assets/images/accident_icon.png', fit: BoxFit.fill)),
-                      // UiUtils.getMarginBox(0.2.w, 0),
+                      UiUtils.getMarginBox(2.w, 0),
+                      UiUtils.getImage(16.w, 16.w, Image.asset('assets/images/icon_car.png', fit: BoxFit.fill)),
+                      UiUtils.getMarginBox(2.w, 0),
                       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         UiUtils.getTextWithFixedScale("시세금액 : ${CommonUtils.getPriceFormattedStringForFullPrice(double.parse(each.carPrice))}", 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.center, 1),
                         UiUtils.getMarginBox(0, 0.5.h),

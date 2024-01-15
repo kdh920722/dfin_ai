@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
+import 'package:upfin/datas/accident_info_data.dart';
 import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import 'package:upfin/views/app_main_view.dart';
@@ -935,26 +936,11 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                                 MyData.selectedAccidentInfoData = each;
                               }
                             }
-                            if(MyData.selectedAccidentInfoData!.igDate != ""){
-                              CommonUtils.log("w","HERE1");
-                              if(MyData.isPossibleAccidentInfo(MyData.selectedAccidentInfoData!)){
-                                CommonUtils.log("w","HERE2");
-                                LogfinController.getAccidentPrList("${MyData.selectedAccidentInfoData!.accidentCaseNumberYear}${MyData.selectedAccidentInfoData!.accidentCaseNumberType}${MyData.selectedAccidentInfoData!.accidentCaseNumberNumber}", (isSuccessToGetOffers, _){
-                                  UiUtils.closeLoadingPop(context);
-                                  if(isSuccessToGetOffers){
-                                    CommonUtils.moveWithReplacementTo(context, AppView.appResultPrView.value, null);
-                                  }else{
-                                    // findUidInAccidentInfoList 실패
-                                    CommonUtils.flutterToast("에러가 발생했어요.\n다시 실행해주세요.");
-                                  }
-                                });
-                              }else{
-                                CommonUtils.log("w","HERE3");
-                                UiUtils.closeLoadingPop(context);
-                                CommonUtils.moveWithReplacementTo(context, AppView.appAccidentDetailInfoView.value, null);
-                              }
+                            if(MyData.selectedAccidentInfoData!.accidentAccountValidType == AccidentInfoData.needToCheckAccount1 ||
+                                MyData.selectedAccidentInfoData!.accidentAccountValidType == AccidentInfoData.needToCheckAccount2){
+                              UiUtils.closeLoadingPop(context);
+                              CommonUtils.moveWithReplacementTo(context, AppView.appAccidentDetailInfoView.value, null);
                             }else{
-                              CommonUtils.log("w","HERE4");
                               LogfinController.getAccidentPrList("${MyData.selectedAccidentInfoData!.accidentCaseNumberYear}${MyData.selectedAccidentInfoData!.accidentCaseNumberType}${MyData.selectedAccidentInfoData!.accidentCaseNumberNumber}", (isSuccessToGetOffers, _){
                                 UiUtils.closeLoadingPop(context);
                                 if(isSuccessToGetOffers){

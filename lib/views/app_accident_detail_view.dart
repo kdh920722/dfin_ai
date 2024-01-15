@@ -7,6 +7,7 @@ import 'package:upfin/styles/ColorStyles.dart';
 import 'package:upfin/views/app_main_view.dart';
 import 'package:upfin/views/app_update_accident_view.dart';
 import '../controllers/firebase_controller.dart';
+import '../datas/accident_info_data.dart';
 import '../styles/TextStyles.dart';
 import '../configs/app_config.dart';
 import '../utils/common_utils.dart';
@@ -20,6 +21,7 @@ class AppAccidentDetailView extends StatefulWidget{
 class AppAccidentDetailViewState extends State<AppAccidentDetailView> with WidgetsBindingObserver, TickerProviderStateMixin{
   static BuildContext? mainContext;
   late final TabController _tabController;
+
   @override
   void initState(){
     CommonUtils.log("d", "AppAccidentDetailView 화면 입장");
@@ -31,7 +33,8 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
     Config.isEmergencyRoot = false;
     FireBaseController.setStateForForeground = null;
 
-    if(!MyData.isPossibleAccidentInfo(MyData.selectedAccidentInfoData!)){
+    if(MyData.selectedAccidentInfoData!.accidentAccountValidType == AccidentInfoData.needToCheckAccount1 ||
+        MyData.selectedAccidentInfoData!.accidentAccountValidType == AccidentInfoData.needToCheckAccount2){
       CommonUtils.flutterToast("환급계좌정보가 잘못되었어요.\n수정해주세요.");
     }
   }
@@ -140,7 +143,17 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
   }
 
   Widget _getAccidentWidgetList(){
-    bool isSuccessToGetDetailInfo = MyData.isPossibleAccidentInfo(MyData.selectedAccidentInfoData!);
+    bool isSuccessToGetDetailInfo = true;
+    bool isNotNeedToUpdateAccount = true;
+    if(MyData.selectedAccidentInfoData!.accidentAccountValidType == AccidentInfoData.needToCheckAccount1 ||
+        MyData.selectedAccidentInfoData!.accidentAccountValidType == AccidentInfoData.needToCheckAccount2){
+      isSuccessToGetDetailInfo = false;
+      isNotNeedToUpdateAccount = false;
+    }else{
+      if(MyData.selectedAccidentInfoData!.accidentAccountValidType == AccidentInfoData.notNeedToCheckAccount1){
+        isSuccessToGetDetailInfo = false;
+      }
+    }
 
     return Padding(padding: EdgeInsets.only(left: 4.w, right: 4.w, top: 4.w, bottom: 4.w),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -160,11 +173,11 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
               SizedBox(width: 61.w, child: UiUtils.getTextWithFixedScale("환급계좌", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
               UiUtils.getMarginBox(0, 2.h),
               SizedBox(width: 61.w, child: UiUtils.getTextWithFixedScale("${MyData.selectedAccidentInfoData!.accidentBankInfo.split("@")[0]} / ${MyData.selectedAccidentInfoData!.accidentBankAccount}",
-                  14.sp, FontWeight.w500, isSuccessToGetDetailInfo? ColorStyles.upFinBlack : ColorStyles.upFinRed, TextAlign.start, null)),
+                  14.sp, FontWeight.w500, isNotNeedToUpdateAccount? ColorStyles.upFinBlack : ColorStyles.upFinRed, TextAlign.start, null)),
             ]),
             const Spacer(flex: 2),
-            UiUtils.getBorderButtonBox(16.w, isSuccessToGetDetailInfo? ColorStyles.upFinButtonBlue: ColorStyles.upFinWhiteRed, isSuccessToGetDetailInfo? ColorStyles.upFinButtonBlue: ColorStyles.upFinWhiteRed,
-                UiUtils.getTextWithFixedScale("변경", 10.sp, FontWeight.w600, isSuccessToGetDetailInfo? ColorStyles.upFinWhite : ColorStyles.upFinRed, TextAlign.start, null), () async {
+            UiUtils.getBorderButtonBox(16.w, isNotNeedToUpdateAccount? ColorStyles.upFinButtonBlue: ColorStyles.upFinWhiteRed, isNotNeedToUpdateAccount? ColorStyles.upFinButtonBlue: ColorStyles.upFinWhiteRed,
+                UiUtils.getTextWithFixedScale("변경", 10.sp, FontWeight.w600, isNotNeedToUpdateAccount? ColorStyles.upFinWhite : ColorStyles.upFinRed, TextAlign.start, null), () async {
                   AppUpdateAccidentViewState.isAccountEditMode = true;
                   AppUpdateAccidentViewState.startViewId = AppUpdateAccidentViewState.bankCodeViewId;
                   AppUpdateAccidentViewState.endViewId = AppUpdateAccidentViewState.bankAccountViewId;

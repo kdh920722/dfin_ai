@@ -49,6 +49,7 @@ class Config{
   static bool isEmergencyRoot = false;
   static bool isTablet = false;
   static Map<String,dynamic> certCmpInfoMap = {};
+  static bool isAutoOpen = false;
 
   static Map<String, WidgetBuilder> appRoutes = {
     AppView.appRootView.value : (context) => AppRootView(),
@@ -125,18 +126,12 @@ class Config{
           switch(each.key){
             case "app_download_url" : appStoreUrl = each.value.toString();
             case "app_state" : appState = int.parse(each.value.toString());
-            //case "app_version" : appVersion = each.value.toString();
+            case "auto_open_yn" : isAutoOpen = each.value.toString() == "y"? true : false;
           }
         }
       }else{
         isValid = false;
       }
-
-      /*
-      if(await _isNeedToUpdateVersion()){
-        appState = stateInfoMap["update"];
-      }
-       */
 
       if(isValid){
         callback(true);

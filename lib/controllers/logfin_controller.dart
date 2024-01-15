@@ -539,29 +539,34 @@ class LogfinController {
                   lendCountInfo = preLoanCountList[2];
                 }
 
+                String bankAccount = dataResult["refund_account"].toString();
                 String lendAmount = dataResult["lend_amount"].toString() == ""? "0" : dataResult["lend_amount"].toString();
                 String wishAmount = dataResult["wish_amount"].toString() == ""? "0" : dataResult["wish_amount"].toString();
                 String accidentNo = dataResult["issue_no"];
                 var resData = jsonDecode(dataResult["res_data"]);
                 String date = dataResult["created_at"].toString();
 
-                String igDate = dataResult["ig_date"] ?? "";
+                String needType = dataResult["is_account_verification_needed"].toString();
+                bool isNeedToCheckAccount = needType == "1" ? true : false;
+                int accountType = AccidentInfoData.getAccidentAccountValidType(isNeedToCheckAccount, resData["data"]);
 
                 CommonUtils.log("i", "accident data ====>\n"
                     "date: ${dataResult["created_at"]} || ${dataResult["updated_at"]}\n"
-                    "igDate : $igDate\n"
+                    "needType : $needType\n"
+                    "isNeedToCheckAccount : $isNeedToCheckAccount\n"
+                    "accountType : $accountType\n"
                     "accidentUid: ${dataResult["id"]}\n"
                     "accidentUid: ${dataResult["uid"]}\n"
                     "accidentCaseNo: $accidentNo\n"
                     "courtInfo: $courtInfo\n"
                     "bankInfo: $bankInfo\n"
-                    "account: ${dataResult["refund_account"]}\n"
+                    "account: $bankAccount\n"
                     "lendCountInfo: $lendCountInfo\n"
                     "lend_amount: ${dataResult["lend_amount"]}\n"
                     "wish_amount: ${dataResult["wish_amount"]}\n"
                     "res_data: ${resData["data"]["resRepaymentList"]}\n");
                 MyData.addToAccidentInfoList(AccidentInfoData(dataResult["id"].toString(), dataResult["uid"], accidentNo.substring(0,4), accidentNo.substring(4,6), accidentNo.substring(6),
-                    courtInfo, bankInfo, dataResult["refund_account"].toString(), lendCountInfo, lendAmount, wishAmount, date, igDate, resData["data"]));
+                    courtInfo, bankInfo, bankAccount, lendCountInfo, lendAmount, wishAmount, date, accountType, resData["data"]));
               }
 
               GetController.to.updateAccidentInfoList(MyData.getAccidentInfoList());
