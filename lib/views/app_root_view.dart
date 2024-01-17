@@ -612,7 +612,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
                   SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceIsSnsLogin, "N");
                   CommonUtils.moveTo(context, AppView.appLoginView.value, null);
                 }),
-            UiUtils.getMarginBox(0, 1.5.h),
+            UiUtils.getMarginBox(0, 1.h),
             UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
                 UiUtils.getTextWithFixedScale("회원가입 ", 16.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
                   SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceSnsToken, "");
