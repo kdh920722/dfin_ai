@@ -43,8 +43,8 @@ class Config{
   static String appStoreUrl = "";
   static String privacyUrl = "";
   static String privacyText = "";
-  static String privacyText2 = "";
-  static String privacyText3 = "";
+  static String appMainIntroText1 = "";
+  static String appMainIntroText2 = "";
   static BuildContext? contextForEmergencyBack;
   static bool isEmergencyRoot = false;
   static bool isTablet = false;
@@ -104,8 +104,8 @@ class Config{
             case "info_version" : appInfoTextMap["info_text_version"] = int.parse(each.value.toString());
             case "privacy_url" : privacyUrl = each.value.toString();
             case "privacy_text" : privacyText = each.value.toString();
-            case "privacy_text2" : privacyText2 = each.value.toString();
-            case "privacy_text3" : privacyText3 = each.value.toString();
+            case "app_main_intro_text1" : appMainIntroText1 = each.value.toString();
+            case "app_main_intro_text2" : appMainIntroText2 = each.value.toString();
             case "cert_cmp_info" : certCmpInfoMap = jsonDecode(jsonEncode(each.value));
           }
         }

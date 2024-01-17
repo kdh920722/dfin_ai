@@ -52,4 +52,18 @@ class LoanInfoData {
 
     return status;
   }
+  static String getDisplayStatusName(String statueId){
+    String status = "";
+    switch(statueId){
+      case "1" : status = "접수중";
+      case "2" : status = "심사중";
+      case "3" : status = "심사중";
+      case "4" : status = "승인";
+      case "5" : status = "보류";
+      case "6" : status = "부결";
+      case "7" : status = "취소";
+    }
+
+    return status;
+  }
 }

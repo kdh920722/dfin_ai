@@ -408,10 +408,10 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
 
       UiUtils.getExpandedScrollView(Axis.vertical,
           SizedBox(width: 85.w, child: Row(children: [
-            UiUtils.getTextField(context, 20.w, TextStyles.upFinTextFormFieldTextStyle, _accidentInfoFocus1, _accidentInfoTextController1, TextInputType.number,
+            UiUtils.getTextField(context, 32.w, TextStyles.upFinTextFormFieldTextStyle, _accidentInfoFocus1, _accidentInfoTextController1, TextInputType.number,
                 UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
             UiUtils.getTextWithFixedScale("개회", 16.sp, FontWeight.w400, ColorStyles.upFinRealGray, TextAlign.center, null),
-            UiUtils.getTextField(context, 32.w, TextStyles.upFinTextFormFieldTextStyle, _accidentInfoFocus2, _accidentInfoTextController2, TextInputType.number,
+            UiUtils.getTextField(context, 43.w, TextStyles.upFinTextFormFieldTextStyle, _accidentInfoFocus2, _accidentInfoTextController2, TextInputType.number,
                 UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
           ]))
       ),

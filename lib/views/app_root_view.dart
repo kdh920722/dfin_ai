@@ -601,9 +601,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
             UiUtils.getMarginBox(0, Config.isPad()? 5.h : 15.h),
             UiUtils.getTitleWithFixedScale("upfin", Config.isPad()? 55.sp : 75.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
             UiUtils.getMarginBox(0, 10.h),
-            UiUtils.getTextWithFixedScale("나에게 꼭 맞는", 24.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
-            UiUtils.getMarginBox(0, 0.5.h),
-            UiUtils.getTextWithFixedScale("다이렉트 대출신청!", 24.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
+            Container(height: 8.h, child: UiUtils.getAnimatedText("나에게 꼭 맞는\n다이렉트 대출신청!", ColorStyles.upFinButtonBlue, 24.sp, FontWeight.w500, const Duration(milliseconds: 200), (){})),
             UiUtils.getMarginBox(0, Config.isPad()? 5.h : 10.h)
           ])),
           UiUtils.getExpandedScrollView(Axis.vertical, SizedBox(width: 100.w, child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [

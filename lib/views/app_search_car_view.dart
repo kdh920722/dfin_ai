@@ -556,8 +556,7 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
     List<String> confirmDataList = [];
     confirmDataList.add("•  ${MyData.name}");
     confirmDataList.add("•  ${MyData.birth.substring(0,4)}년 $birthMonth월 $birthDay일");
-    confirmDataList.add("•  [차량번호]  $selectedCarNum");
-    confirmDataList.add("•  [소유자]  $selectedCarOwner");
+    confirmDataList.add("•  차량번호 $selectedCarNum");
     confirmDataList.add("•  ${selectedJobInfo.split("@")[0]}");
     /*
     confirmDataList.add("•  기대출  ${selectedPreLoanCountInfo.split("@")[0]}");

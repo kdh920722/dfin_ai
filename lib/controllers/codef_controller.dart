@@ -682,7 +682,7 @@ class CodeFController{
     UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, Config.isPad()? 65.h : 45.h, 0.0, (context, setState){
       return Obx(()=>Column(mainAxisAlignment: MainAxisAlignment.start, children:[
         GetController.to.isWait.value? UiUtils.getMarginBox(0, 8.h) : UiUtils.getMarginBox(0, 3.h),
-        GetController.to.isWait.value? UiUtils.getImage(25.w, 25.w,  Image.asset(fit: BoxFit.fill,'assets/images/doc_move.gif'))
+        GetController.to.isWait.value? UiUtils.getImage(30.w, 30.w, Image.asset(fit: BoxFit.fill,'assets/images/doc_move2.gif'))
             : Column(children: [
           UiUtils.getImage(100.w, 30.w,  Image.asset(fit: BoxFit.fitWidth,'assets/images/cert_called.png')),
           UiUtils.getMarginBox(0, 4.h),
@@ -780,7 +780,7 @@ class CodeFController{
         "nameRelationYN": "1",
         "militaryServiceYN": "1",
         "overseasKoreansIDYN": "0",
-        "isIdentityViewYn": "1",
+        "isIdentityViewYn": "0",
         "originDataYN": "0",
         "telecom": telecom
       };
@@ -803,7 +803,7 @@ class CodeFController{
         "relationWithHHYN": "1",
         "changeDateYN": "0",
         "compositionReasonYN": "0",
-        "isIdentityViewYn": "1",
+        "isIdentityViewYn": "0",
         "isNameViewYn": "1",
         "originDataYN": "0",
         "telecom": telecom
@@ -885,7 +885,7 @@ class CodeFController{
         "userName": name,
         "phoneNo": phoneNo,
         "useType": "0",
-        "isIdentityViewYN": "1",
+        "isIdentityViewYN": "0",
         "id": randomKey,
         "originDataYN": "0",
         "telecom": telecom
@@ -930,7 +930,7 @@ class CodeFController{
         "id": randomKey,
         "usePurposes": "01",
         "submitTargets": "01",
-        "isIdentityViewYN": "1",
+        "isIdentityViewYN": "0",
         "originDataYN": "0",
         "applicationType": "01",
         "identity": identity,

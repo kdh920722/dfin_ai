@@ -629,7 +629,8 @@ class LogfinController {
                 String carNum = dataResult["carno"];
                 String date = dataResult["created_at"].toString();
 
-                CommonUtils.log("i", "car data ====>\n"
+
+                CommonUtils.log("w", "car data ====>\n"
                     "date: ${dataResult["created_at"]}\n"
                     "carId: ${dataResult["id"]}\n"
                     "carUid: ${dataResult["uid"]}\n"
@@ -672,6 +673,7 @@ class LogfinController {
               callback(true, false);
             }else{
               MyData.clearLoanInfoList();
+              CommonUtils.isLogValid = true;
               for(Map eachLoans in loansList){
                 CommonUtils.log("i", "each loans : $eachLoans");
                 String uid = "";
@@ -713,7 +715,7 @@ class LogfinController {
                   productName = eachLoans["lender_car"]["lender"]["product_name"].toString();
                   contactNo = eachLoans["lender_car"]["lender"]["contact_no"].toString();
 
-                  CommonUtils.log("w", "loan data ====>\n"
+                  CommonUtils.log("w", "car loan data ====>\n"
                       "uidType: $uidType\n"
                       "uid: $uid\n"
                       "loanUid: ${eachLoans["uid"]}\n"
@@ -755,6 +757,7 @@ class LogfinController {
                   }
                 });
               }
+              CommonUtils.isLogValid = false;
 
               MyData.sortLoanInfoList();
               _setChatRoomInfoList();

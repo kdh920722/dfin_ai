@@ -3,12 +3,12 @@ import 'dart:io';
 import 'dart:math';
 import 'package:app_tracking_transparency/app_tracking_transparency.dart';
 import 'package:camera/camera.dart';
-import 'package:device_info/device_info.dart';
 import 'package:encrypt/encrypt.dart' as encrypt;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_udid/flutter_udid.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
@@ -38,7 +38,7 @@ import '../views/app_main_view.dart';
 
 class CommonUtils {
 
-  static bool isLogValid = true;
+  static bool isLogValid = false;
   static const int logMaxSize = 600;
   static void log(String logType, String logMessage){
     if(FireBaseController.fcmToken != ""){
@@ -191,7 +191,6 @@ class CommonUtils {
     CommonUtils.log("w","check update");
     int state = await Config.isNeedToUpdateForMain();
     CommonUtils.log("w","check update state : $state");
-    state = 10;
     if(state == 99){
       if(context.mounted && !isOutPopOn){
         CommonUtils.log("w","check update mount");
@@ -208,6 +207,7 @@ class CommonUtils {
         });
       }
     }else if(state == 44){
+      CommonUtils.log("w","check update mount222333");
       if(context.mounted && !isOutPopOn){
         CommonUtils.log("w","check update mount");
         isOutPopOn = true;
@@ -407,16 +407,10 @@ class CommonUtils {
   }
 
   static Future<String> getDeviceId() async {
-    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
     String deviceId = "";
     try {
-      if(Config.isAndroid){
-        AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-        deviceId = androidInfo.androidId;
-      }else{
-        IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-        deviceId = iosInfo.identifierForVendor;
-      }
+      deviceId = await FlutterUdid.consistentUdid;
+      CommonUtils.log("w","deviceId : $deviceId");
 
       return deviceId;
     } catch (e) {

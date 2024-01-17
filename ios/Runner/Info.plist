@@ -143,6 +143,9 @@
         <string>applinks:upfin.onelink.me</string>
     </array>
 
+    <key>ITSAppUsesNonExemptEncryption</key>
+    <false/>
+
     <!-- ATT -->
     <!-- ATT : <key>NSUserTrackingUsageDescription</key> -->
     <!-- ATT : <string>This identifier will be used to deliver personalized ads to you.</string> -->

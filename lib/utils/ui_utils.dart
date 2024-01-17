@@ -1,4 +1,6 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:expansion_tile_group/expansion_tile_group.dart';
+import 'package:flutter_shake_animated/flutter_shake_animated.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
@@ -216,6 +218,24 @@ class UiUtils {
         child: Padding(padding: EdgeInsets.only(left: 4.w, right: 4.w, bottom: 2.w, top: 2.w), child: child)));
   }
 
+  static Widget getRoundBoxButtonTextWithFixedScale5(Widget child, Color boxColor, Function() tabCallBack){
+    return GestureDetector(onTap: tabCallBack, child: Container(
+        decoration: BoxDecoration(
+          color: boxColor, // 배경색 설정
+          borderRadius: BorderRadius.circular(1), // 모서리를 둥글게 하는 부분
+        ),child: FittedBox(fit: BoxFit.contain, alignment: Alignment.center,
+        child: Padding(padding: EdgeInsets.only(left: 2.5.w, right: 2.5.w, bottom: 2.w, top: 2.w), child: child))));
+  }
+
+  static Widget getRoundBoxButtonTextWithFixedScale6(Widget child, Color boxColor, Function() tabCallBack){
+    return GestureDetector(onTap: tabCallBack, child: Container( width: 90.w,
+        decoration: BoxDecoration(
+          color: boxColor, // 배경색 설정
+          borderRadius: BorderRadius.circular(1), // 모서리를 둥글게 하는 부분
+        ),child: FittedBox(fit: BoxFit.contain, alignment: Alignment.center,
+        child: Padding(padding: EdgeInsets.only(left: 2.5.w, right: 2.5.w, bottom: 2.w, top: 2.w), child: child))));
+  }
+
   static Widget getRoundBoxTextWithFixedScale2(String text, double fontSize, FontWeight fontWeight, TextAlign? textAlign, Color boxColor, Color textColor){
     return Container(
         decoration: BoxDecoration(
@@ -402,7 +422,7 @@ class UiUtils {
           style: ElevatedButton.styleFrom(
             padding: EdgeInsets.only(left: 4.w, right: 4.w, top: 4.w, bottom: 4.w),
             backgroundColor: buttonColor,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)),
             side: BorderSide(width: 1, color: borderColor),
             elevation: 0.0,
             shadowColor: ColorStyles.upFinGray,
@@ -455,9 +475,9 @@ class UiUtils {
         width: buttonWidth,
         child: ElevatedButton(
           style: ElevatedButton.styleFrom(
-            padding: EdgeInsets.only(left: 4.w, right: 4.w, top: 4.w, bottom: 4.w),
+            padding: EdgeInsets.only(left: 0, right: 0, top: 4.w, bottom: 4.w),
             backgroundColor: buttonColor,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)),
             side: BorderSide(width: 1, color: borderColor),
             elevation: 0.0,
             shadowColor: ColorStyles.upFinGray,
@@ -564,7 +584,7 @@ class UiUtils {
           style: ElevatedButton.styleFrom(
             padding: EdgeInsets.only(left: 4.w, right: 4.w, top: 4.w, bottom: 4.w),
             backgroundColor: buttonColor,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)),
             side: BorderSide(width: 1.3, color: borderColor),
             elevation: 0.0,
             shadowColor: ColorStyles.upFinGray,
@@ -583,8 +603,8 @@ class UiUtils {
           style: ElevatedButton.styleFrom(
             padding: EdgeInsets.zero,
             backgroundColor: buttonColor,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
-            side: const BorderSide(width: 0, color: ColorStyles.upFinWhite),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)),
+            side: BorderSide(width: 0, color: buttonColor),
             elevation: 0.0,
             shadowColor: ColorStyles.upFinGray,
           ),
@@ -920,17 +940,8 @@ class UiUtils {
     if(!isInitAgree){
       for(var each in LogfinController.agreeDocsList){
 
-        if(type == "B"){
-          if(each["type"].toString().contains(type)){
-            agreeInfoList.add(each);
-          }
-          if(each["type"].toString() == companyDocCode){
-            agreeInfoList.add(each);
-          }
-        }else{
-          if(each["type"].toString().contains(type)){
-            agreeInfoList.add(each);
-          }
+        if(each["type"].toString().contains(type)){
+          agreeInfoList.add(each);
         }
       }
 
@@ -1260,6 +1271,38 @@ class UiUtils {
         side: MaterialStateBorderSide.resolveWith((states) =>
         !checkedValue? BorderSide(width: 2.0, color: borderColor) : BorderSide(width: 2.0, color: activeBorderColor))
     )));
+  }
+
+  static Widget getAnimatedTextButton(double width, Color? backColor, Color textColor, String text, double fontSize, FontWeight fontWeight,
+      Duration duration, ShakeConstant shakeConstant, bool isAutoPlay, Function() callback){
+    return ShakeWidget(
+      duration: duration,
+      shakeConstant: shakeConstant,
+      autoPlay: isAutoPlay,
+      child: GestureDetector(onTap: callback, child: Container(
+          padding: EdgeInsets.only(left: 4.w, right: 4.w, top: 4.w, bottom: 4.w),
+          width: width,
+          color: backColor,
+          alignment: Alignment.center,
+          child: getTextWithFixedScale(text, fontSize, fontWeight, textColor, TextAlign.center, 1)
+      )),
+    );
+  }
+
+  static Widget getAnimatedText(String text, Color textColor, double fontSize, FontWeight fontWeight, Duration duration, Function() callback){
+    return AnimatedTextKit(
+      animatedTexts: [
+        TypewriterAnimatedText(
+            text,
+            textStyle: TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor),
+            speed: duration
+        ),
+      ],
+      totalRepeatCount: 100,
+      pause: const Duration(milliseconds: 1000),
+      displayFullTextOnTap: true,
+      stopPauseOnTap: false,
+    );
   }
 
   static void showSlideMenu(BuildContext parentViewContext, SlideMenuMoveType slideType, bool isDismissible,

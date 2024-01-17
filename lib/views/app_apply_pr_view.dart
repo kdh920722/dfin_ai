@@ -3509,139 +3509,276 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       }
 
       UiUtils.showLoadingPop(context);
-      _uploadCertImageToAwsServer(pickedFilePath, (isSuccessToUpload){
-        if(isSuccessToUpload){
-          List<dynamic> docResultList = [];
-          Map<String, dynamic> eachMap = {
-            "pr_document_id" : "12",
-            "response_data" : awsUploadUrl
-          };
-          docResultList.add(eachMap);
+      List<dynamic> docResultList = [];
+      if(pickedFilePath != ""){
+        _uploadCertImageToAwsServer(pickedFilePath, (isSuccessToUpload){
+          if(isSuccessToUpload){
 
-          for(var each in addedDocsList){
-            if(each["is_docs"] && each["is_confirmed"]){
-              var resultMap  =  each["result"]["resultValue"]["data"];
-              //gov24 : 1:주민등록등본           2:주민등록초본        15:지방세납세증명서      16:자동차등록원부(갑)     17:자동차등록원부(을)
-              //nhis  : 3:건강보험자격득실확인서    4:건강보험납부확인서
-              //nts   : 6:사업자등록증(*테스트불가) 10:소득금액증명       11:부가세과세표준증명원(*테스트불가)      14:국세납세증명서
-              if(each["id"] == 3 || each["id"] == 4){
-                if(resultMap is List<dynamic>){
-                  Map<String, dynamic> eachMap = {
-                    "pr_document_id" : each["id"],
-                    "response_data" : json.encode(resultMap)
-                  };
-                  docResultList.add(eachMap);
+            if(isAddedFileHere){
+              Map<String, dynamic> eachMap = {
+                "pr_document_id" : "12",
+                "response_data" : awsUploadUrl
+              };
+              docResultList.add(eachMap);
+            }
+
+            for(var each in addedDocsList){
+              if(each["is_docs"] && each["is_confirmed"]){
+                var resultMap  =  each["result"]["resultValue"]["data"];
+                //gov24 : 1:주민등록등본           2:주민등록초본        15:지방세납세증명서      16:자동차등록원부(갑)     17:자동차등록원부(을)
+                //nhis  : 3:건강보험자격득실확인서    4:건강보험납부확인서
+                //nts   : 6:사업자등록증(*테스트불가) 10:소득금액증명       11:부가세과세표준증명원(*테스트불가)      14:국세납세증명서
+                if(each["id"] == 3 || each["id"] == 4){
+                  if(resultMap is List<dynamic>){
+                    Map<String, dynamic> eachMap = {
+                      "pr_document_id" : each["id"],
+                      "response_data" : json.encode(resultMap)
+                    };
+                    docResultList.add(eachMap);
+                  }else{
+                    List<dynamic> wrapListMap = [];
+                    wrapListMap.add(resultMap);
+                    Map<String, dynamic> eachMap = {
+                      "pr_document_id" : each["id"],
+                      "response_data" : json.encode(wrapListMap)
+                    };
+                    docResultList.add(eachMap);
+                  }
                 }else{
-                  List<dynamic> wrapListMap = [];
-                  wrapListMap.add(resultMap);
-                  Map<String, dynamic> eachMap = {
-                    "pr_document_id" : each["id"],
-                    "response_data" : json.encode(wrapListMap)
-                  };
-                  docResultList.add(eachMap);
+                  if(resultMap is List<dynamic>){
+                    Map<String, dynamic> eachMap = {
+                      "pr_document_id" : each["id"],
+                      "response_data" : json.encode(resultMap)
+                    };
+                    docResultList.add(eachMap);
+                  }else{
+                    Map<String, dynamic> eachMap = {
+                      "pr_document_id" : each["id"],
+                      "response_data" : resultMap
+                    };
+                    docResultList.add(eachMap);
+                  }
                 }
+              }
+            }
+
+            Map<String, dynamic> applyInputMap = {
+              "loan_uid": AppChatViewState.currentLoanUid,
+              "documents": docResultList
+            };
+
+            CommonUtils.isLogValid = true;
+            for(var each in docResultList){
+              CommonUtils.log("w", "each id : ${each['pr_document_id']}");
+            }
+            CommonUtils.isLogValid = false;
+
+            LogfinController.callLogfinApi(LogfinApis.retryDocs, applyInputMap, (isSuccess, outputJson){
+              UiUtils.closeLoadingPop(context);
+              if(isSuccess){
+                List<Map<String, dynamic>> addedDocsListForSave = [];
+                List<Map<String, dynamic>> addedDupleDocsListForSave = [];
+                for(var eachAdded in addedDocsList){
+                  if(eachAdded["is_confirmed"] && eachAdded["id"] != 1000 && eachAdded["id"] != 999){
+                    for(var each in savedDocsList){
+                      if(each["id"] == eachAdded["id"]){
+                        // car_no 중복 확인
+                        if(eachAdded["id"] == 16 || eachAdded["id"] == 17){
+                          if(each.containsKey("car_no") && eachAdded.containsKey("car_no")){
+                            if(each['car_no'] == eachAdded['car_no']){
+                              addedDupleDocsListForSave.add(eachAdded);
+                            }
+                          }
+                        }else{
+                          addedDupleDocsListForSave.add(eachAdded);
+                        }
+                      }
+                    }
+                  }
+                }
+                for(var eachAdded in addedDocsList){
+                  if(eachAdded["is_confirmed"] && eachAdded["id"] != 1000 && eachAdded["id"] != 999){
+                    addedDocsListForSave.add(eachAdded);
+                  }
+                }
+                if(addedDupleDocsListForSave.isNotEmpty){
+                  for(var each in savedDocsList){
+                    bool isDuple = false;
+                    for(var eachDuple in addedDupleDocsListForSave){
+                      if(each["id"] == eachDuple["id"]){
+                        // car_no 중복 확인
+                        if(each["id"] == 16 || each["id"] == 17){
+                          if(each.containsKey("car_no") && eachDuple.containsKey("car_no")){
+                            if(each['car_no'] == eachDuple['car_no']){
+                              isDuple = true;
+                            }
+                          }
+                        }else{
+                          isDuple = true;
+                        }
+                      }
+                    }
+                    if(!isDuple){
+                      addedDocsListForSave.add(each);
+                    }
+                  }
+                }else{
+                  addedDocsListForSave.addAll(savedDocsList);
+                }
+
+                for(var each in addedDocsListForSave){
+                  Map<String, dynamic> resultMap = each["result"];
+                  CommonUtils.log("", "docs cache save!!! ===============================>\n"
+                      "view_id:${each["view_id"]}\n"
+                      "id:${each["id"]}\n"
+                      "name:${each["name"]}\n"
+                      "is_confirmed:${each["is_confirmed"]}\n"
+                      "is_docs:${each["is_docs"]}\n"
+                      "docs_type:${each["docs_type"]}\n"
+                      "result:${resultMap.isEmpty? "" : each["result"]["resultValue"]}\n"
+                  );
+                }
+
+                SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceApplyPrKey, jsonEncode(addedDocsListForSave));
+                setState(() {
+                  currentViewId = _getViewIdFromListById(confirmedId);
+                });
               }else{
-                if(resultMap is List<dynamic>){
-                  Map<String, dynamic> eachMap = {
-                    "pr_document_id" : each["id"],
-                    "response_data" : json.encode(resultMap)
-                  };
-                  docResultList.add(eachMap);
-                }else{
-                  Map<String, dynamic> eachMap = {
-                    "pr_document_id" : each["id"],
-                    "response_data" : resultMap
-                  };
-                  docResultList.add(eachMap);
-                }
+                CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
+              }
+            });
+          }else{
+            UiUtils.closeLoadingPop(context);
+            CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
+          }
+        });
+      }else{
+        for(var each in addedDocsList){
+          if(each["is_docs"] && each["is_confirmed"]){
+            var resultMap  =  each["result"]["resultValue"]["data"];
+            //gov24 : 1:주민등록등본           2:주민등록초본        15:지방세납세증명서      16:자동차등록원부(갑)     17:자동차등록원부(을)
+            //nhis  : 3:건강보험자격득실확인서    4:건강보험납부확인서
+            //nts   : 6:사업자등록증(*테스트불가) 10:소득금액증명       11:부가세과세표준증명원(*테스트불가)      14:국세납세증명서
+            if(each["id"] == 3 || each["id"] == 4){
+              if(resultMap is List<dynamic>){
+                Map<String, dynamic> eachMap = {
+                  "pr_document_id" : each["id"],
+                  "response_data" : json.encode(resultMap)
+                };
+                docResultList.add(eachMap);
+              }else{
+                List<dynamic> wrapListMap = [];
+                wrapListMap.add(resultMap);
+                Map<String, dynamic> eachMap = {
+                  "pr_document_id" : each["id"],
+                  "response_data" : json.encode(wrapListMap)
+                };
+                docResultList.add(eachMap);
+              }
+            }else{
+              if(resultMap is List<dynamic>){
+                Map<String, dynamic> eachMap = {
+                  "pr_document_id" : each["id"],
+                  "response_data" : json.encode(resultMap)
+                };
+                docResultList.add(eachMap);
+              }else{
+                Map<String, dynamic> eachMap = {
+                  "pr_document_id" : each["id"],
+                  "response_data" : resultMap
+                };
+                docResultList.add(eachMap);
               }
             }
           }
-
-          Map<String, dynamic> applyInputMap = {
-            "loan_uid": AppChatViewState.currentLoanUid,
-            "documents": docResultList
-          };
-
-          LogfinController.callLogfinApi(LogfinApis.retryDocs, applyInputMap, (isSuccess, outputJson){
-            UiUtils.closeLoadingPop(context);
-            if(isSuccess){
-              List<Map<String, dynamic>> addedDocsListForSave = [];
-              List<Map<String, dynamic>> addedDupleDocsListForSave = [];
-              for(var eachAdded in addedDocsList){
-                if(eachAdded["is_confirmed"] && eachAdded["id"] != 1000 && eachAdded["id"] != 999){
-                  for(var each in savedDocsList){
-                    if(each["id"] == eachAdded["id"]){
-                      // car_no 중복 확인
-                      if(eachAdded["id"] == 16 || eachAdded["id"] == 17){
-                        if(each.containsKey("car_no") && eachAdded.containsKey("car_no")){
-                          if(each['car_no'] == eachAdded['car_no']){
-                            addedDupleDocsListForSave.add(eachAdded);
-                          }
-                        }
-                      }else{
-                        addedDupleDocsListForSave.add(eachAdded);
-                      }
-                    }
-                  }
-                }
-              }
-              for(var eachAdded in addedDocsList){
-                if(eachAdded["is_confirmed"] && eachAdded["id"] != 1000 && eachAdded["id"] != 999){
-                  addedDocsListForSave.add(eachAdded);
-                }
-              }
-              if(addedDupleDocsListForSave.isNotEmpty){
-                for(var each in savedDocsList){
-                  bool isDuple = false;
-                  for(var eachDuple in addedDupleDocsListForSave){
-                    if(each["id"] == eachDuple["id"]){
-                      // car_no 중복 확인
-                      if(each["id"] == 16 || each["id"] == 17){
-                        if(each.containsKey("car_no") && eachDuple.containsKey("car_no")){
-                          if(each['car_no'] == eachDuple['car_no']){
-                            isDuple = true;
-                          }
-                        }
-                      }else{
-                        isDuple = true;
-                      }
-                    }
-                  }
-                  if(!isDuple){
-                    addedDocsListForSave.add(each);
-                  }
-                }
-              }else{
-                addedDocsListForSave.addAll(savedDocsList);
-              }
-
-              for(var each in addedDocsListForSave){
-                Map<String, dynamic> resultMap = each["result"];
-                CommonUtils.log("", "docs cache save!!! ===============================>\n"
-                    "view_id:${each["view_id"]}\n"
-                    "id:${each["id"]}\n"
-                    "name:${each["name"]}\n"
-                    "is_confirmed:${each["is_confirmed"]}\n"
-                    "is_docs:${each["is_docs"]}\n"
-                    "docs_type:${each["docs_type"]}\n"
-                    "result:${resultMap.isEmpty? "" : each["result"]["resultValue"]}\n"
-                );
-              }
-
-              SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceApplyPrKey, jsonEncode(addedDocsListForSave));
-              setState(() {
-                currentViewId = _getViewIdFromListById(confirmedId);
-              });
-            }else{
-              CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
-            }
-          });
-        }else{
-          UiUtils.closeLoadingPop(context);
-          CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
         }
-      });
+
+        Map<String, dynamic> applyInputMap = {
+          "loan_uid": AppChatViewState.currentLoanUid,
+          "documents": docResultList
+        };
+
+        CommonUtils.isLogValid = true;
+        for(var each in docResultList){
+          CommonUtils.log("w", "each id : ${each['pr_document_id']}");
+        }
+        CommonUtils.isLogValid = false;
+
+        LogfinController.callLogfinApi(LogfinApis.retryDocs, applyInputMap, (isSuccess, outputJson){
+          UiUtils.closeLoadingPop(context);
+          if(isSuccess){
+            List<Map<String, dynamic>> addedDocsListForSave = [];
+            List<Map<String, dynamic>> addedDupleDocsListForSave = [];
+            for(var eachAdded in addedDocsList){
+              if(eachAdded["is_confirmed"] && eachAdded["id"] != 1000 && eachAdded["id"] != 999){
+                for(var each in savedDocsList){
+                  if(each["id"] == eachAdded["id"]){
+                    // car_no 중복 확인
+                    if(eachAdded["id"] == 16 || eachAdded["id"] == 17){
+                      if(each.containsKey("car_no") && eachAdded.containsKey("car_no")){
+                        if(each['car_no'] == eachAdded['car_no']){
+                          addedDupleDocsListForSave.add(eachAdded);
+                        }
+                      }
+                    }else{
+                      addedDupleDocsListForSave.add(eachAdded);
+                    }
+                  }
+                }
+              }
+            }
+            for(var eachAdded in addedDocsList){
+              if(eachAdded["is_confirmed"] && eachAdded["id"] != 1000 && eachAdded["id"] != 999){
+                addedDocsListForSave.add(eachAdded);
+              }
+            }
+            if(addedDupleDocsListForSave.isNotEmpty){
+              for(var each in savedDocsList){
+                bool isDuple = false;
+                for(var eachDuple in addedDupleDocsListForSave){
+                  if(each["id"] == eachDuple["id"]){
+                    // car_no 중복 확인
+                    if(each["id"] == 16 || each["id"] == 17){
+                      if(each.containsKey("car_no") && eachDuple.containsKey("car_no")){
+                        if(each['car_no'] == eachDuple['car_no']){
+                          isDuple = true;
+                        }
+                      }
+                    }else{
+                      isDuple = true;
+                    }
+                  }
+                }
+                if(!isDuple){
+                  addedDocsListForSave.add(each);
+                }
+              }
+            }else{
+              addedDocsListForSave.addAll(savedDocsList);
+            }
+
+            for(var each in addedDocsListForSave){
+              Map<String, dynamic> resultMap = each["result"];
+              CommonUtils.log("", "docs cache save!!! ===============================>\n"
+                  "view_id:${each["view_id"]}\n"
+                  "id:${each["id"]}\n"
+                  "name:${each["name"]}\n"
+                  "is_confirmed:${each["is_confirmed"]}\n"
+                  "is_docs:${each["is_docs"]}\n"
+                  "docs_type:${each["docs_type"]}\n"
+                  "result:${resultMap.isEmpty? "" : each["result"]["resultValue"]}\n"
+              );
+            }
+
+            SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceApplyPrKey, jsonEncode(addedDocsListForSave));
+            setState(() {
+              currentViewId = _getViewIdFromListById(confirmedId);
+            });
+          }else{
+            CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
+          }
+        });
+      }
     }else{
       UiUtils.showLoadingPop(context);
       _uploadCertImageToAwsServer(pickedFilePath, (isSuccessToUpload){
@@ -3722,6 +3859,12 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               "documents": docResultList
             };
           }
+
+          CommonUtils.isLogValid = true;
+          for(var each in docResultList){
+            CommonUtils.log("w", "each id : ${each['pr_document_id']}");
+          }
+          CommonUtils.isLogValid = false;
 
           LogfinController.callLogfinApi(MyData.selectedPrInfoData!.uidType == "1" ? LogfinApis.applyProduct : LogfinApis.applyCarProduct, applyInputMap, (isSuccess, outputJson){
             if(isSuccess){

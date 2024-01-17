@@ -42,6 +42,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
   final _chatTextController = TextEditingController();
   static String currentRoomId = "";
   static String currentLoanUid = "";
+  String currentRoomType = "";
   String currentCompany = "";
   String currentCompanyLogo = "";
   String currentStatus = "";
@@ -62,6 +63,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
   CameraController? _cameraController;
   GlobalKey repaintKey = GlobalKey();
   bool _isCameraReady = false;
+  String statusString = "접수중";
 
   Map<String, bool> cachedImage = {};
 
@@ -82,6 +84,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
         currentCompany = each.companyName;
         currentCompanyLogo = each.companyLogo;
         currentStatus = each.statueId;
+        currentRoomType = each.uidType;
         if(LoanInfoData.getStatusName(currentStatus) == "접수"){
           GetController.to.updateChatStatusTick(1);
         }else if(LoanInfoData.getStatusName(currentStatus) == "심사"){
@@ -1412,6 +1415,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
         child: Column(children: [
           UiUtils.getMarginBox(0, 0.5.h),
           Stack(children: [
+            Container(height: 7.h,),
             Positioned(
               top: 1.h,
               left: 5.w,
@@ -1420,12 +1424,14 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
               }),
             ),
             Positioned(
+              left: 15.w,
               child: Align(
-                  alignment: Alignment.topCenter,
-                  child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    UiUtils.getMarginBox(0, 2.5.h),
-                    UiUtils.getTextWithFixedScale(currentCompany, 15.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.center, 1),
-                    //UiUtils.getMarginBox(0, 1.h),
+                  alignment: Alignment.topLeft,
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    UiUtils.getMarginBox(0, 1.8.h),
+                    UiUtils.getTextWithFixedScale2(currentCompany, 15.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.center, 1),
+                    UiUtils.getMarginBox(0, 0.3.h),
+                    UiUtils.getTextWithFixedScale2(currentRoomType == "1" ? "#개인회생" : "#오토론", 9.sp, FontWeight.w600, ColorStyles.upFinPrTitleColor, TextAlign.center, 1),
                   ])
               ),
             ),
@@ -1437,9 +1443,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                     UiUtils.getMarginBox(0, 1.7.h),
                     Row(mainAxisAlignment:MainAxisAlignment.end, children: [
                       Obx((){
-
-                        //String statusName = LoanInfoData.getDetailStatusName(GetController.to.chatStatusTick.value.toString());
-
+                        statusString = LoanInfoData.getDisplayStatusName(currentStatus);
                         return GestureDetector(
                             child: Container(
                               padding: EdgeInsets.only(top:1.4.w, bottom:1.2.w, right: 0.5.w, left:0.7.w),
@@ -1453,7 +1457,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                               ),
                               child: Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment:MainAxisAlignment.center, children: [
                                 UiUtils.getMarginBox(1.5.w, 0),
-                                UiUtils.getTextWithFixedScale("상태", 10.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null),
+                                UiUtils.getTextWithFixedScale(statusString, 10.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null),
                                 Icon(GetController.to.isShowStatus.value? Icons.arrow_drop_up_outlined : Icons.arrow_drop_down_outlined, color: ColorStyles.upFinBlack, size: 5.w)
                               ]),
                             ),

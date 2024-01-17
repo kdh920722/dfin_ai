@@ -503,10 +503,20 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
   /// finish confirm view
   Widget _getConfirmView(){
     _setSelectedInfo();
+    String birthMonth = MyData.birth.substring(4,6);
+    if(birthMonth.substring(0,1) == "0"){
+      birthMonth = birthMonth.substring(1);
+    }
+
+    String birthDay = MyData.birth.substring(6);
+    if(birthDay.substring(0,1) == "0"){
+      birthDay = birthDay.substring(1);
+    }
     List<String> confirmDataList = [];
-    confirmDataList.add("•  [차량번호] ${MyData.selectedCarInfoData!.carNum}");
-    confirmDataList.add("•  [소유주] ${MyData.selectedCarInfoData!.carOwnerName}");
-    confirmDataList.add("•  [차량 시세금액] ${CommonUtils.getPriceFormattedStringForFullPrice(double.parse(MyData.selectedCarInfoData!.carPrice))}");
+    confirmDataList.add("•  ${MyData.name}");
+    confirmDataList.add("•  ${MyData.birth.substring(0,4)}년 $birthMonth월 $birthDay일");
+    confirmDataList.add("•  차량번호 ${MyData.selectedCarInfoData!.carNum}");
+    confirmDataList.add("•  차량 시세금액 ${CommonUtils.getPriceFormattedStringForFullPrice(double.parse(MyData.selectedCarInfoData!.carPrice))}");
     confirmDataList.add("•  ${selectedJobInfo.split("@")[0]}");
     /*
     confirmDataList.add("•  기대출  ${selectedPreLoanCountInfo.split("@")[0]}");

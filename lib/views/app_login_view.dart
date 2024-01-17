@@ -169,21 +169,22 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
               }
             }
           }),
-          UiUtils.getMarginBox(0, 2.w),
-          UiUtils.getBorderButtonBoxWithZeroPadding(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
-              Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment:MainAxisAlignment.center, children: [
-                UiUtils.getBorderButtonBox(44.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
-                    UiUtils.getTextWithFixedScale("아이디 찾기", 12.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, null), () {
-                      AppFindPwViewState.viewId = 4;
-                      CommonUtils.moveTo(context, AppView.appFindPwView.value, null);
-                    }),
-                UiUtils.getMarginBox(2.w, 0),
-                UiUtils.getBorderButtonBox(44.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
-                    UiUtils.getTextWithFixedScale("비밀번호 찾기", 12.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, null), () {
-                      AppFindPwViewState.viewId = 1;
-                      CommonUtils.moveTo(context, AppView.appFindPwView.value, null);
-                    })
-              ]), () {})
+          UiUtils.getMarginBox(0, 1.w),
+          SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            UiUtils.getMarginBox(0, 3.w),
+            UiUtils.getRoundBoxButtonTextWithFixedScale5(
+                UiUtils.getTextWithFixedScale("아이디가 기억나질 않나요?", 12.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
+                ColorStyles.upFinWhite, (){
+              AppFindPwViewState.viewId = 4;
+              CommonUtils.moveTo(context, AppView.appFindPwView.value, null);
+            }),
+            UiUtils.getRoundBoxButtonTextWithFixedScale5(
+                UiUtils.getTextWithFixedScale("비밀번호를 잊으셨나요?", 12.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
+                ColorStyles.upFinWhite, (){
+              AppFindPwViewState.viewId = 1;
+              CommonUtils.moveTo(context, AppView.appFindPwView.value, null);
+            })
+          ]))
         ])
     )
     );
