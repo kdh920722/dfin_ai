@@ -277,32 +277,32 @@ class AppCarDetailViewState extends State<AppCarDetailView> with WidgetsBindingO
               ),
             ])
         ),
-        MediaQuery(
+        Expanded(child: Container(color: ColorStyles.upFinWhiteGray, child: MediaQuery(
             data : MediaQuery.of(context).copyWith(textScaleFactor : 1.1),
             child : SizedBox(width: 100.w, child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
               Container(color: ColorStyles.upFinWhite, width: 100.w,
-                child: Column(children: [
-                  UiUtils.getMarginBox(0, 2.h),
-                  SizedBox(width: 90.w, height: 5.h,
-                      child: TabBar(
-                        unselectedLabelStyle: TextStyles.upFinUnselectedTabTextInButtonStyle,
-                        unselectedLabelColor: ColorStyles.upFinRealGray,
-                        labelStyle: TextStyles.upFinSelectedTabTextInButtonStyle,
-                        labelColor: ColorStyles.upFinBlack,
-                        indicatorSize: TabBarIndicatorSize.tab,
-                        indicator: MyTabIndicator(),
-                        indicatorColor: ColorStyles.upFinButtonBlue,
-                        dividerColor: ColorStyles.upFinWhiteSky,
-                        controller: _tabController,
-                        tabs: const <Widget>[
-                          Tab(text: "차량정보"),
-                          Tab(text: "접수내역"),
-                        ],
-                      )
-                  )
-                ])
+                  child: Column(children: [
+                    UiUtils.getMarginBox(0, 2.h),
+                    SizedBox(width: 90.w, height: 5.h,
+                        child: TabBar(
+                          unselectedLabelStyle: TextStyles.upFinUnselectedTabTextInButtonStyle,
+                          unselectedLabelColor: ColorStyles.upFinRealGray,
+                          labelStyle: TextStyles.upFinSelectedTabTextInButtonStyle,
+                          labelColor: ColorStyles.upFinBlack,
+                          indicatorSize: TabBarIndicatorSize.tab,
+                          indicator: MyTabIndicator(),
+                          indicatorColor: ColorStyles.upFinButtonBlue,
+                          dividerColor: ColorStyles.upFinWhiteSky,
+                          controller: _tabController,
+                          tabs: const <Widget>[
+                            Tab(text: "차량정보"),
+                            Tab(text: "접수내역"),
+                          ],
+                        )
+                    )
+                  ])
               ),
-              Container(color: ColorStyles.upFinOrange, height: Config.isAndroid? 76.h : 71.h, width: 100.w, child: TabBarView(
+              Expanded(child: TabBarView(
                 controller: _tabController,
                 children: <Widget>[
                   Container(color: ColorStyles.upFinWhite, padding: EdgeInsets.zero,
@@ -320,7 +320,7 @@ class AppCarDetailViewState extends State<AppCarDetailView> with WidgetsBindingO
                   )
                 ],
               )),
-            ]))),
+            ]))))),
       ]),
     );
 

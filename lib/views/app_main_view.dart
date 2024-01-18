@@ -225,7 +225,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                   UiUtils.getTextWithFixedScale("관리자", 9.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null),
                   ColorStyles.upFinBlack, (){
                     // test
-
                 UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, null, Config.isPad()? 65.h : 45.h, 0.5, (context, setState){
                   return Obx(()=>Column(mainAxisAlignment: MainAxisAlignment.start, children:[
                     UiUtils.getMarginBox(0, 8.h),
@@ -289,13 +288,19 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                         ]), () {})),
             Obx((){
               List<Widget> myInfoWidgetList = _getMyInfoWidgetList();
+              /*
+              List<Widget> tempList = [];
+              tempList.add(myInfoWidgetList.first);
+              myInfoWidgetList = tempList;
+               */
+
               return Container(color: ColorStyles.upFinWhiteGray, width: 90.w,
                   height: myInfoWidgetList.isEmpty ? 18.h : myInfoWidgetList.length > 1 ? Config.isPad() ? 39.h : 29.h : Config.isPad() ? 36.h : 26.h,
                   child: myInfoWidgetList.isNotEmpty ? Column(
                     children: <Widget>[
                       // PageView
                       UiUtils.getMarginBox(0, 2.h),
-                      SizedBox(width: 90.w, height: Config.isPad() ? 32.h : 22.h,
+                      SizedBox(width: 90.w, height: Config.isPad() ? 31.1.h : 21.1.h,
                         child: PageView(
                           controller: _pageController,
                           children: myInfoWidgetList,
@@ -307,7 +312,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                         count: myInfoWidgetList.length, // 페이지 수
                         effect: WormEffect(dotWidth: 1.h, dotHeight: 1.h, dotColor: ColorStyles.upFinWhite, activeDotColor: ColorStyles.upFinButtonBlue), // 페이지 인디케이터 스타일
                       ):Container(),
-                      UiUtils.getMarginBox(0, 2.h),
+                      UiUtils.getMarginBox(0, 1.h),
                     ],
                   ) : GetController.to.chatLoanInfoDataList.isEmpty? Container(color: ColorStyles.upFinWhiteGray, padding: EdgeInsets.only(left: 5.w, right: 5.w, top:5.w, bottom: 5.w),
                       child: UiUtils.getBorderButtonBoxWithZeroPadding(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
@@ -434,7 +439,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
       myInfoWidgetList.add(
           UiUtils.getAccidentBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinGray,
               Column(children: [
-                UiUtils.getMarginBox(0, 1.h),
+                UiUtils.getMarginBox(0, 1.5.h),
                 Row(children: [
                   Expanded(flex: 15, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Row(children: [
@@ -462,7 +467,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                   ])),
                 ]),
 
-                UiUtils.getMarginBox(0, 0.8.h),
+                UiUtils.getMarginBox(0, 0.3.h),
                 UiUtils.getBorderButtonBoxForSearch(80.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
                     Row(mainAxisAlignment:MainAxisAlignment.center, children: [
                       UiUtils.getIcon(5.w, 5.w, Icons.search_rounded, 5.w, ColorStyles.upFinWhite),
@@ -538,7 +543,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
       myInfoWidgetList.add(
           UiUtils.getAccidentBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinGray,
               Column(children: [
-                UiUtils.getMarginBox(0, 1.h),
+                UiUtils.getMarginBox(0, 1.5.h),
                 Row(children: [
                   Expanded(flex: 15, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Row(children: [
@@ -562,7 +567,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                   ])),
                 ]),
 
-                UiUtils.getMarginBox(0, 0.8.h),
+                UiUtils.getMarginBox(0, 0.3.h),
                 UiUtils.getBorderButtonBoxForSearch(80.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
                     Row(mainAxisAlignment:MainAxisAlignment.center, children: [
                       UiUtils.getIcon(5.w, 5.w, Icons.search_rounded, 5.w, ColorStyles.upFinWhite),
@@ -793,32 +798,69 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   Widget _getSettingView(){
     return Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: EdgeInsets.only(top:3.w),
         child: Column(children: [
-          SizedBox(width: 95.w, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-            UiUtils.getCloseButton(ColorStyles.upFinDarkGray, () {
+        Stack(children: [
+          Container(height: 7.2.h,),
+          Positioned(
+            top: 1.h,
+            left: 5.w,
+            child: UiUtils.getBackButtonForMainView(() {
               _back();
-            })
-          ])),
-          UiUtils.getMarginBox(0, 3.w),
-          UiUtils.getBorderButtonBoxWithZeroPadding(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
-              Row(children: [UiUtils.getTextWithFixedScale("설정", 22.sp, FontWeight.w600, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)]), () {}),
+            }),
+          ),
+          Positioned(
+            child: Align(
+                alignment: Alignment.center,
+                child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                  UiUtils.getMarginBox(0, 1.8.h),
+                  UiUtils.getTextWithFixedScale2("설정", 22.sp, FontWeight.w600, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1),
+                ])
+            ),
+          )]),
           UiUtils.getMarginBox(0, 3.h),
-          UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
-              Row(children: [UiUtils.getTextWithFixedScale("계정", 15.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)]), () async {
+          UiUtils.getBorderButtonBox(95.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
+              Row(children: [
+                UiUtils.getTextWithFixedScale("계정", 15.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null),
+                const Spacer(flex: 2),
+                Icon(Icons.arrow_forward_ios_rounded, color: ColorStyles.upFinRealGray, size: 5.w)
+              ]), () async {
                 isViewHere = false;
                 await CommonUtils.moveToWithResult(context, AppView.appSignOutView.value, null);
                 isViewHere = true;
               }),
-          UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
+          UiUtils.getBorderButtonBox(95.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
+              Row(children: [
+                UiUtils.getTextWithFixedScale("로그아웃", 15.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null),
+                const Spacer(flex: 2),
+                Icon(Icons.arrow_forward_ios_rounded, color: ColorStyles.upFinRealGray, size: 5.w)
+              ]), () {
+                UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, 100.w, Config.isAndroid ? 27.h : 32.h, 0.5, (slideContext, setState){
+                  return Column(children: [
+                    UiUtils.getMarginBox(0, 2.h),
+                    Center(child: UiUtils.getTextWithFixedScale("로그아웃 하시길 원하시나요?", 16.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null)),
+                    UiUtils.getMarginBox(0, 2.h),
+                    UiUtils.getExpandedScrollView(Axis.vertical,
+                        SizedBox(width : 80.w, child: Column(children: [
+                          UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+                              UiUtils.getTextWithFixedScale("네", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), (){
+                                SharedPreferenceController.deleteValidAutoLoginData();
+                                CommonUtils.backToHome(context);
+                              }),
+                          UiUtils.getMarginBox(0, 1.h),
+                          UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
+                              UiUtils.getTextWithFixedScale("아니오", 12.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), (){
+                                Navigator.pop(slideContext);
+                              })
+                        ]))),
+                  ]);
+                });
+              }),
+          UiUtils.getBorderButtonBox(95.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
               Row(children: [
                 UiUtils.getTextWithFixedScale("버전", 15.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null),
                 const Spacer(flex: 2),
-                UiUtils.getTextWithFixedScale(MyData.isTestUser? "(${Config.appTestVersion.split("+").first})" : "(${Config.appVersion.split("+").first})", 14.sp, FontWeight.w300, ColorStyles.upFinDarkGray, TextAlign.start, null)
+                UiUtils.getTextWithFixedScale(MyData.isTestUser? Config.appTestVersion.split("+").first : Config.appVersion.split("+").first, 14.sp, FontWeight.w300, ColorStyles.upFinDarkGray, TextAlign.start, null)
               ]), () {}),
-          UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
-              Row(children: [UiUtils.getTextWithFixedScale("로그아웃", 15.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)]), () {
-                SharedPreferenceController.deleteValidAutoLoginData();
-                CommonUtils.backToHome(context);
-              })
+
         ])
     );
   }

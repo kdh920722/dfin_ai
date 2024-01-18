@@ -278,7 +278,7 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
               ),
             ])
         ),
-        MediaQuery(
+        Expanded(child: Container(color: ColorStyles.upFinWhiteGray,child: MediaQuery(
             data : MediaQuery.of(context).copyWith(textScaleFactor : 1.1),
             child : SizedBox(width: 100.w, child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
               Container(color: ColorStyles.upFinWhite, width: 100.w,
@@ -303,7 +303,7 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
                     )
                   ])
               ),
-              Container(color: ColorStyles.upFinOrange, height: Config.isAndroid? 76.h : 71.h, child: TabBarView(
+              Expanded(child: TabBarView(
                 controller: _tabController,
                 children: <Widget>[
                   Container(color: ColorStyles.upFinWhite, padding: EdgeInsets.zero,
@@ -320,8 +320,8 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
                       )
                   )
                 ],
-              ))
-            ]))),
+              )),
+            ])))))
       ]),
     );
 

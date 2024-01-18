@@ -1415,7 +1415,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
         child: Column(children: [
           UiUtils.getMarginBox(0, 0.5.h),
           Stack(children: [
-            Container(height: 7.h,),
+            Container(height: 7.2.h,),
             Positioned(
               top: 1.h,
               left: 5.w,

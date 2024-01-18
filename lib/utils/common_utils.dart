@@ -38,7 +38,7 @@ import '../views/app_main_view.dart';
 
 class CommonUtils {
 
-  static bool isLogValid = false;
+  static bool isLogValid = true;
   static const int logMaxSize = 600;
   static void log(String logType, String logMessage){
     if(FireBaseController.fcmToken != ""){

@@ -377,7 +377,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
               ))
             ])
           ),
-          Container(color: ColorStyles.upFinWhiteGray, width: 100.w,
+          Expanded(child: Container(color: ColorStyles.upFinWhiteGray, width: 100.w,
               child: Column(children: [
                 UiUtils.getMarginBox(0, 2.h),
                 SizedBox(width: 90.w, height: 6.h, child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
@@ -394,7 +394,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                         _reOrderList(true);
                       })
                 ])),
-                SizedBox(width: 90.w, height: Config.isAndroid? 65.h : 60.h, child: TabBarView(
+                Expanded(child: SizedBox(width:90.w, child: TabBarView(
                   controller: _tabController,
                   children: <Widget>[
                     possiblePrCnt>0 ? Column(children: [
@@ -406,9 +406,9 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                       _getPrListView(false)
                     ]) : Center(child: UiUtils.getTextWithFixedScale("접수 불가능한 상품이 없습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null))
                   ],
-                ))
+                )))
               ])
-          )
+          ))
         ])
     )
     );

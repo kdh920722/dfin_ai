@@ -531,7 +531,9 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
       CommonUtils.hideKeyBoard();
       if(viewId == 1){
         _setEmpty();
-        Navigator.pop(context);
+        Future.delayed(const Duration(milliseconds: 200), () async {
+          Navigator.pop(context);
+        });
       }else{
         viewId--;
         setState(() {});

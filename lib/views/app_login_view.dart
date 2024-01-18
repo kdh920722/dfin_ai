@@ -99,7 +99,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
           SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             UiUtils.getMarginBox(0, 3.w),
             UiUtils.getTextWithFixedScale("로그인", 26.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
-            UiUtils.getMarginBox(0, 3.h)
+            UiUtils.getMarginBox(0, 2.h)
           ])),
           UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _emailTextFocus, _emailTextController, TextInputType.emailAddress, false,
               UiUtils.getInputDecoration("이메일", 12.sp, "", 0.sp), (text) { }, (value){
@@ -109,7 +109,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
                   return null;
                 }
               }),
-          UiUtils.getMarginBox(0, 2.h),
+          UiUtils.getMarginBox(0, 1.5.h),
           UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _pwdTextFocus, _pwdTextController, TextInputType.visiblePassword, true,
               UiUtils.getInputDecoration("비밀번호", 12.sp, "", 0.sp), (text) { }, (value){
                 if(value != null && value.trim().isEmpty){
@@ -169,9 +169,8 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
               }
             }
           }),
-          UiUtils.getMarginBox(0, 1.w),
           SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            UiUtils.getMarginBox(0, 3.w),
+            UiUtils.getMarginBox(0, 1.w),
             UiUtils.getRoundBoxButtonTextWithFixedScale5(
                 UiUtils.getTextWithFixedScale("아이디가 기억나질 않나요?", 12.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
                 ColorStyles.upFinWhite, (){
