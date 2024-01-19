@@ -88,6 +88,7 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
 
   List<Widget> _getLoanWidgetList(){
     List<Widget> loanWidgetList = [];
+    loanWidgetList.add(UiUtils.getMarginBox(0, 3.h));
     int count = 0;
     for(var each in MyData.getLoanInfoList()){
       String eachAccidentNum = "";
@@ -98,11 +99,11 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
 
       if(eachAccidentNum == selectedAccidentNum){
         loanWidgetList.add(
-            UiUtils.getLoanListBorderButtonBox(100.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
+            UiUtils.getLoanListBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinGray,
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Container(padding: EdgeInsets.only(left: 8.w, right: 8.w),
+                  Container(padding: EdgeInsets.only(left: 6.w, right: 6.w),
                       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        UiUtils.getMarginBox(0, 1.h),
+                        UiUtils.getMarginBox(0, 1.5.h),
                         SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScaleAndOverFlow(each.companyName, 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1)),
                         UiUtils.getMarginBox(0, 2.5.h),
                         SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("접수일", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
@@ -130,18 +131,17 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
                         ),child: Padding(padding: EdgeInsets.only(left: 2.5.w, right: 2.5.w, bottom: 3.w, top: 3.w),
                             child: UiUtils.getTextWithFixedScale(LoanInfoData.getDetailStatusName(each.statueId), 12.sp, FontWeight.w600,
                                 each.statueId == "6" || each.statueId == "7"? ColorStyles.upFinRed : ColorStyles.upFinButtonBlue, TextAlign.center, 1))),
-                        UiUtils.getMarginBox(0, 3.h),
+                        UiUtils.getMarginBox(0, 2.h),
                       ])
                   ),
-                  _getLoanCnt() == 1 || (_getLoanCnt() != 1 && count == _getLoanCnt()) ?
-                  Container() : UiUtils.getMarginColoredBox(100.w, 3.h, ColorStyles.upFinWhiteGray)
                 ]), () {})
         );
+
+        loanWidgetList.add(UiUtils.getMarginBox(0, 3.h));
       }
       count++;
     }
 
-    loanWidgetList.add(UiUtils.getMarginBox(0, 3.h));
     return loanWidgetList;
   }
 
@@ -179,7 +179,7 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
                   14.sp, FontWeight.w500, isNotNeedToUpdateAccount? ColorStyles.upFinBlack : ColorStyles.upFinRed, TextAlign.start, null)),
             ]),
             const Spacer(flex: 2),
-            UiUtils.getBorderButtonBox(16.w, isNotNeedToUpdateAccount? ColorStyles.upFinButtonBlue: ColorStyles.upFinWhiteRed, isNotNeedToUpdateAccount? ColorStyles.upFinButtonBlue: ColorStyles.upFinWhiteRed,
+            UiUtils.getBorderButtonBox5(16.w, isNotNeedToUpdateAccount? ColorStyles.upFinButtonBlue: ColorStyles.upFinWhiteRed, isNotNeedToUpdateAccount? ColorStyles.upFinButtonBlue: ColorStyles.upFinWhiteRed,
                 UiUtils.getTextWithFixedScale("변경", 10.sp, FontWeight.w600, isNotNeedToUpdateAccount? ColorStyles.upFinWhite : ColorStyles.upFinRed, TextAlign.start, null), () async {
                   AppUpdateAccidentViewState.isAccountEditMode = true;
                   AppUpdateAccidentViewState.startViewId = AppUpdateAccidentViewState.bankCodeViewId;
@@ -289,7 +289,7 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
                           unselectedLabelStyle: TextStyles.upFinUnselectedTabTextInButtonStyle,
                           unselectedLabelColor: ColorStyles.upFinRealGray,
                           labelStyle: TextStyles.upFinSelectedTabTextInButtonStyle,
-                          labelColor: ColorStyles.upFinBlack,
+                          labelColor: ColorStyles.upFinButtonBlue,
                           indicatorSize: TabBarIndicatorSize.tab,
                           indicator: MyTabIndicator(),
                           indicatorColor: ColorStyles.upFinButtonBlue,
@@ -311,7 +311,6 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
                   ),
                   _getLoanCnt() != 0 ? Container(color: ColorStyles.upFinWhiteGray, padding: EdgeInsets.zero,
                       child: Column(children: [
-                        UiUtils.getMarginBox(100.w, 3.h),
                         UiUtils.getExpandedScrollView(Axis.vertical, Column(children: _getLoanWidgetList()))
                       ])
                   ) :Container(color: ColorStyles.upFinWhiteGray,

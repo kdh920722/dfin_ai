@@ -90,6 +90,7 @@ class AppCarDetailViewState extends State<AppCarDetailView> with WidgetsBindingO
   List<Widget> _getLoanWidgetList(){
     List<Widget> loanWidgetList = [];
     int count = 0;
+    loanWidgetList.add(UiUtils.getMarginBox(0, 3.h));
     for(var each in MyData.getLoanInfoList()){
       String eachCarNum = "";
       for(var eachCar in MyData.getCarInfoList()){
@@ -99,11 +100,11 @@ class AppCarDetailViewState extends State<AppCarDetailView> with WidgetsBindingO
 
       if(eachCarNum == selectedCarNum){
         loanWidgetList.add(
-            UiUtils.getLoanListBorderButtonBox(100.w, ColorStyles.upFinWhite , ColorStyles.upFinWhite,
+            UiUtils.getLoanListBorderButtonBox(90.w, ColorStyles.upFinWhite , ColorStyles.upFinGray,
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Container(padding: EdgeInsets.only(left: 8.w, right: 8.w),
+                  Container(padding: EdgeInsets.only(left: 6.w, right: 6.w),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      UiUtils.getMarginBox(0, 1.h),
+                      UiUtils.getMarginBox(0, 1.5.h),
                       SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScaleAndOverFlow(each.companyName, 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1)),
                       UiUtils.getMarginBox(0, 2.5.h),
                       SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("접수일", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
@@ -131,18 +132,17 @@ class AppCarDetailViewState extends State<AppCarDetailView> with WidgetsBindingO
                       ),child: Padding(padding: EdgeInsets.only(left: 2.5.w, right: 2.5.w, bottom: 3.w, top: 3.w),
                           child: UiUtils.getTextWithFixedScale(LoanInfoData.getDetailStatusName(each.statueId), 12.sp, FontWeight.w600,
                               each.statueId == "6" || each.statueId == "7"? ColorStyles.upFinRed : ColorStyles.upFinButtonBlue, TextAlign.center, 1))),
-                      UiUtils.getMarginBox(0, 3.h),
+                      UiUtils.getMarginBox(0, 2.h),
                     ])
                   ),
-                  _getLoanCnt() == 1 || (_getLoanCnt() != 1 && count == _getLoanCnt()) ?
-                  Container() : UiUtils.getMarginColoredBox(100.w, 3.h, ColorStyles.upFinWhiteGray)
                 ]), () {})
         );
+
+        loanWidgetList.add(UiUtils.getMarginBox(0, 3.h));
       }
       count++;
     }
 
-    loanWidgetList.add(UiUtils.getMarginBox(0, 3.h));
     return loanWidgetList;
   }
 
@@ -150,9 +150,9 @@ class AppCarDetailViewState extends State<AppCarDetailView> with WidgetsBindingO
     return Padding(padding: EdgeInsets.only(left: 8.w, right: 8.w),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           UiUtils.getMarginBox(0, 5.h),
-          SizedBox(width: 90.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment:CrossAxisAlignment.center, children: [
+          SizedBox(width: 90.w, height: 18.h, child: Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment:CrossAxisAlignment.center, children: [
             Container(
-                width: 55.w,
+                width: 65.w,
                 color:ColorStyles.upFinWhite,
                 alignment: Alignment.center,
                 child: ExtendedImage.network(
@@ -202,16 +202,20 @@ class AppCarDetailViewState extends State<AppCarDetailView> with WidgetsBindingO
           ])),
           UiUtils.getMarginBox(0, 2.h),
           SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(MyData.selectedCarInfoData!.carModel, 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
-          UiUtils.getMarginBox(0, 1.h),
+          UiUtils.getMarginBox(0, 2.h),
           SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(CommonUtils.getPriceFormattedStringForFullPrice(double.parse(MyData.selectedCarInfoData!.carPrice)), 16.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null)),
           UiUtils.getMarginBox(0, 4.h),
-          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("상세 모델명", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
+          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("소유주", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha , TextAlign.start, null)),
           UiUtils.getMarginBox(0, 2.h),
-          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(MyData.selectedCarInfoData!.carModelDetail, 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)),
+          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(MyData.selectedCarInfoData!.carOwnerName, 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)),
           UiUtils.getMarginBox(0, 4.h),
           SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("차량번호", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha , TextAlign.start, null)),
           UiUtils.getMarginBox(0, 2.h),
           SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(MyData.selectedCarInfoData!.carNum, 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)),
+          UiUtils.getMarginBox(0, 4.h),
+          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("상세 모델명", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
+          UiUtils.getMarginBox(0, 2.h),
+          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(MyData.selectedCarInfoData!.carModelDetail, 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)),
           UiUtils.getMarginBox(0, 4.h),
 
         ])
@@ -288,7 +292,7 @@ class AppCarDetailViewState extends State<AppCarDetailView> with WidgetsBindingO
                           unselectedLabelStyle: TextStyles.upFinUnselectedTabTextInButtonStyle,
                           unselectedLabelColor: ColorStyles.upFinRealGray,
                           labelStyle: TextStyles.upFinSelectedTabTextInButtonStyle,
-                          labelColor: ColorStyles.upFinBlack,
+                          labelColor: ColorStyles.upFinButtonBlue,
                           indicatorSize: TabBarIndicatorSize.tab,
                           indicator: MyTabIndicator(),
                           indicatorColor: ColorStyles.upFinButtonBlue,
@@ -310,7 +314,6 @@ class AppCarDetailViewState extends State<AppCarDetailView> with WidgetsBindingO
                   ),
                   _getLoanCnt() != 0 ? Container(color: ColorStyles.upFinWhiteGray, padding: EdgeInsets.zero,
                       child: Column(mainAxisSize: MainAxisSize.min, children: [
-                        UiUtils.getMarginBox(100.w, 3.h),
                         UiUtils.getExpandedScrollView(Axis.vertical, Column(mainAxisSize: MainAxisSize.min, children: _getLoanWidgetList()))
                       ])
                   ) : Container(color: ColorStyles.upFinWhiteGray,

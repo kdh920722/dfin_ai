@@ -179,12 +179,14 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                 Row(mainAxisSize: MainAxisSize.max, children: [
                   Expanded(flex: 15, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
                     SizedBox(width: 90.w, child: Row(children: [
-                      UiUtils.getImage(6.w, 6.w, Image.asset(each.productCompanyLogo)),
+                      UiUtils.getImage(10.w, 10.w, Image.asset(each.productCompanyLogo)),
                       UiUtils.getMarginBox(1.5.w, 0),
-                      UiUtils.getTextWithFixedScale(each.productCompanyName, 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null),
+                      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        UiUtils.getTextWithFixedScale(each.productCompanyName, 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null),
+                        UiUtils.getMarginBox(0, 0.5.h),
+                        UiUtils.getTextWithFixedScaleAndOverFlow(each.productName, 10.sp, FontWeight.w300, ColorStyles.upFinBlack, TextAlign.start, null),
+                      ])
                     ])),
-                    UiUtils.getMarginBox(0, 1.h),
-                    UiUtils.getTextWithFixedScaleAndOverFlow(each.productName, 10.sp, FontWeight.w300, ColorStyles.upFinBlack, TextAlign.start, null),
                     UiUtils.getMarginBox(0, 2.h),
                     SizedBox(width: 80.w, child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       SizedBox(width: 20.w,height: 2.5.h , child: UiUtils.getTextWithFixedScale("금리", 10.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, 1)),
@@ -364,7 +366,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                 unselectedLabelStyle: TextStyles.upFinUnselectedTabTextInButtonStyle,
                 unselectedLabelColor: ColorStyles.upFinRealGray,
                 labelStyle: TextStyles.upFinSelectedTabTextInButtonStyle,
-                labelColor: ColorStyles.upFinBlack,
+                labelColor: ColorStyles.upFinButtonBlue,
                 indicatorSize: TabBarIndicatorSize.tab,
                 indicator: MyPrTabIndicator(),
                 indicatorColor: ColorStyles.upFinButtonBlue,

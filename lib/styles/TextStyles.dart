@@ -5,6 +5,8 @@ import 'ColorStyles.dart';
 class TextStyles {
   static TextStyle upFinTitleTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 22.sp, color: ColorStyles.upFinTextAndBorderBlue, fontWeight: FontWeight.bold, decoration: TextDecoration.none, decorationThickness: 0.0, height: 1);
   static TextStyle upFinBasicTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 14.sp, color: ColorStyles.upFinBlack, fontWeight: FontWeight.w500, decoration: TextDecoration.none, decorationThickness: 0.0, height: 1);
+  static TextStyle upFinBasicTextStyle2 = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 12.sp, color: ColorStyles.upFinBlack, fontWeight: FontWeight.w500, decoration: TextDecoration.none, decorationThickness: 0.0, height: 1);
+
   static TextStyle upFinSkyTextInButtonStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 15.sp, color: ColorStyles.upFinTextAndBorderBlue, fontWeight: FontWeight.w500, decoration: TextDecoration.none, decorationThickness: 0.0, height: 1);
   static TextStyle upFinBasicButtonTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 15.sp, color: ColorStyles.upFinWhite, fontWeight: FontWeight.w500, decoration: TextDecoration.none, decorationThickness: 0.0, height: 1);
   static TextStyle upFinSmallButtonTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 12.sp, color: ColorStyles.upFinWhite, fontWeight: FontWeight.w500, decoration: TextDecoration.none, decorationThickness: 0.0, height: 1);

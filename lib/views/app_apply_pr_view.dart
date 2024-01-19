@@ -2714,22 +2714,14 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
                   return Column(mainAxisAlignment: MainAxisAlignment.start, children:
                   [
-                    Row(children: [
-                      const Spacer(flex: 2),
-                      UiUtils.getIconButton(Icons.close, 7.w, ColorStyles.upFinRealGray, () {
-                        certType = 0;
-                        isCertTypeSelected = false;
-                        Navigator.pop(slideContext);
-                      }),
-                    ]),
+                    UiUtils.getMarginBox(0, 2.h),
+                    SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale(isCertCmpWidgetEmpty? "지금은 인증할 수 없어요" : "간편 인증서 선택", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
                     UiUtils.getMarginBox(0, 1.5.h),
-                    SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale(isCertCmpWidgetEmpty? "지금은 인증할 수 없어요" : "민간 인증서를 선택하세요", 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
-                    UiUtils.getMarginBox(0, 3.h),
                     SizedBox(width: 85.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: certCmpWidgetList)),
                     UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
-                    isCertCmpWidgetEmpty? Container() : UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinTextAndBorderBlue,
-                        UiUtils.getTextWithFixedScale(_isDocsAllConfirmed(docsType) ? "인증완료" : !isErrorResult? "간편인증 진행하기" : "서류 다시 가져오기",
-                            14.sp, FontWeight.w500, !isErrorResult? ColorStyles.upFinTextAndBorderBlue : ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null), (){
+                    isCertCmpWidgetEmpty? Container() : UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+                        UiUtils.getTextWithFixedScale(_isDocsAllConfirmed(docsType) ? "인증완료" : !isErrorResult? "간편인증 진행" : "서류 다시 가져오기",
+                            14.sp, FontWeight.w500, !isErrorResult? ColorStyles.upFinWhite : ColorStyles.upFinWhite, TextAlign.start, null), (){
                           if(certType != 0){
                             GetController.to.updateWait(false);
                             CodeFController.isTimeOutException = false;
@@ -2738,6 +2730,14 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                           }else{
                             CommonUtils.flutterToast("인증서를 선택해주세요");
                           }
+                        }),
+                    UiUtils.getMarginBox(0, 1.h),
+                    UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
+                        UiUtils.getTextWithFixedScale("취소",
+                            14.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null), (){
+                          certType = 0;
+                          isCertTypeSelected = false;
+                          Navigator.pop(slideContext);
                         }),
                     Config.isAndroid? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 3.h)
                   ]);
@@ -3567,12 +3567,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               "documents": docResultList
             };
 
-            CommonUtils.isLogValid = true;
-            for(var each in docResultList){
-              CommonUtils.log("w", "each id : ${each['pr_document_id']}");
-            }
-            CommonUtils.isLogValid = false;
-
             LogfinController.callLogfinApi(LogfinApis.retryDocs, applyInputMap, (isSuccess, outputJson){
               UiUtils.closeLoadingPop(context);
               if(isSuccess){
@@ -3697,12 +3691,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           "loan_uid": AppChatViewState.currentLoanUid,
           "documents": docResultList
         };
-
-        CommonUtils.isLogValid = true;
-        for(var each in docResultList){
-          CommonUtils.log("w", "each id : ${each['pr_document_id']}");
-        }
-        CommonUtils.isLogValid = false;
 
         LogfinController.callLogfinApi(LogfinApis.retryDocs, applyInputMap, (isSuccess, outputJson){
           UiUtils.closeLoadingPop(context);
@@ -3859,12 +3847,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               "documents": docResultList
             };
           }
-
-          CommonUtils.isLogValid = true;
-          for(var each in docResultList){
-            CommonUtils.log("w", "each id : ${each['pr_document_id']}");
-          }
-          CommonUtils.isLogValid = false;
 
           LogfinController.callLogfinApi(MyData.selectedPrInfoData!.uidType == "1" ? LogfinApis.applyProduct : LogfinApis.applyCarProduct, applyInputMap, (isSuccess, outputJson){
             if(isSuccess){

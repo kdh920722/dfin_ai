@@ -45,6 +45,7 @@ class Config{
   static String privacyText = "";
   static String appMainIntroText1 = "";
   static String appMainIntroText2 = "";
+  static String appCallInfo = "";
   static BuildContext? contextForEmergencyBack;
   static bool isEmergencyRoot = false;
   static bool isTablet = false;
@@ -107,6 +108,7 @@ class Config{
             case "app_main_intro_text1" : appMainIntroText1 = each.value.toString();
             case "app_main_intro_text2" : appMainIntroText2 = each.value.toString();
             case "cert_cmp_info" : certCmpInfoMap = jsonDecode(jsonEncode(each.value));
+            case "app_call_info" : appCallInfo = each.value.toString();
           }
         }
       }else{

@@ -679,25 +679,25 @@ class CodeFController{
       }
     });
 
-    UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, Config.isPad()? 65.h : 45.h, 0.0, (context, setState){
+    UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, null, Config.isPad()? 60.h : 40.h, 0.0, (context, setState){
       return Obx(()=>Column(mainAxisAlignment: MainAxisAlignment.start, children:[
-        GetController.to.isWait.value? UiUtils.getMarginBox(0, 8.h) : UiUtils.getMarginBox(0, 3.h),
+        GetController.to.isWait.value? UiUtils.getMarginBox(0, 5.h) : UiUtils.getMarginBox(0, 3.h),
         GetController.to.isWait.value? UiUtils.getImage(30.w, 30.w, Image.asset(fit: BoxFit.fill,'assets/images/doc_move2.gif'))
             : Column(children: [
           UiUtils.getImage(100.w, 30.w,  Image.asset(fit: BoxFit.fitWidth,'assets/images/cert_called.png')),
-          UiUtils.getMarginBox(0, 4.h),
-          UiUtils.getStyledTextWithFixedScale(certName, TextStyles.upFinBasicTextStyle, TextAlign.center, null)]),
+          UiUtils.getMarginBox(0, 2.h),
+          UiUtils.getStyledTextWithFixedScale(certName, TextStyles.upFinBasicTextStyle2, TextAlign.center, null)]),
         GetController.to.isWait.value? UiUtils.getMarginBox(0, 2.h) : UiUtils.getMarginBox(0, 0.5.h),
         GetController.to.isWait.value? Column(children: [
-          UiUtils.getStyledTextWithFixedScale("서류를 가지고 오는중입니다.", TextStyles.upFinBasicTextStyle, TextAlign.center, null),
-          UiUtils.getMarginBox(0, 1.h),
+          UiUtils.getStyledTextWithFixedScale("서류를 가지고 오는중입니다.", TextStyles.upFinBasicTextStyle2, TextAlign.center, null),
+          UiUtils.getMarginBox(0, 2.h),
           LinearPercentIndicator(
             animateFromLastPercent: true,
             alignment: MainAxisAlignment.center,
             barRadius: const Radius.circular(10),
             animation: true,
             center: Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.end, children: [
-              UiUtils.getTextWithFixedScale("${GetController.to.loadingPercent.value}", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
+              UiUtils.getTextWithFixedScale("${GetController.to.loadingPercent.value}", 16.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
               UiUtils.getMarginBox(0.5.w, 0),
               UiUtils.getTextWithFixedScale("%", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
             ]),

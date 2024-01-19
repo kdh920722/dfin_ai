@@ -504,7 +504,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
               if(isFileType){
 
               }else{
-                CommonUtils.log("", "furl : $url");
+                CommonUtils.log("w", "furl : $url");
                 if(url.toLowerCase() == "doc"){
                   Map<String, dynamic> inputMap = {
                     "loan_uid": currentLoanUid
@@ -537,6 +537,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                     }
                   });
                 }else{
+                  //tel:18009221
                   if(await canLaunchUrl(Uri.parse(url))){
                     await launchUrl(Uri.parse(url));
                   }else{
@@ -1429,7 +1430,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                   alignment: Alignment.topLeft,
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     UiUtils.getMarginBox(0, 1.8.h),
-                    UiUtils.getTextWithFixedScale2(currentCompany, 15.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.center, 1),
+                    UiUtils.getTextWithFixedScale2(currentCompany, 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, 1),
                     UiUtils.getMarginBox(0, 0.3.h),
                     UiUtils.getTextWithFixedScale2(currentRoomType == "1" ? "#개인회생" : "#오토론", 9.sp, FontWeight.w600, ColorStyles.upFinPrTitleColor, TextAlign.center, 1),
                   ])
@@ -1457,7 +1458,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                               ),
                               child: Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment:MainAxisAlignment.center, children: [
                                 UiUtils.getMarginBox(1.5.w, 0),
-                                UiUtils.getTextWithFixedScale(statusString, 10.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null),
+                                UiUtils.getTextWithFixedScale(statusString, 10.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null),
                                 Icon(GetController.to.isShowStatus.value? Icons.arrow_drop_up_outlined : Icons.arrow_drop_down_outlined, color: ColorStyles.upFinBlack, size: 5.w)
                               ]),
                             ),

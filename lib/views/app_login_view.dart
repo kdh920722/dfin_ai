@@ -170,7 +170,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
             }
           }),
           SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            UiUtils.getMarginBox(0, 1.w),
+            UiUtils.getMarginBox(0, 1.5.w),
             UiUtils.getRoundBoxButtonTextWithFixedScale5(
                 UiUtils.getTextWithFixedScale("아이디가 기억나질 않나요?", 12.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
                 ColorStyles.upFinWhite, (){

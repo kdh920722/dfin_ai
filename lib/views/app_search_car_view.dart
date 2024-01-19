@@ -42,17 +42,17 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
     }
   }
 
-  final int preLoanCountViewId = 999;
+  final int preLoanCountViewId = 2;
   Key? selectedPreLoanCountKey;
   String selectedPreLoanCountInfo = "";
 
-  final int preLoanPriceViewId = 999;
+  final int preLoanPriceViewId = 3;
   String selectedPreLoanPriceInfo = "";
   final _preLoanPriceFocus = FocusNode();
   final _preLoanPriceTextController = TextEditingController();
   void _preLoanPriceInfoTextControllerListener() {
-    if(_preLoanPriceTextController.text.trim().length > 10){
-      _preLoanPriceTextController.text = _preLoanPriceTextController.text.trim().substring(0, 10);
+    if(_preLoanPriceTextController.text.trim().length > 8){
+      _preLoanPriceTextController.text = _preLoanPriceTextController.text.trim().substring(0, 8);
     }else{
       final text = _preLoanPriceTextController.text.trim();
       final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
@@ -70,8 +70,8 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
   final _wantLoanPriceFocus = FocusNode();
   final _wantLoanPriceTextController = TextEditingController();
   void _wantLoanPriceInfoTextControllerListener() {
-    if(_wantLoanPriceTextController.text.trim().length > 10){
-      _wantLoanPriceTextController.text = _wantLoanPriceTextController.text.trim().substring(0, 10);
+    if(_wantLoanPriceTextController.text.trim().length > 8){
+      _wantLoanPriceTextController.text = _wantLoanPriceTextController.text.trim().substring(0, 8);
     }else{
       final text = _wantLoanPriceTextController.text.trim();
       final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
@@ -84,11 +84,11 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
     }
   }
 
-  final int jobViewId = 2;
+  final int jobViewId = 4;
   Key? selectedJobKey;
   String selectedJobInfo = "";
 
-  final int finishedViewId = 3;
+  final int finishedViewId = 5;
   bool finishedConfirmed = false;
 
   void _unFocusAllNodes(){
@@ -227,8 +227,8 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
 
       UiUtils.getExpandedScrollView(Axis.vertical,
           SizedBox(width: 85.w, child: Row(children: [
-            UiUtils.getTextField(context, 35.w, TextStyles.upFinTextFormFieldTextStyle, _carInfoFocus1, _carInfoTextController1, TextInputType.text,
-                UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
+            UiUtils.getTextField(context, 85.w, TextStyles.upFinTextFormFieldTextStyle, _carInfoFocus1, _carInfoTextController1, TextInputType.text,
+                UiUtils.getInputDecoration("번호", 10.sp, "", 0.sp), (value) { }),
           ]))
       ),
 
@@ -522,7 +522,12 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
     return UiUtils.getRowColumnWithAlignCenter([
       SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         UiUtils.getBackButton(() async {
-          backInputView();
+          if(selectedPreLoanCountInfo.split("@")[1] == "0"){
+            currentViewId--;
+            backInputView();
+          }else{
+            backInputView();
+          }
         }),
       ])),
       UiUtils.getMarginBox(0, 3.h),
@@ -602,13 +607,14 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
               Map<String, dynamic> inputJson = {
                 "car_no": selectedCarNum.replaceAll(" ", "").trim(),
                 "owner_name": MyData.isTestUser? selectedCarOwner : MyData.name,
-                /*
-                "birthday": MyData.birth,
                 "job": selectedJobInfo.split("@")[1],
                 "lend_count": selectedPreLoanCountInfo.split("@")[1],
                 "lend_amount": selectedPreLoanPriceInfo,
+                /*
+                "birthday": MyData.birth,
                 "wish_amount": selectedWantLoanPriceInfo,
                  */
+
               };
               CommonUtils.log("i", "car pr search info:\n$inputJson");
 
@@ -626,7 +632,7 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
                           }
                         }
 
-                        LogfinController.getCarPrList(MyData.selectedCarInfoData!.carNum, selectedJobInfo.split("@")[1], (isSuccessToGetOffers, _){
+                        LogfinController.getCarPrList(MyData.selectedCarInfoData!.carNum, selectedJobInfo.split("@")[1], selectedPreLoanCountInfo.split("@")[1], selectedPreLoanPriceInfo, (isSuccessToGetOffers, _){
                           if(isSuccessToGetOffers){
                             LogfinController.getUserInfo((isSuccessToGetUserInfo){
                               UiUtils.closeLoadingPop(context);
@@ -671,11 +677,11 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
               Map<String, dynamic> inputJson = {
                 "car_no": selectedCarNum.replaceAll(" ", "").trim(),
                 "owner_name": MyData.isTestUser? selectedCarOwner : MyData.name,
-                /*
-                "birthday": MyData.birth,
                 "job": selectedJobInfo.split("@")[1],
                 "lend_count": selectedPreLoanCountInfo.split("@")[1],
                 "lend_amount": selectedPreLoanPriceInfo,
+                /*
+                "birthday": MyData.birth,
                 "wish_amount": selectedWantLoanPriceInfo,
                  */
 
@@ -689,7 +695,7 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
                   LogfinController.getCarInfo((isSuccessToGetCarInfo, isNotEmpty) async {
                     if(isSuccessToGetCarInfo){
                       if(isNotEmpty){
-                        LogfinController.getCarPrList(MyData.selectedCarInfoData!.carNum, selectedJobInfo.split("@")[1], (isSuccessToGetOffers, _) async {
+                        LogfinController.getCarPrList(MyData.selectedCarInfoData!.carNum, selectedJobInfo.split("@")[1], selectedPreLoanCountInfo.split("@")[1], selectedPreLoanPriceInfo, (isSuccessToGetOffers, _) async {
                           if(isSuccessToGetOffers){
                             LogfinController.getUserInfo((isSuccessToGetUserInfo) async {
                               UiUtils.closeLoadingPop(context);

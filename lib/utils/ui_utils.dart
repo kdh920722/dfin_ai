@@ -1,6 +1,5 @@
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:expansion_tile_group/expansion_tile_group.dart';
-import 'package:flutter_shake_animated/flutter_shake_animated.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
@@ -140,7 +139,7 @@ class UiUtils {
   }
 
   static Text getTextWithFixedScale2(String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign? textAlign, int? textMaxLine){
-    return Text(text, style: TextStyle(decoration: TextDecoration.none, height: 1.3, fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor), textScaleFactor: 1.0, textAlign: textAlign, maxLines: textMaxLine);
+    return Text(text, style: TextStyle(decoration: TextDecoration.none, height: 1.4, fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor), textScaleFactor: 1.0, textAlign: textAlign, maxLines: textMaxLine);
   }
 
   static Text getTextWithFixedScaleForAgreeSubTitle(String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign? textAlign, int? textMaxLine){
@@ -224,7 +223,7 @@ class UiUtils {
           color: boxColor, // 배경색 설정
           borderRadius: BorderRadius.circular(1), // 모서리를 둥글게 하는 부분
         ),child: FittedBox(fit: BoxFit.contain, alignment: Alignment.center,
-        child: Padding(padding: EdgeInsets.only(left: 2.5.w, right: 2.5.w, bottom: 2.w, top: 2.w), child: child))));
+        child: Padding(padding: EdgeInsets.only(left: 0, right: 2.5.w, bottom: 2.w, top: 2.w), child: child))));
   }
 
   static Widget getRoundBoxButtonTextWithFixedScale6(Widget child, Color boxColor, Function() tabCallBack){
@@ -447,6 +446,24 @@ class UiUtils {
             ),
             onPressed: onPressedCallback,
             child: childWidget,
+        )
+    );
+  }
+
+  static SizedBox getBorderButtonBox5(double buttonWidth, Color buttonColor, Color borderColor, Widget childWidget, VoidCallback onPressedCallback){
+    return SizedBox(
+        width: buttonWidth,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.only(left: 4.w, right: 4.w, top: 2.w, bottom: 2.w),
+            backgroundColor: buttonColor,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+            side: BorderSide(width: 1, color: borderColor),
+            elevation: 0.0,
+            shadowColor: ColorStyles.upFinGray,
+          ),
+          onPressed: onPressedCallback,
+          child: childWidget,
         )
     );
   }
@@ -850,6 +867,30 @@ class UiUtils {
                       child: SpinKitWave(color: ColorStyles.upFinTextAndBorderBlue, size: 15.w)
                   );
                 })
+          );
+        },
+      );
+    }
+  }
+
+  static void showLoadingPop2(BuildContext targetContext){
+    if(!isLoadingPopOn){
+      isLoadingPopOn = true;
+      showGeneralDialog(
+        barrierDismissible: false,
+        context: targetContext,
+        pageBuilder: (context, animation, secondaryAnimation) {
+          return WillPopScope(
+              onWillPop: () async => false,
+              child: StatefulBuilder(// You need this, notice the parameters below:
+                  builder: (_, StateSetter setState) {
+                    return Container(
+                        width: 100.w,
+                        height: 100.h,
+                        color: Colors.black54,
+                        child: Center(child: getTextWithFixedScale("최신정보로 업데이트 중입니다..", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, 1))
+                    );
+                  })
           );
         },
       );
@@ -1273,23 +1314,7 @@ class UiUtils {
     )));
   }
 
-  static Widget getAnimatedTextButton(double width, Color? backColor, Color textColor, String text, double fontSize, FontWeight fontWeight,
-      Duration duration, ShakeConstant shakeConstant, bool isAutoPlay, Function() callback){
-    return ShakeWidget(
-      duration: duration,
-      shakeConstant: shakeConstant,
-      autoPlay: isAutoPlay,
-      child: GestureDetector(onTap: callback, child: Container(
-          padding: EdgeInsets.only(left: 4.w, right: 4.w, top: 4.w, bottom: 4.w),
-          width: width,
-          color: backColor,
-          alignment: Alignment.center,
-          child: getTextWithFixedScale(text, fontSize, fontWeight, textColor, TextAlign.center, 1)
-      )),
-    );
-  }
-
-  static Widget getAnimatedText(String text, Color textColor, double fontSize, FontWeight fontWeight, Duration duration, Function() callback){
+  static Widget getAnimatedText(String text, Color textColor, double fontSize, FontWeight fontWeight, Duration duration, int repeat, Function() callback){
     return AnimatedTextKit(
       animatedTexts: [
         TypewriterAnimatedText(
@@ -1298,8 +1323,26 @@ class UiUtils {
             speed: duration
         ),
       ],
-      totalRepeatCount: 100,
+      totalRepeatCount: repeat,
       pause: const Duration(milliseconds: 1000),
+      displayFullTextOnTap: true,
+      stopPauseOnTap: false,
+    );
+  }
+
+  static Widget getAnimatedTextList(List<String> textList, Color textColor, double fontSize, FontWeight fontWeight, Duration duration, int repeat, Function() callback){
+    List<TypewriterAnimatedText> list = [];
+    for(var each in textList){
+      list.add(TypewriterAnimatedText(
+          each,
+          textStyle: TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor),
+          speed: duration
+      ));
+    }
+    return AnimatedTextKit(
+      animatedTexts: list,
+      totalRepeatCount: repeat,
+      pause: const Duration(milliseconds: 500),
       displayFullTextOnTap: true,
       stopPauseOnTap: false,
     );

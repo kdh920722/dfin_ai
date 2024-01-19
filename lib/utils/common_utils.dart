@@ -195,10 +195,10 @@ class CommonUtils {
       if(context.mounted && !isOutPopOn){
         CommonUtils.log("w","check update mount");
         isOutPopOn = true;
-        UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isAndroid ? 30.h : 35.h, 0.5, (context, setState){
+        UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isAndroid ? Config.isPad()? 45.h : 35.h : Config.isPad()? 50.h : 40.h, 0.5, (context, setState){
           return Column(children: [
-            UiUtils.getMarginBox(0, 3.h),
-            Center(child: UiUtils.getTextWithFixedScale("시스템 점검중입니다.", 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
+            UiUtils.getMarginBox(0, 5.h),
+            Center(child: UiUtils.getTextWithFixedScale("시스템 점검중입니다.", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
             UiUtils.getMarginBox(0, 3.h),
             UiUtils.getExpandedScrollView(Axis.vertical,
                 SizedBox(width : 80.w, child: UiUtils.getTextWithFixedScale2(Config.appInfoTextMap["close_text"].replaceAll("@@", "\n"), 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null))),
@@ -211,13 +211,14 @@ class CommonUtils {
       if(context.mounted && !isOutPopOn){
         CommonUtils.log("w","check update mount");
         isOutPopOn = true;
-        UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isAndroid ? 18.h : 23.h, 0.5, (context, setState){
+        UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isAndroid ? Config.isPad()? 45.h : 35.h : Config.isPad()? 50.h : 40.h, 0.5, (context, setState){
           return Center(child: Column(children: [
-            UiUtils.getMarginBox(0, 1.h),
-            UiUtils.getTextWithFixedScale("앱 업데이트가 필요합니다!", 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
+            UiUtils.getMarginBox(0, 10.h),
+            UiUtils.getTextWithFixedScale("앱 업데이트가 필요합니다.", 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
             UiUtils.getMarginBox(0, 3.h),
+            UiUtils.getExpandedScrollView(Axis.vertical, Container()),
             UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                UiUtils.getTextWithFixedScale("업데이트", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
+                UiUtils.getTextWithFixedScale("확인", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
                   launchUrl(Uri.parse(Config.appStoreUrl));
                 }),
             Config.isAndroid? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 5.h)

@@ -41,17 +41,17 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
   final String errorMsg = "정보를 입력해주세요";
   int currentViewId = 0;
 
-  static const  int preLoanCountViewId = 99;
+  static const  int preLoanCountViewId = 4;
   Key? selectedPreLoanCountKey;
   String selectedPreLoanCountInfo = "";
 
-  static const  int preLoanPriceViewId = 99;
+  static const  int preLoanPriceViewId = 5;
   String selectedPreLoanPriceInfo = "";
   final _preLoanPriceFocus = FocusNode();
   final _preLoanPriceTextController = TextEditingController();
   void _preLoanPriceInfoTextControllerListener() {
-    if(_preLoanPriceTextController.text.trim().length > 10){
-      _preLoanPriceTextController.text = _preLoanPriceTextController.text.trim().substring(0, 10);
+    if(_preLoanPriceTextController.text.trim().length > 8){
+      _preLoanPriceTextController.text = _preLoanPriceTextController.text.trim().substring(0, 8);
     }else{
       final text = _preLoanPriceTextController.text.trim();
       final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
@@ -69,8 +69,8 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
   final _wantLoanPriceFocus = FocusNode();
   final _wantLoanPriceTextController = TextEditingController();
   void _wantLoanPriceInfoTextControllerListener() {
-    if(_wantLoanPriceTextController.text.trim().length > 10){
-      _wantLoanPriceTextController.text = _wantLoanPriceTextController.text.trim().substring(0, 10);
+    if(_wantLoanPriceTextController.text.trim().length > 8){
+      _wantLoanPriceTextController.text = _wantLoanPriceTextController.text.trim().substring(0, 8);
     }else{
       final text = _wantLoanPriceTextController.text.trim();
       final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
@@ -83,7 +83,7 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
     }
   }
 
-  static const  int jobViewId = 4;
+  static const  int jobViewId = 6;
   Key? selectedJobKey;
   String selectedJobInfo = "";
 
@@ -471,7 +471,12 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
     return UiUtils.getRowColumnWithAlignCenter([
       SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         UiUtils.getBackButton(() async {
-          backInputView();
+          if(selectedPreLoanCountInfo.split("@")[1] == "0"){
+            currentViewId--;
+            backInputView();
+          }else{
+            backInputView();
+          }
         }),
       ])),
       UiUtils.getMarginBox(0, 3.w),
@@ -518,6 +523,12 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
     confirmDataList.add("•  차량번호 ${MyData.selectedCarInfoData!.carNum}");
     confirmDataList.add("•  차량 시세금액 ${CommonUtils.getPriceFormattedStringForFullPrice(double.parse(MyData.selectedCarInfoData!.carPrice))}");
     confirmDataList.add("•  ${selectedJobInfo.split("@")[0]}");
+    confirmDataList.add("•  기대출  ${selectedPreLoanCountInfo.split("@")[0]}");
+    if(selectedPreLoanPriceInfo != "0"){
+      confirmDataList.add("•  인가후 대출금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedPreLoanPriceInfo))}");
+    }else{
+      confirmDataList.add("•  인가후 대출금액  0원");
+    }
     /*
     confirmDataList.add("•  기대출  ${selectedPreLoanCountInfo.split("@")[0]}");
     if(selectedPreLoanPriceInfo != "0"){
@@ -560,6 +571,7 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
       ])),
       UiUtils.getMarginBox(0, 3.w),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("해당 정보로", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      UiUtils.getMarginBox(0, 0.5.h),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출상품을 찾아볼까요?", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: confirmWidgetList)),
@@ -581,7 +593,7 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
 
   void _updateData(){
     UiUtils.showLoadingPop(context);
-    LogfinController.getCarPrList(MyData.selectedCarInfoData!.carNum, selectedJobInfo.split("@")[1], (isSuccessToGetOffers, _){
+    LogfinController.getCarPrList(MyData.selectedCarInfoData!.carNum, selectedJobInfo.split("@")[1], selectedPreLoanCountInfo.split("@")[1], selectedPreLoanPriceInfo, (isSuccessToGetOffers, _){
       if(isSuccessToGetOffers){
         LogfinController.getUserInfo((isSuccessToGetUserInfo){
           UiUtils.closeLoadingPop(context);

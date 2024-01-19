@@ -673,7 +673,6 @@ class LogfinController {
               callback(true, false);
             }else{
               MyData.clearLoanInfoList();
-              CommonUtils.isLogValid = true;
               for(Map eachLoans in loansList){
                 CommonUtils.log("i", "each loans : $eachLoans");
                 String uid = "";
@@ -757,7 +756,6 @@ class LogfinController {
                   }
                 });
               }
-              CommonUtils.isLogValid = false;
 
               MyData.sortLoanInfoList();
               _setChatRoomInfoList();
@@ -831,13 +829,15 @@ class LogfinController {
     }
   }
 
-  static Future<void> getCarPrList(String carNum, String jobInfo, Function(bool isSuccess, Map<String, dynamic>? outputJson) callback) async {
+  static Future<void> getCarPrList(String carNum, String jobInfo, String lendCnt, String lendAmount, Function(bool isSuccess, Map<String, dynamic>? outputJson) callback) async {
     try{
       String carUid = MyData.findUidInCarInfoList(carNum);
       if(carUid != ""){
         Map<String, dynamic> inputJsonForGetOffers= {
           "car_uid": carUid,
-          "job" : jobInfo
+          "job" : jobInfo,
+          "lend_count": lendCnt,
+          "lend_amount": lendAmount,
         };
         callLogfinApi(LogfinApis.searchCarProduct, inputJsonForGetOffers, (isSuccessToGetOffers, outputJsonForGetOffers){
           if(isSuccessToGetOffers){

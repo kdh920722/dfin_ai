@@ -85,8 +85,8 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
   final _preLoanPriceFocus = FocusNode();
   final _preLoanPriceTextController = TextEditingController();
   void _preLoanPriceInfoTextControllerListener() {
-    if(_preLoanPriceTextController.text.trim().length > 10){
-      _preLoanPriceTextController.text = _preLoanPriceTextController.text.trim().substring(0, 10);
+    if(_preLoanPriceTextController.text.trim().length > 8){
+      _preLoanPriceTextController.text = _preLoanPriceTextController.text.trim().substring(0, 8);
     }else{
       final text = _preLoanPriceTextController.text.trim();
       final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
@@ -104,8 +104,8 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
   final _wantLoanPriceFocus = FocusNode();
   final _wantLoanPriceTextController = TextEditingController();
   void _wantLoanPriceInfoTextControllerListener() {
-    if(_wantLoanPriceTextController.text.trim().length > 10){
-      _wantLoanPriceTextController.text = _wantLoanPriceTextController.text.trim().substring(0, 10);
+    if(_wantLoanPriceTextController.text.trim().length > 8){
+      _wantLoanPriceTextController.text = _wantLoanPriceTextController.text.trim().substring(0, 8);
     }else{
       final text = _wantLoanPriceTextController.text.trim();
       final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
@@ -347,7 +347,9 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       ])),
       UiUtils.getMarginBox(0, 3.w),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("우선  ", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      UiUtils.getMarginBox(0, 0.5.w),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("사건정보가 필요합니다.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      UiUtils.getMarginBox(0, 0.5.w),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("해당 법원을 선택해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
       NotificationListener<ScrollNotification>(
@@ -410,7 +412,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
           SizedBox(width: 85.w, child: Row(children: [
             UiUtils.getTextField(context, 32.w, TextStyles.upFinTextFormFieldTextStyle, _accidentInfoFocus1, _accidentInfoTextController1, TextInputType.number,
                 UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
-            UiUtils.getTextWithFixedScale("개회", 16.sp, FontWeight.w400, ColorStyles.upFinRealGray, TextAlign.center, null),
+            UiUtils.getTextWithFixedScale("개회", 16.sp, FontWeight.w400, ColorStyles.upFinButtonBlue, TextAlign.center, null),
             UiUtils.getTextField(context, 43.w, TextStyles.upFinTextFormFieldTextStyle, _accidentInfoFocus2, _accidentInfoTextController2, TextInputType.number,
                 UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
           ]))

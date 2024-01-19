@@ -68,8 +68,8 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
   final _preLoanPriceFocus = FocusNode();
   final _preLoanPriceTextController = TextEditingController();
   void _preLoanPriceInfoTextControllerListener() {
-    if(_preLoanPriceTextController.text.trim().length > 10){
-      _preLoanPriceTextController.text = _preLoanPriceTextController.text.trim().substring(0, 10);
+    if(_preLoanPriceTextController.text.trim().length > 8){
+      _preLoanPriceTextController.text = _preLoanPriceTextController.text.trim().substring(0, 8);
     }else{
       final text = _preLoanPriceTextController.text.trim();
       final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
@@ -87,8 +87,8 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
   final _wantLoanPriceFocus = FocusNode();
   final _wantLoanPriceTextController = TextEditingController();
   void _wantLoanPriceInfoTextControllerListener() {
-    if(_wantLoanPriceTextController.text.trim().length > 10){
-      _wantLoanPriceTextController.text = _wantLoanPriceTextController.text.trim().substring(0, 10);
+    if(_wantLoanPriceTextController.text.trim().length > 8){
+      _wantLoanPriceTextController.text = _wantLoanPriceTextController.text.trim().substring(0, 8);
     }else{
       final text = _wantLoanPriceTextController.text.trim();
       final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
@@ -563,7 +563,12 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
       UiUtils.getRowColumnWithAlignCenter([
         SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           UiUtils.getBackButton(() async {
-            backInputView();
+            if(selectedPreLoanCountInfo.split("@")[1] == "0"){
+              currentViewId--;
+              backInputView();
+            }else{
+              backInputView();
+            }
           }),
         ])),
         UiUtils.getMarginBox(0, 3.w),
@@ -732,6 +737,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
       ])),
       UiUtils.getMarginBox(0, 3.w),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("해당 정보로", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      UiUtils.getMarginBox(0, 0.5.h),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출상품을 찾아볼까요?", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: confirmWidgetList)),

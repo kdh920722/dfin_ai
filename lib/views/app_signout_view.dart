@@ -110,7 +110,7 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
           ])),
           SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             UiUtils.getMarginBox(0, 3.w),
-            UiUtils.getTextWithFixedScale("${MyData.name} 님의 정보", 22.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
+            UiUtils.getTextWithFixedScale("${MyData.name}님의 정보", 22.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
             UiUtils.getMarginBox(0, 3.h)
           ])),
           UiUtils.getDisabledTextField(context, 90.w, MyData.name, TextStyles.upFinDisabledTextFormFieldTextStyle2,
@@ -126,114 +126,118 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
               UiUtils.getDisabledInputDecoration("연락처", 12.sp, "", 0.sp)),
           UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
           UiUtils.getMarginBox(0, 2.h),
-          UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinRealGray,
-              UiUtils.getTextWithFixedScale("탈퇴하기", 12.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.center, null), () {
-                isValidToSignOut = false;
-                isChecked = false;
-                _pwdTextController.text = "";
-                UiUtils.showPopMenu(context, true, 100.w, 100.h, 0.5, 0, ColorStyles.upFinWhite, (slideContext, slideSetState){
-                  Widget slideWidget = Column(
-                      children: [
-                        SizedBox(width: 95.w, child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                          UiUtils.getBackButton(() {
-                            _pwdTextController.text = "";
-                            Navigator.pop(slideContext);
-                          }),
-                          UiUtils.getMarginBox(2.w, 0),
-                        ])),
-                        UiUtils.getMarginBox(0, 3.w),
-                        SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("회원탈퇴", 22.sp, FontWeight.w600, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-                        UiUtils.getMarginBox(0, 3.h),
-                        UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _pwdTextFocus, _pwdTextController, TextInputType.visiblePassword, true,
-                            UiUtils.getInputDecoration("비밀번호", 12.sp, "", 0.sp), (text) {
-                              if(text == ""){
-                                slideSetState(() {
-                                  isValidToSignOut = false;
-                                });
-                              }else{
-                                slideSetState(() {
-                                  isValidToSignOut = true;
-                                });
+          SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            UiUtils.getMarginBox(0, 1.w),
+            UiUtils.getRoundBoxButtonTextWithFixedScale5(
+                UiUtils.getTextWithFixedScale("회원탈퇴를 원하시나요?", 12.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
+                ColorStyles.upFinWhite, (){
+              isValidToSignOut = false;
+              isChecked = false;
+              _pwdTextController.text = "";
+              UiUtils.showPopMenu(context, true, 100.w, 100.h, 0.5, 0, ColorStyles.upFinWhite, (slideContext, slideSetState){
+                Widget slideWidget = Column(
+                    children: [
+                      SizedBox(width: 95.w, child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                        UiUtils.getBackButton(() {
+                          _pwdTextController.text = "";
+                          Navigator.pop(slideContext);
+                        }),
+                        UiUtils.getMarginBox(2.w, 0),
+                      ])),
+                      UiUtils.getMarginBox(0, 3.w),
+                      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("회원탈퇴", 22.sp, FontWeight.w600, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+                      UiUtils.getMarginBox(0, 3.h),
+                      UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _pwdTextFocus, _pwdTextController, TextInputType.visiblePassword, true,
+                          UiUtils.getInputDecoration("비밀번호", 12.sp, "", 0.sp), (text) {
+                            if(text == ""){
+                              slideSetState(() {
+                                isValidToSignOut = false;
+                              });
+                            }else{
+                              slideSetState(() {
+                                isValidToSignOut = true;
+                              });
+                            }
+                          }, (value){}),
+                      Row(crossAxisAlignment:CrossAxisAlignment.start, children: [UiUtils.getMarginBox(5.w, 0),Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
+                        UiUtils.getMarginBox(0, 2.h),
+                        UiUtils.getTextWithFixedScale2("•  탈퇴시 사용자의 정보는 삭제되며, 복구가 불가능합니다.", 10.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null),
+                        UiUtils.getMarginBox(0, 1.h),
+                        GestureDetector(child: Row(children: [
+                          UiUtils.getTextWithFixedScale2("•  자세한 내용은", 10.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null),
+                          UiUtils.getTextWithFixedScale2("개인정보처리방침", 10.sp, FontWeight.w400, ColorStyles.upFinButtonBlue, TextAlign.start, null),
+                          UiUtils.getTextWithFixedScale2("을 참고하세요", 10.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null),
+                        ]),
+                            onTap: () async {
+                              Uri privacyLink = Uri.parse(Config.privacyUrl);
+                              if(await canLaunchUrl(privacyLink)){
+                                launchUrl(privacyLink);
                               }
-                            }, (value){}),
-                        Row(crossAxisAlignment:CrossAxisAlignment.start, children: [UiUtils.getMarginBox(5.w, 0),Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
-                          UiUtils.getMarginBox(0, 2.h),
-                          UiUtils.getTextWithFixedScale2("•  업핀 탈퇴시 사용자의 정보는 삭제되며, 복구가 불가능합니다.", 10.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null),
-                          UiUtils.getTextWithFixedScale2("•  자세한 내용은 개인정보처리방침을 참고하세요.", 10.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null),
-                          GestureDetector(child: Row(children: [
-                            UiUtils.getTextWithFixedScale2("   (개인정보처리방침 바로가기: ", 9.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null),
-                            UiUtils.getTextWithUnderline(Config.privacyUrl, 9.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null, ColorStyles.upFinDarkGray),
-                            UiUtils.getTextWithFixedScale2(")", 9.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null),
-                          ]),
-                              onTap: () async {
-                                Uri privacyLink = Uri.parse(Config.privacyUrl);
-                                if(await canLaunchUrl(privacyLink)){
-                                  launchUrl(privacyLink);
+                            }),
+                      ])]),
+                      Row(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.center, children: [
+                        UiUtils.getMarginBox(2.w, 0),
+                        UiUtils.getCustomCheckBox(UniqueKey(), 1.2, isChecked, ColorStyles.upFinWhite, ColorStyles.upFinButtonBlue,
+                            ColorStyles.upFinGray, ColorStyles.upFinButtonBlue, (checkedValue){
+                              slideSetState(() {
+                                if(checkedValue != null){
+                                  isChecked = checkedValue;
                                 }
-                              }),
-                        ])]),
-                        Row(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.center, children: [
-                          UiUtils.getMarginBox(2.w, 0),
-                          UiUtils.getCustomCheckBox(UniqueKey(), 1, isChecked, ColorStyles.upFinWhite, ColorStyles.upFinButtonBlue,
-                              ColorStyles.upFinGray, ColorStyles.upFinButtonBlue, (checkedValue){
-                                slideSetState(() {
-                                  if(checkedValue != null){
-                                    isChecked = checkedValue;
+                              });
+                            }),
+                        UiUtils.getTextWithFixedScale("위 내용을 모두 확인했습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null),
+                      ]),
+                      UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
+                      isValidToSignOut? Column(children: [
+                        UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+                            UiUtils.getTextWithFixedScale("탈퇴하기", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
+                              CommonUtils.hideKeyBoard();
+                              if(isChecked){
+                                Map<String, dynamic> inputJson = {
+                                  "user" : {
+                                    "email": MyData.email,
+                                    "password": _pwdTextController.text
+                                  }
+                                };
+                                UiUtils.showLoadingPop(context);
+                                LogfinController.callLogfinApi(LogfinApis.deleteAccount, inputJson, (isSuccessToLogin, outputJson) async {
+                                  UiUtils.closeLoadingPop(context);
+                                  if(isSuccessToLogin){
+                                    Navigator.pop(slideContext);
+                                    SharedPreferenceController.deleteAllData();
+                                    CommonUtils.flutterToast("회원삭제 성공");
+                                    CommonUtils.backToHome(context);
+                                  }else{
+                                    if(outputJson!["error"] == "Invalid email or password"){
+                                      CommonUtils.flutterToast("비밀번호가 일치하지 않아요.");
+                                    }else{
+                                      CommonUtils.flutterToast("회원탈퇴중 에러가 발생했어요.");
+                                    }
+
                                   }
                                 });
-                              }),
-                          UiUtils.getTextWithFixedScale("위 내용을 모두 확인했습니다.", 11.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null),
-                        ]),
-                        UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
-                        isValidToSignOut? Column(children: [
-                          UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                              UiUtils.getTextWithFixedScale("탈퇴하기", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
-                                CommonUtils.hideKeyBoard();
-                                if(isChecked){
-                                  Map<String, dynamic> inputJson = {
-                                    "user" : {
-                                      "email": MyData.email,
-                                      "password": _pwdTextController.text
-                                    }
-                                  };
-                                  UiUtils.showLoadingPop(context);
-                                  LogfinController.callLogfinApi(LogfinApis.deleteAccount, inputJson, (isSuccessToLogin, outputJson) async {
-                                    UiUtils.closeLoadingPop(context);
-                                    if(isSuccessToLogin){
-                                      Navigator.pop(slideContext);
-                                      SharedPreferenceController.deleteAllData();
-                                      CommonUtils.flutterToast("회원삭제 성공");
-                                      CommonUtils.backToHome(context);
-                                    }else{
-                                      if(outputJson!["error"] == "Invalid email or password"){
-                                        CommonUtils.flutterToast("비밀번호가 일치하지 않아요.");
-                                      }else{
-                                        CommonUtils.flutterToast("회원탈퇴중 에러가 발생했어요.");
-                                      }
+                              }else{
+                                CommonUtils.flutterToast("내용 확인에 체크하세요.");
+                              }
+                            }),
+                        UiUtils.getMarginBox(0, 0.5.h),
+                        SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          UiUtils.getRoundBoxButtonTextWithFixedScale5(
+                              UiUtils.getTextWithFixedScale("비밀번호를 잊으셨나요?", 12.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
+                              ColorStyles.upFinWhite, (){
+                            CommonUtils.hideKeyBoard();
+                            AppFindPwViewState.viewId = 1;
+                            CommonUtils.moveTo(context, AppView.appFindPwView.value, null);
+                          })
+                        ]))
+                      ]) : Container(),
+                      UiUtils.getMarginBox(0, 5.w)
+                    ]);
 
-                                    }
-                                  });
-                                }else{
-                                  CommonUtils.flutterToast("내용 확인에 체크하세요.");
-                                }
-                              }),
-                          UiUtils.getMarginBox(0, 0.5.h),
-                          SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                            UiUtils.getRoundBoxButtonTextWithFixedScale5(
-                                UiUtils.getTextWithFixedScale("비밀번호를 잊으셨나요?", 12.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
-                                ColorStyles.upFinWhite, (){
-                              CommonUtils.hideKeyBoard();
-                              AppFindPwViewState.viewId = 1;
-                              CommonUtils.moveTo(context, AppView.appFindPwView.value, null);
-                            })
-                          ]))
-                        ]) : Container(),
-                        UiUtils.getMarginBox(0, 5.w)
-                      ]);
-
-                  return slideWidget;
-                });
-              })
+                return slideWidget;
+              });
+            }),
+          ]))
         ])
     );
 
