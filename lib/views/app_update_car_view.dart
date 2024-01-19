@@ -522,13 +522,12 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
     confirmDataList.add("•  ${MyData.birth.substring(0,4)}년 $birthMonth월 $birthDay일");
     confirmDataList.add("•  차량번호 ${MyData.selectedCarInfoData!.carNum}");
     confirmDataList.add("•  차량 시세금액 ${CommonUtils.getPriceFormattedStringForFullPrice(double.parse(MyData.selectedCarInfoData!.carPrice))}");
-    confirmDataList.add("•  ${selectedJobInfo.split("@")[0]}");
-    confirmDataList.add("•  기대출  ${selectedPreLoanCountInfo.split("@")[0]}");
-    if(selectedPreLoanPriceInfo != "0"){
+    if(selectedPreLoanCountInfo.split("@")[1] != "0"){
       confirmDataList.add("•  인가후 대출금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedPreLoanPriceInfo))}");
     }else{
       confirmDataList.add("•  인가후 대출금액  0원");
     }
+    confirmDataList.add("•  ${selectedJobInfo.split("@")[0]}");
     /*
     confirmDataList.add("•  기대출  ${selectedPreLoanCountInfo.split("@")[0]}");
     if(selectedPreLoanPriceInfo != "0"){
