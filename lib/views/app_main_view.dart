@@ -237,6 +237,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                   ColorStyles.upFinBlack, (){
                     // test
 
+                /*
                 //간편인증팝업
                 List<Widget> certCmpWidgetList = [];
                 UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, null, Config.isPad()? 60.h : 40.h, 0.5, (slideContext, setState){
@@ -433,7 +434,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                     Config.isAndroid? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 3.h)
                   ]));
                 });
-
+                */
               })
                  : UiUtils.getMarginBox(0, 0),
               const Spacer(flex: 2),
@@ -531,8 +532,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               ]) : Container();
             }),
             UiUtils.getMarginBox(100.w, 2.h),
-            UiUtils.getMarginColoredBox(100.w, 0.11.h, ColorStyles.upFinGray),
-            UiUtils.getMarginColoredBox(100.w, 2.h, ColorStyles.upFinWhiteGray),
             Stack(alignment: Alignment.center, children: [
               Positioned(
                   child: UiUtils.getBannerButtonBox(100.w, 50.w, ColorStyles.upFinBannerSky2, ColorStyles.upFinBannerSky2,

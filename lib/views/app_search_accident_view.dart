@@ -972,7 +972,11 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                   // prSearch 실패
                   UiUtils.closeLoadingPop(context);
                   String errorMsg = outputJson!["error"];
-                  CommonUtils.flutterToast(errorMsg.replaceAll("+", "").replaceAll("()", "").replaceAll(".", "\n"));
+                  if(errorMsg.split(".").length > 2){
+                    CommonUtils.flutterToast(errorMsg.replaceAll("+", "").replaceAll("()", "").replaceAll(".", "\n"));
+                  }else{
+                    CommonUtils.flutterToast(errorMsg.replaceAll("+", "").replaceAll("()", ""));
+                  }
                   setState(() {
                     currentViewId = 1;
                   });
@@ -1033,7 +1037,11 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                   // prSearch 실패
                   UiUtils.closeLoadingPop(context);
                   String errorMsg = outputJson!["error"];
-                  CommonUtils.flutterToast(errorMsg.replaceAll("+", "").replaceAll("()", "").replaceAll(".", "\n"));
+                  if(errorMsg.split(".").length > 2){
+                    CommonUtils.flutterToast(errorMsg.replaceAll("+", "").replaceAll("()", "").replaceAll(".", "\n"));
+                  }else{
+                    CommonUtils.flutterToast(errorMsg.replaceAll("+", "").replaceAll("()", ""));
+                  }
                   setState(() {
                     currentViewId = 1;
                   });

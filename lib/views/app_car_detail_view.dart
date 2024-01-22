@@ -7,6 +7,7 @@ import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import 'package:upfin/views/app_main_view.dart';
 import '../controllers/firebase_controller.dart';
+import '../controllers/logfin_controller.dart';
 import '../styles/TextStyles.dart';
 import '../configs/app_config.dart';
 import '../utils/common_utils.dart';
@@ -222,7 +223,7 @@ class AppCarDetailViewState extends State<AppCarDetailView> with WidgetsBindingO
     );
   }
 
-  void back(){
+  void _back(){
     CommonUtils.hideKeyBoard();
     MyData.selectedCarInfoData = null;
     Navigator.pop(context);
@@ -265,7 +266,7 @@ class AppCarDetailViewState extends State<AppCarDetailView> with WidgetsBindingO
               Positioned(
                 top: 1.h,
                 child: UiUtils.getBackButtonForMainView(() {
-                  back();
+                  _back();
                 }),
               ),
               Positioned(
@@ -327,7 +328,7 @@ class AppCarDetailViewState extends State<AppCarDetailView> with WidgetsBindingO
       ]),
     );
 
-    return UiUtils.getViewWithAllowBackForAndroid(context, view, back);
+    return UiUtils.getViewWithAllowBackForAndroid(context, view, _back);
   }
 }
 

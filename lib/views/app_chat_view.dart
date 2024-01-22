@@ -1388,7 +1388,126 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
         }
       });
     }
+  }
 
+  String selectedCarNum = "";
+  String selectedCarOwner = "";
+  final _carInfoFocus1 = FocusNode();
+  final _carInfoFocus2 = FocusNode();
+  final _carInfoTextController1 = TextEditingController();
+  final _carInfoTextController2 = TextEditingController();
+  void _carInfoTextController1Listener() {
+    if(_carInfoTextController1.text.trim().length >= 9){
+      _carInfoTextController1.text = _carInfoTextController1.text.substring(0,8);
+    }
+  }
+  void _carInfoTextController2Listener() {
+    if(_carInfoTextController2.text.trim().length >= 18){
+      _carInfoTextController2.text = _carInfoTextController1.text.substring(0,17);
+    }
+  }
+  void _getSearchCarView(){
+    _carInfoTextController1.text = "";
+    _carInfoTextController2.text = "";
+    selectedCarNum = "";
+    selectedCarOwner = "";
+    UiUtils.showPopMenu(context, true, 100.w, 100.h, 0.5, 0, ColorStyles.upFinWhite, (slideContext, slideSetState){
+      Widget slideWidget = Padding(padding: EdgeInsets.only(left: 2.5.w, top: 0.5.h,), child: Column(
+          children: [
+            SizedBox(width: 95.w, child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+              UiUtils.getBackButton(() {
+                Navigator.pop(slideContext);
+              }),
+              UiUtils.getMarginBox(2.w, 0),
+            ])),
+            UiUtils.getMarginBox(0, 3.w),
+            SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("차량번호를 입력하세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+            UiUtils.getMarginBox(0, 1.h),
+            SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("예) 12가3456", 14.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
+            UiUtils.getMarginBox(0, 5.h),
+
+            //test for input name
+            MyData.isTestUser? SizedBox(width: 85.w, child:
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              UiUtils.getTextWithFixedScale("테스트용) 차량 소유자 입력", 10.sp, FontWeight.w600, ColorStyles.upFinRed, TextAlign.center, null),
+              UiUtils.getTextField(context, 30.w, TextStyles.upFinTextFormFieldTextStyle, _carInfoFocus2, _carInfoTextController2, TextInputType.text,
+                  UiUtils.getInputDecoration("이름", 10.sp, "", 0.sp), (value) { }),
+              UiUtils.getMarginBox(0, 5.h),
+            ])) : UiUtils.getMarginBox(0, 0),
+
+            UiUtils.getExpandedScrollView(Axis.vertical,
+                SizedBox(width: 85.w, child: Row(children: [
+                  UiUtils.getTextField(context, 85.w, TextStyles.upFinTextFormFieldTextStyle, _carInfoFocus1, _carInfoTextController1, TextInputType.text,
+                      UiUtils.getInputDecoration("번호", 10.sp, "", 0.sp), (value) { }),
+                ]))
+            ),
+
+            UiUtils.getMarginBox(0, 5.h),
+            UiUtils.getTextButtonBox(90.w, "등록", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+              if(_carInfoTextController1.text.trim() != ""){
+                selectedCarNum = _carInfoTextController1.text.trim();
+                selectedCarOwner = MyData.isTestUser? _carInfoTextController2.text.trim() : MyData.name;
+
+                bool isValid = true;
+                for(var eachCar in MyData.getCarInfoList()){
+                  if(eachCar.carNum == selectedCarNum){
+                    selectedCarNum = "";
+                    isValid = false;
+                  }
+                }
+
+                if(isValid){
+                  Map<String, dynamic> inputJson = {
+                    "car_no": selectedCarNum.replaceAll(" ", "").trim(),
+                    "owner_name": MyData.isTestUser? selectedCarOwner : MyData.name
+                  };
+                  CommonUtils.log("i", "car pr search info:\n$inputJson");
+
+                  UiUtils.showLoadingPop(context);
+                  LogfinController.callLogfinApi(LogfinApis.addAndSearchCar, inputJson, (isSuccess, outputJson){
+                    if(isSuccess){
+                      LogfinController.getCarInfo((isSuccessToGetCarInfo, isNotEmpty){
+                        UiUtils.closeLoadingPop(context);
+                        if(isSuccessToGetCarInfo){
+                          if(isNotEmpty){
+                            CommonUtils.flutterToast("차량정보 조회 완료");
+                            AppMainViewState.refreshMain();
+                            Navigator.pop(slideContext);
+                          }else{
+                            CommonUtils.flutterToast("차량정보 찾기 실패\n다시 실행해주세요.");
+                          }
+                        }else{
+                          CommonUtils.flutterToast("차량정보 찾기 실패\n다시 실행해주세요.");
+                        }
+                      });
+                    }else{
+                      // prSearch 실패
+                      UiUtils.closeLoadingPop(context);
+                      String errorMsg = outputJson!["error"];
+                      if(errorMsg == "no implicit conversion of String into Integer"){
+                        CommonUtils.flutterToast("차량정보를 확인해주세요.");
+                      }else{
+                        if(errorMsg.split(".").length > 2){
+                          CommonUtils.flutterToast(errorMsg.replaceAll("+", "").replaceAll("()", "").replaceAll(".", "\n"));
+                        }else{
+                          CommonUtils.flutterToast(errorMsg.replaceAll("+", "").replaceAll("()", ""));
+                        }
+                      }
+                    }
+                  });
+
+                }else{
+                  CommonUtils.flutterToast("이미 조회하신 차량번호에요.");
+                }
+              }else{
+                CommonUtils.flutterToast("정보를 입력해주세요.");
+              }
+            }),
+            UiUtils.getMarginBox(0, 5.w)
+          ]));
+
+      return slideWidget;
+    });
   }
 
   double inputMinHeight = 9.2.h;
