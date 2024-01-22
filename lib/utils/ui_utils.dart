@@ -217,6 +217,15 @@ class UiUtils {
         child: Padding(padding: EdgeInsets.only(left: 4.w, right: 4.w, bottom: 2.w, top: 2.w), child: child)));
   }
 
+  static Widget getRoundBoxTextWithFixedScale6(Widget child, Color boxColor){
+    return Container(
+        decoration: BoxDecoration(
+          color: boxColor, // 배경색 설정
+          borderRadius: BorderRadius.circular(20.0), // 모서리를 둥글게 하는 부분
+        ),child: FittedBox(fit: BoxFit.contain, alignment: Alignment.center,
+        child: Padding(padding: EdgeInsets.only(left: 2.w, right: 2.w, bottom: 2.w, top: 2.w), child: child)));
+  }
+
   static Widget getRoundBoxButtonTextWithFixedScale5(Widget child, Color boxColor, Function() tabCallBack){
     return GestureDetector(onTap: tabCallBack, child: Container(
         decoration: BoxDecoration(
@@ -227,7 +236,7 @@ class UiUtils {
   }
 
   static Widget getRoundBoxButtonTextWithFixedScale6(Widget child, Color boxColor, Function() tabCallBack){
-    return GestureDetector(onTap: tabCallBack, child: Container( width: 90.w,
+    return GestureDetector(onTap: tabCallBack, child: Container(
         decoration: BoxDecoration(
           color: boxColor, // 배경색 설정
           borderRadius: BorderRadius.circular(1), // 모서리를 둥글게 하는 부분
@@ -513,7 +522,7 @@ class UiUtils {
             padding: EdgeInsets.only(left: 2.w, right: 2.w),
             backgroundColor: buttonColor,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
-            side: BorderSide(width: 1, color: borderColor),
+            side: BorderSide(width: 0.5, color: borderColor),
             elevation: 0.0,
             shadowColor: ColorStyles.upFinGray,
           ),
@@ -888,7 +897,7 @@ class UiUtils {
                         width: 100.w,
                         height: 100.h,
                         color: Colors.black54,
-                        child: Center(child: getTextWithFixedScale("최신정보로 업데이트 중입니다..", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, 1))
+                        child: Center(child: getTextWithFixedScale("최신정보로 업데이트 중", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, 1))
                     );
                   })
           );
@@ -1188,6 +1197,7 @@ class UiUtils {
         ExpansionTileWithoutBorderItem(
             title: titleWidget,
             childrenPadding: EdgeInsets.zero,tilePadding: EdgeInsets.zero, iconColor: ColorStyles.upFinBlack,
+            initiallyExpanded: true,
             onExpansionChanged: (isExpanded){
               if (isExpanded) {
                 if(detailType == getMaxDetailType(detailType)){
@@ -1342,7 +1352,7 @@ class UiUtils {
     return AnimatedTextKit(
       animatedTexts: list,
       totalRepeatCount: repeat,
-      pause: const Duration(milliseconds: 500),
+      pause: const Duration(seconds: 3),
       displayFullTextOnTap: true,
       stopPauseOnTap: false,
     );

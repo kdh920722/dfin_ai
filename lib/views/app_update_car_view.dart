@@ -211,6 +211,12 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
   }
 
   Future<void> backInputView() async {
+    if(currentViewId == jobViewId){
+      if(selectedPreLoanCountInfo.split("@")[1] == "0"){
+        currentViewId--;
+      }
+    }
+
     if(isInputValid){
       isInputValid = false;
       _unFocusAllNodes();
@@ -471,12 +477,7 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
     return UiUtils.getRowColumnWithAlignCenter([
       SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         UiUtils.getBackButton(() async {
-          if(selectedPreLoanCountInfo.split("@")[1] == "0"){
-            currentViewId--;
-            backInputView();
-          }else{
-            backInputView();
-          }
+          backInputView();
         }),
       ])),
       UiUtils.getMarginBox(0, 3.w),

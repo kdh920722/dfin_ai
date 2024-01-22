@@ -1431,8 +1431,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     UiUtils.getMarginBox(0, 1.8.h),
                     UiUtils.getTextWithFixedScale2(currentCompany, 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, 1),
-                    UiUtils.getMarginBox(0, 0.3.h),
-                    UiUtils.getTextWithFixedScale2(currentRoomType == "1" ? "#개인회생" : "#오토론", 9.sp, FontWeight.w600, ColorStyles.upFinPrTitleColor, TextAlign.center, 1),
+                    UiUtils.getTextWithFixedScale2(currentRoomType == "1" ? "개인회생" : "오토론", 9.sp, FontWeight.w600, ColorStyles.upFinPrTitleColor, TextAlign.center, 1),
                   ])
               ),
             ),
@@ -1527,7 +1526,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
               mainAxisSize: MainAxisSize.min, // 자식 위젯에 맞게 높이를 조절합니다.
               children: [
                 isWaiting ? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 0.6.h),
-                isWaiting ? Container() : Align(alignment: Alignment.topRight,
+                isWaiting ? Container() : GetController.to.isShowPickedFile.value? Container() : Align(alignment: Alignment.topRight,
                     child: Padding(padding: EdgeInsets.only(left: 2.w, right: 2.w),
                         child: Wrap(runSpacing: 0.7.h, spacing: 1.7.w, alignment: WrapAlignment.end, direction: Axis.horizontal,
                             children: GetController.to.autoAnswerWidgetList))),

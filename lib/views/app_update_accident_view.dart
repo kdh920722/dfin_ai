@@ -245,6 +245,12 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
   }
 
   Future<void> backInputView() async {
+    if(currentViewId == wantLoanPriceViewId){
+      if(selectedPreLoanCountInfo.split("@")[1] == "0"){
+        currentViewId--;
+      }
+    }
+
     if(isInputValid){
       isInputValid = false;
       _unFocusAllNodes();
@@ -563,12 +569,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
       UiUtils.getRowColumnWithAlignCenter([
         SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           UiUtils.getBackButton(() async {
-            if(selectedPreLoanCountInfo.split("@")[1] == "0"){
-              currentViewId--;
-              backInputView();
-            }else{
-              backInputView();
-            }
+            backInputView();
           }),
         ])),
         UiUtils.getMarginBox(0, 3.w),

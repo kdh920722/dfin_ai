@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:sizer/sizer.dart';
@@ -204,6 +204,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     });
   }
 
+  static bool isSwitched = true;
   bool isScrolling = false;
   Widget _getMyView(){
     return Column(children: [
@@ -223,9 +224,15 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
           child: ListView(shrinkWrap: true,physics: const BouncingScrollPhysics(),children: [
             UiUtils.getMarginBox(0, 2.5.h),
             Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 0.h, bottom: 1.h), child: Row(mainAxisSize: MainAxisSize.max, children: [
-              UiUtils.getTextWithFixedScale("${MyData.name}님", 15.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, 1),
-              UiUtils.getMarginBox(2.w, 0),
-              MyData.isTestUser ? UiUtils.getRoundBoxButtonTextWithFixedScale5(
+              UiUtils.getTextWithFixedScale(MyData.name, 15.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, 1),
+              UiUtils.getMarginBox(1.w, 0),
+              Transform.scale(scale: 0.7, child: CupertinoSwitch(value: isSwitched, activeColor: ColorStyles.upFinSky, onChanged: (value){
+                setState(() {
+                  isSwitched = value;
+
+                });
+              })),
+              MyData.isTestUser ? UiUtils.getRoundBoxButtonTextWithFixedScale6(
                   UiUtils.getTextWithFixedScale("관리자", 9.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null),
                   ColorStyles.upFinBlack, (){
                     // test
@@ -431,15 +438,15 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                  : UiUtils.getMarginBox(0, 0),
               const Spacer(flex: 2),
               UiUtils.getMarginBox(2.w, 0),
-              UiUtils.getIconButton(Icons.add, 7.w, ColorStyles.upFinDarkWhiteGray, () {
+              UiUtils.getIconButton(Icons.add, 7.w, ColorStyles.upFinBannerButton, () {
                 _showChoicePop();
               }),
               UiUtils.getMarginBox(2.w, 0),
-              UiUtils.getIconButton(Icons.refresh_outlined, 7.w, ColorStyles.upFinDarkWhiteGray, () {
+              UiUtils.getIconButton(Icons.refresh_outlined, 7.w, ColorStyles.upFinBannerButton, () {
                 _refreshMyView(context);
               }),
               UiUtils.getMarginBox(2.w, 0),
-              UiUtils.getIconButton(Icons.settings, 7.w, ColorStyles.upFinDarkWhiteGray, () {
+              UiUtils.getIconButton(Icons.settings, 7.w, ColorStyles.upFinBannerButton, () {
                 setState(() {viewTypeId = 3;});
               })
             ])),
@@ -453,7 +460,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                               left: 5.w,
                               child: Row(children: [
                                 UiUtils.getMarginBox(20.w, 0),
-                                UiUtils.getAnimatedTextList(["업핀! 다이렉트 대출의 새로운 시작!", "쉽고 빠르고 편하게 업핀하세요!", "절차가 간편한 새로운 금융 경험~"], ColorStyles.upFinBlack, 12.sp, FontWeight.w500, const Duration(milliseconds: 150), 200, (){})
+                                UiUtils.getAnimatedTextList(["업핀! 다이렉트 대출의 새로운 시작!", "쉽고 빠르고 편하게 업핀하세요!", "절차가 간편한 새로운 금융 경험~"], ColorStyles.upFinButtonBlue, 12.sp, FontWeight.w500, const Duration(milliseconds: 150), 200, (){})
                               ])),
                           Positioned(
                               left: 3.w,
@@ -467,7 +474,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               myInfoWidgetList = tempList;
                */
 
-              return Container(color: ColorStyles.upFinWhiteGray, width: 90.w,
+              return !isSwitched? Container() : Container(color: ColorStyles.upFinWhiteGray, width: 90.w,
                   height: myInfoWidgetList.isEmpty ? 18.h : myInfoWidgetList.length > 1 ? Config.isPad() ? 39.h : 29.h : Config.isPad() ? 36.h : 26.h,
                   child: myInfoWidgetList.isNotEmpty ? Column(
                     children: <Widget>[
@@ -517,7 +524,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               return loanWidgetList.isNotEmpty ? Column(children: [
                 UiUtils.getMarginBox(0, 1.h),
                 Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 2.h, bottom: 1.h), child: Row(mainAxisSize: MainAxisSize.max, children: [
-                  UiUtils.getTextWithFixedScale("접수내역", 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1),
+                  UiUtils.getTextWithFixedScale("채팅", 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1),
                   const Spacer(flex: 2)
                 ])),
                 Column(children: loanWidgetList)
@@ -555,13 +562,13 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             ]),
             UiUtils.getMarginBox(100.w, 3.h),
             Container(padding: EdgeInsets.only(right: 5.w, left : 5.w, bottom : 5.w), child: Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
-              UiUtils.getRoundBoxTextWithFixedScale3(
+              UiUtils.getRoundBoxTextWithFixedScale6(
                   UiUtils.getTextWithFixedScale("중개운영", 10.sp, FontWeight.w600, ColorStyles.upFinMainTitleColor1, TextAlign.start, null),
                   ColorStyles.upFinMainTitleBackColor1),
               UiUtils.getMarginBox(0, 1.h),
               UiUtils.getTextWithFixedScale2(Config.appMainIntroText1.replaceAll("@@", "\n"), 10.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null),
               UiUtils.getMarginBox(0, 4.h),
-              UiUtils.getRoundBoxTextWithFixedScale3(
+              UiUtils.getRoundBoxTextWithFixedScale6(
                   UiUtils.getTextWithFixedScale("서비스운영", 10.sp, FontWeight.w600, ColorStyles.upFinMainTitleColor2, TextAlign.start, null),
                   ColorStyles.upFinMainTitleBackColor2),
               UiUtils.getMarginBox(0, 1.h),
@@ -943,9 +950,11 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
 
   void _refreshMyView(BuildContext context) {
     UiUtils.showLoadingPop2(context);
-    LogfinController.getMainViewInfo((isSuccessToGetMainInfo){
-      UiUtils.closeLoadingPop(context);
-      setState(() {});
+    Future.delayed(const Duration(seconds: 2), () async {
+      LogfinController.getMainViewInfo((isSuccessToGetMainInfo){
+        UiUtils.closeLoadingPop(context);
+        setState(() {});
+      });
     });
   }
 
@@ -1309,7 +1318,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                   width: 100.w,
                   height: 100.h,
                   color: Colors.black54,
-                  child: Center(child: UiUtils.getTextWithFixedScale("최신정보로 업데이트 중입니다..", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, 1))
+                  child: Center(child: UiUtils.getTextWithFixedScale("최신정보로 업데이트 중", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, 1))
               );
             }else{
               return Container();
