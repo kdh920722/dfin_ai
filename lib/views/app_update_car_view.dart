@@ -310,7 +310,8 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
         }),
       ])),
       UiUtils.getMarginBox(0, 3.w),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("기 대출 횟수를 알려주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, height: 4.5.h , child: UiUtils.getTextWithFixedScale("이미 받고 있는", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출 횟수를 알려주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: loanCountList)),
       UiUtils.getMarginBox(0, 5.h),
@@ -341,10 +342,8 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
           }),
         ])),
         UiUtils.getMarginBox(0, 3.w),
-        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("인가후 대출 총금액을", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("알려주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-        UiUtils.getMarginBox(0, 1.h),
-        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력단위(*만원)", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
+        SizedBox(width: 85.w, height: 4.5.h , child: UiUtils.getTextWithFixedScale("이미 받고 있는", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출 총금액을 알려주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
         UiUtils.getMarginBox(0, 5.h),
         Obx(()=>UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _preLoanPriceFocus, _preLoanPriceTextController, TextInputType.number, false,
             UiUtils.getInputDecorationForPrice("", 0.sp, GetController.to.preLoanPrice.value), (text) {
@@ -524,25 +523,12 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
     confirmDataList.add("•  차량번호 ${MyData.selectedCarInfoData!.carNum}");
     confirmDataList.add("•  차량 시세금액 ${CommonUtils.getPriceFormattedStringForFullPrice(double.parse(MyData.selectedCarInfoData!.carPrice))}");
     if(selectedPreLoanCountInfo.split("@")[1] != "0"){
-      confirmDataList.add("•  인가후 대출금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedPreLoanPriceInfo))}");
+      confirmDataList.add("•  기대출  ${selectedPreLoanCountInfo.split("@")[0]}");
+      confirmDataList.add("•  기대출 금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedPreLoanPriceInfo))}");
     }else{
-      confirmDataList.add("•  인가후 대출금액  0원");
+      confirmDataList.add("•  기대출 없음");
     }
     confirmDataList.add("•  ${selectedJobInfo.split("@")[0]}");
-    /*
-    confirmDataList.add("•  기대출  ${selectedPreLoanCountInfo.split("@")[0]}");
-    if(selectedPreLoanPriceInfo != "0"){
-      confirmDataList.add("•  인가후 대출금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedPreLoanPriceInfo))}");
-    }else{
-      confirmDataList.add("•  인가후 대출금액  0원");
-    }
-    if(selectedWantLoanPriceInfo != "0"){
-      confirmDataList.add("•  희망 대출금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedWantLoanPriceInfo))}");
-    }else{
-      confirmDataList.add("•  희망 대출금액  0원");
-    }
-
-     */
 
     List<Widget> confirmWidgetList = [];
     Color textColor = ColorStyles.upFinBlack;

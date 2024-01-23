@@ -497,7 +497,11 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
         }),
       ])),
       UiUtils.getMarginBox(0, 3.w),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("기 대출 횟수를 알려주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, height: 4.5.h , child: UiUtils.getTextWithFixedScale("이미 받고 있는", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출 횟수를 알려주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      UiUtils.getMarginBox(0, 1.h),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale2("개인회생에 포함된 대출이 아닌,", 11.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale2("개인회생 이후 신규로 받은 대출정보를 입력하세요.", 11.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: loanCountList)),
       UiUtils.getMarginBox(0, 5.h),
@@ -528,10 +532,10 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
           }),
         ])),
         UiUtils.getMarginBox(0, 3.w),
-        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("인가후 대출 총금액을", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("알려주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("인가후 대출 총금액", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
         UiUtils.getMarginBox(0, 1.h),
-        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력단위(*만원)", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale2("개인회생에 포함된 대출이 아닌,", 11.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale2("개인회생 이후 신규로 받은 대출정보를 입력하세요.", 11.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
         UiUtils.getMarginBox(0, 5.h),
         Obx(()=>UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _preLoanPriceFocus, _preLoanPriceTextController, TextInputType.number, false,
             UiUtils.getInputDecorationForPrice("", 0.sp, GetController.to.preLoanPrice.value), (text) {
@@ -575,8 +579,6 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
         UiUtils.getMarginBox(0, 3.w),
         SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("희망 대출금액을", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
         SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("알려주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-        UiUtils.getMarginBox(0, 1.h),
-        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력단위(*만원)", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
         UiUtils.getMarginBox(0, 5.h),
         Obx(()=>UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _wantLoanPriceFocus, _wantLoanPriceTextController, TextInputType.number, false,
             UiUtils.getInputDecorationForPrice("", 0.sp, GetController.to.wantLoanPrice.value), (text) {
@@ -698,16 +700,16 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
     _setSelectedInfo();
     List<String> confirmDataList = [];
     confirmDataList.add("•  [환급]  ${selectedBankCodeInfo.split("@")[0]} $selectedBankAccountInfo");
-    confirmDataList.add("•  기대출  ${selectedPreLoanCountInfo.split("@")[0]}");
     if(selectedPreLoanPriceInfo != "0"){
+      confirmDataList.add("•  인가후 대출  ${selectedPreLoanCountInfo.split("@")[0]}");
       confirmDataList.add("•  인가후 대출금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedPreLoanPriceInfo))}");
     }else{
-      confirmDataList.add("•  인가후 대출금액  0원");
+      confirmDataList.add("•  인가후 대출 없음");
     }
     if(selectedWantLoanPriceInfo != "0"){
       confirmDataList.add("•  희망 대출금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedWantLoanPriceInfo))}");
     }else{
-      confirmDataList.add("•  희망 대출금액  0원");
+      //confirmDataList.add("•  희망 대출금액  0원");
     }
     confirmDataList.add("•  ${selectedJobInfo.split("@")[0]}");
 

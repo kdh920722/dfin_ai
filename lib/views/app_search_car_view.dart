@@ -390,7 +390,8 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
           }),
         ])),
         UiUtils.getMarginBox(0, 3.h),
-        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("인가후 대출 총금액", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+        SizedBox(width: 85.w, height: 4.5.h , child: UiUtils.getTextWithFixedScale("이미 받고 있는", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출 총금액을 알려주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
         UiUtils.getMarginBox(0, 5.h),
         Obx(()=>
             Row(mainAxisAlignment: MainAxisAlignment.start, children: [
@@ -558,6 +559,12 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
     confirmDataList.add("•  ${MyData.name}");
     confirmDataList.add("•  ${MyData.birth.substring(0,4)}년 $birthMonth월 $birthDay일");
     confirmDataList.add("•  차량번호 $selectedCarNum");
+    if(selectedPreLoanCountInfo.split("@")[1] != "0"){
+      confirmDataList.add("•  기대출  ${selectedPreLoanCountInfo.split("@")[0]}");
+      confirmDataList.add("•  기대출 금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedPreLoanPriceInfo))}");
+    }else{
+      confirmDataList.add("•  기대출 없음");
+    }
     confirmDataList.add("•  ${selectedJobInfo.split("@")[0]}");
     /*
     confirmDataList.add("•  기대출  ${selectedPreLoanCountInfo.split("@")[0]}");

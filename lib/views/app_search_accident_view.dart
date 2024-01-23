@@ -425,23 +425,27 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       ),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-        selectedAccidentInfo = "${_accidentInfoTextController1.text.trim()}개회${_accidentInfoTextController2.text.trim()}";
-        if(selectedAccidentInfo != "개회" && _accidentInfoTextController1.text.trim() != "" && _accidentInfoTextController2.text.trim() != ""){
-          bool isValid = true;
-          for(var eachAccident in MyData.getAccidentInfoList()){
-            if(eachAccident.accidentCaseNumberYear+eachAccident.accidentCaseNumberType+eachAccident.accidentCaseNumberNumber == selectedAccidentInfo){
-              selectedAccidentInfo = "";
-              isValid = false;
-            }
-          }
-
-          if(isValid){
-            nextInputView();
-          }else{
-            CommonUtils.flutterToast("이미 조회하신 사건번호에요.");
-          }
+        if(_accidentInfoTextController1.text.length!=4){
+          CommonUtils.flutterToast("사건번호 앞4자리를 입력하세요.");
         }else{
-          CommonUtils.flutterToast(errorMsg);
+          selectedAccidentInfo = "${_accidentInfoTextController1.text.trim()}개회${_accidentInfoTextController2.text.trim()}";
+          if(selectedAccidentInfo != "개회" && _accidentInfoTextController1.text.trim() != "" && _accidentInfoTextController2.text.trim() != ""){
+            bool isValid = true;
+            for(var eachAccident in MyData.getAccidentInfoList()){
+              if(eachAccident.accidentCaseNumberYear+eachAccident.accidentCaseNumberType+eachAccident.accidentCaseNumberNumber == selectedAccidentInfo){
+                selectedAccidentInfo = "";
+                isValid = false;
+              }
+            }
+
+            if(isValid){
+              nextInputView();
+            }else{
+              CommonUtils.flutterToast("이미 조회하신 사건번호에요.");
+            }
+          }else{
+            CommonUtils.flutterToast(errorMsg);
+          }
         }
       })
     ]);
@@ -660,6 +664,9 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       UiUtils.getMarginBox(0, 3.h),
       SizedBox(width: 85.w, height: 4.5.h , child: UiUtils.getTextWithFixedScale("이미 받고 있는", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출 횟수를 알려주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      UiUtils.getMarginBox(0, 1.h),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale2("개인회생에 포함된 대출이 아닌,", 11.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale2("개인회생 이후 신규로 받은 대출정보를 입력하세요.", 11.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: loanCountList)),
       UiUtils.getMarginBox(0, 5.h),
@@ -691,6 +698,9 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         ])),
         UiUtils.getMarginBox(0, 3.h),
         SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("인가후 대출 총금액", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+        UiUtils.getMarginBox(0, 1.h),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale2("개인회생에 포함된 대출이 아닌,", 11.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale2("개인회생 이후 신규로 받은 대출정보를 입력하세요.", 11.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
         UiUtils.getMarginBox(0, 5.h),
         Obx(()=>
             Row(mainAxisAlignment: MainAxisAlignment.start, children: [
@@ -867,16 +877,16 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
     confirmDataList.add("•  ${MyData.name}");
     confirmDataList.add("•  ${MyData.birth.substring(0,4)}년 $birthMonth월 $birthDay일");
     confirmDataList.add("•  [환급]  ${selectedBankCodeInfo.split("@")[0]} $selectedBankAccountInfo");
-    confirmDataList.add("•  기대출  ${selectedPreLoanCountInfo.split("@")[0]}");
     if(selectedPreLoanPriceInfo != "0"){
+      confirmDataList.add("•  인가후 대출  ${selectedPreLoanCountInfo.split("@")[0]}");
       confirmDataList.add("•  인가후 대출금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedPreLoanPriceInfo))}");
     }else{
-      confirmDataList.add("•  인가후 대출금액  0원");
+      confirmDataList.add("•  인가후 대출 없음");
     }
     if(selectedWantLoanPriceInfo != "0"){
       confirmDataList.add("•  희망 대출금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedWantLoanPriceInfo))}");
     }else{
-      confirmDataList.add("•  희망 대출금액  0원");
+      //confirmDataList.add("•  희망 대출금액  0원");
     }
     confirmDataList.add("•  ${selectedJobInfo.split("@")[0]}");
 

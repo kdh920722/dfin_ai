@@ -216,7 +216,7 @@ class AppCarDetailViewState extends State<AppCarDetailView> with WidgetsBindingO
           UiUtils.getMarginBox(0, 4.h),
           SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("상세 모델명", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
           UiUtils.getMarginBox(0, 2.h),
-          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(MyData.selectedCarInfoData!.carModelDetail, 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)),
+          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScaleAndOverFlow(MyData.selectedCarInfoData!.carModelDetail, 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)),
           UiUtils.getMarginBox(0, 4.h),
 
         ])

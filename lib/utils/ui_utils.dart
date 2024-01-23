@@ -882,30 +882,6 @@ class UiUtils {
     }
   }
 
-  static void showLoadingPop2(BuildContext targetContext){
-    if(!isLoadingPopOn){
-      isLoadingPopOn = true;
-      showGeneralDialog(
-        barrierDismissible: false,
-        context: targetContext,
-        pageBuilder: (context, animation, secondaryAnimation) {
-          return WillPopScope(
-              onWillPop: () async => false,
-              child: StatefulBuilder(// You need this, notice the parameters below:
-                  builder: (_, StateSetter setState) {
-                    return Container(
-                        width: 100.w,
-                        height: 100.h,
-                        color: Colors.black54,
-                        child: Center(child: getTextWithFixedScale("최신정보로 업데이트 중", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, 1))
-                    );
-                  })
-          );
-        },
-      );
-    }
-  }
-
   static void closeLoadingPop(BuildContext targetContext){
     if(isLoadingPopOn){
       Navigator.pop(targetContext);

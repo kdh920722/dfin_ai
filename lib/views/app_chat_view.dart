@@ -16,6 +16,7 @@ import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:upfin/controllers/get_controller.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/controllers/websocket_controller.dart';
+import 'package:upfin/datas/accident_info_data.dart';
 import 'package:upfin/datas/chat_message_info_data.dart';
 import 'package:upfin/datas/loan_info_data.dart';
 import 'package:upfin/datas/my_data.dart';
@@ -536,6 +537,8 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                       CommonUtils.flutterToast("서류목록을 가져오는데 실패했어요.\n다시 시도해주세요.");
                     }
                   });
+                }else if(url.toLowerCase() == "car"){
+                  _getSearchCarView();
                 }else{
                   //tel:18009221
                   if(await canLaunchUrl(Uri.parse(url))){
@@ -1411,6 +1414,9 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
     _carInfoTextController2.text = "";
     selectedCarNum = "";
     selectedCarOwner = "";
+    String selectedPreLoanPriceInfo = MyData.selectedAccidentInfoData!.accidentLendAmount;
+    String selectedPreLoanCountInfo = MyData.selectedAccidentInfoData!.accidentLendCount;
+    String selectedJobInfo = MyData.jobInfo;
     UiUtils.showPopMenu(context, true, 100.w, 100.h, 0.5, 0, ColorStyles.upFinWhite, (slideContext, slideSetState){
       Widget slideWidget = Padding(padding: EdgeInsets.only(left: 2.5.w, top: 0.5.h,), child: Column(
           children: [
@@ -1459,30 +1465,23 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                 if(isValid){
                   Map<String, dynamic> inputJson = {
                     "car_no": selectedCarNum.replaceAll(" ", "").trim(),
-                    "owner_name": MyData.isTestUser? selectedCarOwner : MyData.name
+                    "owner_name": MyData.isTestUser? selectedCarOwner : MyData.name,
+                    "job": selectedJobInfo.split("@")[1],
+                    "lend_count": selectedPreLoanCountInfo.split("@")[1],
+                    "lend_amount": selectedPreLoanPriceInfo,
+                    "loan_uid" : currentLoanUid
                   };
                   CommonUtils.log("i", "car pr search info:\n$inputJson");
 
                   UiUtils.showLoadingPop(context);
                   LogfinController.callLogfinApi(LogfinApis.addAndSearchCar, inputJson, (isSuccess, outputJson){
+                    UiUtils.closeLoadingPop(context);
                     if(isSuccess){
-                      LogfinController.getCarInfo((isSuccessToGetCarInfo, isNotEmpty){
-                        UiUtils.closeLoadingPop(context);
-                        if(isSuccessToGetCarInfo){
-                          if(isNotEmpty){
-                            CommonUtils.flutterToast("차량정보 조회 완료");
-                            AppMainViewState.refreshMain();
-                            Navigator.pop(slideContext);
-                          }else{
-                            CommonUtils.flutterToast("차량정보 찾기 실패\n다시 실행해주세요.");
-                          }
-                        }else{
-                          CommonUtils.flutterToast("차량정보 찾기 실패\n다시 실행해주세요.");
-                        }
-                      });
+                      CommonUtils.flutterToast("차량정보 조회 완료");
+                      AppMainViewState.refreshMain();
+                      Navigator.pop(slideContext);
                     }else{
                       // prSearch 실패
-                      UiUtils.closeLoadingPop(context);
                       String errorMsg = outputJson!["error"];
                       if(errorMsg == "no implicit conversion of String into Integer"){
                         CommonUtils.flutterToast("차량정보를 확인해주세요.");
@@ -1533,7 +1532,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
         width: 100.w,
         height: 100.h,
         child: Column(children: [
-          UiUtils.getMarginBox(0, 0.5.h),
+          UiUtils.getMarginBox(0, 0.95.h),
           Stack(children: [
             Container(height: 7.2.h,),
             Positioned(
@@ -1548,7 +1547,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
               child: Align(
                   alignment: Alignment.topLeft,
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    UiUtils.getMarginBox(0, 1.8.h),
+                    UiUtils.getMarginBox(0, 1.2.h),
                     UiUtils.getTextWithFixedScale2(currentCompany, 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, 1),
                     UiUtils.getTextWithFixedScale2(currentRoomType == "1" ? "개인회생" : "오토론", 9.sp, FontWeight.w600, ColorStyles.upFinPrTitleColor, TextAlign.center, 1),
                   ])

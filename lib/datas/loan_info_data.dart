@@ -34,6 +34,7 @@ class LoanInfoData {
       case "5" : status = "보류";
       case "6" : status = "부결";
       case "7" : status = "본인취소";
+      case "8" : status = "심사대기";
     }
 
     return status;
@@ -41,6 +42,7 @@ class LoanInfoData {
   static String getStatusName(String statueId){
     String status = "";
     switch(statueId){
+      case "8" : status = "접수";
       case "1" : status = "접수";
       case "2" : status = "심사";
       case "3" : status = "심사";
@@ -55,6 +57,7 @@ class LoanInfoData {
   static String getDisplayStatusName(String statueId){
     String status = "";
     switch(statueId){
+      case "8" : status = "접수중";
       case "1" : status = "접수중";
       case "2" : status = "심사중";
       case "3" : status = "심사중";

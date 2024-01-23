@@ -1010,7 +1010,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               SizedBox(width: 90.w,
                   child: Row(children: [
                     UiUtils.getMarginBox(3.w, 0),
-                    UiUtils.getTextButtonWithFixedScale("•  인가후대출금액 ${CommonUtils.getPriceFormattedString(double.parse(
+                    UiUtils.getTextButtonWithFixedScale("•  인가후 대출금액 ${CommonUtils.getPriceFormattedString(double.parse(
                         MyData.selectedPrInfoData!.uidType == "1" ? MyData.selectedAccidentInfoData!.accidentLendAmount : MyData.selectedCarInfoData!.carLendAmount))}",
                         13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
@@ -1022,7 +1022,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               SizedBox(width: 90.w,
                   child: Row(children: [
                     UiUtils.getMarginBox(3.w, 0),
-                    UiUtils.getTextButtonWithFixedScale("•  인가후대출금액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                    UiUtils.getTextButtonWithFixedScale("•  인가후 대출금액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
                   ])
               )
@@ -3327,7 +3327,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               SizedBox(width: 90.w,
                   child: Row(children: [
                     UiUtils.getMarginBox(3.w, 0),
-                    UiUtils.getTextButtonWithFixedScale("•  인가후대출금액 ${CommonUtils.getPriceFormattedString(double.parse(MyData.selectedPrInfoData!.uidType == "1" ? MyData.selectedAccidentInfoData!.accidentLendAmount : MyData.selectedCarInfoData!.carLendAmount))}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                    UiUtils.getTextButtonWithFixedScale("•  인가후 대출금액 ${CommonUtils.getPriceFormattedString(double.parse(MyData.selectedPrInfoData!.uidType == "1" ? MyData.selectedAccidentInfoData!.accidentLendAmount : MyData.selectedCarInfoData!.carLendAmount))}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
                   ])
               )
@@ -3337,7 +3337,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               SizedBox(width: 90.w,
                   child: Row(children: [
                     UiUtils.getMarginBox(3.w, 0),
-                    UiUtils.getTextButtonWithFixedScale("•  인가후대출금액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                    UiUtils.getTextButtonWithFixedScale("•  인가후 대출금액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
                   ])
               )

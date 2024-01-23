@@ -17,6 +17,7 @@ class SharedPreferenceController {
   static String sharedPreferenceIsSnsLogin = "IS_SNS_LOGIN";
   static String sharedPreferenceValidInfoVersion = "VALID_INFO_VERSION";
   static String sharedPreferenceValidInfoDateKey = "VALID_INFO_DATE";
+  static String sharedPreferenceValidInfoDocDate = "VALID_INFO_DOC_DATE";
   static SharedPreferences? sharedPreferences;
 
   static Future<void> initSharedPreference(Function(bool) callback) async {
@@ -119,6 +120,10 @@ class SharedPreferenceController {
 
       if(sharedPreferences!.containsKey(sharedPreferenceValidInfoDateKey)){
         sharedPreferences!.remove(sharedPreferenceValidInfoDateKey);
+      }
+
+      if(sharedPreferences!.containsKey(sharedPreferenceValidInfoDocDate)){
+        sharedPreferences!.remove(sharedPreferenceValidInfoDocDate);
       }
 
     }catch(error){

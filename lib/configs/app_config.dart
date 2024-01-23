@@ -51,6 +51,9 @@ class Config{
   static bool isTablet = false;
   static Map<String,dynamic> certCmpInfoMap = {};
   static bool isAutoOpen = false;
+  static String accidentOpenNText = "";
+  static bool isAccidentOpen = false;
+  static String autoOpenNText = "";
 
   static Map<String, WidgetBuilder> appRoutes = {
     AppView.appRootView.value : (context) => AppRootView(),
@@ -76,6 +79,27 @@ class Config{
   static bool isPad(){
     final data = MediaQueryData.fromView(WidgetsBinding.instance.window);
     return data.size.shortestSide < 600 ? false :true;
+  }
+
+  static Future<void> getOpenState(Function(bool isSuccess) callback) async {
+    final ref = FirebaseDatabase.instance.ref();
+    final appForDeviceInfoSnapshot = isAndroid? await ref.child('UPFIN/APP_STATE/android_state').get()
+        : await ref.child('UPFIN/APP_STATE/ios_state').get();
+
+    if(appForDeviceInfoSnapshot.exists){
+      for(var each in appForDeviceInfoSnapshot.children){
+        switch(each.key){
+          case "app_download_url" : appStoreUrl = each.value.toString();
+          case "app_state" : appState = int.parse(each.value.toString());
+          case "auto_open_yn" : isAutoOpen = each.value.toString() == "y"? true : false;
+          case "accident_open_yn" : isAccidentOpen = each.value.toString() == "y"? true : false;
+          case "accident_open_n_text" : accidentOpenNText = each.value.toString();
+          case "auto_open_n_text" : autoOpenNText = each.value.toString();
+        }
+      }
+
+      callback(true);
+    }
   }
 
   static Future<void> initAppState(Function(bool isSuccess) callback) async{
@@ -129,6 +153,9 @@ class Config{
             case "app_download_url" : appStoreUrl = each.value.toString();
             case "app_state" : appState = int.parse(each.value.toString());
             case "auto_open_yn" : isAutoOpen = each.value.toString() == "y"? true : false;
+            case "accident_open_yn" : isAccidentOpen = each.value.toString() == "y"? true : false;
+            case "accident_open_n_text" : accidentOpenNText = each.value.toString();
+            case "auto_open_n_text" : autoOpenNText = each.value.toString();
           }
         }
       }else{
