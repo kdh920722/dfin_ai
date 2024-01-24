@@ -500,8 +500,7 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
       SizedBox(width: 85.w, height: 4.5.h , child: UiUtils.getTextWithFixedScale("이미 받고 있는", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출 횟수를 알려주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 1.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale2("개인회생에 포함된 대출이 아닌,", 11.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale2("개인회생 이후 신규로 받은 대출정보를 입력하세요.", 11.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale2("개인회생 신청 이후에 받은 회생대출 횟수", 14.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: loanCountList)),
       UiUtils.getMarginBox(0, 5.h),
@@ -532,10 +531,9 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
           }),
         ])),
         UiUtils.getMarginBox(0, 3.w),
-        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("인가후 대출 총금액", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("개인회생 신청 이후", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
         UiUtils.getMarginBox(0, 1.h),
-        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale2("개인회생에 포함된 대출이 아닌,", 11.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
-        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale2("개인회생 이후 신규로 받은 대출정보를 입력하세요.", 11.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출 총금액", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
         UiUtils.getMarginBox(0, 5.h),
         Obx(()=>UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _preLoanPriceFocus, _preLoanPriceTextController, TextInputType.number, false,
             UiUtils.getInputDecorationForPrice("", 0.sp, GetController.to.preLoanPrice.value), (text) {
@@ -698,7 +696,18 @@ class AppUpdateAccidentViewState extends State<AppUpdateAccidentView> with Widge
   /// finish confirm view
   Widget _getConfirmView(){
     _setSelectedInfo();
+    String birthMonth = MyData.birth.substring(4,6);
+    if(birthMonth.substring(0,1) == "0"){
+      birthMonth = birthMonth.substring(1);
+    }
+
+    String birthDay = MyData.birth.substring(6);
+    if(birthDay.substring(0,1) == "0"){
+      birthDay = birthDay.substring(1);
+    }
     List<String> confirmDataList = [];
+    confirmDataList.add("•  ${MyData.name}");
+    confirmDataList.add("•  ${MyData.birth.substring(0,4)}년 $birthMonth월 $birthDay일");
     confirmDataList.add("•  [환급]  ${selectedBankCodeInfo.split("@")[0]} $selectedBankAccountInfo");
     if(selectedPreLoanPriceInfo != "0"){
       confirmDataList.add("•  인가후 대출  ${selectedPreLoanCountInfo.split("@")[0]}");

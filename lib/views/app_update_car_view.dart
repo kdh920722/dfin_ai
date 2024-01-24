@@ -580,18 +580,10 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
   void _updateData(){
     UiUtils.showLoadingPop(context);
     LogfinController.getCarPrList(MyData.selectedCarInfoData!.carNum, selectedJobInfo.split("@")[1], selectedPreLoanCountInfo.split("@")[1], selectedPreLoanPriceInfo, (isSuccessToGetOffers, _){
+      UiUtils.closeLoadingPop(context);
       if(isSuccessToGetOffers){
-        LogfinController.getUserInfo((isSuccessToGetUserInfo){
-          UiUtils.closeLoadingPop(context);
-          if(isSuccessToGetUserInfo){
-            CommonUtils.moveWithReplacementTo(context, AppView.appResultPrView.value, null);
-          }else{
-            CommonUtils.flutterToast("에러가 발생했습니다.\n다시 실행해주세요.");
-            Navigator.pop(context);
-          }
-        });
+        CommonUtils.moveWithReplacementTo(context, AppView.appResultPrView.value, null);
       }else{
-        UiUtils.closeLoadingPop(context);
         CommonUtils.flutterToast("에러가 발생했습니다.\n다시 실행해주세요.");
         Navigator.pop(context);
       }

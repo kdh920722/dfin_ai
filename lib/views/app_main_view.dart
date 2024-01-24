@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_advanced_switch/flutter_advanced_switch.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:sizer/sizer.dart';
@@ -52,6 +52,16 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     }else{
       doCheckToSearchPr = false;
     }
+
+    _switchController.addListener(() {
+      setState(() {
+        if (_switchController.value) {
+          isSwitched = true;
+        } else {
+          isSwitched = false;
+        }
+      });
+    });
 
     mainContext = context;
     Config.contextForEmergencyBack = context;
@@ -144,7 +154,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                             Config.isAndroid ? Config.isPad()? 45.h : 35.h : Config.isPad()? 50.h : 40.h, 0.5, (slideContext, setState){
                               return Center(child: Column(children: [
                                 UiUtils.getMarginBox(0, 3.h),
-                                UiUtils.getTextWithFixedScale("사건정보 등록 임시중지 안내", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null),
+                                UiUtils.getTextWithFixedScale("시스템 점검중", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null),
                                 UiUtils.getMarginBox(0, 3.h),
                                 SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2(Config.accidentOpenNText.replaceAll("@@", "\n"), 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
                                 UiUtils.getMarginBox(0, 3.h),
@@ -185,7 +195,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                             Config.isAndroid ? Config.isPad()? 45.h : 35.h : Config.isPad()? 50.h : 40.h, 0.5, (slideContext, setState){
                               return Center(child: Column(children: [
                                 UiUtils.getMarginBox(0, 3.h),
-                                SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("자동차 정보 등록 임시중지 안내", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
+                                SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("시스템 점검중", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
                                 UiUtils.getMarginBox(0, 3.h),
                                 UiUtils.getTextWithFixedScale2(Config.autoOpenNText.replaceAll("@@", "\n"), 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null),
                                 UiUtils.getMarginBox(0, 3.h),
@@ -254,7 +264,8 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     });
   }
 
-  static bool isSwitched = true;
+  final _switchController = ValueNotifier<bool>(true);
+  bool isSwitched = true;
   bool isScrolling = false;
   Widget _getMyView(){
     return Column(children: [
@@ -273,21 +284,31 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
           },
           child: ListView(shrinkWrap: true,physics: const BouncingScrollPhysics(),children: [
             UiUtils.getMarginBox(0, 2.5.h),
-            Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 0.h, bottom: 1.h), child: Row(mainAxisSize: MainAxisSize.max, children: [
-              UiUtils.getTextWithFixedScale(MyData.name, 15.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, 1),
-              UiUtils.getMarginBox(1.w, 0),
-              Transform.scale(scale: 0.7, child: CupertinoSwitch(value: isSwitched, activeColor: ColorStyles.upFinSky, onChanged: (value){
-                setState(() {
-                  isSwitched = value;
-
-                });
-              })),
-              MyData.isTestUser ? UiUtils.getRoundBoxButtonTextWithFixedScale6(
-                  UiUtils.getTextWithFixedScale("관리자", 9.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null),
-                  ColorStyles.upFinBlack, (){
-                    // test
-                    SharedPreferenceController.deleteAllData();
-                /*
+            Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 0.h, bottom: 1.h),
+                child: Obx((){
+                  return Row(mainAxisSize: MainAxisSize.max, children: [
+                    UiUtils.getTextWithFixedScale(MyData.name, 15.sp, FontWeight.w600, ColorStyles.upFinDarkGray, TextAlign.start, 1),
+                    UiUtils.getMarginBox(2.w,0),
+                    GetController.to.accidentInfoDataList.isNotEmpty || GetController.to.carInfoDataList.isNotEmpty ?
+                    AdvancedSwitch(
+                      controller: _switchController,
+                      activeColor: ColorStyles.upFinSky,
+                      inactiveColor: ColorStyles.upFinGray,
+                      activeChild: Container(padding: EdgeInsets.only(left: 1.4.w, top: 0.2.w),width: 10.w, child: UiUtils.getTextWithFixedScale("정보", 9.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, 1)),
+                      inactiveChild: Container(padding: EdgeInsets.only(right: 1.4.w, top: 0.2.w),width: 10.w, child: UiUtils.getTextWithFixedScale("정보", 9.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, 1)),
+                      borderRadius: const BorderRadius.all(Radius.circular(20)),
+                      width: 13.5.w,
+                      height: 2.8.h,
+                      enabled: true,
+                      disabledOpacity: 1,
+                    ) : Container(),
+                    UiUtils.getMarginBox(2.w,0),
+                    const Spacer(flex: 2),
+                    MyData.isTestUser ? UiUtils.getRoundBoxButtonTextWithFixedScale6(
+                        UiUtils.getTextWithFixedScale("관리자", 9.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null), ColorStyles.upFinWhiteGray, (){
+                      // test
+                      //SharedPreferenceController.deleteAllData();
+                      /*
                 //간편인증팝업
                 List<Widget> certCmpWidgetList = [];
                 UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, null, Config.isPad()? 60.h : 40.h, 0.5, (slideContext, setState){
@@ -485,22 +506,23 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                   ]));
                 });
                 */
-              })
-                 : UiUtils.getMarginBox(0, 0),
-              const Spacer(flex: 2),
-              UiUtils.getMarginBox(2.w, 0),
-              UiUtils.getIconButton(Icons.add, 7.w, ColorStyles.upFinBannerButton, () {
-                _showChoicePop();
-              }),
-              UiUtils.getMarginBox(2.w, 0),
-              UiUtils.getIconButton(Icons.refresh_outlined, 7.w, ColorStyles.upFinBannerButton, () {
-                _refreshMyView(context);
-              }),
-              UiUtils.getMarginBox(2.w, 0),
-              UiUtils.getIconButton(Icons.settings, 7.w, ColorStyles.upFinBannerButton, () {
-                setState(() {viewTypeId = 3;});
-              })
-            ])),
+                    })
+                        : UiUtils.getMarginBox(0, 0),
+                    UiUtils.getMarginBox(2.w, 0),
+                    UiUtils.getIconButton(Icons.add, 7.w, ColorStyles.upFinBannerButton, () {
+                      _showChoicePop();
+                    }),
+                    UiUtils.getMarginBox(2.w, 0),
+                    UiUtils.getIconButton(Icons.refresh_outlined, 7.w, ColorStyles.upFinBannerButton, () {
+                      _refreshMyView(context);
+                    }),
+                    UiUtils.getMarginBox(2.w, 0),
+                    UiUtils.getIconButton(Icons.settings, 7.w, ColorStyles.upFinBannerButton, () {
+                      setState(() {viewTypeId = 3;});
+                    })
+                  ]);
+                })
+            ),
             Container(padding: EdgeInsets.only(top: 1.h),
                 child: UiUtils.getTopBannerButtonBox(100.w, Config.isPad()? 9.h : 8.h, ColorStyles.upFinBannerSky, ColorStyles.upFinBannerSky,
                     Stack(
@@ -511,7 +533,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                               left: 5.w,
                               child: Row(children: [
                                 UiUtils.getMarginBox(20.w, 0),
-                                UiUtils.getAnimatedTextList(["업핀! 다이렉트 대출의 새로운 시작!", "쉽고 빠르고 편하게 업핀하세요!", "절차가 간편한 새로운 금융 경험~"], ColorStyles.upFinButtonBlue, 12.sp, FontWeight.w500, const Duration(milliseconds: 150), 200, (){})
+                                UiUtils.getAnimatedTextList(["업핀! 다이렉트 대출의 새로운 시작!", "쉽고 빠르고 편하게 업핀하세요!", "절차가 간편한 새로운 금융 경험~"], ColorStyles.upFinButtonBlue, 12.sp, FontWeight.w600, const Duration(milliseconds: 150), 200, (){})
                               ])),
                           Positioned(
                               left: 3.w,
@@ -609,25 +631,25 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                   right: 3.w,
                   child: UiUtils.getImage(50.w, 50.w, Image.asset(fit: BoxFit.fill,'assets/images/ani_man_search.gif'))),
             ]),
-            UiUtils.getMarginBox(100.w, 3.h),
+            UiUtils.getMarginBox(100.w, 5.h),
             Container(padding: EdgeInsets.only(right: 5.w, left : 5.w, bottom : 5.w), child: Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
               UiUtils.getRoundBoxTextWithFixedScale6(
-                  UiUtils.getTextWithFixedScale("중개운영", 10.sp, FontWeight.w600, ColorStyles.upFinMainTitleColor1, TextAlign.start, null),
+                  UiUtils.getTextWithFixedScale("중개운영", 8.sp, FontWeight.w500, ColorStyles.upFinMainTitleColor1, TextAlign.start, null),
                   ColorStyles.upFinMainTitleBackColor1),
               UiUtils.getMarginBox(0, 1.h),
               UiUtils.getTextWithFixedScale2(Config.appMainIntroText1.replaceAll("@@", "\n"), 10.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null),
               UiUtils.getMarginBox(0, 4.h),
               UiUtils.getRoundBoxTextWithFixedScale6(
-                  UiUtils.getTextWithFixedScale("서비스운영", 10.sp, FontWeight.w600, ColorStyles.upFinMainTitleColor2, TextAlign.start, null),
+                  UiUtils.getTextWithFixedScale("서비스운영", 8.sp, FontWeight.w500, ColorStyles.upFinMainTitleColor2, TextAlign.start, null),
                   ColorStyles.upFinMainTitleBackColor2),
               UiUtils.getMarginBox(0, 1.h),
               UiUtils.getTextWithFixedScale2(Config.appMainIntroText2.replaceAll("@@", "\n"), 10.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null),
-              UiUtils.getMarginBox(0, 2.h),
+              UiUtils.getMarginBox(0, 4.h),
               UiUtils.getTextWithFixedScale2(Config.privacyText.replaceAll("@@", "\n"), 10.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null),
               UiUtils.getMarginBox(0, 2.h),
-              GestureDetector(child: Row(children: [
+              GestureDetector(child: Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
                 UiUtils.getTextWithFixedScale("개인정보처리방침 바로가기:", 10.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null),
-                UiUtils.getTextWithUnderline(Config.privacyUrl, 10.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null, ColorStyles.upFinDarkGray)
+                UiUtils.getTextWithUnderline(Config.privacyUrl, 10.sp, FontWeight.w400, ColorStyles.upFinRealGray, TextAlign.start, null, ColorStyles.upFinRealGray)
               ]),
               onTap: () async {
                 Uri privacyLink = Uri.parse(Config.privacyUrl);
@@ -635,7 +657,9 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                 launchUrl(privacyLink);
                 }
               }),
-              UiUtils.getMarginBox(0, 2.h),
+              UiUtils.getMarginBox(0, 4.h),
+              UiUtils.getTextWithFixedScale("Copyright Upfin . All Rights Reserved", 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null),
+              UiUtils.getMarginBox(0, 0.5.h),
             ]))
           ])
       )),
@@ -686,7 +710,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
 
     for(var each in accidentInfoList){
       myInfoWidgetList.add(
-          UiUtils.getAccidentBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinGray,
+          UiUtils.getMyInfoBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinGray,
               Column(children: [
                 UiUtils.getMarginBox(0, 1.5.h),
                 Row(children: [
@@ -706,7 +730,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         UiUtils.getTextWithFixedScale(each.accidentCourtInfo.split("@")[0], 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.center, 1),
                         UiUtils.getMarginBox(0, 0.5.h),
-                        SizedBox(width: 46.w, child: UiUtils.getTextWithFixedScaleAndOverFlow("${each.accidentCaseNumberYear}${each.accidentCaseNumberType}${each.accidentCaseNumberNumber}", 16.sp,
+                        SizedBox(width: 53.w, child: UiUtils.getTextWithFixedScaleAndOverFlow("${each.accidentCaseNumberYear}${each.accidentCaseNumberType}${each.accidentCaseNumberNumber}", 16.sp,
                             FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
                       ]),
                       const Spacer(flex: 1),
@@ -790,7 +814,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
 
     for(var each in carInfoList){
       myInfoWidgetList.add(
-          UiUtils.getAccidentBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinGray,
+          UiUtils.getMyInfoBorderButtonBox(90.w, ColorStyles.upFinWhite, ColorStyles.upFinGray,
               Column(children: [
                 UiUtils.getMarginBox(0, 1.5.h),
                 Row(children: [
@@ -805,7 +829,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                       UiUtils.getImage(16.w, 16.w, Image.asset('assets/images/icon_car.png', fit: BoxFit.fill)),
                       UiUtils.getMarginBox(3.w, 0),
                       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        SizedBox(width: 46.w, child: UiUtils.getTextWithFixedScaleAndOverFlow("${each.carModel} ${each.carModelDetail}", 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, 1)),
+                        SizedBox(width: 53.w, child: UiUtils.getTextWithFixedScaleAndOverFlow("${each.carModel} ${each.carModelDetail}", 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, 1)),
                         UiUtils.getMarginBox(0, 0.5.h),
                         UiUtils.getTextWithFixedScale(each.carNum, 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null),
                       ]),

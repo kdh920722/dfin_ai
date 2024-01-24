@@ -313,7 +313,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                       }
                     }
                   }else{
-                    CommonUtils.flutterToast("신청 불가능한 상풉이에요.");
+                    CommonUtils.flutterToast("신청 불가능한 상품이에요.");
                   }
                 })
         );

@@ -636,17 +636,10 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
                         }
 
                         LogfinController.getCarPrList(MyData.selectedCarInfoData!.carNum, selectedJobInfo.split("@")[1], selectedPreLoanCountInfo.split("@")[1], selectedPreLoanPriceInfo, (isSuccessToGetOffers, _){
+                          UiUtils.closeLoadingPop(context);
                           if(isSuccessToGetOffers){
-                            LogfinController.getUserInfo((isSuccessToGetUserInfo){
-                              UiUtils.closeLoadingPop(context);
-                              if(isSuccessToGetUserInfo){
-                                CommonUtils.moveWithReplacementTo(context, AppView.appResultPrView.value, null);
-                              }else{
-                                CommonUtils.flutterToast("차량정보 찾기 실패\n다시 실행해주세요.");
-                              }
-                            });
+                            CommonUtils.moveWithReplacementTo(context, AppView.appResultPrView.value, null);
                           }else{
-                            UiUtils.closeLoadingPop(context);
                             CommonUtils.flutterToast("차량정보 찾기 실패\n다시 실행해주세요.");
                           }
                         });
@@ -703,20 +696,12 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
                     if(isSuccessToGetCarInfo){
                       if(isNotEmpty){
                         LogfinController.getCarPrList(MyData.selectedCarInfoData!.carNum, selectedJobInfo.split("@")[1], selectedPreLoanCountInfo.split("@")[1], selectedPreLoanPriceInfo, (isSuccessToGetOffers, _) async {
+                          UiUtils.closeLoadingPop(context);
                           if(isSuccessToGetOffers){
-                            LogfinController.getUserInfo((isSuccessToGetUserInfo) async {
-                              UiUtils.closeLoadingPop(context);
-                              if(isSuccessToGetUserInfo){
-                                CommonUtils.moveWithUntil(context, AppView.appMainView.value);
-                                await Future.delayed(const Duration(seconds: 2), () async {});
-                                await FireBaseController.setNotificationTorF(true);
-                              }else{
-                                await FireBaseController.setNotificationTorF(true);
-                                CommonUtils.flutterToast("차량정보 찾기 실패\n다시 실행해주세요.");
-                              }
-                            });
+                            CommonUtils.moveWithUntil(context, AppView.appMainView.value);
+                            await Future.delayed(const Duration(seconds: 2), () async {});
+                            await FireBaseController.setNotificationTorF(true);
                           }else{
-                            UiUtils.closeLoadingPop(context);
                             CommonUtils.flutterToast("차량정보 찾기 실패\n다시 실행해주세요.");
                             await FireBaseController.setNotificationTorF(true);
                           }

@@ -853,7 +853,19 @@ class LogfinController {
 
             if(MyData.getPrInfoList().isNotEmpty){
               MyData.sortPrInfoListBy(false);
-              callback(true, outputJsonForGetOffers);
+              getUserInfo((isSuccessToGetUserInfo){
+                if(isSuccessToGetUserInfo){
+                  getCarInfo((isSuccessToGetCarInfo, isCarInfoNotEmpty){
+                    if(isSuccessToGetCarInfo){
+                      callback(true, outputJsonForGetOffers);
+                    }else{
+                      callback(false, null);
+                    }
+                  });
+                }else{
+                  callback(false, null);
+                }
+              });
             }else{
               callback(false, null);
             }

@@ -7,7 +7,6 @@ import 'package:upfin/datas/my_data.dart';
 import 'package:upfin/styles/ColorStyles.dart';
 import 'package:upfin/views/app_main_view.dart';
 import '../controllers/firebase_controller.dart';
-import '../controllers/logfin_controller.dart';
 import '../styles/TextStyles.dart';
 import '../configs/app_config.dart';
 import '../utils/common_utils.dart';

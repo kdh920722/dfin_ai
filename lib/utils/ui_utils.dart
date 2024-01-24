@@ -223,7 +223,7 @@ class UiUtils {
           color: boxColor, // 배경색 설정
           borderRadius: BorderRadius.circular(20.0), // 모서리를 둥글게 하는 부분
         ),child: FittedBox(fit: BoxFit.contain, alignment: Alignment.center,
-        child: Padding(padding: EdgeInsets.only(left: 2.w, right: 2.w, bottom: 2.w, top: 2.w), child: child)));
+        child: Padding(padding: EdgeInsets.only(left: 2.5.w, right: 2.5.w, bottom: 2.w, top: 2.w), child: child)));
   }
 
   static Widget getRoundBoxButtonTextWithFixedScale5(Widget child, Color boxColor, Function() tabCallBack){
@@ -504,7 +504,7 @@ class UiUtils {
             padding: EdgeInsets.only(left: 0, right: 0, top: 4.w, bottom: 4.w),
             backgroundColor: buttonColor,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)),
-            side: BorderSide(width: 1, color: borderColor),
+            side: BorderSide(width: 0.6, color: borderColor),
             elevation: 0.0,
             shadowColor: ColorStyles.upFinGray,
           ),
@@ -514,7 +514,70 @@ class UiUtils {
     );
   }
 
-  static SizedBox getAccidentBorderButtonBox(double buttonWidth, Color buttonColor, Color borderColor, Widget childWidget, VoidCallback onPressedCallback){
+  static Widget getSwitchButton(StateSetter setState, bool isSwitched, Color kSecondaryColor){
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          isSwitched = !isSwitched;
+        });
+      },
+      child: Container(
+        width: 20.w,
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(30),
+            color: kSecondaryColor),
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Row(
+            mainAxisAlignment:
+            MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                width: 60,
+                height: 30,
+                decoration: BoxDecoration(
+                    borderRadius:
+                    BorderRadius.circular(30),
+                    color: isSwitched
+                        ? Colors.white
+                        : kSecondaryColor),
+                child: Center(
+                    child: Text(
+                      'BUY',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: isSwitched
+                              ? Colors.black
+                              : Colors.white),
+                    )),
+              ),
+              Container(
+                width: 60,
+                height: 30,
+                decoration: BoxDecoration(
+                    borderRadius:
+                    BorderRadius.circular(30),
+                    color: isSwitched
+                        ? kSecondaryColor
+                        : Colors.white),
+                child: Center(
+                    child: Text(
+                      'SELL',
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: isSwitched
+                              ? Colors.white
+                              : Colors.black),
+                    )),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  static SizedBox getMyInfoBorderButtonBox(double buttonWidth, Color buttonColor, Color borderColor, Widget childWidget, VoidCallback onPressedCallback){
     return SizedBox(
         width: buttonWidth,
         child: ElevatedButton(
@@ -522,7 +585,7 @@ class UiUtils {
             padding: EdgeInsets.only(left: 2.w, right: 2.w),
             backgroundColor: buttonColor,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
-            side: BorderSide(width: 0.5, color: borderColor),
+            side: BorderSide(width: 0.6, color: borderColor),
             elevation: 0.0,
             shadowColor: ColorStyles.upFinGray,
           ),

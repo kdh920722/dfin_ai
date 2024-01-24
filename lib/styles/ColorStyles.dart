@@ -8,7 +8,7 @@ class ColorStyles {
   static const Color upFinTextAndBorderBlue = Color(0xff5681ff);
   static const Color upFinBannerSky = Color(0xffD2E8FF);
   static const Color upFinBannerButton = Colors.black54;
-  static const Color upFinBannerSky2 = Color(0xff3a5cFF);
+  static const Color upFinBannerSky2 = Color(0xff3a6cEf);
   static const Color upFinBannerSky2textGreen = Color(0xffccf381);
   static const Color upFinRed = Color(0xffe9603c);
   static const Color upFinWhiteRed = Color(0xffffe4e1);
@@ -21,7 +21,6 @@ class ColorStyles {
   static const Color upFinBlack = Color(0xff1c1c1c);
   static const Color upFinWhite = Colors.white;
   static const Color upFinRealWhite = Colors.white;
-  static const Color upFinMainGray = Color(0xF7F8F9);
   static const Color upFinOrange = Color(0xffF89b00);
   static const Color upFinYellow = Color(0xffFfed76);
   static const Color upFinWhiteYellow = Color(0xffFFF19A);

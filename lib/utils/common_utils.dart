@@ -188,9 +188,7 @@ class CommonUtils {
   }
 
   static Future<void> checkUpdate(BuildContext context) async {
-    CommonUtils.log("w","check update");
     int state = await Config.isNeedToUpdateForMain();
-    CommonUtils.log("w","check update state : $state");
     if(state == 99){
       if(context.mounted && !isOutPopOn){
         CommonUtils.log("w","check update mount");
@@ -207,9 +205,7 @@ class CommonUtils {
         });
       }
     }else if(state == 44){
-      CommonUtils.log("w","check update mount222333");
       if(context.mounted && !isOutPopOn){
-        CommonUtils.log("w","check update mount");
         isOutPopOn = true;
         UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isAndroid ? Config.isPad()? 45.h : 35.h : Config.isPad()? 50.h : 40.h, 0.5, (context, setState){
           return Center(child: Column(children: [
