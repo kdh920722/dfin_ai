@@ -54,6 +54,7 @@ class Config{
   static String accidentOpenNText = "";
   static bool isAccidentOpen = false;
   static String autoOpenNText = "";
+  static List<String> appVerPassUsers = [];
 
   static Map<String, WidgetBuilder> appRoutes = {
     AppView.appRootView.value : (context) => AppRootView(),
@@ -117,6 +118,7 @@ class Config{
       final ref = FirebaseDatabase.instance.ref();
       final appInfoSnapshot = await ref.child('UPFIN/APP_STATE/app_info').get();
       final appSateInfoSnapshot = await ref.child('UPFIN/APP_STATE/app_info/state').get();
+      final appVerPassUserInfoSnapshot = await ref.child('UPFIN/APP_STATE/app_info/app_ver_pass_user').get();
       final appForDeviceInfoSnapshot = isAndroid? await ref.child('UPFIN/APP_STATE/android_state').get()
           : await ref.child('UPFIN/APP_STATE/ios_state').get();
 
@@ -142,6 +144,14 @@ class Config{
       if(appSateInfoSnapshot.exists){
         for(var each in appSateInfoSnapshot.children){
           if(each.key != null) stateInfoMap[each.key!] = int.parse(each.value.toString());
+        }
+      }else{
+        isValid = false;
+      }
+
+      if(appVerPassUserInfoSnapshot.exists){
+        for(var each in appVerPassUserInfoSnapshot.children){
+          if(each.key != null) appVerPassUsers.add(each.value.toString());
         }
       }else{
         isValid = false;

@@ -26,7 +26,10 @@ class CodeFController{
     "CF-01004" : "응답대기시간 초과",
     "CF-12872" : "인증요청 취소",
     "CF-12835" : "인증서정보 없음",
+    "CF-13231" : "등록원부(을)를 가져올 수 없는 차량",
+    "CF-12003" : "인증기관 오류",
     "error_timeout" : "응답대기시간 초과",
+    "error_abort" : "연결이 끊어졌어요. 재시도 해주세요.",
     "error_http" : "인터넷연결 오류",
     "error_connection" : "서버연결 오류",
     "error_cert" : "정보를 가져오는데 문제발생",
@@ -37,6 +40,7 @@ class CodeFController{
   static String token = "";
   static const errorCodeKey = "codefError";
   static bool isTimeOutException = false;
+  static bool isAbortException = false;
   static void setHostStatus(HostStatus host){
     hostStatus = host;
   }
@@ -234,13 +238,23 @@ class CodeFController{
         callback(false, false, resultData, null, null);
       }
     } catch (e) {
-      isTimeOutException = true;
-      CommonUtils.log('e', e.toString());
-      final Map<String, dynamic> resultData = {};
-      resultData['result_code'] = errorCodeKey;
-      resultData['result_codef_code'] = "error_timeout";
-      resultData['result_msg'] = "에러가 발생했습니다.";
-      callback(false, false, resultData, null, null);
+      if(e.toString().contains("connection abort")){
+        isAbortException = true;
+        CommonUtils.log('e', e.toString());
+        final Map<String, dynamic> resultData = {};
+        resultData['result_code'] = errorCodeKey;
+        resultData['result_codef_code'] = "error_abort";
+        resultData['result_msg'] = "에러가 발생했습니다.";
+        callback(false, false, resultData, null, null);
+      }else{
+        isTimeOutException = true;
+        CommonUtils.log('e', e.toString());
+        final Map<String, dynamic> resultData = {};
+        resultData['result_code'] = errorCodeKey;
+        resultData['result_codef_code'] = "error_timeout";
+        resultData['result_msg'] = "에러가 발생했습니다.";
+        callback(false, false, resultData, null, null);
+      }
     }
   }
   /// ------------------------------------------------------------------------------------------------------------------------ ///
@@ -306,6 +320,7 @@ class CodeFController{
                 callback(false, null);
               }else{
                 // cert call for auth..
+                /*
                 if(certType == 1){
                   if(await canLaunchUrl(Uri.parse("kakaotalk://launch"))){
                     launchUrl(Uri.parse("kakaotalk://launch"));
@@ -365,15 +380,81 @@ class CodeFController{
                     }
                   }
                 }
+                */
 
                 if(context.mounted){
                   int callCount = 0;
                   if(apiInfoDataList.length > 1){
+                    CommonUtils.log("i","call fin 1 : 첫번째(초본)호출 후 추가인증요청");
                     for(int i = 1 ; i < apiInfoDataList.length ; i++){
-                      _callApiWithOutCert2(context, apiInfoDataList[i].api, apiInfoDataList[i].inputJson, (isSuccess, resultMap, resultListMap, fullMap) {
-                        callCount++;
-                        if(isSuccess){
-                          if(fullMap == null){
+                      await Future.delayed(const Duration(milliseconds: 700));
+                      if(context.mounted){
+                        _callApiWithOutCert2(context, apiInfoDataList[i].api, apiInfoDataList[i].inputJson, (isSuccess, resultMap, resultListMap, fullMap) {
+                          callCount++;
+                          if(isSuccess){
+                            CommonUtils.log("i","call fin 5 : 나머지 api 응답결과 옴");
+                            if(fullMap == null){
+                              apiInfoDataList[i].isResultSuccess = false;
+                              apiInfoDataList[i].resultMap = null;
+                              apiInfoDataList[i].resultListMap = null;
+                              apiInfoDataList[i].resultFullMap = null;
+                              if(resultMap != null){
+                                apiInfoDataList[i].errorCode = resultMap["result_codef_code"];
+                              }else if(resultListMap != null){
+                                apiInfoDataList[i].errorCode = resultListMap[0]["result_codef_code"];
+                              }
+                            }else{
+                              if(resultMap != null){
+                                if(resultMap["result_code"] == errorCodeKey){
+                                  apiInfoDataList[i].isResultSuccess = false;
+                                  apiInfoDataList[i].resultMap = null;
+                                  apiInfoDataList[i].resultListMap = null;
+                                  apiInfoDataList[i].resultFullMap = fullMap;
+                                  apiInfoDataList[i].errorCode = resultMap["result_codef_code"];
+                                }else{
+                                  if(fullMap["result"]["code"] == "CF-03002"){
+                                    apiInfoDataList[i].isResultSuccess = false;
+                                    apiInfoDataList[i].resultMap = null;
+                                    apiInfoDataList[i].resultListMap = null;
+                                    apiInfoDataList[i].resultFullMap = fullMap;
+                                    apiInfoDataList[i].errorCode = "error_cert";
+                                  }else{
+                                    apiInfoDataList[i].isResultSuccess = true;
+                                    apiInfoDataList[i].resultMap = resultMap;
+                                    apiInfoDataList[i].resultListMap = null;
+                                    apiInfoDataList[i].resultFullMap = fullMap;
+                                  }
+                                }
+                              }else{
+                                if(resultListMap == null || resultListMap.isEmpty){
+                                  apiInfoDataList[i].isResultSuccess = false;
+                                  apiInfoDataList[i].resultMap = null;
+                                  apiInfoDataList[i].resultListMap = null;
+                                  apiInfoDataList[i].resultFullMap = fullMap;
+                                  apiInfoDataList[i].errorCode = "error_null";
+                                }else{
+                                  if(resultListMap[0]["result_code"] == errorCodeKey){
+                                    apiInfoDataList[i].isResultSuccess = false;
+                                    apiInfoDataList[i].resultMap = null;
+                                    apiInfoDataList[i].resultListMap = null;
+                                    apiInfoDataList[i].resultFullMap = fullMap;
+                                    apiInfoDataList[i].errorCode = resultListMap[0]["result_codef_code"];
+                                  }else if(fullMap["result"]["code"] == "CF-03002"){
+                                    apiInfoDataList[i].isResultSuccess = false;
+                                    apiInfoDataList[i].resultMap = null;
+                                    apiInfoDataList[i].resultListMap = null;
+                                    apiInfoDataList[i].resultFullMap = fullMap;
+                                    apiInfoDataList[i].errorCode = "error_cert";
+                                  }else{
+                                    apiInfoDataList[i].isResultSuccess = true;
+                                    apiInfoDataList[i].resultMap = null;
+                                    apiInfoDataList[i].resultListMap = resultListMap;
+                                    apiInfoDataList[i].resultFullMap = fullMap;
+                                  }
+                                }
+                              }
+                            }
+                          }else{
                             apiInfoDataList[i].isResultSuccess = false;
                             apiInfoDataList[i].resultMap = null;
                             apiInfoDataList[i].resultListMap = null;
@@ -383,177 +464,122 @@ class CodeFController{
                             }else if(resultListMap != null){
                               apiInfoDataList[i].errorCode = resultListMap[0]["result_codef_code"];
                             }
-                          }else{
-                            if(resultMap != null){
-                              if(resultMap["result_code"] == errorCodeKey){
-                                apiInfoDataList[i].isResultSuccess = false;
-                                apiInfoDataList[i].resultMap = null;
-                                apiInfoDataList[i].resultListMap = null;
-                                apiInfoDataList[i].resultFullMap = fullMap;
-                                apiInfoDataList[i].errorCode = resultMap["result_codef_code"];
-                              }else{
-                                if(fullMap["result"]["code"] == "CF-03002"){
-                                  apiInfoDataList[i].isResultSuccess = false;
-                                  apiInfoDataList[i].resultMap = null;
-                                  apiInfoDataList[i].resultListMap = null;
-                                  apiInfoDataList[i].resultFullMap = fullMap;
-                                  apiInfoDataList[i].errorCode = "error_cert";
-                                }else{
-                                  apiInfoDataList[i].isResultSuccess = true;
-                                  apiInfoDataList[i].resultMap = resultMap;
-                                  apiInfoDataList[i].resultListMap = null;
-                                  apiInfoDataList[i].resultFullMap = fullMap;
-                                }
+
+                            if(apiInfoDataList[i].errorCode == "CF-12872"){
+                              for(var each in apiInfoDataList){
+                                each.isResultSuccess = false;
+                                each.resultMap = null;
+                                each.resultListMap = null;
+                                each.resultFullMap = fullMap;
+                                each.errorCode = "CF-12872";
                               }
-                            }else{
-                              if(resultListMap == null || resultListMap.isEmpty){
-                                apiInfoDataList[i].isResultSuccess = false;
-                                apiInfoDataList[i].resultMap = null;
-                                apiInfoDataList[i].resultListMap = null;
-                                apiInfoDataList[i].resultFullMap = fullMap;
-                                apiInfoDataList[i].errorCode = "error_null";
-                              }else{
-                                if(resultListMap[0]["result_code"] == errorCodeKey){
-                                  apiInfoDataList[i].isResultSuccess = false;
-                                  apiInfoDataList[i].resultMap = null;
-                                  apiInfoDataList[i].resultListMap = null;
-                                  apiInfoDataList[i].resultFullMap = fullMap;
-                                  apiInfoDataList[i].errorCode = resultListMap[0]["result_codef_code"];
-                                }else if(fullMap["result"]["code"] == "CF-03002"){
-                                  apiInfoDataList[i].isResultSuccess = false;
-                                  apiInfoDataList[i].resultMap = null;
-                                  apiInfoDataList[i].resultListMap = null;
-                                  apiInfoDataList[i].resultFullMap = fullMap;
-                                  apiInfoDataList[i].errorCode = "error_cert";
-                                }else{
-                                  apiInfoDataList[i].isResultSuccess = true;
-                                  apiInfoDataList[i].resultMap = null;
-                                  apiInfoDataList[i].resultListMap = resultListMap;
-                                  apiInfoDataList[i].resultFullMap = fullMap;
-                                }
-                              }
+                              callback(false, apiInfoDataList);
                             }
                           }
-                        }else{
-                          apiInfoDataList[i].isResultSuccess = false;
-                          apiInfoDataList[i].resultMap = null;
-                          apiInfoDataList[i].resultListMap = null;
-                          apiInfoDataList[i].resultFullMap = null;
-                          if(resultMap != null){
-                            apiInfoDataList[i].errorCode = resultMap["result_codef_code"];
-                          }else if(resultListMap != null){
-                            apiInfoDataList[i].errorCode = resultListMap[0]["result_codef_code"];
-                          }
 
-                          if(apiInfoDataList[i].errorCode == "CF-12872"){
-                            for(var each in apiInfoDataList){
-                              each.isResultSuccess = false;
-                              each.resultMap = null;
-                              each.resultListMap = null;
-                              each.resultFullMap = fullMap;
-                              each.errorCode = "CF-12872";
-                            }
-                            callback(false, apiInfoDataList);
+                          if(callCount == apiInfoDataList.length){
+                            callback(true, apiInfoDataList);
                           }
-                        }
-
-                        if(callCount == apiInfoDataList.length){
-                          callback(true, apiInfoDataList);
-                        }
-                      });
+                        });
+                      }
                     }
+                    CommonUtils.log("i","call fin 2 : 추가인증 요청 후 나머지 api2개 호출");
                   }
 
+                  CommonUtils.log("i","call fin 3 : 초본 api와 추가인증 json 요청");
                   isSetAuthPopOn = true;
-                  _setAuthPop2(context, apiInfoDataList[0].api, certType, result2WayMap,(isAuthSuccess, authMap, authListMap, fullMap) async {
-                    callCount++;
-                    if(isAuthSuccess){
-                      if(fullMap == null){
+                  if(context.mounted){
+                    _setAuthPop2(context, apiInfoDataList[0].api, certType, result2WayMap,(isAuthSuccess, authMap, authListMap, fullMap) async {
+                      callCount++;
+                      if(isAuthSuccess){
+                        CommonUtils.log("i","call fin 4 : 초본 api 응답결과 옴");
+                        if(fullMap == null){
+                          apiInfoDataList[0].isResultSuccess = false;
+                          apiInfoDataList[0].resultMap = null;
+                          apiInfoDataList[0].resultListMap = null;
+                          apiInfoDataList[0].resultFullMap = null;
+                          if(authListMap != null){
+                            apiInfoDataList[0].errorCode = authListMap[0]["result_codef_code"];
+                          }
+                        }else{
+                          if(authMap == null){
+                            if(authListMap == null || authListMap.isEmpty){
+                              apiInfoDataList[0].isResultSuccess = false;
+                              apiInfoDataList[0].resultMap = null;
+                              apiInfoDataList[0].resultListMap = null;
+                              apiInfoDataList[0].resultFullMap = fullMap;
+                              apiInfoDataList[0].errorCode = "error_null";
+                            }else{
+                              if(authListMap[0]["result_code"] == errorCodeKey){
+                                apiInfoDataList[0].isResultSuccess = false;
+                                apiInfoDataList[0].resultMap = null;
+                                apiInfoDataList[0].resultListMap = null;
+                                apiInfoDataList[0].resultFullMap = fullMap;
+                                apiInfoDataList[0].errorCode = authListMap[0]["result_codef_code"];
+                              }else if(fullMap["result"]["code"] == "CF-03002"){
+                                apiInfoDataList[0].isResultSuccess = false;
+                                apiInfoDataList[0].resultMap = null;
+                                apiInfoDataList[0].resultListMap = null;
+                                apiInfoDataList[0].resultFullMap = fullMap;
+                                apiInfoDataList[0].errorCode = "error_cert";
+                              }else{
+                                apiInfoDataList[0].isResultSuccess = true;
+                                apiInfoDataList[0].resultMap = null;
+                                apiInfoDataList[0].resultListMap = authListMap;
+                                apiInfoDataList[0].resultFullMap = fullMap;
+                              }
+                            }
+                          }else{
+                            if(authMap["result_code"] == errorCodeKey){
+                              apiInfoDataList[0].isResultSuccess = false;
+                              apiInfoDataList[0].resultMap = null;
+                              apiInfoDataList[0].resultListMap = null;
+                              apiInfoDataList[0].resultFullMap = fullMap;
+                              apiInfoDataList[0].errorCode = authMap["result_codef_code"];
+                            }else{
+                              if(fullMap["result"]["code"] == "CF-03002"){
+                                apiInfoDataList[0].isResultSuccess = false;
+                                apiInfoDataList[0].resultMap = null;
+                                apiInfoDataList[0].resultListMap = null;
+                                apiInfoDataList[0].resultFullMap = fullMap;
+                                apiInfoDataList[0].errorCode = "error_cert";
+                              }else{
+                                apiInfoDataList[0].isResultSuccess = true;
+                                apiInfoDataList[0].resultMap = authMap;
+                                apiInfoDataList[0].resultListMap = null;
+                                apiInfoDataList[0].resultFullMap = fullMap;
+                              }
+                            }
+                          }
+                        }
+                      }else{
                         apiInfoDataList[0].isResultSuccess = false;
                         apiInfoDataList[0].resultMap = null;
                         apiInfoDataList[0].resultListMap = null;
-                        apiInfoDataList[0].resultFullMap = null;
-                        if(authListMap != null){
-                          apiInfoDataList[0].errorCode = authListMap[0]["result_codef_code"];
+                        apiInfoDataList[0].resultFullMap = fullMap;
+                        if(authMap != null){
+                          apiInfoDataList[0].errorCode = authMap["result_codef_code"];
+                        }else if(authListMap != null){
+                          apiInfoDataList[0].errorCode = "error_cert";
                         }
-                      }else{
-                        if(authMap == null){
-                          if(authListMap == null || authListMap.isEmpty){
-                            apiInfoDataList[0].isResultSuccess = false;
-                            apiInfoDataList[0].resultMap = null;
-                            apiInfoDataList[0].resultListMap = null;
-                            apiInfoDataList[0].resultFullMap = fullMap;
-                            apiInfoDataList[0].errorCode = "error_null";
-                          }else{
-                            if(authListMap[0]["result_code"] == errorCodeKey){
-                              apiInfoDataList[0].isResultSuccess = false;
-                              apiInfoDataList[0].resultMap = null;
-                              apiInfoDataList[0].resultListMap = null;
-                              apiInfoDataList[0].resultFullMap = fullMap;
-                              apiInfoDataList[0].errorCode = authListMap[0]["result_codef_code"];
-                            }else if(fullMap["result"]["code"] == "CF-03002"){
-                              apiInfoDataList[0].isResultSuccess = false;
-                              apiInfoDataList[0].resultMap = null;
-                              apiInfoDataList[0].resultListMap = null;
-                              apiInfoDataList[0].resultFullMap = fullMap;
-                              apiInfoDataList[0].errorCode = "error_cert";
-                            }else{
-                              apiInfoDataList[0].isResultSuccess = true;
-                              apiInfoDataList[0].resultMap = null;
-                              apiInfoDataList[0].resultListMap = authListMap;
-                              apiInfoDataList[0].resultFullMap = fullMap;
-                            }
+
+                        if(apiInfoDataList[0].errorCode == "CF-12872"){
+                          for(var each in apiInfoDataList){
+                            each.isResultSuccess = false;
+                            each.resultMap = null;
+                            each.resultListMap = null;
+                            each.resultFullMap = fullMap;
+                            each.errorCode = "CF-12872";
                           }
-                        }else{
-                          if(authMap["result_code"] == errorCodeKey){
-                            apiInfoDataList[0].isResultSuccess = false;
-                            apiInfoDataList[0].resultMap = null;
-                            apiInfoDataList[0].resultListMap = null;
-                            apiInfoDataList[0].resultFullMap = fullMap;
-                            apiInfoDataList[0].errorCode = authMap["result_codef_code"];
-                          }else{
-                            if(fullMap["result"]["code"] == "CF-03002"){
-                              apiInfoDataList[0].isResultSuccess = false;
-                              apiInfoDataList[0].resultMap = null;
-                              apiInfoDataList[0].resultListMap = null;
-                              apiInfoDataList[0].resultFullMap = fullMap;
-                              apiInfoDataList[0].errorCode = "error_cert";
-                            }else{
-                              apiInfoDataList[0].isResultSuccess = true;
-                              apiInfoDataList[0].resultMap = authMap;
-                              apiInfoDataList[0].resultListMap = null;
-                              apiInfoDataList[0].resultFullMap = fullMap;
-                            }
-                          }
+                          callback(false, apiInfoDataList);
                         }
-                      }
-                    }else{
-                      apiInfoDataList[0].isResultSuccess = false;
-                      apiInfoDataList[0].resultMap = null;
-                      apiInfoDataList[0].resultListMap = null;
-                      apiInfoDataList[0].resultFullMap = fullMap;
-                      if(authMap != null){
-                        apiInfoDataList[0].errorCode = authMap["result_codef_code"];
-                      }else if(authListMap != null){
-                        apiInfoDataList[0].errorCode = "error_cert";
                       }
 
-                      if(apiInfoDataList[0].errorCode == "CF-12872"){
-                        for(var each in apiInfoDataList){
-                          each.isResultSuccess = false;
-                          each.resultMap = null;
-                          each.resultListMap = null;
-                          each.resultFullMap = fullMap;
-                          each.errorCode = "CF-12872";
-                        }
-                        callback(false, apiInfoDataList);
+                      if(callCount == apiInfoDataList.length){
+                        callback(true, apiInfoDataList);
                       }
-                    }
-
-                    if(callCount == apiInfoDataList.length){
-                      callback(true, apiInfoDataList);
-                    }
-                  });
+                    });
+                  }
                 }
               }
             }
@@ -709,7 +735,7 @@ class CodeFController{
           )
         ])
             : Container(),
-        GetController.to.isWait.value? Container() : UiUtils.getStyledTextWithFixedScale("인증 후 확인 버튼을 눌러주세요.", TextStyles.upFinBasicTextStyle, TextAlign.center, null),
+        GetController.to.isWait.value? Container() : UiUtils.getStyledTextWithFixedScale("인증 후 확인 버튼을 눌러주세요.", TextStyles.upFinBasicTextStyle2, TextAlign.center, null),
         GetController.to.isWait.value? Container() : UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
         GetController.to.isWait.value? Container() : UiUtils.getBorderButtonBox(85.w, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinTextAndBorderBlue,
             UiUtils.getTextWithFixedScale("확인", 15.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
@@ -847,25 +873,26 @@ class CodeFController{
         "carNo": carNum,
         "ownerName": carOwnerName,
         "displyed": "1",
+        "identity2": "",
       };
 
       return inputJsonForCarRegistrationA;
     }else if(api == Apis.gov24CarRegistrationB){
       Map<String, dynamic> inputJsonForCarRegistrationB = {
-        "organization": "0001",
-        "loginType": "6",
-        "userName": name,
-        "loginIdentity": loginIdentity,
-        "phoneNo": phoneNo,
-        "id": randomKey,
-        "loginTypeLevel": loginCertType,
-        "address": address,
-        "isIdentityViewYn": "1",
+        "organization": "0001",//
+        "loginType": "6",//
+        "userName": name,//
+        "loginIdentity": loginIdentity,//
+        "phoneNo": phoneNo,//
+        "id": randomKey,//
+        "loginTypeLevel": loginCertType,//
+        "address": address,//
+        "isIdentityViewYn": "1",//
         "telecom": telecom,
-        "birthDate": "",
-        "carNo": carNum,
-        "ownerName": carOwnerName,
-        "displyed": "1",
+        "birthDate": "",//
+        "carNo": carNum,//
+        "ownerName": carOwnerName,//
+        "identity" : ""
       };
 
       return inputJsonForCarRegistrationB;

@@ -1531,7 +1531,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
         width: 100.w,
         height: 100.h,
         child: Column(children: [
-          UiUtils.getMarginBox(0, 0.95.h),
+
           Stack(children: [
             Container(height: 7.2.h,),
             Positioned(
@@ -1546,9 +1546,9 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
               child: Align(
                   alignment: Alignment.topLeft,
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    UiUtils.getMarginBox(0, 1.2.h),
-                    UiUtils.getTextWithFixedScale2(currentCompany, 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, 1),
-                    UiUtils.getTextWithFixedScale2(currentRoomType == "1" ? "개인회생" : "오토론", 9.sp, FontWeight.w600, ColorStyles.upFinPrTitleColor, TextAlign.center, 1),
+                    UiUtils.getMarginBox(0, 1.8.h),
+                    SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScaleAndOverFlow(currentCompany, 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1)),
+                    UiUtils.getTextWithFixedScale2(currentRoomType == "1" ? "개인회생" : "오토론", 10.sp, FontWeight.w600, ColorStyles.upFinPrTitleColor, TextAlign.center, 1),
                   ])
               ),
             ),
@@ -1596,7 +1596,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
 
                          */
                       }),
-                      UiUtils.getMarginBox(5.w, 0),
+                      UiUtils.getMarginBox(2.w, 0),
                     ])
                     //UiUtils.getMarginBox(0, 1.h),
                   ])

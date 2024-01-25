@@ -918,6 +918,7 @@ class LogfinController {
       LogfinController.callLogfinApi(LogfinApis.getCarDocs, inputJson, (isSuccessToSearchDocs, outputJsonForSearchDocs){
         if(isSuccessToSearchDocs){
           for(var each in outputJsonForSearchDocs!["documents"]){
+            // test
             MyData.addToPrDocsInfoList(PrDocsInfoData(each["id"], each["name"], each["del_flg"]));
           }
 

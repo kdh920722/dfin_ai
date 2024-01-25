@@ -1837,6 +1837,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             UiUtils.getTextWithFixedScale("다음", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
               _setConfirmedToDocItemByViewId(currentViewId, true);
               if(selectedSearchCertAddressInfo != "" && selectedSearchCertAddressInfo != selectedAddressInfo){
+                CommonUtils.log("w","adress : ");
                 for(var each in addedDocsList){
                   if(each["is_docs"]){
                     each["is_confirmed"] = false;
@@ -2139,6 +2140,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                             if(isCheckNeeded){
                               if(context.mounted){
                                 UiUtils.closeLoadingPop(context);
+                                CommonUtils.setAppLog("retry cert capture");
                                 UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isPad()? 100.h: 80.h, 0.5, (slideContext, slideSetState){
                                   _dlNumInfoTextController1.addListener((){
                                     if(_dlNumInfoTextController1.text.trim().length > 2){
@@ -2537,6 +2539,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           };
           _setResultToListById(each.apiId, resultMap);
           if(each.isResultSuccess){
+            selectedSearchCertAddressInfo = selectedAddressInfo;
             _setConfirmedToDocItemByViewId(_getViewIdFromListById(each.apiId), true);
           }else{
             _setConfirmedToDocItemByViewId(_getViewIdFromListById(each.apiId), false);
@@ -2725,6 +2728,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                           if(certType != 0){
                             GetController.to.updateWait(false);
                             CodeFController.isTimeOutException = false;
+                            CodeFController.isAbortException = false;
                             onPressedCallback();
                             isCertTypeSelected = true;
                           }else{
@@ -2751,7 +2755,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           }),
       UiUtils.getMarginBox(0, 1.2.h),
       isRetry? Container() : !_isDocsAllConfirmed(docsType)? UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
-          UiUtils.getTextWithFixedScale(isErrorResult? "다음에 할게요" : "다음에 할게요", 12.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
+          UiUtils.getTextWithFixedScale(isErrorResult? "다음" : "다음에 할게요", 12.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
             nextInputView();
           }) : Container()
     ]);
@@ -3030,7 +3034,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         String randomKey = gov24Count==1 ? "" : CommonUtils.getRandomKey().toString();
         List<ApiInfoData> apiInfoDataList = [];
         for(var each in addedDocsList){
-          if(each["docs_type"] == "gov24"){
+          if(each["docs_type"] == "gov24" && !each["is_confirmed"]){
             if(each["id"] == 1){
               // 등본
               Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.gov24residentRegistrationCopy,
@@ -3048,6 +3052,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               apiInfoDataList.add(ApiInfoData(each["id"], inputJson, Apis.gov24localTaxPaymentCert, true));
             }else if(each["id"] == 16){
               // 자동차등록원부(갑)
+
               Map<String, dynamic> inputJson = MyData.isTestUser ?
               CodeFController.makeInputJsonForCertApis(Apis.gov24residentRegistrationCopy,
                   identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey, "", "") :
@@ -3057,6 +3062,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               apiInfoDataList.add(ApiInfoData(each["id"], inputJson, MyData.isTestUser ? Apis.gov24residentRegistrationCopy : Apis.gov24CarRegistrationA, true));
             }else if(each["id"] == 17){
               // 자동차등록원부(을)
+
               Map<String, dynamic> inputJson = MyData.isTestUser ?
               CodeFController.makeInputJsonForCertApis(Apis.gov24localTaxPaymentCert,
                   identity, selectedBusinessNumberInfo, birth, name, phoneNo, telecom, address, loginCertType, randomKey, "", "") :
@@ -3122,7 +3128,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         String randomKey = nhisCount==1 ? "" : CommonUtils.getRandomKey().toString();
         List<ApiInfoData> apiInfoDataList = [];
         for(var each in addedDocsList){
-          if(each["docs_type"] == "nhis"){
+          if(each["docs_type"] == "nhis" && !each["is_confirmed"]){
             if(each["id"] == 3){
               // 건강보험자격득실확인서
               Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.nhisIdentifyConfirmation,
@@ -3191,7 +3197,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         String randomKey = ntsCount==1 ? "" : CommonUtils.getRandomKey().toString();
         List<ApiInfoData> apiInfoDataList = [];
         for(var each in addedDocsList){
-          if(each["docs_type"] == "nts"){
+          if(each["docs_type"] == "nts" && !each["is_confirmed"]){
             if(each["id"] == 6){
               // 사업자등록증
               Map<String, dynamic> inputJson = CodeFController.makeInputJsonForCertApis(Apis.ntsProofCorporateRegistration,

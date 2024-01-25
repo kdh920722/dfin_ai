@@ -44,6 +44,7 @@ class CommonUtils {
     if(FireBaseController.fcmToken != ""){
       if(logType.toLowerCase() == "e"){
         FireBaseController.writeLog("error", FireBaseController.fcmToken, logMessage);
+        CommonUtils.setAppLog("ERROR:$logMessage");
       }
     }
 
@@ -189,6 +190,12 @@ class CommonUtils {
 
   static Future<void> checkUpdate(BuildContext context) async {
     int state = await Config.isNeedToUpdateForMain();
+    bool isVerPass = false;
+    for(var each in Config.appVerPassUsers){
+      if(each == MyData.email) isVerPass = true;
+    }
+
+    state = isVerPass? 10 : state; // test
     if(state == 99){
       if(context.mounted && !isOutPopOn){
         CommonUtils.log("w","check update mount");
