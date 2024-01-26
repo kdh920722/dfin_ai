@@ -110,6 +110,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
     precacheImage(const AssetImage('assets/images/chat_loading.gif'), context);
     precacheImage(const AssetImage('assets/images/cert_called.png'), context);
     precacheImage(const AssetImage('assets/images/icon_car.png'), context);
+    precacheImage(const AssetImage('assets/images/doc_move2.gif'), context);
   }
 
   Future<void> _initFirebase() async {

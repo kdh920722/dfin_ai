@@ -307,7 +307,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                     MyData.isTestUser ? UiUtils.getRoundBoxButtonTextWithFixedScale6(
                         UiUtils.getTextWithFixedScale("관리자", 9.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null), ColorStyles.upFinWhiteGray, (){
                       // test
-                      SharedPreferenceController.deleteAllData();
+                      //SharedPreferenceController.deleteAllData();
                       /*
                 //간편인증팝업
                 List<Widget> certCmpWidgetList = [];
