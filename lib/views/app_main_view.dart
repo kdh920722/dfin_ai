@@ -139,34 +139,28 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                     Icon(Icons.arrow_forward_ios_rounded, color: ColorStyles.upFinRealGray, size: 5.w),
                     UiUtils.getMarginBox(5.w, 0),
                   ]), () async {
-                    if(!MyData.isTestUser){
+                    if(Config.isAccidentOpen){
                       isViewHere = false;
                       await CommonUtils.moveToWithResult(context, AppView.appSearchAccidentView.value, null);
                       isViewHere = true;
                     }else{
-                      if(Config.isAccidentOpen){
-                        isViewHere = false;
-                        await CommonUtils.moveToWithResult(context, AppView.appSearchAccidentView.value, null);
-                        isViewHere = true;
-                      }else{
 
-                        UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, 100.w,
-                            Config.isAndroid ? Config.isPad()? 45.h : 35.h : Config.isPad()? 50.h : 40.h, 0.5, (slideContext, setState){
-                              return Center(child: Column(children: [
-                                UiUtils.getMarginBox(0, 3.h),
-                                UiUtils.getTextWithFixedScale("시스템 점검중", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null),
-                                UiUtils.getMarginBox(0, 3.h),
-                                SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2(Config.accidentOpenNText.replaceAll("@@", "\n"), 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
-                                UiUtils.getMarginBox(0, 3.h),
-                                UiUtils.getExpandedScrollView(Axis.vertical, Container()),
-                                UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                                    UiUtils.getTextWithFixedScale("확인", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
-                                      Navigator.pop(slideContext);
-                                    }),
-                                Config.isAndroid? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 5.h)
-                              ]));
-                            });
-                      }
+                      UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, 100.w,
+                          Config.isAndroid ? Config.isPad()? 45.h : 35.h : Config.isPad()? 50.h : 40.h, 0.5, (slideContext, setState){
+                            return Center(child: Column(children: [
+                              UiUtils.getMarginBox(0, 3.h),
+                              UiUtils.getTextWithFixedScale("시스템 점검중", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null),
+                              UiUtils.getMarginBox(0, 3.h),
+                              SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2(Config.accidentOpenNText.replaceAll("@@", "\n"), 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)),
+                              UiUtils.getMarginBox(0, 3.h),
+                              UiUtils.getExpandedScrollView(Axis.vertical, Container()),
+                              UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+                                  UiUtils.getTextWithFixedScale("확인", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
+                                    Navigator.pop(slideContext);
+                                  }),
+                              Config.isAndroid? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 5.h)
+                            ]));
+                          });
                     }
                   }),
                   UiUtils.getMarginBox(0, 1.h),
@@ -180,35 +174,29 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                     UiUtils.getMarginBox(5.w, 0),
 
                   ]), () async {
-                    if(!MyData.isTestUser){
+                    if(Config.isAutoOpen){
                       isViewHere = false;
                       await CommonUtils.moveToWithResult(context, AppView.appSearchCarView.value, null);
                       isViewHere = true;
                     }else{
-                      if(Config.isAutoOpen){
-                        isViewHere = false;
-                        await CommonUtils.moveToWithResult(context, AppView.appSearchCarView.value, null);
-                        isViewHere = true;
-                      }else{
 
-                        UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, 100.w,
-                            Config.isAndroid ? Config.isPad()? 45.h : 35.h : Config.isPad()? 50.h : 40.h, 0.5, (slideContext, setState){
-                              return Center(child: Column(children: [
-                                UiUtils.getMarginBox(0, 3.h),
-                                SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("시스템 점검중", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
-                                UiUtils.getMarginBox(0, 3.h),
-                                UiUtils.getTextWithFixedScale2(Config.autoOpenNText.replaceAll("@@", "\n"), 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null),
-                                UiUtils.getMarginBox(0, 3.h),
-                                UiUtils.getExpandedScrollView(Axis.vertical, Container()),
-                                UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                                    UiUtils.getTextWithFixedScale("확인", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
-                                      Navigator.pop(slideContext);
-                                    }),
-                                Config.isAndroid? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 5.h)
-                              ]));
-                            });
+                      UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, 100.w,
+                          Config.isAndroid ? Config.isPad()? 45.h : 35.h : Config.isPad()? 50.h : 40.h, 0.5, (slideContext, setState){
+                            return Center(child: Column(children: [
+                              UiUtils.getMarginBox(0, 3.h),
+                              SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("시스템 점검중", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
+                              UiUtils.getMarginBox(0, 3.h),
+                              UiUtils.getTextWithFixedScale2(Config.autoOpenNText.replaceAll("@@", "\n"), 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null),
+                              UiUtils.getMarginBox(0, 3.h),
+                              UiUtils.getExpandedScrollView(Axis.vertical, Container()),
+                              UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+                                  UiUtils.getTextWithFixedScale("확인", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
+                                    Navigator.pop(slideContext);
+                                  }),
+                              Config.isAndroid? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 5.h)
+                            ]));
+                          });
 
-                      }
                     }
                   })
                 ]),
