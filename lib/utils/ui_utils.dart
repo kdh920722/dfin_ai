@@ -735,19 +735,15 @@ class UiUtils {
   }
 
   static Widget getExpandedScrollView(Axis scrollDir, Widget scrollChildView){
-    return Expanded(child: SingleChildScrollView(scrollDirection: scrollDir, physics: const BouncingScrollPhysics(), child: scrollChildView));
-  }
-
-  static Widget getExpandedScrollViewFit2(Axis scrollDir, Widget scrollChildView){
-    return Flexible(fit: FlexFit.tight, child: SingleChildScrollView(scrollDirection: scrollDir, physics: const BouncingScrollPhysics(), child: scrollChildView));
+    return Expanded(child: SingleChildScrollView(scrollDirection: scrollDir, child: scrollChildView));
   }
 
   static Widget getExpandedScrollViewWithController(Axis scrollDir, Widget scrollChildView, ScrollController controller){
-    return Expanded(child: SingleChildScrollView(controller: controller, scrollDirection: scrollDir, physics: const BouncingScrollPhysics(), child: scrollChildView));
+    return Expanded(child: SingleChildScrollView(controller: controller, scrollDirection: scrollDir, child: scrollChildView));
   }
 
-  static Widget getExpandedScrollViewWithControllerFlex(Axis scrollDir, Widget scrollChildView, ScrollController controller){
-    return Expanded(flex:2, child: SingleChildScrollView(controller: controller, scrollDirection: scrollDir, physics: const BouncingScrollPhysics(), child: scrollChildView));
+  static Widget getExpandedScrollViewWithScrollbar(Axis scrollDir, Widget scrollChildView, ScrollController controller){
+    return Expanded(child: SizedBox(width: 90.w, child: Scrollbar(radius: const Radius.circular(3), trackVisibility: false, scrollbarOrientation: ScrollbarOrientation.right, thickness: 1.5.w, thumbVisibility: true, controller: controller, child: SingleChildScrollView(controller: controller, scrollDirection: scrollDir, child: scrollChildView))));
   }
 
   static Widget getDisabledTextField(BuildContext context, double width, String initText, TextStyle textStyle, InputDecoration inputDecoration){

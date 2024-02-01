@@ -39,6 +39,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   String retryChatRoomId = "";
   static bool isViewHere = false;
   static BuildContext? mainContext;
+  final ScrollController _infoPopScrollController = ScrollController();
 
   @override
   void initState(){
@@ -80,6 +81,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     WebSocketController.resetConnectWebSocketCable();
     WebSocketController.resetRetry();
     AppMainViewState.isStart = false;
+    _infoPopScrollController.dispose();
     FireBaseController.setStateForForeground = null;
     isViewHere = false;
     super.dispose();
@@ -134,7 +136,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                     UiUtils.getMarginBox(4.w, 0),
                     UiUtils.getImage(16.w, 16.w, Image.asset('assets/images/accident_icon.png', fit: BoxFit.fill)),
                     UiUtils.getMarginBox(5.6.w, 0),
-                    UiUtils.getTextWithFixedScale("개인회생사건 등록", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, null),
+                    UiUtils.getTextWithFixedScale("개인회생대출 시작하기", 13.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.center, null),
                     const Spacer(flex: 2),
                     Icon(Icons.arrow_forward_ios_rounded, color: ColorStyles.upFinRealGray, size: 5.w),
                     UiUtils.getMarginBox(5.w, 0),
@@ -168,7 +170,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                     UiUtils.getMarginBox(6.w, 0),
                     UiUtils.getImage(16.w, 16.w, Image.asset('assets/images/icon_car.png', fit: BoxFit.fill)),
                     UiUtils.getMarginBox(4.w, 0),
-                    UiUtils.getTextWithFixedScale("자동차 정보 등록", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, null),
+                    UiUtils.getTextWithFixedScale("오토론 시작하기", 13.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.center, null),
                     const Spacer(flex: 2),
                     Icon(Icons.arrow_forward_ios_rounded, color: ColorStyles.upFinRealGray, size: 5.w),
                     UiUtils.getMarginBox(5.w, 0),
@@ -270,7 +272,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             }
             return true;
           },
-          child: ListView(shrinkWrap: true,physics: const BouncingScrollPhysics(),children: [
+          child: ListView(shrinkWrap: true, children: [
             UiUtils.getMarginBox(0, 2.5.h),
             Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 0.h, bottom: 1.h),
                 child: Obx((){
@@ -295,6 +297,8 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                     MyData.isTestUser ? UiUtils.getRoundBoxButtonTextWithFixedScale6(
                         UiUtils.getTextWithFixedScale("관리자", 9.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null), ColorStyles.upFinWhiteGray, (){
                       // test
+                      //메인뷰팝업
+                      _showInfoPop();
                       //SharedPreferenceController.deleteAllData();
                       /*
                 //간편인증팝업
@@ -410,9 +414,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                     Config.isAndroid? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 3.h)
                   ]);
                 });
-
-                //메인뷰팝업
-                _showInfoPop();
 
                 //앱종료팝업
                 UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, 100.w, Config.isAndroid ? Config.isPad()? 45.h : 35.h : Config.isPad()? 50.h : 40.h, 0.5, (slideContext, slideSetState){
@@ -1245,10 +1246,10 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
         return Center(child: Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
           UiUtils.getMarginBox(0, 1.h),
           SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("안내사항", 14.sp, FontWeight.w800, ColorStyles.upFinBlack, TextAlign.center, null)),
-          UiUtils.getMarginBox(0, 3.h),
-          UiUtils.getExpandedScrollView(Axis.vertical,
-              Padding(padding: EdgeInsets.only(left: 2.w, right: 2.w, top: 0, bottom: 0), child: UiUtils.getTextWithFixedScale2(Config.appInfoTextMap["info_text"].replaceAll("@@", "\n"), 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null))),
-          UiUtils.getMarginBox(0, 0.5.h),
+          UiUtils.getMarginBox(0, 2.h),
+          UiUtils.getExpandedScrollViewWithScrollbar(Axis.vertical,
+              Padding(padding: EdgeInsets.only(left: 2.w, right: 2.w, top: 0, bottom: 0), child: UiUtils.getTextWithFixedScale2(Config.appInfoTextMap["info_text"].replaceAll("@@", "\n"), 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)), _infoPopScrollController),
+
           UiUtils.getBorderButtonBoxWithZeroPadding(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
               Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment:CrossAxisAlignment.center, children: [
                 UiUtils.getCustomCheckBox(UniqueKey(), 1.2, isRemove1week, ColorStyles.upFinButtonBlue, ColorStyles.upFinWhiteGray,
@@ -1276,7 +1277,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                   isRemove1week = true;
                 }
               });}),
-          UiUtils.getMarginBox(0, 1.5.h),
+          UiUtils.getMarginBox(0, 0.5.h),
           UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
               UiUtils.getTextWithFixedScale("확인", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
                 SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceValidInfoVersion, Config.appInfoTextMap["info_text_version"].toString());

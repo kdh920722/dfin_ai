@@ -877,7 +877,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
     confirmDataList.add("•  [환급]  ${selectedBankCodeInfo.split("@")[0]} $selectedBankAccountInfo");
     if(selectedPreLoanPriceInfo != "0"){
       confirmDataList.add("•  인가후 대출  ${selectedPreLoanCountInfo.split("@")[0]}");
-      confirmDataList.add("•  인가후 대출금액  ${CommonUtils.getPriceFormattedString(double.parse(selectedPreLoanPriceInfo))}");
+      confirmDataList.add("•  인가후 대출 잔액  ${CommonUtils.getPriceFormattedString(double.parse(selectedPreLoanPriceInfo))}");
     }else{
       confirmDataList.add("•  인가후 대출 없음");
     }

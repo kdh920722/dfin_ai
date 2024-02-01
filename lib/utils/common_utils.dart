@@ -355,7 +355,10 @@ class CommonUtils {
         try{
           FireBaseController.analytics!.logEvent(name: eventName, parameters: data);
           FacebookController.facebookAppEvents!.logEvent(name: eventName, parameters: data);
-          AppsflyerController.appsFlyerSdk!.logEvent(eventName, data);
+
+          Map<String, dynamic> temp = {};
+          temp[eventName] = data;
+          AppsflyerController.appsFlyerSdk!.logEvent(data.toString(), data);
           CommonUtils.log("d", "app log : $eventName");
         }catch(error){
           CommonUtils.log("d", "app log error : $error");

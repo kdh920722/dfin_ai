@@ -161,6 +161,7 @@ class LogfinController {
         }
         tempList.sort((a,b)=>int.parse(a.split("@")[2]).compareTo(int.parse(b.split("@")[2])));
         preLoanCountList.addAll(tempList);
+
       } else {
         failCount++;
       }
@@ -529,14 +530,21 @@ class LogfinController {
                     courtInfo = eachCourt;
                   }
                 }
-                String lendCount = dataResult["lend_count"].toString() == ""? "0" : dataResult["lend_count"].toString();
-                int count = int.parse(lendCount);
-                if(count == 0){
-                  lendCountInfo = preLoanCountList[0];
-                }else if(count == 1){
-                  lendCountInfo = preLoanCountList[1];
+
+                if(dataResult.containsKey("lend_count")){
+                  String lendCount = dataResult["lend_count"].toString() == ""? "0" : dataResult["lend_count"].toString();
+                  int count = int.parse(lendCount);
+                  if(count <= preLoanCountList.length-1){
+                    for(var each in preLoanCountList){
+                      if(each.split("@")[1] == count.toString()){
+                        lendCountInfo = each;
+                      }
+                    }
+                  }else{
+                    lendCountInfo = preLoanCountList.last;
+                  }
                 }else{
-                  lendCountInfo = preLoanCountList[2];
+                  lendCountInfo = preLoanCountList.first;
                 }
 
                 String bankAccount = dataResult["refund_account"].toString();
@@ -605,15 +613,17 @@ class LogfinController {
                 if(dataResult.containsKey("lend_count")){
                   String lendCount = dataResult["lend_count"].toString() == ""? "0" : dataResult["lend_count"].toString();
                   int count = int.parse(lendCount);
-                  if(count == 0){
-                    lendCountInfo = preLoanCountList[0];
-                  }else if(count == 1){
-                    lendCountInfo = preLoanCountList[1];
+                  if(count <= preLoanCountList.length-1){
+                    for(var each in preLoanCountList){
+                      if(each.split("@")[1] == count.toString()){
+                        lendCountInfo = each;
+                      }
+                    }
                   }else{
-                    lendCountInfo = preLoanCountList[2];
+                    lendCountInfo = preLoanCountList.last;
                   }
                 }else{
-                  lendCountInfo = preLoanCountList[0];
+                  lendCountInfo = preLoanCountList.first;
                 }
 
                 String lendAmount = "0";

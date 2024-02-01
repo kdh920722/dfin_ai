@@ -1010,7 +1010,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               SizedBox(width: 90.w,
                   child: Row(children: [
                     UiUtils.getMarginBox(3.w, 0),
-                    UiUtils.getTextButtonWithFixedScale("•  인가후 대출금액 ${CommonUtils.getPriceFormattedString(double.parse(
+                    UiUtils.getTextButtonWithFixedScale("•  인가후 대출 잔액 ${CommonUtils.getPriceFormattedString(double.parse(
                         MyData.selectedPrInfoData!.uidType == "1" ? MyData.selectedAccidentInfoData!.accidentLendAmount : MyData.selectedCarInfoData!.carLendAmount))}",
                         13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
@@ -1022,7 +1022,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               SizedBox(width: 90.w,
                   child: Row(children: [
                     UiUtils.getMarginBox(3.w, 0),
-                    UiUtils.getTextButtonWithFixedScale("•  인가후 대출금액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                    UiUtils.getTextButtonWithFixedScale("•  인가후 대출 잔액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
                   ])
               )
@@ -2140,7 +2140,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                             if(isCheckNeeded){
                               if(context.mounted){
                                 UiUtils.closeLoadingPop(context);
-                                CommonUtils.setAppLog("retry cert capture");
+                                CommonUtils.setAppLog("retry_cert_capture");
                                 UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isPad()? 100.h: 80.h, 0.5, (slideContext, slideSetState){
                                   _dlNumInfoTextController1.addListener((){
                                     if(_dlNumInfoTextController1.text.trim().length > 2){
@@ -2755,7 +2755,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           }),
       UiUtils.getMarginBox(0, 1.2.h),
       isRetry? Container() : !_isDocsAllConfirmed(docsType)? UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
-          UiUtils.getTextWithFixedScale(isErrorResult? "다음" : "다음에 할게요", 12.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
+          UiUtils.getTextWithFixedScale(isErrorResult? "다음에 할게요" : "다음에 할게요", 12.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
             nextInputView();
           }) : Container()
     ]);
@@ -3335,7 +3335,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               SizedBox(width: 90.w,
                   child: Row(children: [
                     UiUtils.getMarginBox(3.w, 0),
-                    UiUtils.getTextButtonWithFixedScale("•  인가후 대출금액 ${CommonUtils.getPriceFormattedString(double.parse(MyData.selectedPrInfoData!.uidType == "1" ? MyData.selectedAccidentInfoData!.accidentLendAmount : MyData.selectedCarInfoData!.carLendAmount))}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                    UiUtils.getTextButtonWithFixedScale("•  인가후 대출 잔액 ${CommonUtils.getPriceFormattedString(double.parse(MyData.selectedPrInfoData!.uidType == "1" ? MyData.selectedAccidentInfoData!.accidentLendAmount : MyData.selectedCarInfoData!.carLendAmount))}", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
                   ])
               )
@@ -3345,7 +3345,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               SizedBox(width: 90.w,
                   child: Row(children: [
                     UiUtils.getMarginBox(3.w, 0),
-                    UiUtils.getTextButtonWithFixedScale("•  인가후 대출금액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
+                    UiUtils.getTextButtonWithFixedScale("•  인가후 대출 잔액 0원", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null, (){})
 
                   ])
               )

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:isolate';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
@@ -9,6 +10,7 @@ import 'package:http/http.dart' as http;
 import 'package:sizer/sizer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../configs/app_config.dart';
+import '../datas/background_task_data.dart';
 import '../styles/ColorStyles.dart';
 import '../styles/TextStyles.dart';
 import '../utils/common_utils.dart';
@@ -113,7 +115,196 @@ class CodeFController{
     }
   }
 
+  static void backgroundTask(BackgroundTaskData backData) async {
+    try {
+      final response = await http.post(Uri.parse(backData.url),
+          headers: {
+            'Authorization': backData.tokenHeader,
+            'Content-Type': 'application/json'
+          },
+          body: jsonEncode(backData.inputJson)
+      ).timeout(const Duration(seconds: 120));
+
+      String responseString = jsonEncode({
+        'statusCode': response.statusCode,
+        'body': response.body,
+        'headers': response.headers,
+      });
+      backData.sendPort.send(responseString);
+
+    } catch (e) {
+      backData.sendPort.send(e.toString());
+    }
+  }
+
   static Future<void> _getDataFromApi2(Apis apiInfo, Map<String, dynamic> inputJson,
+      void Function(bool isSuccess, bool is2WayProcess, Map<String, dynamic>? outputJson, List<dynamic>? outputJsonArray, Map<String, dynamic>? fullOutPut) callback) async {
+    final baseUrl = hostStatus.value == HostStatus.prod.value ? Host.baseUrl.value : HostDev.baseUrl.value;
+    final endPoint = apiInfo.value;
+    CommonUtils.log("i", "call api : $endPoint");
+    CommonUtils.log("i", "call input json : \n$inputJson");
+    final url = baseUrl + endPoint;
+    var targetUrl = "";
+    if(Config.isWeb){
+      targetUrl = 'https://corsproxy.io/?${Uri.encodeComponent(url)}';
+    }else{
+      targetUrl = url;
+    }
+    final tokenHeader = 'Bearer $token';
+
+    try {
+      ReceivePort receivePort = ReceivePort();
+      Isolate isolate = await Isolate.spawn(backgroundTask, BackgroundTaskData(receivePort.sendPort, targetUrl, tokenHeader, inputJson));
+      String data = "";
+      receivePort.listen((message) {
+        data = message as String;
+
+        if(data.toLowerCase().contains("exception")){
+          if(data.toLowerCase().contains("connection abort")){
+            isAbortException = true;
+            CommonUtils.log('e', data.toString());
+            final Map<String, dynamic> resultData = {};
+            resultData['result_code'] = errorCodeKey;
+            resultData['result_codef_code'] = "error_abort";
+            resultData['result_msg'] = "에러가 발생했습니다.";
+            callback(false, false, resultData, null, null);
+          }else{
+            isTimeOutException = true;
+            CommonUtils.log('e', data.toString());
+            final Map<String, dynamic> resultData = {};
+            resultData['result_code'] = errorCodeKey;
+            resultData['result_codef_code'] = "error_timeout";
+            resultData['result_msg'] = "에러가 발생했습니다.";
+            callback(false, false, resultData, null, null);
+          }
+
+          isolate.kill(priority: Isolate.immediate);
+        }else{
+          Map<String, dynamic> responseData = jsonDecode(data);
+
+          http.Response response = http.Response(
+            responseData['body'],
+            responseData['statusCode'],
+            headers: Map<String, String>.from(responseData['headers']),
+          );
+
+          if(response.statusCode == 200) {
+            final decodedResponseBody = Uri.decodeFull(response.body);
+            final json = jsonDecode(decodedResponseBody);
+            if(json.containsKey('result') && json.containsKey('data')){
+              final result = json['result'];
+              var resultCode = result['code'];
+              CommonUtils.log('w', '$endPoint\nout full : \n$json');
+
+              // CF-00000 : 성공, CF-03002 : 추가 인증 필요
+              final msg = result['message'];
+              if(resultCode == 'CF-00000' || resultCode == 'CF-03002' || resultCode == 'CF-13231'){
+                final resultData = json['data'];
+                if (resultData is Map<String, dynamic>) {
+                  if(resultData.isNotEmpty){
+                    resultData['result_code'] = resultCode;
+
+                    resultData['result_codef_code'] = resultCode;
+                    if(resultCode == 'CF-03002') {
+                      callback(true, true, resultData, null, json);
+                    } else {
+                      callback(true, false, resultData, null, json);
+                    }
+
+                    isolate.kill(priority: Isolate.immediate);
+                  }else{
+                    if(resultCode == 'CF-13231'){
+                      resultData['result_code'] = resultCode;
+                      resultData['result_codef_code'] = resultCode;
+                      callback(true, false, resultData, null, json);
+                    }else{
+                      final Map<String, dynamic> resultData = {};
+                      resultData['result_code'] = errorCodeKey;
+
+                      if(resultCode == "CF-12100"){
+                        if(result['extraMessage'].toString().contains("시군구")){
+                          resultCode = "CF-12100A";
+                        }
+                      }
+
+                      resultData['result_codef_code'] = resultCode;
+                      resultData['result_msg'] = msg;
+                      CommonUtils.log('e', 'out resultCode error : $resultCode');
+                      callback(true, false, resultData, null, json);
+                    }
+
+                    isolate.kill(priority: Isolate.immediate);
+                  }
+                } else if (resultData is List<dynamic>) {
+                  if(resultData.isNotEmpty){
+                    resultData[0]['result_code'] = resultCode;
+
+                    if(resultCode == "CF-12100"){
+                      if(result['extraMessage'].toString().contains("시군구")){
+                        resultCode = "CF-12100A";
+                      }
+                    }
+
+                    resultData[0]['result_codef_code'] = resultCode;
+                    if(resultCode == 'CF-03002') {
+                      callback(true, true, null, resultData, json);
+                    } else {
+                      callback(true, false, null, resultData, json);
+                    }
+
+                    isolate.kill(priority: Isolate.immediate);
+                  }else{
+                    final Map<String, dynamic> resultData = {};
+                    resultData['result_code'] = errorCodeKey;
+
+                    if(resultCode == "CF-12100"){
+                      if(result['extraMessage'].toString().contains("시군구")){
+                        resultCode = "CF-12100A";
+                      }
+                    }
+
+                    resultData['result_codef_code'] = resultCode;
+                    resultData['result_msg'] = msg;
+                    CommonUtils.log('e', 'out resultCode error : $resultCode');
+                    callback(true, false, resultData, null, json);
+                    isolate.kill(priority: Isolate.immediate);
+                  }
+                }
+              } else {
+                final Map<String, dynamic> resultData = {};
+                resultData['result_code'] = errorCodeKey;
+
+                if(resultCode == "CF-12100"){
+                  if(result['extraMessage'].toString().contains("시군구")){
+                    resultCode = "CF-12100A";
+                  }
+                }
+
+                resultData['result_codef_code'] = resultCode;
+                resultData['result_msg'] = msg;
+                CommonUtils.log('e', 'out resultCode error : $resultCode');
+                callback(true, false, resultData, null, json);
+                isolate.kill(priority: Isolate.immediate);
+              }
+            }
+          } else {
+            CommonUtils.log('e', 'http error code : ${response.statusCode}');
+            final Map<String, dynamic> resultData = {};
+            resultData['result_code'] = errorCodeKey;
+            resultData['result_codef_code'] = "error_http";
+            resultData['result_msg'] = "인터넷 연결에러가 발생했습니다.";
+            callback(false, false, resultData, null, null);
+            isolate.kill(priority: Isolate.immediate);
+          }
+        }
+      });
+
+    } catch (e) {
+      CommonUtils.log('e', 'isolate error : $e');
+    }
+  }
+
+  static Future<void> _getDataFromApi3(Apis apiInfo, Map<String, dynamic> inputJson,
       void Function(bool isSuccess, bool is2WayProcess, Map<String, dynamic>? outputJson, List<dynamic>? outputJsonArray, Map<String, dynamic>? fullOutPut) callback) async {
     final baseUrl = hostStatus.value == HostStatus.prod.value ? Host.baseUrl.value : HostDev.baseUrl.value;
     final endPoint = apiInfo.value;
@@ -306,7 +497,7 @@ class CodeFController{
 
   static Future<void> _callApiWithCert2(BuildContext context, StateSetter setState, int certType,
   List<ApiInfoData> apiInfoDataList, Function(bool isSuccess, List<ApiInfoData>? resultApiInfoDataList) callback) async {
-    await CodeFController._getDataFromApi2(apiInfoDataList[0].api, apiInfoDataList[0].inputJson, (isSuccess, is2WayProcess, map, listMap, fullResultMap) async {
+    CodeFController._getDataFromApi2(apiInfoDataList[0].api, apiInfoDataList[0].inputJson, (isSuccess, is2WayProcess, map, listMap, fullResultMap) async {
       if(isSuccess){
         if(fullResultMap != null){
           if(is2WayProcess){
@@ -380,81 +571,24 @@ class CodeFController{
                     }
                   }
                 }
-                */
 
                 if(context.mounted){
-                  int callCount = 0;
-                  if(apiInfoDataList.length > 1){
-                    CommonUtils.log("i","call fin 1 : 첫번째(초본)호출 후 추가인증요청");
-                    for(int i = 1 ; i < apiInfoDataList.length ; i++){
-                      await Future.delayed(const Duration(milliseconds: 700));
-                      if(context.mounted){
-                        _callApiWithOutCert2(context, apiInfoDataList[i].api, apiInfoDataList[i].inputJson, (isSuccess, resultMap, resultListMap, fullMap) {
-                          callCount++;
-                          if(isSuccess){
-                            CommonUtils.log("i","call fin 5 : 나머지 api 응답결과 옴");
-                            if(fullMap == null){
-                              apiInfoDataList[i].isResultSuccess = false;
-                              apiInfoDataList[i].resultMap = null;
-                              apiInfoDataList[i].resultListMap = null;
-                              apiInfoDataList[i].resultFullMap = null;
-                              if(resultMap != null){
-                                apiInfoDataList[i].errorCode = resultMap["result_codef_code"];
-                              }else if(resultListMap != null){
-                                apiInfoDataList[i].errorCode = resultListMap[0]["result_codef_code"];
-                              }
-                            }else{
-                              if(resultMap != null){
-                                if(resultMap["result_code"] == errorCodeKey){
-                                  apiInfoDataList[i].isResultSuccess = false;
-                                  apiInfoDataList[i].resultMap = null;
-                                  apiInfoDataList[i].resultListMap = null;
-                                  apiInfoDataList[i].resultFullMap = fullMap;
-                                  apiInfoDataList[i].errorCode = resultMap["result_codef_code"];
-                                }else{
-                                  if(fullMap["result"]["code"] == "CF-03002"){
-                                    apiInfoDataList[i].isResultSuccess = false;
-                                    apiInfoDataList[i].resultMap = null;
-                                    apiInfoDataList[i].resultListMap = null;
-                                    apiInfoDataList[i].resultFullMap = fullMap;
-                                    apiInfoDataList[i].errorCode = "error_cert";
-                                  }else{
-                                    apiInfoDataList[i].isResultSuccess = true;
-                                    apiInfoDataList[i].resultMap = resultMap;
-                                    apiInfoDataList[i].resultListMap = null;
-                                    apiInfoDataList[i].resultFullMap = fullMap;
-                                  }
-                                }
-                              }else{
-                                if(resultListMap == null || resultListMap.isEmpty){
-                                  apiInfoDataList[i].isResultSuccess = false;
-                                  apiInfoDataList[i].resultMap = null;
-                                  apiInfoDataList[i].resultListMap = null;
-                                  apiInfoDataList[i].resultFullMap = fullMap;
-                                  apiInfoDataList[i].errorCode = "error_null";
-                                }else{
-                                  if(resultListMap[0]["result_code"] == errorCodeKey){
-                                    apiInfoDataList[i].isResultSuccess = false;
-                                    apiInfoDataList[i].resultMap = null;
-                                    apiInfoDataList[i].resultListMap = null;
-                                    apiInfoDataList[i].resultFullMap = fullMap;
-                                    apiInfoDataList[i].errorCode = resultListMap[0]["result_codef_code"];
-                                  }else if(fullMap["result"]["code"] == "CF-03002"){
-                                    apiInfoDataList[i].isResultSuccess = false;
-                                    apiInfoDataList[i].resultMap = null;
-                                    apiInfoDataList[i].resultListMap = null;
-                                    apiInfoDataList[i].resultFullMap = fullMap;
-                                    apiInfoDataList[i].errorCode = "error_cert";
-                                  }else{
-                                    apiInfoDataList[i].isResultSuccess = true;
-                                    apiInfoDataList[i].resultMap = null;
-                                    apiInfoDataList[i].resultListMap = resultListMap;
-                                    apiInfoDataList[i].resultFullMap = fullMap;
-                                  }
-                                }
-                              }
-                            }
-                          }else{
+
+                }
+
+                */
+
+                int callCount = 0;
+                if(apiInfoDataList.length > 1){
+                  CommonUtils.log("i","call fin 1 : 첫번째(초본)호출 후 추가인증요청");
+                  for(int i = 1 ; i < apiInfoDataList.length ; i++){
+                    // await Future.delayed(const Duration(milliseconds: 700));
+                    if(context.mounted){
+                      _callApiWithOutCert2(context, apiInfoDataList[i].api, apiInfoDataList[i].inputJson, (isSuccess, resultMap, resultListMap, fullMap) {
+                        callCount++;
+                        if(isSuccess){
+                          CommonUtils.log("i","call fin 5 : 나머지 api 응답결과 옴");
+                          if(fullMap == null){
                             apiInfoDataList[i].isResultSuccess = false;
                             apiInfoDataList[i].resultMap = null;
                             apiInfoDataList[i].resultListMap = null;
@@ -464,122 +598,182 @@ class CodeFController{
                             }else if(resultListMap != null){
                               apiInfoDataList[i].errorCode = resultListMap[0]["result_codef_code"];
                             }
-
-                            if(apiInfoDataList[i].errorCode == "CF-12872"){
-                              for(var each in apiInfoDataList){
-                                each.isResultSuccess = false;
-                                each.resultMap = null;
-                                each.resultListMap = null;
-                                each.resultFullMap = fullMap;
-                                each.errorCode = "CF-12872";
+                          }else{
+                            if(resultMap != null){
+                              if(resultMap["result_code"] == errorCodeKey){
+                                apiInfoDataList[i].isResultSuccess = false;
+                                apiInfoDataList[i].resultMap = null;
+                                apiInfoDataList[i].resultListMap = null;
+                                apiInfoDataList[i].resultFullMap = fullMap;
+                                apiInfoDataList[i].errorCode = resultMap["result_codef_code"];
+                              }else{
+                                if(fullMap["result"]["code"] == "CF-03002"){
+                                  apiInfoDataList[i].isResultSuccess = false;
+                                  apiInfoDataList[i].resultMap = null;
+                                  apiInfoDataList[i].resultListMap = null;
+                                  apiInfoDataList[i].resultFullMap = fullMap;
+                                  apiInfoDataList[i].errorCode = "error_cert";
+                                }else{
+                                  apiInfoDataList[i].isResultSuccess = true;
+                                  apiInfoDataList[i].resultMap = resultMap;
+                                  apiInfoDataList[i].resultListMap = null;
+                                  apiInfoDataList[i].resultFullMap = fullMap;
+                                }
                               }
-                              callback(false, apiInfoDataList);
+                            }else{
+                              if(resultListMap == null || resultListMap.isEmpty){
+                                apiInfoDataList[i].isResultSuccess = false;
+                                apiInfoDataList[i].resultMap = null;
+                                apiInfoDataList[i].resultListMap = null;
+                                apiInfoDataList[i].resultFullMap = fullMap;
+                                apiInfoDataList[i].errorCode = "error_null";
+                              }else{
+                                if(resultListMap[0]["result_code"] == errorCodeKey){
+                                  apiInfoDataList[i].isResultSuccess = false;
+                                  apiInfoDataList[i].resultMap = null;
+                                  apiInfoDataList[i].resultListMap = null;
+                                  apiInfoDataList[i].resultFullMap = fullMap;
+                                  apiInfoDataList[i].errorCode = resultListMap[0]["result_codef_code"];
+                                }else if(fullMap["result"]["code"] == "CF-03002"){
+                                  apiInfoDataList[i].isResultSuccess = false;
+                                  apiInfoDataList[i].resultMap = null;
+                                  apiInfoDataList[i].resultListMap = null;
+                                  apiInfoDataList[i].resultFullMap = fullMap;
+                                  apiInfoDataList[i].errorCode = "error_cert";
+                                }else{
+                                  apiInfoDataList[i].isResultSuccess = true;
+                                  apiInfoDataList[i].resultMap = null;
+                                  apiInfoDataList[i].resultListMap = resultListMap;
+                                  apiInfoDataList[i].resultFullMap = fullMap;
+                                }
+                              }
                             }
-                          }
-
-                          if(callCount == apiInfoDataList.length){
-                            callback(true, apiInfoDataList);
-                          }
-                        });
-                      }
-                    }
-                    CommonUtils.log("i","call fin 2 : 추가인증 요청 후 나머지 api2개 호출");
-                  }
-
-                  CommonUtils.log("i","call fin 3 : 초본 api와 추가인증 json 요청");
-                  isSetAuthPopOn = true;
-                  if(context.mounted){
-                    _setAuthPop2(context, apiInfoDataList[0].api, certType, result2WayMap,(isAuthSuccess, authMap, authListMap, fullMap) async {
-                      callCount++;
-                      if(isAuthSuccess){
-                        CommonUtils.log("i","call fin 4 : 초본 api 응답결과 옴");
-                        if(fullMap == null){
-                          apiInfoDataList[0].isResultSuccess = false;
-                          apiInfoDataList[0].resultMap = null;
-                          apiInfoDataList[0].resultListMap = null;
-                          apiInfoDataList[0].resultFullMap = null;
-                          if(authListMap != null){
-                            apiInfoDataList[0].errorCode = authListMap[0]["result_codef_code"];
                           }
                         }else{
-                          if(authMap == null){
-                            if(authListMap == null || authListMap.isEmpty){
-                              apiInfoDataList[0].isResultSuccess = false;
-                              apiInfoDataList[0].resultMap = null;
-                              apiInfoDataList[0].resultListMap = null;
-                              apiInfoDataList[0].resultFullMap = fullMap;
-                              apiInfoDataList[0].errorCode = "error_null";
-                            }else{
-                              if(authListMap[0]["result_code"] == errorCodeKey){
-                                apiInfoDataList[0].isResultSuccess = false;
-                                apiInfoDataList[0].resultMap = null;
-                                apiInfoDataList[0].resultListMap = null;
-                                apiInfoDataList[0].resultFullMap = fullMap;
-                                apiInfoDataList[0].errorCode = authListMap[0]["result_codef_code"];
-                              }else if(fullMap["result"]["code"] == "CF-03002"){
-                                apiInfoDataList[0].isResultSuccess = false;
-                                apiInfoDataList[0].resultMap = null;
-                                apiInfoDataList[0].resultListMap = null;
-                                apiInfoDataList[0].resultFullMap = fullMap;
-                                apiInfoDataList[0].errorCode = "error_cert";
-                              }else{
-                                apiInfoDataList[0].isResultSuccess = true;
-                                apiInfoDataList[0].resultMap = null;
-                                apiInfoDataList[0].resultListMap = authListMap;
-                                apiInfoDataList[0].resultFullMap = fullMap;
-                              }
+                          apiInfoDataList[i].isResultSuccess = false;
+                          apiInfoDataList[i].resultMap = null;
+                          apiInfoDataList[i].resultListMap = null;
+                          apiInfoDataList[i].resultFullMap = null;
+                          if(resultMap != null){
+                            apiInfoDataList[i].errorCode = resultMap["result_codef_code"];
+                          }else if(resultListMap != null){
+                            apiInfoDataList[i].errorCode = resultListMap[0]["result_codef_code"];
+                          }
+
+                          if(apiInfoDataList[i].errorCode == "CF-12872"){
+                            for(var each in apiInfoDataList){
+                              each.isResultSuccess = false;
+                              each.resultMap = null;
+                              each.resultListMap = null;
+                              each.resultFullMap = fullMap;
+                              each.errorCode = "CF-12872";
                             }
-                          }else{
-                            if(authMap["result_code"] == errorCodeKey){
-                              apiInfoDataList[0].isResultSuccess = false;
-                              apiInfoDataList[0].resultMap = null;
-                              apiInfoDataList[0].resultListMap = null;
-                              apiInfoDataList[0].resultFullMap = fullMap;
-                              apiInfoDataList[0].errorCode = authMap["result_codef_code"];
-                            }else{
-                              if(fullMap["result"]["code"] == "CF-03002"){
-                                apiInfoDataList[0].isResultSuccess = false;
-                                apiInfoDataList[0].resultMap = null;
-                                apiInfoDataList[0].resultListMap = null;
-                                apiInfoDataList[0].resultFullMap = fullMap;
-                                apiInfoDataList[0].errorCode = "error_cert";
-                              }else{
-                                apiInfoDataList[0].isResultSuccess = true;
-                                apiInfoDataList[0].resultMap = authMap;
-                                apiInfoDataList[0].resultListMap = null;
-                                apiInfoDataList[0].resultFullMap = fullMap;
-                              }
-                            }
+                            callback(false, apiInfoDataList);
                           }
                         }
-                      }else{
+
+                        if(callCount == apiInfoDataList.length){
+                          callback(true, apiInfoDataList);
+                        }
+                      });
+                    }
+                  }
+                  CommonUtils.log("i","call fin 2 : 추가인증 요청 후 나머지 api2개 호출");
+                }
+
+                CommonUtils.log("i","call fin 3 : 초본 api와 추가인증 json 요청");
+                isSetAuthPopOn = true;
+                if(context.mounted){
+                  _setAuthPop2(context, apiInfoDataList[0].api, certType, result2WayMap,(isAuthSuccess, authMap, authListMap, fullMap) async {
+                    callCount++;
+                    if(isAuthSuccess){
+                      CommonUtils.log("i","call fin 4 : 초본 api 응답결과 옴");
+                      if(fullMap == null){
                         apiInfoDataList[0].isResultSuccess = false;
                         apiInfoDataList[0].resultMap = null;
                         apiInfoDataList[0].resultListMap = null;
-                        apiInfoDataList[0].resultFullMap = fullMap;
-                        if(authMap != null){
-                          apiInfoDataList[0].errorCode = authMap["result_codef_code"];
-                        }else if(authListMap != null){
-                          apiInfoDataList[0].errorCode = "error_cert";
+                        apiInfoDataList[0].resultFullMap = null;
+                        if(authListMap != null){
+                          apiInfoDataList[0].errorCode = authListMap[0]["result_codef_code"];
                         }
-
-                        if(apiInfoDataList[0].errorCode == "CF-12872"){
-                          for(var each in apiInfoDataList){
-                            each.isResultSuccess = false;
-                            each.resultMap = null;
-                            each.resultListMap = null;
-                            each.resultFullMap = fullMap;
-                            each.errorCode = "CF-12872";
+                      }else{
+                        if(authMap == null){
+                          if(authListMap == null || authListMap.isEmpty){
+                            apiInfoDataList[0].isResultSuccess = false;
+                            apiInfoDataList[0].resultMap = null;
+                            apiInfoDataList[0].resultListMap = null;
+                            apiInfoDataList[0].resultFullMap = fullMap;
+                            apiInfoDataList[0].errorCode = "error_null";
+                          }else{
+                            if(authListMap[0]["result_code"] == errorCodeKey){
+                              apiInfoDataList[0].isResultSuccess = false;
+                              apiInfoDataList[0].resultMap = null;
+                              apiInfoDataList[0].resultListMap = null;
+                              apiInfoDataList[0].resultFullMap = fullMap;
+                              apiInfoDataList[0].errorCode = authListMap[0]["result_codef_code"];
+                            }else if(fullMap["result"]["code"] == "CF-03002"){
+                              apiInfoDataList[0].isResultSuccess = false;
+                              apiInfoDataList[0].resultMap = null;
+                              apiInfoDataList[0].resultListMap = null;
+                              apiInfoDataList[0].resultFullMap = fullMap;
+                              apiInfoDataList[0].errorCode = "error_cert";
+                            }else{
+                              apiInfoDataList[0].isResultSuccess = true;
+                              apiInfoDataList[0].resultMap = null;
+                              apiInfoDataList[0].resultListMap = authListMap;
+                              apiInfoDataList[0].resultFullMap = fullMap;
+                            }
                           }
-                          callback(false, apiInfoDataList);
+                        }else{
+                          if(authMap["result_code"] == errorCodeKey){
+                            apiInfoDataList[0].isResultSuccess = false;
+                            apiInfoDataList[0].resultMap = null;
+                            apiInfoDataList[0].resultListMap = null;
+                            apiInfoDataList[0].resultFullMap = fullMap;
+                            apiInfoDataList[0].errorCode = authMap["result_codef_code"];
+                          }else{
+                            if(fullMap["result"]["code"] == "CF-03002"){
+                              apiInfoDataList[0].isResultSuccess = false;
+                              apiInfoDataList[0].resultMap = null;
+                              apiInfoDataList[0].resultListMap = null;
+                              apiInfoDataList[0].resultFullMap = fullMap;
+                              apiInfoDataList[0].errorCode = "error_cert";
+                            }else{
+                              apiInfoDataList[0].isResultSuccess = true;
+                              apiInfoDataList[0].resultMap = authMap;
+                              apiInfoDataList[0].resultListMap = null;
+                              apiInfoDataList[0].resultFullMap = fullMap;
+                            }
+                          }
                         }
                       }
-
-                      if(callCount == apiInfoDataList.length){
-                        callback(true, apiInfoDataList);
+                    }else{
+                      apiInfoDataList[0].isResultSuccess = false;
+                      apiInfoDataList[0].resultMap = null;
+                      apiInfoDataList[0].resultListMap = null;
+                      apiInfoDataList[0].resultFullMap = fullMap;
+                      if(authMap != null){
+                        apiInfoDataList[0].errorCode = authMap["result_codef_code"];
+                      }else if(authListMap != null){
+                        apiInfoDataList[0].errorCode = "error_cert";
                       }
-                    });
-                  }
+
+                      if(apiInfoDataList[0].errorCode == "CF-12872"){
+                        for(var each in apiInfoDataList){
+                          each.isResultSuccess = false;
+                          each.resultMap = null;
+                          each.resultListMap = null;
+                          each.resultFullMap = fullMap;
+                          each.errorCode = "CF-12872";
+                        }
+                        callback(false, apiInfoDataList);
+                      }
+                    }
+
+                    if(callCount == apiInfoDataList.length){
+                      callback(true, apiInfoDataList);
+                    }
+                  });
                 }
               }
             }
@@ -746,6 +940,35 @@ class CodeFController{
                     if(map['result_code'] == "CF-03002"){
                       CommonUtils.flutterToast("인증을 진행해주세요.");
                       GetController.to.updateWait(false);
+                      apiTimerCount = 0;
+                      GetController.to.resetPercent();
+
+                      apiCheckTimer ??= Timer.periodic(const Duration(seconds: 1), (Timer timer) {
+                        apiTimerCount++;
+
+                        if(GetController.to.isWait.value){
+                          if(GetController.to.loadingPercent.value >= 80){
+                            GetController.to.updatePercent(0);
+                            if(apiCheckTimer != null) apiCheckTimer!.cancel();
+                            apiCheckTimer = null;
+                          }else if(GetController.to.loadingPercent.value >= 50){
+                            GetController.to.updatePercent(10);
+                          }else if(GetController.to.loadingPercent.value >= 10){
+                            GetController.to.updatePercent(6);
+                          }else{
+                            GetController.to.updatePercent(4);
+                          }
+                        }else{
+                          apiTimerCount = 0;
+                          GetController.to.setPercent(1);
+                        }
+
+
+                        if(apiTimerCount >= 100){
+                          if(apiCheckTimer != null) apiCheckTimer!.cancel();
+                          apiCheckTimer = null;
+                        }
+                      });
                     }else if(fullMap!['result']['code'] == "CF-12872"){
                       callback(false, map, listMap, fullMap);
                     }else if(fullMap['result']['code'] == "CF-12835"){
@@ -763,6 +986,35 @@ class CodeFController{
                     if(listMap?[0]['result_code'] == "CF-03002"){
                       CommonUtils.flutterToast("인증을 진행해주세요.");
                       GetController.to.updateWait(false);
+                      apiTimerCount = 0;
+                      GetController.to.resetPercent();
+
+                      apiCheckTimer ??= Timer.periodic(const Duration(seconds: 1), (Timer timer) {
+                        apiTimerCount++;
+
+                        if(GetController.to.isWait.value){
+                          if(GetController.to.loadingPercent.value >= 80){
+                            GetController.to.updatePercent(0);
+                            if(apiCheckTimer != null) apiCheckTimer!.cancel();
+                            apiCheckTimer = null;
+                          }else if(GetController.to.loadingPercent.value >= 50){
+                            GetController.to.updatePercent(10);
+                          }else if(GetController.to.loadingPercent.value >= 10){
+                            GetController.to.updatePercent(6);
+                          }else{
+                            GetController.to.updatePercent(4);
+                          }
+                        }else{
+                          apiTimerCount = 0;
+                          GetController.to.setPercent(1);
+                        }
+
+
+                        if(apiTimerCount >= 100){
+                          if(apiCheckTimer != null) apiCheckTimer!.cancel();
+                          apiCheckTimer = null;
+                        }
+                      });
                     }else if(fullMap!['result']['code'] == "CF-12872"){
                       callback(false, map, listMap, fullMap);
                     }else if(fullMap['result']['code'] == "CF-12835"){
@@ -801,8 +1053,8 @@ class CodeFController{
         "userName": name,
         "loginTypeLevel": loginCertType,
         "phoneNo": phoneNo,
-        "personalInfoChangeYN": "0",
-        "pastAddrChangeYN": "0",
+        "personalInfoChangeYN": "1",
+        "pastAddrChangeYN": "1",
         "nameRelationYN": "1",
         "militaryServiceYN": "1",
         "overseasKoreansIDYN": "0",
