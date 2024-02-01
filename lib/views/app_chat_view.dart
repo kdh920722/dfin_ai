@@ -563,6 +563,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
       if(otherInfo.message.contains("<button") || otherInfo.message.contains("<br>")){
         otherInfoWidget = _getHtmlView(otherInfo.message, "UPFIN", otherInfo.messageType);
       }else{
+        otherInfo.message = otherInfo.message.replaceAll(" / ", "\n");
         otherInfoWidget = UiUtils.getSelectableTextWithFixedScale2(otherInfo.message, 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null);
       }
     }else{
