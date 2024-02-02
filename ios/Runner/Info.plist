@@ -33,6 +33,14 @@
 				<string>fb780305570800959</string>
 			</array>
 		</dict>
+		<dict>
+			<key>CFBundleTypeRole</key>
+			<string>Editor</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>upfin</string>
+			</array>
+		</dict>
 	</array>
 	<key>CFBundleVersion</key>
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
@@ -40,6 +48,14 @@
 	<string>All files have been downloaded</string>
 	<key>FDMaximumConcurrentTasks</key>
 	<integer>5</integer>
+	<key>FacebookAppID</key>
+	<string>780305570800959</string>
+	<key>FacebookClientToken</key>
+	<string>bc10dc12c8ff6c250204b2638197b185</string>
+	<key>FacebookDisplayName</key>
+	<string>업핀</string>
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
 	<key>KAKAO_APP_KEY</key>
 	<string>077c95950e4c99aefd181d2cd069524a</string>
 	<key>LSApplicationQueriesSchemes</key>
@@ -130,24 +146,9 @@
 	<false/>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-
-    <key>FacebookClientToken</key>
-    <string>bc10dc12c8ff6c250204b2638197b185</string>
-    <key>FacebookAppID</key>
-    <string>780305570800959</string>
-    <key>FacebookDisplayName</key>
-    <string>업핀</string>
-
-    <key>com.apple.developer.associated-domains</key>
-    <array>
-        <string>applinks:upfin.onelink.me</string>
-    </array>
-
-    <key>ITSAppUsesNonExemptEncryption</key>
-    <false/>
-
-    <!-- ATT -->
-    <!-- ATT : <key>NSUserTrackingUsageDescription</key> -->
-    <!-- ATT : <string>This identifier will be used to deliver personalized ads to you.</string> -->
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:upfin.onelink.me</string>
+	</array>
 </dict>
 </plist>

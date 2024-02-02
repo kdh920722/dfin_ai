@@ -1534,7 +1534,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
         child: Column(children: [
 
           Stack(children: [
-            Container(height: 7.2.h,),
+            Container(height: 6.5.h,),
             Positioned(
               top: 1.h,
               left: 5.w,
@@ -1549,7 +1549,8 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     UiUtils.getMarginBox(0, 1.8.h),
                     SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScaleAndOverFlow(currentCompany, 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1)),
-                    UiUtils.getTextWithFixedScale2(currentRoomType == "1" ? "개인회생" : "오토론", 10.sp, FontWeight.w600, ColorStyles.upFinPrTitleColor, TextAlign.center, 1),
+                    UiUtils.getMarginBox(0, 0.3.h),
+                    UiUtils.getTextWithFixedScale2(currentRoomType == "1" ? "개인회생" : "오토론", 10.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.center, 1),
                   ])
               ),
             ),
