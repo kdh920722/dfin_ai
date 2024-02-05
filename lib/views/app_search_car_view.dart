@@ -698,7 +698,7 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
                   LogfinController.getCarInfo((isSuccessToGetCarInfo, isNotEmpty) async {
                     if(isSuccessToGetCarInfo){
                       if(isNotEmpty){
-                        LogfinController.getCarPrList(MyData.selectedCarInfoData!.carNum, selectedJobInfo.split("@")[1], selectedPreLoanCountInfo.split("@")[1], selectedPreLoanPriceInfo, (isSuccessToGetOffers, _) async {
+                        LogfinController.getCarPrList(selectedCarNum.replaceAll(" ", "").trim(), selectedJobInfo.split("@")[1], selectedPreLoanCountInfo.split("@")[1], selectedPreLoanPriceInfo, (isSuccessToGetOffers, _) async {
                           UiUtils.closeLoadingPop(context);
                           if(isSuccessToGetOffers){
                             CommonUtils.moveWithUntil(context, AppView.appMainView.value);
