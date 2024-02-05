@@ -298,7 +298,12 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                         UiUtils.getTextWithFixedScale("관리자", 9.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null), ColorStyles.upFinWhiteGray, (){
                       // test
                       //메인뷰팝업
-                      _showInfoPop();
+                      /*
+                      UiUtils.showLoadingPercentPop(context);
+                      Future.delayed(const Duration(seconds: 5), () {
+                        UiUtils.closeLoadingPercentPop(context);
+                      });
+                       */
                       //SharedPreferenceController.deleteAllData();
                       /*
                 //간편인증팝업
@@ -818,7 +823,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                       UiUtils.getImage(16.w, 16.w, Image.asset('assets/images/icon_car.png', fit: BoxFit.fill)),
                       UiUtils.getMarginBox(3.w, 0),
                       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        SizedBox(width: 53.w, child: UiUtils.getTextWithFixedScaleAndOverFlow("${each.carModel} ${each.carModelDetail}", 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, 1)),
+                        SizedBox(width: 53.w, height: 1.9.h, child: UiUtils.getTextWithFixedScaleAndOverFlow("${each.carModel} ${each.carModelDetail}", 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, 1)),
                         UiUtils.getMarginBox(0, 0.5.h),
                         UiUtils.getTextWithFixedScale(each.carNum, 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null),
                       ]),

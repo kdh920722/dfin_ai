@@ -340,7 +340,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
   }
 
   void _back(){
-    Navigator.pop(context);
+    CommonUtils.moveWithUntil(context, AppView.appMainView.value);
   }
 
   @override
@@ -356,7 +356,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                   MyData.selectedAccidentInfoData = null;
                   MyData.selectedCarInfoData = null;
                   MyData.selectedPrInfoData = null;
-                  Navigator.pop(context);
+                  _back();
                 })
               ])),
               UiUtils.getMarginBox(0, 3.w),

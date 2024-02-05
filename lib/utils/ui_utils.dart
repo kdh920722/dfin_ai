@@ -1,12 +1,15 @@
+import 'dart:async';
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:expansion_tile_group/expansion_tile_group.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_widget_from_html/flutter_widget_from_html.dart';
+import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:upfin/controllers/logfin_controller.dart';
 import 'package:upfin/styles/TextStyles.dart';
+import '../controllers/get_controller.dart';
 import '../styles/ColorStyles.dart';
 import '../configs/app_config.dart';
 import 'common_utils.dart';
@@ -940,11 +943,103 @@ class UiUtils {
       );
     }
   }
+  static Timer? loadingCheckTimer;
+  static int loadingTimerCount = 0;
+  static void showLoadingPercentPop(BuildContext targetContext, String text){
+    if(!isLoadingPopOn){
+      isLoadingPopOn = true;
+
+      loadingTimerCount = 0;
+      GetController.to.resetPercent();
+
+      loadingCheckTimer ??= Timer.periodic(const Duration(seconds: 1), (Timer timer) {
+        loadingTimerCount++;
+
+        if(GetController.to.loadingPercent.value >= 80){
+          GetController.to.updatePercent(0);
+          if(loadingCheckTimer != null) loadingCheckTimer!.cancel();
+          loadingCheckTimer = null;
+        }else if(GetController.to.loadingPercent.value >= 60){
+          GetController.to.updatePercent(6);
+        }else if(GetController.to.loadingPercent.value >= 40){
+          GetController.to.updatePercent(3);
+        }else if(GetController.to.loadingPercent.value >= 20){
+          GetController.to.updatePercent(4);
+        }else if(GetController.to.loadingPercent.value >= 5){
+          GetController.to.updatePercent(5);
+        }else{
+          GetController.to.updatePercent(3);
+        }
+
+
+        if(loadingTimerCount >= 100){
+          if(loadingCheckTimer != null) loadingCheckTimer!.cancel();
+          loadingCheckTimer = null;
+        }
+      });
+
+      showGeneralDialog(
+        barrierDismissible: false,
+        context: targetContext,
+        pageBuilder: (context, animation, secondaryAnimation) {
+          return WillPopScope(
+              onWillPop: () async => false,
+              child: StatefulBuilder(// You need this, notice the parameters below:
+                  builder: (_, StateSetter setState) {
+                    return Obx((){
+                      return Container(
+                          width: 100.w,
+                          height: 100.h,
+                          color: Colors.black54,
+                          child: Column(crossAxisAlignment: CrossAxisAlignment.center, mainAxisAlignment : MainAxisAlignment.center, children: [
+                            UiUtils.getTextWithFixedScale(text, 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, 1),
+                            UiUtils.getMarginBox(0, 2.h),
+                            Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.end, children: [
+                              UiUtils.getTextWithFixedScale("${GetController.to.loadingPercent.value}", 16.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null),
+                              UiUtils.getMarginBox(0.5.w, 0),
+                              UiUtils.getTextWithFixedScale("%", 16.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null),
+                            ])
+                          ])
+                      );
+                    });
+                  })
+          );
+        },
+      );
+    }
+  }
 
   static void closeLoadingPop(BuildContext targetContext){
     if(isLoadingPopOn){
       Navigator.pop(targetContext);
       isLoadingPopOn = false;
+    }
+  }
+
+  static void closeLoadingPercentPop(BuildContext targetContext){
+    if(isLoadingPopOn){
+      GetController.to.setPercent(0);
+      Navigator.pop(targetContext);
+      if(loadingCheckTimer != null) loadingCheckTimer!.cancel();
+      loadingCheckTimer = null;
+      loadingTimerCount = 0;
+      GetController.to.resetPercent();
+      isLoadingPopOn = false;
+    }
+  }
+
+  static void closeLoadingPercentPopForSuccess(BuildContext targetContext, Function(bool isEnd) callback){
+    if(isLoadingPopOn){
+      GetController.to.setPercent(100);
+      Future.delayed(const Duration(seconds: 1), () {
+        Navigator.pop(targetContext);
+        if(loadingCheckTimer != null) loadingCheckTimer!.cancel();
+        loadingCheckTimer = null;
+        loadingTimerCount = 0;
+        GetController.to.resetPercent();
+        isLoadingPopOn = false;
+        callback(true);
+      });
     }
   }
 

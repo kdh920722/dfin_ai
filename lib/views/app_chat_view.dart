@@ -1170,6 +1170,8 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
               });
             }
           }
+        }else if(each.contains("대출관리")){
+          _getSearchCarView();
         }else if(each.contains("채팅")){
           inputTextHide = false;
           GetController.to.updateInputTextHide(inputTextHide);
@@ -1467,20 +1469,24 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                     "car_no": selectedCarNum.replaceAll(" ", "").trim(),
                     "owner_name": MyData.isTestUser? selectedCarOwner : MyData.name,
                     "job": selectedJobInfo.split("@")[1],
-                    "lend_count": selectedPreLoanCountInfo.split("@")[1],
-                    "lend_amount": selectedPreLoanPriceInfo,
+                    "lend_count": "0", // selectedPreLoanCountInfo.split("@")[1],
+                    "lend_amount": "0", // selectedPreLoanPriceInfo,
                     "loan_uid" : currentLoanUid
                   };
                   CommonUtils.log("i", "car pr search info:\n$inputJson");
 
-                  UiUtils.showLoadingPop(context);
+                  UiUtils.showLoadingPercentPop(context, "자동차정보를 조회중입니다.");
                   LogfinController.callLogfinApi(LogfinApis.addAndSearchCar, inputJson, (isSuccess, outputJson){
-                    UiUtils.closeLoadingPop(context);
                     if(isSuccess){
-                      CommonUtils.flutterToast("차량정보 조회 완료");
-                      AppMainViewState.refreshMain();
-                      Navigator.pop(slideContext);
+                      UiUtils.closeLoadingPercentPopForSuccess(context, (isEnd){
+                        if(isEnd){
+                          CommonUtils.flutterToast("차량정보 조회 완료");
+                          AppMainViewState.refreshMain();
+                          Navigator.pop(slideContext);
+                        }
+                      });
                     }else{
+                      UiUtils.closeLoadingPercentPop(context);
                       // prSearch 실패
                       String errorMsg = outputJson!["error"];
                       if(errorMsg == "no implicit conversion of String into Integer"){

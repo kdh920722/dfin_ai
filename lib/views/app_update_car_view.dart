@@ -41,11 +41,11 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
   final String errorMsg = "정보를 입력해주세요";
   int currentViewId = 0;
 
-  static const  int preLoanCountViewId = 4;
+  static const  int preLoanCountViewId = 99;
   Key? selectedPreLoanCountKey;
   String selectedPreLoanCountInfo = "";
 
-  static const  int preLoanPriceViewId = 5;
+  static const  int preLoanPriceViewId = 99;
   String selectedPreLoanPriceInfo = "";
   final _preLoanPriceFocus = FocusNode();
   final _preLoanPriceTextController = TextEditingController();
@@ -83,7 +83,7 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
     }
   }
 
-  static const  int jobViewId = 6;
+  static const  int jobViewId = 4;
   Key? selectedJobKey;
   String selectedJobInfo = "";
 
@@ -211,11 +211,13 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
   }
 
   Future<void> backInputView() async {
+    /*
     if(currentViewId == jobViewId){
       if(selectedPreLoanCountInfo.split("@")[1] == "0"){
         currentViewId--;
       }
     }
+     */
 
     if(isInputValid){
       isInputValid = false;
@@ -516,12 +518,14 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
     confirmDataList.add("•  ${MyData.birth.substring(0,4)}년 $birthMonth월 $birthDay일");
     confirmDataList.add("•  차량번호 ${MyData.selectedCarInfoData!.carNum}");
     confirmDataList.add("•  차량 시세금액 ${CommonUtils.getPriceFormattedStringForFullPrice(double.parse(MyData.selectedCarInfoData!.carPrice))}");
+    /*
     if(selectedPreLoanCountInfo.split("@")[1] != "0"){
       confirmDataList.add("•  기대출  ${selectedPreLoanCountInfo.split("@")[0]}");
       confirmDataList.add("•  기대출 잔액  ${CommonUtils.getPriceFormattedString(double.parse(selectedPreLoanPriceInfo))}");
     }else{
       confirmDataList.add("•  기대출 없음");
     }
+     */
     confirmDataList.add("•  ${selectedJobInfo.split("@")[0]}");
 
     List<Widget> confirmWidgetList = [];
@@ -573,7 +577,10 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
 
   void _updateData(){
     UiUtils.showLoadingPop(context);
-    LogfinController.getCarPrList(MyData.selectedCarInfoData!.carNum, selectedJobInfo.split("@")[1], selectedPreLoanCountInfo.split("@")[1], selectedPreLoanPriceInfo, (isSuccessToGetOffers, _){
+    LogfinController.getCarPrList(MyData.selectedCarInfoData!.carNum, selectedJobInfo.split("@")[1],
+        "0", // selectedPreLoanCountInfo.split("@")[1]
+        "0", // selectedPreLoanPriceInfo
+            (isSuccessToGetOffers, _){
       UiUtils.closeLoadingPop(context);
       if(isSuccessToGetOffers){
         CommonUtils.moveWithReplacementTo(context, AppView.appResultPrView.value, null);
