@@ -340,15 +340,14 @@ class CommonUtils {
 
   static bool isAppLogInit = false;
   static setAppLog(String eventName) async {
-    if(MyData.email != "" && isAppLogInit){
-      String appVersion = await Config.getAppVersion();
+    if(MyData.email != "" && isAppLogInit && Config.appVersionCode != ""){
       String currTime = CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime());
       if(currTime.length == 14){
         Map<String, Object> data = {
           'id': MyData.email,
           'time': "${currTime.substring(0,4)}.${currTime.substring(4,6)}.${currTime.substring(6,8)}-${currTime.substring(8,10)}:${currTime.substring(10,12)}:${currTime.substring(12)}",
           'os' : Config.isAndroid? "2" : "1",
-          'version' : appVersion,
+          'version' : Config.appVersionCode,
           'event_name' : eventName
         };
 
@@ -390,6 +389,11 @@ class CommonUtils {
     String minutes = twoDigits(duration.inMinutes.remainder(60));
     String seconds = twoDigits(duration.inSeconds.remainder(60));
     return "$minutes:$seconds";
+  }
+
+  static Map<String,dynamic> parseRubyToMap(String jsonString){
+    jsonString = jsonString.replaceAll('=>', ':');
+    return jsonDecode(jsonString);
   }
 
   static Future<void> moveTo(BuildContext fromContext, String toRoute, Object? arguments) async {

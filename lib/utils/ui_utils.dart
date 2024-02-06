@@ -161,6 +161,10 @@ class UiUtils {
     return GestureDetector(onTap: onPressedCallback, child : UiUtils.getTextWithFixedScale(text, fontSize, fontWeight, textColor, textAlign, null));
   }
 
+  static Widget getTextOverFlowButtonWithFixedScale(double width, String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign? textAlign, int? textMaxLine, Function() onPressedCallback){
+    return GestureDetector(onTap: onPressedCallback, child : SizedBox(width: width, child: UiUtils.getTextWithFixedScaleAndOverFlow(text, fontSize, fontWeight, textColor, textAlign, null)));
+  }
+
   static Widget getTextButtonWithFixedScale2(String text, double fontSize, FontWeight fontWeight, Color textColor, TextAlign? textAlign, int? textMaxLine, Function() onPressedCallback){
     return GestureDetector(onTap: onPressedCallback, child : UiUtils.getTextWithFixedScale2(text, fontSize, fontWeight, textColor, textAlign, null));
   }
@@ -945,36 +949,39 @@ class UiUtils {
   }
   static Timer? loadingCheckTimer;
   static int loadingTimerCount = 0;
+  static bool isLoadingStop = false;
   static void showLoadingPercentPop(BuildContext targetContext, String text){
     if(!isLoadingPopOn){
       isLoadingPopOn = true;
 
+      isLoadingStop = false;
       loadingTimerCount = 0;
       GetController.to.resetPercent();
 
       loadingCheckTimer ??= Timer.periodic(const Duration(seconds: 1), (Timer timer) {
-        loadingTimerCount++;
+        if(!isLoadingStop){
+          loadingTimerCount++;
 
-        if(GetController.to.loadingPercent.value >= 80){
-          GetController.to.updatePercent(0);
-          if(loadingCheckTimer != null) loadingCheckTimer!.cancel();
-          loadingCheckTimer = null;
-        }else if(GetController.to.loadingPercent.value >= 60){
-          GetController.to.updatePercent(6);
-        }else if(GetController.to.loadingPercent.value >= 40){
-          GetController.to.updatePercent(3);
-        }else if(GetController.to.loadingPercent.value >= 20){
-          GetController.to.updatePercent(4);
-        }else if(GetController.to.loadingPercent.value >= 5){
-          GetController.to.updatePercent(5);
-        }else{
-          GetController.to.updatePercent(3);
-        }
+          if(GetController.to.loadingPercent.value >= 80){
+            GetController.to.updatePercent(0);
+            if(loadingCheckTimer != null) loadingCheckTimer!.cancel();
+            loadingCheckTimer = null;
+          }else if(GetController.to.loadingPercent.value >= 60){
+            GetController.to.updatePercent(6);
+          }else if(GetController.to.loadingPercent.value >= 40){
+            GetController.to.updatePercent(3);
+          }else if(GetController.to.loadingPercent.value >= 20){
+            GetController.to.updatePercent(4);
+          }else if(GetController.to.loadingPercent.value >= 5){
+            GetController.to.updatePercent(5);
+          }else{
+            GetController.to.updatePercent(3);
+          }
 
-
-        if(loadingTimerCount >= 100){
-          if(loadingCheckTimer != null) loadingCheckTimer!.cancel();
-          loadingCheckTimer = null;
+          if(loadingTimerCount >= 100){
+            if(loadingCheckTimer != null) loadingCheckTimer!.cancel();
+            loadingCheckTimer = null;
+          }
         }
       });
 
@@ -1025,6 +1032,7 @@ class UiUtils {
       loadingTimerCount = 0;
       GetController.to.resetPercent();
       isLoadingPopOn = false;
+      isLoadingStop = false;
     }
   }
 
@@ -1038,6 +1046,7 @@ class UiUtils {
         loadingTimerCount = 0;
         GetController.to.resetPercent();
         isLoadingPopOn = false;
+        isLoadingStop = false;
         callback(true);
       });
     }

@@ -55,6 +55,7 @@ class Config{
   static bool isAccidentOpen = false;
   static String autoOpenNText = "";
   static List<String> appVerPassUsers = [];
+  static String appVersionCode = "";
 
   static Map<String, WidgetBuilder> appRoutes = {
     AppView.appRootView.value : (context) => AppRootView(),

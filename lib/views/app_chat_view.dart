@@ -1170,8 +1170,6 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
               });
             }
           }
-        }else if(each.contains("대출관리")){
-          _getSearchCarView();
         }else if(each.contains("채팅")){
           inputTextHide = false;
           GetController.to.updateInputTextHide(inputTextHide);
@@ -1420,10 +1418,10 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
     String selectedPreLoanCountInfo = MyData.selectedAccidentInfoData!.accidentLendCount;
     String selectedJobInfo = MyData.jobInfo;
     UiUtils.showPopMenu(context, true, 100.w, 100.h, 0.5, 0, ColorStyles.upFinWhite, (slideContext, slideSetState){
-      Widget slideWidget = Padding(padding: EdgeInsets.only(left: 2.5.w, top: 0.5.h,), child: Column(
+      Widget slideWidget = Padding(padding: EdgeInsets.only(left: 2.5.w), child: Column(
           children: [
-            SizedBox(width: 95.w, child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-              UiUtils.getBackButton(() {
+            SizedBox(width: 95.w, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
+              UiUtils.getCloseButton(ColorStyles.upFinDarkGray, () {
                 Navigator.pop(slideContext);
               }),
               UiUtils.getMarginBox(2.w, 0),
@@ -1476,7 +1474,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                   CommonUtils.log("i", "car pr search info:\n$inputJson");
 
                   UiUtils.showLoadingPercentPop(context, "자동차정보를 조회중입니다.");
-                  LogfinController.callLogfinApi(LogfinApis.addAndSearchCar, inputJson, (isSuccess, outputJson){
+                  LogfinController.addCar(context, inputJson, (isSuccess){
                     if(isSuccess){
                       UiUtils.closeLoadingPercentPopForSuccess(context, (isEnd){
                         if(isEnd){
@@ -1487,20 +1485,8 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                       });
                     }else{
                       UiUtils.closeLoadingPercentPop(context);
-                      // prSearch 실패
-                      String errorMsg = outputJson!["error"];
-                      if(errorMsg == "no implicit conversion of String into Integer"){
-                        CommonUtils.flutterToast("차량정보를 확인해주세요.");
-                      }else{
-                        if(errorMsg.split(".").length > 2){
-                          CommonUtils.flutterToast(errorMsg.replaceAll("+", "").replaceAll("()", "").replaceAll(".", "\n"));
-                        }else{
-                          CommonUtils.flutterToast(errorMsg.replaceAll("+", "").replaceAll("()", ""));
-                        }
-                      }
                     }
                   });
-
                 }else{
                   CommonUtils.flutterToast("이미 조회하신 차량번호에요.");
                 }

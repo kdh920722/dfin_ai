@@ -2125,7 +2125,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                         }
 
                         if(isValid){
-                          await HyphenController.callHyphenApiForCert(HyphenApis.driveIdCert, inputJson, (isSuccessToCertId){
+                          await HyphenController.callHyphenApiForCert(HyphenApis.driveIdCert, inputJson, (isSuccessToCertId, errorCode){
                             if(isSuccessToCertId){
                               _setConfirmedToDocItemByViewId(currentViewId, true);
                               Map<String, dynamic> resultMap = {
@@ -2136,7 +2136,11 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                                 pickedFilePath = croppedImagePath;
                               });
                             }else{
-                              isCheckNeeded = true;
+                              if(errorCode == 0){
+                                isCheckNeeded = true;
+                              }else{
+                                isCheckNeeded = false;
+                              }
                             }
 
                             if(isCheckNeeded){
@@ -2232,7 +2236,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                                                     inputJson["licence04"] = _dlNumInfoTextController4.text.trim();
                                                     inputJson["serialNo"] = _dlNumInfoTextControllerSerial.text.trim();
                                                     UiUtils.showLoadingPop(slideContext);
-                                                    HyphenController.callHyphenApiForCert(HyphenApis.driveIdCert, inputJson, (isSuccessToCertId){
+                                                    HyphenController.callHyphenApiForCert(HyphenApis.driveIdCert, inputJson, (isSuccessToCertId, errorCode){
                                                       UiUtils.closeLoadingPop(slideContext);
                                                       Navigator.pop(slideContext);
                                                       if(isSuccessToCertId){
@@ -2360,7 +2364,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                                                   inputJson["licence04"] = _dlNumInfoTextController4.text.trim();
                                                   inputJson["serialNo"] = _dlNumInfoTextControllerSerial.text.trim();
                                                   UiUtils.showLoadingPop(slideContext);
-                                                  HyphenController.callHyphenApiForCert(HyphenApis.driveIdCert, inputJson, (isSuccessToCertId){
+                                                  HyphenController.callHyphenApiForCert(HyphenApis.driveIdCert, inputJson, (isSuccessToCertId, errorCode){
                                                     UiUtils.closeLoadingPop(slideContext);
                                                     Navigator.pop(slideContext);
                                                     if(isSuccessToCertId){
@@ -2392,7 +2396,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                               });
                             }
                           }else{
-                            HyphenController.callHyphenApiForCert(HyphenApis.driveIdCert, inputJson, (isSuccessToCertId){
+                            HyphenController.callHyphenApiForCert(HyphenApis.driveIdCert, inputJson, (isSuccessToCertId, errorCode){
                               UiUtils.closeLoadingPop(context);
                               if(isSuccessToCertId){
                                 _setConfirmedToDocItemByViewId(currentViewId, true);
@@ -2424,7 +2428,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                           "issueDt": "${map["issueDate"][0]["formatted"]["year"]}${map["issueDate"][0]["formatted"]["month"]}${map["issueDate"][0]["formatted"]["day"]}"
                         };
 
-                        HyphenController.callHyphenApiForCert(HyphenApis.idCert, inputJson, (isSuccessToCertId){
+                        HyphenController.callHyphenApiForCert(HyphenApis.idCert, inputJson, (isSuccessToCertId, errorCode){
                           UiUtils.closeLoadingPop(context);
                           if(isSuccessToCertId){
                             _setConfirmedToDocItemByViewId(currentViewId, true);

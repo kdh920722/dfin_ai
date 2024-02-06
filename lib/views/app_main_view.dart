@@ -297,7 +297,15 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                     MyData.isTestUser ? UiUtils.getRoundBoxButtonTextWithFixedScale6(
                         UiUtils.getTextWithFixedScale("관리자", 9.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null), ColorStyles.upFinWhiteGray, (){
                       // test
-                      //메인뷰팝업
+                      Map<String, dynamic> inputJson = {
+                        "car_no": "68누1772",
+                        "owner_name": "김미순",
+                        "job": "1",
+                        "lend_count": "0", // selectedPreLoanCountInfo.split("@")[1]
+                        "lend_amount": "0", // selectedPreLoanPriceInfo
+
+                      };
+
                       /*
                       UiUtils.showLoadingPercentPop(context);
                       Future.delayed(const Duration(seconds: 5), () {
@@ -1032,6 +1040,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     int chatRoomCnt = MyData.getChatRoomInfoList().length;
     Future.delayed(Duration(seconds: chatRoomCnt > 6 ? 0 : 2), () async {
       LogfinController.getMainViewInfo((isSuccessToGetMainInfo){
+        if(chatRoomCnt == 0) GetController.to.updateAllSubScribed(true);
         setState(() {});
       });
     });
@@ -1118,7 +1127,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               Row(children: [
                 UiUtils.getTextWithFixedScale("버전", 15.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null),
                 const Spacer(flex: 2),
-                UiUtils.getTextWithFixedScale(MyData.isTestUser? Config.appTestVersion.split("+").first : Config.appVersion.split("+").first, 14.sp, FontWeight.w300, ColorStyles.upFinDarkGray, TextAlign.start, null)
+                UiUtils.getTextWithFixedScale(Config.appVersionCode.split("+").first, 14.sp, FontWeight.w300, ColorStyles.upFinDarkGray, TextAlign.start, null)
               ]), () {}),
           UiUtils.getBorderButtonBox(95.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
               Row(children: [
@@ -1307,6 +1316,8 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       if(isViewHere){
+        int chatRoomCnt = MyData.getChatRoomInfoList().length;
+        if(chatRoomCnt == 0) GetController.to.updateAllSubScribed(true);
         await CommonUtils.checkUpdate(context);
       }
 
@@ -1392,22 +1403,18 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
           if(GetController.to.isAllSubscribed.value){
             return Container();
           }else{
-            if(MyData.getChatRoomInfoList().isNotEmpty){
-              return WillPopScope(
-                  onWillPop: () async => false,
-                  child: StatefulBuilder(// You need this, notice the parameters below:
-                      builder: (_, StateSetter setState) {
-                        return Container(
-                            width: 100.w,
-                            height: 100.h,
-                            color: Colors.black54,
-                            child: Center(child: UiUtils.getTextWithFixedScale("최신정보로 업데이트 중", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, 1))
-                        );
-                      })
-              );
-            }else{
-              return Container();
-            }
+            return WillPopScope(
+                onWillPop: () async => false,
+                child: StatefulBuilder(// You need this, notice the parameters below:
+                    builder: (_, StateSetter setState) {
+                      return Container(
+                          width: 100.w,
+                          height: 100.h,
+                          color: Colors.black54,
+                          child: Center(child: UiUtils.getTextWithFixedScale("최신정보로 업데이트 중", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, 1))
+                      );
+                    })
+            );
           }
         })
         )

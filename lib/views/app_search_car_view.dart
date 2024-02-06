@@ -630,7 +630,7 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
               CommonUtils.log("i", "car search info yes :\n$inputJson");
 
               UiUtils.showLoadingPercentPop(context, "상품 조회를 위해 차량정보를 분석중입니다.");
-              LogfinController.callLogfinApi(LogfinApis.addAndSearchCar, inputJson, (isSuccess, outputJson){
+              LogfinController.addCar(context, inputJson, (isSuccess){
                 if(isSuccess){
                   LogfinController.getUserInfo((isSuccessToGetUSerInfo){
                     if(isSuccessToGetUSerInfo){
@@ -675,18 +675,7 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
                     }
                   });
                 }else{
-                  // prSearch 실패
                   UiUtils.closeLoadingPercentPop(context);
-                  String errorMsg = outputJson!["error"];
-                  if(errorMsg == "no implicit conversion of String into Integer"){
-                    CommonUtils.flutterToast("차량정보를 확인해주세요.");
-                  }else{
-                    if(errorMsg.split(".").length > 2){
-                      CommonUtils.flutterToast(errorMsg.replaceAll("+", "").replaceAll("()", "").replaceAll(".", "\n"));
-                    }else{
-                      CommonUtils.flutterToast(errorMsg.replaceAll("+", "").replaceAll("()", ""));
-                    }
-                  }
                   setState(() {
                     currentViewId = 1;
                   });

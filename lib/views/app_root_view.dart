@@ -44,6 +44,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
     WidgetsBinding.instance.addObserver(this);
     MyData.resetMyData();
     _initDeepLinkHandling();
+    CommonUtils.hideKeyBoard();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if(!isInitRootView){
         isInitRootView = true;
@@ -458,6 +459,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
 
   Future<void> _initAtFirst() async {
     Config.isAppMainInit = true;
+    Config.appVersionCode = await Config.getAppVersion();
     await _initFirebase();
     await _initAppState();
     if(Config.appState == Config.stateInfoMap["open"]){

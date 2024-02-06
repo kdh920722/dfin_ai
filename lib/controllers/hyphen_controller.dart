@@ -84,52 +84,65 @@ class HyphenController {
     }
   }
 
-  static Future<void> callHyphenApiForCert(HyphenApis api, Map<String, dynamic> inputJson, Function(bool isSuccess) callback) async {
+  static Future<void> callHyphenApiForCert(HyphenApis api, Map<String, dynamic> inputJson, Function(bool isSuccess, int errorCode) callback) async {
     HyphenController._callHyphenApi(api, inputJson, (isSuccessToCertId, outputJsonForCertId){
       if(isSuccessToCertId){
         if(api == HyphenApis.idCert){
           if(outputJsonForCertId!["truthYn"] == "Y"){
             if(MyData.name == outputJsonForCertId["name"]){
               CommonUtils.flutterToast("신분증 확인에 성공했어요.");
-              callback(true);
+              callback(true, 0);
             }else{
               CommonUtils.flutterToast("신분증 진위확인에 실패\n유효한 신분증이 아니에요.");
-              callback(false);
+              callback(false, 0);
             }
           }else{
             CommonUtils.flutterToast("신분증 진위확인에 실패\n유효한 신분증이 아니에요.");
-            callback(false);
+            callback(false, 0);
           }
         }else{
           if(outputJsonForCertId!["licenceTruthYn"] == "Y"){
             if(MyData.name == outputJsonForCertId["name"]){
               CommonUtils.flutterToast("신분증 확인에 성공했어요.");
-              callback(true);
+              callback(true, 0);
             }else{
               CommonUtils.flutterToast("신분증 진위확인에 실패\n유효한 신분증이 아니에요.");
-              callback(false);
+              callback(false, 0);
             }
           }else{
             CommonUtils.flutterToast("신분증 진위확인에 실패\n유효한 신분증이 아니에요.");
-            callback(false);
+            callback(false, 0);
           }
         }
       }else{
         if(outputJsonForCertId != null){
           if(outputJsonForCertId.containsKey("error")){
             if(outputJsonForCertId["error"].toString().contains("재처리")){
-              CommonUtils.flutterToast("진위확인 기관오류입니다.\n약 3분뒤에 다시 시도해주세요.");
+              CommonUtils.flutterToast("시스템 점검중입니다.\n약 3분뒤에 다시 시도해주세요.");
+              callback(false, 1);
             }else{
-              CommonUtils.flutterToast(outputJsonForCertId["error"]);
+              if(outputJsonForCertId["error"].toString().contains("점검중")){
+                CommonUtils.flutterToast("시스템 점검중입니다.");
+                callback(false, 2);
+              }else{
+                String errorMsg = outputJsonForCertId["error"].toString();
+                if(errorMsg.split("] ").length > 1){
+                  errorMsg = errorMsg.split("] ").last;
+                  errorMsg = errorMsg.replaceAll("다. ", "다.\n");
+                }
+
+                CommonUtils.flutterToast(errorMsg);
+                callback(false, 0);
+              }
             }
           }else{
             CommonUtils.flutterToast("신분증 진위확인에 실패\n유효한 신분증이 아니에요.");
+            callback(false, 0);
           }
         }else{
           CommonUtils.flutterToast("신분증 진위확인에 실패했어요.");
+          callback(false, 0);
         }
-
-        callback(false);
       }
     });
   }

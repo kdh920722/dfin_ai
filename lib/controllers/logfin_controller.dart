@@ -1,4 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
+import 'package:flutter/material.dart';
+import 'package:sizer/sizer.dart';
 import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:http/http.dart' as http;
 import 'package:upfin/controllers/get_controller.dart';
@@ -12,7 +14,9 @@ import 'dart:convert';
 import '../configs/app_config.dart';
 import '../datas/chatroom_info_data.dart';
 import '../datas/pr_info_data.dart';
+import '../styles/ColorStyles.dart';
 import '../utils/common_utils.dart';
+import '../utils/ui_utils.dart';
 
 class LogfinController {
   static final LogfinController _instance = LogfinController._internal();
@@ -356,8 +360,36 @@ class LogfinController {
           }else if(api == LogfinApis.findEmail){
             callback(true, resultData);
             return;
-          }else if(api == LogfinApis.addAndSearchCar){
-            callback(true, resultData['car_info']);
+          }else if(api == LogfinApis.addCar){
+            Map<String, dynamic> tempMap = resultData;
+            Map<String, dynamic> resultMap = {};
+            if(tempMap.containsKey("retry")){
+              if(tempMap["retry"]){
+                List<dynamic> tempDataList = [];
+                List<Map<String, dynamic>> modelList = [];
+                tempDataList = tempMap["data"]["modellist"];
+                for(Map<String, dynamic> eachModel in tempDataList){
+                  String modelName = eachModel["modelname"];
+                  for(Map<String, dynamic> eachSeries in eachModel["serieslist"]){
+                    String seriesNo = eachSeries["seriesno"];
+                    String seriesName = eachSeries["seriesname"];
+                    modelList.add({"seriesno" : seriesNo, "name1" : modelName, "name2" : seriesName});
+                  }
+                }
+
+                resultMap["retry"] = true;
+                resultMap["tsKey"] = tempMap["data"]["ts_key"];
+                resultMap["modelList"] = modelList;
+                callback(true, resultMap);
+              }else{
+                resultMap["retry"] = false;
+                callback(true, resultMap);
+              }
+            }else{
+              resultMap["retry"] = false;
+              resultMap["car_info"] = resultData['car_info'];
+              callback(true, resultMap);
+            }
             return;
           }else if(api == LogfinApis.searchCarProduct){
             callback(true, resultData);
@@ -672,6 +704,132 @@ class LogfinController {
     }
   }
 
+  static Future<void> addCar(BuildContext context, Map<String, dynamic> inputJson, Function(bool isSuccess) callback) async{
+    LogfinController.callLogfinApi(LogfinApis.addCar, inputJson, (isSuccess, outputJson){
+      if(isSuccess){
+        if(outputJson!["retry"]){
+          UiUtils.isLoadingStop = true;
+          CommonUtils.log("w", "outputJson : $outputJson");
+          Key? selectedModelKey;
+          String selectedModelInfo = "";
+          UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isPad()? 60.h : 40.h, 0.5, (slideContext, setSlideState){
+            List<Widget> widgetList = [];
+            Color textColor = ColorStyles.upFinBlack;
+            FontWeight fontWeight = FontWeight.w500;
+            for(var each in outputJson["modelList"]){
+              Key key = Key(each["seriesno"]);
+              if(selectedModelKey == key) {
+                textColor = ColorStyles.upFinBlack;
+                fontWeight = FontWeight.w600;
+              }
+              else{
+                textColor = ColorStyles.upFinBlack;
+                fontWeight = FontWeight.w500;
+              }
+              widgetList.add(
+                  SizedBox(width: 90.w,
+                      child: Row(children: [
+                        selectedModelKey == key? UiUtils.getCustomCheckBox(key, 1.5, selectedModelKey == key, ColorStyles.upFinButtonBlue, ColorStyles.upFinWhite,
+                            ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
+                              setSlideState(() {
+                                if(checkedValue != null){
+                                  if(checkedValue) {
+                                    selectedModelKey = key;
+                                    selectedModelInfo = each["seriesno"];
+                                  }
+                                }
+                              });
+                            }) : UiUtils.getCustomCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
+                            ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
+                              setSlideState(() {
+                                if(checkedValue != null){
+                                  if(!checkedValue) {
+                                    selectedModelKey = key;
+                                    selectedModelInfo = each["seriesno"];
+                                  }
+                                }
+                              });
+                            }),
+                        Expanded(child: UiUtils.getTextOverFlowButtonWithFixedScale(55.w, "${each["name1"]} ${each["name2"]}", 13.sp, fontWeight, textColor, TextAlign.start, null, (){
+                          setSlideState(() {
+                            selectedModelKey = key;
+                            selectedModelInfo = each["seriesno"];
+                          });
+                        }))
+                      ])
+                  )
+              );
+              widgetList.add(
+                  UiUtils.getMarginBox(0, 0.3.h)
+              );
+
+
+            }
+
+            return Material(
+                color: ColorStyles.upFinWhite,
+                child: Column(children: [
+                  UiUtils.getMarginBox(0, 2.h),
+                  Center(child: UiUtils.getTextWithFixedScale("상세모델을 선택하세요", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
+                  UiUtils.getMarginBox(0, 2.5.h),
+                  UiUtils.getExpandedScrollView(Axis.vertical,
+                      Column(crossAxisAlignment:CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.start, children: widgetList)),
+                  UiUtils.getMarginBox(0, 0.5.h),
+                  UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+                      UiUtils.getTextWithFixedScale("확인", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
+                        if(selectedModelInfo != ""){
+                          String seriesNo = selectedModelInfo;
+                          String tsKey = outputJson["tsKey"];
+                          inputJson["ts_key"] = tsKey;
+                          inputJson["seriesno"] = seriesNo;
+                          UiUtils.isLoadingStop = false;
+                          LogfinController.callLogfinApi(LogfinApis.addCar, inputJson, (isSuccessToRetry, outputJsonForRerty){
+                            if(isSuccessToRetry){
+                              callback(true);
+                            }else{
+                              String errorMsg = outputJson!["error"];
+                              if(errorMsg == "no implicit conversion of String into Integer"){
+                                CommonUtils.flutterToast("차량정보를 확인해주세요.");
+                              }else{
+                                if(errorMsg.split(".").length > 2){
+                                  CommonUtils.flutterToast(errorMsg.replaceAll("+", "").replaceAll("()", "").replaceAll(".", "\n"));
+                                }else{
+                                  CommonUtils.flutterToast(errorMsg.replaceAll("+", "").replaceAll("()", ""));
+                                }
+                              }
+
+                              callback(false);
+                            }
+                          });
+                          Navigator.pop(slideContext);
+                        }else{
+                          CommonUtils.flutterToast("모델을 선택하세요.");
+                        }
+                      }),
+                  Config.isAndroid? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 3.h)
+                ])
+            );
+          });
+        }else{
+          callback(true);
+        }
+      }else{
+        String errorMsg = outputJson!["error"];
+        if(errorMsg == "no implicit conversion of String into Integer"){
+          CommonUtils.flutterToast("차량정보를 확인해주세요.");
+        }else{
+          if(errorMsg.split(".").length > 2){
+            CommonUtils.flutterToast(errorMsg.replaceAll("+", "").replaceAll("()", "").replaceAll(".", "\n"));
+          }else{
+            CommonUtils.flutterToast(errorMsg.replaceAll("+", "").replaceAll("()", ""));
+          }
+        }
+
+        callback(false);
+      }
+    });
+  }
+
   static Future<void> getLoanInfo(Function(bool isSuccess, bool isNotEmpty) callback) async{
     try{
       callLogfinApi(LogfinApis.getLoansInfo, <String, dynamic>{}, (isSuccessToGetLoansInfo, loansInfoOutputJson) async {
@@ -685,6 +843,7 @@ class LogfinController {
               MyData.clearLoanInfoList();
               for(Map eachLoans in loansList){
                 CommonUtils.log("i", "each loans : $eachLoans");
+
                 String uid = "";
                 String uidType = "";
                 String lenderId = "";
@@ -960,7 +1119,7 @@ enum LogfinApis {
   sendMessage, getMessage, checkMessage, getAgreeDocuments, getFaqs,
   getRetryDocs, retryDocs,
   findEmail, sendEmailCode, checkEmailCode, checkMemberByPhone, updatePassword,
-  getMyCarInfo, addAndSearchCar, searchCar, searchCarProduct, getCarDocs, applyCarProduct, installTracking
+  getMyCarInfo, addCar, searchCar, searchCarProduct, getCarDocs, applyCarProduct, installTracking
 }
 
 extension LogfinApisExtension on LogfinApis {
@@ -1026,7 +1185,7 @@ extension LogfinApisExtension on LogfinApis {
         /// auto loan
       case LogfinApis.getMyCarInfo:
         return '/get_cars.json';
-      case LogfinApis.addAndSearchCar:
+      case LogfinApis.addCar:
         return '/add_car.json';
       case LogfinApis.searchCar:
         return '/get_carinfo.json';
