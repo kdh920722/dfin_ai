@@ -1,5 +1,6 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 import 'package:upfin/controllers/firebase_controller.dart';
 import 'package:http/http.dart' as http;
@@ -642,6 +643,12 @@ class LogfinController {
               for(var eachCarInfo in carList){
                 Map<String, dynamic> dataResult = eachCarInfo;
 
+                Map<String, dynamic> regAMap = {};
+                if(dataResult["reg_a"] != null){
+                  regAMap = CommonUtils.parseRubyToMap(dataResult["reg_a"].toString());
+                  CommonUtils.log("w", "each result a : $regAMap");
+                }
+
                 if(dataResult.containsKey("lend_count")){
                   String lendCount = dataResult["lend_count"].toString() == ""? "0" : dataResult["lend_count"].toString();
                   int count = int.parse(lendCount);
@@ -683,7 +690,7 @@ class LogfinController {
                     "wish_amount: $wishAmount\n");
                 MyData.addToCarInfoList(CarInfoData(dataResult["id"].toString(), dataResult["uid"].toString(), carNum, dataResult["owner_name"].toString(),
                     dataResult["amount"].toString(), lendCountInfo, lendAmount, wishAmount,
-                    date, dataResult["car_name"].toString(), dataResult["car_name_detail"].toString(), dataResult["car_image"].toString(), eachCarInfo));
+                    date, dataResult["car_name"].toString(), dataResult["car_name_detail"].toString(), dataResult["car_image"].toString(), regAMap, eachCarInfo));
               }
 
               GetController.to.updateCarInfoList(MyData.getCarInfoList());

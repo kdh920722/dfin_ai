@@ -11,8 +11,9 @@ class CarInfoData {
   String carModel;
   String carModelDetail;
   String carImage;
+  Map<String, dynamic> regAData;
   Map<String, dynamic> resData;
 
   CarInfoData(this.id, this.carUid, this.carNum, this.carOwnerName, this.carPrice,
-      this.carLendCount, this.carLendAmount, this.carWishAmount, this.date, this.carModel, this.carModelDetail, this.carImage, this.resData);
+      this.carLendCount, this.carLendAmount, this.carWishAmount, this.date, this.carModel, this.carModelDetail, this.carImage, this.regAData, this.resData);
 }
