@@ -494,7 +494,7 @@ class LogfinController {
           if(userInfoOutputJson != null){
             CommonUtils.log("w","user : ${userInfoOutputJson["user"]}");
             if(userInfoOutputJson["user"].containsKey("test_yn")){
-              MyData.isTestUser = userInfoOutputJson["user"]["test_yn"].toString() == "1" ? true : false;
+              MyData.isTestUser = userInfoOutputJson["user"]["test_yn"].toString() == "1" ? false : true;
             }
             MyData.name = userInfoOutputJson["user"]["name"];
             MyData.email =  userInfoOutputJson["user"]["email"];
@@ -643,10 +643,39 @@ class LogfinController {
               for(var eachCarInfo in carList){
                 Map<String, dynamic> dataResult = eachCarInfo;
 
-                Map<String, dynamic> regAMap = {};
-                if(dataResult["reg_a"] != null){
-                  regAMap = CommonUtils.parseRubyToMap(dataResult["reg_a"].toString());
-                  CommonUtils.log("w", "each result a : $regAMap");
+                List<dynamic> regBList = [];
+                if(dataResult.containsKey("reg_b") && dataResult["reg_b"] != null){
+                  if(CommonUtils.getRubyType(dataResult["reg_b"].toString()) == 0){
+                    CommonUtils.log("w", "each reg_b is Map");
+                    Map<String, dynamic> regBMap = {};
+                    Map<String, dynamic> regBMapTemp = {};
+                    regBMapTemp = CommonUtils.parseRubyToMap(dataResult["reg_b"].toString());
+
+                    regBMap["resLedgerBNo"] = regBMapTemp["resLedgerBNo"];
+                    regBMapTemp["resUserNm"] = regBMapTemp["resUserNm"].toString().replaceAll("주식회사", "(주)").replaceAll("+", "");
+                    regBMap["resUserNm"] = regBMapTemp["resUserNm"];
+                    regBMap["resBondPrice"] = CommonUtils.getPriceFormattedStringForFullPrice(double.parse(regBMapTemp["resBondPrice"].toString()));
+                    regBMap["commStartDate"] = "${regBMapTemp["commStartDate"].toString().substring(0,4)}년 ${regBMapTemp["commStartDate"].toString().substring(4,6)}월 ${regBMapTemp["commStartDate"].toString().substring(6)}일";
+                    regBList.add(regBMap);
+                  }else if(CommonUtils.getRubyType(dataResult["reg_b"].toString()) == 1){
+                    CommonUtils.log("w", "each reg_b is List");
+                    List<dynamic> regBTempList = CommonUtils.parseRubyToList(dataResult["reg_b"].toString());
+                    for(var each in regBTempList){
+                      Map<String, dynamic> regBMap = {};
+                      regBMap["resLedgerBNo"] = each["resLedgerBNo"];
+                      each["resUserNm"] = each["resUserNm"].toString().replaceAll("주식회사", "(주)").replaceAll("+", "");
+                      regBMap["resUserNm"] = each["resUserNm"];
+                      regBMap["resBondPrice"] = CommonUtils.getPriceFormattedStringForFullPrice(double.parse(each["resBondPrice"].toString()));
+                      regBMap["commStartDate"] = "${each["commStartDate"].toString().substring(0,4)}년 ${each["commStartDate"].toString().substring(4,6)}월 ${each["commStartDate"].toString().substring(6)}일";
+                      regBList.add(regBMap);
+                    }
+                  }else{
+                    CommonUtils.log("w", "each reg_b is null");
+                  }
+
+                  for(var each in regBList){
+                    CommonUtils.log("w", "each reg_b : $each");
+                  }
                 }
 
                 if(dataResult.containsKey("lend_count")){
@@ -690,7 +719,7 @@ class LogfinController {
                     "wish_amount: $wishAmount\n");
                 MyData.addToCarInfoList(CarInfoData(dataResult["id"].toString(), dataResult["uid"].toString(), carNum, dataResult["owner_name"].toString(),
                     dataResult["amount"].toString(), lendCountInfo, lendAmount, wishAmount,
-                    date, dataResult["car_name"].toString(), dataResult["car_name_detail"].toString(), dataResult["car_image"].toString(), regAMap, eachCarInfo));
+                    date, dataResult["car_name"].toString(), dataResult["car_name_detail"].toString(), dataResult["car_image"].toString(), regBList, eachCarInfo));
               }
 
               GetController.to.updateCarInfoList(MyData.getCarInfoList());

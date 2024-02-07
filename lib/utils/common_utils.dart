@@ -358,7 +358,6 @@ class CommonUtils {
           Map<String, dynamic> temp = {};
           temp[eventName] = data;
           AppsflyerController.appsFlyerSdk!.logEvent(data.toString(), data);
-          CommonUtils.log("d", "app log : $eventName");
         }catch(error){
           CommonUtils.log("d", "app log error : $error");
         }
@@ -392,8 +391,22 @@ class CommonUtils {
   }
 
   static Map<String,dynamic> parseRubyToMap(String jsonString){
-    jsonString = jsonString.replaceAll('=>', ':');
-    return jsonDecode(jsonString);
+    return jsonDecode(jsonString.replaceAll('=>', ':'));
+  }
+
+  static List<dynamic> parseRubyToList(String jsonString){
+    return jsonDecode(jsonString.replaceAll("=>", ":"));
+  }
+
+  static int getRubyType(String jsonString){
+    // 0: map, 1: list, 2: null
+    if(jsonString.substring(0,1) == "{"){
+      return 0;
+    }else if(jsonString.substring(0,1) == "["){
+      return 1;
+    }else{
+      return 2;
+    }
   }
 
   static Future<void> moveTo(BuildContext fromContext, String toRoute, Object? arguments) async {
