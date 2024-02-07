@@ -645,6 +645,8 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
                               }
                             }
 
+                            // todo : [저당] 저당에 대한 기대출 잔액 입력 받도록.
+
                             LogfinController.getCarPrList(MyData.selectedCarInfoData!.carNum, selectedJobInfo.split("@")[1],
                                 "0", // selectedPreLoanCountInfo.split("@")[1]
                                 "0", // selectedPreLoanPriceInfo

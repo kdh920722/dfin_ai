@@ -400,12 +400,16 @@ class CommonUtils {
 
   static int getRubyType(String jsonString){
     // 0: map, 1: list, 2: null
-    if(jsonString.substring(0,1) == "{"){
-      return 0;
-    }else if(jsonString.substring(0,1) == "["){
-      return 1;
-    }else{
+    if(jsonString.isEmpty){
       return 2;
+    }else{
+      if(jsonString.substring(0,1) == "{"){
+        return 0;
+      }else if(jsonString.substring(0,1) == "["){
+        return 1;
+      }else{
+        return 2;
+      }
     }
   }
 

@@ -518,6 +518,7 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
     confirmDataList.add("•  ${MyData.birth.substring(0,4)}년 $birthMonth월 $birthDay일");
     confirmDataList.add("•  차량번호 ${MyData.selectedCarInfoData!.carNum}");
     confirmDataList.add("•  차량 시세금액 ${CommonUtils.getPriceFormattedStringForFullPrice(double.parse(MyData.selectedCarInfoData!.carPrice))}");
+
     /*
     if(selectedPreLoanCountInfo.split("@")[1] != "0"){
       confirmDataList.add("•  기대출  ${selectedPreLoanCountInfo.split("@")[0]}");
@@ -545,6 +546,44 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
       confirmWidgetList.add(
         UiUtils.getMarginBox(0, 3.h),
       );
+    }
+
+    // todo : [저당] 저당에 대한 기대출 잔액 있다면, 표시 하도록.
+    // todo : [저당] 잔액 있지만, 입력하지 않았다면, '미입력'으로 표시.
+    if(MyData.selectedCarInfoData!.regBData.isNotEmpty){
+      confirmWidgetList.add(
+        UiUtils.getMarginBox(0, 2.h),
+      );
+      confirmWidgetList.add(
+        SizedBox(width: 80.w, child: UiUtils.getTextButtonWithFixedScale("저당정보 ${MyData.selectedCarInfoData!.regBData.length}개", 16.sp, FontWeight.w600, textColor, TextAlign.start, null, (){})),
+      );
+      confirmWidgetList.add(
+        UiUtils.getMarginBox(0, 2.h),
+      );
+
+      List<Widget> regBWidgetList = [];
+      for(Map<String,dynamic> each in MyData.selectedCarInfoData!.regBData){
+        //resLedgerBNo resUserNm resBondPriceTxt commStartDateTxt
+        regBWidgetList.add(
+          SizedBox(width: 80.w, child: UiUtils.getBorderButtonBoxForRound3(ColorStyles.upFinWhite, ColorStyles.upFinGray,
+              Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.start, children: [
+                SizedBox(width: 75.w, child: UiUtils.getTextWithFixedScaleAndOverFlow("${each["resUserNm"]}", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
+                UiUtils.getMarginBox(0, 0.5.h),
+                UiUtils.getTextButtonWithFixedScale("•  을부번호 ${each["resLedgerBNo"]}", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null, (){}),
+                UiUtils.getMarginBox(0, 0.5.h),
+                UiUtils.getTextButtonWithFixedScale("•  저당금액 ${each["resBondPriceTxt"]}", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null, (){}),
+                UiUtils.getMarginBox(0, 0.5.h),
+                UiUtils.getTextButtonWithFixedScale("•  저당 잔여금액 미입력", 12.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null, (){}),
+                UiUtils.getMarginBox(0, 1.h),
+                Row(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.end, children: [
+                  const Spacer(flex: 2),
+                  UiUtils.getTextButtonWithFixedScale("${each["commStartDateTxt2"]}", 9.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null, (){})
+                ]),
+              ]), () { })),
+        );
+        regBWidgetList.add(UiUtils.getMarginBox(0, 1.h));
+      }
+      confirmWidgetList.add(Column(children: regBWidgetList));
     }
 
     return UiUtils.getRowColumnWithAlignCenter([

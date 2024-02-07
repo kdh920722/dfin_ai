@@ -672,6 +672,21 @@ class UiUtils {
     );
   }
 
+  static Widget getBorderButtonBoxForRound3(Color buttonColor, Color borderColor, Widget childWidget, VoidCallback onPressedCallback){
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        padding: EdgeInsets.only(left: 3.w, right: 2.w, top: 3.w, bottom: 2.w),
+        backgroundColor: buttonColor,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
+        side: BorderSide(color: borderColor, width: 0.26.w),
+        elevation: 0,
+        shadowColor: ColorStyles.upFinGray,
+      ),
+      onPressed: onPressedCallback,
+      child: childWidget,
+    );
+  }
+
   static SizedBox getBannerButtonBox(double buttonWidth, double buttonHeight, Color buttonColor, Color borderColor, Widget childWidget, VoidCallback onPressedCallback){
     return SizedBox(
         width: buttonWidth,

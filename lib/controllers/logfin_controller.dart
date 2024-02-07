@@ -646,28 +646,13 @@ class LogfinController {
                 List<dynamic> regBList = [];
                 if(dataResult.containsKey("reg_b") && dataResult["reg_b"] != null){
                   if(CommonUtils.getRubyType(dataResult["reg_b"].toString()) == 0){
-                    CommonUtils.log("w", "each reg_b is Map");
-                    Map<String, dynamic> regBMap = {};
                     Map<String, dynamic> regBMapTemp = {};
                     regBMapTemp = CommonUtils.parseRubyToMap(dataResult["reg_b"].toString());
-
-                    regBMap["resLedgerBNo"] = regBMapTemp["resLedgerBNo"];
-                    regBMapTemp["resUserNm"] = regBMapTemp["resUserNm"].toString().replaceAll("주식회사", "(주)").replaceAll("+", "");
-                    regBMap["resUserNm"] = regBMapTemp["resUserNm"];
-                    regBMap["resBondPrice"] = CommonUtils.getPriceFormattedStringForFullPrice(double.parse(regBMapTemp["resBondPrice"].toString()));
-                    regBMap["commStartDate"] = "${regBMapTemp["commStartDate"].toString().substring(0,4)}년 ${regBMapTemp["commStartDate"].toString().substring(4,6)}월 ${regBMapTemp["commStartDate"].toString().substring(6)}일";
-                    regBList.add(regBMap);
+                    regBList.add(CarInfoData.getConvertedRegBMap(regBMapTemp));
                   }else if(CommonUtils.getRubyType(dataResult["reg_b"].toString()) == 1){
-                    CommonUtils.log("w", "each reg_b is List");
                     List<dynamic> regBTempList = CommonUtils.parseRubyToList(dataResult["reg_b"].toString());
                     for(var each in regBTempList){
-                      Map<String, dynamic> regBMap = {};
-                      regBMap["resLedgerBNo"] = each["resLedgerBNo"];
-                      each["resUserNm"] = each["resUserNm"].toString().replaceAll("주식회사", "(주)").replaceAll("+", "");
-                      regBMap["resUserNm"] = each["resUserNm"];
-                      regBMap["resBondPrice"] = CommonUtils.getPriceFormattedStringForFullPrice(double.parse(each["resBondPrice"].toString()));
-                      regBMap["commStartDate"] = "${each["commStartDate"].toString().substring(0,4)}년 ${each["commStartDate"].toString().substring(4,6)}월 ${each["commStartDate"].toString().substring(6)}일";
-                      regBList.add(regBMap);
+                      regBList.add(CarInfoData.getConvertedRegBMap(each));
                     }
                   }else{
                     CommonUtils.log("w", "each reg_b is null");
