@@ -636,13 +636,13 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             UiUtils.getMarginBox(100.w, 5.h),
             Container(padding: EdgeInsets.only(right: 5.w, left : 5.w, bottom : 5.w), child: Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
               UiUtils.getRoundBoxTextWithFixedScale6(
-                  UiUtils.getTextWithFixedScale("중개운영", 8.sp, FontWeight.w500, ColorStyles.upFinMainTitleColor1, TextAlign.start, null),
+                  UiUtils.getTextWithFixedScale("중개운영", 8.sp, FontWeight.w600, ColorStyles.upFinMainTitleColor1, TextAlign.start, null),
                   ColorStyles.upFinMainTitleBackColor1),
               UiUtils.getMarginBox(0, 1.h),
               UiUtils.getTextWithFixedScale2(Config.appMainIntroText1.replaceAll("@@", "\n"), 10.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null),
               UiUtils.getMarginBox(0, 4.h),
               UiUtils.getRoundBoxTextWithFixedScale6(
-                  UiUtils.getTextWithFixedScale("서비스운영", 8.sp, FontWeight.w500, ColorStyles.upFinMainTitleColor2, TextAlign.start, null),
+                  UiUtils.getTextWithFixedScale("서비스운영", 8.sp, FontWeight.w600, ColorStyles.upFinMainTitleColor2, TextAlign.start, null),
                   ColorStyles.upFinMainTitleBackColor2),
               UiUtils.getMarginBox(0, 1.h),
               UiUtils.getTextWithFixedScale2(Config.appMainIntroText2.replaceAll("@@", "\n"), 10.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null),
@@ -852,7 +852,14 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                       MyData.selectedAccidentInfoData = null;
                       MyData.selectedCarInfoData = each;
                       AppUpdateCarViewState.startViewId = AppUpdateCarViewState.confirmedViewId;
-                      AppUpdateCarViewState.endViewId = AppUpdateCarViewState.jobViewId;
+                      CommonUtils.log("w", "regB : ${MyData.selectedCarInfoData!.regBData}");
+                      if(MyData.selectedCarInfoData!.regBData.isEmpty){
+                        AppUpdateCarViewState.endViewId = AppUpdateCarViewState.jobViewId;
+                      }else{
+                        AppUpdateCarViewState.endViewId = AppUpdateCarViewState.preLoanInfoViewId;
+                      }
+
+                      CommonUtils.log("w", "endViewId : ${AppUpdateCarViewState.endViewId}");
                       isViewHere = false;
                       await CommonUtils.moveToWithResult(context, AppView.appUpdateCarView.value, null);
                       isViewHere = false;

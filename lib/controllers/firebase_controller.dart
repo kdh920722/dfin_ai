@@ -147,11 +147,9 @@ class FireBaseController{
             }
             CommonUtils.log("d", "fcm token : $firebaseToken");
             messaging.onTokenRefresh.listen((event) {
-              //TODO : 서버에 해당 토큰을 저장하는 로직 구현
               CommonUtils.log("i", "updated fcm token : $firebaseToken");
             });
 
-            //TODO : 서버에 해당 토큰을 저장하는 로직 구현
             callback(true, firebaseToken);
           }else{
             CommonUtils.log("e", "fcm token is null");

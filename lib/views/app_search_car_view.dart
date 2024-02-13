@@ -12,6 +12,7 @@ import '../controllers/firebase_controller.dart';
 import '../styles/TextStyles.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
+import 'app_update_car_view.dart';
 
 class AppSearchCarView extends StatefulWidget{
   @override
@@ -645,23 +646,31 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
                               }
                             }
 
-                            // todo : [저당] 저당에 대한 기대출 잔액 입력 받도록.
-
-                            LogfinController.getCarPrList(MyData.selectedCarInfoData!.carNum, selectedJobInfo.split("@")[1],
-                                "0", // selectedPreLoanCountInfo.split("@")[1]
-                                "0", // selectedPreLoanPriceInfo
-                                    (isSuccessToGetOffers, _){
-                                  if(isSuccessToGetOffers){
-                                    UiUtils.closeLoadingPercentPopForSuccess(context, (isEnd){
-                                      if(isEnd){
-                                        CommonUtils.moveWithReplacementTo(context, AppView.appResultPrView.value, null);
-                                      }
-                                    });
-                                  }else{
-                                    UiUtils.closeLoadingPercentPop(context);
-                                    CommonUtils.flutterToast("상품정보 찾기 실패");
-                                  }
-                                });
+                            if(MyData.selectedCarInfoData!.regBData.isEmpty){
+                              LogfinController.getCarPrList(MyData.selectedCarInfoData!.carNum, selectedJobInfo.split("@")[1],
+                                  "0", // selectedPreLoanCountInfo.split("@")[1]
+                                  "0", // selectedPreLoanPriceInfo
+                                  [], (isSuccessToGetOffers, _){
+                                    if(isSuccessToGetOffers){
+                                      UiUtils.closeLoadingPercentPopForSuccess(context, (isEnd){
+                                        if(isEnd){
+                                          CommonUtils.moveWithReplacementTo(context, AppView.appResultPrView.value, null);
+                                        }
+                                      });
+                                    }else{
+                                      UiUtils.closeLoadingPercentPop(context);
+                                      CommonUtils.flutterToast("상품정보 찾기 실패");
+                                    }
+                                  });
+                            }else{
+                              UiUtils.closeLoadingPercentPopForSuccess(context, (isEnd){
+                                if(isEnd){
+                                  AppUpdateCarViewState.startViewId = AppUpdateCarViewState.preLoanInfoViewId;
+                                  AppUpdateCarViewState.endViewId = AppUpdateCarViewState.preLoanInfoViewId;
+                                  CommonUtils.moveWithReplacementTo(context, AppView.appUpdateCarView.value, null);
+                                }
+                              });
+                            }
                           }else{
                             UiUtils.closeLoadingPercentPop(context);
                             CommonUtils.flutterToast("차량정보 찾기 실패");

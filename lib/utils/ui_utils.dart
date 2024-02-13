@@ -728,7 +728,8 @@ class UiUtils {
   static Widget getCountCircleBox(double circleBoxSize, int messageCount, double fontSize, FontWeight fontWeight, Color textColor, TextAlign textAlign, int textMaxLine){
     return Stack(
       alignment: Alignment.center,
-      children: [Container(
+      children: [
+        Container(
           width: circleBoxSize,
           height: circleBoxSize,
           decoration: const BoxDecoration(

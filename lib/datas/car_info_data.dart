@@ -13,7 +13,7 @@ class CarInfoData {
   String carModel;
   String carModelDetail;
   String carImage;
-  List<dynamic> regBData;
+  List<Map<String, dynamic>> regBData;
   Map<String, dynamic> resData;
 
   static Map<String,dynamic> getConvertedRegBMap(Map<String,dynamic> dataMap){

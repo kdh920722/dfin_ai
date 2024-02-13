@@ -64,20 +64,21 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
     }
   }
 
-  static const  int wantLoanPriceViewId = 99;
-  String selectedWantLoanPriceInfo = "";
-  final _wantLoanPriceFocus = FocusNode();
-  final _wantLoanPriceTextController = TextEditingController();
-  void _wantLoanPriceInfoTextControllerListener() {
-    if(_wantLoanPriceTextController.text.trim().length > 8){
-      _wantLoanPriceTextController.text = _wantLoanPriceTextController.text.trim().substring(0, 8);
+  static int preLoanInfoViewId = 5;
+  static int eachPreLoanPriceViewId = 10;
+  List<Map<String,dynamic>> selectedEachPreLoanPriceInfo = [];
+  final _eachPreLoanPriceFocus = FocusNode();
+  final _eachPreLoanPriceTextController = TextEditingController();
+  void _eachPreLoanPriceInfoTextControllerListener() {
+    if(_eachPreLoanPriceTextController.text.trim().length > 8){
+      _eachPreLoanPriceTextController.text = _eachPreLoanPriceTextController.text.trim().substring(0, 8);
     }else{
-      final text = _wantLoanPriceTextController.text.trim();
+      final text = _eachPreLoanPriceTextController.text.trim();
       final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
       if (number != null) {
         final formattedText = CommonUtils.getPriceCommaFormattedString(number);
         if (formattedText != text) {
-          _wantLoanPriceTextController.value = TextEditingValue(text: formattedText, selection: TextSelection.collapsed(offset: formattedText.length));
+          _eachPreLoanPriceTextController.value = TextEditingValue(text: formattedText, selection: TextSelection.collapsed(offset: formattedText.length));
         }
       }
     }
@@ -92,29 +93,31 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
 
   void _unFocusAllNodes(){
     _preLoanPriceFocus.unfocus();
-    _wantLoanPriceFocus.unfocus();
+    _eachPreLoanPriceFocus.unfocus();
     _nameForTestTextFocus.unfocus();
   }
 
   void _disposeAllTextControllers(){
     _preLoanPriceTextController.dispose();
-    _wantLoanPriceTextController.dispose();
+    _eachPreLoanPriceTextController.dispose();
     _nameForTestTextController.dispose();
   }
 
   void _checkView(){
     if(!isFinishedConfirmed){
-      if(selectedPreLoanCountInfo.isEmpty){
-        currentViewId = preLoanCountViewId;
-      }else if(selectedPreLoanPriceInfo.isEmpty){
-        currentViewId = preLoanPriceViewId;
-      }else if(selectedWantLoanPriceInfo.isEmpty){
-        currentViewId = wantLoanPriceViewId;
-      }else if(selectedJobInfo.isEmpty){
+      if(selectedJobInfo.isEmpty){
         currentViewId = jobViewId;
       }
     }else{
       currentViewId = confirmedViewId;
+    }
+  }
+
+  void _setEachPreLoanInfo(String loanAmount){
+    _eachPreLoanPriceTextController.text = loanAmount;
+    if(_eachPreLoanPriceTextController.text.trim() != ""){
+      final number = double.tryParse(_eachPreLoanPriceTextController.text.trim().replaceAll(',', ''));
+      GetController.to.updatePreLoanPrice(CommonUtils.getPriceFormattedString(number!));
     }
   }
 
@@ -123,14 +126,8 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
     final number = double.tryParse(_preLoanPriceTextController.text.trim().replaceAll(',', ''));
     GetController.to.updatePreLoanPrice(CommonUtils.getPriceFormattedString(number!));
 
-    _wantLoanPriceTextController.text = MyData.selectedCarInfoData!.carWishAmount;
-    if(_wantLoanPriceTextController.text.trim() != ""){
-      final number = double.tryParse(_wantLoanPriceTextController.text.trim().replaceAll(',', ''));
-      GetController.to.updateWantLoanPrice(CommonUtils.getPriceFormattedString(number!));
-    }
-
     selectedPreLoanPriceInfo = MyData.selectedCarInfoData!.carLendAmount;
-    selectedWantLoanPriceInfo = MyData.selectedCarInfoData!.carWishAmount;
+    selectedEachPreLoanPriceInfo = MyData.selectedCarInfoData!.regBData;
     selectedPreLoanCountInfo = MyData.selectedCarInfoData!.carLendCount;
     selectedPreLoanCountKey = Key(MyData.selectedCarInfoData!.carLendCount);
 
@@ -154,12 +151,17 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _preLoanPriceTextController.addListener(_preLoanPriceInfoTextControllerListener);
-    _wantLoanPriceTextController.addListener(_wantLoanPriceInfoTextControllerListener);
+    _eachPreLoanPriceTextController.addListener(_eachPreLoanPriceInfoTextControllerListener);
     _checkView();
     GetController.to.resetPreLoanPrice();
-    GetController.to.resetWantLoanPrice();
-
     _setSelectedInfo();
+
+    if(MyData.selectedCarInfoData!.regBData.isEmpty){
+      preLoanInfoViewId = 99;
+      eachPreLoanPriceViewId = 99;
+    }
+
+    savedRegBInfoList = MyData.selectedCarInfoData!.regBData;
 
     currentViewId = startViewId;
     mainContext = context;
@@ -178,9 +180,13 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
     GetController.to.resetPreLoanPrice();
     GetController.to.resetWantLoanPrice();
     Config.contextForEmergencyBack = AppCarDetailViewState.mainContext;
+    preLoanInfoViewId = 5;
+    eachPreLoanPriceViewId = 10;
     startViewId = 0;
     endViewId = 0;
     isViewHere = false;
+    currRegBInfo = {};
+    savedRegBInfoList = [];
     super.dispose();
   }
 
@@ -379,52 +385,6 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
   }
   /// pre loan price end
 
-  /// want loan price view
-  Widget _getWantLoanPriceView(){
-    return Stack(children: [
-      UiUtils.getRowColumnWithAlignCenter([
-        SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          UiUtils.getBackButton(() async {
-            backInputView();
-          }),
-        ])),
-        UiUtils.getMarginBox(0, 3.w),
-        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("희망 대출금액을", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-        UiUtils.getMarginBox(0, 0.5.h),
-        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("알려주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-        UiUtils.getMarginBox(0, 1.h),
-        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력단위(*만원)", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
-        UiUtils.getMarginBox(0, 5.h),
-        Obx(()=>UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _wantLoanPriceFocus, _wantLoanPriceTextController, TextInputType.number, false,
-            UiUtils.getInputDecorationForPrice("", 0.sp, GetController.to.wantLoanPrice.value), (text) {
-              if(text.trim() != ""){
-                final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
-                GetController.to.updateWantLoanPrice(CommonUtils.getPriceFormattedString(number!));
-              }else{
-                GetController.to.updateWantLoanPrice("만원");
-              }
-            }, (value){})
-        ),
-        UiUtils.getMarginBox(0, 5.h),
-        UiUtils.getExpandedScrollView(Axis.vertical, Container()),
-        UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
-          if(_wantLoanPriceTextController.text.trim() != ""){
-            final number = double.tryParse(_wantLoanPriceTextController.text.trim().replaceAll(',', '')); // 콤마 제거 후 숫자 변환
-            String price = number.toString();
-            if(price.contains(".")){
-              price = price.split(".")[0];
-            }
-            selectedWantLoanPriceInfo = price;
-          }else{
-            selectedWantLoanPriceInfo = "0";
-          }
-          nextInputView();
-        })
-      ])
-    ]);
-  }
-  /// want loan price end
-
   /// job view
   Widget _getJobView(){
     List<Widget> jobList = [];
@@ -501,6 +461,158 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
   }
   /// job view end
 
+  /// pre loan info view
+  Widget _getPreLoanInfoView(){
+    List<Widget> confirmWidgetList = [];
+    Color textColor = ColorStyles.upFinBlack;
+
+    confirmWidgetList.add(
+      UiUtils.getMarginBox(0, 3.h),
+    );
+
+    // todo : [저당] [표시] 저당에 대한 기대출 잔액 있다면, 표시(잔액 또는 미입력).
+    if(MyData.selectedCarInfoData!.regBData.isNotEmpty){
+      confirmWidgetList.add(
+        UiUtils.getMarginBox(0, 2.h),
+      );
+      confirmWidgetList.add(
+        SizedBox(width: 80.w, child: UiUtils.getTextButtonWithFixedScale("저당정보 ${MyData.selectedCarInfoData!.regBData.length}개", 16.sp, FontWeight.w600, textColor, TextAlign.start, null, (){})),
+      );
+      confirmWidgetList.add(
+        UiUtils.getMarginBox(0, 2.h),
+      );
+
+      List<Widget> regBWidgetList = [];
+      for(Map<String,dynamic> each in savedRegBInfoList){
+        String eachPreLoanPrice = each["preLoanPrice"].toString();
+        String eachPreLoanPriceTxt = "";
+        if(eachPreLoanPrice == ""){
+          eachPreLoanPriceTxt = "미입력";
+        }else if(eachPreLoanPrice == "0"){
+          eachPreLoanPriceTxt = "없음";
+        }else{
+          eachPreLoanPriceTxt = CommonUtils.getPriceFormattedString(double.parse(eachPreLoanPrice));
+        }
+        regBWidgetList.add(
+          SizedBox(width: 85.w, child: UiUtils.getBorderButtonBoxForRound3(ColorStyles.upFinWhite, ColorStyles.upFinGray,
+              Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.start, children: [
+                SizedBox(width: 80.w, child: UiUtils.getTextWithFixedScaleAndOverFlow("${each["resUserNm"]}", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
+                UiUtils.getMarginBox(0, 0.5.h),
+                UiUtils.getTextButtonWithFixedScale("•  을부번호 ${each["resLedgerBNo"]}", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null, (){}),
+                UiUtils.getMarginBox(0, 0.5.h),
+                UiUtils.getTextButtonWithFixedScale("•  채권가액 ${each["resBondPriceTxt"]}", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null, (){}),
+                UiUtils.getMarginBox(0, 0.5.h),
+                UiUtils.getTextButtonWithFixedScale("•  대출잔액 $eachPreLoanPriceTxt", 12.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null, (){}),
+                UiUtils.getMarginBox(0, 1.h),
+                Row(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.end, children: [
+                  const Spacer(flex: 2),
+                  UiUtils.getTextButtonWithFixedScale("${each["commStartDateTxt2"]}", 9.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null, (){})
+                ]),
+                UiUtils.getMarginBox(0, 2.h),
+                UiUtils.getBorderButtonBox(79.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
+                    UiUtils.getTextWithFixedScale("입력하기", 12.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
+                      currRegBInfo = {};
+                      currRegBInfo = each;
+                      currentViewId = eachPreLoanPriceViewId;
+                      _setEachPreLoanInfo(each["preLoanPrice"].toString());
+                      setState(() {});
+                    }),
+                UiUtils.getMarginBox(0, 0.5.h),
+              ]), () { })),
+        );
+        regBWidgetList.add(UiUtils.getMarginBox(0, 1.h));
+      }
+
+      confirmWidgetList.add(Column(children: regBWidgetList));
+    }
+
+    return UiUtils.getRowColumnWithAlignCenter([
+      SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        UiUtils.getBackButton(() async {
+          backInputView();
+        }),
+      ])),
+      UiUtils.getMarginBox(0, 3.w),
+      savedRegBInfoList.length == 1 ? SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("저당에 대한", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null))
+       : SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("각 저당에 대한", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      UiUtils.getMarginBox(0, 0.5.h),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출잔액을 입력하세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: confirmWidgetList)),
+      UiUtils.getMarginBox(0, 5.h),
+      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+        nextInputView();
+      })
+    ]);
+  }
+  /// pre loan info view end
+
+  /// each pre loan price view
+  Map<String, dynamic> currRegBInfo = {};
+  List<Map<String, dynamic>> savedRegBInfoList = [];
+  Widget _getEachPreLoanPriceView(){
+    return Stack(children: [
+      UiUtils.getRowColumnWithAlignCenter([
+        SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+          UiUtils.getCloseButton(ColorStyles.upFinDarkGray, () {
+            currRegBInfo = {};
+            currentViewId = preLoanInfoViewId;
+            setState(() {});
+          }),
+        ])),
+        UiUtils.getMarginBox(0, 3.w),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출잔액을 알려주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+        UiUtils.getMarginBox(0, 1.h),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력단위(*만원)", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
+        UiUtils.getMarginBox(0, 5.h),
+        Obx(()=>UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _eachPreLoanPriceFocus, _eachPreLoanPriceTextController, TextInputType.number, false,
+            UiUtils.getInputDecorationForPrice("", 0.sp, GetController.to.preLoanPrice.value), (text) {
+              if(text.trim() != ""){
+                final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
+                GetController.to.updatePreLoanPrice(CommonUtils.getPriceFormattedString(number!));
+              }else{
+                GetController.to.updatePreLoanPrice("만원");
+              }
+            }, (value){})
+        ),
+        UiUtils.getMarginBox(0, 1.h),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("•  을부번호 ${currRegBInfo["resLedgerBNo"]}", 14.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
+        UiUtils.getMarginBox(0, 0.5.h),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("•  채권가액 ${currRegBInfo["resBondPriceTxt"]}", 14.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
+        UiUtils.getMarginBox(0, 5.h),
+        UiUtils.getExpandedScrollView(Axis.vertical, Container()),
+        UiUtils.getTextButtonBox(90.w, "확인", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+          String eachPreLoanPrice = "";
+          if(_eachPreLoanPriceTextController.text.trim() != ""){
+            final number = double.tryParse(_eachPreLoanPriceTextController.text.trim().replaceAll(',', '')); // 콤마 제거 후 숫자 변환
+            String price = number.toString();
+            if(price.contains(".")){
+              price = price.split(".")[0];
+            }
+            eachPreLoanPrice = price;
+          }else{
+            eachPreLoanPrice = "0";
+          }
+
+          double bondPrice = double.parse(currRegBInfo["resBondPrice"].toString());
+          double inputPrice = double.parse("${eachPreLoanPrice}0000");
+          if(inputPrice > bondPrice){
+            CommonUtils.flutterToast("대출잔액이 대출금액보다 큽니다.");
+          }else{
+            for(Map<String, dynamic> eachMap in savedRegBInfoList){
+              if(currRegBInfo["resLedgerBNo"] == eachMap["resLedgerBNo"]){
+                eachMap["preLoanPrice"] = eachPreLoanPrice;
+              }
+            }
+            currRegBInfo = {};
+            currentViewId = preLoanInfoViewId;
+            setState(() {});
+          }
+        })
+      ])
+    ]);
+  }
+  /// each pre loan price end
+
   /// finish confirm view
   Widget _getConfirmView(){
     _setSelectedInfo();
@@ -548,8 +660,7 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
       );
     }
 
-    // todo : [저당] 저당에 대한 기대출 잔액 있다면, 표시 하도록.
-    // todo : [저당] 잔액 있지만, 입력하지 않았다면, '미입력'으로 표시.
+    // todo : [저당] [표시] 저당에 대한 기대출 잔액 있다면, 표시(잔액 또는 미입력).
     if(MyData.selectedCarInfoData!.regBData.isNotEmpty){
       confirmWidgetList.add(
         UiUtils.getMarginBox(0, 2.h),
@@ -563,7 +674,15 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
 
       List<Widget> regBWidgetList = [];
       for(Map<String,dynamic> each in MyData.selectedCarInfoData!.regBData){
-        //resLedgerBNo resUserNm resBondPriceTxt commStartDateTxt
+        String eachPreLoanPrice = each["preLoanPrice"].toString();
+        String eachPreLoanPriceTxt = "";
+        if(eachPreLoanPrice == ""){
+          eachPreLoanPriceTxt = "미입력";
+        }else if(eachPreLoanPrice == "0"){
+          eachPreLoanPriceTxt = "없음";
+        }else{
+          eachPreLoanPriceTxt = CommonUtils.getPriceFormattedString(double.parse(eachPreLoanPrice));
+        }
         regBWidgetList.add(
           SizedBox(width: 80.w, child: UiUtils.getBorderButtonBoxForRound3(ColorStyles.upFinWhite, ColorStyles.upFinGray,
               Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.start, children: [
@@ -571,9 +690,9 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
                 UiUtils.getMarginBox(0, 0.5.h),
                 UiUtils.getTextButtonWithFixedScale("•  을부번호 ${each["resLedgerBNo"]}", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null, (){}),
                 UiUtils.getMarginBox(0, 0.5.h),
-                UiUtils.getTextButtonWithFixedScale("•  저당금액 ${each["resBondPriceTxt"]}", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null, (){}),
+                UiUtils.getTextButtonWithFixedScale("•  채권가액 ${each["resBondPriceTxt"]}", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null, (){}),
                 UiUtils.getMarginBox(0, 0.5.h),
-                UiUtils.getTextButtonWithFixedScale("•  저당 잔여금액 미입력", 12.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null, (){}),
+                UiUtils.getTextButtonWithFixedScale("•  대출잔액 $eachPreLoanPriceTxt", 12.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null, (){}),
                 UiUtils.getMarginBox(0, 1.h),
                 Row(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.end, children: [
                   const Spacer(flex: 2),
@@ -616,10 +735,19 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
 
   void _updateData(){
     UiUtils.showLoadingPop(context);
+    // todo : [저당] [저장] 기대출 잔액 입력된 값 있으면 저장.
+    List<Map<String, dynamic>> savedList = [];
+    for(Map<String, dynamic> each in savedRegBInfoList){
+      savedList.add({
+        "res_ledger_b_no" : each["resLedgerBNo"].toString(),
+        "rm_amount" : each["preLoanPrice"].toString()
+      });
+    }
+
     LogfinController.getCarPrList(MyData.selectedCarInfoData!.carNum, selectedJobInfo.split("@")[1],
         "0", // selectedPreLoanCountInfo.split("@")[1]
         "0", // selectedPreLoanPriceInfo
-            (isSuccessToGetOffers, _){
+        savedList, (isSuccessToGetOffers, _){
       UiUtils.closeLoadingPop(context);
       if(isSuccessToGetOffers){
         CommonUtils.moveWithReplacementTo(context, AppView.appResultPrView.value, null);
@@ -648,8 +776,10 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
       view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getPreLoanCountView());
     }else if(currentViewId == preLoanPriceViewId){
       view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getPreLoanPriceView());
-    }else if(currentViewId == wantLoanPriceViewId){
-      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getWantLoanPriceView());
+    }else if(currentViewId == preLoanInfoViewId){
+      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getPreLoanInfoView());
+    }else if(currentViewId == eachPreLoanPriceViewId){
+      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getEachPreLoanPriceView());
     }else if(currentViewId == jobViewId){
       view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getJobView());
     }else{

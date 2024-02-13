@@ -494,7 +494,7 @@ class LogfinController {
           if(userInfoOutputJson != null){
             CommonUtils.log("w","user : ${userInfoOutputJson["user"]}");
             if(userInfoOutputJson["user"].containsKey("test_yn")){
-              MyData.isTestUser = userInfoOutputJson["user"]["test_yn"].toString() == "1" ? false : true;
+              MyData.isTestUser = userInfoOutputJson["user"]["test_yn"].toString() == "1" ? true : false;
             }
             MyData.name = userInfoOutputJson["user"]["name"];
             MyData.email =  userInfoOutputJson["user"]["email"];
@@ -628,6 +628,26 @@ class LogfinController {
     }
   }
 
+  static String _getRmAmount(Map<String, dynamic> dataResult, Map<String, dynamic> tempMap){
+    String resultAmount = "";
+    if(dataResult.containsKey("lend_amount_list")){
+      if(dataResult["lend_amount_list"] != null){
+        List<dynamic> amountList = dataResult["lend_amount_list"];
+        if(amountList.isNotEmpty){
+          for(Map<String, dynamic> eachAmount in amountList){
+            if(eachAmount["res_ledger_b_no"].toString() == tempMap["resLedgerBNo"]){
+              if(eachAmount["rm_amount"] != null){
+                resultAmount = eachAmount["rm_amount"].toString();
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return resultAmount;
+  }
+
   static Future<void> getCarInfo(Function(bool isSuccess, bool isNotEmpty) callback) async{
     try{
       callLogfinApi(LogfinApis.getMyCarInfo, <String, dynamic>{}, (isSuccessToGetCarInfo, carInfoOutputJson){
@@ -643,23 +663,25 @@ class LogfinController {
               for(var eachCarInfo in carList){
                 Map<String, dynamic> dataResult = eachCarInfo;
 
-                List<dynamic> regBList = [];
+                List<Map<String, dynamic>> regBList = [];
                 if(dataResult.containsKey("reg_b") && dataResult["reg_b"] != null){
                   if(CommonUtils.getRubyType(dataResult["reg_b"].toString()) == 0){
                     Map<String, dynamic> regBMapTemp = {};
                     regBMapTemp = CommonUtils.parseRubyToMap(dataResult["reg_b"].toString());
-                    regBList.add(CarInfoData.getConvertedRegBMap(regBMapTemp));
+                    Map<String, dynamic> tempMap = CarInfoData.getConvertedRegBMap(regBMapTemp);
+                    // todo : [저당] [조회] 각 저당에 대해 기대출 잔액 입력된 값 있는지 조회.
+                    tempMap["preLoanPrice"] = _getRmAmount(dataResult, tempMap);
+                    regBList.add(tempMap);
                   }else if(CommonUtils.getRubyType(dataResult["reg_b"].toString()) == 1){
                     List<dynamic> regBTempList = CommonUtils.parseRubyToList(dataResult["reg_b"].toString());
                     for(var each in regBTempList){
-                      regBList.add(CarInfoData.getConvertedRegBMap(each));
+                      Map<String, dynamic> tempMap = CarInfoData.getConvertedRegBMap(each);
+                      // todo : [저당] [조회] 각 저당에 대해 기대출 잔액 입력된 값 있는지 조회.
+                      tempMap["preLoanPrice"] = _getRmAmount(dataResult, tempMap);
+                      regBList.add(tempMap);
                     }
                   }else{
                     CommonUtils.log("w", "each reg_b is null");
-                  }
-
-                  for(var each in regBList){
-                    CommonUtils.log("w", "each reg_b : $each");
                   }
                 }
 
@@ -1019,7 +1041,7 @@ class LogfinController {
     }
   }
 
-  static Future<void> getCarPrList(String carNum, String jobInfo, String lendCnt, String lendAmount, Function(bool isSuccess, Map<String, dynamic>? outputJson) callback) async {
+  static Future<void> getCarPrList(String carNum, String jobInfo, String lendCnt, String lendAmount, List<Map<String, dynamic>> amountList, Function(bool isSuccess, Map<String, dynamic>? outputJson) callback) async {
     try{
       String carUid = MyData.findUidInCarInfoList(carNum);
       if(carUid != ""){
@@ -1028,6 +1050,7 @@ class LogfinController {
           "job" : jobInfo,
           "lend_count": lendCnt,
           "lend_amount": lendAmount,
+          "lend_amount_list" : amountList
         };
         callLogfinApi(LogfinApis.searchCarProduct, inputJsonForGetOffers, (isSuccessToGetOffers, outputJsonForGetOffers){
           if(isSuccessToGetOffers){
