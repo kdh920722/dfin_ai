@@ -1,8 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:sizer/sizer.dart';
-import 'package:upfin/styles/ColorStyles.dart';
-import 'package:upfin/utils/common_utils.dart';
-import 'package:upfin/utils/ui_utils.dart';
+import 'package:dfin/styles/ColorStyles.dart';
+import 'package:dfin/utils/common_utils.dart';
+import 'package:dfin/utils/ui_utils.dart';
 
 class StringConfig{
   /*

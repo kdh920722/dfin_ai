@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>업핀</string>
+	<string>도이치핀</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -15,7 +15,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>UpFin</string>
+	<string>DFin</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -29,8 +29,8 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>kakao077c95950e4c99aefd181d2cd069524a</string>
-				<string>fb780305570800959</string>
+				<string>kakao8b274aad5e2a4f3b8a5a1530750bc1ad</string>
+				<string>fb3591726524402718</string>
 			</array>
 		</dict>
 		<dict>
@@ -38,7 +38,7 @@
 			<string>Editor</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>upfin</string>
+				<string>dfin</string>
 			</array>
 		</dict>
 	</array>
@@ -49,18 +49,18 @@
 	<key>FDMaximumConcurrentTasks</key>
 	<integer>5</integer>
 	<key>FacebookAppID</key>
-	<string>780305570800959</string>
+	<string>3591726524402718</string>
 	<key>FacebookClientToken</key>
 	<string>bc10dc12c8ff6c250204b2638197b185</string>
 	<key>FacebookDisplayName</key>
-	<string>업핀</string>
+	<string>도이치핀</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>KAKAO_APP_KEY</key>
-	<string>077c95950e4c99aefd181d2cd069524a</string>
+	<string>8b274aad5e2a4f3b8a5a1530750bc1ad</string>
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
-		<string>kakao077c95950e4c99aefd181d2cd069524a</string>
+		<string>kakao8b274aad5e2a4f3b8a5a1530750bc1ad</string>
 		<string>kakaokompassauth</string>
 		<string>storykompassauth</string>
 		<string>kakaolink</string>
@@ -148,7 +148,7 @@
 	<false/>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>applinks:upfin.onelink.me</string>
+		<string>applinks:dfin.onelink.me</string>
 	</array>
 </dict>
 </plist>

@@ -3,24 +3,24 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:upfin/datas/my_data.dart';
-import 'package:upfin/views/app_accident_detail_view.dart';
-import 'package:upfin/views/app_agree_detail_info_view.dart';
-import 'package:upfin/views/app_apply_pr_view.dart';
-import 'package:upfin/views/app_car_detail_view.dart';
-import 'package:upfin/views/app_findpw_view.dart';
-import 'package:upfin/views/app_main_view.dart';
-import 'package:upfin/views/app_result_pr_view.dart';
-import 'package:upfin/views/app_root_view.dart';
-import 'package:upfin/views/app_search_accident_view.dart';
-import 'package:upfin/views/app_search_car_view.dart';
-import 'package:upfin/views/app_signout_view.dart';
-import 'package:upfin/views/app_signup_view.dart';
-import 'package:upfin/views/app_update_accident_view.dart';
+import 'package:dfin/datas/my_data.dart';
+import 'package:dfin/views/app_accident_detail_view.dart';
+import 'package:dfin/views/app_agree_detail_info_view.dart';
+import 'package:dfin/views/app_apply_pr_view.dart';
+import 'package:dfin/views/app_car_detail_view.dart';
+import 'package:dfin/views/app_findpw_view.dart';
+import 'package:dfin/views/app_main_view.dart';
+import 'package:dfin/views/app_result_pr_view.dart';
+import 'package:dfin/views/app_root_view.dart';
+import 'package:dfin/views/app_search_accident_view.dart';
+import 'package:dfin/views/app_search_car_view.dart';
+import 'package:dfin/views/app_signout_view.dart';
+import 'package:dfin/views/app_signup_view.dart';
+import 'package:dfin/views/app_update_accident_view.dart';
 import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:upfin/views/app_update_car_view.dart';
-import 'package:upfin/views/debug_for_admin_view.dart';
+import 'package:dfin/views/app_update_car_view.dart';
+import 'package:dfin/views/debug_for_admin_view.dart';
 import 'package:yaml/yaml.dart';
 import '../utils/common_utils.dart';
 import '../views/app_chat_view.dart';
@@ -85,8 +85,8 @@ class Config{
 
   static Future<void> getOpenState(Function(bool isSuccess) callback) async {
     final ref = FirebaseDatabase.instance.ref();
-    final appForDeviceInfoSnapshot = isAndroid? await ref.child('UPFIN/APP_STATE/android_state').get()
-        : await ref.child('UPFIN/APP_STATE/ios_state').get();
+    final appForDeviceInfoSnapshot = isAndroid? await ref.child('DFIN/APP_STATE/android_state').get()
+        : await ref.child('DFIN/APP_STATE/ios_state').get();
 
     if(appForDeviceInfoSnapshot.exists){
       for(var each in appForDeviceInfoSnapshot.children){
@@ -117,11 +117,11 @@ class Config{
 
       bool isValid = true;
       final ref = FirebaseDatabase.instance.ref();
-      final appInfoSnapshot = await ref.child('UPFIN/APP_STATE/app_info').get();
-      final appSateInfoSnapshot = await ref.child('UPFIN/APP_STATE/app_info/state').get();
-      final appVerPassUserInfoSnapshot = await ref.child('UPFIN/APP_STATE/app_info/app_ver_pass_user').get();
-      final appForDeviceInfoSnapshot = isAndroid? await ref.child('UPFIN/APP_STATE/android_state').get()
-          : await ref.child('UPFIN/APP_STATE/ios_state').get();
+      final appInfoSnapshot = await ref.child('DFIN/APP_STATE/app_info').get();
+      final appSateInfoSnapshot = await ref.child('DFIN/APP_STATE/app_info/state').get();
+      final appVerPassUserInfoSnapshot = await ref.child('DFIN/APP_STATE/app_info/app_ver_pass_user').get();
+      final appForDeviceInfoSnapshot = isAndroid? await ref.child('DFIN/APP_STATE/android_state').get()
+          : await ref.child('DFIN/APP_STATE/ios_state').get();
 
       if(appInfoSnapshot.exists){
         for(var each in appInfoSnapshot.children){
@@ -188,8 +188,8 @@ class Config{
   static Future<int> isNeedToUpdateForMain() async {
     int stateCode = 10;
     final ref = FirebaseDatabase.instance.ref();
-    final appForDeviceInfoSnapshot = isAndroid? await ref.child('UPFIN/APP_STATE/android_state').get()
-        : await ref.child('UPFIN/APP_STATE/ios_state').get();
+    final appForDeviceInfoSnapshot = isAndroid? await ref.child('DFIN/APP_STATE/android_state').get()
+        : await ref.child('DFIN/APP_STATE/ios_state').get();
 
     if(appForDeviceInfoSnapshot.exists){
       for(var each in appForDeviceInfoSnapshot.children){

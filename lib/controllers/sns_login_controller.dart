@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
-import 'package:upfin/controllers/sharedpreference_controller.dart';
-import 'package:upfin/datas/my_data.dart';
+import 'package:dfin/controllers/sharedpreference_controller.dart';
+import 'package:dfin/datas/my_data.dart';
 import '../configs/app_config.dart';
 import '../styles/ColorStyles.dart';
 import '../utils/common_utils.dart';
@@ -33,7 +33,7 @@ extension LoginPlatformExtension on LoginPlatform {
 class SnsLoginController{
   static LoginPlatform loginPlatform = LoginPlatform.none;
 
-  static const String kakaoKey = "077c95950e4c99aefd181d2cd069524a";
+  static const String kakaoKey = "8b274aad5e2a4f3b8a5a1530750bc1ad";
   static String kakaoToken = "";
   static String kakaoId = "";
   static String appleUrl = "";

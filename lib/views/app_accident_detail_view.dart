@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
-import 'package:upfin/datas/loan_info_data.dart';
-import 'package:upfin/datas/my_data.dart';
-import 'package:upfin/styles/ColorStyles.dart';
-import 'package:upfin/views/app_main_view.dart';
-import 'package:upfin/views/app_update_accident_view.dart';
+import 'package:dfin/datas/loan_info_data.dart';
+import 'package:dfin/datas/my_data.dart';
+import 'package:dfin/styles/ColorStyles.dart';
+import 'package:dfin/views/app_main_view.dart';
+import 'package:dfin/views/app_update_accident_view.dart';
 import '../controllers/firebase_controller.dart';
 import '../datas/accident_info_data.dart';
 import '../styles/TextStyles.dart';

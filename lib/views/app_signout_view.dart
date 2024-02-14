@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:sizer/sizer.dart';
-import 'package:upfin/controllers/logfin_controller.dart';
-import 'package:upfin/datas/my_data.dart';
-import 'package:upfin/styles/ColorStyles.dart';
+import 'package:dfin/controllers/logfin_controller.dart';
+import 'package:dfin/datas/my_data.dart';
+import 'package:dfin/styles/ColorStyles.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../controllers/firebase_controller.dart';
 import '../controllers/sharedpreference_controller.dart';

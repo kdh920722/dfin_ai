@@ -131,13 +131,13 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data />
                 <!-- Redirect URI, "kakao${YOUR_NATIVE_APP_KEY}://oauth" 형식 -->
-                <data android:scheme="kakao077c95950e4c99aefd181d2cd069524a" android:host="oauth"/>
+                <data android:scheme="kakao8b274aad5e2a4f3b8a5a1530750bc1ad" android:host="oauth"/>
             </intent-filter>
         </activity>
 
         <meta-data
             android:name="com.google.firebase.messaging.default_notification_channel_id"
-            android:value="upfin_notification" />
+            android:value="dfin_notification" />
 
         <activity
             android:name=".MainActivity"
@@ -170,17 +170,17 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="upfin"
-                      android:host="ysmeta.upfin.ai"/>
+                <data android:scheme="dfin"
+                      android:host="ysmeta.dfin.ai"/>
             </intent-filter>
 
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="upfin" />
+                <data android:scheme="dfin" />
                 <data android:scheme="https"
-                    android:host="upfin.onelink.me" />
+                    android:host="dfin.onelink.me" />
             </intent-filter>
         </activity>
         <!-- Don't delete the meta-data below.

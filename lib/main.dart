@@ -4,10 +4,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter_native_splash/flutter_native_splash.dart';
 import 'package:get/get.dart';
 import 'package:intl/date_symbol_data_local.dart';
-import 'package:upfin/configs/app_config.dart';
-import 'package:upfin/controllers/facebook_controller.dart';
-import 'package:upfin/controllers/firebase_controller.dart';
-import 'package:upfin/utils/ui_utils.dart';
+import 'package:dfin/configs/app_config.dart';
+import 'package:dfin/controllers/facebook_controller.dart';
+import 'package:dfin/controllers/firebase_controller.dart';
+import 'package:dfin/utils/ui_utils.dart';
 import 'controllers/get_controller.dart';
 
 void main() async{

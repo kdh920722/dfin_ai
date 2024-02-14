@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:sizer/sizer.dart';
-import 'package:upfin/configs/app_config.dart';
-import 'package:upfin/controllers/logfin_controller.dart';
-import 'package:upfin/datas/my_data.dart';
-import 'package:upfin/styles/ColorStyles.dart';
-import 'package:upfin/views/app_main_view.dart';
+import 'package:dfin/configs/app_config.dart';
+import 'package:dfin/controllers/logfin_controller.dart';
+import 'package:dfin/datas/my_data.dart';
+import 'package:dfin/styles/ColorStyles.dart';
+import 'package:dfin/views/app_main_view.dart';
 import '../controllers/firebase_controller.dart';
 import '../styles/TextStyles.dart';
 import '../utils/common_utils.dart';

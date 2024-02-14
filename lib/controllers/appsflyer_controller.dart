@@ -1,6 +1,6 @@
 import 'package:appsflyer_sdk/appsflyer_sdk.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:upfin/controllers/firebase_controller.dart';
+import 'package:dfin/controllers/firebase_controller.dart';
 import '../configs/app_config.dart';
 import '../utils/common_utils.dart';
 import 'logfin_controller.dart';
@@ -21,7 +21,7 @@ class AppsflyerController{
   static Future<void> initAppsflyer(Function(bool) callback) async{
     try{
       final ref = FirebaseDatabase.instance.ref();
-      final snapshot = await ref.child('UPFIN/API/appsflyer').get();
+      final snapshot = await ref.child('DFIN/API/appsflyer').get();
       if (snapshot.exists) {
         for(var each in snapshot.children){
           switch(each.key){

@@ -1,7 +1,7 @@
-import 'package:upfin/datas/accident_info_data.dart';
-import 'package:upfin/datas/loan_info_data.dart';
-import 'package:upfin/datas/pr_docs_info_data.dart';
-import 'package:upfin/datas/pr_info_data.dart';
+import 'package:dfin/datas/accident_info_data.dart';
+import 'package:dfin/datas/loan_info_data.dart';
+import 'package:dfin/datas/pr_docs_info_data.dart';
+import 'package:dfin/datas/pr_info_data.dart';
 import '../utils/common_utils.dart';
 import 'car_info_data.dart';
 import 'chatroom_info_data.dart';

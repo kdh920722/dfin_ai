@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>API_KEY</key>
+	<string>AIzaSyD5FNZFQ-G0ZbWBDn3DVpOW68l9LmnWix4</string>
+	<key>GCM_SENDER_ID</key>
+	<string>50124109960</string>
+	<key>PLIST_VERSION</key>
+	<string>1</string>
+	<key>BUNDLE_ID</key>
+	<string>com.ysmeta.upfinai.RunnerTests</string>
+	<key>PROJECT_ID</key>
+	<string>ysmeta-dfin</string>
+	<key>STORAGE_BUCKET</key>
+	<string>ysmeta-dfin.appspot.com</string>
+	<key>IS_ADS_ENABLED</key>
+	<false></false>
+	<key>IS_ANALYTICS_ENABLED</key>
+	<false></false>
+	<key>IS_APPINVITE_ENABLED</key>
+	<true></true>
+	<key>IS_GCM_ENABLED</key>
+	<true></true>
+	<key>IS_SIGNIN_ENABLED</key>
+	<true></true>
+	<key>GOOGLE_APP_ID</key>
+	<string>1:50124109960:ios:a80f9d3f1d2fc691e5073d</string>
+	<key>DATABASE_URL</key>
+	<string>https://ysmeta-dfin-default-rtdb.firebaseio.com</string>
+</dict>
+</plist>

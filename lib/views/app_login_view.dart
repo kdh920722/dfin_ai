@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:upfin/controllers/logfin_controller.dart';
-import 'package:upfin/controllers/sharedpreference_controller.dart';
+import 'package:dfin/controllers/logfin_controller.dart';
+import 'package:dfin/controllers/sharedpreference_controller.dart';
 import 'package:sizer/sizer.dart';
-import 'package:upfin/styles/ColorStyles.dart';
-import 'package:upfin/views/app_findpw_view.dart';
+import 'package:dfin/styles/ColorStyles.dart';
+import 'package:dfin/views/app_findpw_view.dart';
 import '../styles/TextStyles.dart';
 import '../configs/app_config.dart';
 import '../utils/common_utils.dart';

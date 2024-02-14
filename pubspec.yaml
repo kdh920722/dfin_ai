@@ -1,4 +1,4 @@
-name: upfin
+name: dfin
 description: A new Flutter project.
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
@@ -46,7 +46,7 @@ dependencies:
   chat_gpt_sdk: 2.2.3
   velocity_x: ^3.6.0
   firebase_database: ^10.2.4
-  firebase_core: ^2.15.1
+  firebase_core: ^2.24.2
   firebase_auth: ^4.7.2
   sizer: ^2.0.15
   visibility_detector: ^0.4.0+2

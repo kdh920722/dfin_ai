@@ -24,6 +24,8 @@ class DefaultFirebaseOptions {
         return android;
       case TargetPlatform.iOS:
         return ios;
+      case TargetPlatform.macOS:
+        return macos;
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -42,34 +44,42 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions web = FirebaseOptions(
-    apiKey: 'AIzaSyBINsK6iIcIu_e3Tm4HRglg3nmvjrgy-zM',
-    appId: '1:121132222404:web:eef6ccd1145e16904e0691',
-    messagingSenderId: '121132222404',
-    projectId: 'upfin-6524b',
-    authDomain: 'upfin-6524b.firebaseapp.com',
-    databaseURL: 'https://upfin-6524b-default-rtdb.firebaseio.com',
-    storageBucket: 'upfin-6524b.appspot.com',
-    measurementId: 'G-4SL4681NTR',
+    apiKey: 'AIzaSyDcam765TvsXo0_5gIE-C56BhAWsCPWPAI',
+    appId: '1:50124109960:web:14ff393f7b54cad7e5073d',
+    messagingSenderId: '50124109960',
+    projectId: 'ysmeta-dfin',
+    authDomain: 'ysmeta-dfin.firebaseapp.com',
+    databaseURL: 'https://ysmeta-dfin-default-rtdb.firebaseio.com',
+    storageBucket: 'ysmeta-dfin.appspot.com',
+    measurementId: 'G-WB0CEJMB6P',
   );
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAyBc-0zaE3Acl3I9CjqA7vhIVT665T_q8',
-    appId: '1:121132222404:android:4907f093c687294e4e0691',
-    messagingSenderId: '121132222404',
-    projectId: 'upfin-6524b',
-    databaseURL: 'https://upfin-6524b-default-rtdb.firebaseio.com',
-    storageBucket: 'upfin-6524b.appspot.com',
+    apiKey: 'AIzaSyADXNJOeGlILR-Eo0XyGiz_cCAzIZL7Hmg',
+    appId: '1:50124109960:android:9d7616370397effee5073d',
+    messagingSenderId: '50124109960',
+    projectId: 'ysmeta-dfin',
+    databaseURL: 'https://ysmeta-dfin-default-rtdb.firebaseio.com',
+    storageBucket: 'ysmeta-dfin.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDsZMz4klE7uxPeKdSFmotSL64WBXobSCk',
-    appId: '1:121132222404:ios:ca637a6877d4fc834e0691',
-    messagingSenderId: '121132222404',
-    projectId: 'upfin-6524b',
-    databaseURL: 'https://upfin-6524b-default-rtdb.firebaseio.com',
-    storageBucket: 'upfin-6524b.appspot.com',
-    androidClientId: '121132222404-tdugpjfo3fr1rhm85qohkal6o6cjmvf4.apps.googleusercontent.com',
-    iosClientId: '121132222404-is98fn90r7rsqgd59s3c8snehlj3rg5o.apps.googleusercontent.com',
-    iosBundleId: 'com.ysmeta.upfinai',
+    apiKey: 'AIzaSyD5FNZFQ-G0ZbWBDn3DVpOW68l9LmnWix4',
+    appId: '1:50124109960:ios:a819d680eec8be83e5073d',
+    messagingSenderId: '50124109960',
+    projectId: 'ysmeta-dfin',
+    databaseURL: 'https://ysmeta-dfin-default-rtdb.firebaseio.com',
+    storageBucket: 'ysmeta-dfin.appspot.com',
+    iosBundleId: 'com.ysmeta.dfin',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyD5FNZFQ-G0ZbWBDn3DVpOW68l9LmnWix4',
+    appId: '1:50124109960:ios:a80f9d3f1d2fc691e5073d',
+    messagingSenderId: '50124109960',
+    projectId: 'ysmeta-dfin',
+    databaseURL: 'https://ysmeta-dfin-default-rtdb.firebaseio.com',
+    storageBucket: 'ysmeta-dfin.appspot.com',
+    iosBundleId: 'com.ysmeta.upfinai.RunnerTests',
   );
 }

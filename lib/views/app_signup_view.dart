@@ -1,11 +1,11 @@
-import 'package:upfin/controllers/get_controller.dart';
+import 'package:dfin/controllers/get_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
-import 'package:upfin/controllers/iamport_controller.dart';
-import 'package:upfin/controllers/logfin_controller.dart';
-import 'package:upfin/datas/my_data.dart';
-import 'package:upfin/styles/ColorStyles.dart';
+import 'package:dfin/controllers/iamport_controller.dart';
+import 'package:dfin/controllers/logfin_controller.dart';
+import 'package:dfin/datas/my_data.dart';
+import 'package:dfin/styles/ColorStyles.dart';
 import '../styles/TextStyles.dart';
 import '../configs/app_config.dart';
 import '../utils/common_utils.dart';

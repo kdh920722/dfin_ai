@@ -6,12 +6,12 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:upfin/configs/app_config.dart';
-import 'package:upfin/controllers/appsflyer_controller.dart';
-import 'package:upfin/controllers/websocket_controller.dart';
-import 'package:upfin/datas/my_data.dart';
-import 'package:upfin/views/app_chat_view.dart';
-import 'package:upfin/views/app_main_view.dart';
+import 'package:dfin/configs/app_config.dart';
+import 'package:dfin/controllers/appsflyer_controller.dart';
+import 'package:dfin/controllers/websocket_controller.dart';
+import 'package:dfin/datas/my_data.dart';
+import 'package:dfin/views/app_chat_view.dart';
+import 'package:dfin/views/app_main_view.dart';
 import '../configs/firebase_options.dart';
 import '../utils/common_utils.dart';
 
@@ -60,7 +60,7 @@ class FireBaseController{
 
   static Future<void> writeLog(String type, String id, String msg) async {
     try{
-      String dbPath = "UPFIN/LOG/$type";
+      String dbPath = "DFIN/LOG/$type";
 
       final snapshot = await FirebaseDatabase.instance.ref().child("$dbPath/$fcmToken").get();
       if (snapshot.exists) {
@@ -100,10 +100,10 @@ class FireBaseController{
   }
 
   /// firebase FCM =========================================================================== ///
-  static String channelIdForAndroid = "upfin_notification";
-  static String channelNameForAndroid = "upfin_notification";
-  static String channelDescForAndroid = "upfin 알림";
-  static String channelTitleForIOS = "upfin 알림";
+  static String channelIdForAndroid = "dfin_notification";
+  static String channelNameForAndroid = "dfin_notification";
+  static String channelDescForAndroid = "dfin 알림";
+  static String channelTitleForIOS = "dfin 알림";
   static StateSetter? setStateForForeground;
 
   static Future<void> initFcm(Function(bool isSuccess, String fcmToken) callback) async {
