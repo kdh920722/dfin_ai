@@ -239,12 +239,13 @@ class FireBaseController{
 
   @pragma('vm:entry-point')
   static Future<void> _handlerForFirebaseMessagingOnBackground(RemoteMessage message) async {
-    CommonUtils.log("w", "BACK PUSH");
+    CommonUtils.log("w", "BACK PUSH \n${message.messageId}${message.data}");
+    await CommonUtils.saveSettingsToFile("push_from", "B");
+    await CommonUtils.saveSettingsToFile("push_room_id", _getRoomIdFromMessage(message));
+    /*
     await _initFirebaseForBackgroundPush((bool isSuccess) async {
       if(isSuccess){
         CommonUtils.log("", "firebase init on background");
-
-
         FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
         await flutterLocalNotificationsPlugin.initialize(
           const InitializationSettings(
@@ -283,6 +284,7 @@ class FireBaseController{
         CommonUtils.log("e", "firebase init error ");
       }
     });
+    */
   }
 
   static Future<void> initInteractedMessageForBackground(FirebaseMessaging fbMsg) async {

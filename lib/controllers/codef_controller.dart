@@ -8,7 +8,6 @@ import 'package:dfin/controllers/get_controller.dart';
 import 'package:dfin/datas/api_info_data.dart';
 import 'package:http/http.dart' as http;
 import 'package:sizer/sizer.dart';
-import 'package:url_launcher/url_launcher.dart';
 import '../configs/app_config.dart';
 import '../datas/background_task_data.dart';
 import '../styles/ColorStyles.dart';

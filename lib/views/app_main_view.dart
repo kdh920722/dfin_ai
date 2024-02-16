@@ -93,6 +93,10 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
       case AppLifecycleState.resumed:
         CommonUtils.log('d','AppMainView resumed');
         await CommonUtils.checkUpdate(context);
+        if(!CommonUtils.isOutPopOn) {
+          CommonUtils.log("i","push check start 0!!!");
+          _checkViewInit();
+        }
         break;
       case AppLifecycleState.inactive:
         CommonUtils.log('d','AppMainView inactive');
@@ -1228,6 +1232,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             await CommonUtils.saveSettingsToFile("push_from", "");
             await CommonUtils.saveSettingsToFile("push_room_id", "");
             isStart = false;
+            if(context.mounted) _refreshMyView(context);
           }
         }else{
           if(context.mounted) UiUtils.closeLoadingPop(context);
@@ -1317,35 +1322,39 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     }
   }
 
+  Future<void> _checkViewInit() async {
+    if(isViewHere){
+      int chatRoomCnt = MyData.getChatRoomInfoList().length;
+      if(chatRoomCnt == 0) GetController.to.updateAllSubScribed(true);
+      await CommonUtils.checkUpdate(context);
+    }
+
+    if(isViewHere && viewTypeId == 2){
+      if(!isInfoPopShow){
+        isInfoPopShow = true;
+        if(!CommonUtils.isValidStateByInfoExpiredDate()){
+          _showInfoPop();
+        }else{
+          if(!CommonUtils.isValidStateByInfoVersion()){
+            _showInfoPop();
+          }else{
+            isInfoPopShow = false;
+            _detectPushClickFromBack();
+          }
+        }
+      }
+    }else{
+      isStart = false;
+      if(reSubScribeCheckTimer != null) reSubScribeCheckTimer!.cancel();
+    }
+  }
+
   double bottomBarHeight = 0;
   static bool isInfoPopShow = false;
   @override
   Widget build(BuildContext context) {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      if(isViewHere){
-        int chatRoomCnt = MyData.getChatRoomInfoList().length;
-        if(chatRoomCnt == 0) GetController.to.updateAllSubScribed(true);
-        await CommonUtils.checkUpdate(context);
-      }
-
-      if(isViewHere && viewTypeId == 2){
-        if(!isInfoPopShow){
-          isInfoPopShow = true;
-          if(!CommonUtils.isValidStateByInfoExpiredDate()){
-            _showInfoPop();
-          }else{
-            if(!CommonUtils.isValidStateByInfoVersion()){
-              _showInfoPop();
-            }else{
-              isInfoPopShow = false;
-              _detectPushClickFromBack();
-            }
-          }
-        }
-      }else{
-        isStart = false;
-        if(reSubScribeCheckTimer != null) reSubScribeCheckTimer!.cancel();
-      }
+      _checkViewInit();
     });
 
     Widget view = Stack(
@@ -1410,18 +1419,22 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
           if(GetController.to.isAllSubscribed.value){
             return Container();
           }else{
-            return WillPopScope(
-                onWillPop: () async => false,
-                child: StatefulBuilder(// You need this, notice the parameters below:
-                    builder: (_, StateSetter setState) {
-                      return Container(
-                          width: 100.w,
-                          height: 100.h,
-                          color: Colors.black54,
-                          child: Center(child: UiUtils.getTextWithFixedScale("최신정보로 업데이트 중", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, 1))
-                      );
-                    })
-            );
+            if(UiUtils.isLoadingPopOn){
+              return Container();
+            }else{
+              return WillPopScope(
+                  onWillPop: () async => false,
+                  child: StatefulBuilder(// You need this, notice the parameters below:
+                      builder: (_, StateSetter setState) {
+                        return Container(
+                            width: 100.w,
+                            height: 100.h,
+                            color: Colors.black54,
+                            child: Center(child: UiUtils.getTextWithFixedScale("최신정보로 업데이트 중", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, 1))
+                        );
+                      })
+              );
+            }
           }
         })
         )
