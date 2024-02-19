@@ -21,5 +21,6 @@ class TextStyles {
   static TextStyle upFinUnselectedTabTextInButtonStyle2 = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 12.sp, color: ColorStyles.upFinRealGray, fontWeight: FontWeight.w500, decoration: TextDecoration.none, decorationThickness: 0.0, height: 1);
   static TextStyle upFinHtmlTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 12.sp, color: ColorStyles.upFinBlack, fontWeight: FontWeight.w500, decoration: TextDecoration.none, decorationThickness: 0.0, height: 1.2);
   static TextStyle upFinDisabledTextFormFieldTextStyle2 = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 14.sp, color: ColorStyles.upFinBlack, fontWeight: FontWeight.w500, decoration: TextDecoration.none, decorationThickness: 0.0, height: 1.5);
+  static TextStyle upFinSecureTextFormFieldTextStyle = TextStyle(fontFamily: "SpoqaHanSansNeo", fontSize: 12.sp, color: ColorStyles.upFinWhite, fontWeight: FontWeight.w800, decoration: TextDecoration.none, decorationThickness: 0.0, height: 1.5);
 
 }

@@ -70,24 +70,24 @@ class UiUtils {
 
   static Widget getScrollView(BuildContext context, Widget view, ScrollController scrollController, Future<bool> Function() callbackBackButtonForView){
     return GestureDetector(
-      onTap: () {
-        CommonUtils.hideKeyBoard();
-        scrollController.jumpTo(0);
-      },
-      child: SafeArea(
-          child: WillPopScope(
-              onWillPop: () => callbackBackButtonForView(),
-              child: Scaffold(
-                  backgroundColor: ColorStyles.upFinWhite,
-                  body: ListView(
-                      controller: scrollController,
-                      shrinkWrap: true,
-                      physics: const BouncingScrollPhysics(),
-                      children: [view]
-                  )
-              )
-          )
-      )
+        onTap: () {
+          CommonUtils.hideKeyBoard();
+          scrollController.jumpTo(0);
+        },
+        child: SafeArea(
+            child: WillPopScope(
+                onWillPop: () => callbackBackButtonForView(),
+                child: Scaffold(
+                    backgroundColor: ColorStyles.upFinWhite,
+                    body: ListView(
+                        controller: scrollController,
+                        shrinkWrap: true,
+                        physics: const BouncingScrollPhysics(),
+                        children: [view]
+                    )
+                )
+            )
+        )
     );
   }
 
@@ -181,8 +181,8 @@ class UiUtils {
 
   static Widget getBorderTextWithFixedScale(String text, double fontSize, FontWeight fontWeight, TextAlign? textAlign, Color borderColor, Color textColor){
     return Container(padding: EdgeInsets.all(0.1.w), // 텍스트 주위에 여백 추가
-      decoration: BoxDecoration(border: Border.all(color: borderColor, width: 2.0), borderRadius: BorderRadius.circular(2.0)),
-      child: Text(textScaleFactor: 1.0, text, style: TextStyle(decoration: TextDecoration.none, height: 1, fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor)));
+        decoration: BoxDecoration(border: Border.all(color: borderColor, width: 2.0), borderRadius: BorderRadius.circular(2.0)),
+        child: Text(textScaleFactor: 1.0, text, style: TextStyle(decoration: TextDecoration.none, height: 1, fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor)));
   }
 
   static Widget getRoundedBoxTextWithFixedScale(String text, double fontSize, FontWeight fontWeight, TextAlign? textAlign, Color borderColor, Color fillColor, Color textColor){
@@ -193,7 +193,7 @@ class UiUtils {
 
   static Widget getBoxTextWithFixedScale(String text, double fontSize, FontWeight fontWeight, TextAlign? textAlign, Color boxColor, Color textColor){
     return Container(color: boxColor, child: FittedBox(fit: BoxFit.contain, alignment: Alignment.center,
-    child: Padding(padding: EdgeInsets.only(left: 2.w, right: 2.w, bottom: 1.w, top: 1.w), child: Text(textScaleFactor: 1.0, text, style: TextStyle(fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor)))));
+        child: Padding(padding: EdgeInsets.only(left: 2.w, right: 2.w, bottom: 1.w, top: 1.w), child: Text(textScaleFactor: 1.0, text, style: TextStyle(fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor)))));
   }
 
   static Widget getBoxTextAndIconWithFixedScale(String text, double fontSize, FontWeight fontWeight, TextAlign? textAlign, Color boxColor, Color textColor, IconData icon, Color iconColor, double iconSize){
@@ -211,7 +211,7 @@ class UiUtils {
         decoration: BoxDecoration(
           color: boxColor, // 배경색 설정
           borderRadius: BorderRadius.circular(20.0), // 모서리를 둥글게 하는 부분
-    ),child: FittedBox(fit: BoxFit.contain, alignment: Alignment.center,
+        ),child: FittedBox(fit: BoxFit.contain, alignment: Alignment.center,
         child: Padding(padding: EdgeInsets.only(left: 2.w, right: 2.w, bottom: 1.w, top: 1.w), child: Text(textScaleFactor: 1.0, text, style: TextStyle(fontFamily: "SpoqaHanSansNeo", fontWeight: fontWeight, fontSize: fontSize, color: textColor)))));
   }
 
@@ -309,7 +309,11 @@ class UiUtils {
 
   static Widget getRoundImageButton(Image image, double size, Color iconColor, VoidCallback onPressedCallback) {
     return SizedBox(width: size, height: size, child: IconButton(padding: const EdgeInsets.all(4.5), onPressed: onPressedCallback, icon: ClipRRect(
-      borderRadius: BorderRadius.circular(10.0), child: image)));
+        borderRadius: BorderRadius.circular(10.0), child: image)));
+  }
+
+  static Widget getCircleImage(String imagePath, double size) {
+    return SizedBox(width: size, height: size, child: CircleAvatar(backgroundImage: AssetImage(imagePath)));
   }
 
   static Widget getImage(double width, double height, Image image) {
@@ -383,8 +387,8 @@ class UiUtils {
           ),
           onPressed: onPressedCallback,
           child: Padding(
-            padding: EdgeInsets.all(4.w),
-            child: getStyledTextWithFixedScale(buttonText,buttonTextStyles,TextAlign.center,null)
+              padding: EdgeInsets.all(4.w),
+              child: getStyledTextWithFixedScale(buttonText,buttonTextStyles,TextAlign.center,null)
           ),
         )
     );
@@ -452,16 +456,16 @@ class UiUtils {
     return SizedBox(
         width: buttonWidth,
         child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              padding: EdgeInsets.only(left: 4.w, right: 4.w, top: 4.w, bottom: 4.w),
-              backgroundColor: buttonColor,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
-              side: BorderSide(width: 1, color: borderColor),
-              elevation: 0.0,
-              shadowColor: ColorStyles.upFinGray,
-            ),
-            onPressed: onPressedCallback,
-            child: childWidget,
+          style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.only(left: 4.w, right: 4.w, top: 4.w, bottom: 4.w),
+            backgroundColor: buttonColor,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+            side: BorderSide(width: 1, color: borderColor),
+            elevation: 0.0,
+            shadowColor: ColorStyles.upFinGray,
+          ),
+          onPressed: onPressedCallback,
+          child: childWidget,
         )
     );
   }
@@ -783,7 +787,7 @@ class UiUtils {
             data : MediaQuery.of(context).copyWith(textScaleFactor : 1.1),
             child : TextField(enableInteractiveSelection: true, focusNode: focusNode, cursorColor: ColorStyles.upFinBlack, controller: textEditingController,
                 keyboardType: textInputType, decoration: inputDecoration, onChanged: onChangedCallback, style: textStyle))
-        );
+    );
   }
 
   static Widget getChatTextField(BuildContext context, double width, TextStyle textStyle, FocusNode focusNode, TextEditingController textEditingController, TextInputType textInputType,
@@ -802,7 +806,7 @@ class UiUtils {
             data : MediaQuery.of(context).copyWith(textScaleFactor : 1.1),
             child : TextFormField(enableInteractiveSelection: true, focusNode: focusNode, obscureText : isPwd, cursorColor: ColorStyles.upFinBlack, controller: textEditingController,
                 keyboardType: textInputType, decoration: inputDecoration, onChanged: onChangedCallback, validator: validatorCallback, style: textStyle))
-        );
+    );
   }
 
   static InputDecoration getInputDecoration(String labelText, double labelTextSize, String counterText, double counterTextSize){
@@ -948,16 +952,16 @@ class UiUtils {
         context: targetContext,
         pageBuilder: (context, animation, secondaryAnimation) {
           return WillPopScope(
-            onWillPop: () async => false,
-            child: StatefulBuilder(// You need this, notice the parameters below:
-                builder: (_, StateSetter setState) {
-                  return Container(
-                      width: 100.w,
-                      height: 100.h,
-                      color: ColorStyles.upFinDarkGrayWithAlpha,
-                      child: SpinKitWave(color: ColorStyles.upFinTextAndBorderBlue, size: 15.w)
-                  );
-                })
+              onWillPop: () async => false,
+              child: StatefulBuilder(// You need this, notice the parameters below:
+                  builder: (_, StateSetter setState) {
+                    return Container(
+                        width: 100.w,
+                        height: 100.h,
+                        color: ColorStyles.upFinDarkGrayWithAlpha,
+                        child: SpinKitWave(color: ColorStyles.upFinTextAndBorderBlue, size: 15.w)
+                    );
+                  })
           );
         },
       );
@@ -1106,17 +1110,17 @@ class UiUtils {
       context: parentViewContext,
       builder: (_) {
         return Dialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          backgroundColor: ColorStyles.upFinWhite,
-          insetPadding: EdgeInsets.all(3.w),
-          child: StatefulBuilder(
-            builder: (__, StateSetter popViewSetState){
-              Widget contentsWidget = createWidgetMethod(parentViewContext, popViewSetState);
-              return SizedBox(
-                  width: popWidth,
-                  child: Padding(padding: EdgeInsets.all(3.w), child: contentsWidget));
-            }
-          )
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            backgroundColor: ColorStyles.upFinWhite,
+            insetPadding: EdgeInsets.all(3.w),
+            child: StatefulBuilder(
+                builder: (__, StateSetter popViewSetState){
+                  Widget contentsWidget = createWidgetMethod(parentViewContext, popViewSetState);
+                  return SizedBox(
+                      width: popWidth,
+                      child: Padding(padding: EdgeInsets.all(3.w), child: contentsWidget));
+                }
+            )
         );
       },
     );
@@ -1447,7 +1451,7 @@ class UiUtils {
         checkColor: ColorStyles.upFinWhite,
         activeColor: ColorStyles.upFinTextAndBorderBlue,
         side: MaterialStateBorderSide.resolveWith((states) =>
-         !checkedValue? const BorderSide(width: 2.0, color: ColorStyles.upFinGray) : const BorderSide(width: 2.0, color: ColorStyles.upFinTextAndBorderBlue))
+        !checkedValue? const BorderSide(width: 2.0, color: ColorStyles.upFinGray) : const BorderSide(width: 2.0, color: ColorStyles.upFinTextAndBorderBlue))
     ));
   }
 
@@ -1566,26 +1570,26 @@ class UiUtils {
         }
 
         return WillPopScope(
-          onWillPop: () async => isDismissible,
-          child: Align(
-            alignment: alignment,
-            child: Container(
-              width: popWidth,
-              height: popHeight,
-              decoration: BoxDecoration(
-                color: ColorStyles.upFinWhite,
-                borderRadius: borderRadius,
+            onWillPop: () async => isDismissible,
+            child: Align(
+              alignment: alignment,
+              child: Container(
+                width: popWidth,
+                height: popHeight,
+                decoration: BoxDecoration(
+                  color: ColorStyles.upFinWhite,
+                  borderRadius: borderRadius,
+                ),
+                child: SizedBox.expand(
+                    child: StatefulBuilder(
+                        builder: (_, StateSetter popViewSetState){
+                          Widget contentsWidget = createWidgetMethod(parentViewContext, popViewSetState);
+                          return Padding(padding: EdgeInsets.all(5.w), child: contentsWidget);
+                        }
+                    )
+                ),
               ),
-              child: SizedBox.expand(
-                  child: StatefulBuilder(
-                      builder: (_, StateSetter popViewSetState){
-                        Widget contentsWidget = createWidgetMethod(parentViewContext, popViewSetState);
-                        return Padding(padding: EdgeInsets.all(5.w), child: contentsWidget);
-                      }
-                  )
-              ),
-            ),
-          )
+            )
         );
       },
       transitionBuilder: (context, anim1, anim2, child) {
@@ -1746,38 +1750,38 @@ class UiUtils {
     BorderRadius borderRadius = BorderRadius.circular(radius);
 
     showGeneralDialog(
-      barrierLabel: "",
-      barrierDismissible: isDismissible,
-      barrierColor: Colors.black.withOpacity(opacity),
-      transitionDuration: const Duration(milliseconds: 50),
-      context: parentViewContext,
-      pageBuilder: (context, anim1, anim2) {
-        return WillPopScope(
-            onWillPop: () async => isDismissible,
-            child: Align(
-              alignment: alignment,
-              child: SafeArea(child:Container(
-                width: popWidth,
-                height: popHeight,
-                decoration: BoxDecoration(
-                  color: backColor,
-                  borderRadius: borderRadius,
-                ),
-                child: SizedBox.expand(
-                    child: StatefulBuilder(
-                        builder: (_, StateSetter popViewSetState){
-                          Widget contentsWidget = createWidgetMethod(parentViewContext, popViewSetState);
-                          return Padding(padding: EdgeInsets.only(top: 3.w), child: Scaffold(
-                              backgroundColor: backColor,
-                              body:contentsWidget
-                          ));
-                        }
-                    )
-                ),
-              ))
-            )
-        );
-      }
+        barrierLabel: "",
+        barrierDismissible: isDismissible,
+        barrierColor: Colors.black.withOpacity(opacity),
+        transitionDuration: const Duration(milliseconds: 50),
+        context: parentViewContext,
+        pageBuilder: (context, anim1, anim2) {
+          return WillPopScope(
+              onWillPop: () async => isDismissible,
+              child: Align(
+                  alignment: alignment,
+                  child: SafeArea(child:Container(
+                    width: popWidth,
+                    height: popHeight,
+                    decoration: BoxDecoration(
+                      color: backColor,
+                      borderRadius: borderRadius,
+                    ),
+                    child: SizedBox.expand(
+                        child: StatefulBuilder(
+                            builder: (_, StateSetter popViewSetState){
+                              Widget contentsWidget = createWidgetMethod(parentViewContext, popViewSetState);
+                              return Padding(padding: EdgeInsets.only(top: 3.w), child: Scaffold(
+                                  backgroundColor: backColor,
+                                  body:contentsWidget
+                              ));
+                            }
+                        )
+                    ),
+                  ))
+              )
+          );
+        }
     );
   }
 
@@ -1795,16 +1799,16 @@ class UiUtils {
     }
 
     return Align(
-      alignment: alignment,
-      child: Padding(
-          padding: EdgeInsets.all(5.w),
-          child: FloatingActionButton.extended(
-            label: Text(text!),
-            icon: Icon(icon),
-            backgroundColor: fabColor,
-            onPressed: onPressedCallback,
-          )
-      )
+        alignment: alignment,
+        child: Padding(
+            padding: EdgeInsets.all(5.w),
+            child: FloatingActionButton.extended(
+              label: Text(text!),
+              icon: Icon(icon),
+              backgroundColor: fabColor,
+              onPressed: onPressedCallback,
+            )
+        )
     );
   }
 
@@ -1819,7 +1823,7 @@ class UiUtils {
               child: UiUtils.getTitleWithFixedScale("upfin", Config.isPad()? 55.sp : 75.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null))
         ])
     );
-      /*
+    /*
       Container(width: 100.w, height: 100.h, color: ColorStyles.upFinWhite,
         child: Center(child: CircularPercentIndicator(
           animateFromLastPercent: true,

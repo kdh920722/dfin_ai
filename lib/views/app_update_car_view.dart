@@ -534,7 +534,7 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
       ])),
       UiUtils.getMarginBox(0, 3.w),
       savedRegBInfoList.length == 1 ? SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("저당에 대한", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null))
-       : SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("각 저당에 대한", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+          : SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("각 저당에 대한", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 0.5.h),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출잔액을 입력하세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: confirmWidgetList)),
@@ -715,9 +715,9 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("해당 정보로", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 0.5.h),
       SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출상품을 찾아볼까요?", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-      UiUtils.getMarginBox(0, 5.h),
+      UiUtils.getMarginBox(0, 4.h),
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: confirmWidgetList)),
-      UiUtils.getMarginBox(0, 5.h),
+      UiUtils.getMarginBox(0, 4.h),
       Row(children: [
         UiUtils.getBorderButtonBox(42.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
             UiUtils.getTextWithFixedScale("네 좋아요!", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
@@ -748,14 +748,14 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
         "0", // selectedPreLoanCountInfo.split("@")[1]
         "0", // selectedPreLoanPriceInfo
         savedList, (isSuccessToGetOffers, _){
-      UiUtils.closeLoadingPop(context);
-      if(isSuccessToGetOffers){
-        CommonUtils.moveWithReplacementTo(context, AppView.appResultPrView.value, null);
-      }else{
-        CommonUtils.flutterToast("에러가 발생했습니다.\n다시 실행해주세요.");
-        Navigator.pop(context);
-      }
-    });
+          UiUtils.closeLoadingPop(context);
+          if(isSuccessToGetOffers){
+            CommonUtils.moveWithReplacementTo(context, AppView.appResultPrView.value, null);
+          }else{
+            CommonUtils.flutterToast("에러가 발생했습니다.\n다시 실행해주세요.");
+            Navigator.pop(context);
+          }
+        });
   }
 
   void _back(){

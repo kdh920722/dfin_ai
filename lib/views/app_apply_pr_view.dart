@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_secure_keyboard/flutter_secure_keyboard.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:sizer/sizer.dart';
@@ -49,6 +50,9 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   final _dlNumInfoTextController4 = TextEditingController();
   final _dlNumInfoFocusSerial = FocusNode();
   final _dlNumInfoTextControllerSerial = TextEditingController();
+  final _secureKeyboardController = SecureKeyboardController();
+  final _pinCodeEditor = TextEditingController();
+  final _pinCodeTextFieldFocusNode = FocusNode();
 
   int reUseTargetViewId = -1;
 
@@ -161,7 +165,32 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     if(MyData.getLoanInfoList().isNotEmpty){
       String savedValue = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceApplyPrKey);
       if(savedValue != ""){
-        savedDocsList = List<Map<String, dynamic>>.from(jsonDecode(savedValue));
+        List<Map<String, dynamic>> tempList = List<Map<String, dynamic>>.from(jsonDecode(savedValue));
+        bool isSavedDoc = false;
+        for(Map<String, dynamic> eachTemp in tempList){
+          if(eachTemp["is_docs"]){
+            if(eachTemp.containsKey("doc_date")){
+              DateTime currentTime = CommonUtils.getCurrentLocalTime();
+              DateTime minus3Days = currentTime.subtract(const Duration(days: 3));
+              DateTime savedTime = CommonUtils.convertStringToTime(eachTemp["doc_date"]);
+
+              if(minus3Days.isBefore(savedTime)){
+                isSavedDoc = true;
+              }else{
+                isSavedDoc = false;
+              }
+            }else{
+              isSavedDoc = false;
+            }
+          }else{
+            isSavedDoc = true;
+          }
+
+          if(isSavedDoc){
+            savedDocsList.add(eachTemp);
+          }
+        }
+
         if(savedDocsList.isNotEmpty){
           currentViewId = addedDocsInfoIntroViewId;
         }
@@ -653,6 +682,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     _disposeAllTextControllersForDl();
     WidgetsBinding.instance.removeObserver(this);
     _bankScrollController.dispose();
+    _pinCodeTextFieldFocusNode.unfocus();
+    _pinCodeEditor.dispose();
     Config.contextForEmergencyBack = AppResultPrViewState.mainContext;
     if(_cameraController != null){
       _cameraController!.dispose();
@@ -1310,7 +1341,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           UiUtils.getTextWithFixedScale("네 좋아요!", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () async {
             await _setSavedData();
 
-
             bool isAuthCertError = false;
             for(var each in savedDocsList){
               if(each['id'] == cameraId){
@@ -1364,7 +1394,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               }
             }
           }),
-      UiUtils.getMarginBox(0, 1.5.h),
+      UiUtils.getMarginBox(0, 1.h),
       UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
           UiUtils.getTextWithFixedScale("다시 입력할게요", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, null), () {
             setState(() {
@@ -1679,6 +1709,189 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
   }
   /// business number view end
 
+  /// indiv number view
+  String inputIndivNo = "";
+  List<String> inputLiveTextList = [];
+  int indivNoViewId = 1234;
+  bool isNextShow = false;
+  Widget _getIndivNumberView(){
+    return UiUtils.getRowColumnWithAlignCenter([
+      GestureDetector(child: Column(children: [
+        Container(padding: EdgeInsets.only(top: 3.w, left: 5.w, right: 5.w), width: 100.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          UiUtils.getBackButton(() async {
+            // back to camera
+            if(_secureKeyboardController.isShowing){
+              _secureKeyboardController.hide();
+              CommonUtils.hideKeyBoard();
+            }
+            setState(() {
+              inputIndivNo = "";
+              isNextShow = false;
+              inputLiveTextList.clear();
+              _pinCodeEditor.text = "";
+              currentViewId = _getViewIdFromListById(cameraId);
+            });
+          }),
+        ])),
+        UiUtils.getMarginBox(0, 3.w),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("주민등록번호 뒷자리를", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+        UiUtils.getMarginBox(0, 0.5.h),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+        UiUtils.getMarginBox(0, 5.h),
+      ]), onTap: (){
+        if(_secureKeyboardController.isShowing){
+          _secureKeyboardController.hide();
+          CommonUtils.hideKeyBoard();
+        }
+      }),
+      SizedBox(width: 100.w, height: 50.h, child: WithSecureKeyboard(
+        keyTextStyle: TextStyles.upFinSecureTextFormFieldTextStyle,
+        inputTextStyle: TextStyles.upFinSecureTextFormFieldTextStyle,
+        keySpacing: 0.2.h,
+        keyRadius: 5,
+        keyboardHeight: 38.h,
+        keyboardPadding: EdgeInsets.only(left: 5.w, right: 5.w),
+        keyInputMonitorPadding: EdgeInsets.only(left: 6.w, right: 5.w),
+        doneKeyColor: ColorStyles.upFinButtonBlue,
+        controller: _secureKeyboardController,
+        backgroundColor: ColorStyles.upFinWhite,
+        actionKeyColor: ColorStyles.upFinBlack,
+        stringKeyColor: ColorStyles.upFinRealGray,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(width: 85.w, child: TextFormField(
+              controller: _pinCodeEditor,
+              decoration: InputDecoration(contentPadding: EdgeInsets.only(bottom: 4.w),
+                  labelText: "",
+                  floatingLabelBehavior: FloatingLabelBehavior.auto,
+                  labelStyle: TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "SpoqaHanSansNeo", color: ColorStyles.upFinTextAndBorderBlue, fontSize: 10.sp, fontWeight: FontWeight.w500),
+                  hintText: "",
+                  counterText: "",
+                  isDense: true,
+                  prefixIcon: Text(" ${MyData.birth.substring(2)}   ⏤   ", style: TextStyles.upFinDisabledTextFormFieldTextStyle),
+                  prefixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
+                  errorStyle: TextStyle(fontSize: 0.sp),
+                  counterStyle: TextStyle(decoration: TextDecoration.none, height: 2.2, fontFamily: "SpoqaHanSansNeo", color: ColorStyles.upFinTextAndBorderBlue, fontSize: 10.sp, fontWeight: FontWeight.w500),
+                  enabledBorder: const UnderlineInputBorder(
+                      borderSide: BorderSide(color: ColorStyles.upFinButtonBlue)),
+
+                  focusedBorder: UnderlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: const BorderSide(color: ColorStyles.upFinButtonBlue),
+                  ),
+                  errorBorder: const UnderlineInputBorder(borderSide: BorderSide(color: ColorStyles.upFinRed)),
+                  filled: true,
+                  fillColor: ColorStyles.upFinWhite
+              ),
+              readOnly: true,
+              focusNode: _pinCodeTextFieldFocusNode,
+              // We recommended to set false to prevent the software keyboard from opening.
+              enableInteractiveSelection: false,
+              obscureText: true,
+              obscuringCharacter: '●',
+              onTap: () {
+                if(_secureKeyboardController.isShowing){
+                  _secureKeyboardController.hide();
+                  CommonUtils.hideKeyBoard();
+                }else{
+                  isNextShow = false;
+                  setState(() {});
+                  _secureKeyboardController.show(
+                    type: SecureKeyboardType.NUMERIC,
+                    focusNode: _pinCodeTextFieldFocusNode,
+                    initText: '',
+                    hintText: '',
+                    hideKeyInputMonitor: true,
+                    obscureText:false,
+                    disableKeyBubble:true,
+                    onKeyPressed: (SecureKeyboardKey key){
+                      setState(() {
+                        if(key.text == null){
+                          // delete
+                          if("SecureKeyboardKeyAction.CLEAR" == key.action.toString()){
+                            inputLiveTextList.clear();
+                          }else if("SecureKeyboardKeyAction.BACKSPACE" == key.action.toString()){
+                            if(inputLiveTextList.isNotEmpty) inputLiveTextList.removeLast();
+                          }
+                          _pinCodeEditor.text = "";
+                          for(String each in inputLiveTextList){
+                            _pinCodeEditor.text += each;
+                          }
+                          setState(() {});
+                        }else{
+                          // input
+                          inputLiveTextList.add(key.text.toString());
+                          if(inputLiveTextList.length > 7){
+                            isNextShow = true;
+                            inputLiveTextList.removeLast();
+                            _secureKeyboardController.hide();
+                            CommonUtils.hideKeyBoard();
+                          }else if(inputLiveTextList.length == 7) {
+                            isNextShow = true;
+                            _secureKeyboardController.hide();
+                            CommonUtils.hideKeyBoard();
+                          }
+
+                          _pinCodeEditor.text = "";
+                          for(String each in inputLiveTextList){
+                            _pinCodeEditor.text += each;
+                          }
+                          setState(() {});
+                        }
+                      });
+                    },
+                    onDoneKeyPressed: (List<int> charCodes) {
+                      if(inputLiveTextList.length > 7){
+                        isNextShow = true;
+                      }else if(inputLiveTextList.length == 7) {
+                        isNextShow = true;
+                      }else{
+                        isNextShow = false;
+                      }
+                      _pinCodeEditor.text = "";
+                      for(String each in inputLiveTextList){
+                        _pinCodeEditor.text += each;
+                      }
+                      setState(() {});
+                    },
+                  );
+                }
+              },
+            )),
+          ],
+        ),
+      )),
+      GestureDetector(child: Column(children: [
+        UiUtils.getMarginColoredBox(100.w, 10.h, ColorStyles.upFinWhite),
+      ]), onTap: (){
+        if(_secureKeyboardController.isShowing){
+          _secureKeyboardController.hide();
+          CommonUtils.hideKeyBoard();
+        }
+      }),
+      UiUtils.getExpandedScrollView(Axis.vertical, Container()),
+      !isNextShow ? Container() : UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+          UiUtils.getTextWithFixedScale("다음", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
+            inputIndivNo = _pinCodeEditor.text.trim();
+
+            // camera false reset
+            _setConfirmedToDocItemByViewId(_getViewIdFromListById(cameraId), false);
+            Map<String, dynamic> resultMap = {
+              "resultValue" : {}
+            };
+            _setResultToListById(cameraId, resultMap);
+            pickedFilePath = "";
+            MyData.idNumber = "${MyData.birth.substring(2)}-$inputIndivNo";
+            CommonUtils.log("w","id : ${MyData.idNumber}");
+            currentViewId = _getViewIdFromListById(cameraId);
+            nextInputView();
+          }),
+      UiUtils.getMarginBox(0, 5.w)
+    ]);
+  }
+  /// indiv number view end
+
   /// address view
   Widget _getAddressView(){
     List<Widget> addressWidgetList = [];
@@ -1950,6 +2163,19 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               }
             }),
       ])),
+      UiUtils.getMarginBox(0, 1.h),
+      isRetry? Container() : UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
+          UiUtils.getTextWithFixedScale("다음에 할게요", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
+            _setConfirmedToDocItemByViewId(currentViewId, false);
+            Map<String, dynamic> resultMap = {
+              "resultValue" : {}
+            };
+            _setResultToListById(cameraId, resultMap);
+            setState(() {
+              pickedFilePath = "";
+              currentViewId = indivNoViewId;
+            });
+          })
     ]);
   }
   Widget _takeCustomCamera() {
@@ -1994,13 +2220,13 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           ),
         ),
         Positioned(
-          top: 3.w,
-          right: 3.w,
-          child: UiUtils.getCloseButton(ColorStyles.upFinWhite, () {
-            setState(() {
-              currentViewId = _getViewIdFromListById(cameraId);
-            });
-          })
+            top: 3.w,
+            right: 3.w,
+            child: UiUtils.getCloseButton(ColorStyles.upFinWhite, () {
+              setState(() {
+                currentViewId = _getViewIdFromListById(cameraId);
+              });
+            })
         ),
         Positioned(
             top: 30.7.h,
@@ -2010,29 +2236,29 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             top: 8.h,
             child: SizedBox(width: 85.w, child: Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
               UiUtils.getTextWithFixedScale("파란색 영역에", 26.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, null),
-             UiUtils.getMarginBox(0, 0.5.h),
-             UiUtils.getTextWithFixedScale("신분증을 놓아주세요.", 26.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, null),
+              UiUtils.getMarginBox(0, 0.5.h),
+              UiUtils.getTextWithFixedScale("신분증을 놓아주세요.", 26.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.start, null),
               UiUtils.getMarginBox(0, 3.h),
               UiUtils.getTextWithFixedScale2(
                   "• 신분증은 반드시 신분증 원본을 준비해주세요.", 10.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null),
               UiUtils.getMarginBox(0, 0.5.h),
               UiUtils.getTextWithFixedScale2(
-                      "• 신분증을 어두운 배경에 두고, 밝은곳에서 촬영해주세요.", 10.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null),
+                  "• 신분증을 어두운 배경에 두고, 밝은곳에서 촬영해주세요.", 10.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null),
             ]))
         ),
         Positioned(
-            top: 35.h,
-            child: Container(
-              width: 85.w,
-              height: 25.h,
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(
-                  color: ColorStyles.upFinButtonBlue,
-                  width: 1.w,
-                ),
+          top: 35.h,
+          child: Container(
+            width: 85.w,
+            height: 25.h,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(
+                color: ColorStyles.upFinButtonBlue,
+                width: 1.w,
               ),
             ),
+          ),
         ),
         Positioned(
             top: Config.isAndroid? 87.5.h : 80.h,
@@ -2759,7 +2985,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               nextInputView();
             }
           }),
-      UiUtils.getMarginBox(0, 1.2.h),
+      UiUtils.getMarginBox(0, 1.h),
       isRetry? Container() : !_isDocsAllConfirmed(docsType)? UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
           UiUtils.getTextWithFixedScale(isErrorResult? "다음에 할게요" : "다음에 할게요", 12.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
             nextInputView();
@@ -3606,6 +3832,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                 }
                 for(var eachAdded in addedDocsList){
                   if(eachAdded["is_confirmed"] && eachAdded["id"] != 1000 && eachAdded["id"] != 999){
+                    eachAdded["doc_date"] = CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime());
                     addedDocsListForSave.add(eachAdded);
                   }
                 }
@@ -3627,6 +3854,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                       }
                     }
                     if(!isDuple){
+                      each["doc_date"] = CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime());
                       addedDocsListForSave.add(each);
                     }
                   }
@@ -3731,6 +3959,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             }
             for(var eachAdded in addedDocsList){
               if(eachAdded["is_confirmed"] && eachAdded["id"] != 1000 && eachAdded["id"] != 999){
+                eachAdded["doc_date"] = CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime());
                 addedDocsListForSave.add(eachAdded);
               }
             }
@@ -3752,6 +3981,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                   }
                 }
                 if(!isDuple){
+                  each["doc_date"] = CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime());
                   addedDocsListForSave.add(each);
                 }
               }
@@ -3783,177 +4013,343 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       }
     }else{
       UiUtils.showLoadingPop(context);
-      _uploadCertImageToAwsServer(pickedFilePath, (isSuccessToUpload){
-        if(isSuccessToUpload){
-          List<dynamic> docResultList = [];
-          Map<String, dynamic> eachMap = {
-            "pr_document_id" : "12",
-            "response_data" : awsUploadUrl
-          };
-          docResultList.add(eachMap);
-          for(var each in addedDocsList){
-            if(each["is_docs"] && each["is_confirmed"]){
-              var resultMap  =  each["result"]["resultValue"]["data"];
-              //gov24 : 1:주민등록등본           2:주민등록초본        15:지방세납세증명서      16:자동차등록원부(갑)     17:자동차등록원부(을)
-              //nhis  : 3:건강보험자격득실확인서    4:건강보험납부확인서
-              //nts   : 6:사업자등록증(*테스트불가) 10:소득금액증명       11:부가세과세표준증명원(*테스트불가)      14:국세납세증명서
-              if(each["id"] == 3 || each["id"] == 4){
-                if(resultMap is List<dynamic>){
-                  Map<String, dynamic> eachMap = {
-                    "pr_document_id" : each["id"],
-                    "response_data" : json.encode(resultMap)
-                  };
-                  docResultList.add(eachMap);
+      if(pickedFilePath != ""){
+        _uploadCertImageToAwsServer(pickedFilePath, (isSuccessToUpload){
+          if(isSuccessToUpload){
+            List<dynamic> docResultList = [];
+            Map<String, dynamic> eachMap = {
+              "pr_document_id" : "12",
+              "response_data" : awsUploadUrl
+            };
+            docResultList.add(eachMap);
+            for(var each in addedDocsList){
+              if(each["is_docs"] && each["is_confirmed"]){
+                var resultMap  =  each["result"]["resultValue"]["data"];
+                //gov24 : 1:주민등록등본           2:주민등록초본        15:지방세납세증명서      16:자동차등록원부(갑)     17:자동차등록원부(을)
+                //nhis  : 3:건강보험자격득실확인서    4:건강보험납부확인서
+                //nts   : 6:사업자등록증(*테스트불가) 10:소득금액증명       11:부가세과세표준증명원(*테스트불가)      14:국세납세증명서
+                if(each["id"] == 3 || each["id"] == 4){
+                  if(resultMap is List<dynamic>){
+                    Map<String, dynamic> eachMap = {
+                      "pr_document_id" : each["id"],
+                      "response_data" : json.encode(resultMap)
+                    };
+                    docResultList.add(eachMap);
+                  }else{
+                    List<dynamic> wrapListMap = [];
+                    wrapListMap.add(resultMap);
+                    Map<String, dynamic> eachMap = {
+                      "pr_document_id" : each["id"],
+                      "response_data" : json.encode(wrapListMap)
+                    };
+                    docResultList.add(eachMap);
+                  }
                 }else{
-                  List<dynamic> wrapListMap = [];
-                  wrapListMap.add(resultMap);
-                  Map<String, dynamic> eachMap = {
-                    "pr_document_id" : each["id"],
-                    "response_data" : json.encode(wrapListMap)
-                  };
-                  docResultList.add(eachMap);
-                }
-              }else{
-                if(resultMap is List<dynamic>){
-                  Map<String, dynamic> eachMap = {
-                    "pr_document_id" : each["id"],
-                    "response_data" : json.encode(resultMap)
-                  };
-                  docResultList.add(eachMap);
-                }else{
-                  Map<String, dynamic> eachMap = {
-                    "pr_document_id" : each["id"],
-                    "response_data" : resultMap
-                  };
-                  docResultList.add(eachMap);
+                  if(resultMap is List<dynamic>){
+                    Map<String, dynamic> eachMap = {
+                      "pr_document_id" : each["id"],
+                      "response_data" : json.encode(resultMap)
+                    };
+                    docResultList.add(eachMap);
+                  }else{
+                    Map<String, dynamic> eachMap = {
+                      "pr_document_id" : each["id"],
+                      "response_data" : resultMap
+                    };
+                    docResultList.add(eachMap);
+                  }
                 }
               }
             }
-          }
-          String address = _getResultFromListById(addressId)["resultValue"];
-          Map<String, dynamic>? applyInputMap;
-          if(MyData.selectedPrInfoData!.uidType == "1"){
-            applyInputMap = {
-              "offer_id": MyData.selectedPrInfoData!.productOfferId,
-              "offer_rid": MyData.selectedPrInfoData!.productOfferRid,
-              "lender_pr_id": MyData.selectedPrInfoData!.productOfferLenderPrId,
-              "address": address,
-              "contact_no1": MyData.phoneNumber.substring(0,3),
-              "contact_no2": MyData.phoneNumber.substring(3,7),
-              "contact_no3": MyData.phoneNumber.substring(7),
-              "jumin_no1": MyData.idNumber.split("-")[0],
-              "jumin_no2": MyData.idNumber.split("-")[1],
-              "memo": '모바일 신청(개인회생) ${Config.isAndroid ? "android" : "ios"}',
-              "documents": docResultList
-            };
-          }else{
-            applyInputMap = {
-              "offer_id": MyData.selectedPrInfoData!.productOfferId,
-              "offer_rid": MyData.selectedPrInfoData!.productOfferRid,
-              "lender_car_id": MyData.selectedPrInfoData!.productOfferLenderPrId,
-              "address": address,
-              "contact_no1": MyData.phoneNumber.substring(0,3),
-              "contact_no2": MyData.phoneNumber.substring(3,7),
-              "contact_no3": MyData.phoneNumber.substring(7),
-              "jumin_no1": MyData.idNumber.split("-")[0],
-              "jumin_no2": MyData.idNumber.split("-")[1],
-              "memo": '모바일 신청(오토론) ${Config.isAndroid ? "android" : "ios"}',
-              "documents": docResultList
-            };
-          }
+            String address = _getResultFromListById(addressId)["resultValue"];
+            Map<String, dynamic>? applyInputMap;
+            if(MyData.selectedPrInfoData!.uidType == "1"){
+              applyInputMap = {
+                "offer_id": MyData.selectedPrInfoData!.productOfferId,
+                "offer_rid": MyData.selectedPrInfoData!.productOfferRid,
+                "lender_pr_id": MyData.selectedPrInfoData!.productOfferLenderPrId,
+                "address": address,
+                "contact_no1": MyData.phoneNumber.substring(0,3),
+                "contact_no2": MyData.phoneNumber.substring(3,7),
+                "contact_no3": MyData.phoneNumber.substring(7),
+                "jumin_no1": MyData.idNumber.split("-")[0],
+                "jumin_no2": MyData.idNumber.split("-")[1],
+                "memo": '모바일 신청(개인회생) ${Config.isAndroid ? "android" : "ios"}',
+                "documents": docResultList
+              };
+            }else{
+              applyInputMap = {
+                "offer_id": MyData.selectedPrInfoData!.productOfferId,
+                "offer_rid": MyData.selectedPrInfoData!.productOfferRid,
+                "lender_car_id": MyData.selectedPrInfoData!.productOfferLenderPrId,
+                "address": address,
+                "contact_no1": MyData.phoneNumber.substring(0,3),
+                "contact_no2": MyData.phoneNumber.substring(3,7),
+                "contact_no3": MyData.phoneNumber.substring(7),
+                "jumin_no1": MyData.idNumber.split("-")[0],
+                "jumin_no2": MyData.idNumber.split("-")[1],
+                "memo": '모바일 신청(오토론) ${Config.isAndroid ? "android" : "ios"}',
+                "documents": docResultList
+              };
+            }
 
-          LogfinController.callLogfinApi(MyData.selectedPrInfoData!.uidType == "1" ? LogfinApis.applyProduct : LogfinApis.applyCarProduct, applyInputMap, (isSuccess, outputJson){
-            if(isSuccess){
-              LogfinController.getLoanInfo((isSuccessToGetLoanInfo, isNotEmpty){
-                if(isSuccessToGetLoanInfo){
-                  if(isNotEmpty){
-                    List<Map<String, dynamic>> addedDocsListForSave = [];
-                    List<Map<String, dynamic>> addedDupleDocsListForSave = [];
-                    for(var eachAdded in addedDocsList){
-                      if(eachAdded["is_confirmed"] && eachAdded["id"] != 1000 && eachAdded["id"] != 999){
+            LogfinController.callLogfinApi(MyData.selectedPrInfoData!.uidType == "1" ? LogfinApis.applyProduct : LogfinApis.applyCarProduct, applyInputMap, (isSuccess, outputJson){
+              if(isSuccess){
+                LogfinController.getLoanInfo((isSuccessToGetLoanInfo, isNotEmpty){
+                  if(isSuccessToGetLoanInfo){
+                    if(isNotEmpty){
+                      List<Map<String, dynamic>> addedDocsListForSave = [];
+                      List<Map<String, dynamic>> addedDupleDocsListForSave = [];
+                      for(var eachAdded in addedDocsList){
+                        if(eachAdded["is_confirmed"] && eachAdded["id"] != 1000 && eachAdded["id"] != 999){
+                          for(var each in savedDocsList){
+                            if(each["id"] == eachAdded["id"]){
+                              // car_no 중복 확인
+                              if(eachAdded["id"] == 16 || eachAdded["id"] == 17){
+                                if(each.containsKey("car_no'") && eachAdded.containsKey("'car_no")){
+                                  if(each['car_no'] == eachAdded['car_no']){
+                                    addedDupleDocsListForSave.add(eachAdded);
+                                  }
+                                }
+                              }else{
+                                addedDupleDocsListForSave.add(eachAdded);
+                              }
+                            }
+                          }
+                        }
+                      }
+                      for(var eachAdded in addedDocsList){
+                        if(eachAdded["is_confirmed"] && eachAdded["id"] != 1000 && eachAdded["id"] != 999){
+                          eachAdded["doc_date"] = CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime());
+                          addedDocsListForSave.add(eachAdded);
+                        }
+                      }
+                      if(addedDupleDocsListForSave.isNotEmpty){
                         for(var each in savedDocsList){
-                          if(each["id"] == eachAdded["id"]){
-                            // car_no 중복 확인
-                            if(eachAdded["id"] == 16 || eachAdded["id"] == 17){
-                              if(each.containsKey("car_no'") && eachAdded.containsKey("'car_no")){
-                                if(each['car_no'] == eachAdded['car_no']){
-                                  addedDupleDocsListForSave.add(eachAdded);
+                          bool isDuple = false;
+                          for(var eachDuple in addedDupleDocsListForSave){
+                            if(each["id"] == eachDuple["id"]){
+                              // car_no 중복 확인
+                              if(each["id"] == 16 || each["id"] == 17){
+                                if(each.containsKey("car_no") && eachDuple.containsKey("car_no")){
+                                  if(each['car_no'] == eachDuple['car_no']){
+                                    isDuple = true;
+                                  }
                                 }
+                              }else{
+                                isDuple = true;
                               }
-                            }else{
-                              addedDupleDocsListForSave.add(eachAdded);
                             }
                           }
-                        }
-                      }
-                    }
-                    for(var eachAdded in addedDocsList){
-                      if(eachAdded["is_confirmed"] && eachAdded["id"] != 1000 && eachAdded["id"] != 999){
-                        addedDocsListForSave.add(eachAdded);
-                      }
-                    }
-                    if(addedDupleDocsListForSave.isNotEmpty){
-                      for(var each in savedDocsList){
-                        bool isDuple = false;
-                        for(var eachDuple in addedDupleDocsListForSave){
-                          if(each["id"] == eachDuple["id"]){
-                            // car_no 중복 확인
-                            if(each["id"] == 16 || each["id"] == 17){
-                              if(each.containsKey("car_no") && eachDuple.containsKey("car_no")){
-                                if(each['car_no'] == eachDuple['car_no']){
-                                  isDuple = true;
-                                }
-                              }
-                            }else{
-                              isDuple = true;
-                            }
+                          if(!isDuple){
+                            each["doc_date"] = CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime());
+                            addedDocsListForSave.add(each);
                           }
                         }
-                        if(!isDuple){
-                          addedDocsListForSave.add(each);
-                        }
+                      }else{
+                        addedDocsListForSave.addAll(savedDocsList);
                       }
+
+                      for(var each in addedDocsListForSave){
+                        Map<String, dynamic> resultMap = each["result"];
+                        CommonUtils.log("", "apply cache save!!! ===============================>\n"
+                            "view_id:${each["view_id"]}\n"
+                            "id:${each["id"]}\n"
+                            "name:${each["name"]}\n"
+                            "is_confirmed:${each["is_confirmed"]}\n"
+                            "is_docs:${each["is_docs"]}\n"
+                            "docs_type:${each["docs_type"]}\n"
+                            "result:${resultMap.isEmpty? "" : each["result"]["resultValue"]}\n"
+                        );
+                      }
+
+                      SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceApplyPrKey, jsonEncode(addedDocsListForSave));
+                      UiUtils.closeLoadingPop(context);
+                      setState(() {
+                        currentViewId = _getViewIdFromListById(confirmedId);
+                      });
                     }else{
-                      addedDocsListForSave.addAll(savedDocsList);
+                      UiUtils.closeLoadingPop(context);
+                      CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
                     }
-
-                    for(var each in addedDocsListForSave){
-                      Map<String, dynamic> resultMap = each["result"];
-                      CommonUtils.log("", "apply cache save!!! ===============================>\n"
-                          "view_id:${each["view_id"]}\n"
-                          "id:${each["id"]}\n"
-                          "name:${each["name"]}\n"
-                          "is_confirmed:${each["is_confirmed"]}\n"
-                          "is_docs:${each["is_docs"]}\n"
-                          "docs_type:${each["docs_type"]}\n"
-                          "result:${resultMap.isEmpty? "" : each["result"]["resultValue"]}\n"
-                      );
-                    }
-
-                    SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceApplyPrKey, jsonEncode(addedDocsListForSave));
-                    UiUtils.closeLoadingPop(context);
-                    setState(() {
-                      currentViewId = _getViewIdFromListById(confirmedId);
-                    });
                   }else{
                     UiUtils.closeLoadingPop(context);
                     CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
                   }
+                });
+              }else{
+                UiUtils.closeLoadingPop(context);
+                CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
+              }
+            });
+          }else{
+            UiUtils.closeLoadingPop(context);
+            CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
+          }
+        });
+      }else{
+        List<dynamic> docResultList = [];
+        for(var each in addedDocsList){
+          if(each["is_docs"] && each["is_confirmed"]){
+            var resultMap  =  each["result"]["resultValue"]["data"];
+            //gov24 : 1:주민등록등본           2:주민등록초본        15:지방세납세증명서      16:자동차등록원부(갑)     17:자동차등록원부(을)
+            //nhis  : 3:건강보험자격득실확인서    4:건강보험납부확인서
+            //nts   : 6:사업자등록증(*테스트불가) 10:소득금액증명       11:부가세과세표준증명원(*테스트불가)      14:국세납세증명서
+            if(each["id"] == 3 || each["id"] == 4){
+              if(resultMap is List<dynamic>){
+                Map<String, dynamic> eachMap = {
+                  "pr_document_id" : each["id"],
+                  "response_data" : json.encode(resultMap)
+                };
+                docResultList.add(eachMap);
+              }else{
+                List<dynamic> wrapListMap = [];
+                wrapListMap.add(resultMap);
+                Map<String, dynamic> eachMap = {
+                  "pr_document_id" : each["id"],
+                  "response_data" : json.encode(wrapListMap)
+                };
+                docResultList.add(eachMap);
+              }
+            }else{
+              if(resultMap is List<dynamic>){
+                Map<String, dynamic> eachMap = {
+                  "pr_document_id" : each["id"],
+                  "response_data" : json.encode(resultMap)
+                };
+                docResultList.add(eachMap);
+              }else{
+                Map<String, dynamic> eachMap = {
+                  "pr_document_id" : each["id"],
+                  "response_data" : resultMap
+                };
+                docResultList.add(eachMap);
+              }
+            }
+          }
+        }
+        String address = _getResultFromListById(addressId)["resultValue"];
+        Map<String, dynamic>? applyInputMap;
+        if(MyData.selectedPrInfoData!.uidType == "1"){
+          applyInputMap = {
+            "offer_id": MyData.selectedPrInfoData!.productOfferId,
+            "offer_rid": MyData.selectedPrInfoData!.productOfferRid,
+            "lender_pr_id": MyData.selectedPrInfoData!.productOfferLenderPrId,
+            "address": address,
+            "contact_no1": MyData.phoneNumber.substring(0,3),
+            "contact_no2": MyData.phoneNumber.substring(3,7),
+            "contact_no3": MyData.phoneNumber.substring(7),
+            "jumin_no1": MyData.idNumber.split("-")[0],
+            "jumin_no2": MyData.idNumber.split("-")[1],
+            "memo": '모바일 신청(개인회생) ${Config.isAndroid ? "android" : "ios"}',
+            "documents": docResultList
+          };
+        }else{
+          applyInputMap = {
+            "offer_id": MyData.selectedPrInfoData!.productOfferId,
+            "offer_rid": MyData.selectedPrInfoData!.productOfferRid,
+            "lender_car_id": MyData.selectedPrInfoData!.productOfferLenderPrId,
+            "address": address,
+            "contact_no1": MyData.phoneNumber.substring(0,3),
+            "contact_no2": MyData.phoneNumber.substring(3,7),
+            "contact_no3": MyData.phoneNumber.substring(7),
+            "jumin_no1": MyData.idNumber.split("-")[0],
+            "jumin_no2": MyData.idNumber.split("-")[1],
+            "memo": '모바일 신청(오토론) ${Config.isAndroid ? "android" : "ios"}',
+            "documents": docResultList
+          };
+        }
+
+        LogfinController.callLogfinApi(MyData.selectedPrInfoData!.uidType == "1" ? LogfinApis.applyProduct : LogfinApis.applyCarProduct, applyInputMap, (isSuccess, outputJson){
+          if(isSuccess){
+            LogfinController.getLoanInfo((isSuccessToGetLoanInfo, isNotEmpty){
+              if(isSuccessToGetLoanInfo){
+                if(isNotEmpty){
+                  List<Map<String, dynamic>> addedDocsListForSave = [];
+                  List<Map<String, dynamic>> addedDupleDocsListForSave = [];
+                  for(var eachAdded in addedDocsList){
+                    if(eachAdded["is_confirmed"] && eachAdded["id"] != 1000 && eachAdded["id"] != 999){
+                      for(var each in savedDocsList){
+                        if(each["id"] == eachAdded["id"]){
+                          // car_no 중복 확인
+                          if(eachAdded["id"] == 16 || eachAdded["id"] == 17){
+                            if(each.containsKey("car_no'") && eachAdded.containsKey("'car_no")){
+                              if(each['car_no'] == eachAdded['car_no']){
+                                addedDupleDocsListForSave.add(eachAdded);
+                              }
+                            }
+                          }else{
+                            addedDupleDocsListForSave.add(eachAdded);
+                          }
+                        }
+                      }
+                    }
+                  }
+                  for(var eachAdded in addedDocsList){
+                    if(eachAdded["is_confirmed"] && eachAdded["id"] != 1000 && eachAdded["id"] != 999){
+                      eachAdded["doc_date"] = CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime());
+                      addedDocsListForSave.add(eachAdded);
+                    }
+                  }
+                  if(addedDupleDocsListForSave.isNotEmpty){
+                    for(var each in savedDocsList){
+                      bool isDuple = false;
+                      for(var eachDuple in addedDupleDocsListForSave){
+                        if(each["id"] == eachDuple["id"]){
+                          // car_no 중복 확인
+                          if(each["id"] == 16 || each["id"] == 17){
+                            if(each.containsKey("car_no") && eachDuple.containsKey("car_no")){
+                              if(each['car_no'] == eachDuple['car_no']){
+                                isDuple = true;
+                              }
+                            }
+                          }else{
+                            isDuple = true;
+                          }
+                        }
+                      }
+                      if(!isDuple){
+                        each["doc_date"] = CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime());
+                        addedDocsListForSave.add(each);
+                      }
+                    }
+                  }else{
+                    addedDocsListForSave.addAll(savedDocsList);
+                  }
+
+                  for(var each in addedDocsListForSave){
+                    Map<String, dynamic> resultMap = each["result"];
+                    CommonUtils.log("", "apply cache save!!! ===============================>\n"
+                        "view_id:${each["view_id"]}\n"
+                        "id:${each["id"]}\n"
+                        "name:${each["name"]}\n"
+                        "is_confirmed:${each["is_confirmed"]}\n"
+                        "is_docs:${each["is_docs"]}\n"
+                        "docs_type:${each["docs_type"]}\n"
+                        "result:${resultMap.isEmpty? "" : each["result"]["resultValue"]}\n"
+                    );
+                  }
+
+                  SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceApplyPrKey, jsonEncode(addedDocsListForSave));
+                  UiUtils.closeLoadingPop(context);
+                  setState(() {
+                    currentViewId = _getViewIdFromListById(confirmedId);
+                  });
                 }else{
                   UiUtils.closeLoadingPop(context);
                   CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
                 }
-              });
-            }else{
-              UiUtils.closeLoadingPop(context);
-              CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
-            }
-          });
-        }else{
-          UiUtils.closeLoadingPop(context);
-          CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
-        }
-      });
+              }else{
+                UiUtils.closeLoadingPop(context);
+                CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
+              }
+            });
+          }else{
+            UiUtils.closeLoadingPop(context);
+            CommonUtils.flutterToast("접수에 실패했습니다.\n다시 시도해주세요.");
+          }
+        });
+      }
     }
   }
   /// finish view end
@@ -4002,6 +4398,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getBankAccountView());
       }else if(_getIdFromListByViewId(currentViewId) == businessNumberId){
         view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getBusinessNumberView());
+      }else if(currentViewId == indivNoViewId){
+        view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, child: _getIndivNumberView());
       }else if(_getIdFromListByViewId(currentViewId) == addressId){
         view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getAddressView());
       }else if(_getIdFromListByViewId(currentViewId) == cameraId){

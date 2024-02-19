@@ -590,6 +590,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.0.17"
+  flutter_secure_keyboard:
+    dependency: "direct main"
+    description:
+      name: flutter_secure_keyboard
+      sha256: "241dd6454e684557a72f9b7365abc951b66fa80a3b8e1dee0e649d66042b371c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "3.0.0"
   flutter_spinkit:
     dependency: "direct main"
     description:

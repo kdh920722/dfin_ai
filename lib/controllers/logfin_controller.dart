@@ -521,6 +521,12 @@ class LogfinController {
               }
             }
 
+            if(userInfoOutputJson.containsKey("pr_room")){
+              MyData.userChatRoomInfo.clear();
+              MyData.userChatRoomInfo = {};
+              MyData.userChatRoomInfo = userInfoOutputJson["pr_room"];
+            }
+
             MyData.printData();
             callback(true);
           }else{
@@ -883,6 +889,8 @@ class LogfinController {
               callback(true, false);
             }else{
               MyData.clearLoanInfoList();
+              MyData.userChatRoomInfo["user_chat_room"] = "user";
+              loansList.add(MyData.userChatRoomInfo);
               for(Map eachLoans in loansList){
                 CommonUtils.log("i", "each loans : $eachLoans");
 
@@ -892,80 +900,111 @@ class LogfinController {
                 String companyName = "";
                 String productName = "";
                 String contactNo = "";
+                String loanUid = "";
 
-                if(eachLoans.containsKey("lender_pr")){
-                  CommonUtils.log("i", "accident loan ==>");
-                  uidType = "1";
-                  uid = eachLoans["accident_uid"].toString();
-                  lenderId = eachLoans["lender_pr_id"].toString();
-                  companyName = eachLoans["lender_pr"]["lender"]["name"].toString();
-                  productName = eachLoans["lender_pr"]["lender"]["product_name"].toString();
-                  contactNo = eachLoans["lender_pr"]["lender"]["contact_no"].toString();
+                if(eachLoans.containsKey("user_chat_room")){
+                  CommonUtils.log("i", "user room ==>");
+                  uidType = "0";
+                  uid = "user";
+                  lenderId = "user";
+                  companyName = "업핀 서포터";
+                  productName = "user";
+                  contactNo = "user";
+                  loanUid = "0";
 
-                  CommonUtils.log("w", "loan data ====>\n"
-                      "uidType: $uidType\n"
-                      "uid: $uid\n"
-                      "loanUid: ${eachLoans["uid"]}\n"
-                      "lenderPrId: ${eachLoans["lender_pr_id"]}\n"
-                      "submitAmount: ${eachLoans["submit_offer"]["amount"]}\n"
-                      "submitRate: ${eachLoans["submit_offer"]["interest_rate"]}\n"
-                      "companyName: ${eachLoans["lender_pr"]["lender"]["name"]}\n"
-                      "productName: ${eachLoans["lender_pr"]["lender"]["product_name"]}\n"
-                      "contactNo: ${eachLoans["lender_pr"]["lender"]["contact_no"]}\n"
-                      "createdDate: ${eachLoans["submit_offer"]["created_at"]}\n"
-                      "updatedDate: ${eachLoans["submit_offer"]["updated_at"]}\n"
-                      "statueId: ${eachLoans["status_info"]["id"]}\n"
-                      "roomId: ${eachLoans["pr_room"]["id"]}\n");
-                }else if(eachLoans.containsKey("lender_car")){
-                  CommonUtils.log("i", "car loan ==>");
-                  uidType = "3";
-                  uid = eachLoans["search_car_result_uid"].toString();
-                  lenderId = eachLoans["lender_car_id"].toString();
-                  companyName = eachLoans["lender_car"]["lender"]["name"].toString();
-                  productName = eachLoans["lender_car"]["lender"]["product_name"].toString();
-                  contactNo = eachLoans["lender_car"]["lender"]["contact_no"].toString();
-
-                  CommonUtils.log("w", "car loan data ====>\n"
-                      "uidType: $uidType\n"
-                      "uid: $uid\n"
-                      "loanUid: ${eachLoans["uid"]}\n"
-                      "lenderPrId: ${eachLoans["lender_car_id"]}\n"
-                      "submitAmount: ${eachLoans["submit_offer"]["amount"]}\n"
-                      "submitRate: ${eachLoans["submit_offer"]["interest_rate"]}\n"
-                      "companyName: ${eachLoans["lender_car"]["lender"]["name"]}\n"
-                      "productName: ${eachLoans["lender_car"]["lender"]["product_name"]}\n"
-                      "contactNo: ${eachLoans["lender_car"]["lender"]["contact_no"]}\n"
-                      "createdDate: ${eachLoans["submit_offer"]["created_at"]}\n"
-                      "updatedDate: ${eachLoans["submit_offer"]["updated_at"]}\n"
-                      "statueId: ${eachLoans["status_info"]["id"]}\n"
-                      "roomId: ${eachLoans["pr_room"]["id"]}\n");
-                }
-
-                var inputJson = {
-                  "loan_uid" : eachLoans["uid"],
-                  "last_message_id" : 0,
-                  "length" : 100
-                };
-                await callLogfinApi(LogfinApis.getMessage, inputJson, (isSuccessToGetLoanMessageInfo, loanMessageInfoOutputJson){
-                  if(isSuccessToGetLoanMessageInfo){
-                    String tempAmount = eachLoans["submit_offer"]["amount"].toString();
-                    String submitAmount = "0";
-                    if(tempAmount.length < 5){
-                      CommonUtils.log("e", "submitAmount error $tempAmount");
-                    }else{
-                      submitAmount = eachLoans["submit_offer"]["amount"].toString().substring(0, eachLoans["submit_offer"]["amount"].toString().length-4);
+                  var inputJson = {
+                    "loan_uid" : loanUid,
+                    "last_message_id" : 0,
+                    "length" : 100
+                  };
+                  await callLogfinApi(LogfinApis.getMessage, inputJson, (isSuccessToGetLoanMessageInfo, loanMessageInfoOutputJson){
+                    if(isSuccessToGetLoanMessageInfo){
+                      String submitAmount = "0";
+                      loanMessageInfoOutputJson!["last_read_message_id"] = eachLoans["last_read_message_id"].toString();
+                      MyData.addToLoanInfoList(
+                          LoanInfoData(uid, uidType, "user", lenderId, submitAmount, "0",
+                              companyName, "assets/images/upfin_icon.png",
+                              productName, contactNo, eachLoans["created_at"].toString(), eachLoans["updated_at"].toString(),
+                              "0", eachLoans["id"].toString(), jsonEncode(loanMessageInfoOutputJson)));
                     }
+                  });
+                }else{
+                  if(eachLoans.containsKey("lender_pr")){
+                    CommonUtils.log("i", "accident loan ==>");
+                    uidType = "1";
+                    uid = eachLoans["accident_uid"].toString();
+                    lenderId = eachLoans["lender_pr_id"].toString();
+                    companyName = eachLoans["lender_pr"]["lender"]["name"].toString();
+                    productName = eachLoans["lender_pr"]["lender"]["product_name"].toString();
+                    contactNo = eachLoans["lender_pr"]["lender"]["contact_no"].toString();
+                    loanUid = eachLoans["uid"].toString();
 
-                    loanMessageInfoOutputJson!["last_read_message_id"] = eachLoans["pr_room"]["last_read_message_id"].toString();
-                    MyData.addToLoanInfoList(
-                        LoanInfoData(uid, uidType, eachLoans["uid"].toString(), lenderId,
-                            submitAmount, eachLoans["submit_offer"]["interest_rate"].toString(),
-                            companyName, companyName == "(주)안전대부"? "assets/images/bank_logo_safe.png" : "assets/images/bank_logo_default.png",
-                            productName, contactNo,
-                            eachLoans["submit_offer"]["created_at"].toString(), eachLoans["submit_offer"]["updated_at"].toString(),
-                            eachLoans["status_info"]["id"].toString(), eachLoans["pr_room"]["id"].toString(), jsonEncode(loanMessageInfoOutputJson)));
+                    CommonUtils.log("w", "loan data ====>\n"
+                        "uidType: $uidType\n"
+                        "uid: $uid\n"
+                        "loanUid: ${eachLoans["uid"]}\n"
+                        "lenderPrId: ${eachLoans["lender_pr_id"]}\n"
+                        "submitAmount: ${eachLoans["submit_offer"]["amount"]}\n"
+                        "submitRate: ${eachLoans["submit_offer"]["interest_rate"]}\n"
+                        "companyName: ${eachLoans["lender_pr"]["lender"]["name"]}\n"
+                        "productName: ${eachLoans["lender_pr"]["lender"]["product_name"]}\n"
+                        "contactNo: ${eachLoans["lender_pr"]["lender"]["contact_no"]}\n"
+                        "createdDate: ${eachLoans["submit_offer"]["created_at"]}\n"
+                        "updatedDate: ${eachLoans["submit_offer"]["updated_at"]}\n"
+                        "statueId: ${eachLoans["status_info"]["id"]}\n"
+                        "roomId: ${eachLoans["pr_room"]["id"]}\n");
+                  }else if(eachLoans.containsKey("lender_car")){
+                    CommonUtils.log("i", "car loan ==>");
+                    uidType = "3";
+                    uid = eachLoans["search_car_result_uid"].toString();
+                    lenderId = eachLoans["lender_car_id"].toString();
+                    companyName = eachLoans["lender_car"]["lender"]["name"].toString();
+                    productName = eachLoans["lender_car"]["lender"]["product_name"].toString();
+                    contactNo = eachLoans["lender_car"]["lender"]["contact_no"].toString();
+                    loanUid = eachLoans["uid"].toString();
+
+                    CommonUtils.log("w", "car loan data ====>\n"
+                        "uidType: $uidType\n"
+                        "uid: $uid\n"
+                        "loanUid: ${eachLoans["uid"]}\n"
+                        "lenderPrId: ${eachLoans["lender_car_id"]}\n"
+                        "submitAmount: ${eachLoans["submit_offer"]["amount"]}\n"
+                        "submitRate: ${eachLoans["submit_offer"]["interest_rate"]}\n"
+                        "companyName: ${eachLoans["lender_car"]["lender"]["name"]}\n"
+                        "productName: ${eachLoans["lender_car"]["lender"]["product_name"]}\n"
+                        "contactNo: ${eachLoans["lender_car"]["lender"]["contact_no"]}\n"
+                        "createdDate: ${eachLoans["submit_offer"]["created_at"]}\n"
+                        "updatedDate: ${eachLoans["submit_offer"]["updated_at"]}\n"
+                        "statueId: ${eachLoans["status_info"]["id"]}\n"
+                        "roomId: ${eachLoans["pr_room"]["id"]}\n");
                   }
-                });
+
+                  var inputJson = {
+                    "loan_uid" : loanUid,
+                    "last_message_id" : 0,
+                    "length" : 100
+                  };
+                  await callLogfinApi(LogfinApis.getMessage, inputJson, (isSuccessToGetLoanMessageInfo, loanMessageInfoOutputJson){
+                    if(isSuccessToGetLoanMessageInfo){
+                      String tempAmount = eachLoans["submit_offer"]["amount"].toString();
+                      String submitAmount = "0";
+                      if(tempAmount.length < 5){
+                        CommonUtils.log("e", "submitAmount error $tempAmount");
+                      }else{
+                        submitAmount = eachLoans["submit_offer"]["amount"].toString().substring(0, eachLoans["submit_offer"]["amount"].toString().length-4);
+                      }
+
+                      loanMessageInfoOutputJson!["last_read_message_id"] = eachLoans["pr_room"]["last_read_message_id"].toString();
+                      MyData.addToLoanInfoList(
+                          LoanInfoData(uid, uidType, eachLoans["uid"].toString(), lenderId,
+                              submitAmount, eachLoans["submit_offer"]["interest_rate"].toString(),
+                              companyName, companyName == "(주)안전대부"? "assets/images/bank_logo_safe.png" : "assets/images/bank_logo_default.png",
+                              productName, contactNo,
+                              eachLoans["submit_offer"]["created_at"].toString(), eachLoans["submit_offer"]["updated_at"].toString(),
+                              eachLoans["status_info"]["id"].toString(), eachLoans["pr_room"]["id"].toString(), jsonEncode(loanMessageInfoOutputJson)));
+                    }
+                  });
+                }
               }
 
               MyData.sortLoanInfoList();
@@ -1189,7 +1228,7 @@ extension LogfinApisExtension on LogfinApis {
       case LogfinApis.getOffersInfo:
         return '/get_offers.json';
       case LogfinApis.getLoansInfo:
-          return '/get_loans.json';
+        return '/get_loans.json';
       case LogfinApis.getLoansDetailInfo:
         return '/get_loan.json';
       case LogfinApis.getOffers:
@@ -1225,7 +1264,7 @@ extension LogfinApisExtension on LogfinApis {
       case LogfinApis.updatePassword:
         return '/users/update_password.json';
 
-        /// auto loan
+    /// auto loan
       case LogfinApis.getMyCarInfo:
         return '/get_cars.json';
       case LogfinApis.addCar:

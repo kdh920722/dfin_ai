@@ -26,6 +26,7 @@ class MyData {
   static String phoneNumberFromSns = "";
   static bool isTestUser = false;
   static bool isLogout = true;
+  static Map<String, dynamic> userChatRoomInfo = {};
 
   // accident data
   static final List<AccidentInfoData> _accidentInfoList = [];
@@ -265,6 +266,8 @@ class MyData {
     telecomTypeFromPhoneCert = "";
     isMaleFromPhoneCert = false;
     isTestUser = false;
+    userChatRoomInfo.clear();
+    userChatRoomInfo = {};
     clearAccidentInfoList();
     clearCarInfoList();
     clearLoanInfoList();

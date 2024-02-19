@@ -91,7 +91,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   Future<void> didChangeAppLifecycleState(AppLifecycleState state) async {
     switch (state) {
       case AppLifecycleState.resumed:
-        CommonUtils.log('d','AppMainView resumed');
         await CommonUtils.checkUpdate(context);
         if(!CommonUtils.isOutPopOn) {
           CommonUtils.log("i","push check start 0!!!");
@@ -573,7 +572,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                       ):Container(),
                       UiUtils.getMarginBox(0, 1.h),
                     ],
-                  ) : GetController.to.chatLoanInfoDataList.isEmpty? Container(color: ColorStyles.upFinWhiteGray, padding: EdgeInsets.only(left: 5.w, right: 5.w, top:5.w, bottom: 5.w),
+                  ) : GetController.to.chatLoanInfoDataList.length == 1? Container(color: ColorStyles.upFinWhiteGray, padding: EdgeInsets.only(left: 5.w, right: 5.w, top:5.w, bottom: 5.w),
                       child: UiUtils.getBorderButtonBoxWithZeroPadding(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
                           Column(children: [
                             UiUtils.getMarginBox(0, 2.h),
@@ -599,14 +598,18 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               );
             }),
             Obx((){
+              List<Widget> chatWidgetList = [];
+              List<Widget> userChatWidgetList = _getUserChatWidgetList();
               List<Widget> loanWidgetList = _getLoanChatWidgetList();
-              return loanWidgetList.isNotEmpty ? Column(children: [
+              chatWidgetList.addAll(userChatWidgetList);
+              chatWidgetList.addAll(loanWidgetList);
+              return chatWidgetList.isNotEmpty ? Column(children: [
                 UiUtils.getMarginBox(0, 1.h),
                 Container(padding: EdgeInsets.only(left: 5.w, right: 5.w, top: 2.h, bottom: 1.h), child: Row(mainAxisSize: MainAxisSize.max, children: [
                   UiUtils.getTextWithFixedScale("채팅", 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1),
                   const Spacer(flex: 2)
                 ])),
-                Column(children: loanWidgetList)
+                Column(children: chatWidgetList)
               ]) : Container();
             }),
             UiUtils.getMarginBox(100.w, 2.h),
@@ -623,13 +626,13 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                         SizedBox(width: 85.w, child: Row(children: [
                           UiUtils.getMarginBox(1.w, 0),
                           GestureDetector(child: UiUtils.getRoundBoxTextWithFixedScale4("상담원 연결", 14.sp, FontWeight.w600, TextAlign.center, ColorStyles.upFinBannerSky2textGreen, ColorStyles.upFinBannerSky2),
-                          onTap: () async {
-                            if(await canLaunchUrl(Uri.parse(Config.appCallInfo))){
-                              await launchUrl(Uri.parse(Config.appCallInfo));
-                            }else{
-                              CommonUtils.flutterToast("연결할 수 없어요.");
-                            }
-                          }),
+                              onTap: () async {
+                                if(await canLaunchUrl(Uri.parse(Config.appCallInfo))){
+                                  await launchUrl(Uri.parse(Config.appCallInfo));
+                                }else{
+                                  CommonUtils.flutterToast("연결할 수 없어요.");
+                                }
+                              }),
                         ],)
                         ),
                       ]), () {})),
@@ -657,12 +660,12 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                 UiUtils.getTextWithFixedScale("개인정보처리방침 바로가기:", 10.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null),
                 UiUtils.getTextWithUnderline(Config.privacyUrl, 10.sp, FontWeight.w400, ColorStyles.upFinRealGray, TextAlign.start, null, ColorStyles.upFinRealGray)
               ]),
-              onTap: () async {
-                Uri privacyLink = Uri.parse(Config.privacyUrl);
-                if(await canLaunchUrl(privacyLink)){
-                launchUrl(privacyLink);
-                }
-              }),
+                  onTap: () async {
+                    Uri privacyLink = Uri.parse(Config.privacyUrl);
+                    if(await canLaunchUrl(privacyLink)){
+                      launchUrl(privacyLink);
+                    }
+                  }),
               UiUtils.getMarginBox(0, 4.h),
               UiUtils.getTextWithFixedScale("Copyright Upfin . All Rights Reserved", 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null),
               UiUtils.getMarginBox(0, 0.5.h),
@@ -726,7 +729,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                       UiUtils.getBoxTextWithFixedScale("사건정보", 8.sp, FontWeight.w600, TextAlign.center, ColorStyles.upFinPrTitleBackColor, ColorStyles.upFinPrTitleColor),
                       UiUtils.getMarginBox(2.w, 0),
                       each.accidentAccountValidType == AccidentInfoData.needToCheckAccount1 || each.accidentAccountValidType == AccidentInfoData.needToCheckAccount2 ?
-                        UiUtils.getBoxTextWithFixedScale("환급계좌 오류", 8.sp, FontWeight.w600, TextAlign.start, ColorStyles.upFinWhiteRed, ColorStyles.upFinRed) : Container()
+                      UiUtils.getBoxTextWithFixedScale("환급계좌 오류", 8.sp, FontWeight.w600, TextAlign.start, ColorStyles.upFinWhiteRed, ColorStyles.upFinRed) : Container()
                     ]),
                     UiUtils.getMarginBox(0, 0.5.h),
                     Row(mainAxisAlignment: MainAxisAlignment.start, children: [
@@ -881,86 +884,171 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     return myInfoWidgetList;
   }
 
+  List<Widget> _getUserChatWidgetList(){
+    List<Widget> userChatRoomWidgetList = [];
+    for(var each in GetController.to.chatLoanInfoDataList){
+      if(each.chatRoomType == "0"){
+        var jsonData = jsonDecode(each.chatRoomMsgInfo);
+        Map<String, dynamic> msg = jsonData;
+        List<dynamic> listMsg = msg["data"];
+        listMsg.sort((a,b) => a["id"].compareTo(b["id"]));
+        String lastMsg = listMsg[listMsg.length-1]["message"].toString();
+        if(lastMsg.contains(" / ")){
+          lastMsg = lastMsg.split(" / ")[1];
+        }
+        if(lastMsg.contains("<br")){
+          lastMsg = lastMsg.replaceAll("<br>", "").replaceAll("<b>", "").replaceAll("</b>", "");
+        }
+        if(lastMsg.contains("http")){
+          String ext = lastMsg.split(".").last;
+          if(LogfinController.validFileTypeList.contains(ext)){
+            if(LogfinController.validDocFileTypeList.contains(ext)){
+              lastMsg = "파일을 보냈습니다.";
+            }else{
+              lastMsg = "사진을 보냈습니다.";
+            }
+          }
+        }
+        String lastDateString = CommonUtils.convertTimeToString(CommonUtils.parseToLocalTime(listMsg[listMsg.length-1]["created_at"]));
+        int lastReadId = int.parse(msg["last_read_message_id"].toString());
+        int cnt = 0;
+        for(Map<String, dynamic> eachMsg in listMsg){
+          if(eachMsg["username"].toString() == "UPFIN"){
+            if(int.parse(eachMsg["id"].toString()) > lastReadId){
+              cnt++;
+            }
+          }
+        }
+
+        userChatRoomWidgetList.add(
+            Column(children: [
+              UiUtils.getMarginBox(0, 1.5.h),
+              UiUtils.getBorderButtonBoxWithZeroPadding(92.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
+                  Row(mainAxisSize: MainAxisSize.min, children: [
+                    Expanded(flex: 2, child:  UiUtils.getCircleImage(each.chatRoomIconPath, 11.w)),
+                    UiUtils.getMarginBox(1.w, 0),
+                    Expanded(flex: 10, child: Column(mainAxisSize: MainAxisSize.max, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Column(mainAxisSize: MainAxisSize.max, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        UiUtils.getMarginBox(0, 1.h),
+                        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Container(),
+                          Container(),
+                          UiUtils.getTextWithFixedScale(each.chatRoomTitle, 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null),
+                          UiUtils.getMarginBox(0, 1.h),
+                          Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                            Container(),
+                            Container(),
+                            Expanded(child: UiUtils.getTextWithFixedScaleAndOverFlow(lastMsg, 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, 1))
+                          ]),
+                          UiUtils.getMarginBox(0, 0.2.h),
+                        ])
+                      ])
+                    ])),
+                    Expanded(flex: 2, child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                      Row(mainAxisAlignment: MainAxisAlignment.end, children: [ UiUtils.getTextWithFixedScale(CommonUtils.getFormattedLastMsgTime(lastDateString), 8.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null), UiUtils.getMarginBox(0.5.w, 0) ],),
+                      UiUtils.getMarginBox(0,1.h),
+                      cnt > 0? Row(mainAxisSize: MainAxisSize.min, children: [
+                        UiUtils.getCountCircleBox(6.w, cnt, 7.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.center, 1), UiUtils.getMarginBox(0.8.w, 0)]) : Container()
+                    ]))
+                  ]), () async {
+                    if(WebSocketController.isSubscribe(each.chatRoomId)){
+                      _goToChatRoom(listMsg, each.chatRoomId);
+                    }else{
+                      _resetAndGoToChatRoom(context, each.chatRoomId);
+                    }
+                  }),
+              UiUtils.getMarginBox(0, 1.5.h),
+              GetController.to.chatLoanInfoDataList.length == 1 ?
+              Container() : UiUtils.getMarginColoredBox(90.w, 0.15.h, ColorStyles.upFinWhiteGray)
+            ])
+        );
+      }
+    }
+
+    return userChatRoomWidgetList;
+  }
+
   List<Widget> _getLoanChatWidgetList(){
     List<Widget> loanChatRoomWidgetList = [];
     int count = 0;
     for(var each in GetController.to.chatLoanInfoDataList){
-      var jsonData = jsonDecode(each.chatRoomMsgInfo);
-      Map<String, dynamic> msg = jsonData;
-      List<dynamic> listMsg = msg["data"];
-      listMsg.sort((a,b) => a["id"].compareTo(b["id"]));
-      String lastMsg = listMsg[listMsg.length-1]["message"].toString();
-      if(lastMsg.contains(" / ")){
-        lastMsg = lastMsg.split(" / ")[1];
-      }
-      if(lastMsg.contains("http")){
-        String ext = lastMsg.split(".").last;
-        if(LogfinController.validFileTypeList.contains(ext)){
-          if(LogfinController.validDocFileTypeList.contains(ext)){
-            lastMsg = "파일을 보냈습니다.";
-          }else{
-            lastMsg = "사진을 보냈습니다.";
+      if(each.chatRoomType != "0"){
+        var jsonData = jsonDecode(each.chatRoomMsgInfo);
+        Map<String, dynamic> msg = jsonData;
+        List<dynamic> listMsg = msg["data"];
+        listMsg.sort((a,b) => a["id"].compareTo(b["id"]));
+        String lastMsg = listMsg[listMsg.length-1]["message"].toString();
+        if(lastMsg.contains(" / ")){
+          lastMsg = lastMsg.split(" / ")[1];
+        }
+        if(lastMsg.contains("http")){
+          String ext = lastMsg.split(".").last;
+          if(LogfinController.validFileTypeList.contains(ext)){
+            if(LogfinController.validDocFileTypeList.contains(ext)){
+              lastMsg = "파일을 보냈습니다.";
+            }else{
+              lastMsg = "사진을 보냈습니다.";
+            }
           }
         }
-      }
-      String lastDateString = CommonUtils.convertTimeToString(CommonUtils.parseToLocalTime(listMsg[listMsg.length-1]["created_at"]));
-      int lastReadId = int.parse(msg["last_read_message_id"].toString());
-      int cnt = 0;
-      for(Map<String, dynamic> eachMsg in listMsg){
-        if(eachMsg["username"].toString() == "UPFIN"){
-          if(int.parse(eachMsg["id"].toString()) > lastReadId){
-            cnt++;
+        String lastDateString = CommonUtils.convertTimeToString(CommonUtils.parseToLocalTime(listMsg[listMsg.length-1]["created_at"]));
+        int lastReadId = int.parse(msg["last_read_message_id"].toString());
+        int cnt = 0;
+        for(Map<String, dynamic> eachMsg in listMsg){
+          if(eachMsg["username"].toString() == "UPFIN"){
+            if(int.parse(eachMsg["id"].toString()) > lastReadId){
+              cnt++;
+            }
           }
         }
-      }
 
-      String roomType = each.chatRoomType == "1" ? "#개인회생" : "#오토론";
-
-      loanChatRoomWidgetList.add(
-          Column(children: [
-            UiUtils.getMarginBox(0, 1.5.h),
-            UiUtils.getBorderButtonBoxWithZeroPadding(92.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
-                Row(mainAxisSize: MainAxisSize.min, children: [
-                  Expanded(flex: 2, child:  UiUtils.getImage(11.w, 11.w, Image.asset(each.chatRoomIconPath))),
-                  UiUtils.getMarginBox(1.w, 0),
-                  Expanded(flex: 10, child: Column(mainAxisSize: MainAxisSize.max, crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Column(mainAxisSize: MainAxisSize.max, crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      UiUtils.getMarginBox(0, 1.h),
-                      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        UiUtils.getTextWithFixedScale(roomType, 9.sp, FontWeight.w600, ColorStyles.upFinPrTitleColor, TextAlign.start, null),
-                        UiUtils.getMarginBox(0, 0.5.h),
-                        UiUtils.getTextWithFixedScale(each.chatRoomTitle, 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null),
+        String roomType = each.chatRoomType == "1" ? "#개인회생" : "#오토론";
+        count++;
+        loanChatRoomWidgetList.add(
+            Column(children: [
+              UiUtils.getMarginBox(0, 1.5.h),
+              UiUtils.getBorderButtonBoxWithZeroPadding(92.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
+                  Row(mainAxisSize: MainAxisSize.min, children: [
+                    Expanded(flex: 2, child:  UiUtils.getImage(11.w, 11.w, Image.asset(each.chatRoomIconPath))),
+                    UiUtils.getMarginBox(1.w, 0),
+                    Expanded(flex: 10, child: Column(mainAxisSize: MainAxisSize.max, crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Column(mainAxisSize: MainAxisSize.max, crossAxisAlignment: CrossAxisAlignment.start, children: [
                         UiUtils.getMarginBox(0, 1.h),
-                        Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-                          UiUtils.getRoundBoxTextWithFixedScale(LoanInfoData.getDetailStatusName(each.chatRoomLoanStatus), 7.sp,
-                              FontWeight.w600, TextAlign.center,  each.chatRoomLoanStatus == "6" || each.chatRoomLoanStatus == "7"? ColorStyles.upFinWhiteRed : ColorStyles.upFinWhiteSky,
-                              each.chatRoomLoanStatus == "6" || each.chatRoomLoanStatus == "7"? ColorStyles.upFinRed : ColorStyles.upFinButtonBlue),
-                          UiUtils.getMarginBox(2.w, 0),
-                          Expanded(child: UiUtils.getTextWithFixedScaleAndOverFlow(lastMsg, 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, 1))
-                        ]),
-                        UiUtils.getMarginBox(0, 0.2.h),
+                        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          UiUtils.getTextWithFixedScale(roomType, 9.sp, FontWeight.w600, ColorStyles.upFinPrTitleColor, TextAlign.start, null),
+                          UiUtils.getMarginBox(0, 0.5.h),
+                          UiUtils.getTextWithFixedScale(each.chatRoomTitle, 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null),
+                          UiUtils.getMarginBox(0, 1.h),
+                          Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+                            UiUtils.getRoundBoxTextWithFixedScale(LoanInfoData.getDetailStatusName(each.chatRoomLoanStatus), 7.sp,
+                                FontWeight.w600, TextAlign.center,  each.chatRoomLoanStatus == "6" || each.chatRoomLoanStatus == "7"? ColorStyles.upFinWhiteRed : ColorStyles.upFinWhiteSky,
+                                each.chatRoomLoanStatus == "6" || each.chatRoomLoanStatus == "7"? ColorStyles.upFinRed : ColorStyles.upFinButtonBlue),
+                            UiUtils.getMarginBox(2.w, 0),
+                            Expanded(child: UiUtils.getTextWithFixedScaleAndOverFlow(lastMsg, 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, 1))
+                          ]),
+                          UiUtils.getMarginBox(0, 0.2.h),
+                        ])
                       ])
-                    ])
-                  ])),
-                  Expanded(flex: 2, child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                   Row(mainAxisAlignment: MainAxisAlignment.end, children: [ UiUtils.getTextWithFixedScale(CommonUtils.getFormattedLastMsgTime(lastDateString), 8.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null), UiUtils.getMarginBox(0.5.w, 0) ],),
-                    UiUtils.getMarginBox(0,1.h),
-                    cnt > 0? Row(mainAxisSize: MainAxisSize.min, children: [
-                      UiUtils.getCountCircleBox(6.w, cnt, 7.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.center, 1), UiUtils.getMarginBox(0.8.w, 0)]) : Container()
-                  ]))
-                ]), () async {
-                  if(WebSocketController.isSubscribe(each.chatRoomId)){
-                    _goToChatRoom(listMsg, each.chatRoomId);
-                  }else{
-                    _resetAndGoToChatRoom(context, each.chatRoomId);
-                  }
-                }),
-            UiUtils.getMarginBox(0, 1.5.h),
-            GetController.to.chatLoanInfoDataList.length == 1 || (GetController.to.chatLoanInfoDataList.length != 1 && count == GetController.to.chatLoanInfoDataList.length-1) ?
-                Container() : UiUtils.getMarginColoredBox(90.w, 0.15.h, ColorStyles.upFinWhiteGray)
-          ])
-      );
-      count++;
+                    ])),
+                    Expanded(flex: 2, child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                      Row(mainAxisAlignment: MainAxisAlignment.end, children: [ UiUtils.getTextWithFixedScale(CommonUtils.getFormattedLastMsgTime(lastDateString), 8.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null), UiUtils.getMarginBox(0.5.w, 0) ],),
+                      UiUtils.getMarginBox(0,1.h),
+                      cnt > 0? Row(mainAxisSize: MainAxisSize.min, children: [
+                        UiUtils.getCountCircleBox(6.w, cnt, 7.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.center, 1), UiUtils.getMarginBox(0.8.w, 0)]) : Container()
+                    ]))
+                  ]), () async {
+                    if(WebSocketController.isSubscribe(each.chatRoomId)){
+                      _goToChatRoom(listMsg, each.chatRoomId);
+                    }else{
+                      _resetAndGoToChatRoom(context, each.chatRoomId);
+                    }
+                  }),
+              UiUtils.getMarginBox(0, 1.5.h),
+              GetController.to.chatLoanInfoDataList.length == 2 || (GetController.to.chatLoanInfoDataList.length != 2 && count == GetController.to.chatLoanInfoDataList.length-1) ?
+              Container() : UiUtils.getMarginColoredBox(90.w, 0.15.h, ColorStyles.upFinWhiteGray)
+            ])
+        );
+      }
     }
 
     return loanChatRoomWidgetList;
@@ -1000,7 +1088,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                 }
               }
             }
-          }else{
+          }else if(each.chatRoomType == "3"){
             LogfinController.autoAnswerMap = LogfinController.autoAnswerMapForCar;
             for(var eachLoan in MyData.getLoanInfoList()){
               if(each.chatLoanUid == eachLoan.loanUid){
@@ -1014,6 +1102,10 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                 }
               }
             }
+          }else{
+            LogfinController.autoAnswerMap = {};
+            MyData.selectedCarInfoData = null;
+            MyData.selectedAccidentInfoData = null;
           }
         }
       }
@@ -1105,24 +1197,24 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   Widget _getSettingView(){
     return Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: EdgeInsets.only(top:3.w),
         child: Column(children: [
-        Stack(children: [
-          Container(height: 7.2.h,),
-          Positioned(
-            top: 1.h,
-            left: 5.w,
-            child: UiUtils.getBackButtonForMainView(() {
-              _back();
-            }),
-          ),
-          Positioned(
-            child: Align(
-                alignment: Alignment.center,
-                child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-                  UiUtils.getMarginBox(0, 1.8.h),
-                  UiUtils.getTextWithFixedScale2("설정", 22.sp, FontWeight.w600, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1),
-                ])
+          Stack(children: [
+            Container(height: 7.2.h,),
+            Positioned(
+              top: 1.h,
+              left: 5.w,
+              child: UiUtils.getBackButtonForMainView(() {
+                _back();
+              }),
             ),
-          )]),
+            Positioned(
+              child: Align(
+                  alignment: Alignment.center,
+                  child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                    UiUtils.getMarginBox(0, 1.8.h),
+                    UiUtils.getTextWithFixedScale2("설정", 22.sp, FontWeight.w600, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1),
+                  ])
+              ),
+            )]),
           UiUtils.getMarginBox(0, 3.h),
           UiUtils.getBorderButtonBox(95.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
               Row(children: [
