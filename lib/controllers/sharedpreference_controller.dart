@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:shared_preferences/shared_preferences.dart';
+import '../datas/my_data.dart';
 import '../utils/common_utils.dart';
 
 class SharedPreferenceController {
@@ -72,6 +75,28 @@ class SharedPreferenceController {
       }
     }catch(error){
       CommonUtils.log('e', error.toString());
+    }
+  }
+
+  static void deleteApplyPrJsonData(){
+    if(sharedPreferences!.containsKey(sharedPreferenceApplyPrKey)){
+      String savedValue = getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceApplyPrKey);
+      List<Map<String, dynamic>> tempList = List<Map<String, dynamic>>.from(jsonDecode(savedValue));
+      DateTime currentTime = CommonUtils.getCurrentLocalTime();
+      DateTime minus3Days = currentTime.subtract(MyData.isTestUser? const Duration(hours: 1) : const Duration(days: 3));
+
+      bool isValid = false;
+      for(Map<String, dynamic> eachTemp in tempList){
+        if(eachTemp.containsKey("doc_date")){
+          DateTime savedTime = CommonUtils.convertStringToTime(eachTemp["doc_date"]);
+          if(minus3Days.isBefore(savedTime)){
+            isValid = true;
+          }
+        }
+      }
+      if(!isValid){
+        sharedPreferences!.remove(sharedPreferenceApplyPrKey);
+      }
     }
   }
 

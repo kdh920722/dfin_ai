@@ -922,7 +922,7 @@ class LogfinController {
                       String submitAmount = "0";
                       loanMessageInfoOutputJson!["last_read_message_id"] = eachLoans["last_read_message_id"].toString();
                       MyData.addToLoanInfoList(
-                          LoanInfoData(uid, uidType, "user", lenderId, submitAmount, "0",
+                          LoanInfoData(uid, uidType, loanUid, lenderId, submitAmount, "0",
                               companyName, "assets/images/upfin_icon.png",
                               productName, contactNo, eachLoans["created_at"].toString(), eachLoans["updated_at"].toString(),
                               "0", eachLoans["id"].toString(), jsonEncode(loanMessageInfoOutputJson)));
@@ -996,7 +996,7 @@ class LogfinController {
 
                       loanMessageInfoOutputJson!["last_read_message_id"] = eachLoans["pr_room"]["last_read_message_id"].toString();
                       MyData.addToLoanInfoList(
-                          LoanInfoData(uid, uidType, eachLoans["uid"].toString(), lenderId,
+                          LoanInfoData(uid, uidType, loanUid, lenderId,
                               submitAmount, eachLoans["submit_offer"]["interest_rate"].toString(),
                               companyName, companyName == "(주)안전대부"? "assets/images/bank_logo_safe.png" : "assets/images/bank_logo_default.png",
                               productName, contactNo,

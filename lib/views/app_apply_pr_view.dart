@@ -163,6 +163,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     ntsCount = 0;
 
     if(MyData.getLoanInfoList().isNotEmpty){
+      CommonUtils.log("w","apply pr check..");
+      SharedPreferenceController.deleteApplyPrJsonData();
       String savedValue = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceApplyPrKey);
       if(savedValue != ""){
         List<Map<String, dynamic>> tempList = List<Map<String, dynamic>>.from(jsonDecode(savedValue));
@@ -171,7 +173,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           if(eachTemp["is_docs"]){
             if(eachTemp.containsKey("doc_date")){
               DateTime currentTime = CommonUtils.getCurrentLocalTime();
-              DateTime minus3Days = currentTime.subtract(const Duration(days: 3));
+              DateTime minus3Days = currentTime.subtract(MyData.isTestUser? const Duration(hours: 1) : const Duration(days: 3));
               DateTime savedTime = CommonUtils.convertStringToTime(eachTemp["doc_date"]);
 
               if(minus3Days.isBefore(savedTime)){
@@ -462,7 +464,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
 
     addedDocsList.sort((a,b)=>a["view_id"].compareTo(b["view_id"]));
     for(var each in addedDocsList){
-      CommonUtils.log("i", "each added doc :  ${each["view_id"]} ${each["id"]} ${each["name"]}");
+      CommonUtils.log("i", "each added doc :  $each");
     }
 
     if(_isIdHereFromListById(1)) gov24Count++;
@@ -485,7 +487,12 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           carNo =  each['car_no'];
         }
       }
-      CommonUtils.log("w", "!!!!saved check\n"
+
+      String docDate = "";
+      if(each.containsKey("doc_date")){
+        docDate = each["doc_date"];
+      }
+      CommonUtils.log("w", "!!!!saved check ====>\n"
           "view_id:${each["view_id"]}\n"
           "id:${each["id"]}\n"
           "name:${each["name"]}\n"
@@ -493,6 +500,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           "is_confirmed:${each["is_confirmed"]}\n"
           "is_docs:${each["is_docs"]}\n"
           "docs_type:${each["docs_type"]}\n"
+          "docs_date:$docDate\n"
           "result:${resultMap.isEmpty? "" : each["result"]["resultValue"]}\n"
       );
     }
@@ -2110,7 +2118,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
               }
             }),
       ])) : Container(),
-      UiUtils.getMarginBox(0, 1.5.h),
+      UiUtils.getMarginBox(0, 1.h),
       SizedBox(width: 90.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
         UiUtils.getBorderButtonBox(90.w, pickedFilePath != "" ? ColorStyles.upFinWhiteSky : ColorStyles.upFinButtonBlue, pickedFilePath != "" ? ColorStyles.upFinWhiteSky : ColorStyles.upFinButtonBlue,
             UiUtils.getTextWithFixedScale(pickedFilePath != "" ? "다시 촬영하기" : "촬영하기", 14.sp, FontWeight.w500, pickedFilePath != "" ? ColorStyles.upFinButtonBlue : ColorStyles.upFinWhite, TextAlign.start, null), () async {
@@ -3854,7 +3862,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                       }
                     }
                     if(!isDuple){
-                      each["doc_date"] = CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime());
+
                       addedDocsListForSave.add(each);
                     }
                   }
@@ -3981,7 +3989,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                   }
                 }
                 if(!isDuple){
-                  each["doc_date"] = CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime());
+
                   addedDocsListForSave.add(each);
                 }
               }
@@ -4106,7 +4114,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                             if(each["id"] == eachAdded["id"]){
                               // car_no 중복 확인
                               if(eachAdded["id"] == 16 || eachAdded["id"] == 17){
-                                if(each.containsKey("car_no'") && eachAdded.containsKey("'car_no")){
+                                if(each.containsKey("car_no") && eachAdded.containsKey("car_no")){
                                   if(each['car_no'] == eachAdded['car_no']){
                                     addedDupleDocsListForSave.add(eachAdded);
                                   }
@@ -4142,7 +4150,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                             }
                           }
                           if(!isDuple){
-                            each["doc_date"] = CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime());
+
                             addedDocsListForSave.add(each);
                           }
                         }
@@ -4273,7 +4281,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                         if(each["id"] == eachAdded["id"]){
                           // car_no 중복 확인
                           if(eachAdded["id"] == 16 || eachAdded["id"] == 17){
-                            if(each.containsKey("car_no'") && eachAdded.containsKey("'car_no")){
+                            if(each.containsKey("car_no") && eachAdded.containsKey("car_no")){
                               if(each['car_no'] == eachAdded['car_no']){
                                 addedDupleDocsListForSave.add(eachAdded);
                               }
@@ -4291,6 +4299,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                       addedDocsListForSave.add(eachAdded);
                     }
                   }
+
                   if(addedDupleDocsListForSave.isNotEmpty){
                     for(var each in savedDocsList){
                       bool isDuple = false;
@@ -4309,7 +4318,6 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                         }
                       }
                       if(!isDuple){
-                        each["doc_date"] = CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime());
                         addedDocsListForSave.add(each);
                       }
                     }

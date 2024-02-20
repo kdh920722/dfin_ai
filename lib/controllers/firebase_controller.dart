@@ -60,7 +60,7 @@ class FireBaseController{
 
   static Future<void> writeLog(String type, String id, String msg) async {
     try{
-      String dbPath = "DFIN/LOG/$type";
+      String dbPath = "UPFIN/LOG/$type";
 
       final snapshot = await FirebaseDatabase.instance.ref().child("$dbPath/$fcmToken").get();
       if (snapshot.exists) {
@@ -100,10 +100,10 @@ class FireBaseController{
   }
 
   /// firebase FCM =========================================================================== ///
-  static String channelIdForAndroid = "dfin_notification";
-  static String channelNameForAndroid = "dfin_notification";
-  static String channelDescForAndroid = "dfin 알림";
-  static String channelTitleForIOS = "dfin 알림";
+  static String channelIdForAndroid = "upfin_notification";
+  static String channelNameForAndroid = "upfin_notification";
+  static String channelDescForAndroid = "upfin 알림";
+  static String channelTitleForIOS = "upfin 알림";
   static StateSetter? setStateForForeground;
 
   static Future<void> initFcm(Function(bool isSuccess, String fcmToken) callback) async {
@@ -127,7 +127,7 @@ class FireBaseController{
           await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(androidNotificationChannel);
 
           if(!Config.isAndroid){
-           // await messaging.requestPermission(alert: true, announcement: false, badge: true, carPlay: false, criticalAlert: false, provisional: false, sound: true);
+            // await messaging.requestPermission(alert: true, announcement: false, badge: true, carPlay: false, criticalAlert: false, provisional: false, sound: true);
           }
 
           // Foreground handling event
@@ -177,7 +177,7 @@ class FireBaseController{
       flutterLocalNotificationsPlugin.show(
           message.hashCode,
           message.notification?.title,
-          message.notification?.body,
+          message.notification?.body.toString().replaceAll("<br>", "").replaceAll("<b>", "").replaceAll("</b>", ""),
           Config.isAndroid? NotificationDetails(
               android: AndroidNotificationDetails(
                 channel!.id,
@@ -242,6 +242,8 @@ class FireBaseController{
     CommonUtils.log("w", "BACK PUSH \n${message.messageId}${message.data}");
     await CommonUtils.saveSettingsToFile("push_from", "B");
     await CommonUtils.saveSettingsToFile("push_room_id", _getRoomIdFromMessage(message));
+
+
     /*
     await _initFirebaseForBackgroundPush((bool isSuccess) async {
       if(isSuccess){

@@ -300,14 +300,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                     MyData.isTestUser ? UiUtils.getRoundBoxButtonTextWithFixedScale6(
                         UiUtils.getTextWithFixedScale("관리자", 9.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null), ColorStyles.upFinWhiteGray, (){
                       // test
-                      Map<String, dynamic> inputJson = {
-                        "car_no": "68누1772",
-                        "owner_name": "김미순",
-                        "job": "1",
-                        "lend_count": "0", // selectedPreLoanCountInfo.split("@")[1]
-                        "lend_amount": "0", // selectedPreLoanPriceInfo
-
-                      };
+                      SharedPreferenceController.deleteAllData();
 
                       /*
                       UiUtils.showLoadingPercentPop(context);

@@ -96,7 +96,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
           currentCompanyLogo = each.companyLogo;
           currentStatus = each.statueId;
           currentRoomType = each.uidType;
-          currentRoomTypeName == "1" ? "개인회생" : "오토론";
+          currentRoomTypeName = currentRoomType == "1" ? "개인회생" : "오토론";
           if(LoanInfoData.getStatusName(currentStatus) == "접수"){
             GetController.to.updateChatStatusTick(1);
           }else if(LoanInfoData.getStatusName(currentStatus) == "심사"){
