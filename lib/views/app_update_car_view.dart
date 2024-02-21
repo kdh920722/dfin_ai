@@ -513,9 +513,80 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
                     UiUtils.getTextWithFixedScale("입력하기", 12.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
                       currRegBInfo = {};
                       currRegBInfo = each;
-                      currentViewId = eachPreLoanPriceViewId;
+                      //currentViewId = eachPreLoanPriceViewId;
                       _setEachPreLoanInfo(each["preLoanPrice"].toString());
-                      setState(() {});
+                      //setState(() {});
+                      UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, 100.w, 80.h, 0.5, (slideContext, slideSetState){
+                        return Material(
+                            color: ColorStyles.upFinWhite,
+                            child: GestureDetector(onTap: (){
+                              if(_eachPreLoanPriceFocus.hasFocus){
+                                CommonUtils.hideKeyBoard();
+                              }
+                            },
+                                child: UiUtils.getRowColumnWithAlignCenter([
+                                  SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                                    UiUtils.getCloseButton(ColorStyles.upFinDarkGray, () {
+                                      currRegBInfo = {};
+                                      Navigator.pop(slideContext);
+                                      //currentViewId = preLoanInfoViewId;
+                                      //setState(() {});
+                                    }),
+                                  ])),
+                                  UiUtils.getMarginBox(0, 3.w),
+                                  SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출잔액을 알려주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+                                  UiUtils.getMarginBox(0, 1.h),
+                                  SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력단위(*만원)", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
+                                  UiUtils.getMarginBox(0, 5.h),
+                                  Obx(()=>UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _eachPreLoanPriceFocus, _eachPreLoanPriceTextController, TextInputType.number, false,
+                                      UiUtils.getInputDecorationForPrice("", 0.sp, GetController.to.preLoanPrice.value), (text) {
+                                        if(text.trim() != ""){
+                                          final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
+                                          GetController.to.updatePreLoanPrice(CommonUtils.getPriceFormattedString(number!));
+                                        }else{
+                                          GetController.to.updatePreLoanPrice("만원");
+                                        }
+                                      }, (value){})
+                                  ),
+                                  UiUtils.getMarginBox(0, 1.h),
+                                  SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("•  을부번호 ${currRegBInfo["resLedgerBNo"]}", 14.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
+                                  UiUtils.getMarginBox(0, 0.5.h),
+                                  SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("•  채권가액 ${currRegBInfo["resBondPriceTxt"]}", 14.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
+                                  UiUtils.getMarginBox(0, 5.h),
+                                  UiUtils.getExpandedScrollView(Axis.vertical, Container()),
+                                  UiUtils.getTextButtonBox(90.w, "확인", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+                                    String eachPreLoanPrice = "";
+                                    if(_eachPreLoanPriceTextController.text.trim() != ""){
+                                      final number = double.tryParse(_eachPreLoanPriceTextController.text.trim().replaceAll(',', '')); // 콤마 제거 후 숫자 변환
+                                      String price = number.toString();
+                                      if(price.contains(".")){
+                                        price = price.split(".")[0];
+                                      }
+                                      eachPreLoanPrice = price;
+                                    }else{
+                                      eachPreLoanPrice = "0";
+                                    }
+
+                                    double bondPrice = double.parse(currRegBInfo["resBondPrice"].toString());
+                                    double inputPrice = double.parse("${eachPreLoanPrice}0000");
+                                    if(inputPrice > bondPrice){
+                                      CommonUtils.flutterToast("대출잔액이 대출금액보다 큽니다.");
+                                    }else{
+                                      for(Map<String, dynamic> eachMap in savedRegBInfoList){
+                                        if(currRegBInfo["resLedgerBNo"] == eachMap["resLedgerBNo"]){
+                                          eachMap["preLoanPrice"] = eachPreLoanPrice;
+                                        }
+                                      }
+                                      currRegBInfo = {};
+                                      //currentViewId = preLoanInfoViewId;
+                                      Navigator.pop(slideContext);
+                                      setState(() {});
+                                    }
+                                  }),
+                                  Config.isAndroid ?UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 5.h)
+                                ]))
+                        );
+                      });
                     }),
                 UiUtils.getMarginBox(0, 0.5.h),
               ]), () { })),

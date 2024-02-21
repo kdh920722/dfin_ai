@@ -78,7 +78,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
         duration: const Duration(milliseconds: 500),
         lowerBound: 0.0,
         upperBound: 1.0);
-    currentRoomId = GetController.to.chatMessageInfoDataList[0].chatRoomId;
+
     for(var each in MyData.getLoanInfoList()){
       if(each.chatRoomId == currentRoomId){
         if(each.uidType == "0"){
@@ -912,7 +912,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
       await FireBaseController.setNotificationTorF(true);
       await LogfinController.callLogfinApi(LogfinApis.checkMessage, inputJson, (isSuccess, outputJson){
         if(!isSuccess){
-          CommonUtils.flutterToast("메시지를 읽는중\n오류가 발생했어요.");
+          //CommonUtils.flutterToast("메시지를 읽는중\n오류가 발생했어요.");
         }
 
         if(context.mounted) {
@@ -1188,6 +1188,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                   inputTextHide = false;
                   GetController.to.updateInputTextHide(inputTextHide);
                   _setAutoAnswerWidgetList();
+                  setState(() {});
                 }else if(each.contains("이전")){
                   CommonUtils.log("","fcm : ${FireBaseController.fcmToken}");
                   pickedFiles.clear();
@@ -1631,7 +1632,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
             Expanded(child: RefreshIndicator(onRefresh: ()=>_requestPrev(),color: ColorStyles.upFinButtonBlue, backgroundColor: ColorStyles.upFinWhiteSky,
                 child: SingleChildScrollView(controller: _chatScrollController, scrollDirection: Axis.vertical, physics: const BouncingScrollPhysics(),
                     child: Obx(()=>Column(mainAxisAlignment: MainAxisAlignment.start, children: _getChatList()))))),
-            isUserChatRoom ? Container() : Obx((){
+            Obx((){
               bool isWaiting = GetController.to.isAutoAnswerWaiting.value;
               bool isScrollWaiting = GetController.to.isShowScrollBottom.value;
 
@@ -1664,7 +1665,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                         }),
                     UiUtils.getMarginBox(0, 5.w),
                   ]) : Container(),
-                  isWaiting ? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 2.h)
+                  isWaiting ? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 1.h)
                 ],
               ));
             }),
@@ -1709,21 +1710,21 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, S
                                           if(inputHeight <= inputMaxHeight){
                                             final desiredHeight = inputMinHeight*0.7+textLinePainter.height;
                                             final height = desiredHeight.clamp(inputMinHeight, inputMaxHeight);
-                                            /*
-                                          setState(() {
-                                            inputHeight = height;
-                                          });
 
-                                           */
+                                            setState(() {
+                                              inputHeight = height;
+                                            });
+
+
                                           }
                                         }else{
-                                          /*
-                                        setState(() {
-                                          isTextFieldFocus = false;
-                                          inputHeight = inputMinHeight;
-                                        });
 
-                                         */
+                                          setState(() {
+                                            isTextFieldFocus = false;
+                                            inputHeight = inputMinHeight;
+                                          });
+
+
                                         }
                                       })
                                 ]))])),

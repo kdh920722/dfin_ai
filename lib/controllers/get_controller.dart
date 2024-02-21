@@ -130,16 +130,31 @@ class GetController extends GetxController {
 
   void updateChatLoanInfoList(List<ChatRoomInfoData> newList) {
     chatLoanInfoDataList.clear();
-    for(int i=0; i < newList.length; i++){
-      var jsonData = jsonDecode(newList[i].chatRoomMsgInfo);
-      Map<String, dynamic> msg = jsonData;
-      List<dynamic> listMsg = msg["data"];
-      listMsg.sort((a,b) => b["id"].compareTo(a["id"]));
-      msg.remove("data");
-      msg["data"] = listMsg;
-      newList[i].chatRoomMsgInfo = jsonEncode(msg);
+    if(newList.isNotEmpty){
+      for(int i=0; i < newList.length; i++){
+        var jsonData = jsonDecode(newList[i].chatRoomMsgInfo);
+        Map<String, dynamic> msg = jsonData;
+        List<dynamic> listMsg = msg["data"];
+        listMsg.sort((a,b) => b["id"].compareTo(a["id"]));
+        msg.remove("data");
+        msg["data"] = listMsg;
+        newList[i].chatRoomMsgInfo = jsonEncode(msg);
+      }
+      List<ChatRoomInfoData> userChatRoomList = [];
+      List<ChatRoomInfoData> chatRoomList = [];
+      for(var each in newList){
+        if(each.chatRoomType == "0"){
+          userChatRoomList.add(each);
+        }else{
+          chatRoomList.add(each);
+        }
+      }
+      chatRoomList.sort((a,b) => jsonDecode(b.chatRoomMsgInfo)["data"][0]["id"].compareTo(jsonDecode(a.chatRoomMsgInfo)["data"][0]["id"]));
+
+      newList.clear();
+      newList.addAll(userChatRoomList);
+      newList.addAll(chatRoomList);
     }
-    newList.sort((a,b) => jsonDecode(b.chatRoomMsgInfo)["data"][0]["id"].compareTo(jsonDecode(a.chatRoomMsgInfo)["data"][0]["id"]));
 
     chatLoanInfoDataList.assignAll(newList);
   }

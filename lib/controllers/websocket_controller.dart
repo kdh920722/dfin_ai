@@ -130,7 +130,7 @@ class WebSocketController {
 
                   subCnt++;
 
-                  CommonUtils.log("", "onConnected : $roomId : $subCnt || ${MyData.getChatRoomInfoList().length}");
+                  CommonUtils.log("w", "onConnected : $roomId : $subCnt || ${MyData.getChatRoomInfoList().length}");
 
                   if(MyData.getChatRoomInfoList().length == subCnt){
                     GetController.to.updateAllSubScribed(true);

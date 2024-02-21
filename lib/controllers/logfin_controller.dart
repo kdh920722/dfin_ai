@@ -884,26 +884,25 @@ class LogfinController {
         if(isSuccessToGetLoansInfo){
           if(loansInfoOutputJson != null){
             List<dynamic> loansList = loansInfoOutputJson["loans"];
+            String uid = "";
+            String uidType = "";
+            String lenderId = "";
+            String companyName = "";
+            String productName = "";
+            String contactNo = "";
+            String loanUid = "";
+
+            MyData.userChatRoomInfo["user_chat_room"] = "user";
+            loansList.add(MyData.userChatRoomInfo);
+
             if(loansList.isEmpty){
               GetController.to.resetChatLoanInfoList();
               callback(true, false);
             }else{
               MyData.clearLoanInfoList();
-              MyData.userChatRoomInfo["user_chat_room"] = "user";
-              loansList.add(MyData.userChatRoomInfo);
               for(Map eachLoans in loansList){
                 CommonUtils.log("i", "each loans : $eachLoans");
-
-                String uid = "";
-                String uidType = "";
-                String lenderId = "";
-                String companyName = "";
-                String productName = "";
-                String contactNo = "";
-                String loanUid = "";
-
                 if(eachLoans.containsKey("user_chat_room")){
-                  CommonUtils.log("i", "user room ==>");
                   uidType = "0";
                   uid = "user";
                   lenderId = "user";
@@ -918,16 +917,34 @@ class LogfinController {
                     "length" : 100
                   };
                   await callLogfinApi(LogfinApis.getMessage, inputJson, (isSuccessToGetLoanMessageInfo, loanMessageInfoOutputJson){
+                    CommonUtils.log("w","my chat info : $isSuccessToGetLoanMessageInfo *** $loanMessageInfoOutputJson *** ${eachLoans["last_read_message_id"]} *** ${MyData.userChatRoomInfo["id"].toString()}");
                     if(isSuccessToGetLoanMessageInfo){
+                      List<dynamic> tempList = loanMessageInfoOutputJson!["data"];
+
+                      if(tempList.isEmpty){
+                        Map<String, dynamic> jsonMap = {
+                          "id": "0",
+                          "message": "환영합니다!",
+                          "created_at": MyData.userChatRoomInfo["created_at"],
+                          "updated_at": MyData.userChatRoomInfo["updated_at"],
+                          "message_type": "text",
+                          "username": "UPFIN",
+                          "msg_type": "text"};
+                        tempList.add(jsonMap);
+
+                        loanMessageInfoOutputJson["data"] = tempList;
+                      }
+
                       String submitAmount = "0";
-                      loanMessageInfoOutputJson!["last_read_message_id"] = eachLoans["last_read_message_id"].toString();
+                      loanMessageInfoOutputJson["last_read_message_id"] = MyData.userChatRoomInfo["manager_last_read_message_id"].toString();
                       MyData.addToLoanInfoList(
                           LoanInfoData(uid, uidType, loanUid, lenderId, submitAmount, "0",
                               companyName, "assets/images/upfin_icon.png",
-                              productName, contactNo, eachLoans["created_at"].toString(), eachLoans["updated_at"].toString(),
-                              "0", eachLoans["id"].toString(), jsonEncode(loanMessageInfoOutputJson)));
+                              productName, contactNo, MyData.userChatRoomInfo["created_at"].toString(), MyData.userChatRoomInfo["updated_at"].toString(),
+                              "0", MyData.userChatRoomInfo["id"].toString(), jsonEncode(loanMessageInfoOutputJson)));
                     }
                   });
+
                 }else{
                   if(eachLoans.containsKey("lender_pr")){
                     CommonUtils.log("i", "accident loan ==>");
@@ -985,6 +1002,7 @@ class LogfinController {
                     "length" : 100
                   };
                   await callLogfinApi(LogfinApis.getMessage, inputJson, (isSuccessToGetLoanMessageInfo, loanMessageInfoOutputJson){
+                    CommonUtils.log("w","other chat info : $isSuccessToGetLoanMessageInfo *** $loanMessageInfoOutputJson");
                     if(isSuccessToGetLoanMessageInfo){
                       String tempAmount = eachLoans["submit_offer"]["amount"].toString();
                       String submitAmount = "0";

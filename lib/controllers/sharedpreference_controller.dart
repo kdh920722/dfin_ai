@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:shared_preferences/shared_preferences.dart';
 import '../datas/my_data.dart';
 import '../utils/common_utils.dart';
@@ -83,7 +82,7 @@ class SharedPreferenceController {
       String savedValue = getSharedPreferenceValue(SharedPreferenceController.sharedPreferenceApplyPrKey);
       List<Map<String, dynamic>> tempList = List<Map<String, dynamic>>.from(jsonDecode(savedValue));
       DateTime currentTime = CommonUtils.getCurrentLocalTime();
-      DateTime minus3Days = currentTime.subtract(MyData.isTestUser? const Duration(hours: 1) : const Duration(days: 3));
+      DateTime minus3Days = currentTime.subtract(MyData.isTestUser? const Duration(minutes: 30) : const Duration(days: 3));
 
       bool isValid = false;
       for(Map<String, dynamic> eachTemp in tempList){

@@ -17,6 +17,7 @@ import 'package:dfin/datas/loan_info_data.dart';
 import 'package:dfin/datas/my_data.dart';
 import 'package:dfin/styles/ColorStyles.dart';
 import 'package:dfin/styles/TextStyles.dart';
+import 'package:dfin/views/app_chat_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../controllers/get_controller.dart';
 import '../controllers/sharedpreference_controller.dart';
@@ -592,9 +593,9 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             }),
             Obx((){
               List<Widget> chatWidgetList = [];
-              List<Widget> userChatWidgetList = _getUserChatWidgetList();
+              //List<Widget> userChatWidgetList = _getUserChatWidgetList();
               List<Widget> loanWidgetList = _getLoanChatWidgetList();
-              chatWidgetList.addAll(userChatWidgetList);
+              //chatWidgetList.addAll(userChatWidgetList);
               chatWidgetList.addAll(loanWidgetList);
               return chatWidgetList.isNotEmpty ? Column(children: [
                 UiUtils.getMarginBox(0, 1.h),
@@ -884,25 +885,31 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
         var jsonData = jsonDecode(each.chatRoomMsgInfo);
         Map<String, dynamic> msg = jsonData;
         List<dynamic> listMsg = msg["data"];
-        listMsg.sort((a,b) => a["id"].compareTo(b["id"]));
-        String lastMsg = listMsg[listMsg.length-1]["message"].toString();
-        if(lastMsg.contains(" / ")){
-          lastMsg = lastMsg.split(" / ")[1];
-        }
-        if(lastMsg.contains("<br")){
-          lastMsg = lastMsg.replaceAll("<br>", "").replaceAll("<b>", "").replaceAll("</b>", "");
-        }
-        if(lastMsg.contains("http")){
-          String ext = lastMsg.split(".").last;
-          if(LogfinController.validFileTypeList.contains(ext)){
-            if(LogfinController.validDocFileTypeList.contains(ext)){
-              lastMsg = "파일을 보냈습니다.";
-            }else{
-              lastMsg = "사진을 보냈습니다.";
+        CommonUtils.log("w","listMsg : $listMsg");
+        String lastDateString = "";
+        String lastMsg = "";
+        if(listMsg.isNotEmpty){
+          listMsg.sort((a,b) => a["id"].compareTo(b["id"]));
+          lastMsg = listMsg[listMsg.length-1]["message"].toString();
+          if(lastMsg.contains(" / ")){
+            lastMsg = lastMsg.split(" / ")[1];
+          }
+          if(lastMsg.contains("<b")){
+            lastMsg = lastMsg.replaceAll("<br>", "").replaceAll("<b>", "").replaceAll("</b>", "");
+          }
+          if(lastMsg.contains("http")){
+            String ext = lastMsg.split(".").last;
+            if(LogfinController.validFileTypeList.contains(ext)){
+              if(LogfinController.validDocFileTypeList.contains(ext)){
+                lastMsg = "파일을 보냈습니다.";
+              }else{
+                lastMsg = "사진을 보냈습니다.";
+              }
             }
           }
+          lastDateString = CommonUtils.convertTimeToString(CommonUtils.parseToLocalTime(listMsg[listMsg.length-1]["created_at"]));
         }
-        String lastDateString = CommonUtils.convertTimeToString(CommonUtils.parseToLocalTime(listMsg[listMsg.length-1]["created_at"]));
+
         int lastReadId = int.parse(msg["last_read_message_id"].toString());
         int cnt = 0;
         for(Map<String, dynamic> eachMsg in listMsg){
@@ -938,7 +945,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                       ])
                     ])),
                     Expanded(flex: 2, child: Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                      Row(mainAxisAlignment: MainAxisAlignment.end, children: [ UiUtils.getTextWithFixedScale(CommonUtils.getFormattedLastMsgTime(lastDateString), 8.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null), UiUtils.getMarginBox(0.5.w, 0) ],),
+                      Row(mainAxisAlignment: MainAxisAlignment.end, children: [ UiUtils.getTextWithFixedScale(lastDateString == "" ? "" : CommonUtils.getFormattedLastMsgTime(lastDateString), 8.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null), UiUtils.getMarginBox(0.5.w, 0) ],),
                       UiUtils.getMarginBox(0,1.h),
                       cnt > 0? Row(mainAxisSize: MainAxisSize.min, children: [
                         UiUtils.getCountCircleBox(6.w, cnt, 7.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.center, 1), UiUtils.getMarginBox(0.8.w, 0)]) : Container()
@@ -973,6 +980,9 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
         String lastMsg = listMsg[listMsg.length-1]["message"].toString();
         if(lastMsg.contains(" / ")){
           lastMsg = lastMsg.split(" / ")[1];
+        }
+        if(lastMsg.contains("<b")){
+          lastMsg = lastMsg.replaceAll("<br>", "").replaceAll("<b>", "").replaceAll("</b>", "");
         }
         if(lastMsg.contains("http")){
           String ext = lastMsg.split(".").last;
@@ -1085,18 +1095,16 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             LogfinController.autoAnswerMap = LogfinController.autoAnswerMapForCar;
             for(var eachLoan in MyData.getLoanInfoList()){
               if(each.chatLoanUid == eachLoan.loanUid){
-                CommonUtils.log("w","22 uid : ${eachLoan.loanUid}");
-                CommonUtils.log("w","33 uid : ${eachLoan.uid}");
+                CommonUtils.log("w","22 uid : ${LogfinController.autoAnswerMap}");
                 for(var eachCar in MyData.getCarInfoList()){
                   if(eachLoan.uid == eachCar.carUid){
                     MyData.selectedCarInfoData = eachCar;
-                    CommonUtils.log("w","44 uid : ${eachCar.carUid}");
                   }
                 }
               }
             }
           }else{
-            LogfinController.autoAnswerMap = {};
+            LogfinController.autoAnswerMap = {"채팅": "chat"};
             MyData.selectedCarInfoData = null;
             MyData.selectedAccidentInfoData = null;
           }
@@ -1104,6 +1112,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
       }
 
       UiUtils.closeLoadingPop(context);
+      AppChatViewState.currentRoomId = chatRoomId;
       await CommonUtils.moveToWithResult(context, AppView.appChatView.value, null);
     }
     isViewHere = true;
