@@ -4,6 +4,8 @@ import 'package:dfin/datas/my_data.dart';
 import 'dart:convert';
 import '../configs/app_config.dart';
 import '../utils/common_utils.dart';
+import '../views/app_apply_pr_view.dart';
+import 'logfin_controller.dart';
 
 class HyphenController {
   static final HyphenController _instance = HyphenController._internal();
@@ -90,6 +92,7 @@ class HyphenController {
         if(api == HyphenApis.idCert){
           if(outputJsonForCertId!["truthYn"] == "Y"){
             if(MyData.name == outputJsonForCertId["name"]){
+              LogfinController.setLogJson(AppApplyPrViewState.isRetry? LogfinController.applyDocCertCodeString : LogfinController.applyCertCodeString, {"input" : inputJson}, {});
               CommonUtils.flutterToast("신분증 확인에 성공했어요.");
               callback(true, 0);
             }else{
@@ -97,12 +100,14 @@ class HyphenController {
               callback(false, 0);
             }
           }else{
+            LogfinController.setLogJson(AppApplyPrViewState.isRetry? LogfinController.applyDocCertCodeString : LogfinController.applyCertCodeString, {"input" : inputJson}, {"error_output" : outputJsonForCertId});
             CommonUtils.flutterToast("신분증 진위확인에 실패\n유효한 신분증이 아니에요.");
             callback(false, 0);
           }
         }else{
           if(outputJsonForCertId!["licenceTruthYn"] == "Y"){
             if(MyData.name == outputJsonForCertId["name"]){
+              LogfinController.setLogJson(AppApplyPrViewState.isRetry? LogfinController.applyDocCertCodeString : LogfinController.applyCertCodeString, {"input" : inputJson}, {});
               CommonUtils.flutterToast("신분증 확인에 성공했어요.");
               callback(true, 0);
             }else{
@@ -110,12 +115,15 @@ class HyphenController {
               callback(false, 0);
             }
           }else{
+            LogfinController.setLogJson(AppApplyPrViewState.isRetry? LogfinController.applyDocCertCodeString : LogfinController.applyCertCodeString, {"input" : inputJson}, {"error_output" : outputJsonForCertId});
             CommonUtils.flutterToast("신분증 진위확인에 실패\n유효한 신분증이 아니에요.");
             callback(false, 0);
           }
         }
       }else{
         if(outputJsonForCertId != null){
+          LogfinController.setLogJson(AppApplyPrViewState.isRetry? LogfinController.applyDocCertCodeString : LogfinController.applyCertCodeString, {"input" : inputJson}, {"error_output" : outputJsonForCertId});
+
           if(outputJsonForCertId.containsKey("error")){
             if(outputJsonForCertId["error"].toString().contains("재처리")){
               CommonUtils.flutterToast("시스템 점검중입니다.\n약 3분뒤에 다시 시도해주세요.");
@@ -140,6 +148,7 @@ class HyphenController {
             callback(false, 0);
           }
         }else{
+          LogfinController.setLogJson(AppApplyPrViewState.isRetry? LogfinController.applyDocCertCodeString : LogfinController.applyCertCodeString, {"input" : inputJson}, {"error_output" : "hyphen result is null"});
           CommonUtils.flutterToast("신분증 진위확인에 실패했어요.");
           callback(false, 0);
         }

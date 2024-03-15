@@ -89,7 +89,6 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
   List<Widget> _getLoanWidgetList(){
     List<Widget> loanWidgetList = [];
     loanWidgetList.add(UiUtils.getMarginBox(0, 3.h));
-    int count = 0;
     for(var each in MyData.getLoanInfoList()){
       String eachAccidentNum = "";
       for(var eachAccident in MyData.getAccidentInfoList()){
@@ -139,7 +138,6 @@ class AppAccidentDetailViewState extends State<AppAccidentDetailView> with Widge
 
         loanWidgetList.add(UiUtils.getMarginBox(0, 3.h));
       }
-      count++;
     }
 
     return loanWidgetList;

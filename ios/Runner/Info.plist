@@ -116,7 +116,7 @@
 	<key>NSCameraUsageDescription</key>
 	<string>사진 전송을 통해 상품접수에 필요한 정보를 제공하기 위해 필요합니다. 설정에서 이를 구성할 수 있습니다.</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>This app does not require access to the microphone.</string>
+    <string>동영상 전송을 통해 상품접수에 필요한 정보를 제공하기 위해 필요합니다. 설정에서 이를 구성할 수 있습니다.</string>
 	<key>PermissionGroupNotification</key>
 	<string>앱에서 제공하는 정보 제공 기능을 사용자에게 알리기 위해 푸쉬 알림이 필요합니다. 설정에서 이를 구성할 수 있습니다.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>

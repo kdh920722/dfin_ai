@@ -17,7 +17,7 @@ class JusoController{
   static Future<void> initJuso(Function(bool) callback) async{
     try{
       final ref = FirebaseDatabase.instance.ref();
-      final snapshot = await ref.child('DFIN/API/juso').get();
+      final snapshot = await ref.child('UPFIN/API/juso').get();
       if (snapshot.exists) {
         for(var each in snapshot.children){
           switch(each.key){

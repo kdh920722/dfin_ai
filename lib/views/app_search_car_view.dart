@@ -630,7 +630,7 @@ class AppSearchCarViewState extends State<AppSearchCarView> with WidgetsBindingO
               };
               CommonUtils.log("i", "car search info yes :\n$inputJson");
 
-              UiUtils.showLoadingPercentPop(context, "상품 조회를 위해 차량정보를 분석중입니다.");
+              UiUtils.showLoadingPercentPop(context, "상품 조회를 위해 차량정보를 분석중");
               LogfinController.addCar(context, inputJson, (isSuccess){
                 if(isSuccess){
                   LogfinController.getUserInfo((isSuccessToGetUSerInfo){

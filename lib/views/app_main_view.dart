@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_advanced_switch/flutter_advanced_switch.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get_state_manager/src/rx_flutter/rx_obx_widget.dart';
 import 'package:percent_indicator/linear_percent_indicator.dart';
 import 'package:sizer/sizer.dart';
@@ -32,7 +33,7 @@ class AppMainView extends StatefulWidget{
   AppMainViewState createState() => AppMainViewState();
 }
 
-class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
+class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver, TickerProviderStateMixin{
   final PageController _pageController = PageController();
   static bool doCheckToSearchPr = false;
   int viewTypeId = 2; // 1: 대출 / 2: MY / 3: 설정
@@ -41,6 +42,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   static bool isViewHere = false;
   static BuildContext? mainContext;
   final ScrollController _infoPopScrollController = ScrollController();
+  late AnimationController _logoAniController;
 
   @override
   void initState(){
@@ -73,6 +75,11 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     isViewHere = true;
     FireBaseController.analytics!.logLogin();
 
+    _logoAniController = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 500),
+        lowerBound: 0.0,
+        upperBound: 1.0);
   }
 
   @override
@@ -81,6 +88,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
     WidgetsBinding.instance.removeObserver(this);
     WebSocketController.resetConnectWebSocketCable();
     WebSocketController.resetRetry();
+    _logoAniController.dispose();
     AppMainViewState.isStart = false;
     _infoPopScrollController.dispose();
     FireBaseController.setStateForForeground = null;
@@ -294,6 +302,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                       width: 13.5.w,
                       height: 2.8.h,
                       enabled: true,
+                      initialValue: isSwitched,
                       disabledOpacity: 1,
                     ) : Container(),
                     UiUtils.getMarginBox(2.w,0),
@@ -301,7 +310,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                     MyData.isTestUser ? UiUtils.getRoundBoxButtonTextWithFixedScale6(
                         UiUtils.getTextWithFixedScale("관리자", 9.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null), ColorStyles.upFinWhiteGray, (){
                       // test
-                      SharedPreferenceController.deleteAllData();
+                      //SharedPreferenceController.deleteAllData();
 
                       /*
                       UiUtils.showLoadingPercentPop(context);
@@ -593,9 +602,13 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             }),
             Obx((){
               List<Widget> chatWidgetList = [];
-              //List<Widget> userChatWidgetList = _getUserChatWidgetList();
+              List<Widget> userChatWidgetList = _getUserChatWidgetList();
               List<Widget> loanWidgetList = _getLoanChatWidgetList();
-              //chatWidgetList.addAll(userChatWidgetList);
+              if(MyData.isTestUser){
+                chatWidgetList.addAll(userChatWidgetList);
+              } else{
+                if(Config.isUserChatOn) chatWidgetList.addAll(userChatWidgetList);
+              }
               chatWidgetList.addAll(loanWidgetList);
               return chatWidgetList.isNotEmpty ? Column(children: [
                 UiUtils.getMarginBox(0, 1.h),
@@ -620,13 +633,13 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                         SizedBox(width: 85.w, child: Row(children: [
                           UiUtils.getMarginBox(1.w, 0),
                           GestureDetector(child: UiUtils.getRoundBoxTextWithFixedScale4("상담원 연결", 14.sp, FontWeight.w600, TextAlign.center, ColorStyles.upFinBannerSky2textGreen, ColorStyles.upFinBannerSky2),
-                              onTap: () async {
-                                if(await canLaunchUrl(Uri.parse(Config.appCallInfo))){
-                                  await launchUrl(Uri.parse(Config.appCallInfo));
-                                }else{
-                                  CommonUtils.flutterToast("연결할 수 없어요.");
-                                }
-                              }),
+                          onTap: () async {
+                            if(await canLaunchUrl(Uri.parse(Config.appCallInfo))){
+                              await launchUrl(Uri.parse(Config.appCallInfo));
+                            }else{
+                              CommonUtils.flutterToast("연결할 수 없어요.");
+                            }
+                          }),
                         ],)
                         ),
                       ]), () {})),
@@ -654,12 +667,12 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                 UiUtils.getTextWithFixedScale("개인정보처리방침 바로가기:", 10.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null),
                 UiUtils.getTextWithUnderline(Config.privacyUrl, 10.sp, FontWeight.w400, ColorStyles.upFinRealGray, TextAlign.start, null, ColorStyles.upFinRealGray)
               ]),
-                  onTap: () async {
-                    Uri privacyLink = Uri.parse(Config.privacyUrl);
-                    if(await canLaunchUrl(privacyLink)){
-                      launchUrl(privacyLink);
-                    }
-                  }),
+              onTap: () async {
+                Uri privacyLink = Uri.parse(Config.privacyUrl);
+                if(await canLaunchUrl(privacyLink)){
+                launchUrl(privacyLink);
+                }
+              }),
               UiUtils.getMarginBox(0, 4.h),
               UiUtils.getTextWithFixedScale("Copyright Upfin . All Rights Reserved", 10.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null),
               UiUtils.getMarginBox(0, 0.5.h),
@@ -723,7 +736,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                       UiUtils.getBoxTextWithFixedScale("사건정보", 8.sp, FontWeight.w600, TextAlign.center, ColorStyles.upFinPrTitleBackColor, ColorStyles.upFinPrTitleColor),
                       UiUtils.getMarginBox(2.w, 0),
                       each.accidentAccountValidType == AccidentInfoData.needToCheckAccount1 || each.accidentAccountValidType == AccidentInfoData.needToCheckAccount2 ?
-                      UiUtils.getBoxTextWithFixedScale("환급계좌 오류", 8.sp, FontWeight.w600, TextAlign.start, ColorStyles.upFinWhiteRed, ColorStyles.upFinRed) : Container()
+                        UiUtils.getBoxTextWithFixedScale("환급계좌 오류", 8.sp, FontWeight.w600, TextAlign.start, ColorStyles.upFinWhiteRed, ColorStyles.upFinRed) : Container()
                     ]),
                     UiUtils.getMarginBox(0, 0.5.h),
                     Row(mainAxisAlignment: MainAxisAlignment.start, children: [
@@ -885,20 +898,22 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
         var jsonData = jsonDecode(each.chatRoomMsgInfo);
         Map<String, dynamic> msg = jsonData;
         List<dynamic> listMsg = msg["data"];
-        CommonUtils.log("w","listMsg : $listMsg");
         String lastDateString = "";
         String lastMsg = "";
         if(listMsg.isNotEmpty){
-          listMsg.sort((a,b) => a["id"].compareTo(b["id"]));
+          listMsg.sort((a,b) => double.parse(a["id"].toString()).compareTo(double.parse(b["id"].toString())));
           lastMsg = listMsg[listMsg.length-1]["message"].toString();
           if(lastMsg.contains(" / ")){
             lastMsg = lastMsg.split(" / ")[1];
           }
           if(lastMsg.contains("<b")){
-            lastMsg = lastMsg.replaceAll("<br>", "").replaceAll("<b>", "").replaceAll("</b>", "");
+            lastMsg = lastMsg.replaceAll("<a href=", "").replaceAll("</a", "").replaceAll("<br>", "").replaceAll("<b>", "").replaceAll("</b>", "").replaceAll(">", "");
+          }
+          if(lastMsg.contains(".upfin_web")){
+            lastMsg = "파일을 보냈습니다.";
           }
           if(lastMsg.contains("http")){
-            String ext = lastMsg.split(".").last;
+            String ext = lastMsg.split(".").last.toLowerCase();
             if(LogfinController.validFileTypeList.contains(ext)){
               if(LogfinController.validDocFileTypeList.contains(ext)){
                 lastMsg = "파일을 보냈습니다.";
@@ -908,6 +923,9 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             }
           }
           lastDateString = CommonUtils.convertTimeToString(CommonUtils.parseToLocalTime(listMsg[listMsg.length-1]["created_at"]));
+        }else{
+          lastMsg = Config.defaultMessage;
+          lastMsg = lastMsg.replaceAll("@@", "\n");
         }
 
         int lastReadId = int.parse(msg["last_read_message_id"].toString());
@@ -925,15 +943,20 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               UiUtils.getMarginBox(0, 1.5.h),
               UiUtils.getBorderButtonBoxWithZeroPadding(92.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
                   Row(mainAxisSize: MainAxisSize.min, children: [
-                    Expanded(flex: 2, child:  UiUtils.getCircleImage(each.chatRoomIconPath, 11.w)),
+                    Expanded(flex: 2, child: CommonUtils.isUrlPath(each.chatRoomIconPath) ? UiUtils.getCircleNetWorkImage(11.w, each.chatRoomIconPath, _logoAniController)
+                        : UiUtils.getCircleImage(each.chatRoomIconPath, 11.w)),
                     UiUtils.getMarginBox(1.w, 0),
                     Expanded(flex: 10, child: Column(mainAxisSize: MainAxisSize.max, crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Column(mainAxisSize: MainAxisSize.max, crossAxisAlignment: CrossAxisAlignment.start, children: [
                         UiUtils.getMarginBox(0, 1.h),
                         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                          Container(),
-                          Container(),
-                          UiUtils.getTextWithFixedScale(each.chatRoomTitle, 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null),
+                          UiUtils.getTextWithFixedScale("#공식채널", 9.sp, FontWeight.w600, ColorStyles.upFinPrTitleColor, TextAlign.start, null),
+                          UiUtils.getMarginBox(0, 0.5.h),
+                          Row(children: [
+                            UiUtils.getIcon(4.w, 4.w, Icons.notifications, 4.w, ColorStyles.upFinRealGray),
+                            UiUtils.getMarginBox(1.w, 0),
+                            UiUtils.getTextWithFixedScale(each.chatRoomTitle, 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)
+                          ]),
                           UiUtils.getMarginBox(0, 1.h),
                           Row(mainAxisAlignment: MainAxisAlignment.start, children: [
                             Container(),
@@ -964,7 +987,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
         );
       }
     }
-
     return userChatRoomWidgetList;
   }
 
@@ -976,13 +998,16 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
         var jsonData = jsonDecode(each.chatRoomMsgInfo);
         Map<String, dynamic> msg = jsonData;
         List<dynamic> listMsg = msg["data"];
-        listMsg.sort((a,b) => a["id"].compareTo(b["id"]));
+        listMsg.sort((a,b) => double.parse(a["id"].toString()).compareTo(double.parse(b["id"].toString())));
         String lastMsg = listMsg[listMsg.length-1]["message"].toString();
         if(lastMsg.contains(" / ")){
           lastMsg = lastMsg.split(" / ")[1];
         }
         if(lastMsg.contains("<b")){
-          lastMsg = lastMsg.replaceAll("<br>", "").replaceAll("<b>", "").replaceAll("</b>", "");
+          lastMsg = lastMsg.replaceAll("<a href=", "").replaceAll("</a", "").replaceAll("<br>", "").replaceAll("<b>", "").replaceAll("</b>", "").replaceAll(">", "");
+        }
+        if(lastMsg.contains(".upfin_web")){
+          lastMsg = "파일을 전송했습니다.";
         }
         if(lastMsg.contains("http")){
           String ext = lastMsg.split(".").last;
@@ -1012,7 +1037,8 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               UiUtils.getMarginBox(0, 1.5.h),
               UiUtils.getBorderButtonBoxWithZeroPadding(92.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
                   Row(mainAxisSize: MainAxisSize.min, children: [
-                    Expanded(flex: 2, child:  UiUtils.getImage(11.w, 11.w, Image.asset(each.chatRoomIconPath))),
+                    Expanded(flex: 2, child: CommonUtils.isUrlPath(each.chatRoomIconPath) ? UiUtils.getCircleNetWorkImage(11.w, each.chatRoomIconPath, _logoAniController)
+                        : UiUtils.getImage(11.w, 11.w, Image.asset(each.chatRoomIconPath))),
                     UiUtils.getMarginBox(1.w, 0),
                     Expanded(flex: 10, child: Column(mainAxisSize: MainAxisSize.max, crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Column(mainAxisSize: MainAxisSize.max, crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -1058,10 +1084,9 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   }
 
   Future<void> _goToChatRoom(List<dynamic> listMsg, String chatRoomId) async {
-    CommonUtils.log("w","chatRoomId : $chatRoomId");
-    if(listMsg.length>30){
+    if(listMsg.length>20){
       UiUtils.showLoadingPop(context);
-      await Future.delayed(const Duration(milliseconds: 200));
+      await Future.delayed(const Duration(milliseconds: 300));
     }
 
     GetController.to.resetChatMessageInfoList();
@@ -1072,7 +1097,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
       GetController.to.addChatMessageInfoList(messageItem);
     }
 
-    await FireBaseController.setNotificationTorF(false);
+    FireBaseController.setNotificationTorF(false);
     isViewHere = false;
     if(context.mounted){
       for(var each in GetController.to.chatLoanInfoDataList){
@@ -1081,12 +1106,9 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             LogfinController.autoAnswerMap = LogfinController.autoAnswerMapForAccident;
             for(var eachLoan in MyData.getLoanInfoList()){
               if(each.chatLoanUid == eachLoan.loanUid){
-                CommonUtils.log("w","22 uid : ${eachLoan.loanUid}");
-                CommonUtils.log("w","33 uid : ${eachLoan.uid}");
                 for(var eachAccident in MyData.getAccidentInfoList()){
                   if(eachLoan.uid == eachAccident.accidentUid){
                     MyData.selectedAccidentInfoData = eachAccident;
-                    CommonUtils.log("w","44 uid : ${eachAccident.accidentUid}");
                   }
                 }
               }
@@ -1095,7 +1117,6 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
             LogfinController.autoAnswerMap = LogfinController.autoAnswerMapForCar;
             for(var eachLoan in MyData.getLoanInfoList()){
               if(each.chatLoanUid == eachLoan.loanUid){
-                CommonUtils.log("w","22 uid : ${LogfinController.autoAnswerMap}");
                 for(var eachCar in MyData.getCarInfoList()){
                   if(eachLoan.uid == eachCar.carUid){
                     MyData.selectedCarInfoData = eachCar;
@@ -1104,16 +1125,20 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
               }
             }
           }else{
-            LogfinController.autoAnswerMap = {"채팅": "chat"};
+            //LogfinController.autoAnswerMap = {"채팅": "chat"};
+            LogfinController.autoAnswerMap = {};
             MyData.selectedCarInfoData = null;
             MyData.selectedAccidentInfoData = null;
           }
         }
       }
 
-      UiUtils.closeLoadingPop(context);
       AppChatViewState.currentRoomId = chatRoomId;
+      if(listMsg.length>20){
+        if(context.mounted) UiUtils.closeLoadingPop(context);
+      }
       await CommonUtils.moveToWithResult(context, AppView.appChatView.value, null);
+
     }
     isViewHere = true;
     if(context.mounted){
@@ -1122,7 +1147,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
       for(var eachMessage in GetController.to.chatMessageInfoDataList){
         listMsg.add(jsonDecode(eachMessage.messageInfo));
       }
-      listMsg.sort((a,b) => a["id"].compareTo(b["id"]));
+      listMsg.sort((a,b) => double.parse(a["id"].toString()).compareTo(double.parse(b["id"].toString())));
       for(int i = 0 ; i < MyData.getChatRoomInfoList().length ; i++){
         if(MyData.getChatRoomInfoList()[i].chatRoomId == chatRoomId){
           Map<String, dynamic> msgInfo = jsonDecode(MyData.getChatRoomInfoList()[i].chatRoomMsgInfo);
@@ -1143,7 +1168,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   void _refreshMyView(BuildContext context) {
     GetController.to.updateAllSubScribed(false);
     int chatRoomCnt = MyData.getChatRoomInfoList().length;
-    Future.delayed(Duration(seconds: chatRoomCnt > 6 ? 0 : 2), () async {
+    Future.delayed(Duration(seconds: chatRoomCnt > 6 ? 0 : 1), () async {
       LogfinController.getMainViewInfo((isSuccessToGetMainInfo){
         if(chatRoomCnt == 0) GetController.to.updateAllSubScribed(true);
         setState(() {});
@@ -1199,24 +1224,24 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
   Widget _getSettingView(){
     return Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: EdgeInsets.only(top:3.w),
         child: Column(children: [
-          Stack(children: [
-            Container(height: 7.2.h,),
-            Positioned(
-              top: 1.h,
-              left: 5.w,
-              child: UiUtils.getBackButtonForMainView(() {
-                _back();
-              }),
+        Stack(children: [
+          Container(height: 7.2.h,),
+          Positioned(
+            top: 1.h,
+            left: 5.w,
+            child: UiUtils.getBackButtonForMainView(() {
+              _back();
+            }),
+          ),
+          Positioned(
+            child: Align(
+                alignment: Alignment.center,
+                child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                  UiUtils.getMarginBox(0, 1.8.h),
+                  UiUtils.getTextWithFixedScale2("설정", 22.sp, FontWeight.w600, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1),
+                ])
             ),
-            Positioned(
-              child: Align(
-                  alignment: Alignment.center,
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-                    UiUtils.getMarginBox(0, 1.8.h),
-                    UiUtils.getTextWithFixedScale2("설정", 22.sp, FontWeight.w600, ColorStyles.upFinTextAndBorderBlue, TextAlign.center, 1),
-                  ])
-              ),
-            )]),
+          )]),
           UiUtils.getMarginBox(0, 3.h),
           UiUtils.getBorderButtonBox(95.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
               Row(children: [
@@ -1351,7 +1376,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
         var jsonData = jsonDecode(each.chatRoomMsgInfo);
         Map<String, dynamic> msg = jsonData;
         List<dynamic> listMsg = msg["data"];
-        listMsg.sort((a,b) => a["id"].compareTo(b["id"]));
+        listMsg.sort((a,b) => double.parse(a["id"].toString()).compareTo(double.parse(b["id"].toString())));
         _goToChatRoom(listMsg, each.chatRoomId);
       }
     }
@@ -1368,7 +1393,8 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
           SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("안내사항", 14.sp, FontWeight.w800, ColorStyles.upFinBlack, TextAlign.center, null)),
           UiUtils.getMarginBox(0, 2.h),
           UiUtils.getExpandedScrollViewWithScrollbar(Axis.vertical,
-              Padding(padding: EdgeInsets.only(left: 2.w, right: 2.w, top: 0, bottom: 0), child: UiUtils.getTextWithFixedScale2(Config.appInfoTextMap["info_text"].replaceAll("@@", "\n"), 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)), _infoPopScrollController),
+              Padding(padding: EdgeInsets.only(left: 2.w, right: 2.w, top: 0, bottom: 0), child:
+              UiUtils.getTextWithFixedScale2(Config.appInfoTextMap["info_text"].replaceAll("@@", "\n"), 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)), _infoPopScrollController),
 
           UiUtils.getBorderButtonBoxWithZeroPadding(90.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite,
               Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment:CrossAxisAlignment.center, children: [
@@ -1524,7 +1550,12 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver{
                             width: 100.w,
                             height: 100.h,
                             color: Colors.black54,
-                            child: Center(child: UiUtils.getTextWithFixedScale("최신정보로 업데이트 중", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, 1))
+                            child:
+                            Center(child: Column(mainAxisAlignment:MainAxisAlignment.center, children: [
+                              SpinKitWave(color: ColorStyles.upFinTextAndBorderBlue, size: 15.w),
+                              UiUtils.getMarginBox(0, 3.h),
+                              UiUtils.getTextWithFixedScale("최신정보로 업데이트 중", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, 1)
+                            ]))
                         );
                       })
               );

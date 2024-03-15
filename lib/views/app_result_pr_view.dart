@@ -7,6 +7,7 @@ import 'package:dfin/datas/my_data.dart';
 import 'package:dfin/styles/ColorStyles.dart';
 import 'package:dfin/views/app_main_view.dart';
 import '../controllers/firebase_controller.dart';
+import '../datas/pr_info_data.dart';
 import '../styles/TextStyles.dart';
 import '../utils/common_utils.dart';
 import '../utils/ui_utils.dart';
@@ -23,6 +24,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
   int possiblePrCnt = 0;
   int impossiblePrCnt = 0;
   bool isOrderByLimit = false;
+  late AnimationController _logoAniController;
 
   int selectedTabIndex = 0 ;
   int selectedTabCount = 0 ;
@@ -36,6 +38,12 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
     setPrCnt();
     MyData.selectedPrInfoData = null;
     _tabController = TabController(length: 2, vsync: this);
+
+    _logoAniController = AnimationController(
+        vsync: this,
+        duration: const Duration(milliseconds: 500),
+        lowerBound: 0.0,
+        upperBound: 1.0);
 
     for(var each in MyData.getPrInfoList()){
       if(each.isPossible){
@@ -67,6 +75,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
     CommonUtils.log("i", "AppResultPrView 화면 파괴");
     WidgetsBinding.instance.removeObserver(this);
     _tabController.dispose();
+    _logoAniController.dispose();
     Config.contextForEmergencyBack = AppMainViewState.mainContext;
     MyData.selectedAccidentInfoData = null;
     MyData.selectedCarInfoData = null;
@@ -121,7 +130,7 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
   List<Widget> _getMsgListIWidget(List<String> msgList){
     List<Widget> widgetList = [];
     for(var eachMsg in msgList){
-      widgetList.add(UiUtils.getBoxTextAndIconWithFixedScale(eachMsg, 8.sp, FontWeight.w500, TextAlign.start, ColorStyles.upFinWhiteRed, ColorStyles.upFinRed,
+      widgetList.add(UiUtils.getBoxTextAndIconWithFixedScale(eachMsg, 10.sp, FontWeight.w500, TextAlign.start, ColorStyles.upFinWhiteRed, ColorStyles.upFinRed,
           Icons.warning_rounded, ColorStyles.upFinRed, 5.w));
 
       widgetList.add(UiUtils.getMarginBox(0, 0.5.h));
@@ -179,7 +188,8 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                 Row(mainAxisSize: MainAxisSize.max, children: [
                   Expanded(flex: 15, child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
                     SizedBox(width: 90.w, child: Row(children: [
-                      UiUtils.getImage(10.w, 10.w, Image.asset(each.productCompanyLogo)),
+                      CommonUtils.isUrlPath(each.productCompanyLogo) ? UiUtils.getCircleNetWorkImage(10.w, each.productCompanyLogo, _logoAniController)
+                          : UiUtils.getImage(10.w, 10.w, Image.asset(each.productCompanyLogo)),
                       UiUtils.getMarginBox(1.5.w, 0),
                       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         UiUtils.getTextWithFixedScale(each.productCompanyName, 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null),
@@ -242,34 +252,8 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                                 UiUtils.getBorderButtonBox(43.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
                                     UiUtils.getTextWithFixedScale("네! 신청할게요", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () async {
                                       Navigator.pop(slideContext);
-                                      MyData.selectedPrInfoData = each;
-                                      await _addAgreeInfoForProduct(MyData.selectedPrInfoData!.productDocCode);
-                                      if(context.mounted){
-                                        UiUtils.showAgreePop(context, "B", MyData.selectedPrInfoData!.productDocCode, () {
-                                          UiUtils.showLoadingPop(context);
-                                          if(each.uidType == "1"){
-                                            LogfinController.getPrDocsList(MyData.selectedPrInfoData!.productOfferId, MyData.selectedPrInfoData!.productOfferRid, (isSuccessToSearchDocs, _) async {
-                                              UiUtils.closeLoadingPop(context);
-                                              if(isSuccessToSearchDocs){
-                                                CommonUtils.moveToWithResult(context, AppView.appApplyPrView.value, null);
-                                              }else{
-                                                CommonUtils.flutterToast("상품정보를 불러오는데\n실패했어요.");
-                                                MyData.selectedPrInfoData = null;
-                                              }
-                                            });
-                                          }else{
-                                            LogfinController.getCarPrDocsList((isSuccessToSearchDocs, _) async {
-                                              UiUtils.closeLoadingPop(context);
-                                              if(isSuccessToSearchDocs){
-                                                CommonUtils.moveToWithResult(context, AppView.appApplyPrView.value, null);
-                                              }else{
-                                                CommonUtils.flutterToast("상품정보를 불러오는데\n실패했어요.");
-                                                MyData.selectedPrInfoData = null;
-                                              }
-                                            });
-                                          }
-                                        });
-                                      }
+                                      //_showAgree(each);
+                                      _showDetailView(each);
                                     }),
                                 UiUtils.getMarginBox(2.w, 0),
                                 UiUtils.getBorderButtonBox(43.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
@@ -282,35 +266,8 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
                         );
                       });
                     }else{
-                      MyData.selectedPrInfoData = each;
-                      await _addAgreeInfoForProduct(MyData.selectedPrInfoData!.productDocCode);
-                      if(context.mounted){
-                        UiUtils.showAgreePop(context, "B", MyData.selectedPrInfoData!.productDocCode, () {
-                          UiUtils.showLoadingPop(context);
-                          if(each.uidType == "1"){
-                            LogfinController.getPrDocsList(MyData.selectedPrInfoData!.productOfferId, MyData.selectedPrInfoData!.productOfferRid, (isSuccessToSearchDocs, _) async {
-                              UiUtils.closeLoadingPop(context);
-                              if(isSuccessToSearchDocs){
-                                CommonUtils.moveToWithResult(context, AppView.appApplyPrView.value, null);
-                              }else{
-                                CommonUtils.flutterToast("상품정보를 불러오는데\n실패했어요.");
-                                MyData.selectedPrInfoData = null;
-                              }
-                            });
-                          }else{
-                            LogfinController.getCarPrDocsList((isSuccessToSearchDocs, _) async {
-                              UiUtils.closeLoadingPop(context);
-                              if(isSuccessToSearchDocs){
-                                CommonUtils.moveToWithResult(context, AppView.appApplyPrView.value, null);
-                              }else{
-                                CommonUtils.flutterToast("상품정보를 불러오는데\n실패했어요.");
-                                MyData.selectedPrInfoData = null;
-                              }
-                            });
-                          }
-
-                        });
-                      }
+                      //_showAgree(each);
+                      _showDetailView(each);
                     }
                   }else{
                     CommonUtils.flutterToast("신청 불가능한 상품이에요.");
@@ -322,6 +279,173 @@ class AppResultPrViewState extends State<AppResultPrView> with WidgetsBindingObs
     }
 
     return UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: prInfoWidgetList));
+  }
+
+  List<Widget> _getEachDetailWidget(String title, String detailInfo){
+    List<Widget> introWidgetList = [];
+    introWidgetList.add(
+        UiUtils.getMarginBox(0, 5.h)
+    );
+    introWidgetList.add(
+        SizedBox(width: 80.w,
+            child: UiUtils.getTextWithFixedScale(title, 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)
+        )
+    );
+    introWidgetList.add(
+        UiUtils.getMarginBox(0, 1.h)
+    );
+
+    introWidgetList.add(
+        SizedBox(width: 80.w,
+            child: Row(children: [
+              //UiUtils.getMarginBox(3.w, 0),
+              SizedBox(width: 75.w, child: UiUtils.getTextWithFixedScale2(detailInfo == "" ? "정보없음" : "${detailInfo.replaceAll("(", "\n(")}", 14.sp, FontWeight.w500, detailInfo == "" ?  ColorStyles.upFinDarkGrayWithAlpha : ColorStyles.upFinBlack, TextAlign.start, null))
+            ])
+        )
+    );
+    return introWidgetList;
+  }
+
+  String _getDetailStringInfo(String keyString, Map<String, dynamic> info){
+    String result = "";
+    if(info.containsKey(keyString)){
+      String infoString = info[keyString].toString();
+      if(infoString != "" && infoString != "null"){
+        result = infoString;
+      }
+    }
+
+    return result;
+  }
+
+  void _showDetailView(PrInfoData selectedPrInfo){
+    UiUtils.showPopMenu(context, false, 100.w, 100.h, 0.5, 0, ColorStyles.upFinWhite, (popContext, popSetState){
+      List<Widget> introWidgetList = [];
+
+      introWidgetList.add(
+          UiUtils.getMarginBox(0, 1.h)
+      );
+
+      introWidgetList.add(
+          Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            SizedBox(width: 90.w, child: Row(children: [
+              CommonUtils.isUrlPath(selectedPrInfo.productCompanyLogo) ? UiUtils.getCircleNetWorkImage(12.w, selectedPrInfo.productCompanyLogo, _logoAniController)
+                  : UiUtils.getImage(12.w, 12.w, Image.asset(selectedPrInfo.productCompanyLogo)),
+              UiUtils.getMarginBox(3.w, 0),
+              Column(children: [
+                SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScaleAndOverFlow(selectedPrInfo.productCompanyName, 15.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, 1)),
+                UiUtils.getMarginBox(0, 1.h),
+                SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScaleAndOverFlow(selectedPrInfo.productName, 10.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, 1)),
+              ])
+            ])),
+            UiUtils.getMarginBox(0, 3.h),
+            SizedBox(width: 90.w, child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+              UiUtils.getBorderButtonBoxWithZeroPadding(41.w, ColorStyles.upFinRealWhite, ColorStyles.upFinGray,
+                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    UiUtils.getMarginBox(0, 2.h),
+                    SizedBox(width: 30.w, child: UiUtils.getTextWithFixedScale("최저금리", 10.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, 1)),
+                    UiUtils.getMarginBox(0, 1.h),
+                    SizedBox(width: 35.w, child: UiUtils.getTextWithFixedScale("${selectedPrInfo.productLoanMinRates}%", 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1)),
+                    UiUtils.getMarginBox(0, 2.h),
+                  ]), () {}),
+              UiUtils.getMarginBox(2.w, 0),
+              UiUtils.getBorderButtonBoxWithZeroPadding(41.w, ColorStyles.upFinRealWhite, ColorStyles.upFinGray,
+                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    UiUtils.getMarginBox(0, 2.h),
+                    SizedBox(width: 30.w, child: UiUtils.getTextWithFixedScale("최대한도", 10.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, 1)),
+                    UiUtils.getMarginBox(0, 1.h),
+                    SizedBox(width: 35.w, child: UiUtils.getTextWithFixedScale(CommonUtils.getPriceFormattedString(double.parse(selectedPrInfo.productLoanLimit)), 15.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1)),
+                    UiUtils.getMarginBox(0, 2.h),
+                  ]), () {})
+            ]))
+          ])
+      );
+
+      Map<String, dynamic> info = selectedPrInfo.lenderInfo;
+      CommonUtils.log("i", "info  : $info");
+      introWidgetList.addAll(_getEachDetailWidget("중도상환수수료", _getDetailStringInfo("prepayment_fee", info)));
+      introWidgetList.addAll(_getEachDetailWidget("상환방식", _getDetailStringInfo("repayment_method", info)));
+      introWidgetList.addAll(_getEachDetailWidget("상환기간", _getDetailStringInfo("repayment_term", info)));
+      introWidgetList.addAll(_getEachDetailWidget("부대비용", _getDetailStringInfo("additional_fee", info)));
+      introWidgetList.addAll(_getEachDetailWidget("이자납입", _getDetailStringInfo("delay_rate", info)));
+      introWidgetList.addAll(_getEachDetailWidget("연체이자율", _getDetailStringInfo("interest_payment", info)));
+
+      return UiUtils.getRowColumnWithAlignCenter([
+        SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          UiUtils.getBackButton(() async {
+            Navigator.pop(popContext);
+          }),
+        ])),
+        UiUtils.getMarginBox(0, 2.w),
+        UiUtils.getExpandedScrollView(Axis.vertical, SizedBox(width: 85.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: introWidgetList))),
+        UiUtils.getMarginBox(0, 4.h),
+        UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
+            UiUtils.getTextWithFixedScale("신청하기", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () async {
+              MyData.selectedPrInfoData = selectedPrInfo;
+              await _addAgreeInfoForProduct(MyData.selectedPrInfoData!.productDocCode);
+              if(popContext.mounted){
+                UiUtils.showAgreePop(popContext, "B", MyData.selectedPrInfoData!.productDocCode, () {
+                  UiUtils.showLoadingPop(popContext);
+                  if(selectedPrInfo.uidType == "1"){
+                    LogfinController.getPrDocsList(MyData.selectedPrInfoData!.productOfferId, MyData.selectedPrInfoData!.productOfferRid, (isSuccessToSearchDocs, _) async {
+                      UiUtils.closeLoadingPop(popContext);
+                      Navigator.pop(popContext);
+                      if(isSuccessToSearchDocs){
+                        CommonUtils.moveToWithResult(context, AppView.appApplyPrView.value, null);
+                      }else{
+                        CommonUtils.flutterToast("상품정보를 불러오는데\n실패했어요.");
+                        MyData.selectedPrInfoData = null;
+                      }
+                    });
+                  }else{
+                    LogfinController.getCarPrDocsList((isSuccessToSearchDocs, _) async {
+                      UiUtils.closeLoadingPop(popContext);
+                      Navigator.pop(popContext);
+                      if(isSuccessToSearchDocs){
+                        CommonUtils.moveToWithResult(context, AppView.appApplyPrView.value, null);
+                      }else{
+                        CommonUtils.flutterToast("상품정보를 불러오는데\n실패했어요.");
+                        MyData.selectedPrInfoData = null;
+                      }
+                    });
+                  }
+                });
+              }
+            }),
+        UiUtils.getMarginBox(0, 3.h)
+      ]);
+    });
+  }
+
+  Future<void> _showAgree(PrInfoData selectedPrInfo) async {
+    MyData.selectedPrInfoData = selectedPrInfo;
+    await _addAgreeInfoForProduct(MyData.selectedPrInfoData!.productDocCode);
+    if(context.mounted){
+      UiUtils.showAgreePop(context, "B", MyData.selectedPrInfoData!.productDocCode, () {
+        UiUtils.showLoadingPop(context);
+        if(selectedPrInfo.uidType == "1"){
+          LogfinController.getPrDocsList(MyData.selectedPrInfoData!.productOfferId, MyData.selectedPrInfoData!.productOfferRid, (isSuccessToSearchDocs, _) async {
+            UiUtils.closeLoadingPop(context);
+            if(isSuccessToSearchDocs){
+              CommonUtils.moveToWithResult(context, AppView.appApplyPrView.value, null);
+            }else{
+              CommonUtils.flutterToast("상품정보를 불러오는데\n실패했어요.");
+              MyData.selectedPrInfoData = null;
+            }
+          });
+        }else{
+          LogfinController.getCarPrDocsList((isSuccessToSearchDocs, _) async {
+            UiUtils.closeLoadingPop(context);
+            if(isSuccessToSearchDocs){
+              CommonUtils.moveToWithResult(context, AppView.appApplyPrView.value, null);
+            }else{
+              CommonUtils.flutterToast("상품정보를 불러오는데\n실패했어요.");
+              MyData.selectedPrInfoData = null;
+            }
+          });
+        }
+      });
+    }
   }
 
   Future<void> _addAgreeInfoForProduct(String productDocCode) async {

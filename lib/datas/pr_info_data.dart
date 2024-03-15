@@ -12,10 +12,11 @@ class PrInfoData {
   String productLoanMinRates;
   String productLoanMaxRates;
   String productLoanLimit;
-  String productCompanyLogo;
+  String productCompanyLogo; // company icon or path
   bool isPossible;
+  Map<String, dynamic> lenderInfo;
   List<dynamic> failReason;
 
   PrInfoData(this.uid, this.uidType, this.productOfferId, this.productOfferRid, this.productOfferLenderPrId, this.productCompanyName, this.productCompanyCode, this.productDocCode, this.productName,
-      this.productCode, this.productLoanMinRates, this.productLoanMaxRates, this.productLoanLimit, this.productCompanyLogo, this.isPossible, this.failReason);
+      this.productCode, this.productLoanMinRates, this.productLoanMaxRates, this.productLoanLimit, this.productCompanyLogo, this.isPossible, this.lenderInfo, this.failReason);
 }

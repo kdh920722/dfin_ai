@@ -17,7 +17,9 @@ class ColorStyles {
   static const Color upFinWhiteGray = Color(0xffeff2f6);
   static const Color upFinDarkWhiteGray = Color(0xff6D6C6C);
   static const Color upFinDarkGray = Color(0xff616161);
+  static const Color upFinChatScrollDarkGray = Color(0xB3616161);
   static const Color upFinRealGray = Colors.grey;
+  static const Color upFinRealGray2 = Color(0xffE5EBEE);
   static const Color upFinBlack = Color(0xff1c1c1c);
   static const Color upFinWhite = Colors.white;
   static const Color upFinRealWhite = Colors.white;

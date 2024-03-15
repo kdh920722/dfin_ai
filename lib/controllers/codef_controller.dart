@@ -1187,7 +1187,7 @@ class CodeFController{
         "startDate": startDate,
         "endDate": endDate,
         "usePurposes": "2",
-        "useType": "01",
+        "useType": "00",
         "originDataYN": "0",
         "telecom": telecom
       };

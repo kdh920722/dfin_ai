@@ -76,6 +76,17 @@
 
         <meta-data android:name="com.facebook.sdk.ApplicationId" android:value="@string/facebook_app_id"/>
         <meta-data android:name="com.facebook.sdk.ClientToken" android:value="@string/facebook_client_token"/>
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.ysmeta.upfinai.flutter_inappwebview.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
+
         <!-- 추가 -->
         <!-- Used for Google Play Store Campaign Measurement -->
         <receiver

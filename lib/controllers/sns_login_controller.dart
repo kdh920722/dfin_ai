@@ -33,7 +33,7 @@ extension LoginPlatformExtension on LoginPlatform {
 class SnsLoginController{
   static LoginPlatform loginPlatform = LoginPlatform.none;
 
-  static const String kakaoKey = "8b274aad5e2a4f3b8a5a1530750bc1ad";
+  static const String kakaoKey = "077c95950e4c99aefd181d2cd069524a";
   static String kakaoToken = "";
   static String kakaoId = "";
   static String appleUrl = "";

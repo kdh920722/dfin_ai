@@ -6,7 +6,7 @@ class LoanInfoData {
   String submitAmount;
   String submitRate;
   String companyName;
-  String companyLogo;
+  String companyLogo; // company icon or path
   String productName;
   String contactNo;
   String createdDate;

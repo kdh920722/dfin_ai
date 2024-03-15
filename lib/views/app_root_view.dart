@@ -100,8 +100,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
     precacheImage(const AssetImage('assets/images/img_woman_searcher_01.png'), context);
     precacheImage(const AssetImage('assets/images/img_woman_coffee.png'), context);
     precacheImage(const AssetImage('assets/images/accident_icon.png'), context);
-    precacheImage(const AssetImage('assets/images/bank_logo_default.png'), context);
-    precacheImage(const AssetImage('assets/images/bank_logo_safe.png'), context);
+    precacheImage(const AssetImage('assets/images/icon_default_bank.png'), context);
     precacheImage(const AssetImage('assets/images/ani_man_search.gif'), context);
     precacheImage(const AssetImage('assets/images/img_id_card.png'), context);
     precacheImage(const AssetImage('assets/images/kakao_icon.png'), context);

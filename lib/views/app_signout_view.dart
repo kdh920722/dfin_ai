@@ -220,7 +220,7 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
                                 CommonUtils.flutterToast("내용 확인에 체크하세요.");
                               }
                             }),
-                        UiUtils.getMarginBox(0, 0.5.h),
+                        UiUtils.getMarginBox(0, 1.5.h),
                         SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                           UiUtils.getRoundBoxButtonTextWithFixedScale5(
                               UiUtils.getTextWithFixedScale("비밀번호를 잊으셨나요?", 12.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),

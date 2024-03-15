@@ -18,6 +18,9 @@ class GetController extends GetxController {
   RxBool isAutoAnswerWaiting = false.obs;
   RxString preLoanPrice = "만원".obs;
   RxString wantLoanPrice = "만원".obs;
+  RxBool isOneTimeKeyHere = false.obs;
+  RxBool isWebViewHere = false.obs;
+  RxDouble chatInputHeight = 0.0.obs;
 
   RxList<AccidentInfoData> accidentInfoDataList = <AccidentInfoData>[].obs;
   RxList<CarInfoData> carInfoDataList = <CarInfoData>[].obs;
@@ -78,12 +81,19 @@ class GetController extends GetxController {
     isWait = false.obs;
   }
 
-
   void updateConfirmed(bool newValue) {
     isConfirmed.value = newValue;
   }
   void resetConfirmed() {
     isConfirmed = false.obs;
+  }
+
+  void updateWebViewFlag(bool newValue) {
+    isWebViewHere.value = newValue;
+  }
+
+  void updateOneTimeKeyFlag(bool newValue) {
+    isOneTimeKeyHere.value = newValue;
   }
 
   void updateAllSubScribed(bool newValue) {
@@ -135,7 +145,7 @@ class GetController extends GetxController {
         var jsonData = jsonDecode(newList[i].chatRoomMsgInfo);
         Map<String, dynamic> msg = jsonData;
         List<dynamic> listMsg = msg["data"];
-        listMsg.sort((a,b) => b["id"].compareTo(a["id"]));
+        listMsg.sort((a,b) => double.parse(b["id"].toString()).compareTo(double.parse(a["id"].toString())));
         msg.remove("data");
         msg["data"] = listMsg;
         newList[i].chatRoomMsgInfo = jsonEncode(msg);
@@ -244,6 +254,11 @@ class GetController extends GetxController {
   void updateChatAutoAnswerHeight(double newValue) {
     //chatAutoAnswerHeight.value = newValue;
   }
+
+  void updateChatInputHeight(double newValue) {
+    chatInputHeight.value = newValue;
+  }
+
   void updateChatStatusTick(int newValue) {
     chatStatusTick.value = newValue;
   }

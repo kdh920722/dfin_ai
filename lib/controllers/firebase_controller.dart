@@ -14,6 +14,7 @@ import 'package:dfin/views/app_chat_view.dart';
 import 'package:dfin/views/app_main_view.dart';
 import '../configs/firebase_options.dart';
 import '../utils/common_utils.dart';
+import 'logfin_controller.dart';
 
 class FireBaseController{
   static final FireBaseController _instance = FireBaseController._internal();
@@ -127,7 +128,7 @@ class FireBaseController{
           await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(androidNotificationChannel);
 
           if(!Config.isAndroid){
-            // await messaging.requestPermission(alert: true, announcement: false, badge: true, carPlay: false, criticalAlert: false, provisional: false, sound: true);
+           // await messaging.requestPermission(alert: true, announcement: false, badge: true, carPlay: false, criticalAlert: false, provisional: false, sound: true);
           }
 
           // Foreground handling event
@@ -173,27 +174,42 @@ class FireBaseController{
   static Future<void> _showNotification(RemoteMessage message, FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin, AndroidNotificationChannel? channel) async {
     //await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(alert: true, badge: true, sound: true);
 
-    if(Config.isAndroid && !MyData.isLogout){
-      flutterLocalNotificationsPlugin.show(
-          message.hashCode,
-          message.notification?.title,
-          message.notification?.body.toString().replaceAll("<br>", "").replaceAll("<b>", "").replaceAll("</b>", ""),
-          Config.isAndroid? NotificationDetails(
-              android: AndroidNotificationDetails(
-                channel!.id,
-                channel.name,
-                channelDescription: channel.description,
-                icon: '@mipmap/ic_launcher',
-              )
-          ) : NotificationDetails(
-              iOS: DarwinNotificationDetails(
-                badgeNumber: 0,
-                subtitle: channelTitleForIOS,
-                sound: 'slow_spring_board.aiff',
-              )
-          ),
-          payload: _getRoomIdFromMessage(message)
-      );
+    if(!MyData.isLogout && Config.isAndroid){
+      CommonUtils.log("w","dfffascon android");
+      String? pushMsg = message.notification?.body.toString().replaceAll("<a href=", "").replaceAll("</a", "").replaceAll("<br>", "").replaceAll("<b>", "").replaceAll("</b>", "").replaceAll(">", "");
+      if(pushMsg != null){
+        if(pushMsg.contains("http")){
+          String ext = pushMsg.split(".").last.toLowerCase();
+          if(LogfinController.validFileTypeList.contains(ext)){
+            if(LogfinController.validDocFileTypeList.contains(ext)){
+              pushMsg = "파일을 보냈습니다.";
+            }else{
+              pushMsg = "사진을 보냈습니다.";
+            }
+          }
+        }
+
+        flutterLocalNotificationsPlugin.show(
+            message.hashCode,
+            message.notification?.title,
+            pushMsg,
+            Config.isAndroid? NotificationDetails(
+                android: AndroidNotificationDetails(
+                  channel!.id,
+                  channel.name,
+                  channelDescription: channel.description,
+                  icon: '@mipmap/ic_launcher',
+                )
+            ) : NotificationDetails(
+                iOS: DarwinNotificationDetails(
+                  badgeNumber: 0,
+                  subtitle: channelTitleForIOS,
+                  sound: 'slow_spring_board.aiff',
+                )
+            ),
+            payload: _getRoomIdFromMessage(message)
+        );
+      }
     }
 
     /*

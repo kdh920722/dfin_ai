@@ -34,7 +34,7 @@ class GptController{
   static Future<void> initGPT(Function(bool) callback) async{
     try{
       final ref = FirebaseDatabase.instance.ref();
-      final snapshot = await ref.child('DFIN/API/gpt/key').get();
+      final snapshot = await ref.child('UPFIN/API/gpt/key').get();
       if (snapshot.exists) {
         GptController.gptApiKey =  snapshot.value.toString();
         callback(true);

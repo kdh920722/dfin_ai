@@ -23,9 +23,11 @@ import 'package:dfin/controllers/get_controller.dart';
 import 'package:dfin/controllers/sharedpreference_controller.dart';
 import 'package:dfin/controllers/websocket_controller.dart';
 import 'package:dfin/utils/ui_utils.dart';
+import 'package:dfin/views/app_apply_pr_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:velocity_x/velocity_x.dart';
 import '../configs/app_config.dart';
+import '../controllers/logfin_controller.dart';
 import '../datas/my_data.dart';
 import '../styles/ColorStyles.dart';
 import '../styles/TextStyles.dart';
@@ -33,7 +35,6 @@ import 'package:image/image.dart' as imglib;
 import 'package:timezone/data/latest.dart' as tzlocal;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:http/http.dart' as http;
-
 import '../views/app_main_view.dart';
 
 class CommonUtils {
@@ -43,7 +44,7 @@ class CommonUtils {
   static void log(String logType, String logMessage){
     if(FireBaseController.fcmToken != ""){
       if(logType.toLowerCase() == "e"){
-        FireBaseController.writeLog("error", FireBaseController.fcmToken, logMessage);
+        //FireBaseController.writeLog("error", FireBaseController.fcmToken, logMessage);
         CommonUtils.setAppLog("ERROR:$logMessage");
       }
     }
@@ -195,7 +196,7 @@ class CommonUtils {
       if(each == MyData.email) isVerPass = true;
     }
 
-    state = isVerPass? 10 : state; // test
+    state = isVerPass? 10 : state;
     if(state == 99){
       if(context.mounted && !isOutPopOn){
         CommonUtils.log("w","check update mount");
@@ -826,12 +827,20 @@ class CommonUtils {
       bool isError = false;
       if(maskingXSizeForBounding > maskingYSizeForBounding){
         //가로모드
-        if(maskingXSizeForBounding*0.6 <= maskingXSize){
+        if(maskingXSizeForBounding*0.4 >= maskingXSize){
+          isError = true;
+        }
+
+        if(maskingYSize*2.5 >= maskingXSize){
           isError = true;
         }
       }else{
         //세로모드
-        if(maskingYSizeForBounding*0.6 <= maskingYSize){
+        if(maskingYSizeForBounding*0.4 >= maskingYSize){
+          isError = true;
+        }
+
+        if(maskingXSize*2.5 >= maskingYSize){
           isError = true;
         }
       }
@@ -846,6 +855,15 @@ class CommonUtils {
 
       if(isError){
         CommonUtils.log('e', "masking size error");
+        String maskingErrorInfoBounding = "Bounding image info ===========>\n"
+            "maskingXSizeForBounding:$maskingXSizeForBounding maskingYSizeForBounding:$maskingYSizeForBounding\n"
+            "startXPointForBounding:$startXPointForBounding startYPointForBounding: $startYPointForBounding";
+        String maskingErrorInfo = "Masking image info ===========>\n"
+            "maskingXSize:$maskingXSize maskingYSize:$maskingYSize\n"
+            "startXPoint:$startXPoint startYPoint: $startYPoint";
+        LogfinController.setLogJson(AppApplyPrViewState.isRetry? LogfinController.applyDocCertCodeString : LogfinController.applyCertCodeString, {"input" : imagePath},
+            {"maskingErrorInfoBounding" : maskingErrorInfoBounding, "maskingErrorInfo" : maskingErrorInfo, "error_output" : maskingInfoMap});
+
         return "";
       }else{
         imglib.fillRect(image, x1: startXPoint, x2 : endXPoint, y1: startYPoint, y2 : endYPoint, color: imglib.ColorRgba8(0, 0, 0, 255));
@@ -857,7 +875,29 @@ class CommonUtils {
 
     } catch (e) {
       CommonUtils.log('e', e.toString());
+      LogfinController.setLogJson(AppApplyPrViewState.isRetry? LogfinController.applyDocCertCodeString : LogfinController.applyCertCodeString, {"input" : imagePath}, {"error_output" : e.toString()});
       return "";
+    }
+  }
+
+  static bool isWeekendInSeoul() {
+    try {
+      tzlocal.initializeTimeZones(); // 타임존 초기화
+      final location = tz.getLocation('Asia/Seoul'); // 원하는 타임존 설정
+      var now = DateTime.now().toUtc();
+      var nowForTest = now.add(const Duration(days: 5));
+      tz.TZDateTime seoulTime = tz.TZDateTime.from(convertToUtcTime(MyData.isTestUser? nowForTest : now), location);
+
+      //CommonUtils.log("w", "seoulTime : ${seoulTime.weekday}\n${DateTime.monday} ${DateTime.tuesday} ${DateTime.wednesday} ${DateTime.thursday} ${DateTime.friday} ${DateTime.saturday} ${DateTime.sunday}");
+      // Check if it's Saturday or Sunday
+      if (seoulTime.weekday == DateTime.saturday ||
+          seoulTime.weekday == DateTime.sunday) {
+        return true; // It's a weekend
+      } else {
+        return false; // It's not a weekend
+      }
+    } catch (e) {
+      return false;
     }
   }
 
@@ -912,6 +952,22 @@ class CommonUtils {
     WebSocketController.resetRetry();
     GetController.to.updateAllSubScribed(true);
     if(CodeFController.apiCheckTimer != null) CodeFController.apiCheckTimer!.cancel();
+  }
+
+  static bool isUrlPath(String url){
+    if(url.contains("http")){
+      return true;
+    }else{
+      return false;
+    }
+  }
+
+  static String checkAppLogo(String logoUrl){
+    if(logoUrl == ""){
+      return "assets/images/icon_default_bank.png";
+    }else{
+      return logoUrl;
+    }
   }
 
   static Future<void> goToMain(BuildContext context, String? email, String? password) async {

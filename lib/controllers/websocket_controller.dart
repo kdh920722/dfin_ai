@@ -130,7 +130,7 @@ class WebSocketController {
 
                   subCnt++;
 
-                  CommonUtils.log("w", "onConnected : $roomId : $subCnt || ${MyData.getChatRoomInfoList().length}");
+                  //CommonUtils.log("w", "onConnected : $roomId : $subCnt || ${MyData.getChatRoomInfoList().length}");
 
                   if(MyData.getChatRoomInfoList().length == subCnt){
                     GetController.to.updateAllSubScribed(true);
@@ -143,7 +143,7 @@ class WebSocketController {
                 },
                 onMessage: (Map message) {
                   var eachMsg = message;
-                  CommonUtils.log("", "arrived message : ${eachMsg["pr_room_id"].toString()} || $roomId \n $message");
+                  CommonUtils.log("i", "arrived message : ${eachMsg["pr_room_id"].toString()} || $roomId \n $message");
 
                   if(AppChatViewState.isScrollMove && eachMsg["username"].toString() == "UPFIN"){
                     String lastMsg = eachMsg["message"].toString();

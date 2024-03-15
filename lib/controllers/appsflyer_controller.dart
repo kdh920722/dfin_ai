@@ -21,7 +21,7 @@ class AppsflyerController{
   static Future<void> initAppsflyer(Function(bool) callback) async{
     try{
       final ref = FirebaseDatabase.instance.ref();
-      final snapshot = await ref.child('DFIN/API/appsflyer').get();
+      final snapshot = await ref.child('UPFIN/API/appsflyer').get();
       if (snapshot.exists) {
         for(var each in snapshot.children){
           switch(each.key){

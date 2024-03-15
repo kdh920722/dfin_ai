@@ -89,7 +89,6 @@ class AppCarDetailViewState extends State<AppCarDetailView> with WidgetsBindingO
 
   List<Widget> _getLoanWidgetList(){
     List<Widget> loanWidgetList = [];
-    int count = 0;
     loanWidgetList.add(UiUtils.getMarginBox(0, 3.h));
     for(var each in MyData.getLoanInfoList()){
       String eachCarNum = "";
@@ -140,13 +139,13 @@ class AppCarDetailViewState extends State<AppCarDetailView> with WidgetsBindingO
 
         loanWidgetList.add(UiUtils.getMarginBox(0, 3.h));
       }
-      count++;
     }
 
     return loanWidgetList;
   }
 
   Widget _getCarWidgetList(){
+    CommonUtils.log("i","img : ${MyData.selectedCarInfoData!.carImage}");
     return Padding(padding: EdgeInsets.only(left: 8.w, right: 8.w),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           UiUtils.getMarginBox(0, 5.h),

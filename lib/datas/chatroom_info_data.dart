@@ -2,7 +2,7 @@ class ChatRoomInfoData {
   String chatRoomId; // uid
   String chatLoanUid; // uid
   String chatRoomType; // 1 : accident,  3 : car
-  String chatRoomIconPath;
+  String chatRoomIconPath; // company icon or path
   String chatRoomTitle;
   String chatRoomSubTitle;
   String chatRoomMsgInfo;

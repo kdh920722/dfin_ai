@@ -20,6 +20,7 @@ import 'package:dfin/views/app_update_accident_view.dart';
 import 'dart:io';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:dfin/views/app_update_car_view.dart';
+import 'package:dfin/views/app_web_view.dart';
 import 'package:dfin/views/debug_for_admin_view.dart';
 import 'package:yaml/yaml.dart';
 import '../utils/common_utils.dart';
@@ -56,6 +57,11 @@ class Config{
   static String autoOpenNText = "";
   static List<String> appVerPassUsers = [];
   static String appVersionCode = "";
+  static bool isErrorLogTracking = true;
+  static String fileUploadWebUrl = "";
+  static bool isUserChatOn = true;
+  static String defaultMessage = "";
+  static String defaultMessageForWeekend = "";
 
   static Map<String, WidgetBuilder> appRoutes = {
     AppView.appRootView.value : (context) => AppRootView(),
@@ -76,6 +82,7 @@ class Config{
     AppView.appCarDetailInfoView.value : (context) => AppCarDetailView(),
     AppView.appSearchCarView.value : (context) => AppSearchCarView(),
     AppView.appUpdateCarView.value : (context) => AppUpdateCarView(),
+    AppView.appWebView.value : (context) => AppWebView(),
   };
 
   static bool isPad(){
@@ -85,8 +92,8 @@ class Config{
 
   static Future<void> getOpenState(Function(bool isSuccess) callback) async {
     final ref = FirebaseDatabase.instance.ref();
-    final appForDeviceInfoSnapshot = isAndroid? await ref.child('DFIN/APP_STATE/android_state').get()
-        : await ref.child('DFIN/APP_STATE/ios_state').get();
+    final appForDeviceInfoSnapshot = isAndroid? await ref.child('UPFIN/APP_STATE/android_state').get()
+        : await ref.child('UPFIN/APP_STATE/ios_state').get();
 
     if(appForDeviceInfoSnapshot.exists){
       for(var each in appForDeviceInfoSnapshot.children){
@@ -117,11 +124,11 @@ class Config{
 
       bool isValid = true;
       final ref = FirebaseDatabase.instance.ref();
-      final appInfoSnapshot = await ref.child('DFIN/APP_STATE/app_info').get();
-      final appSateInfoSnapshot = await ref.child('DFIN/APP_STATE/app_info/state').get();
-      final appVerPassUserInfoSnapshot = await ref.child('DFIN/APP_STATE/app_info/app_ver_pass_user').get();
-      final appForDeviceInfoSnapshot = isAndroid? await ref.child('DFIN/APP_STATE/android_state').get()
-          : await ref.child('DFIN/APP_STATE/ios_state').get();
+      final appInfoSnapshot = await ref.child('UPFIN/APP_STATE/app_info').get();
+      final appSateInfoSnapshot = await ref.child('UPFIN/APP_STATE/app_info/state').get();
+      final appVerPassUserInfoSnapshot = await ref.child('UPFIN/APP_STATE/app_info/app_ver_pass_user').get();
+      final appForDeviceInfoSnapshot = isAndroid? await ref.child('UPFIN/APP_STATE/android_state').get()
+          : await ref.child('UPFIN/APP_STATE/ios_state').get();
 
       if(appInfoSnapshot.exists){
         for(var each in appInfoSnapshot.children){
@@ -136,6 +143,11 @@ class Config{
             case "app_main_intro_text2" : appMainIntroText2 = each.value.toString();
             case "cert_cmp_info" : certCmpInfoMap = jsonDecode(jsonEncode(each.value));
             case "app_call_info" : appCallInfo = each.value.toString();
+            case "error_log_tracking" : isErrorLogTracking = each.value.toString() == "y" ? true : false;
+            case "file_upload_web_url" : fileUploadWebUrl = each.value.toString();
+            case "user_chat_yn" : isUserChatOn = each.value.toString() == "y" ? true : false;
+            case "default_chat_message" : defaultMessage = each.value.toString();
+            case "default_chat_message_weekend" : defaultMessageForWeekend = each.value.toString();
           }
         }
       }else{
@@ -188,8 +200,8 @@ class Config{
   static Future<int> isNeedToUpdateForMain() async {
     int stateCode = 10;
     final ref = FirebaseDatabase.instance.ref();
-    final appForDeviceInfoSnapshot = isAndroid? await ref.child('DFIN/APP_STATE/android_state').get()
-        : await ref.child('DFIN/APP_STATE/ios_state').get();
+    final appForDeviceInfoSnapshot = isAndroid? await ref.child('UPFIN/APP_STATE/android_state').get()
+        : await ref.child('UPFIN/APP_STATE/ios_state').get();
 
     if(appForDeviceInfoSnapshot.exists){
       for(var each in appForDeviceInfoSnapshot.children){
@@ -233,7 +245,7 @@ class Config{
 enum AppView {
   appRootView, appLoginView, appCertificationView, appSignupView, appMainView, appSearchAccidentView, appSignOutView,
   appUpdateAccidentView, appResultPrView, appApplyPrView, appChatView, appAccidentDetailInfoView, appAgreeDetailInfoView,
-  appFindPwView, debugForAdminView, appCarDetailInfoView, appSearchCarView, appUpdateCarView
+  appFindPwView, debugForAdminView, appCarDetailInfoView, appSearchCarView, appUpdateCarView, appWebView
 }
 
 extension SAppViewExtension on AppView {
@@ -275,6 +287,8 @@ extension SAppViewExtension on AppView {
         return '/appSearchCarView';
       case AppView.appUpdateCarView:
         return '/appUpdateCarView';
+      case AppView.appWebView:
+        return '/appWebView';
     }
   }
 }

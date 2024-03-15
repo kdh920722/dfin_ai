@@ -45,6 +45,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     _pwdTextController.text = SharedPreferenceController.getSharedPreferenceValue(SharedPreferenceController.sharedPreferencePwKey);
     Config.contextForEmergencyBack = context;
     Config.isEmergencyRoot = false;
+    backKeyValid = true;
   }
 
   @override
@@ -54,6 +55,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     _unFocusAllNodes();
     _disposeAllTextControllers();
     Config.contextForEmergencyBack = null;
+    backKeyValid = true;
     super.dispose();
   }
 
@@ -78,12 +80,17 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
     }
   }
 
+  bool backKeyValid = true;
   void _back(){
     CommonUtils.hideKeyBoard();
-    Future.delayed(const Duration(milliseconds: 400), () async {
-      _setEmpty();
-      Navigator.pop(context);
-    });
+    if(backKeyValid){
+      backKeyValid = false;
+      Future.delayed(const Duration(milliseconds: 400), () async {
+        _setEmpty();
+        Navigator.pop(context);
+        backKeyValid = true;
+      });
+    }
   }
 
   @override
@@ -133,6 +140,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
               LogfinController.callLogfinApi(LogfinApis.signIn, inputJson, (isSuccessToLogin, outputJson) async {
                 if(isSuccessToLogin){
                   CommonUtils.flutterToast("환영합니다!");
+                  CommonUtils.log("i", "login test start : ${CommonUtils.getCurrentLocalTime()}");
                   await LogfinController.getMainViewInfo((isSuccessToGetMainInfo){
                     UiUtils.closeLoadingPop(context);
                     if(isSuccessToGetMainInfo){
@@ -143,6 +151,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
                       SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceSnsToken, "");
                       SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceSnsId, "");
                       SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceIsSnsLogin, "N");
+                      CommonUtils.log("i", "login test end : ${CommonUtils.getCurrentLocalTime()}");
                       CommonUtils.goToMain(context, _emailTextController.text.trim(), _pwdTextController.text.trim());
                     }
                   });
@@ -170,7 +179,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
             }
           }),
           SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            UiUtils.getMarginBox(0, 1.5.w),
+            UiUtils.getMarginBox(0, 4.w),
             UiUtils.getRoundBoxButtonTextWithFixedScale5(
                 UiUtils.getTextWithFixedScale("아이디가 기억나질 않나요?", 12.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
                 ColorStyles.upFinWhite, (){

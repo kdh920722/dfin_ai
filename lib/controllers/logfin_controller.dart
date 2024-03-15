@@ -129,7 +129,7 @@ class LogfinController {
       } else {
         failCount++;
       }
-      CommonUtils.log("", "list : $jobList");
+      //CommonUtils.log("", "list : $jobList");
 
       final courtSnapshot = await ref.child('UPFIN/API/logfin/list_data/court').get();
       if (courtSnapshot.exists) {
@@ -142,7 +142,7 @@ class LogfinController {
       } else {
         failCount++;
       }
-      CommonUtils.log("", "list : $courtList");
+      //CommonUtils.log("", "list : $courtList");
 
       final bankSnapshot = await ref.child('UPFIN/API/logfin/list_data/bank').get();
       if (bankSnapshot.exists) {
@@ -155,7 +155,7 @@ class LogfinController {
       } else {
         failCount++;
       }
-      CommonUtils.log("", "list : $bankList");
+      //CommonUtils.log("", "list : $bankList");
 
       final loanCountSnapshot = await ref.child('UPFIN/API/logfin/list_data/loan_count').get();
       if (loanCountSnapshot.exists) {
@@ -169,7 +169,7 @@ class LogfinController {
       } else {
         failCount++;
       }
-      CommonUtils.log("", "list : $preLoanCountList");
+      //CommonUtils.log("", "list : $preLoanCountList");
 
       final niceSnapshot = await ref.child('UPFIN/API/logfin/nice').get();
       if (niceSnapshot.exists) {
@@ -182,7 +182,7 @@ class LogfinController {
       } else {
         failCount++;
       }
-      CommonUtils.log("", "niceUrl : $niceUrl");
+      //CommonUtils.log("", "niceUrl : $niceUrl");
 
       final agreeTypeSnapshot = await ref.child('UPFIN/API/logfin/list_data/agree/agreeDetailType').get();
       if (agreeTypeSnapshot.exists) {
@@ -226,7 +226,7 @@ class LogfinController {
       await LogfinController.callLogfinApi(LogfinApis.getFaqs, {"loan_type_id": "1"}, (isSuccessToGetMap, outputJsonMap){
         if(isSuccessToGetMap){
           autoAnswerMapForAccident = outputJsonMap!;
-          autoAnswerMapForAccident["파일첨부 📁"] = {"카메라 📷" : "camera"};
+          autoAnswerMapForAccident["파일첨부 📁"] = {"카메라 📷" : "camera", "파일 🗂" : "file"};
         }else{
           failCount++;
         }
@@ -235,7 +235,7 @@ class LogfinController {
       await LogfinController.callLogfinApi(LogfinApis.getFaqs, {"loan_type_id": "3"}, (isSuccessToGetMap, outputJsonMap){
         if(isSuccessToGetMap){
           autoAnswerMapForCar = outputJsonMap!;
-          autoAnswerMapForCar["파일첨부 📁"] = {"카메라 📷" : "camera"};
+          autoAnswerMapForCar["파일첨부 📁"] = {"카메라 📷" : "camera", "파일 🗂" : "file"};
         }else{
           failCount++;
         }
@@ -252,7 +252,7 @@ class LogfinController {
           cnt++;
           if(isSuccessToGetAgreeInfo){
             agreeDocsList.add({"type" : searchType, "detailType": each, "isAgree": false, "result" : outputJsonForGetAgreeInfo});
-            CommonUtils.log("", "agree result : ${{"type" : searchType, "result" : outputJsonForGetAgreeInfo}}");
+            //CommonUtils.log("", "agree result : ${{"type" : searchType, "result" : outputJsonForGetAgreeInfo}}");
           }else{
             failCount++;
           }
@@ -281,6 +281,225 @@ class LogfinController {
       CommonUtils.setAppLog(logValue);
     }catch(error){
       CommonUtils.log("d", error.toString());
+    }
+  }
+
+  /***
+      <기타>
+      0.회원가입
+      1.로그인
+      2.소셜로그인
+      3.상품조회
+      4.개인회생 계좌정보 입력 및 수정
+      5.이메일 찾기
+      6.비밀번호 변경
+      7.회원탈퇴
+
+      <프로세스 시작-완료>
+      10.상품접수
+      -11.신분증 촬영
+      -12.gov24 문서 가져오기
+      -13.nhis 문서 가져오기
+      -14.nts 문서 가져오기
+      -15.aws업로드
+      -16.접수완료
+      -17.주민번호 입력
+
+      20.미제출 서류접수
+      -21.신분증 촬영
+      -22.gov24 문서 가져오기
+      -23.nhis 문서 가져오기
+      -24.nts 문서 가져오기
+      -25.aws업로드
+      -26.접수완료
+
+      30.이메일 인증시작 (인증코드 발송)
+      -31.이메일 인증완료 (인증코드 인증)
+
+      40.휴대폰 인증시작
+      -41.이메일 휴대폰 인증완료
+   * */
+  static const String applyStartCodeString = "apply_start";
+  static const String applyCertCodeString = "apply_cert";
+  static const String applyIdNumberCodeString = "apply_id";
+  static const String applyGov24CodeString = "apply_gov24";
+  static const String applyNhisCodeString = "apply_nhis";
+  static const String applyNtsCodeString = "apply_nts";
+  static const String applyAwsCodeString = "apply_upload_image";
+  static const String applyDocStartCodeString = "send_doc_start";
+  static const String applyDocCertCodeString = "send_doc_cert";
+  static const String applyDocGov24CodeString = "send_doc_gov24";
+  static const String applyDocNhisCodeString = "send_doc_nhis";
+  static const String applyDocNtsCodeString = "send_doc_nts";
+  static const String applyDocAwsCodeString = "send_upload_image";
+  static const String phoneFinCodeString = "check_phone_fin";
+  static Map<String, String> _getStepCode(String stepCodeString){
+    Map<String, String> stepCodeInfo = {};
+    int stepCode = 99;
+    String stepName = "";
+    /*
+    if(LogfinApis.signUp.value == stepCodeString){
+      //0.회원가입
+      stepCode = 0;
+      stepName = "회원가입";
+    }else if(LogfinApis.signIn.value == stepCodeString){
+      //1.로그인
+      stepCode = 1;
+      stepName = "로그인";
+    }else if(LogfinApis.socialLogin.value == stepCodeString){
+      //2.소셜로그인
+      stepCode = 2;
+      stepName = "소셜로그인";
+    }else if(LogfinApis.prSearch.value == stepCodeString){
+      //3.상품조회(개인회생)
+      stepCode = 3;
+      stepName = "상품조회(개인회생)";
+    }else if(LogfinApis.searchCarProduct.value == stepCodeString){
+      //3.상품조회(오토론)
+      stepCode = 3;
+      stepName = "상품조회(오토론)";
+    }else if(LogfinApis.bankUpdateInfo.value == stepCodeString){
+      //4.개인회생 계좌정보 입력 및 수정
+      stepCode = 4;
+      stepName = "개인회생 계좌정보 입력 및 수정";
+    }else if(LogfinApis.findEmail.value == stepCodeString){
+      //5.이메일 찾기
+      stepCode = 5;
+      stepName = "이메일 찾기";
+    }else if(LogfinApis.updatePassword.value == stepCodeString){
+      //6.비밀번호 변경
+      stepCode = 6;
+      stepName = "비밀번호 변경";
+    }else if(LogfinApis.deleteAccount.value == stepCodeString){
+      //7.회원탈퇴
+      stepCode = 7;
+      stepName = "회원탈퇴";
+    }else if(LogfinApis.applyProduct.value == stepCodeString){
+      //15.상품 접수 완료(개인회생)
+      stepCode = 15;
+      stepName = "상품 접수 완료(개인회생)";
+    }else if(LogfinApis.applyCarProduct.value == stepCodeString){
+      //15.상품 접수 완료(오토론)
+      stepCode = 16;
+      stepName = "상품 접수 완료(오토론)";
+    }else if(LogfinApis.retryDocs.value == stepCodeString){
+      //25.미제출 서류 접수 완료
+      stepCode = 26;
+      stepName = "미제출 서류 접수 완료";
+    }else if(LogfinApis.sendEmailCode.value == stepCodeString){
+      //30.이메일 인증시작
+      stepCode = 30;
+      stepName = "이메일 인증시작";
+    }else if(LogfinApis.checkEmailCode.value == stepCodeString){
+      //31.이메일 인증완료
+      stepCode = 31;
+      stepName = "이메일 인증완료";
+    }else if(LogfinApis.checkMemberByPhone.value == stepCodeString){
+      //40.휴대폰 인증시작
+      stepCode = 40;
+      stepName = "휴대폰 인증시작";
+    }else {
+
+    }
+    */
+
+    if(phoneFinCodeString == stepCodeString){
+      //41.휴대폰 인증완료
+      stepCode = 41;
+      stepName = "휴대폰 인증완료";
+    }else if(applyStartCodeString == stepCodeString){
+      //10.상품접수 시작
+      stepCode = 10;
+      stepName = "상품접수 시작";
+    }else if(applyCertCodeString == stepCodeString){
+      //11.상품접수 신분증 촬영
+      stepCode = 11;
+      stepName = "상품접수 신분증 촬영";
+    }else if(applyIdNumberCodeString == stepCodeString){
+      //17.상품접수 신분증 촬영
+      stepCode = 17;
+      stepName = "상품접수 주민번호 입력";
+    }else if(applyGov24CodeString == stepCodeString){
+      //12.상품접수 gov24 문서 가져오기
+      stepCode = 12;
+      stepName = "상품접수 gov24 문서 가져오기";
+    }else if(applyNhisCodeString == stepCodeString){
+      //13.상품접수 nhis 문서 가져오기
+      stepCode = 13;
+      stepName = "상품접수 nhis 문서 가져오기";
+    }else if(applyNtsCodeString == stepCodeString){
+      //14.상품접수 nts 문서 가져오기
+      stepCode = 14;
+      stepName = "상품접수 nts 문서 가져오기";
+    }else if(applyDocStartCodeString == stepCodeString){
+      //20.미제출 서류접수 시작
+      stepCode = 20;
+      stepName = "미제출 서류접수 시작";
+    }else if(applyDocCertCodeString == stepCodeString){
+      //21.미제출 서류접수 신분증 촬영
+      stepCode = 21;
+      stepName = "미제출 서류접수 신분증 촬영";
+    }else if(applyDocGov24CodeString == stepCodeString){
+      //22.미제출 서류접수 gov24 문서 가져오기
+      stepCode = 22;
+      stepName = "미제출 서류접수 gov24 문서 가져오기";
+    }else if(applyDocNhisCodeString == stepCodeString){
+      //23.미제출 서류접수 nhis 문서 가져오기
+      stepCode = 23;
+      stepName = "미제출 서류접수 nhis 문서 가져오기";
+    }else if(applyDocNtsCodeString == stepCodeString){
+      //24.미제출 서류접수 nts 문서 가져오기
+      stepCode = 24;
+      stepName = "미제출 서류접수 nts 문서 가져오기";
+    }else if(applyAwsCodeString == stepCodeString){
+      //16.aws이미지 업로드
+      stepCode = 15;
+      stepName = "상품접수 aws이미지 업로드";
+    }else if(applyDocAwsCodeString == stepCodeString){
+      //24.미제출 서류접수 aws이미지 업로드
+      stepCode = 25;
+      stepName = "미제출 서류접수 aws이미지 업로드";
+    }else{
+      // none..
+    }
+
+    stepCodeInfo["stepCode"] = stepCode.toString();
+    stepCodeInfo["stepName"] = stepName;
+    return stepCodeInfo;
+  }
+  static Future<void> setLogJson(String apiInfo, Map<String, dynamic> inputJson, Map<String, dynamic> errorJson) async {
+    if(apiInfo != LogfinApis.logTracking.value){
+      Map<String, dynamic> logJson = {};
+      logJson["device_os"] = Config.isAndroid? "android" : "ios";
+      logJson["date"] = CommonUtils.convertTimeToString(CommonUtils.getCurrentLocalTime());
+      logJson["error_content"] = errorJson;
+      logJson["error_yn"] = errorJson.containsKey("error_output") ? "y" : "n";
+      Map<String, dynamic> stepInfo = _getStepCode(apiInfo);
+      logJson["step_code"] = stepInfo["stepCode"];
+      logJson["step_name"] = stepInfo["stepName"];
+
+      if(logJson["step_code"].toString() != "99" && userToken != "" && Config.isErrorLogTracking){
+        //CommonUtils.log("w","target logJson : \n$logJson");
+        var targetUrl = url+LogfinApis.logTracking.value;
+        logJson['api_token'] = userToken;
+        try{
+          final url = Uri.parse(targetUrl);
+          final header = "Bearer $headerKey";
+          final response = await http.post(
+            url,
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": header,
+            },
+            body: jsonEncode(logJson),
+          );
+
+          final json = jsonDecode(response.body);
+          CommonUtils.log("w","save logJson : $json");
+        }catch(e){
+          CommonUtils.log('e', 'logJson error : \n$e');
+        }
+      }
     }
   }
 
@@ -327,9 +546,11 @@ class LogfinController {
       );
 
       final json = jsonDecode(response.body);
-      CommonUtils.log('w', 'out full : \n$json');
+      CommonUtils.log('w', '${api.value} out full : \n$json');
 
       if (response.statusCode == 200) { // HTTP_OK
+        setLogJson(api.value, inputJson, {});
+
         final resultData = json;
         if(resultData["success"]){
           if(api != LogfinApis.getMessage && api != LogfinApis.installTracking && api != LogfinApis.getCarDocs
@@ -337,7 +558,6 @@ class LogfinController {
               && api != LogfinApis.checkMemberByPhone && api != LogfinApis.checkMember && api != LogfinApis.checkEmailCode && api != LogfinApis.checkMessage){
             _setAppLogByApi(api);
           }
-
 
           if(api == LogfinApis.signUp){
             LogfinController.userToken = resultData["data"]["user"]['api_token'];
@@ -352,6 +572,9 @@ class LogfinController {
             callback(true, resultData);
             return;
           }else if(api == LogfinApis.getAgreeDocuments){
+            callback(true, resultData);
+            return;
+          }else if(api == LogfinApis.getOneTimeKey){
             callback(true, resultData);
             return;
           }else if(api == LogfinApis.getFaqs){
@@ -403,6 +626,8 @@ class LogfinController {
           callback(false, resultData);
         }
       } else {
+        setLogJson(api.value, inputJson, {"error_output" : "http error : ${response.statusCode}"});
+
         final resultData = json;
         if(resultData["error"] == "Invalid Email or password."){
           callback(false, <String,dynamic>{"error":"회원가입이 필요합니다."});
@@ -414,6 +639,7 @@ class LogfinController {
         }
       }
     } catch (e) {
+      setLogJson(api.value, inputJson, {"error_output" : e.toString()});
       CommonUtils.log('e', e.toString());
       callback(false, <String,dynamic>{"error":"에러가 발생했습니다."});
     }
@@ -421,64 +647,82 @@ class LogfinController {
 
   static Future<void> getMainViewInfo(Function(bool isSuccess) callback) async {
     try{
-      // 1) 유저정보 가져오기
-      getUserInfo((isSuccessToGetUserInfo){
-        if(isSuccessToGetUserInfo){
-          int callCnt = 0;
-          bool isFailed = false;
+      MyData.resetMyData();
+      int callCnt = 0;
+      bool isFailed = false;
 
-          // 사건정보 가져오기
-          getAccidentInfo((isSuccessToGetAccidentInfo, isAccidentInfoNotEmpty){
-            callCnt++;
-            if(!isSuccessToGetAccidentInfo){
-              isFailed = true;
-            }
-
-            if(callCnt == 2){
-              if(isFailed){
-                callback(false);
-              }else{
-                getLoanInfo((isSuccessToGetLoanInfo, isLoanInfoNotEmpty){
-                  if(isSuccessToGetLoanInfo){
-                    if(isLoanInfoNotEmpty){
-                      callback(true);
-                    }else{
-                      // 대출이력 가져오기 실패는 아니나, 데이터 없음.
-                      callback(true);
-                    }
-                  }
-                });
-              }
-            }
-          });
-
-          // 차량정보 가져오기
-          getCarInfo((isSuccessToGetCarInfo, isCarInfoNotEmpty){
-            callCnt++;
-            if(!isSuccessToGetCarInfo){
-              isFailed = true;
-            }
-
-            if(callCnt == 2){
-              if(isFailed){
-                callback(false);
-              }else{
-                getLoanInfo((isSuccessToGetLoanInfo, isLoanInfoNotEmpty){
-                  if(isSuccessToGetLoanInfo){
-                    if(isLoanInfoNotEmpty){
-                      callback(true);
-                    }else{
-                      // 대출이력 가져오기 실패는 아니나, 데이터 없음.
-                      callback(true);
-                    }
-                  }
-                });
-              }
-            }
-          });
+      getAccidentInfo((isSuccessToGetAccidentInfo, isAccidentInfoNotEmpty){
+        if(!isSuccessToGetAccidentInfo){
+          isFailed = true;
         }else{
-          // 유저정보 가져오기 실패
-          callback(false);
+          if(callCnt != 2){
+            callCnt++;
+          }else{
+            if(isFailed){
+              callback(false);
+            }else{
+              getLoanInfo((isSuccessToGetLoanInfo, isLoanInfoNotEmpty){
+                if(isSuccessToGetLoanInfo){
+                  if(isLoanInfoNotEmpty){
+                    callback(true);
+                  }else{
+                    // 대출이력 가져오기 실패는 아니나, 데이터 없음.
+                    callback(true);
+                  }
+                }
+              });
+            }
+          }
+        }
+      });
+
+      getCarInfo((isSuccessToGetCarInfo, isCarInfoNotEmpty){
+        if(!isSuccessToGetCarInfo){
+          isFailed = true;
+        }else{
+          if(callCnt != 2){
+            callCnt++;
+          }else{
+            if(isFailed){
+              callback(false);
+            }else{
+              getLoanInfo((isSuccessToGetLoanInfo, isLoanInfoNotEmpty){
+                if(isSuccessToGetLoanInfo){
+                  if(isLoanInfoNotEmpty){
+                    callback(true);
+                  }else{
+                    // 대출이력 가져오기 실패는 아니나, 데이터 없음.
+                    callback(true);
+                  }
+                }
+              });
+            }
+          }
+        }
+      });
+
+      getUserInfo((isSuccessToGetUserInfo){
+        if(!isSuccessToGetUserInfo){
+          isFailed = true;
+        }else{
+          if(callCnt != 2){
+            callCnt++;
+          }else{
+            if(isFailed){
+              callback(false);
+            }else{
+              getLoanInfo((isSuccessToGetLoanInfo, isLoanInfoNotEmpty){
+                if(isSuccessToGetLoanInfo){
+                  if(isLoanInfoNotEmpty){
+                    callback(true);
+                  }else{
+                    // 대출이력 가져오기 실패는 아니나, 데이터 없음.
+                    callback(true);
+                  }
+                }
+              });
+            }
+          }
         }
       });
     }catch(error){
@@ -491,7 +735,7 @@ class LogfinController {
       callLogfinApi(LogfinApis.getUserInfo, <String, dynamic>{}, (isSuccessToGetUserInfo, userInfoOutputJson){
         if(isSuccessToGetUserInfo){
           if(userInfoOutputJson != null){
-            CommonUtils.log("w","user : ${userInfoOutputJson["user"]}");
+            //CommonUtils.log("w","user : ${userInfoOutputJson["user"]}");
             if(userInfoOutputJson["user"].containsKey("test_yn")){
               MyData.isTestUser = userInfoOutputJson["user"]["test_yn"].toString() == "1" ? true : false;
             }
@@ -505,14 +749,14 @@ class LogfinController {
             MyData.isMale =  userInfoOutputJson["user"]["gender"] == "1"? true : false;
             if(userInfoOutputJson.containsKey("customer")){
               Map<String, dynamic> customerMap = userInfoOutputJson["customer"];
-              CommonUtils.log("w","customer : $customerMap");
+              //CommonUtils.log("w","customer : $customerMap");
               if(userInfoOutputJson["user"]["telecom"] == null && customerMap["telecom"] != null){
                 MyData.telecom = customerMap["telecom"].toString();
               }
               if(customerMap.containsKey("uid")) MyData.customerUidForNiceCert = customerMap["uid"].toString();
               if(customerMap.containsKey("registration_no")) MyData.idNumber = customerMap["registration_no"] == null? "" : customerMap["registration_no"].toString();
               if(customerMap.containsKey("job_type_id")){
-                CommonUtils.log("w","customer : ${customerMap['job_type_id']}");
+                //CommonUtils.log("w","customer : ${customerMap['job_type_id']}");
                 for(var eachJob in jobList){
                   if(eachJob.split("@")[1] == customerMap["job_type_id"].toString()){
                     MyData.jobInfo = eachJob;
@@ -527,7 +771,7 @@ class LogfinController {
               MyData.userChatRoomInfo = userInfoOutputJson["pr_room"];
             }
 
-            MyData.printData();
+            //MyData.printData();
             callback(true);
           }else{
             callback(false);
@@ -596,6 +840,7 @@ class LogfinController {
                 bool isNeedToCheckAccount = needType == "1" ? true : false;
                 int accountType = AccidentInfoData.getAccidentAccountValidType(isNeedToCheckAccount, resData["data"]);
 
+                /*
                 CommonUtils.log("i", "accident data ====>\n"
                     "date: ${dataResult["created_at"]} || ${dataResult["updated_at"]}\n"
                     "needType : $needType\n"
@@ -611,6 +856,7 @@ class LogfinController {
                     "lend_amount: ${dataResult["lend_amount"]}\n"
                     "wish_amount: ${dataResult["wish_amount"]}\n"
                     "res_data: ${resData["data"]["resRepaymentList"]}\n");
+                */
                 MyData.addToAccidentInfoList(AccidentInfoData(dataResult["id"].toString(), dataResult["uid"], accidentNo.substring(0,4), accidentNo.substring(4,6), accidentNo.substring(6),
                     courtInfo, bankInfo, bankAccount, lendCountInfo, lendAmount, wishAmount, date, accountType, resData["data"]));
               }
@@ -719,7 +965,7 @@ class LogfinController {
                 String carNum = dataResult["carno"];
                 String date = dataResult["created_at"].toString();
 
-
+                /*
                 CommonUtils.log("w", "car data ====>\n"
                     "date: ${dataResult["created_at"]}\n"
                     "carId: ${dataResult["id"]}\n"
@@ -729,6 +975,7 @@ class LogfinController {
                     "lendCountInfo: $lendCountInfo\n"
                     "lend_amount: $lendAmount\n"
                     "wish_amount: $wishAmount\n");
+                */
                 MyData.addToCarInfoList(CarInfoData(dataResult["id"].toString(), dataResult["uid"].toString(), carNum, dataResult["owner_name"].toString(),
                     dataResult["amount"].toString(), lendCountInfo, lendAmount, wishAmount,
                     date, dataResult["car_name"].toString(), dataResult["car_name_detail"].toString(), dataResult["car_image"].toString(), regBList, eachCarInfo));
@@ -818,7 +1065,7 @@ class LogfinController {
                 color: ColorStyles.upFinWhite,
                 child: Column(children: [
                   UiUtils.getMarginBox(0, 2.h),
-                  Center(child: UiUtils.getTextWithFixedScale("상세모델을 선택하세요", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
+                  Center(child: UiUtils.getTextWithFixedScale("상세모델을 선택하세요.", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
                   UiUtils.getMarginBox(0, 2.5.h),
                   UiUtils.getExpandedScrollView(Axis.vertical,
                       Column(crossAxisAlignment:CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.start, children: widgetList)),
@@ -835,7 +1082,7 @@ class LogfinController {
                             if(isSuccessToRetry){
                               callback(true);
                             }else{
-                              String errorMsg = outputJson!["error"];
+                              String errorMsg = outputJson["error"];
                               if(errorMsg == "no implicit conversion of String into Integer"){
                                 CommonUtils.flutterToast("차량정보를 확인해주세요.");
                               }else{
@@ -891,6 +1138,7 @@ class LogfinController {
             String productName = "";
             String contactNo = "";
             String loanUid = "";
+            String companyLogo = "";
 
             MyData.userChatRoomInfo["user_chat_room"] = "user";
             loansList.add(MyData.userChatRoomInfo);
@@ -901,15 +1149,16 @@ class LogfinController {
             }else{
               MyData.clearLoanInfoList();
               for(Map eachLoans in loansList){
-                CommonUtils.log("i", "each loans : $eachLoans");
+                //CommonUtils.log("i", "each loans : $eachLoans");
                 if(eachLoans.containsKey("user_chat_room")){
                   uidType = "0";
                   uid = "user";
                   lenderId = "user";
-                  companyName = "업핀 서포터";
+                  companyName = "업핀";
                   productName = "user";
                   contactNo = "user";
                   loanUid = "0";
+                  companyLogo = "assets/images/icon_upfin.png";
 
                   var inputJson = {
                     "loan_uid" : loanUid,
@@ -917,37 +1166,21 @@ class LogfinController {
                     "length" : 100
                   };
                   await callLogfinApi(LogfinApis.getMessage, inputJson, (isSuccessToGetLoanMessageInfo, loanMessageInfoOutputJson){
-                    CommonUtils.log("w","my chat info : $isSuccessToGetLoanMessageInfo *** $loanMessageInfoOutputJson *** ${eachLoans["last_read_message_id"]} *** ${MyData.userChatRoomInfo["id"].toString()}");
+                    //CommonUtils.log("w","my chat info : $isSuccessToGetLoanMessageInfo *** $loanMessageInfoOutputJson *** ${eachLoans["last_read_message_id"]} *** ${MyData.userChatRoomInfo["id"].toString()}");
                     if(isSuccessToGetLoanMessageInfo){
-                      List<dynamic> tempList = loanMessageInfoOutputJson!["data"];
-
-                      if(tempList.isEmpty){
-                        Map<String, dynamic> jsonMap = {
-                          "id": "0",
-                          "message": "환영합니다!",
-                          "created_at": MyData.userChatRoomInfo["created_at"],
-                          "updated_at": MyData.userChatRoomInfo["updated_at"],
-                          "message_type": "text",
-                          "username": "UPFIN",
-                          "msg_type": "text"};
-                        tempList.add(jsonMap);
-
-                        loanMessageInfoOutputJson["data"] = tempList;
-                      }
-
                       String submitAmount = "0";
-                      loanMessageInfoOutputJson["last_read_message_id"] = MyData.userChatRoomInfo["manager_last_read_message_id"].toString();
+                      loanMessageInfoOutputJson!["last_read_message_id"] = MyData.userChatRoomInfo["last_read_message_id"].toString();
                       MyData.addToLoanInfoList(
                           LoanInfoData(uid, uidType, loanUid, lenderId, submitAmount, "0",
-                              companyName, "assets/images/upfin_icon.png",
-                              productName, contactNo, MyData.userChatRoomInfo["created_at"].toString(), MyData.userChatRoomInfo["updated_at"].toString(),
-                              "0", MyData.userChatRoomInfo["id"].toString(), jsonEncode(loanMessageInfoOutputJson)));
+                              companyName, companyLogo, productName, contactNo,
+                              MyData.userChatRoomInfo["created_at"].toString(), MyData.userChatRoomInfo["updated_at"].toString(), "0",
+                              MyData.userChatRoomInfo["id"].toString(), jsonEncode(loanMessageInfoOutputJson)));
                     }
                   });
 
                 }else{
                   if(eachLoans.containsKey("lender_pr")){
-                    CommonUtils.log("i", "accident loan ==>");
+                    //CommonUtils.log("i", "accident loan ==>");
                     uidType = "1";
                     uid = eachLoans["accident_uid"].toString();
                     lenderId = eachLoans["lender_pr_id"].toString();
@@ -955,7 +1188,8 @@ class LogfinController {
                     productName = eachLoans["lender_pr"]["lender"]["product_name"].toString();
                     contactNo = eachLoans["lender_pr"]["lender"]["contact_no"].toString();
                     loanUid = eachLoans["uid"].toString();
-
+                    companyLogo = CommonUtils.checkAppLogo(eachLoans["lender_pr"]["lender"]["logo"].toString());
+                    /*
                     CommonUtils.log("w", "loan data ====>\n"
                         "uidType: $uidType\n"
                         "uid: $uid\n"
@@ -970,8 +1204,9 @@ class LogfinController {
                         "updatedDate: ${eachLoans["submit_offer"]["updated_at"]}\n"
                         "statueId: ${eachLoans["status_info"]["id"]}\n"
                         "roomId: ${eachLoans["pr_room"]["id"]}\n");
+                    */
                   }else if(eachLoans.containsKey("lender_car")){
-                    CommonUtils.log("i", "car loan ==>");
+                    //CommonUtils.log("i", "car loan ==>");
                     uidType = "3";
                     uid = eachLoans["search_car_result_uid"].toString();
                     lenderId = eachLoans["lender_car_id"].toString();
@@ -979,7 +1214,8 @@ class LogfinController {
                     productName = eachLoans["lender_car"]["lender"]["product_name"].toString();
                     contactNo = eachLoans["lender_car"]["lender"]["contact_no"].toString();
                     loanUid = eachLoans["uid"].toString();
-
+                    companyLogo = CommonUtils.checkAppLogo(eachLoans["lender_car"]["lender"]["logo"].toString());
+                    /*
                     CommonUtils.log("w", "car loan data ====>\n"
                         "uidType: $uidType\n"
                         "uid: $uid\n"
@@ -994,6 +1230,7 @@ class LogfinController {
                         "updatedDate: ${eachLoans["submit_offer"]["updated_at"]}\n"
                         "statueId: ${eachLoans["status_info"]["id"]}\n"
                         "roomId: ${eachLoans["pr_room"]["id"]}\n");
+                    */
                   }
 
                   var inputJson = {
@@ -1002,7 +1239,7 @@ class LogfinController {
                     "length" : 100
                   };
                   await callLogfinApi(LogfinApis.getMessage, inputJson, (isSuccessToGetLoanMessageInfo, loanMessageInfoOutputJson){
-                    CommonUtils.log("w","other chat info : $isSuccessToGetLoanMessageInfo *** $loanMessageInfoOutputJson");
+                    //CommonUtils.log("w","other chat info : $isSuccessToGetLoanMessageInfo *** $loanMessageInfoOutputJson");
                     if(isSuccessToGetLoanMessageInfo){
                       String tempAmount = eachLoans["submit_offer"]["amount"].toString();
                       String submitAmount = "0";
@@ -1016,8 +1253,7 @@ class LogfinController {
                       MyData.addToLoanInfoList(
                           LoanInfoData(uid, uidType, loanUid, lenderId,
                               submitAmount, eachLoans["submit_offer"]["interest_rate"].toString(),
-                              companyName, companyName == "(주)안전대부"? "assets/images/bank_logo_safe.png" : "assets/images/bank_logo_default.png",
-                              productName, contactNo,
+                              companyName, companyLogo, productName, contactNo,
                               eachLoans["submit_offer"]["created_at"].toString(), eachLoans["submit_offer"]["updated_at"].toString(),
                               eachLoans["status_info"]["id"].toString(), eachLoans["pr_room"]["id"].toString(), jsonEncode(loanMessageInfoOutputJson)));
                     }
@@ -1029,11 +1265,9 @@ class LogfinController {
               _setChatRoomInfoList();
               WebSocketController.resetConnectWebSocketCable();
               GetController.to.updateAllSubScribed(false);
-              Future.delayed(const Duration(milliseconds: 500), () {
-                WebSocketController.connectToWebSocketCable();
-                GetController.to.updateChatLoanInfoList(MyData.getChatRoomInfoList());
-                callback(true, true);
-              });
+              WebSocketController.connectToWebSocketCable();
+              GetController.to.updateChatLoanInfoList(MyData.getChatRoomInfoList());
+              callback(true, true);
             }
           }else{
             GetController.to.resetChatLoanInfoList();
@@ -1075,8 +1309,7 @@ class LogfinController {
             for(var each in offerPrList){
               MyData.addToPrInfoList(PrInfoData(accidentUid, "1", offerId, each["rid"], each["lender_pr_id"].toString(), each["lender_name"], each["lender_id"].toString(),
                   each["lender_doc"].toString(), each["product_name"], each["rid"], each["min_rate"].toString(), each["max_rate"].toString(), each["limit"].toString(),
-                  each["lender_name"] == "(주)안전대부"? "assets/images/bank_logo_safe.png" : "assets/images/bank_logo_default.png",
-                  each["result"] as bool, each["msg"] is List ? each["msg"] : []));
+                  CommonUtils.checkAppLogo(each["logo"].toString()), each["result"] as bool, each["lender_pr"], each["msg"] is List ? each["msg"] : []));
             }
 
             if(MyData.getPrInfoList().isNotEmpty){
@@ -1116,8 +1349,7 @@ class LogfinController {
             for(var each in offerPrList){
               MyData.addToPrInfoList(PrInfoData(carUid, "3", offerId, each["rid"].toString(), each["lender_car_id"].toString(), each["lender_name"].toString(), each["lender_id"].toString(),
                   each["lender_doc"].toString(), each["product_name"].toString(), each["rid"].toString(), each["min_rate"].toString(), each["max_rate"].toString(),
-                  each["limit"].toString(), each["lender_name"] == "(주)안전대부"? "assets/images/bank_logo_safe.png" : "assets/images/bank_logo_default.png",
-                  each["result"] as bool, each["msg"] is List ? each["msg"] : []));
+                  each["limit"].toString(), CommonUtils.checkAppLogo(each["logo"].toString()), each["result"] as bool, each["lender_car"], each["msg"] is List ? each["msg"] : []));
             }
 
             if(MyData.getPrInfoList().isNotEmpty){
@@ -1187,7 +1419,6 @@ class LogfinController {
       LogfinController.callLogfinApi(LogfinApis.getCarDocs, inputJson, (isSuccessToSearchDocs, outputJsonForSearchDocs){
         if(isSuccessToSearchDocs){
           for(var each in outputJsonForSearchDocs!["documents"]){
-            // test
             MyData.addToPrDocsInfoList(PrDocsInfoData(each["id"], each["name"], each["del_flg"]));
           }
 
@@ -1219,7 +1450,7 @@ enum LogfinApis {
   sendMessage, getMessage, checkMessage, getAgreeDocuments, getFaqs,
   getRetryDocs, retryDocs,
   findEmail, sendEmailCode, checkEmailCode, checkMemberByPhone, updatePassword,
-  getMyCarInfo, addCar, searchCar, searchCarProduct, getCarDocs, applyCarProduct, installTracking
+  getMyCarInfo, addCar, searchCar, searchCarProduct, getCarDocs, applyCarProduct, installTracking, logTracking, getOneTimeKey
 }
 
 extension LogfinApisExtension on LogfinApis {
@@ -1246,7 +1477,7 @@ extension LogfinApisExtension on LogfinApis {
       case LogfinApis.getOffersInfo:
         return '/get_offers.json';
       case LogfinApis.getLoansInfo:
-        return '/get_loans.json';
+          return '/get_loans.json';
       case LogfinApis.getLoansDetailInfo:
         return '/get_loan.json';
       case LogfinApis.getOffers:
@@ -1282,7 +1513,7 @@ extension LogfinApisExtension on LogfinApis {
       case LogfinApis.updatePassword:
         return '/users/update_password.json';
 
-    /// auto loan
+        /// auto loan
       case LogfinApis.getMyCarInfo:
         return '/get_cars.json';
       case LogfinApis.addCar:
@@ -1296,8 +1527,13 @@ extension LogfinApisExtension on LogfinApis {
       case LogfinApis.applyCarProduct:
         return '/submit_auto_product.json';
 
+
+      case LogfinApis.logTracking:
+        return '/log_error.json';
       case LogfinApis.installTracking:
         return '/first_launch.json';
+      case LogfinApis.getOneTimeKey:
+        return '/get_user_token.json';
     }
   }
 }

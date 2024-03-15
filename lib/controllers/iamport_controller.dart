@@ -10,6 +10,8 @@ import 'package:iamport_flutter/iamport_certification.dart';
 import 'package:iamport_flutter/model/certification_data.dart';
 import 'package:http/http.dart' as http;
 
+import 'logfin_controller.dart';
+
 class IamportController {
   static final IamportController _instance = IamportController._internal();
   factory IamportController() => _instance;
@@ -172,6 +174,7 @@ class IamportController {
           if(isSuccess){
             _callDetailedInfo(result["imp_uid"]!, (isSuccessToGetDetailedInfo, outputJson){
               CommonUtils.log('i', 'cert detailed result : $outputJson');
+              LogfinController.setLogJson(LogfinController.phoneFinCodeString, inputJson, isSuccessToGetDetailedInfo? {} : {"error_output" : outputJson});
               if(isSuccessToGetDetailedInfo){
                 Navigator.pop(parentViewContext, outputJson);
               }else{
@@ -179,6 +182,7 @@ class IamportController {
               }
             });
           }else{
+            LogfinController.setLogJson(LogfinController.phoneFinCodeString, inputJson, {"error_output" : result});
             Navigator.pop(parentViewContext, null);
           }
         },
