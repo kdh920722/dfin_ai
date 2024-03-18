@@ -37,6 +37,7 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
     Config.contextForEmergencyBack = context;
     Config.isEmergencyRoot = false;
     isValidToSignOut = false;
+    backValid = true;
     FireBaseController.setStateForForeground = null;
   }
 
@@ -48,6 +49,7 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
     _disposeAllTextControllers();
     Config.contextForEmergencyBack =null;
     isValidToSignOut = false;
+    backValid = true;
     super.dispose();
   }
 
@@ -87,9 +89,16 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
   }
 
 
+  bool backValid = true;
   void _back(){
-    CommonUtils.hideKeyBoard();
-    Navigator.pop(context);
+    if(backValid){
+      backValid = false;
+      CommonUtils.hideKeyBoard();
+      Future.delayed(const Duration(milliseconds: 300), () async {
+        Navigator.pop(context);
+        backValid = true;
+      });
+    }
   }
 
   bool isValidToSignOut = false;
@@ -98,7 +107,7 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
   @override
   Widget build(BuildContext context) {
     Widget view = Container(
-        color: ColorStyles.upFinWhite,
+        color: ColorStyles.dFinBlack,
         width: 100.w,
         height: 100.h,
         padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w),
@@ -110,45 +119,54 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
           ])),
           SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             UiUtils.getMarginBox(0, 3.w),
-            UiUtils.getTextWithFixedScale("${MyData.name}님의 정보", 22.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
+            UiUtils.getTextWithFixedScale("사용자 정보", 22.sp, FontWeight.w600, ColorStyles.dFinWhiteGray, TextAlign.start, null),
             UiUtils.getMarginBox(0, 3.h)
           ])),
-          UiUtils.getDisabledTextField(context, 90.w, MyData.name, TextStyles.upFinDisabledTextFormFieldTextStyle2,
+          UiUtils.getDisabledTextField(context, 90.w, MyData.name, TextStyles.dFinDisabledTextFormFieldTextStyle2,
               UiUtils.getDisabledInputDecoration("이름", 12.sp, "", 0.sp)),
           UiUtils.getMarginBox(0, 2.h),
-          UiUtils.getDisabledTextField(context, 90.w, _getBirth(), TextStyles.upFinDisabledTextFormFieldTextStyle2,
+          UiUtils.getDisabledTextField(context, 90.w, _getBirth(), TextStyles.dFinDisabledTextFormFieldTextStyle2,
               UiUtils.getDisabledInputDecoration("생년월일", 12.sp, "", 0.sp)),
           UiUtils.getMarginBox(0, 2.h),
-          UiUtils.getDisabledTextField(context, 90.w, MyData.email, TextStyles.upFinDisabledTextFormFieldTextStyle2,
+          UiUtils.getDisabledTextField(context, 90.w, MyData.email, TextStyles.dFinDisabledTextFormFieldTextStyle2,
               UiUtils.getDisabledInputDecoration("이메일", 12.sp, "", 0.sp)),
           UiUtils.getMarginBox(0, 2.h),
-          UiUtils.getDisabledTextField(context, 90.w, "${MyData.phoneNumber.substring(0,3)}-${MyData.phoneNumber.substring(3,7)}-${MyData.phoneNumber.substring(7)}", TextStyles.upFinDisabledTextFormFieldTextStyle2,
+          UiUtils.getDisabledTextField(context, 90.w, "${MyData.phoneNumber.substring(0,3)}-${MyData.phoneNumber.substring(3,7)}-${MyData.phoneNumber.substring(7)}", TextStyles.dFinDisabledTextFormFieldTextStyle2,
               UiUtils.getDisabledInputDecoration("연락처", 12.sp, "", 0.sp)),
           UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
           UiUtils.getMarginBox(0, 2.h),
           SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             UiUtils.getMarginBox(0, 1.w),
             UiUtils.getRoundBoxButtonTextWithFixedScale5(
-                UiUtils.getTextWithFixedScale("회원탈퇴를 원하시나요?", 12.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
-                ColorStyles.upFinWhite, (){
+                UiUtils.getTextWithFixedScale("회원탈퇴를 원하시나요?", 12.sp, FontWeight.w500, ColorStyles.dFinRealGray, TextAlign.start, null),
+                ColorStyles.dFinBlack, (){
               isValidToSignOut = false;
               isChecked = false;
               _pwdTextController.text = "";
-              UiUtils.showPopMenu(context, true, 100.w, 100.h, 0.5, 0, ColorStyles.upFinWhite, (slideContext, slideSetState){
+              UiUtils.showPopMenu(context, true, 100.w, 100.h, 0.5, 0, ColorStyles.dFinBlack, (slideContext, slideSetState){
                 Widget slideWidget = Column(
                     children: [
                       SizedBox(width: 95.w, child: Row(mainAxisAlignment: MainAxisAlignment.start, children: [
                         UiUtils.getBackButton(() {
                           _pwdTextController.text = "";
-                          Navigator.pop(slideContext);
+                          if(backValid){
+                            backValid = false;
+                            CommonUtils.hideKeyBoard();
+                            Future.delayed(const Duration(milliseconds: 300), () async {
+                              Navigator.pop(slideContext);
+                              backValid = true;
+                            });
+                          }
                         }),
                         UiUtils.getMarginBox(2.w, 0),
                       ])),
                       UiUtils.getMarginBox(0, 3.w),
-                      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("회원탈퇴", 22.sp, FontWeight.w600, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
-                      UiUtils.getMarginBox(0, 3.h),
-                      UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _pwdTextFocus, _pwdTextController, TextInputType.visiblePassword, true,
-                          UiUtils.getInputDecoration("비밀번호", 12.sp, "", 0.sp), (text) {
+                      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("회원탈퇴", 22.sp, FontWeight.w600, ColorStyles.dFinWhiteGray, TextAlign.start, null)),
+                      UiUtils.getMarginBox(0, 5.h),
+                      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("비밀번호", 11.sp, FontWeight.w500, ColorStyles.dFinRealGray, TextAlign.start, null)),
+                      UiUtils.getMarginBox(0, 1.5.h),
+                      UiUtils.getTextFormField(context, 90.w, TextStyles.dFinTextFormFieldTextStyle, _pwdTextFocus, _pwdTextController, TextInputType.visiblePassword, true,
+                          UiUtils.getInputDecoration("", 12.sp, "", 0.sp), (text) {
                             if(text == ""){
                               slideSetState(() {
                                 isValidToSignOut = false;
@@ -161,12 +179,12 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
                           }, (value){}),
                       Row(crossAxisAlignment:CrossAxisAlignment.start, children: [UiUtils.getMarginBox(5.w, 0),Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
                         UiUtils.getMarginBox(0, 2.h),
-                        UiUtils.getTextWithFixedScale2("•  탈퇴시 사용자의 정보는 삭제되며, 복구가 불가능합니다.", 10.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null),
+                        UiUtils.getTextWithFixedScale2("•  탈퇴시 사용자의 정보는 삭제되며, 복구가 불가능합니다.", 10.sp, FontWeight.w400, ColorStyles.dFinDarkGray, TextAlign.start, null),
                         UiUtils.getMarginBox(0, 1.h),
                         GestureDetector(child: Row(children: [
-                          UiUtils.getTextWithFixedScale2("•  자세한 내용은", 10.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null),
-                          UiUtils.getTextWithFixedScale2("개인정보처리방침", 10.sp, FontWeight.w400, ColorStyles.upFinButtonBlue, TextAlign.start, null),
-                          UiUtils.getTextWithFixedScale2("을 참고하세요", 10.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null),
+                          UiUtils.getTextWithFixedScale2("•  자세한 내용은", 10.sp, FontWeight.w400, ColorStyles.dFinDarkGray, TextAlign.start, null),
+                          UiUtils.getTextWithFixedScale2("개인정보처리방침", 10.sp, FontWeight.w400, ColorStyles.dFinButtonBlue, TextAlign.start, null),
+                          UiUtils.getTextWithFixedScale2("을 참고하세요", 10.sp, FontWeight.w400, ColorStyles.dFinDarkGray, TextAlign.start, null),
                         ]),
                             onTap: () async {
                               Uri privacyLink = Uri.parse(Config.privacyUrl);
@@ -177,20 +195,20 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
                       ])]),
                       Row(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.center, children: [
                         UiUtils.getMarginBox(2.w, 0),
-                        UiUtils.getCustomCheckBox(UniqueKey(), 1.2, isChecked, ColorStyles.upFinWhite, ColorStyles.upFinButtonBlue,
-                            ColorStyles.upFinGray, ColorStyles.upFinButtonBlue, (checkedValue){
+                        UiUtils.getCustomCheckBox(UniqueKey(), 1.2, isChecked, ColorStyles.dFinWhite, ColorStyles.dFinButtonBlue,
+                            ColorStyles.dFinGray, ColorStyles.dFinButtonBlue, (checkedValue){
                               slideSetState(() {
                                 if(checkedValue != null){
                                   isChecked = checkedValue;
                                 }
                               });
                             }),
-                        UiUtils.getTextWithFixedScale("위 내용을 모두 확인했습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null),
+                        UiUtils.getTextWithFixedScale("위 내용을 모두 확인했습니다.", 12.sp, FontWeight.w500, ColorStyles.dFinWhiteGray, TextAlign.start, null),
                       ]),
                       UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
                       isValidToSignOut? Column(children: [
-                        UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                            UiUtils.getTextWithFixedScale("탈퇴하기", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
+                        UiUtils.getBorderButtonBox(90.w, ColorStyles.dFinButtonBlue, ColorStyles.dFinButtonBlue,
+                            UiUtils.getTextWithFixedScale("탈퇴하기", 14.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.center, null), () {
                               CommonUtils.hideKeyBoard();
                               if(isChecked){
                                 Map<String, dynamic> inputJson = {
@@ -223,8 +241,8 @@ class AppSignOutViewState extends State<AppSignOutView> with WidgetsBindingObser
                         UiUtils.getMarginBox(0, 1.5.h),
                         SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                           UiUtils.getRoundBoxButtonTextWithFixedScale5(
-                              UiUtils.getTextWithFixedScale("비밀번호를 잊으셨나요?", 12.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
-                              ColorStyles.upFinWhite, (){
+                              UiUtils.getTextWithFixedScale("비밀번호를 잊으셨나요?", 12.sp, FontWeight.w500, ColorStyles.dFinWhiteGray, TextAlign.start, null),
+                              ColorStyles.dFinBlack, (){
                             CommonUtils.hideKeyBoard();
                             AppFindPwViewState.viewId = 1;
                             CommonUtils.moveTo(context, AppView.appFindPwView.value, null);

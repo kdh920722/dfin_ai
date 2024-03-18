@@ -25,7 +25,7 @@ class IamportController {
   static Future<void> initIamport(Function(bool) callback) async{
     try{
       final ref = FirebaseDatabase.instance.ref();
-      final snapshot = await ref.child('UPFIN/API/iamport').get();
+      final snapshot = await ref.child('DFIN/API/iamport').get();
       if (snapshot.exists) {
         for (var each in snapshot.children) {
           switch (each.key) {
@@ -35,7 +35,7 @@ class IamportController {
           }
         }
 
-        final snapshotForCarrier = await ref.child('UPFIN/API/iamport/tel_carrier_list').get();
+        final snapshotForCarrier = await ref.child('DFIN/API/iamport/tel_carrier_list').get();
         if (snapshotForCarrier.exists) {
           List<String> tempList = [];
           for (var each in snapshotForCarrier.children) {
@@ -141,8 +141,8 @@ class IamportController {
 
     return Scaffold(
       appBar: AppBar(
-        title: SizedBox(width: 67.w, child: UiUtils.getTextWithFixedScale("휴대폰 본인인증", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
-        backgroundColor: ColorStyles.upFinWhite,
+        title: SizedBox(width: 67.w, child: UiUtils.getTextWithFixedScale("휴대폰 본인인증", 14.sp, FontWeight.w600, ColorStyles.dFinBlack, TextAlign.center, null)),
+        backgroundColor: ColorStyles.dFinWhite,
         leading: UiUtils.getBackButton(() {
           Navigator.pop(parentViewContext);
         })

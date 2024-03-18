@@ -268,7 +268,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
   }
 
   void _showCapturedImage() {
-    UiUtils.showPopMenu(context, false, 100.w, 100.h, 0.5, 0, ColorStyles.upFinBlack, (popContext, popSetState){
+    UiUtils.showPopMenu(context, false, 100.w, 100.h, 0.5, 0, ColorStyles.dFinBlack, (popContext, popSetState){
       return Stack(
         alignment: Alignment.center,
         children: [
@@ -277,19 +277,19 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
           ),
           Positioned(
               child: SizedBox(width: 100.w, height: appConfig.Config.isAndroid? 70.h : 63.h,
-                  child: Container(color: ColorStyles.upFinBlack, child: UiUtils.getImage(80.w, 22.h, Image.file(File(imageFilFromCamera!.path)))))
+                  child: Container(color: ColorStyles.dFinBlack, child: UiUtils.getImage(80.w, 22.h, Image.file(File(imageFilFromCamera!.path)))))
           ),
           Positioned(
               top: appConfig.Config.isAndroid? 85.h : 80.h,
               child: Row(children: [
-                UiUtils.getBorderButtonBox(30.w, ColorStyles.upFinBlack, ColorStyles.upFinBlack,
-                    UiUtils.getTextWithFixedScale("취소", 13.sp, FontWeight.w300, ColorStyles.upFinWhite, TextAlign.start, null), () {
+                UiUtils.getBorderButtonBox(30.w, ColorStyles.dFinBlack, ColorStyles.dFinBlack,
+                    UiUtils.getTextWithFixedScale("취소", 13.sp, FontWeight.w300, ColorStyles.dFinWhite, TextAlign.start, null), () {
                       Navigator.pop(popContext);
                       _takeCustomCamera();
                     }),
                 UiUtils.getMarginBox(20.w, 0),
-                UiUtils.getBorderButtonBox(30.w, ColorStyles.upFinBlack, ColorStyles.upFinBlack,
-                    UiUtils.getTextWithFixedScale("확인", 13.sp, FontWeight.w300, ColorStyles.upFinWhite, TextAlign.start, null), () {
+                UiUtils.getBorderButtonBox(30.w, ColorStyles.dFinBlack, ColorStyles.dFinBlack,
+                    UiUtils.getTextWithFixedScale("확인", 13.sp, FontWeight.w300, ColorStyles.dFinWhite, TextAlign.start, null), () {
                       XFile? image = imageFilFromCamera;
                       if(image != null){
                         isShowPickedFile = true;
@@ -319,7 +319,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
     });
   }
   void _takeCustomCamera() {
-    UiUtils.showPopMenu(context, false, 100.w, 100.h, 0.5, 0, ColorStyles.upFinBlack, (popContext, popSetState){
+    UiUtils.showPopMenu(context, false, 100.w, 100.h, 0.5, 0, ColorStyles.dFinBlack, (popContext, popSetState){
       return Stack(
         alignment: Alignment.center,
         children: [
@@ -328,19 +328,19 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
           ),
           Positioned(
               child: SizedBox(width: 100.w, height: appConfig.Config.isAndroid? 70.h : 63.h, child: _cameraController != null && _isCameraReady ?
-              CameraPreview(_cameraController!) : Container(color: ColorStyles.upFinBlack))
+              CameraPreview(_cameraController!) : Container(color: ColorStyles.dFinBlack))
           ),
           Positioned(
               top: 3.w,
               right: 3.w,
-              child: UiUtils.getCloseButton(ColorStyles.upFinWhite, () {
+              child: UiUtils.getCloseButton(ColorStyles.dFinWhite, () {
                 imageFilFromCamera = null;
                 Navigator.pop(popContext);
               })
           ),
           Positioned(
               top: appConfig.Config.isAndroid? 85.h : 80.h,
-              child: UiUtils.getIconButtonWithHeight(5.h, Icons.camera, 5.h, ColorStyles.upFinWhite, () {
+              child: UiUtils.getIconButtonWithHeight(5.h, Icons.camera, 5.h, ColorStyles.dFinWhite, () {
                 if(_cameraController != null){
                   _onTakePicture(popContext);
                 }
@@ -577,7 +577,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
               return true;
             },
             renderMode: RenderMode.column,
-            textStyle: TextStyles.upFinHtmlTextStyle,
+            textStyle: TextStyles.dFinHtmlTextStyle,
           )
         ]));
   }
@@ -590,7 +590,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
         otherInfoWidget = _getHtmlView(otherInfo.message, "UPFIN", otherInfo.messageType);
       }else{
         otherInfo.message = otherInfo.message.replaceAll(" / ", "\n");
-        otherInfoWidget = UiUtils.getSelectableTextWithFixedScale2(otherInfo.message, 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null);
+        otherInfoWidget = UiUtils.getSelectableTextWithFixedScale2(otherInfo.message, 13.sp, FontWeight.w500, ColorStyles.dFinBlack, TextAlign.start, null);
       }
     }else{
       bool isValid = true;
@@ -607,12 +607,12 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
           String extension = fileInfo.last.toLowerCase();
           String fileName = fileInfo[fileInfo.length-2].split("/").last;
           otherInfoWidget = Row(mainAxisSize:MainAxisSize.min, crossAxisAlignment:CrossAxisAlignment.start, children: [
-            UiUtils.getIcon(8.w, 10.w, Icons.file_copy_rounded, 7.w, ColorStyles.upFinRealGray),
+            UiUtils.getIcon(8.w, 10.w, Icons.file_copy_rounded, 7.w, ColorStyles.dFinRealGray),
             UiUtils.getMarginBox(1.w, 0),
             Column(mainAxisSize:MainAxisSize.min, crossAxisAlignment:CrossAxisAlignment.start, children: [
-              UiUtils.getSelectableTextWithFixedScale2("${extension.toUpperCase()} 파일을 전송했습니다.", 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null),
+              UiUtils.getSelectableTextWithFixedScale2("${extension.toUpperCase()} 파일을 전송했습니다.", 13.sp, FontWeight.w500, ColorStyles.dFinBlack, TextAlign.start, null),
               UiUtils.getMarginBox(0, 0.1.h),
-              Container(constraints: BoxConstraints(maxWidth: 60.w), child: UiUtils.getTextWithFixedScaleAndOverFlow("$fileName.$extension", 8.sp, FontWeight.w300, ColorStyles.upFinDarkGray, TextAlign.start, null))
+              Container(constraints: BoxConstraints(maxWidth: 60.w), child: UiUtils.getTextWithFixedScaleAndOverFlow("$fileName.$extension", 8.sp, FontWeight.w300, ColorStyles.dFinDarkGray, TextAlign.start, null))
             ])
           ]);
         }else{
@@ -620,7 +620,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
           otherInfoWidget = _getImageView(otherInfo.message);
         }
       }else{
-        otherInfoWidget = UiUtils.getTextWithFixedScale("${extension.toUpperCase()} 파일은 지원히지 않습니다.", 13.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null);
+        otherInfoWidget = UiUtils.getTextWithFixedScale("${extension.toUpperCase()} 파일은 지원히지 않습니다.", 13.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.start, null);
       }
     }
 
@@ -638,12 +638,12 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
                   decoration: BoxDecoration(
                     borderRadius: isImageView? const BorderRadius.only(topRight: Radius.circular(1), topLeft: Radius.circular(1), bottomRight: Radius.circular(1))
                       : const BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomRight: Radius.circular(15)),
-                    color: isImageView? ColorStyles.upFinWhite : ColorStyles.upFinWhiteGray,
+                    color: isImageView? ColorStyles.dFinWhite : ColorStyles.dFinWhiteGray,
                   ),
                   child: otherInfoWidget
               ),
               UiUtils.getMarginBox(1.w, 0),
-              UiUtils.getTextWithFixedScale(CommonUtils.getFormattedLastMsgTime(otherInfo.messageTime), 8.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null)
+              UiUtils.getTextWithFixedScale(CommonUtils.getFormattedLastMsgTime(otherInfo.messageTime), 8.sp, FontWeight.w400, ColorStyles.dFinDarkGray, TextAlign.start, null)
             ]),
             UiUtils.getMarginBox(0, 1.h)
           ]),
@@ -665,7 +665,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
                   padding: EdgeInsets.all(3.w),
                   decoration: const BoxDecoration(
                     borderRadius: BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomRight: Radius.circular(15)),
-                    color: ColorStyles.upFinWhiteGray,
+                    color: ColorStyles.dFinWhiteGray,
                   ),
                   child: UiUtils.getImage(5.w, 5.w, Image.asset(fit: BoxFit.fill,'assets/images/chat_loading.gif'))
               ),
@@ -690,12 +690,12 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
                   padding: EdgeInsets.all(3.w),
                   decoration: const BoxDecoration(
                     borderRadius: BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomRight: Radius.circular(15)),
-                    color: ColorStyles.upFinWhiteGray,
+                    color: ColorStyles.dFinWhiteGray,
                   ),
-                  child:  UiUtils.getSelectableTextWithFixedScale2(message, 13.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)
+                  child:  UiUtils.getSelectableTextWithFixedScale2(message, 13.sp, FontWeight.w500, ColorStyles.dFinBlack, TextAlign.start, null)
               ),
               UiUtils.getMarginBox(1.w, 0),
-              UiUtils.getTextWithFixedScale("", 8.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null)
+              UiUtils.getTextWithFixedScale("", 8.sp, FontWeight.w400, ColorStyles.dFinDarkGray, TextAlign.start, null)
             ]),
             UiUtils.getMarginBox(0, 1.h)
           ]),
@@ -721,7 +721,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
               return Container(
                   alignment: Alignment.center,
                   decoration: const BoxDecoration(
-                    color: ColorStyles.upFinWhite,
+                    color: ColorStyles.dFinWhite,
                     borderRadius: BorderRadius.all(Radius.circular(5)),
                   ),
                   constraints: BoxConstraints(maxWidth: 60.w, maxHeight: 60.w, minWidth: 20.w, minHeight: 20.w),
@@ -742,7 +742,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
                             int val = state.loadingProgress!.cumulativeBytesLoaded;
                             return Center(
                                 child: CircularProgressIndicator(
-                                    color: ColorStyles.upFinWhite,
+                                    color: ColorStyles.dFinWhite,
                                     value: val / total
                                 )
                             );
@@ -766,7 +766,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
                             cachedImage.remove(srcUrl);
                           }
                           return GestureDetector(
-                            child: UiUtils.getIcon(10.w, 10.w, Icons.refresh_rounded, 10.w, ColorStyles.upFinRed),
+                            child: UiUtils.getIcon(10.w, 10.w, Icons.refresh_rounded, 10.w, ColorStyles.dFinRed),
                             onTap: () {
                               state.reLoadImage();
                             },
@@ -780,7 +780,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
               return Container(
                   alignment: Alignment.center,
                   decoration: const BoxDecoration(
-                    color: ColorStyles.upFinWhiteGray,
+                    color: ColorStyles.dFinWhiteGray,
                     borderRadius: BorderRadius.all(Radius.circular(5)),
                   ),
                   constraints: BoxConstraints(maxWidth: 60.w, maxHeight: 60.w, minWidth: 20.w, minHeight: 20.w),
@@ -791,21 +791,21 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
         ),
         onTap: ()  {
           if(!isLoading){
-            UiUtils.showPopMenu(context, true, 100.w, 100.h, 0.5, 0, ColorStyles.upFinBlack, (slideContext, slideSetState){
+            UiUtils.showPopMenu(context, true, 100.w, 100.h, 0.5, 0, ColorStyles.dFinBlack, (slideContext, slideSetState){
               Widget slideWidget = Column(children: [
                 SizedBox(width: 97.w, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                  UiUtils.getCloseButton(ColorStyles.upFinWhite, () {
+                  UiUtils.getCloseButton(ColorStyles.dFinWhite, () {
                     Navigator.pop(slideContext);
                   })
                 ])),
                 UiUtils.getMarginBox(0, 4.h),
                 Container(
-                    color:ColorStyles.upFinBlack,
+                    color:ColorStyles.dFinBlack,
                     width: 90.w, height: appConfig.Config.isAndroid? 75.h : 70.h,
                     child: InteractiveViewer(
                         constrained: false,
                         child: Container(
-                            color:ColorStyles.upFinBlack,
+                            color:ColorStyles.dFinBlack,
                             alignment: Alignment.center,
                             constraints: BoxConstraints(maxWidth: 90.w, maxHeight: appConfig.Config.isAndroid? 75.h : 70.h, minWidth: 20.w, minHeight: 20.w),
                             child: ExtendedImage.network(
@@ -824,7 +824,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
                                       int val = state.loadingProgress!.cumulativeBytesLoaded;
                                       return Center(
                                           child: CircularProgressIndicator(
-                                              color: ColorStyles.upFinWhite,
+                                              color: ColorStyles.dFinWhite,
                                               value: val / total
                                           )
                                       );
@@ -844,7 +844,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
                                   case LoadState.failed:
                                     _aniController.reset();
                                     return GestureDetector(
-                                      child: UiUtils.getIcon(10.w, 10.w, Icons.refresh_rounded, 10.w, ColorStyles.upFinRed),
+                                      child: UiUtils.getIcon(10.w, 10.w, Icons.refresh_rounded, 10.w, ColorStyles.dFinRed),
                                       onTap: () {
                                         state.reLoadImage();
                                       },
@@ -867,7 +867,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
     Widget? meInfoWidget;
     bool isImageView = false;
     if(meInfo.messageType == "text"){
-      meInfoWidget = UiUtils.getSelectableTextWithFixedScale2(meInfo.message, 13.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null);
+      meInfoWidget = UiUtils.getSelectableTextWithFixedScale2(meInfo.message, 13.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.start, null);
     }else{
       String extension = meInfo.message.split('.').last.toLowerCase();
       if(extension == "upfin_web"){
@@ -895,29 +895,29 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
           if(isAllSuccess){
             meInfoWidget = Column(mainAxisSize:MainAxisSize.min, crossAxisAlignment:CrossAxisAlignment.start, children: [
               Row(mainAxisSize:MainAxisSize.min, children: [
-                UiUtils.getIcon(7.w, 7.w, Icons.file_copy_rounded, 7.w, ColorStyles.upFinWhite),
+                UiUtils.getIcon(7.w, 7.w, Icons.file_copy_rounded, 7.w, ColorStyles.dFinWhite),
                 UiUtils.getMarginBox(2.w, 0),
-                UiUtils.getSelectableTextWithFixedScale2("${int.parse(sCnt) + int.parse(fCnt)}개 파일을 모두 전송했습니다.", 13.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null)
+                UiUtils.getSelectableTextWithFixedScale2("${int.parse(sCnt) + int.parse(fCnt)}개 파일을 모두 전송했습니다.", 13.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.start, null)
               ])
             ]);
           }else{
             meInfoWidget = Row(mainAxisSize:MainAxisSize.min, crossAxisAlignment:CrossAxisAlignment.start, children: [
-              UiUtils.getIcon(8.w, 10.w, Icons.file_copy_rounded, 7.w, ColorStyles.upFinWhite),
+              UiUtils.getIcon(8.w, 10.w, Icons.file_copy_rounded, 7.w, ColorStyles.dFinWhite),
               UiUtils.getMarginBox(2.w, 0),
               Column(mainAxisSize:MainAxisSize.min, crossAxisAlignment:CrossAxisAlignment.start, children: [
-                UiUtils.getSelectableTextWithFixedScale2("${int.parse(sCnt) + int.parse(fCnt)}개 파일을 전송했습니다.", 13.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null),
+                UiUtils.getSelectableTextWithFixedScale2("${int.parse(sCnt) + int.parse(fCnt)}개 파일을 전송했습니다.", 13.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.start, null),
                 UiUtils.getMarginBox(0, 0.05.h),
                 Row(mainAxisSize:MainAxisSize.min, children: [
-                  UiUtils.getSelectableTextWithFixedScale2("(결과 : ", 10.sp, FontWeight.w300, ColorStyles.upFinWhite, TextAlign.start, null),
-                  sMsg != "" ? UiUtils.getSelectableTextWithFixedScale2("$sMsg${int.parse(fCnt) != 0 ? "," : ")"}", 10.sp, FontWeight.w300, ColorStyles.upFinWhite, TextAlign.start, null) : UiUtils.getMarginBox(0, 0),
+                  UiUtils.getSelectableTextWithFixedScale2("(결과 : ", 10.sp, FontWeight.w300, ColorStyles.dFinWhite, TextAlign.start, null),
+                  sMsg != "" ? UiUtils.getSelectableTextWithFixedScale2("$sMsg${int.parse(fCnt) != 0 ? "," : ")"}", 10.sp, FontWeight.w300, ColorStyles.dFinWhite, TextAlign.start, null) : UiUtils.getMarginBox(0, 0),
                   sMsg != "" ? UiUtils.getMarginBox(1.w, 0) : UiUtils.getMarginBox(0, 0),
-                  fMsg != "" ? UiUtils.getSelectableTextWithFixedScale2("$fMsg)", 10.sp, FontWeight.w300, ColorStyles.upFinWhite, TextAlign.start, null) : UiUtils.getMarginBox(0, 0),
+                  fMsg != "" ? UiUtils.getSelectableTextWithFixedScale2("$fMsg)", 10.sp, FontWeight.w300, ColorStyles.dFinWhite, TextAlign.start, null) : UiUtils.getMarginBox(0, 0),
                 ])
               ])
             ]);
           }
         }else{
-          meInfoWidget = UiUtils.getSelectableTextWithFixedScale2("파일전송 메시지 오류", 13.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null);
+          meInfoWidget = UiUtils.getSelectableTextWithFixedScale2("파일전송 메시지 오류", 13.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.start, null);
         }
       }else{
         List<String> validDocExtensions = LogfinController.validDocFileTypeList;
@@ -927,12 +927,12 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
           String extension = fileInfo.last.toLowerCase();
           String fileName = fileInfo[fileInfo.length-2].split("/").last;
           meInfoWidget = Row(mainAxisSize:MainAxisSize.min, crossAxisAlignment:CrossAxisAlignment.start, children: [
-            UiUtils.getIcon(8.w, 10.w, Icons.file_copy_rounded, 7.w, ColorStyles.upFinWhite),
+            UiUtils.getIcon(8.w, 10.w, Icons.file_copy_rounded, 7.w, ColorStyles.dFinWhite),
             UiUtils.getMarginBox(1.w, 0),
             Column(mainAxisSize:MainAxisSize.min, crossAxisAlignment:CrossAxisAlignment.start, children: [
-              UiUtils.getSelectableTextWithFixedScale2("${extension.toUpperCase()} 파일을 전송했습니다.", 13.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null),
+              UiUtils.getSelectableTextWithFixedScale2("${extension.toUpperCase()} 파일을 전송했습니다.", 13.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.start, null),
               UiUtils.getMarginBox(0, 0.1.h),
-              Container(constraints: BoxConstraints(maxWidth: 60.w), child: UiUtils.getTextWithFixedScaleAndOverFlow("$fileName.$extension", 8.sp, FontWeight.w300, ColorStyles.upFinWhiteGray, TextAlign.start, null))
+              Container(constraints: BoxConstraints(maxWidth: 60.w), child: UiUtils.getTextWithFixedScaleAndOverFlow("$fileName.$extension", 8.sp, FontWeight.w300, ColorStyles.dFinWhiteGray, TextAlign.start, null))
             ])
           ]);
         }else{
@@ -941,7 +941,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
             meInfoWidget = _getImageView(meInfo.message);
             isImageView = true;
           }else{
-            meInfoWidget = UiUtils.getTextWithFixedScale("${extension.toUpperCase()} 파일은 지원히지 않습니다.", 13.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null);
+            meInfoWidget = UiUtils.getTextWithFixedScale("${extension.toUpperCase()} 파일은 지원히지 않습니다.", 13.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.start, null);
           }
         }
       }
@@ -952,7 +952,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
         width: 100.w,
         child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
           Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-            UiUtils.getTextWithFixedScale(CommonUtils.getFormattedLastMsgTime(meInfo.messageTime), 8.sp, FontWeight.w400, ColorStyles.upFinDarkGray, TextAlign.start, null),
+            UiUtils.getTextWithFixedScale(CommonUtils.getFormattedLastMsgTime(meInfo.messageTime), 8.sp, FontWeight.w400, ColorStyles.dFinDarkGray, TextAlign.start, null),
             UiUtils.getMarginBox(1.w, 0),
             Container(
                 constraints: BoxConstraints(maxWidth: isImageView? 63.w : 73.w),
@@ -960,7 +960,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
                 decoration: BoxDecoration(
                   borderRadius: isImageView? const BorderRadius.only(topRight: Radius.circular(1), topLeft: Radius.circular(1), bottomLeft: Radius.circular(1))
                       : const BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomLeft: Radius.circular(15)),
-                  color: isImageView? ColorStyles.upFinWhite : ColorStyles.upFinTextAndBorderBlue,
+                  color: isImageView? ColorStyles.dFinWhite : ColorStyles.dFinTextAndBorderBlue,
                 ),
                 child: meInfoWidget
             ),
@@ -983,7 +983,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
                 padding: EdgeInsets.all(3.w),
                 decoration: const BoxDecoration(
                   borderRadius: BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomLeft: Radius.circular(15)),
-                  color: ColorStyles.upFinTextAndBorderBlue
+                  color: ColorStyles.dFinTextAndBorderBlue
                 ),
                 child: UiUtils.getImage(5.w, 5.w, Image.asset(fit: BoxFit.fill,'assets/images/chat_loading.gif'))
             ),
@@ -1075,7 +1075,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
 
   Widget _getWeekendInfoWidgetForUserChat(){
     return Column(crossAxisAlignment:CrossAxisAlignment.center, children: [
-      UiUtils.getTextWithFixedScale2(Config.defaultMessageForWeekend.replaceAll("@", "\n"), 11.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null),
+      UiUtils.getTextWithFixedScale2(Config.defaultMessageForWeekend.replaceAll("@", "\n"), 11.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.start, null),
     ]);
   }
 
@@ -1090,7 +1090,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
             GetController.to.chatStatusTick.value>2?_stepTick(2, true):_stepTick(2, false)
           ]),
       UiUtils.getMarginBox(0, 1.5.h),
-      UiUtils.getMarginColoredBox(100.w, 0.12.h, ColorStyles.upFinGray)
+      UiUtils.getMarginColoredBox(100.w, 0.12.h, ColorStyles.dFinGray)
 
     ]);
   }
@@ -1112,11 +1112,11 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
     }
 
     return Column(children: [
-      isChecked? passed? UiUtils.getIcon(3.w, 3.w, Icons.radio_button_checked_rounded, 3.w, ColorStyles.upFinButtonBlue)
-          : UiUtils.getIcon(3.w, 3.w, Icons.circle, 3.w, ColorStyles.upFinButtonBlue)
-            : UiUtils.getIcon(3.w, 3.w, Icons.radio_button_unchecked_rounded, 3.w, ColorStyles.upFinWhiteSky),
+      isChecked? passed? UiUtils.getIcon(3.w, 3.w, Icons.radio_button_checked_rounded, 3.w, ColorStyles.dFinButtonBlue)
+          : UiUtils.getIcon(3.w, 3.w, Icons.circle, 3.w, ColorStyles.dFinButtonBlue)
+            : UiUtils.getIcon(3.w, 3.w, Icons.radio_button_unchecked_rounded, 3.w, ColorStyles.dFinWhiteSky),
       UiUtils.getMarginBox(0, 1.5.h),
-      UiUtils.getTextWithFixedScale(typeString, 9.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.center, null),
+      UiUtils.getTextWithFixedScale(typeString, 9.sp, FontWeight.w600, ColorStyles.dFinRealGray, TextAlign.center, null),
     ]);
   }
 
@@ -1124,7 +1124,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
     return Column(children: [
       UiUtils.getMarginBox(0, 0.5.h),
       Container(
-        color: isReached? ColorStyles.upFinButtonBlue : ColorStyles.upFinWhiteSky,
+        color: isReached? ColorStyles.dFinButtonBlue : ColorStyles.dFinWhiteSky,
         height: 0.15.h,
         width: 36.w,
       )
@@ -1226,18 +1226,18 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
       answerList.add("이전");
     }
     for(var each in answerList){
-      Color borderColor = ColorStyles.upFinGray;
-      Color fillColor = ColorStyles.upFinWhite;
-      Color textColor = ColorStyles.upFinBlack;
+      Color borderColor = ColorStyles.dFinGray;
+      Color fillColor = ColorStyles.dFinWhite;
+      Color textColor = ColorStyles.dFinBlack;
       if(each.contains("이전")){
-        borderColor = ColorStyles.upFinBlack;
-        fillColor = ColorStyles.upFinBlack;
-        textColor = ColorStyles.upFinWhite;
+        borderColor = ColorStyles.dFinBlack;
+        fillColor = ColorStyles.dFinBlack;
+        textColor = ColorStyles.dFinWhite;
       }
       if(each.contains("맨아래")){
-        borderColor = ColorStyles.upFinRealGray;
-        fillColor = ColorStyles.upFinRealGray;
-        textColor = ColorStyles.upFinWhite;
+        borderColor = ColorStyles.dFinRealGray;
+        fillColor = ColorStyles.dFinRealGray;
+        textColor = ColorStyles.dFinWhite;
       }
 
       if(each.contains("자주하는 질문")){
@@ -1344,13 +1344,13 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
               children: [
                 UiUtils.getMarginBox(100.w, 1.h),
                 Column(children: [
-                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("촬영을위한 카메라 권한이 필요해요.",14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
+                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("촬영을위한 카메라 권한이 필요해요.",14.sp, FontWeight.w600, ColorStyles.dFinBlack, TextAlign.center, null)),
                   UiUtils.getMarginBox(0, 1.h),
-                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("설정에서 카메라 권한을 허용 해주세요",12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null))
+                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("설정에서 카메라 권한을 허용 해주세요",12.sp, FontWeight.w500, ColorStyles.dFinBlack, TextAlign.center, null))
                 ]),
                 UiUtils.getExpandedScrollView(Axis.vertical, Container()),
-                UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                    UiUtils.getTextWithFixedScale("설정 바로가기", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () async {
+                UiUtils.getBorderButtonBox(90.w, ColorStyles.dFinButtonBlue, ColorStyles.dFinButtonBlue,
+                    UiUtils.getTextWithFixedScale("설정 바로가기", 12.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.start, null), () async {
                       Navigator.pop(slideContext);
                       openAppSettings();
                     }),
@@ -1407,13 +1407,13 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
                   children: [
                     UiUtils.getMarginBox(100.w, 1.h),
                     Column(children: [
-                      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("촬영을위한 카메라 권한이 필요해요.",14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
+                      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("촬영을위한 카메라 권한이 필요해요.",14.sp, FontWeight.w600, ColorStyles.dFinBlack, TextAlign.center, null)),
                       UiUtils.getMarginBox(0, 1.h),
-                      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("설정에서 카메라 권한을 허용 해주세요",12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null))
+                      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("설정에서 카메라 권한을 허용 해주세요",12.sp, FontWeight.w500, ColorStyles.dFinBlack, TextAlign.center, null))
                     ]),
                     UiUtils.getExpandedScrollView(Axis.vertical, Container()),
-                    UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                        UiUtils.getTextWithFixedScale("설정 바로가기", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () async {
+                    UiUtils.getBorderButtonBox(90.w, ColorStyles.dFinButtonBlue, ColorStyles.dFinButtonBlue,
+                        UiUtils.getTextWithFixedScale("설정 바로가기", 12.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.start, null), () async {
                           Navigator.pop(slideContext);
                           openAppSettings();
                         }),
@@ -1431,13 +1431,13 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
               children: [
                 UiUtils.getMarginBox(100.w, 1.h),
                 Column(children: [
-                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("파일전송을위한 마이크 권한이 필요해요.",14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
+                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("파일전송을위한 마이크 권한이 필요해요.",14.sp, FontWeight.w600, ColorStyles.dFinBlack, TextAlign.center, null)),
                   UiUtils.getMarginBox(0, 1.h),
-                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("설정에서 마이크 권한을 허용 해주세요",12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null))
+                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("설정에서 마이크 권한을 허용 해주세요",12.sp, FontWeight.w500, ColorStyles.dFinBlack, TextAlign.center, null))
                 ]),
                 UiUtils.getExpandedScrollView(Axis.vertical, Container()),
-                UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                    UiUtils.getTextWithFixedScale("설정 바로가기", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () async {
+                UiUtils.getBorderButtonBox(90.w, ColorStyles.dFinButtonBlue, ColorStyles.dFinButtonBlue,
+                    UiUtils.getTextWithFixedScale("설정 바로가기", 12.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.start, null), () async {
                       Navigator.pop(slideContext);
                       openAppSettings();
                     }),
@@ -1568,7 +1568,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
           Container(
               width: 22.w, height: 17.h,
               decoration: const BoxDecoration(
-                  color: ColorStyles.upFinWhite
+                  color: ColorStyles.dFinWhite
               ),
               child: SizedBox(
                 width: 21.w,
@@ -1597,25 +1597,25 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
                             padding: EdgeInsets.only(top: 0.2.h),
                             decoration: const BoxDecoration(
                                 borderRadius: BorderRadius.only(topLeft: Radius.circular(7), topRight: Radius.circular(7)),
-                                color: ColorStyles.upFinBlack),
-                            child: Center(child: UiUtils.getTextWithFixedScale("✕", 7.sp, FontWeight.w600, ColorStyles.upFinWhite, TextAlign.center, 1))
+                                color: ColorStyles.dFinBlack),
+                            child: Center(child: UiUtils.getTextWithFixedScale("✕", 7.sp, FontWeight.w600, ColorStyles.dFinWhite, TextAlign.center, 1))
                         )),
                     UiUtils.getMarginBox(0.5.w, 0)
                   ]),
                   isImage? Container(
                       padding: EdgeInsets.all(0.3.w),
-                      decoration: const BoxDecoration(color: ColorStyles.upFinBlack, borderRadius: BorderRadius.all(Radius.circular(0))),
+                      decoration: const BoxDecoration(color: ColorStyles.dFinBlack, borderRadius: BorderRadius.all(Radius.circular(0))),
                       width: 21.w,
                       height: 14.8.h,
                       child: Image.file(File(pickedFiles[i].path), fit: BoxFit.fill)
                   ) : Container(
                       padding: EdgeInsets.only(top:0.3.w, bottom: 0.3.w, left: 2.w, right: 2.w),
-                      decoration: const BoxDecoration(color: ColorStyles.upFinBlack, borderRadius: BorderRadius.all(Radius.circular(0))),
+                      decoration: const BoxDecoration(color: ColorStyles.dFinBlack, borderRadius: BorderRadius.all(Radius.circular(0))),
                       width: 21.w,
                       height: 14.8.h,
                       child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [UiUtils.getMarginBox(0, 1.2.h),
-                        UiUtils.getIcon(19.5.w, 5.h, Icons.folder_copy_outlined, 5.h, ColorStyles.upFinWhite), UiUtils.getMarginBox(0, 0.5.h),
-                        UiUtils.getExpandedScrollView(Axis.vertical, UiUtils.getTextWithFixedScale(fileName, 10.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null))
+                        UiUtils.getIcon(19.5.w, 5.h, Icons.folder_copy_outlined, 5.h, ColorStyles.dFinWhite), UiUtils.getMarginBox(0, 0.5.h),
+                        UiUtils.getExpandedScrollView(Axis.vertical, UiUtils.getTextWithFixedScale(fileName, 10.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.center, null))
                       ])
                   )
                 ]),
@@ -1745,39 +1745,39 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
     selectedCarNum = "";
     selectedCarOwner = "";
     String selectedJobInfo = MyData.jobInfo;
-    UiUtils.showPopMenu(context, true, 100.w, 100.h, 0.5, 0, ColorStyles.upFinWhite, (slideContext, slideSetState){
+    UiUtils.showPopMenu(context, true, 100.w, 100.h, 0.5, 0, ColorStyles.dFinWhite, (slideContext, slideSetState){
       Widget slideWidget = Padding(padding: EdgeInsets.only(left: 2.5.w), child: Column(
           children: [
             SizedBox(width: 95.w, child: Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-              UiUtils.getCloseButton(ColorStyles.upFinDarkGray, () {
+              UiUtils.getCloseButton(ColorStyles.dFinDarkGray, () {
                 Navigator.pop(slideContext);
               }),
               UiUtils.getMarginBox(2.w, 0),
             ])),
             UiUtils.getMarginBox(0, 3.w),
-            SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("차량번호를 입력하세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+            SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("차량번호를 입력하세요.", 22.sp, FontWeight.w800, ColorStyles.dFinTextAndBorderBlue, TextAlign.start, null)),
             UiUtils.getMarginBox(0, 1.h),
-            SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("예) 12가3456", 14.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
+            SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("예) 12가3456", 14.sp, FontWeight.w500, ColorStyles.dFinRealGray, TextAlign.start, null)),
             UiUtils.getMarginBox(0, 5.h),
 
             //test for input name
             MyData.isTestUser? SizedBox(width: 85.w, child:
             Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              UiUtils.getTextWithFixedScale("테스트용) 차량 소유자 입력", 10.sp, FontWeight.w600, ColorStyles.upFinRed, TextAlign.center, null),
-              UiUtils.getTextField(context, 30.w, TextStyles.upFinTextFormFieldTextStyle, _carInfoFocus2, _carInfoTextController2, TextInputType.text,
+              UiUtils.getTextWithFixedScale("테스트용) 차량 소유자 입력", 10.sp, FontWeight.w600, ColorStyles.dFinRed, TextAlign.center, null),
+              UiUtils.getTextField(context, 30.w, TextStyles.dFinTextFormFieldTextStyle, _carInfoFocus2, _carInfoTextController2, TextInputType.text,
                   UiUtils.getInputDecoration("이름", 10.sp, "", 0.sp), (value) { }),
               UiUtils.getMarginBox(0, 5.h),
             ])) : UiUtils.getMarginBox(0, 0),
 
             UiUtils.getExpandedScrollView(Axis.vertical,
                 SizedBox(width: 85.w, child: Row(children: [
-                  UiUtils.getTextField(context, 85.w, TextStyles.upFinTextFormFieldTextStyle, _carInfoFocus1, _carInfoTextController1, TextInputType.text,
+                  UiUtils.getTextField(context, 85.w, TextStyles.dFinTextFormFieldTextStyle, _carInfoFocus1, _carInfoTextController1, TextInputType.text,
                       UiUtils.getInputDecoration("번호", 10.sp, "", 0.sp), (value) { }),
                 ]))
             ),
 
             UiUtils.getMarginBox(0, 5.h),
-            UiUtils.getTextButtonBox(90.w, "등록", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+            UiUtils.getTextButtonBox(90.w, "등록", TextStyles.dFinBasicButtonTextStyle, ColorStyles.dFinButtonBlue, () async {
               if(_carInfoTextController1.text.trim() != ""){
                 selectedCarNum = _carInfoTextController1.text.trim();
                 selectedCarOwner = MyData.isTestUser? _carInfoTextController2.text.trim() : MyData.name;
@@ -1849,7 +1849,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
 
     Widget view = Stack(children: [
         Container(
-        color: ColorStyles.upFinWhite,
+        color: ColorStyles.dFinWhite,
         width: 100.w,
         height: 100.h,
         child: Column(children: [
@@ -1874,9 +1874,9 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
                           : UiUtils.getCircleImage(currentCompanyLogo, 9.w),
                       UiUtils.getMarginBox(2.w, 0),
                       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        SizedBox(width: 60.w, child: UiUtils.getTextWithFixedScaleAndOverFlow(currentCompany, 12.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1)),
+                        SizedBox(width: 60.w, child: UiUtils.getTextWithFixedScaleAndOverFlow(currentCompany, 12.sp, FontWeight.w600, ColorStyles.dFinBlack, TextAlign.start, 1)),
                         UiUtils.getMarginBox(0, 0.3.h),
-                        UiUtils.getTextWithFixedScale2(currentRoomTypeName, 10.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.center, 1),
+                        UiUtils.getTextWithFixedScale2(currentRoomTypeName, 10.sp, FontWeight.w500, ColorStyles.dFinRealGray, TextAlign.center, 1),
                       ])
                     ])
                   ])
@@ -1896,16 +1896,16 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
                               padding: EdgeInsets.only(top:1.4.w, bottom:1.2.w, right: 0.5.w, left:0.7.w),
                               decoration: BoxDecoration(
                                 borderRadius: const BorderRadius.all(Radius.circular(18)),
-                                color: ColorStyles.upFinWhite,
+                                color: ColorStyles.dFinWhite,
                                   border: Border.all(
-                                    color: ColorStyles.upFinGray,
+                                    color: ColorStyles.dFinGray,
                                     width: 0.25.w,
                                   )
                               ),
                               child: Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment:MainAxisAlignment.center, children: [
                                 UiUtils.getMarginBox(1.5.w, 0),
-                                UiUtils.getTextWithFixedScale(statusString, 10.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null),
-                                Icon(GetController.to.isShowStatus.value? Icons.arrow_drop_up_outlined : Icons.arrow_drop_down_outlined, color: ColorStyles.upFinBlack, size: 5.w)
+                                UiUtils.getTextWithFixedScale(statusString, 10.sp, FontWeight.w500, ColorStyles.dFinBlack, TextAlign.start, null),
+                                Icon(GetController.to.isShowStatus.value? Icons.arrow_drop_up_outlined : Icons.arrow_drop_down_outlined, color: ColorStyles.dFinBlack, size: 5.w)
                               ]),
                             ),
                             onTap: (){
@@ -1936,13 +1936,13 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
           UiUtils.getMarginBox(0, 1.1.h),
           Obx((){
             if(GetController.to.isShowStatus.value){
-              return isUserChatRoom ? UiUtils.getMarginColoredBox(100.w, 0.1.h, ColorStyles.upFinGray) : UiUtils.getMarginBox(0, 0);
+              return isUserChatRoom ? UiUtils.getMarginColoredBox(100.w, 0.1.h, ColorStyles.dFinGray) : UiUtils.getMarginBox(0, 0);
             }else{
-              return UiUtils.getMarginColoredBox(100.w, 0.1.h, ColorStyles.upFinGray);
+              return UiUtils.getMarginColoredBox(100.w, 0.1.h, ColorStyles.dFinGray);
             }
           }),
           isUserChatRoom ? CommonUtils.isWeekendInSeoul() ?
-          Container(color: ColorStyles.upFinButtonBlue, width: 100.w, child: Padding(padding: EdgeInsets.only(left: 5.w, right: 5.w, bottom: 2.h, top: 2.h), child: _getWeekendInfoWidgetForUserChat())) : Container() : Obx((){
+          Container(color: ColorStyles.dFinButtonBlue, width: 100.w, child: Padding(padding: EdgeInsets.only(left: 5.w, right: 5.w, bottom: 2.h, top: 2.h), child: _getWeekendInfoWidgetForUserChat())) : Container() : Obx((){
             if(GetController.to.isShowStatus.value){
               return Column(children:[
                 UiUtils.getMarginBox(0, 3.h),
@@ -1952,7 +1952,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
               return Container();
             }
           }),
-          Expanded(child: RefreshIndicator(onRefresh: ()=>_requestPrev(),color: ColorStyles.upFinButtonBlue, backgroundColor: ColorStyles.upFinWhiteSky,
+          Expanded(child: RefreshIndicator(onRefresh: ()=>_requestPrev(),color: ColorStyles.dFinButtonBlue, backgroundColor: ColorStyles.dFinWhiteSky,
               child: SingleChildScrollView(controller: _chatScrollController, scrollDirection: Axis.vertical, physics: const BouncingScrollPhysics(),
                   child: Obx(()=>Column(mainAxisAlignment: MainAxisAlignment.start, children: _getChatList()))))),
           Obx((){
@@ -1973,7 +1973,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
 
             if(isUserChatRoom) isWaiting = false;
 
-            return Container(color:ColorStyles.upFinWhite, child: Column(
+            return Container(color:ColorStyles.dFinWhite, child: Column(
               mainAxisSize: MainAxisSize.min, // 자식 위젯에 맞게 높이를 조절합니다.
               children: [
                 isWaiting ? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, isUserChatRoom ? 0 : 0.6.h),
@@ -1982,7 +1982,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
                         child: Wrap(runSpacing: 0.7.h, spacing: 1.7.w, alignment: WrapAlignment.end, direction: Axis.horizontal,
                             children: GetController.to.autoAnswerWidgetList))),
                 isWaiting ? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, isUserChatRoom ? 0 : 1.h),
-                GetController.to.isInputTextHide.value? Container() : GetController.to.isShowPickedFile.value? Container() : UiUtils.getMarginColoredBox(100.w, 0.1.h, ColorStyles.upFinGray),
+                GetController.to.isInputTextHide.value? Container() : GetController.to.isShowPickedFile.value? Container() : UiUtils.getMarginColoredBox(100.w, 0.1.h, ColorStyles.dFinGray),
                 Obx((){
                   return GetController.to.isInputTextHide.value? Container() : GetController.to.isShowPickedFile.value? Container() : AnimatedContainer(
                       duration: const Duration(milliseconds:200),
@@ -1992,22 +1992,22 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
                         minHeight: inputMinHeight,
                         maxHeight: inputMaxHeight,
                       ),
-                      color: ColorStyles.upFinWhiteGray,
+                      color: ColorStyles.dFinWhiteGray,
                       child: Padding(padding: EdgeInsets.only(left: 3.w,right: 3.w,bottom: 3.w,top: 2.w), child:
                       Container(
                           decoration: BoxDecoration(
-                            color: ColorStyles.upFinWhiteGray, // 배경색 설정
+                            color: ColorStyles.dFinWhiteGray, // 배경색 설정
                             borderRadius: BorderRadius.circular(1.0), // 모서리를 둥글게 하는 부분
                           ),
                           child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
                             Expanded(flex: 75, child: Column(children: [UiUtils.getExpandedScrollView(Axis.vertical,
                                 Column(children: [
-                                  UiUtils.getChatTextField(context, 82.w, TextStyles.upFinChatTextStyle, _chatTextFocus, _chatTextController, TextInputType.multiline,
+                                  UiUtils.getChatTextField(context, 82.w, TextStyles.dFinChatTextStyle, _chatTextFocus, _chatTextController, TextInputType.multiline,
                                       UiUtils.getChatInputDecoration(), (textValue) {
                                         if(textValue != ""){
                                           isTextFieldFocus = true;
                                           final textLinePainter = TextPainter(
-                                            text: TextSpan(text: textValue, style: TextStyles.upFinTextFormFieldTextStyle),
+                                            text: TextSpan(text: textValue, style: TextStyles.dFinTextFormFieldTextStyle),
                                             maxLines: null,
                                             textDirection: TextDirection.ltr,
                                           )..layout(minWidth: 0, maxWidth: 72.w);
@@ -2026,9 +2026,9 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
                                         }
                                       }),
                                 ]))])),
-                            Expanded(flex: 1, child: Container(color: ColorStyles.upFinWhiteGray)),
+                            Expanded(flex: 1, child: Container(color: ColorStyles.dFinWhiteGray)),
                             Expanded(flex: !isTextFieldFocus? 20 : 13, child: !isTextFieldFocus ? SizedBox(height: 15.w, child: Row(crossAxisAlignment:CrossAxisAlignment.center, mainAxisAlignment:MainAxisAlignment.center, children: [
-                              UiUtils.getIconButtonWithHeight(6.w, Icons.photo_camera_outlined, 7.w, ColorStyles.upFinRealGray, () {
+                              UiUtils.getIconButtonWithHeight(6.w, Icons.photo_camera_outlined, 7.w, ColorStyles.dFinRealGray, () {
                                 if(chatButtonPressedPossible){
                                   chatButtonPressedPossible = false;
                                   CommonUtils.hideKeyBoard();
@@ -2039,7 +2039,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
                                 }
                               }),
                               UiUtils.getMarginBox(4.w, 0),
-                              Transform.rotate(angle: -25*(3.14/180), child: UiUtils.getIconButtonWithHeight(6.w, Icons.attachment, 7.w, ColorStyles.upFinRealGray, () {
+                              Transform.rotate(angle: -25*(3.14/180), child: UiUtils.getIconButtonWithHeight(6.w, Icons.attachment, 7.w, ColorStyles.dFinRealGray, () {
                                 if(chatButtonPressedPossible){
                                   chatButtonPressedPossible = false;
                                   CommonUtils.hideKeyBoard();
@@ -2050,8 +2050,8 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
                                 }
 
                               }))
-                            ])) : UiUtils.getBorderButtonBoxForRound6(ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                                Transform.rotate(angle: -25*(3.14/180), child: Icon(Icons.send_rounded, color: ColorStyles.upFinWhite, size: 6.w)), () {
+                            ])) : UiUtils.getBorderButtonBoxForRound6(ColorStyles.dFinButtonBlue, ColorStyles.dFinButtonBlue,
+                                Transform.rotate(angle: -25*(3.14/180), child: Icon(Icons.send_rounded, color: ColorStyles.dFinWhite, size: 6.w)), () {
                                   if(_chatTextController.text.toString().trim() != ""){
                                     _sendMessage(_chatTextController.text, "");
                                     _chatTextController.text = "";
@@ -2071,8 +2071,8 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
                 GetController.to.isShowPickedFile.value? Column(children: [
                   UiUtils.getSizedScrollView(90.w, inputHelpMinHeight, Axis.horizontal, _getPickedFilesWidget()),
                   UiUtils.getMarginBox(0, 3.w),
-                  UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                      UiUtils.getTextWithFixedScale("전송", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () async{
+                  UiUtils.getBorderButtonBox(90.w, ColorStyles.dFinButtonBlue, ColorStyles.dFinButtonBlue,
+                      UiUtils.getTextWithFixedScale("전송", 14.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.center, null), () async{
                         await _sendFileToAws();
                       }),
                   UiUtils.getMarginBox(0, 5.w),
@@ -2086,7 +2086,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
         if(GetController.to.isShowScrollBottom.value){
           return Positioned(
               bottom: GetController.to.isInputTextHide.value? 5.w : 20.w, right: 5.w,
-              child: UiUtils.getIconButtonWithHeight(10.w, Icons.arrow_drop_down_circle, 10.w, ColorStyles.upFinChatScrollDarkGray, () {
+              child: UiUtils.getIconButtonWithHeight(10.w, Icons.arrow_drop_down_circle, 10.w, ColorStyles.dFinChatScrollDarkGray, () {
                 isScrollMove = false;
                 GetController.to.updateAutoAnswerWaiting(false);
                 GetController.to.updateShowScrollBottom(false);
@@ -2110,7 +2110,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
 class ChatBubbleTriangleForOther extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    var paint = Paint()..color = ColorStyles.upFinWhiteGray;
+    var paint = Paint()..color = ColorStyles.dFinWhiteGray;
 
     var path = Path();
     path.lineTo(0, -2.w);
@@ -2128,7 +2128,7 @@ class ChatBubbleTriangleForOther extends CustomPainter {
 class ChatBubbleTriangleForMe extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
-    var paint = Paint()..color = ColorStyles.upFinTextAndBorderBlue;
+    var paint = Paint()..color = ColorStyles.dFinTextAndBorderBlue;
 
     var path = Path();
     path.lineTo(0, -2.w);

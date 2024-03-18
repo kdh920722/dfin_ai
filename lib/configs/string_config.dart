@@ -53,7 +53,7 @@ class StringConfig{
 
             // @제목 문구
             widgetList.add(Padding(padding: EdgeInsets.only(left: 2.w, right: 0.w, top: 0.w, bottom: 0.w),
-                child: UiUtils.getTextWithFixedScale(textList[i], 22.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)));
+                child: UiUtils.getTextWithFixedScale(textList[i], 22.sp, FontWeight.w600, ColorStyles.dFinBlack, TextAlign.start, null)));
 
             // @제목 아래간격
             widgetList.add(UiUtils.getMarginBox(0, 1.h));
@@ -69,7 +69,7 @@ class StringConfig{
 
                   // @소제목 문구
                   widgetList.add(Padding(padding: EdgeInsets.only(left: 4.w, right: 0.w, top: 0.w, bottom: 0.w),
-                      child: UiUtils.getTextWithFixedScale(subTextList[i2], 16.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)));
+                      child: UiUtils.getTextWithFixedScale(subTextList[i2], 16.sp, FontWeight.w500, ColorStyles.dFinBlack, TextAlign.start, null)));
 
                   // @소제목 아래간격
                   widgetList.add(UiUtils.getMarginBox(0, 0.5.h));
@@ -85,7 +85,7 @@ class StringConfig{
 
                         // @본문 문구
                         widgetList.add(Padding(padding: EdgeInsets.only(left: 8.w, right: 0.w, top: 0.w, bottom: 0.w),
-                            child: UiUtils.getTextWithFixedScale(contentsTextList[i3], 12.sp, FontWeight.w400, ColorStyles.upFinBlack, TextAlign.start, null)));
+                            child: UiUtils.getTextWithFixedScale(contentsTextList[i3], 12.sp, FontWeight.w400, ColorStyles.dFinBlack, TextAlign.start, null)));
 
                         // @본문 아래간격
                         widgetList.add(UiUtils.getMarginBox(0, 1.h));
@@ -100,7 +100,7 @@ class StringConfig{
 
                             // @소안내 문구
                             widgetList.add(Padding(padding: EdgeInsets.only(left: 4.w, right: 0.w, top: 0.w, bottom: 0.w),
-                                child: UiUtils.getTextWithFixedScale(alarmContentsTextList[i4], 12.sp, FontWeight.w400, ColorStyles.upFinRed, TextAlign.start, null)));
+                                child: UiUtils.getTextWithFixedScale(alarmContentsTextList[i4], 12.sp, FontWeight.w400, ColorStyles.dFinRed, TextAlign.start, null)));
 
                             // @소안내 아래간격
                             widgetList.add(UiUtils.getMarginBox(0, 0.5.h));
@@ -125,7 +125,7 @@ class StringConfig{
 
                   // @안내 문구
                   widgetList.add(Padding(padding: EdgeInsets.only(left: 2.w, right: 0.w, top: 0.w, bottom: 0.w),
-                      child: UiUtils.getTextWithFixedScale(bigAlarmContentsTextList[i5], 18.sp, FontWeight.w600, ColorStyles.upFinRed, TextAlign.start, null)));
+                      child: UiUtils.getTextWithFixedScale(bigAlarmContentsTextList[i5], 18.sp, FontWeight.w600, ColorStyles.dFinRed, TextAlign.start, null)));
 
                   // @안내 아래간격
                   widgetList.add(UiUtils.getMarginBox(0, 2.h));

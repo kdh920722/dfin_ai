@@ -61,7 +61,7 @@ class FireBaseController{
 
   static Future<void> writeLog(String type, String id, String msg) async {
     try{
-      String dbPath = "UPFIN/LOG/$type";
+      String dbPath = "DFIN/LOG/$type";
 
       final snapshot = await FirebaseDatabase.instance.ref().child("$dbPath/$fcmToken").get();
       if (snapshot.exists) {
@@ -101,10 +101,10 @@ class FireBaseController{
   }
 
   /// firebase FCM =========================================================================== ///
-  static String channelIdForAndroid = "upfin_notification";
-  static String channelNameForAndroid = "upfin_notification";
-  static String channelDescForAndroid = "upfin 알림";
-  static String channelTitleForIOS = "upfin 알림";
+  static String channelIdForAndroid = "dfin_notification";
+  static String channelNameForAndroid = "dfin_notification";
+  static String channelDescForAndroid = "dfin 알림";
+  static String channelTitleForIOS = "dfin 알림";
   static StateSetter? setStateForForeground;
 
   static Future<void> initFcm(Function(bool isSuccess, String fcmToken) callback) async {

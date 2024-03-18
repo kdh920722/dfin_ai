@@ -30,7 +30,7 @@ class WebSocketController {
   static Future<void> initWebSocket(Function(bool isSuccess) callback) async{
     try{
       final ref = FirebaseDatabase.instance.ref();
-      final snapshot = await ref.child('UPFIN/API/websocket').get();
+      final snapshot = await ref.child('DFIN/API/websocket').get();
       if (snapshot.exists) {
         for(var each in snapshot.children){
           switch(each.key){

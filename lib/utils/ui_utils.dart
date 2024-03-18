@@ -39,7 +39,7 @@ class UiUtils {
             child: WillPopScope(
                 onWillPop: () => callbackBackButtonForView(),
                 child: Scaffold(
-                  backgroundColor: ColorStyles.upFinWhite,
+                  backgroundColor: ColorStyles.dFinWhite,
                   body: view,
                 )
             )
@@ -61,7 +61,7 @@ class UiUtils {
                   });
                 },
                 child: Scaffold(
-                  backgroundColor: ColorStyles.upFinWhite,
+                  backgroundColor: ColorStyles.dFinWhite,
                   body: view,
                 )
             )
@@ -79,7 +79,7 @@ class UiUtils {
           child: WillPopScope(
               onWillPop: () => callbackBackButtonForView(),
               child: Scaffold(
-                  backgroundColor: ColorStyles.upFinWhite,
+                  backgroundColor: ColorStyles.dFinWhite,
                   body: ListView(
                       controller: scrollController,
                       shrinkWrap: true,
@@ -107,7 +107,7 @@ class UiUtils {
                   });
                 },
                 child: Scaffold(
-                    backgroundColor: ColorStyles.upFinWhite,
+                    backgroundColor: ColorStyles.dFinWhite,
                     body: ListView(
                         controller: scrollController,
                         shrinkWrap: true,
@@ -315,7 +315,12 @@ class UiUtils {
   }
 
   static Widget getImageButton(Image image, double size, Color iconColor, VoidCallback onPressedCallback) {
-    return SizedBox(width: size, height: size, child: IconButton(padding: const EdgeInsets.all(4.5), onPressed: onPressedCallback, icon: image, iconSize: size));
+    return Container(color : iconColor, width: size, height: size, child: IconButton(padding: const EdgeInsets.all(4.5), onPressed: onPressedCallback, icon: image, iconSize: size));
+  }
+
+  static Widget getCircleImageButton(Image image, double size, Color iconColor, VoidCallback onPressedCallback) {
+    return Container(decoration: BoxDecoration(border: Border.all(color: iconColor, width: 0.1.w), shape: BoxShape.circle),
+        width: size, height: size, child: IconButton(padding: const EdgeInsets.all(0.5), onPressed: onPressedCallback, icon: image, iconSize: size));
   }
 
   static Widget getRoundImageButton(Image image, double size, Color iconColor, VoidCallback onPressedCallback) {
@@ -327,12 +332,12 @@ class UiUtils {
     return Container(
         width: size,
         height: size,
-        color:ColorStyles.upFinWhite,
+        color:ColorStyles.dFinDarkWhiteGray,
         alignment: Alignment.center,
         child: ExtendedImage.network(
           imageUrl,
           fit: BoxFit.contain,
-          border: Border.all(color: ColorStyles.upFinWhiteGray, width: 0.3.w),
+          border: Border.all(color: ColorStyles.dFinWhiteGray, width: 0.3.w),
           cache: true,
           cacheMaxAge: const Duration(hours: 1),
           shape: BoxShape.circle,
@@ -345,14 +350,14 @@ class UiUtils {
                   int val = state.loadingProgress!.cumulativeBytesLoaded;
                   return Center(
                       child: CircularProgressIndicator(
-                          color: ColorStyles.upFinWhite,
+                          color: ColorStyles.dFinWhite,
                           value: val / total
                       )
                   );
                 }else{
                   return const Center(
                       child: CircularProgressIndicator(
-                          color: ColorStyles.upFinWhite,
+                          color: ColorStyles.dFinWhite,
                           value: 1
                       )
                   );
@@ -370,7 +375,7 @@ class UiUtils {
               case LoadState.failed:
                 aniController.reset();
                 return GestureDetector(
-                  child: UiUtils.getIcon(8.w, 8.w, Icons.refresh_rounded, 8.w, ColorStyles.upFinRed),
+                  child: UiUtils.getIcon(8.w, 8.w, Icons.refresh_rounded, 8.w, ColorStyles.dFinRed),
                   onTap: () {
                     state.reLoadImage();
                   },
@@ -418,14 +423,14 @@ class UiUtils {
     return SizedBox(
         width : 15.w,
         child: IconButton(constraints: const BoxConstraints(), padding: EdgeInsets.only(right: 5.w),
-            onPressed: onPressedCallback, icon: Icon(Icons.arrow_back_ios_new_sharp, color: ColorStyles.upFinDarkGray, size: 5.w)));
+            onPressed: onPressedCallback, icon: Icon(Icons.arrow_back_ios_new_sharp, color: ColorStyles.dFinWhiteGray, size: 5.w)));
   }
 
   static Widget getBackButtonForMainView(VoidCallback onPressedCallback) {
     return SizedBox(
         width : 15.w,
         child: IconButton(constraints: const BoxConstraints(), padding: EdgeInsets.only(right: 10.w),
-            onPressed: onPressedCallback, icon: Icon(Icons.arrow_back_ios_new_sharp, color: ColorStyles.upFinDarkGray, size: 5.w)));
+            onPressed: onPressedCallback, icon: Icon(Icons.arrow_back_ios_new_sharp, color: ColorStyles.dFinWhiteGray, size: 5.w)));
   }
 
   static Widget getCloseButton(Color iconColor, VoidCallback onPressedCallback) {
@@ -445,7 +450,7 @@ class UiUtils {
             backgroundColor: buttonColor,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
             elevation: 0.5,
-            shadowColor: ColorStyles.upFinGray,
+            shadowColor: ColorStyles.dFinGray,
           ),
           onPressed: onPressedCallback,
           child: Icon(icon, color: iconColor, size: size),
@@ -461,7 +466,7 @@ class UiUtils {
             backgroundColor: buttonColor,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
             elevation: 0.0,
-            shadowColor: ColorStyles.upFinGray,
+            shadowColor: ColorStyles.dFinGray,
           ),
           onPressed: onPressedCallback,
           child: Padding(
@@ -480,7 +485,7 @@ class UiUtils {
             backgroundColor: buttonColor,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
             elevation: 0.5,
-            shadowColor: ColorStyles.upFinGray,
+            shadowColor: ColorStyles.dFinGray,
           ),
           onPressed: onPressedCallback,
           child: Padding(
@@ -501,7 +506,7 @@ class UiUtils {
             backgroundColor: buttonColor,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
             elevation: 0.5,
-            shadowColor: ColorStyles.upFinGray,
+            shadowColor: ColorStyles.dFinGray,
           ),
           onPressed: onPressedCallback,
           child: Padding(
@@ -519,10 +524,10 @@ class UiUtils {
           style: ElevatedButton.styleFrom(
             padding: EdgeInsets.only(left: 4.w, right: 4.w, top: 4.w, bottom: 4.w),
             backgroundColor: buttonColor,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             side: BorderSide(width: 1, color: borderColor),
-            elevation: 0.0,
-            shadowColor: ColorStyles.upFinGray,
+            elevation: 1.5,
+            shadowColor: ColorStyles.dFinBlack,
           ),
           onPressed: onPressedCallback,
           child: childWidget,
@@ -537,13 +542,49 @@ class UiUtils {
             style: ElevatedButton.styleFrom(
               padding: EdgeInsets.only(left: 4.w, right: 4.w, top: 4.w, bottom: 4.w),
               backgroundColor: buttonColor,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
               side: BorderSide(width: 0.1.w, color: borderColor),
-              elevation: 0.0,
-              shadowColor: ColorStyles.upFinGray,
+              elevation: 1.5,
+              shadowColor: ColorStyles.dFinBlack,
             ),
             onPressed: onPressedCallback,
             child: childWidget,
+        )
+    );
+  }
+
+  static SizedBox getBorderButtonBoxWithNoShadow(double buttonWidth, Color buttonColor, Color borderColor, Widget childWidget, VoidCallback onPressedCallback){
+    return SizedBox(
+        width: buttonWidth,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.only(left: 4.w, right: 4.w, top: 4.w, bottom: 4.w),
+            backgroundColor: buttonColor,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            side: BorderSide(width: 0.1.w, color: borderColor),
+            elevation: 0,
+            shadowColor: ColorStyles.dFinBlack,
+          ),
+          onPressed: onPressedCallback,
+          child: childWidget,
+        )
+    );
+  }
+
+  static SizedBox getBorderButtonBox2(double buttonWidth, Color buttonColor, Color borderColor, Widget childWidget, VoidCallback onPressedCallback){
+    return SizedBox(
+        width: buttonWidth,
+        child: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            padding: EdgeInsets.only(left: 4.w, right: 4.w, top: 4.w, bottom: 4.w),
+            backgroundColor: buttonColor,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            side: BorderSide(width: 0.1.w, color: borderColor),
+            elevation: 0,
+            shadowColor: ColorStyles.dFinBlack,
+          ),
+          onPressed: onPressedCallback,
+          child: childWidget,
         )
     );
   }
@@ -558,7 +599,7 @@ class UiUtils {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
             side: BorderSide(width: 1, color: borderColor),
             elevation: 0.0,
-            shadowColor: ColorStyles.upFinGray,
+            shadowColor: ColorStyles.dFinGray,
           ),
           onPressed: onPressedCallback,
           child: childWidget,
@@ -577,7 +618,7 @@ class UiUtils {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             side: BorderSide(width: 1, color: borderColor),
             elevation: 0.0,
-            shadowColor: ColorStyles.upFinGray,
+            shadowColor: ColorStyles.dFinGray,
           ),
           onPressed: onPressedCallback,
           child: childWidget,
@@ -595,7 +636,7 @@ class UiUtils {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)),
             side: BorderSide(width: 0.6, color: borderColor),
             elevation: 0.0,
-            shadowColor: ColorStyles.upFinGray,
+            shadowColor: ColorStyles.dFinGray,
           ),
           onPressed: onPressedCallback,
           child: childWidget,
@@ -673,10 +714,10 @@ class UiUtils {
           style: ElevatedButton.styleFrom(
             padding: EdgeInsets.only(left: 2.w, right: 2.w),
             backgroundColor: buttonColor,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)),
             side: BorderSide(width: 0.6, color: borderColor),
             elevation: 0.0,
-            shadowColor: ColorStyles.upFinGray,
+            shadowColor: ColorStyles.dFinGray,
           ),
           onPressed: onPressedCallback,
           child: childWidget,
@@ -694,7 +735,7 @@ class UiUtils {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
             side: BorderSide(width: 1.3, color: borderColor),
             elevation: 0.0,
-            shadowColor: ColorStyles.upFinGray,
+            shadowColor: ColorStyles.dFinGray,
           ),
           onPressed: onPressedCallback,
           child: childWidget,
@@ -712,7 +753,7 @@ class UiUtils {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)),
             side: BorderSide(width: 0, color: borderColor),
             elevation: 0.0,
-            shadowColor: ColorStyles.upFinGray,
+            shadowColor: ColorStyles.dFinGray,
           ),
           onPressed: onPressedCallback,
           child: childWidget,
@@ -731,7 +772,7 @@ class UiUtils {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(2)),
             side: BorderSide(width: 1.3, color: borderColor),
             elevation: 0.0,
-            shadowColor: ColorStyles.upFinGray,
+            shadowColor: ColorStyles.dFinGray,
           ),
           onPressed: onPressedCallback,
           child: childWidget,
@@ -749,7 +790,7 @@ class UiUtils {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             side: BorderSide(width: 1.3, color: borderColor),
             elevation: 0.0,
-            shadowColor: ColorStyles.upFinGray,
+            shadowColor: ColorStyles.dFinGray,
           ),
           onPressed: onPressedCallback,
           child: childWidget,
@@ -765,7 +806,7 @@ class UiUtils {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         side: BorderSide(color: borderColor, width: 0.4.w),
         elevation: 0.0,
-        shadowColor: ColorStyles.upFinGray,
+        shadowColor: ColorStyles.dFinGray,
       ),
       onPressed: onPressedCallback,
       child: childWidget,
@@ -780,7 +821,7 @@ class UiUtils {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(3)),
         side: BorderSide(color: borderColor, width: 0.26.w),
         elevation: 0,
-        shadowColor: ColorStyles.upFinGray,
+        shadowColor: ColorStyles.dFinGray,
       ),
       onPressed: onPressedCallback,
       child: childWidget,
@@ -795,7 +836,7 @@ class UiUtils {
         shape: const CircleBorder(),
         side: BorderSide(color: borderColor, width: 0.w),
         elevation: 0,
-        shadowColor: ColorStyles.upFinGray,
+        shadowColor: ColorStyles.dFinGray,
       ),
       onPressed: onPressedCallback,
       child: childWidget,
@@ -813,7 +854,7 @@ class UiUtils {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)),
             side: BorderSide(width: 1.3, color: borderColor),
             elevation: 0.0,
-            shadowColor: ColorStyles.upFinGray,
+            shadowColor: ColorStyles.dFinGray,
           ),
           onPressed: onPressedCallback,
           child: childWidget,
@@ -832,7 +873,7 @@ class UiUtils {
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)),
             side: BorderSide(width: 0, color: buttonColor),
             elevation: 0.0,
-            shadowColor: ColorStyles.upFinGray,
+            shadowColor: ColorStyles.dFinGray,
           ),
           onPressed: onPressedCallback,
           child: childWidget,
@@ -849,7 +890,7 @@ class UiUtils {
           height: circleBoxSize,
           decoration: const BoxDecoration(
             shape: BoxShape.circle,
-            color: ColorStyles.upFinRed, // 빨간색 배경
+            color: ColorStyles.dFinRed, // 빨간색 배경
           ),
         ),
         // 안읽은 메시지 숫자 텍스트
@@ -896,7 +937,7 @@ class UiUtils {
     return SizedBox(width: width,
         child: MediaQuery(
             data : MediaQuery.of(context).copyWith(textScaleFactor : 1.1),
-            child : TextField(enableInteractiveSelection: true, focusNode: focusNode, cursorColor: ColorStyles.upFinBlack, controller: textEditingController,
+            child : TextField(enableInteractiveSelection: true, focusNode: focusNode, cursorColor: ColorStyles.dFinBlack, controller: textEditingController,
                 keyboardType: textInputType, decoration: inputDecoration, onChanged: onChangedCallback, style: textStyle))
         );
   }
@@ -906,7 +947,7 @@ class UiUtils {
     return SizedBox(width: width,
         child: MediaQuery(
             data : MediaQuery.of(context).copyWith(textScaleFactor : 1.1),
-            child : TextField(enableInteractiveSelection: true, maxLines: null, focusNode: focusNode, cursorColor: ColorStyles.upFinBlack, controller: textEditingController,
+            child : TextField(enableInteractiveSelection: true, maxLines: null, focusNode: focusNode, cursorColor: ColorStyles.dFinBlack, controller: textEditingController,
                 keyboardType: textInputType, decoration: inputDecoration, onChanged: onChangedCallback, style: textStyle)));
   }
 
@@ -915,7 +956,7 @@ class UiUtils {
     return SizedBox(width: width,
         child: MediaQuery(
             data : MediaQuery.of(context).copyWith(textScaleFactor : 1.1),
-            child : TextFormField(enableInteractiveSelection: true, focusNode: focusNode, obscureText : isPwd, cursorColor: ColorStyles.upFinBlack, controller: textEditingController,
+            child : TextFormField(enableInteractiveSelection: true, focusNode: focusNode, obscureText : isPwd, cursorColor: ColorStyles.dFinBlack, controller: textEditingController,
                 keyboardType: textInputType, decoration: inputDecoration, onChanged: onChangedCallback, validator: validatorCallback, style: textStyle))
         );
   }
@@ -924,20 +965,23 @@ class UiUtils {
     return InputDecoration(
         labelText: labelText,
         floatingLabelBehavior: FloatingLabelBehavior.auto,
-        labelStyle: TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "SpoqaHanSansNeo", color: ColorStyles.upFinTextAndBorderBlue, fontSize: labelTextSize, fontWeight: FontWeight.w500),
+        labelStyle: TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "SpoqaHanSansNeo", color: ColorStyles.dFinTextAndBorderBlue, fontSize: labelTextSize, fontWeight: FontWeight.w500),
         hintText: "",
         counterText: counterText,
         errorStyle: TextStyle(fontSize: 0.sp),
-        counterStyle: TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "SpoqaHanSansNeo", color: ColorStyles.upFinTextAndBorderBlue, fontSize: counterTextSize, fontWeight: FontWeight.w500),
-        enabledBorder: const UnderlineInputBorder(
-            borderSide: BorderSide(color: ColorStyles.upFinButtonBlue)),
-        focusedBorder: UnderlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: ColorStyles.upFinButtonBlue),
+        contentPadding: EdgeInsets.only(left: 5.w, right: 5.w, bottom: 5.w),
+        counterStyle: TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "SpoqaHanSansNeo", color: ColorStyles.dFinTextAndBorderBlue, fontSize: counterTextSize, fontWeight: FontWeight.w500),
+        enabledBorder: UnderlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+            borderSide: const BorderSide(color: ColorStyles.dFinBlack)
         ),
-        errorBorder: const UnderlineInputBorder(borderSide: BorderSide(color: ColorStyles.upFinRed)),
+        focusedBorder: UnderlineInputBorder(
+          borderRadius: BorderRadius.circular(20),
+          borderSide: const BorderSide(color: ColorStyles.dFinBlack),
+        ),
+        errorBorder: const UnderlineInputBorder(borderSide: BorderSide(color: ColorStyles.dFinRed)),
         filled: true,
-        fillColor: ColorStyles.upFinWhite
+        fillColor: ColorStyles.dFinDarkWhiteGray
     );
   }
 
@@ -945,24 +989,24 @@ class UiUtils {
     return InputDecoration(
         labelText: labelText,
         floatingLabelBehavior: FloatingLabelBehavior.auto,
-        labelStyle: TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "SpoqaHanSansNeo", color: ColorStyles.upFinTextAndBorderBlue, fontSize: labelTextSize, fontWeight: FontWeight.w500),
+        labelStyle: TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "SpoqaHanSansNeo", color: ColorStyles.dFinTextAndBorderBlue, fontSize: labelTextSize, fontWeight: FontWeight.w500),
         hintText: "",
         counterText: counterText,
         isDense: true,
-        suffixIcon: Text("만원  ", style: TextStyles.upFinDisabledTextFormFieldTextStyle),
+        suffixIcon: Text("만원  ", style: TextStyles.dFinDisabledTextFormFieldTextStyle),
         suffixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
         errorStyle: TextStyle(fontSize: 0.sp),
-        counterStyle: TextStyle(decoration: TextDecoration.none, height: 2.2, fontFamily: "SpoqaHanSansNeo", color: ColorStyles.upFinTextAndBorderBlue, fontSize: 10.sp, fontWeight: FontWeight.w500),
+        counterStyle: TextStyle(decoration: TextDecoration.none, height: 2.2, fontFamily: "SpoqaHanSansNeo", color: ColorStyles.dFinTextAndBorderBlue, fontSize: 10.sp, fontWeight: FontWeight.w500),
         enabledBorder: const UnderlineInputBorder(
-            borderSide: BorderSide(color: ColorStyles.upFinButtonBlue)),
+            borderSide: BorderSide(color: ColorStyles.dFinButtonBlue)),
 
         focusedBorder: UnderlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: ColorStyles.upFinButtonBlue),
+          borderSide: const BorderSide(color: ColorStyles.dFinButtonBlue),
         ),
-        errorBorder: const UnderlineInputBorder(borderSide: BorderSide(color: ColorStyles.upFinRed)),
+        errorBorder: const UnderlineInputBorder(borderSide: BorderSide(color: ColorStyles.dFinRed)),
         filled: true,
-        fillColor: ColorStyles.upFinWhite
+        fillColor: ColorStyles.dFinWhite
     );
   }
 
@@ -970,22 +1014,22 @@ class UiUtils {
     return InputDecoration(
         labelText: labelText,
         floatingLabelBehavior: FloatingLabelBehavior.auto,
-        labelStyle: TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "SpoqaHanSansNeo", color: ColorStyles.upFinTextAndBorderBlue, fontSize: labelTextSize, fontWeight: FontWeight.w500),
+        labelStyle: TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "SpoqaHanSansNeo", color: ColorStyles.dFinTextAndBorderBlue, fontSize: labelTextSize, fontWeight: FontWeight.w500),
         hintText: "",
         isDense: true,
         suffixIcon: iconWidget,
         suffixIconConstraints: const BoxConstraints(minWidth: 0, minHeight: 0),
         errorStyle: TextStyle(fontSize: 0.sp),
         enabledBorder: const UnderlineInputBorder(
-            borderSide: BorderSide(color: ColorStyles.upFinButtonBlue)),
+            borderSide: BorderSide(color: ColorStyles.dFinButtonBlue)),
 
         focusedBorder: UnderlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: ColorStyles.upFinButtonBlue),
+          borderSide: const BorderSide(color: ColorStyles.dFinButtonBlue),
         ),
-        errorBorder: const UnderlineInputBorder(borderSide: BorderSide(color: ColorStyles.upFinRed)),
+        errorBorder: const UnderlineInputBorder(borderSide: BorderSide(color: ColorStyles.dFinRed)),
         filled: true,
-        fillColor: ColorStyles.upFinWhite
+        fillColor: ColorStyles.dFinWhite
     );
   }
 
@@ -993,21 +1037,21 @@ class UiUtils {
     return InputDecoration(
         labelText: labelText,
         floatingLabelBehavior: FloatingLabelBehavior.auto,
-        labelStyle: TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "SpoqaHanSansNeo", color: ColorStyles.upFinRealGray, fontSize: labelTextSize, fontWeight: FontWeight.w500),
+        labelStyle: TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "SpoqaHanSansNeo", color: ColorStyles.dFinRealGray, fontSize: labelTextSize, fontWeight: FontWeight.w500),
         hintText: "",
         counterText: counterText,
         errorStyle: TextStyle(fontSize: 0.sp),
-        counterStyle: TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "SpoqaHanSansNeo", color: ColorStyles.upFinRealGray, fontSize: counterTextSize, fontWeight: FontWeight.w500),
+        counterStyle: TextStyle(decoration: TextDecoration.none, height: 1.1, fontFamily: "SpoqaHanSansNeo", color: ColorStyles.dFinRealGray, fontSize: counterTextSize, fontWeight: FontWeight.w500),
         enabledBorder: const UnderlineInputBorder(
-            borderSide: BorderSide(color: ColorStyles.upFinButtonBlue)),
+            borderSide: BorderSide(color: ColorStyles.dFinButtonBlue)),
         border: InputBorder.none, // 언더라인 없애기
         focusedBorder: UnderlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: const BorderSide(color: ColorStyles.upFinButtonBlue),
+          borderSide: const BorderSide(color: ColorStyles.dFinButtonBlue),
         ),
-        errorBorder: const UnderlineInputBorder(borderSide: BorderSide(color: ColorStyles.upFinButtonBlue)),
+        errorBorder: const UnderlineInputBorder(borderSide: BorderSide(color: ColorStyles.dFinButtonBlue)),
         filled: true,
-        fillColor: ColorStyles.upFinWhite
+        fillColor: ColorStyles.dFinBlack
     );
   }
 
@@ -1017,18 +1061,18 @@ class UiUtils {
         labelStyle: TextStyle(fontSize: 0.sp),
         errorStyle: TextStyle(fontSize: 0.sp),
         counterStyle: TextStyle(fontSize: 0.sp),
-        hintStyle: TextStyles.upFinChatHintTextStyle,
+        hintStyle: TextStyles.dFinChatHintTextStyle,
         hintText: "메시지를 입력해주세요.",
         enabledBorder: UnderlineInputBorder(
           borderRadius: BorderRadius.circular(1),
-          borderSide: const BorderSide(color: ColorStyles.upFinWhiteGray),
+          borderSide: const BorderSide(color: ColorStyles.dFinWhiteGray),
         ),
         focusedBorder: UnderlineInputBorder(
           borderRadius: BorderRadius.circular(1),
-          borderSide: const BorderSide(color: ColorStyles.upFinWhiteGray),
+          borderSide: const BorderSide(color: ColorStyles.dFinWhiteGray),
         ),
         filled: true,
-        fillColor: ColorStyles.upFinWhiteGray
+        fillColor: ColorStyles.dFinWhiteGray
     );
   }
 
@@ -1040,18 +1084,18 @@ class UiUtils {
         counterStyle: TextStyle(fontSize: 0.sp),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(width: 0.3.w, color: ColorStyles.upFinGray),
+          borderSide: BorderSide(width: 0.3.w, color: ColorStyles.dFinGray),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(width: 0.3.w, color: ColorStyles.upFinGray),
+          borderSide: BorderSide(width: 0.3.w, color: ColorStyles.dFinGray),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(width: 0.3.w, color: ColorStyles.upFinGray),
+          borderSide: BorderSide(width: 0.3.w, color: ColorStyles.dFinGray),
         ),
         filled: true,
-        fillColor: ColorStyles.upFinWhite
+        fillColor: ColorStyles.dFinWhite
     );
   }
 
@@ -1071,8 +1115,8 @@ class UiUtils {
                   return Container(
                       width: 100.w,
                       height: 100.h,
-                      color: ColorStyles.upFinDarkGrayWithAlpha,
-                      child: SpinKitWave(color: ColorStyles.upFinTextAndBorderBlue, size: 15.w)
+                      color: ColorStyles.dFinDarkGrayWithAlpha,
+                      child: SpinKitWave(color: ColorStyles.dFinTextAndBorderBlue, size: 15.w)
                   );
                 })
           );
@@ -1132,14 +1176,14 @@ class UiUtils {
                           height: 100.h,
                           color: Colors.black54,
                           child: Column(crossAxisAlignment: CrossAxisAlignment.center, mainAxisAlignment : MainAxisAlignment.center, children: [
-                            SpinKitWave(color: ColorStyles.upFinTextAndBorderBlue, size: 15.w),
+                            SpinKitWave(color: ColorStyles.dFinTextAndBorderBlue, size: 15.w),
                             UiUtils.getMarginBox(0, 3.h),
-                            UiUtils.getTextWithFixedScale(text, 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, 1),
+                            UiUtils.getTextWithFixedScale(text, 12.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.center, 1),
                             UiUtils.getMarginBox(0, 2.h),
                             Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.end, children: [
-                              UiUtils.getTextWithFixedScale("${GetController.to.loadingPercent.value}", 16.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null),
+                              UiUtils.getTextWithFixedScale("${GetController.to.loadingPercent.value}", 16.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.center, null),
                               UiUtils.getMarginBox(0.5.w, 0),
-                              UiUtils.getTextWithFixedScale("%", 16.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null),
+                              UiUtils.getTextWithFixedScale("%", 16.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.center, null),
                             ])
                           ])
                       ));
@@ -1202,7 +1246,7 @@ class UiUtils {
                     return Container(
                         width: 100.w,
                         height: 100.h,
-                        color: ColorStyles.upFinDarkGrayWithAlpha
+                        color: ColorStyles.dFinDarkGrayWithAlpha
                     );
                   })
           );
@@ -1226,7 +1270,7 @@ class UiUtils {
       builder: (_) {
         return Dialog(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          backgroundColor: ColorStyles.upFinWhite,
+          backgroundColor: ColorStyles.dFinWhite,
           insetPadding: EdgeInsets.all(3.w),
           child: StatefulBuilder(
             builder: (__, StateSetter popViewSetState){
@@ -1368,7 +1412,7 @@ class UiUtils {
             return null;
           },
           renderMode: RenderMode.column,
-          textStyle: TextStyles.upFinHtmlTextStyle,
+          textStyle: TextStyles.dFinHtmlTextStyle,
         )
       ]);
 
@@ -1378,16 +1422,16 @@ class UiUtils {
 
     Widget getSmallAgreeInfoWidget(String titleString, String contentsString, bool isAgreeCheck, Function(bool isCheck) callAct){
       return SizedBox(width: 100.w, height: 4.h, child: Row(children: [
-        UiUtils.getBorderButtonBoxWithZeroPadding(87.5.w, ColorStyles.upFinWhite, ColorStyles.upFinWhite, Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-          isAgreeCheck? UiUtils.getCustomCheckBox(UniqueKey(), 1, isAgreeCheck, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinWhite,
-              ColorStyles.upFinWhite, ColorStyles.upFinWhite, (checkedValue){
+        UiUtils.getBorderButtonBoxWithZeroPadding(87.5.w, ColorStyles.dFinDarkWhiteGray, ColorStyles.dFinDarkWhiteGray, Row(mainAxisAlignment: MainAxisAlignment.start, children: [
+          isAgreeCheck? UiUtils.getCustomCheckBox(UniqueKey(), 1, isAgreeCheck, ColorStyles.dFinButtonBlue, ColorStyles.dFinWhite,
+              ColorStyles.dFinWhite, ColorStyles.dFinWhite, (checkedValue){
                 thisSetState(() {
                   if(checkedValue != null){
                     callAct(checkedValue);
                   }
                 });
-              }) : UiUtils.getCustomCheckBox(UniqueKey(), 1, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
-              ColorStyles.upFinWhite, ColorStyles.upFinWhite, (checkedValue){
+              }) : UiUtils.getCustomCheckBox(UniqueKey(), 1, true, ColorStyles.dFinGray, ColorStyles.dFinWhite,
+              ColorStyles.dFinWhite, ColorStyles.dFinWhite, (checkedValue){
                 thisSetState(() {
                   if(checkedValue != null){
                     if(!checkedValue) {
@@ -1396,7 +1440,7 @@ class UiUtils {
                   }
                 });
               }),
-          UiUtils.getTextButtonWithFixedScale2(titleString, 10.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null, () {
+          UiUtils.getTextButtonWithFixedScale2(titleString, 10.sp, FontWeight.w500, ColorStyles.dFinWhiteGray, TextAlign.start, null, () {
             smallAgreePressEvent(parentContext, titleString, contentsString, (agreeResult){
               thisSetState(() {
                 callAct(agreeResult);
@@ -1404,7 +1448,7 @@ class UiUtils {
             });
           }),
           const Spacer(flex: 2),
-          UiUtils.getIconButton(Icons.arrow_forward_ios_rounded, 4.w, ColorStyles.upFinRealGray, () {
+          UiUtils.getIconButton(Icons.arrow_forward_ios_rounded, 4.w, ColorStyles.dFinGray, () {
             smallAgreePressEvent(parentContext, titleString, contentsString, (agreeResult){
               thisSetState(() {
                 callAct(agreeResult);
@@ -1429,7 +1473,7 @@ class UiUtils {
               setTypeAgreeState(isChanged!, type, detailType);
             });
           }),
-          UiUtils.getTextWithFixedScale(getAgreeTypeTitle(detailType), 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null)
+          UiUtils.getTextWithFixedScale(getAgreeTypeTitle(detailType), 12.sp, FontWeight.w500, ColorStyles.dFinWhiteGray, TextAlign.center, null)
         ],
       ));
     }
@@ -1470,7 +1514,7 @@ class UiUtils {
       widgetList.add(
         ExpansionTileWithoutBorderItem(
             title: titleWidget,
-            childrenPadding: EdgeInsets.zero,tilePadding: EdgeInsets.zero, iconColor: ColorStyles.upFinBlack,
+            childrenPadding: EdgeInsets.zero,tilePadding: EdgeInsets.zero, iconColor: ColorStyles.dFinWhiteGray, collapsedIconColor: ColorStyles.dFinWhiteGray,
             initiallyExpanded: true,
             onExpansionChanged: (isExpanded){
               if (isExpanded) {
@@ -1506,29 +1550,29 @@ class UiUtils {
       return widgetList;
     }
 
-    return Material(child: Container(color: ColorStyles.upFinWhite,
+    return Material(color: ColorStyles.dFinDarkWhiteGray, child: Container(color: ColorStyles.dFinDarkWhiteGray,
         child: Column(children: [
           Row(mainAxisAlignment: MainAxisAlignment.end,children: [
-            UiUtils.getIconButton(Icons.close, 7.w, ColorStyles.upFinDarkGray, () {
+            UiUtils.getIconButton(Icons.close, 7.w, ColorStyles.dFinWhiteGray, () {
               Navigator.pop(thisContext);
             })
           ]),
           Row(mainAxisAlignment: MainAxisAlignment.start,children: [
-            UiUtils.getTextWithFixedScale("업핀 서비스 약관동의", 16.sp, FontWeight.w800, ColorStyles.upFinBlack, TextAlign.center, null)
+            UiUtils.getTextWithFixedScale("AND 서비스 약관동의", 16.sp, FontWeight.w800, ColorStyles.dFinWhiteGray, TextAlign.center, null)
           ]),
           UiUtils.getMarginBox(0, 1.5.h),
           Wrap(children: [
-            UiUtils.getTextWithFixedScaleForAgreeSubTitle("서비스를 이용하기 위해 고객님의 서비스 이용약관에 동의가 필요합니다.", 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null)
+            UiUtils.getTextWithFixedScaleForAgreeSubTitle("서비스를 이용하기 위해 고객님의 서비스 이용약관에 동의가 필요합니다.", 12.sp, FontWeight.w500, ColorStyles.dFinWhiteGray, TextAlign.start, null)
           ]),
           UiUtils.getMarginBox(0, 3.h),
-          GestureDetector(child: Container(height: 8.h, color: ColorStyles.upFinWhiteGray, child: Row(
+          GestureDetector(child: Container(height: 8.h, color: ColorStyles.dFinDarkWhiteGray, child: Row(
             children: [
               UiUtils.getCheckBox(1.2, isAllAgree(), (isChanged) {
                 thisSetState(() {
                   setAgreeState(isChanged!, true, "");
                 });
               }),
-              UiUtils.getTextWithFixedScale("전체동의", 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null)
+              UiUtils.getTextWithFixedScale("전체동의", 14.sp, FontWeight.w500, ColorStyles.dFinWhiteGray, TextAlign.center, null)
             ],
           )),onTap: (){
             thisSetState(() {
@@ -1543,11 +1587,12 @@ class UiUtils {
             Column(crossAxisAlignment:CrossAxisAlignment.start, children: getAgreeWidgetList()),
           ]), _agreeScrollController),
           UiUtils.getMarginBox(0, 1.5.h),
-          isTypeAgree("1") ? UiUtils.getTextButtonBox(90.w, "동의하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, (){
+          isTypeAgree("1") ? UiUtils.getBorderButtonBox(90.w, ColorStyles.dFinButtonBlue, ColorStyles.dFinButtonBlue,
+              getTextWithFixedScale("동의하기", 14.sp, FontWeight.w500, ColorStyles.dFinWhiteGray, TextAlign.center, 1), (){
             Navigator.pop(thisContext);
             onPressedCallback();
-          })
-              : UiUtils.getTextButtonBox(90.w, "동의하기", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinGray, () {}),
+          }) : UiUtils.getBorderButtonBox(90.w, ColorStyles.dFinButtonBlue, ColorStyles.dFinButtonBlue,
+              getTextWithFixedScale("동의하기", 14.sp, FontWeight.w500, ColorStyles.dFinWhiteGray, TextAlign.center, 1), (){}),
           Config.isAndroid? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 3.h)
         ])
     ));
@@ -1563,10 +1608,10 @@ class UiUtils {
         value: checkedValue,
         onChanged: onChanged,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(1)),
-        checkColor: ColorStyles.upFinWhite,
-        activeColor: ColorStyles.upFinTextAndBorderBlue,
+        checkColor: ColorStyles.dFinWhite,
+        activeColor: ColorStyles.dFinButtonBlue,
         side: MaterialStateBorderSide.resolveWith((states) =>
-         !checkedValue? const BorderSide(width: 2.0, color: ColorStyles.upFinGray) : const BorderSide(width: 2.0, color: ColorStyles.upFinTextAndBorderBlue))
+         !checkedValue? const BorderSide(width: 2.0, color: ColorStyles.dFinGray) : const BorderSide(width: 2.0, color: ColorStyles.dFinButtonBlue))
     ));
   }
 
@@ -1692,7 +1737,7 @@ class UiUtils {
               width: popWidth,
               height: popHeight,
               decoration: BoxDecoration(
-                color: ColorStyles.upFinWhite,
+                color: ColorStyles.dFinDarkWhiteGray,
                 borderRadius: borderRadius,
               ),
               child: SizedBox.expand(
@@ -1799,7 +1844,7 @@ class UiUtils {
                 width: popWidth,
                 height: popHeight,
                 decoration: BoxDecoration(
-                  color: ColorStyles.upFinWhite,
+                  color: ColorStyles.dFinDarkWhiteGray,
                   borderRadius: borderRadius,
                 ),
                 child: SizedBox.expand(
@@ -1928,14 +1973,15 @@ class UiUtils {
   }
 
   static Widget getInitLoadingView(int percent) {
-    return Container(width: 100.w, height: 100.h, color: ColorStyles.upFinButtonBlue,
+    return Container(width: 100.w, height: 100.h, color: ColorStyles.dFinBlack,
         child: Stack(alignment: Alignment.center, children: [
           Positioned(
-              bottom: 0,
-              child: UiUtils.getImage(90.w, 90.w, Image.asset(fit: BoxFit.fill,'assets/images/img_man_searcher.png'))),
-          Positioned(
               top: Config.isPad()? 15.h : 35.h,
-              child: UiUtils.getTitleWithFixedScale("upfin", Config.isPad()? 55.sp : 75.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null))
+              child: Center(child: Column(children: [
+                UiUtils.getTitleWithFixedScale("AND", Config.isPad()? 55.sp : 75.sp, FontWeight.w500, ColorStyles.dFinButtonBlue, TextAlign.center, null),
+                UiUtils.getMarginBox(0, 5.h),
+                UiUtils.getTitleWithFixedScale("값어치를 하는 내차량의 재발견", Config.isPad()? 16.sp : 16.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.center, null)
+              ])))
         ])
     );
       /*

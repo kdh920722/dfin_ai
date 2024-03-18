@@ -255,39 +255,39 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
       ])),
       SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         UiUtils.getMarginBox(0, 3.w),
-        isVerifyViewValid? UiUtils.getTextWithFixedScale("이메일로 전송된", 26.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null)
-            : UiUtils.getTextWithFixedScale("회원가입", 26.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
+        isVerifyViewValid? UiUtils.getTextWithFixedScale("이메일로 전송된", 26.sp, FontWeight.w600, ColorStyles.dFinButtonBlue, TextAlign.start, null)
+            : UiUtils.getTextWithFixedScale("회원가입", 26.sp, FontWeight.w600, ColorStyles.dFinButtonBlue, TextAlign.start, null),
         isVerifyViewValid? UiUtils.getMarginBox(0, 0.5.h)
             : UiUtils.getMarginBox(0, 0),
-        isVerifyViewValid? UiUtils.getTextWithFixedScale("인증번호를 입력하세요.", 26.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null)
+        isVerifyViewValid? UiUtils.getTextWithFixedScale("인증번호를 입력하세요.", 26.sp, FontWeight.w600, ColorStyles.dFinButtonBlue, TextAlign.start, null)
             : UiUtils.getMarginBox(0, 0),
         UiUtils.getMarginBox(0, 3.h)
       ])),
-      UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _emailTextFocus, _emailTextController, TextInputType.emailAddress, false,
+      UiUtils.getTextFormField(context, 90.w, TextStyles.dFinTextFormFieldTextStyle, _emailTextFocus, _emailTextController, TextInputType.emailAddress, false,
           UiUtils.getInputDecoration("이메일", 12.sp, "", 0.sp), (text) { }, (value){
             return null;
           }),
       UiUtils.getMarginBox(0, 2.h),
       isVerifyViewValid? Column(children: [
-        UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _verifyCodeTextFocus, _verifyCodeTextController, TextInputType.number, false,
+        UiUtils.getTextFormField(context, 90.w, TextStyles.dFinTextFormFieldTextStyle, _verifyCodeTextFocus, _verifyCodeTextController, TextInputType.number, false,
             UiUtils.getInputDecoration("인증번호", 12.sp, "", 0.sp), (text) { }, (value){
               return null;
             }),
         UiUtils.getMarginBox(0, 2.h),
         SizedBox(width: 90.w, child: Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
           UiUtils.getTextWithFixedScale2(
-              "• 인증번호 수신까지 시간이 1~2분 정도 소요될 수 있어요.", 10.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
+              "• 인증번호 수신까지 시간이 1~2분 정도 소요될 수 있어요.", 10.sp, FontWeight.w500, ColorStyles.dFinTextAndBorderBlue, TextAlign.start, null),
           UiUtils.getMarginBox(0, 0.5.h),
           UiUtils.getTextWithFixedScale2(
-              "• 수신이 되지 않는 경우, 스팸 메일함을 확인 해 주세요.", 10.sp, FontWeight.w500, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null),
+              "• 수신이 되지 않는 경우, 스팸 메일함을 확인 해 주세요.", 10.sp, FontWeight.w500, ColorStyles.dFinTextAndBorderBlue, TextAlign.start, null),
         ]))
       ]) : Container(),
       UiUtils.getExpandedScrollView(Axis.vertical, Container()),
       UiUtils.getMarginBox(0, 1.h),
-      isEmailViewValid? UiUtils.getBorderButtonBox(90.w, isEmailValid? ColorStyles.upFinWhiteSky : ColorStyles.upFinButtonBlue,
-          isEmailValid? ColorStyles.upFinWhiteSky : ColorStyles.upFinButtonBlue,
+      isEmailViewValid? UiUtils.getBorderButtonBox(90.w, isEmailValid? ColorStyles.dFinWhiteSky : ColorStyles.dFinButtonBlue,
+          isEmailValid? ColorStyles.dFinWhiteSky : ColorStyles.dFinButtonBlue,
           UiUtils.getTextWithFixedScale(isEmailValid? "인증번호 재발송":"인증번호 발송", 14.sp, FontWeight.w500,
-              isEmailValid? ColorStyles.upFinButtonBlue : ColorStyles.upFinWhite, TextAlign.center, null), () {
+              isEmailValid? ColorStyles.dFinButtonBlue : ColorStyles.dFinWhite, TextAlign.center, null), () {
             if(CommonUtils.isEmailValid(_emailTextController.text.trim())){
               CommonUtils.hideKeyBoard();
               Map<String, dynamic> inputJson = {
@@ -332,7 +332,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
             }
           }) : Container(),
       UiUtils.getMarginBox(0, 1.h),
-      isEmailValid ? UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
+      isEmailValid ? UiUtils.getTextButtonBox(90.w, "다음", TextStyles.dFinBasicButtonTextStyle, ColorStyles.dFinButtonBlue, () {
         setState(() {
           _verifyCodeTextController.text = "";
           viewId = 2;
@@ -350,12 +350,12 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
       ])),
       SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         UiUtils.getMarginBox(0, 3.w),
-        UiUtils.getTextWithFixedScale("회원가입", 26.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
+        UiUtils.getTextWithFixedScale("회원가입", 26.sp, FontWeight.w600, ColorStyles.dFinButtonBlue, TextAlign.start, null),
         UiUtils.getMarginBox(0, 3.h)
       ])),
-      UiUtils.getDisabledTextField(context, 90.w, confirmedEmail, TextStyles.upFinTextFormFieldTextStyle, UiUtils.getInputDecoration("이메일", 12.sp, "", 0.sp)),
+      UiUtils.getDisabledTextField(context, 90.w, confirmedEmail, TextStyles.dFinTextFormFieldTextStyle, UiUtils.getInputDecoration("이메일", 12.sp, "", 0.sp)),
       UiUtils.getMarginBox(0, 2.h),
-      UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _pwdTextFocus, _pwdTextController, TextInputType.visiblePassword, true,
+      UiUtils.getTextFormField(context, 90.w, TextStyles.dFinTextFormFieldTextStyle, _pwdTextFocus, _pwdTextController, TextInputType.visiblePassword, true,
           UiUtils.getInputDecoration("비밀번호", 12.sp, "", 0.sp), (text) { }, (value){
             if(value != null && value.trim().isEmpty){
               return "비밀번호를 입력하세요.";
@@ -368,7 +368,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
             }
       }),
       UiUtils.getMarginBox(0, 2.h),
-      UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _pwdConfirmFocus, _pwdConfirmTextController, TextInputType.visiblePassword, true,
+      UiUtils.getTextFormField(context, 90.w, TextStyles.dFinTextFormFieldTextStyle, _pwdConfirmFocus, _pwdConfirmTextController, TextInputType.visiblePassword, true,
           UiUtils.getInputDecoration("비밀번호 확인", 12.sp, "", 0.sp), (text) { }, (value){
             if(value != null && value.trim().isEmpty){
               return "비밀번호를 한번 더 입력하세요.";
@@ -385,7 +385,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
             }
       }),
       UiUtils.getExpandedScrollView(Axis.vertical, Container()),
-      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
+      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.dFinBasicButtonTextStyle, ColorStyles.dFinButtonBlue, () {
         if(_formKeyForSignIn.currentState!.validate()){
           CommonUtils.hideKeyBoard();
           setState(() {
@@ -411,10 +411,10 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
       ])) : UiUtils.getMarginBox(0, 7.h)),
       SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         UiUtils.getMarginBox(0, 3.w),
-        UiUtils.getTextWithFixedScale("본인인증", 26.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
+        UiUtils.getTextWithFixedScale("본인인증", 26.sp, FontWeight.w600, ColorStyles.dFinButtonBlue, TextAlign.start, null),
         UiUtils.getMarginBox(0, 3.h)
       ])),
-      UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _nameTextFocus, _nameTextController, TextInputType.text, false,
+      UiUtils.getTextFormField(context, 90.w, TextStyles.dFinTextFormFieldTextStyle, _nameTextFocus, _nameTextController, TextInputType.text, false,
           UiUtils.getInputDecoration("이름", 12.sp, "", 0.sp), (text) { }, (value){
             if(value != null && value.trim().isEmpty){
               return "이름을 입력하세요.";
@@ -423,7 +423,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
             }
           }),
       UiUtils.getMarginBox(0, 2.h),
-      isPhoneShowValid? UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _phoneNumberTextFocus, _phoneNumberTextController, TextInputType.phone, false,
+      isPhoneShowValid? UiUtils.getTextFormField(context, 90.w, TextStyles.dFinTextFormFieldTextStyle, _phoneNumberTextFocus, _phoneNumberTextController, TextInputType.phone, false,
           UiUtils.getInputDecoration("휴대전화 번호", 12.sp, "", 0.sp), (text) { }, (value){
             if(value != null && value.trim().isEmpty){
               return "휴대전화 번호를 입력하세요.";
@@ -432,8 +432,8 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
             }
           }): Container(),
       UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
-      isButtonValid? UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-          UiUtils.getTextWithFixedScale("다음", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () async {
+      isButtonValid? UiUtils.getBorderButtonBox(90.w, ColorStyles.dFinButtonBlue, ColorStyles.dFinButtonBlue,
+          UiUtils.getTextWithFixedScale("다음", 14.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.center, null), () async {
             CommonUtils.hideKeyBoard();
             if(_phoneNumberTextController.text.trim() != ""){
               Map<String, dynamic> inputJson4 = {
@@ -546,7 +546,7 @@ class AppSignUpViewState extends State<AppSignUpView> with WidgetsBindingObserve
 
   @override
   Widget build(BuildContext context) {
-    Widget view = Container(width: 100.w, height: Config.isAndroid? 95.h: 90.h, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w),
+    Widget view = Container(width: 100.w, height: Config.isAndroid? 95.h: 90.h, color: ColorStyles.dFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w),
         child: viewId == 1 ? _getEmailView() : viewId == 2 ? _getPwInfoView() : _getPhoneValidView());
 
 

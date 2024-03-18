@@ -20,7 +20,7 @@ class HyphenController {
   static Future<void> initHyphen(Function(bool) callback) async {
     try {
       final ref = FirebaseDatabase.instance.ref();
-      final snapshot = await ref.child('UPFIN/API/hyphen').get();
+      final snapshot = await ref.child('DFIN/API/hyphen').get();
       if (snapshot.exists) {
         for (var each in snapshot.children) {
           switch (each.key) {

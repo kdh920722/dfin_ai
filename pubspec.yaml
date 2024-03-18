@@ -90,17 +90,17 @@ dependencies:
   flutter_inappwebview: ^5.8.0
 
 flutter_native_splash:
-  color: "#466bf7"
-  color_dark: "#466bf7"
-  icon_background_color: "#466bf7"
+  color: "#000000"
+  color_dark: "#000000"
+  icon_background_color: "#000000"
   image: assets/images/upfin_splash_icon.png
   image_dark: assets/images/upfin_splash_icon.png
   android: true
   ios: true
 
   android_12:
-    color: "#466bf7"
-    color_dark: "#466bf7"
+    color: "#000000"
+    color_dark: "#000000"
     image: assets/images/upfin_splash_icon.png
     image_dark: assets/images/upfin_splash_icon.png
     android: true

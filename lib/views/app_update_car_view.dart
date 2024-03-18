@@ -279,23 +279,23 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
   /// pre loan count view
   Widget _getPreLoanCountView(){
     List<Widget> loanCountList = [];
-    Color textColor = ColorStyles.upFinBlack;
+    Color textColor = ColorStyles.dFinBlack;
     FontWeight fontWeight = FontWeight.w500;
     for(var each in LogfinController.preLoanCountList){
       Key key = Key(each);
       if(selectedPreLoanCountKey == key) {
-        textColor = ColorStyles.upFinBlack;
+        textColor = ColorStyles.dFinBlack;
         fontWeight = FontWeight.w600;
       }
       else{
-        textColor = ColorStyles.upFinBlack;
+        textColor = ColorStyles.dFinBlack;
         fontWeight = FontWeight.w500;
       }
       loanCountList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                selectedPreLoanCountKey == key? UiUtils.getCustomCheckBox(key, 1.5, selectedPreLoanCountKey == key, ColorStyles.upFinButtonBlue, ColorStyles.upFinWhite,
-                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
+                selectedPreLoanCountKey == key? UiUtils.getCustomCheckBox(key, 1.5, selectedPreLoanCountKey == key, ColorStyles.dFinButtonBlue, ColorStyles.dFinWhite,
+                    ColorStyles.dFinWhite,  ColorStyles.dFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
                           if(checkedValue) {
@@ -304,8 +304,8 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
                           }
                         }
                       });
-                    }) : UiUtils.getCustomCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
-                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
+                    }) : UiUtils.getCustomCheckBox(key, 1.5, true, ColorStyles.dFinGray, ColorStyles.dFinWhite,
+                    ColorStyles.dFinWhite,  ColorStyles.dFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
                           if(!checkedValue) {
@@ -336,13 +336,13 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
         }),
       ])),
       UiUtils.getMarginBox(0, 3.w),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("이미 받고 있는", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("이미 받고 있는", 22.sp, FontWeight.w800, ColorStyles.dFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 0.5.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출 횟수를 알려주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출 횟수를 알려주세요.", 22.sp, FontWeight.w800, ColorStyles.dFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: loanCountList)),
       UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.dFinBasicButtonTextStyle, ColorStyles.dFinButtonBlue, () async {
         if(selectedPreLoanCountInfo.isNotEmpty){
           if(selectedPreLoanCountInfo.split("@")[1] == "0"){
             selectedPreLoanPriceInfo = "0";
@@ -369,11 +369,11 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
           }),
         ])),
         UiUtils.getMarginBox(0, 3.w),
-        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("이미 받고 있는", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("이미 받고 있는", 22.sp, FontWeight.w800, ColorStyles.dFinTextAndBorderBlue, TextAlign.start, null)),
         UiUtils.getMarginBox(0, 0.5.h),
-        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출 잔액을 알려주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출 잔액을 알려주세요.", 22.sp, FontWeight.w800, ColorStyles.dFinTextAndBorderBlue, TextAlign.start, null)),
         UiUtils.getMarginBox(0, 5.h),
-        Obx(()=>UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _preLoanPriceFocus, _preLoanPriceTextController, TextInputType.number, false,
+        Obx(()=>UiUtils.getTextFormField(context, 90.w, TextStyles.dFinTextFormFieldTextStyle, _preLoanPriceFocus, _preLoanPriceTextController, TextInputType.number, false,
             UiUtils.getInputDecorationForPrice("", 0.sp, GetController.to.preLoanPrice.value), (text) {
               if(text.trim() != ""){
                 final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
@@ -385,7 +385,7 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
         ),
         UiUtils.getMarginBox(0, 5.h),
         UiUtils.getExpandedScrollView(Axis.vertical, Container()),
-        UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+        UiUtils.getTextButtonBox(90.w, "다음", TextStyles.dFinBasicButtonTextStyle, ColorStyles.dFinButtonBlue, () async {
           if(_preLoanPriceTextController.text.trim() != ""){
             final number = double.tryParse(_preLoanPriceTextController.text.trim().replaceAll(',', '')); // 콤마 제거 후 숫자 변환
             String price = number.toString();
@@ -406,23 +406,23 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
   /// job view
   Widget _getJobView(){
     List<Widget> jobList = [];
-    Color textColor = ColorStyles.upFinBlack;
+    Color textColor = ColorStyles.dFinBlack;
     FontWeight fontWeight = FontWeight.w500;
     for(var each in LogfinController.jobList){
       Key key = Key(each);
       if(selectedJobKey == key) {
-        textColor = ColorStyles.upFinBlack;
+        textColor = ColorStyles.dFinBlack;
         fontWeight = FontWeight.w600;
       }
       else{
-        textColor = ColorStyles.upFinBlack;
+        textColor = ColorStyles.dFinBlack;
         fontWeight = FontWeight.w500;
       }
       jobList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                selectedJobKey == key? UiUtils.getCustomCheckBox(key, 1.5, selectedJobKey == key, ColorStyles.upFinButtonBlue, ColorStyles.upFinWhite,
-                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
+                selectedJobKey == key? UiUtils.getCustomCheckBox(key, 1.5, selectedJobKey == key, ColorStyles.dFinButtonBlue, ColorStyles.dFinWhite,
+                    ColorStyles.dFinWhite,  ColorStyles.dFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
                           if(checkedValue) {
@@ -431,8 +431,8 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
                           }
                         }
                       });
-                    }) : UiUtils.getCustomCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
-                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
+                    }) : UiUtils.getCustomCheckBox(key, 1.5, true, ColorStyles.dFinGray, ColorStyles.dFinWhite,
+                    ColorStyles.dFinWhite,  ColorStyles.dFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
                           if(!checkedValue) {
@@ -463,12 +463,12 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
         }),
       ])),
       UiUtils.getMarginBox(0, 3.w),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("직업 구분을 선택해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("직업 구분을 선택해주세요.", 22.sp, FontWeight.w800, ColorStyles.dFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
 
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: jobList)),
       UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.dFinBasicButtonTextStyle, ColorStyles.dFinButtonBlue, () async {
         if(selectedJobInfo.isNotEmpty){
           nextInputView();
         }else{
@@ -483,7 +483,7 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
   bool isChecked = false;
   Widget _getPreLoanInfoView(){
     List<Widget> confirmWidgetList = [];
-    Color textColor = ColorStyles.upFinBlack;
+    Color textColor = ColorStyles.dFinBlack;
 
     confirmWidgetList.add(
       UiUtils.getMarginBox(0, 3.h),
@@ -513,24 +513,24 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
           eachPreLoanPriceTxt = CommonUtils.getPriceFormattedString(double.parse(eachPreLoanPrice));
         }
         regBWidgetList.add(
-          SizedBox(width: 85.w, child: UiUtils.getBorderButtonBoxForRound3(ColorStyles.upFinWhite, ColorStyles.upFinGray,
+          SizedBox(width: 85.w, child: UiUtils.getBorderButtonBoxForRound3(ColorStyles.dFinWhite, ColorStyles.dFinGray,
               Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.start, children: [
                 UiUtils.getMarginBox(0, 0.5.h),
-                SizedBox(width: 80.w, child: UiUtils.getTextWithFixedScaleAndOverFlow("${each["resUserNm"]}", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
+                SizedBox(width: 80.w, child: UiUtils.getTextWithFixedScaleAndOverFlow("${each["resUserNm"]}", 14.sp, FontWeight.w600, ColorStyles.dFinBlack, TextAlign.start, null)),
                 UiUtils.getMarginBox(0, 1.5.h),
-                UiUtils.getTextButtonWithFixedScale("•  을부번호 ${each["resLedgerBNo"]}", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null, (){}),
+                UiUtils.getTextButtonWithFixedScale("•  을부번호 ${each["resLedgerBNo"]}", 12.sp, FontWeight.w500, ColorStyles.dFinBlack, TextAlign.start, null, (){}),
                 UiUtils.getMarginBox(0, 0.5.h),
-                UiUtils.getTextButtonWithFixedScale("•  채권가액 ${each["resBondPriceTxt"]}", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null, (){}),
+                UiUtils.getTextButtonWithFixedScale("•  채권가액 ${each["resBondPriceTxt"]}", 12.sp, FontWeight.w500, ColorStyles.dFinBlack, TextAlign.start, null, (){}),
                 UiUtils.getMarginBox(0, 0.5.h),
-                UiUtils.getTextButtonWithFixedScale("•  대출잔액 $eachPreLoanPriceTxt", 12.sp, FontWeight.w500, eachPreLoanPriceTxt == "미입력" ? ColorStyles.upFinRed : ColorStyles.upFinButtonBlue, TextAlign.start, null, (){}),
+                UiUtils.getTextButtonWithFixedScale("•  대출잔액 $eachPreLoanPriceTxt", 12.sp, FontWeight.w500, eachPreLoanPriceTxt == "미입력" ? ColorStyles.dFinRed : ColorStyles.dFinButtonBlue, TextAlign.start, null, (){}),
                 UiUtils.getMarginBox(0, 1.h),
                 Row(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.end, children: [
                   const Spacer(flex: 2),
-                  UiUtils.getTextButtonWithFixedScale("${each["commStartDateTxt2"]}", 9.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null, (){})
+                  UiUtils.getTextButtonWithFixedScale("${each["commStartDateTxt2"]}", 9.sp, FontWeight.w500, ColorStyles.dFinRealGray, TextAlign.start, null, (){})
                 ]),
                 UiUtils.getMarginBox(0, 1.5.h),
-                UiUtils.getBorderButtonBox(79.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
-                    UiUtils.getTextWithFixedScale("입력하기", 12.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
+                UiUtils.getBorderButtonBox(79.w, ColorStyles.dFinWhiteSky, ColorStyles.dFinWhiteSky,
+                    UiUtils.getTextWithFixedScale("입력하기", 12.sp, FontWeight.w600, ColorStyles.dFinButtonBlue, TextAlign.start, null), () {
                       currRegBInfo = {};
                       currRegBInfo = each;
                       _setEachPreLoanInfo(each["preLoanPrice"].toString());
@@ -542,7 +542,7 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
                       }
                       UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, true, 100.w, 80.h, 0.5, (slideContext, slideSetState){
                         return Material(
-                            color: ColorStyles.upFinWhite,
+                            color: ColorStyles.dFinDarkWhiteGray,
                             child: GestureDetector(onTap: (){
                               if(_eachPreLoanPriceFocus.hasFocus){
                                 CommonUtils.hideKeyBoard();
@@ -550,11 +550,11 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
                             },
                             child: UiUtils.getRowColumnWithAlignCenter([
                               UiUtils.getMarginBox(85.w, 5.w),
-                              SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출잔액을 알려주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+                              SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출잔액을 알려주세요.", 22.sp, FontWeight.w800, ColorStyles.dFinTextAndBorderBlue, TextAlign.start, null)),
                               UiUtils.getMarginBox(85.w, 1.h),
-                              SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력단위(*만원)", 12.sp, FontWeight.w600, ColorStyles.upFinRealGray, TextAlign.start, null)),
+                              SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력단위(*만원)", 12.sp, FontWeight.w600, ColorStyles.dFinRealGray, TextAlign.start, null)),
                               UiUtils.getMarginBox(85.w, 5.h),
-                              Obx(()=>UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _eachPreLoanPriceFocus, _eachPreLoanPriceTextController, TextInputType.number, false,
+                              Obx(()=>UiUtils.getTextFormField(context, 90.w, TextStyles.dFinTextFormFieldTextStyle, _eachPreLoanPriceFocus, _eachPreLoanPriceTextController, TextInputType.number, false,
                                   UiUtils.getInputDecorationForPrice("", 0.sp, GetController.to.preLoanPrice.value), (text) {
                                     if(!isChecked){
                                       if(text.trim() != ""){
@@ -567,12 +567,12 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
                                   }, (value){})
                               ),
                               UiUtils.getMarginBox(85.w, 1.h),
-                              SizedBox(width: 83.w, child: UiUtils.getTextWithFixedScale("•  을부번호 ${currRegBInfo["resLedgerBNo"]}", 12.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
+                              SizedBox(width: 83.w, child: UiUtils.getTextWithFixedScale("•  을부번호 ${currRegBInfo["resLedgerBNo"]}", 12.sp, FontWeight.w500, ColorStyles.dFinRealGray, TextAlign.start, null)),
                               UiUtils.getMarginBox(85.w, 0.5.h),
-                              SizedBox(width: 83.w, child: UiUtils.getTextWithFixedScale("•  채권가액 ${currRegBInfo["resBondPriceTxt"]}", 12.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
+                              SizedBox(width: 83.w, child: UiUtils.getTextWithFixedScale("•  채권가액 ${currRegBInfo["resBondPriceTxt"]}", 12.sp, FontWeight.w500, ColorStyles.dFinRealGray, TextAlign.start, null)),
                               SizedBox(width: 90.w, child: Row(mainAxisAlignment: MainAxisAlignment.start, crossAxisAlignment: CrossAxisAlignment.center, children: [
-                                UiUtils.getCustomCheckBox(UniqueKey(), 1.2, isChecked, ColorStyles.upFinWhite, ColorStyles.upFinButtonBlue,
-                                    ColorStyles.upFinGray, ColorStyles.upFinButtonBlue, (checkedValue){
+                                UiUtils.getCustomCheckBox(UniqueKey(), 1.2, isChecked, ColorStyles.dFinWhite, ColorStyles.dFinButtonBlue,
+                                    ColorStyles.dFinGray, ColorStyles.dFinButtonBlue, (checkedValue){
                                       slideSetState(() {
                                         CommonUtils.hideKeyBoard();
                                         if(checkedValue != null){
@@ -592,10 +592,10 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
                                         }
                                       });
                                     }),
-                                UiUtils.getTextWithFixedScale("대출잔액이 없어요.", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null),
+                                UiUtils.getTextWithFixedScale("대출잔액이 없어요.", 12.sp, FontWeight.w500, ColorStyles.dFinBlack, TextAlign.start, null),
                               ])),
-                              Expanded(child: Container(color: ColorStyles.upFinWhite, width: 85.w,)),
-                              UiUtils.getTextButtonBox(90.w, "확인", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+                              Expanded(child: Container(color: ColorStyles.dFinWhite, width: 85.w,)),
+                              UiUtils.getTextButtonBox(90.w, "확인", TextStyles.dFinBasicButtonTextStyle, ColorStyles.dFinButtonBlue, () async {
                                 String eachPreLoanPrice = "";
                                 if(_eachPreLoanPriceTextController.text.trim() != ""){
                                   final number = double.tryParse(_eachPreLoanPriceTextController.text.trim().replaceAll(',', '')); // 콤마 제거 후 숫자 변환
@@ -618,8 +618,8 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
                                 }
                               }),
                               UiUtils.getMarginBox(0, 1.h),
-                              UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
-                                  UiUtils.getTextWithFixedScale("다음에 할게요", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), (){
+                              UiUtils.getBorderButtonBox(90.w, ColorStyles.dFinWhiteSky, ColorStyles.dFinWhiteSky,
+                                  UiUtils.getTextWithFixedScale("다음에 할게요", 14.sp, FontWeight.w500, ColorStyles.dFinButtonBlue, TextAlign.start, null), (){
                                     for(Map<String, dynamic> eachMap in savedRegBInfoList){
                                       if(currRegBInfo["resLedgerBNo"] == eachMap["resLedgerBNo"]){
                                         eachMap["preLoanPrice"] = "";
@@ -650,13 +650,13 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
         }),
       ])),
       UiUtils.getMarginBox(0, 3.w),
-      savedRegBInfoList.length == 1 ? SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("저당에 대한", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null))
-       : SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("각 저당에 대한", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      savedRegBInfoList.length == 1 ? SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("저당에 대한", 22.sp, FontWeight.w800, ColorStyles.dFinTextAndBorderBlue, TextAlign.start, null))
+       : SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("각 저당에 대한", 22.sp, FontWeight.w800, ColorStyles.dFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 0.5.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출잔액을 입력하세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출잔액을 입력하세요.", 22.sp, FontWeight.w800, ColorStyles.dFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: confirmWidgetList)),
       UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.dFinBasicButtonTextStyle, ColorStyles.dFinButtonBlue, () async {
         if(startViewId == preLoanInfoViewId){
           isEditMode = true;
         }
@@ -689,13 +689,13 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
       return Column(mainAxisAlignment: MainAxisAlignment.start, children:
       [
         UiUtils.getMarginBox(0, 2.h),
-        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("아직 입력하지 않은 대출잔액이 있어요!", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("아직 입력하지 않은 대출잔액이 있어요!", 14.sp, FontWeight.w600, ColorStyles.dFinBlack, TextAlign.start, null)),
         UiUtils.getMarginBox(0, 3.h),
-        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale2("대출잔액을 입력하시면,고객님에게 맞는\n더욱 정확한 대출상품을 찾으실 수 있습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale2("대출잔액을 입력하시면,고객님에게 맞는\n더욱 정확한 대출상품을 찾으실 수 있습니다.", 12.sp, FontWeight.w500, ColorStyles.dFinBlack, TextAlign.start, null)),
         UiUtils.getMarginBox(0, 2.h),
         UiUtils.getExpandedScrollView(Axis.vertical, Container()),
-        UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-            UiUtils.getTextWithFixedScale("대출잔액 입력하기", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), (){
+        UiUtils.getBorderButtonBox(90.w, ColorStyles.dFinButtonBlue, ColorStyles.dFinButtonBlue,
+            UiUtils.getTextWithFixedScale("대출잔액 입력하기", 14.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.start, null), (){
               Navigator.pop(slideContext);
               if(!isEditMode){
                 currentViewId++;
@@ -703,8 +703,8 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
               }
             }),
         UiUtils.getMarginBox(0, 1.h),
-        UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
-            UiUtils.getTextWithFixedScale("대출상품 찾아보기", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), (){
+        UiUtils.getBorderButtonBox(90.w, ColorStyles.dFinWhiteSky, ColorStyles.dFinWhiteSky,
+            UiUtils.getTextWithFixedScale("대출상품 찾아보기", 14.sp, FontWeight.w500, ColorStyles.dFinButtonBlue, TextAlign.start, null), (){
               Navigator.pop(slideContext);
               _updateData();
             }),
@@ -746,7 +746,7 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
     confirmDataList.add("•  ${selectedJobInfo.split("@")[0]}");
 
     List<Widget> confirmWidgetList = [];
-    Color textColor = ColorStyles.upFinBlack;
+    Color textColor = ColorStyles.dFinBlack;
 
     confirmWidgetList.add(
       SizedBox(width: 80.w, child: UiUtils.getTextButtonWithFixedScale("기본정보", 16.sp, FontWeight.w600, textColor, TextAlign.start, null, (){})),
@@ -755,7 +755,7 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
       UiUtils.getMarginBox(0, 3.h),
     );
     for(var each in confirmDataList){
-      textColor = ColorStyles.upFinBlack;
+      textColor = ColorStyles.dFinBlack;
       confirmWidgetList.add(
         SizedBox(width: 80.w, child: UiUtils.getTextButtonWithFixedScale(each, 16.sp, FontWeight.w500, textColor, TextAlign.start, null, (){})),
       );
@@ -788,20 +788,20 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
           eachPreLoanPriceTxt = CommonUtils.getPriceFormattedString(double.parse(eachPreLoanPrice));
         }
         regBWidgetList.add(
-          SizedBox(width: 80.w, child: UiUtils.getBorderButtonBoxForRound3(ColorStyles.upFinWhite, ColorStyles.upFinGray,
+          SizedBox(width: 80.w, child: UiUtils.getBorderButtonBoxForRound3(ColorStyles.dFinWhite, ColorStyles.dFinGray,
               Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.start, children: [
                 UiUtils.getMarginBox(0, 0.5.h),
-                SizedBox(width: 75.w, child: UiUtils.getTextWithFixedScaleAndOverFlow("${each["resUserNm"]}", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
+                SizedBox(width: 75.w, child: UiUtils.getTextWithFixedScaleAndOverFlow("${each["resUserNm"]}", 14.sp, FontWeight.w600, ColorStyles.dFinBlack, TextAlign.start, null)),
                 UiUtils.getMarginBox(0, 1.5.h),
-                UiUtils.getTextButtonWithFixedScale("•  을부번호 ${each["resLedgerBNo"]}", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null, (){}),
+                UiUtils.getTextButtonWithFixedScale("•  을부번호 ${each["resLedgerBNo"]}", 12.sp, FontWeight.w500, ColorStyles.dFinBlack, TextAlign.start, null, (){}),
                 UiUtils.getMarginBox(0, 0.5.h),
-                UiUtils.getTextButtonWithFixedScale("•  채권가액 ${each["resBondPriceTxt"]}", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null, (){}),
+                UiUtils.getTextButtonWithFixedScale("•  채권가액 ${each["resBondPriceTxt"]}", 12.sp, FontWeight.w500, ColorStyles.dFinBlack, TextAlign.start, null, (){}),
                 UiUtils.getMarginBox(0, 0.5.h),
-                UiUtils.getTextButtonWithFixedScale("•  대출잔액 $eachPreLoanPriceTxt", 12.sp, FontWeight.w500, eachPreLoanPriceTxt == "미입력" ? ColorStyles.upFinRed : ColorStyles.upFinButtonBlue, TextAlign.start, null, (){}),
+                UiUtils.getTextButtonWithFixedScale("•  대출잔액 $eachPreLoanPriceTxt", 12.sp, FontWeight.w500, eachPreLoanPriceTxt == "미입력" ? ColorStyles.dFinRed : ColorStyles.dFinButtonBlue, TextAlign.start, null, (){}),
                 UiUtils.getMarginBox(0, 1.h),
                 Row(crossAxisAlignment: CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.end, children: [
                   const Spacer(flex: 2),
-                  UiUtils.getTextButtonWithFixedScale("${each["commStartDateTxt2"]}", 9.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null, (){})
+                  UiUtils.getTextButtonWithFixedScale("${each["commStartDateTxt2"]}", 9.sp, FontWeight.w500, ColorStyles.dFinRealGray, TextAlign.start, null, (){})
                 ]),
                 UiUtils.getMarginBox(0, 0.5.h),
               ]), () { })),
@@ -818,15 +818,15 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
         }),
       ])),
       UiUtils.getMarginBox(0, 3.w),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("해당 정보로", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("해당 정보로", 22.sp, FontWeight.w800, ColorStyles.dFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 0.5.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출상품을 찾아볼까요?", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출상품을 찾아볼까요?", 22.sp, FontWeight.w800, ColorStyles.dFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 4.h),
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: confirmWidgetList)),
       UiUtils.getMarginBox(0, 4.h),
       Row(children: [
-        UiUtils.getBorderButtonBox(42.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-            UiUtils.getTextWithFixedScale("네 좋아요!", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
+        UiUtils.getBorderButtonBox(42.w, ColorStyles.dFinButtonBlue, ColorStyles.dFinButtonBlue,
+            UiUtils.getTextWithFixedScale("네 좋아요!", 14.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.start, null), () {
               bool isAllInput = true;
               for(Map<String, dynamic> eachMap in savedRegBInfoList){
                 CommonUtils.log("w", "preLoanPrice : ${eachMap["preLoanPrice"]}");
@@ -844,8 +844,8 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
               }
             }),
         UiUtils.getMarginBox(2.w, 0),
-        UiUtils.getBorderButtonBox(42.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
-            UiUtils.getTextWithFixedScale("정보변경", 14.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
+        UiUtils.getBorderButtonBox(42.w, ColorStyles.dFinWhiteSky, ColorStyles.dFinWhiteSky,
+            UiUtils.getTextWithFixedScale("정보변경", 14.sp, FontWeight.w500, ColorStyles.dFinButtonBlue, TextAlign.start, null), () {
               isEditMode = true;
               nextInputView();
             })
@@ -899,16 +899,16 @@ class AppUpdateCarViewState extends State<AppUpdateCarView> with WidgetsBindingO
   Widget build(BuildContext context) {
     Widget? view;
     if(currentViewId == preLoanCountViewId){
-      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getPreLoanCountView());
+      view = Container(height: 100.h, width: 100.w, color: ColorStyles.dFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getPreLoanCountView());
     }else if(currentViewId == preLoanPriceViewId){
-      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getPreLoanPriceView());
+      view = Container(height: 100.h, width: 100.w, color: ColorStyles.dFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getPreLoanPriceView());
     }else if(currentViewId == preLoanInfoViewId){
-      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getPreLoanInfoView());
+      view = Container(height: 100.h, width: 100.w, color: ColorStyles.dFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getPreLoanInfoView());
     }else if(currentViewId == jobViewId){
-      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getJobView());
+      view = Container(height: 100.h, width: 100.w, color: ColorStyles.dFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getJobView());
     }else{
       isEditMode = false;
-      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getConfirmView());
+      view = Container(height: 100.h, width: 100.w, color: ColorStyles.dFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getConfirmView());
     }
     return UiUtils.getViewWithAllowBackForAndroid(context, view, _back);
   }

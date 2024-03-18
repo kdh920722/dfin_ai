@@ -88,7 +88,7 @@ class LogfinController {
   static Future<void> initLogfin(Function(bool) callback) async {
     try {
       final ref = FirebaseDatabase.instance.ref();
-      final snapshot = await ref.child('UPFIN/API/logfin').get();
+      final snapshot = await ref.child('DFIN/API/logfin').get();
       if (snapshot.exists) {
         for (var each in snapshot.children) {
           switch (each.key) {
@@ -118,7 +118,7 @@ class LogfinController {
       final ref = FirebaseDatabase.instance.ref();
       int failCount = 0;
 
-      final jobSnapshot = await ref.child('UPFIN/API/logfin/list_data/job').get();
+      final jobSnapshot = await ref.child('DFIN/API/logfin/list_data/job').get();
       if (jobSnapshot.exists) {
         List<String> tempList = [];
         for (var each in jobSnapshot.children) {
@@ -131,7 +131,7 @@ class LogfinController {
       }
       //CommonUtils.log("", "list : $jobList");
 
-      final courtSnapshot = await ref.child('UPFIN/API/logfin/list_data/court').get();
+      final courtSnapshot = await ref.child('DFIN/API/logfin/list_data/court').get();
       if (courtSnapshot.exists) {
         List<String> tempList = [];
         for (var each in courtSnapshot.children) {
@@ -144,7 +144,7 @@ class LogfinController {
       }
       //CommonUtils.log("", "list : $courtList");
 
-      final bankSnapshot = await ref.child('UPFIN/API/logfin/list_data/bank').get();
+      final bankSnapshot = await ref.child('DFIN/API/logfin/list_data/bank').get();
       if (bankSnapshot.exists) {
         List<String> tempList = [];
         for (var each in bankSnapshot.children) {
@@ -157,7 +157,7 @@ class LogfinController {
       }
       //CommonUtils.log("", "list : $bankList");
 
-      final loanCountSnapshot = await ref.child('UPFIN/API/logfin/list_data/loan_count').get();
+      final loanCountSnapshot = await ref.child('DFIN/API/logfin/list_data/loan_count').get();
       if (loanCountSnapshot.exists) {
         List<String> tempList = [];
         for (var each in loanCountSnapshot.children) {
@@ -171,7 +171,7 @@ class LogfinController {
       }
       //CommonUtils.log("", "list : $preLoanCountList");
 
-      final niceSnapshot = await ref.child('UPFIN/API/logfin/nice').get();
+      final niceSnapshot = await ref.child('DFIN/API/logfin/nice').get();
       if (niceSnapshot.exists) {
         for (var each in niceSnapshot.children) {
           switch (each.key) {
@@ -184,7 +184,7 @@ class LogfinController {
       }
       //CommonUtils.log("", "niceUrl : $niceUrl");
 
-      final agreeTypeSnapshot = await ref.child('UPFIN/API/logfin/list_data/agree/agreeDetailType').get();
+      final agreeTypeSnapshot = await ref.child('DFIN/API/logfin/list_data/agree/agreeDetailType').get();
       if (agreeTypeSnapshot.exists) {
         for (var each in agreeTypeSnapshot.children) {
           agreeDocsDetailTypeInfoList.add(each.value.toString());
@@ -193,7 +193,7 @@ class LogfinController {
         failCount++;
       }
 
-      final fileTypeSnapshot = await ref.child('UPFIN/API/logfin/list_data/valid_file_type').get();
+      final fileTypeSnapshot = await ref.child('DFIN/API/logfin/list_data/valid_file_type').get();
       if (fileTypeSnapshot.exists) {
         for (var each in fileTypeSnapshot.children) {
           validFileTypeList.add(each.value.toString().split("@").first);
@@ -205,7 +205,7 @@ class LogfinController {
         failCount++;
       }
 
-      final agreeASnapshot = await ref.child('UPFIN/API/logfin/list_data/agree/agreeA').get();
+      final agreeASnapshot = await ref.child('DFIN/API/logfin/list_data/agree/agreeA').get();
       List<String> docTypeTempList = [];
       if (agreeASnapshot.exists) {
         for (var each in agreeASnapshot.children) {
@@ -214,7 +214,7 @@ class LogfinController {
       } else {
         failCount++;
       }
-      final agreeBSnapshot = await ref.child('UPFIN/API/logfin/list_data/agree/agreeB').get();
+      final agreeBSnapshot = await ref.child('DFIN/API/logfin/list_data/agree/agreeB').get();
       if (agreeBSnapshot.exists) {
         for (var each in agreeBSnapshot.children) {
           docTypeTempList.add(each.value.toString());
@@ -1009,23 +1009,23 @@ class LogfinController {
           String selectedModelInfo = "";
           UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isPad()? 60.h : 40.h, 0.5, (slideContext, setSlideState){
             List<Widget> widgetList = [];
-            Color textColor = ColorStyles.upFinBlack;
+            Color textColor = ColorStyles.dFinBlack;
             FontWeight fontWeight = FontWeight.w500;
             for(var each in outputJson["modelList"]){
               Key key = Key(each["seriesno"]);
               if(selectedModelKey == key) {
-                textColor = ColorStyles.upFinBlack;
+                textColor = ColorStyles.dFinBlack;
                 fontWeight = FontWeight.w600;
               }
               else{
-                textColor = ColorStyles.upFinBlack;
+                textColor = ColorStyles.dFinBlack;
                 fontWeight = FontWeight.w500;
               }
               widgetList.add(
                   SizedBox(width: 90.w,
                       child: Row(children: [
-                        selectedModelKey == key? UiUtils.getCustomCheckBox(key, 1.5, selectedModelKey == key, ColorStyles.upFinButtonBlue, ColorStyles.upFinWhite,
-                            ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
+                        selectedModelKey == key? UiUtils.getCustomCheckBox(key, 1.5, selectedModelKey == key, ColorStyles.dFinButtonBlue, ColorStyles.dFinWhite,
+                            ColorStyles.dFinWhite,  ColorStyles.dFinWhite, (checkedValue){
                               setSlideState(() {
                                 if(checkedValue != null){
                                   if(checkedValue) {
@@ -1034,8 +1034,8 @@ class LogfinController {
                                   }
                                 }
                               });
-                            }) : UiUtils.getCustomCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
-                            ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
+                            }) : UiUtils.getCustomCheckBox(key, 1.5, true, ColorStyles.dFinGray, ColorStyles.dFinWhite,
+                            ColorStyles.dFinWhite,  ColorStyles.dFinWhite, (checkedValue){
                               setSlideState(() {
                                 if(checkedValue != null){
                                   if(!checkedValue) {
@@ -1062,16 +1062,16 @@ class LogfinController {
             }
 
             return Material(
-                color: ColorStyles.upFinWhite,
+                color: ColorStyles.dFinDarkWhiteGray,
                 child: Column(children: [
                   UiUtils.getMarginBox(0, 2.h),
-                  Center(child: UiUtils.getTextWithFixedScale("상세모델을 선택하세요.", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
+                  Center(child: UiUtils.getTextWithFixedScale("상세모델을 선택하세요.", 14.sp, FontWeight.w600, ColorStyles.dFinBlack, TextAlign.center, null)),
                   UiUtils.getMarginBox(0, 2.5.h),
                   UiUtils.getExpandedScrollView(Axis.vertical,
                       Column(crossAxisAlignment:CrossAxisAlignment.start, mainAxisAlignment: MainAxisAlignment.start, children: widgetList)),
                   UiUtils.getMarginBox(0, 0.5.h),
-                  UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                      UiUtils.getTextWithFixedScale("확인", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
+                  UiUtils.getBorderButtonBox(90.w, ColorStyles.dFinButtonBlue, ColorStyles.dFinButtonBlue,
+                      UiUtils.getTextWithFixedScale("확인", 14.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.start, null), () {
                         if(selectedModelInfo != ""){
                           String seriesNo = selectedModelInfo;
                           String tsKey = outputJson["tsKey"];

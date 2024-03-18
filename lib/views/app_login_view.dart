@@ -95,7 +95,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
 
   @override
   Widget build(BuildContext context) {
-    Widget view = Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child:
+    Widget view = Container(color: ColorStyles.dFinWhite, width: 100.w, height: 100.h, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child:
     Form(key: _formKey,
         child: UiUtils.getRowColumnWithAlignCenter([
           SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -105,10 +105,10 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
           ])),
           SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             UiUtils.getMarginBox(0, 3.w),
-            UiUtils.getTextWithFixedScale("로그인", 26.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null),
+            UiUtils.getTextWithFixedScale("로그인", 26.sp, FontWeight.w600, ColorStyles.dFinButtonBlue, TextAlign.start, null),
             UiUtils.getMarginBox(0, 2.h)
           ])),
-          UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _emailTextFocus, _emailTextController, TextInputType.emailAddress, false,
+          UiUtils.getTextFormField(context, 90.w, TextStyles.dFinTextFormFieldTextStyle, _emailTextFocus, _emailTextController, TextInputType.emailAddress, false,
               UiUtils.getInputDecoration("이메일", 12.sp, "", 0.sp), (text) { }, (value){
                 if(value != null && value.trim().isEmpty){
                   return "이메일을 입력하세요.";
@@ -117,7 +117,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
                 }
               }),
           UiUtils.getMarginBox(0, 1.5.h),
-          UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _pwdTextFocus, _pwdTextController, TextInputType.visiblePassword, true,
+          UiUtils.getTextFormField(context, 90.w, TextStyles.dFinTextFormFieldTextStyle, _pwdTextFocus, _pwdTextController, TextInputType.visiblePassword, true,
               UiUtils.getInputDecoration("비밀번호", 12.sp, "", 0.sp), (text) { }, (value){
                 if(value != null && value.trim().isEmpty){
                   return "비밀번호를 입력하세요.";
@@ -126,7 +126,7 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
                 }
               }),
           UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
-          UiUtils.getTextButtonBox(90.w, "로그인", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () {
+          UiUtils.getTextButtonBox(90.w, "로그인", TextStyles.dFinBasicButtonTextStyle, ColorStyles.dFinButtonBlue, () {
             if(_formKey.currentState!.validate() && Config.isControllerLoadFinished){
               CommonUtils.log("i", "OK");
               Map<String, dynamic> inputJson = {
@@ -181,14 +181,14 @@ class AppLoginViewState extends State<AppLoginView> with WidgetsBindingObserver{
           SizedBox(width: 90.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             UiUtils.getMarginBox(0, 4.w),
             UiUtils.getRoundBoxButtonTextWithFixedScale5(
-                UiUtils.getTextWithFixedScale("아이디가 기억나질 않나요?", 12.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
-                ColorStyles.upFinWhite, (){
+                UiUtils.getTextWithFixedScale("아이디가 기억나질 않나요?", 12.sp, FontWeight.w500, ColorStyles.dFinButtonBlue, TextAlign.start, null),
+                ColorStyles.dFinWhite, (){
               AppFindPwViewState.viewId = 4;
               CommonUtils.moveTo(context, AppView.appFindPwView.value, null);
             }),
             UiUtils.getRoundBoxButtonTextWithFixedScale5(
-                UiUtils.getTextWithFixedScale("비밀번호를 잊으셨나요?", 12.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
-                ColorStyles.upFinWhite, (){
+                UiUtils.getTextWithFixedScale("비밀번호를 잊으셨나요?", 12.sp, FontWeight.w500, ColorStyles.dFinButtonBlue, TextAlign.start, null),
+                ColorStyles.dFinWhite, (){
               AppFindPwViewState.viewId = 1;
               CommonUtils.moveTo(context, AppView.appFindPwView.value, null);
             })

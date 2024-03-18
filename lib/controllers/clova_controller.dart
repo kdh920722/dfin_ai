@@ -16,7 +16,7 @@ class CLOVAController{
   static Future<void> initCLOVA(Function(bool) callback) async{
     try{
       final ref = FirebaseDatabase.instance.ref();
-      final snapshot = await ref.child('UPFIN/API/clova').get();
+      final snapshot = await ref.child('DFIN/API/clova').get();
       if (snapshot.exists) {
         for(var each in snapshot.children){
           switch(each.key){
@@ -29,7 +29,7 @@ class CLOVAController{
         callback(false);
       }
     }catch(e){
-      CommonUtils.log("e", "clova get url error : ${e.toString()}");
+      CommonUtils.log("e", "DFIN get url error : ${e.toString()}");
       callback(false);
     }
   }

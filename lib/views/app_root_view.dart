@@ -422,13 +422,13 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
               children: [
                 UiUtils.getMarginBox(100.w, 1.h),
                 Column(children: [
-                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("권한이 필요합니다.",14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
+                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("권한이 필요합니다.",14.sp, FontWeight.w600, ColorStyles.dFinBlack, TextAlign.center, null)),
                   UiUtils.getMarginBox(0, 1.h),
-                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("[$deniedPermissionsString]권한을$allText 허용해주세요",12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null))
+                  SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("[$deniedPermissionsString]권한을$allText 허용해주세요",12.sp, FontWeight.w500, ColorStyles.dFinBlack, TextAlign.center, null))
                 ]),
                 UiUtils.getExpandedScrollView(Axis.vertical, Container()),
-                UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                    UiUtils.getTextWithFixedScale("설정 바로가기", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () async {
+                UiUtils.getBorderButtonBox(90.w, ColorStyles.dFinButtonBlue, ColorStyles.dFinButtonBlue,
+                    UiUtils.getTextWithFixedScale("설정 바로가기", 12.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.start, null), () async {
                       openAppSettings();
                     }),
                 Config.isAndroid ? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 5.h),
@@ -493,11 +493,11 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
         UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isAndroid ? Config.isPad()? 45.h : 35.h : Config.isPad()? 50.h : 40.h, 0.5, (context, setState){
           return Center(child: Column(children: [
             UiUtils.getMarginBox(0, 10.h),
-            UiUtils.getTextWithFixedScale("앱 업데이트가 필요합니다.", 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
+            UiUtils.getTextWithFixedScale("앱 업데이트가 필요합니다.", 14.sp, FontWeight.w500, ColorStyles.dFinBlack, TextAlign.center, null),
             UiUtils.getMarginBox(0, 3.h),
             UiUtils.getExpandedScrollView(Axis.vertical, Container()),
-            UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                UiUtils.getTextWithFixedScale("확인", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
+            UiUtils.getBorderButtonBox(90.w, ColorStyles.dFinButtonBlue, ColorStyles.dFinButtonBlue,
+                UiUtils.getTextWithFixedScale("확인", 14.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.center, null), () {
                   launchUrl(Uri.parse(Config.appStoreUrl));
                 }),
             Config.isAndroid? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 5.h)
@@ -509,10 +509,10 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
         UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isAndroid ? Config.isPad()? 45.h : 35.h : Config.isPad()? 50.h : 40.h, 0.5, (context, setState){
           return Column(children: [
             UiUtils.getMarginBox(0, 5.h),
-            Center(child: UiUtils.getTextWithFixedScale("시스템 점검중입니다.", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
+            Center(child: UiUtils.getTextWithFixedScale("시스템 점검중입니다.", 14.sp, FontWeight.w600, ColorStyles.dFinBlack, TextAlign.center, null)),
             UiUtils.getMarginBox(0, 3.h),
             UiUtils.getExpandedScrollView(Axis.vertical,
-                SizedBox(width : 80.w, child: UiUtils.getTextWithFixedScale2(Config.appInfoTextMap["close_text"].replaceAll("@@", "\n"), 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null))),
+                SizedBox(width : 80.w, child: UiUtils.getTextWithFixedScale2(Config.appInfoTextMap["close_text"].replaceAll("@@", "\n"), 12.sp, FontWeight.w500, ColorStyles.dFinDarkGray, TextAlign.start, null))),
             UiUtils.getMarginBox(0, 1.h)
           ]);
         });
@@ -598,35 +598,35 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
       if(!Config.isControllerLoadFinished){
         view = Obx(()=>UiUtils.getInitLoadingView(GetController.to.loadingPercent.value));
       }else{
-        view = Container(color: ColorStyles.upFinWhite, width: 100.w, height: 100.h, padding: EdgeInsets.all(5.w), child:
+        view = Container(color: ColorStyles.dFinBlack, width: 100.w, height: 100.h, padding: EdgeInsets.all(5.w), child:
         Column(children: [
-          SizedBox(width: 100.w, child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-            UiUtils.getMarginBox(0, Config.isPad()? 5.h : 15.h),
-            UiUtils.getTitleWithFixedScale("upfin", Config.isPad()? 55.sp : 75.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
-            UiUtils.getMarginBox(0, 10.h),
-            UiUtils.getTextWithFixedScale("나에게 꼭 맞는", 24.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
-            UiUtils.getMarginBox(0, 0.5.h),
-            UiUtils.getTextWithFixedScale("다이렉트 대출신청!", 24.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null),
-            UiUtils.getMarginBox(0, Config.isPad()? 3.h : 6.h)
-          ])),
+          SizedBox(width: 100.w, child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            UiUtils.getMarginBox(0, Config.isPad()? 5.h : 10.h),
+            UiUtils.getTextWithFixedScale2("AUTO\nCAR\nFINANCE", Config.isPad()? 55.sp : 35.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.start, null),
+            UiUtils.getMarginBox(0, 2.h),
+            UiUtils.getTextWithFixedScale("값어치를 하는 내차량의 재발견", 16.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.start, null),
+            UiUtils.getMarginBox(0, Config.isPad()? 3.h : 20.h)
+          ])])),
           UiUtils.getExpandedScrollView(Axis.vertical, SizedBox(width: 100.w, child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-            UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                UiUtils.getTextWithFixedScale("로그인", 16.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
+            UiUtils.getBorderButtonBox(90.w, ColorStyles.dFinButtonBlue, ColorStyles.dFinButtonBlue,
+                UiUtils.getTextWithFixedScale("로그인", 14.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.start, null), () {
                   SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceSnsToken, "");
                   SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceSnsId, "");
                   SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceIsSnsLogin, "N");
                   CommonUtils.moveTo(context, AppView.appLoginView.value, null);
                 }),
             UiUtils.getMarginBox(0, 1.h),
-            UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
-                UiUtils.getTextWithFixedScale("회원가입 ", 16.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.start, null), () {
+            UiUtils.getBorderButtonBoxWithNoShadow(90.w, ColorStyles.dFinBlack, ColorStyles.dFinBlack,
+                UiUtils.getTextWithFixedScale("회원가입 ", 14.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.start, null), () {
                   SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceSnsToken, "");
                   SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceSnsId, "");
                   SharedPreferenceController.saveSharedPreference(SharedPreferenceController.sharedPreferenceIsSnsLogin, "N");
                   CommonUtils.moveTo(context, AppView.appSignupView.value, null);
                 }),
             UiUtils.getMarginBox(0, 4.h),
-            SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("소셜계정으로 로그인", 12.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, null)),
+            UiUtils.getMarginColoredBox(90.w, 0.02.h, ColorStyles.dFinWhiteGray),
+            UiUtils.getMarginBox(0, 2.h),
+            SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("SNS 계정으로 회원가입 및 로그인", 11.sp, FontWeight.w500, ColorStyles.dFinWhiteGray, TextAlign.center, null)),
             UiUtils.getMarginBox(0, 1.h),
             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               SnsLoginController.getKakaoLoginButton(context, 12.w, (isSuccessToLogin) async {
@@ -648,6 +648,7 @@ class AppRootViewState extends State<AppRootView> with WidgetsBindingObserver{
                   UiUtils.closeLoadingPop(context);
                 }
               }),
+              UiUtils.getMarginBox(2.w, 0),
               SnsLoginController.getAppleLoginButton(context, 12.w, (isSuccessToLogin) async {
                 if(isSuccessToLogin != null){
                   if(isSuccessToLogin){

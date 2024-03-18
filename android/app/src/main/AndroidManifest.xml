@@ -79,7 +79,7 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.ysmeta.upfinai.flutter_inappwebview.fileprovider"
+            android:authorities="com.ysmeta.dfin.flutter_inappwebview.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

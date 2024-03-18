@@ -91,7 +91,7 @@ class AppWebViewState extends State<AppWebView> with WidgetsBindingObserver{
   @override
   Widget build(BuildContext context) {
     Widget view = Stack(children: [
-      Container(width:100.w, height: 100.h, color: ColorStyles.upFinWhite,
+      Container(width:100.w, height: 100.h, color: ColorStyles.dFinWhite,
           child: Column(children: [
             Container(padding: EdgeInsets.only(bottom: 0, top: 3.w, left: 5.w, right: 5.w), width: 100.w, child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               UiUtils.getBackButtonForMainView(() {
@@ -164,7 +164,7 @@ class AppWebViewState extends State<AppWebView> with WidgetsBindingObserver{
                         height: 100.h,
                         color: Colors.black54,
                         child:
-                        Center(child: SpinKitWave(color: ColorStyles.upFinTextAndBorderBlue, size: 15.w))
+                        Center(child: SpinKitWave(color: ColorStyles.dFinTextAndBorderBlue, size: 15.w))
                     );
                   })
           );

@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>도이치핀</string>
+	<string>안드 AnD</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -53,7 +53,7 @@
 	<key>FacebookClientToken</key>
 	<string>bc10dc12c8ff6c250204b2638197b185</string>
 	<key>FacebookDisplayName</key>
-	<string>도이치핀</string>
+	<string>안드 AnD</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
 	<false/>
 	<key>KAKAO_APP_KEY</key>

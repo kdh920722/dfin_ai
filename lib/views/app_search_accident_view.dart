@@ -279,15 +279,15 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
   /// court view
   Widget _getCourtView(){
     List<Widget> courtList = [];
-    Color textColor = ColorStyles.upFinBlack;
+    Color textColor = ColorStyles.dFinBlack;
     FontWeight fontWeight = FontWeight.w500;
     for(int i=0; i<LogfinController.courtList.length ; i++){
       Key key = Key(LogfinController.courtList[i]);
       if(selectedCourtKey == key){
-        textColor = ColorStyles.upFinBlack;
+        textColor = ColorStyles.dFinBlack;
         fontWeight = FontWeight.w600;
       }else{
-        textColor = ColorStyles.upFinBlack;
+        textColor = ColorStyles.dFinBlack;
         fontWeight = FontWeight.w500;
         if(GetController.to.firstVisibleItem1.value >= 3){
           if(GetController.to.firstVisibleItem1.value-2 <= i && i <= GetController.to.firstVisibleItem1.value+1){
@@ -310,8 +310,8 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       courtList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                selectedCourtKey == key? UiUtils.getCustomCheckBox(key, 1.5, selectedCourtKey == key, ColorStyles.upFinButtonBlue, ColorStyles.upFinWhite,
-                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
+                selectedCourtKey == key? UiUtils.getCustomCheckBox(key, 1.5, selectedCourtKey == key, ColorStyles.dFinButtonBlue, ColorStyles.dFinWhite,
+                    ColorStyles.dFinWhite,  ColorStyles.dFinWhite, (checkedValue){
                   setState(() {
                     if(checkedValue != null){
                       if(checkedValue) {
@@ -320,8 +320,8 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                       }
                     }
                   });
-                }) : UiUtils.getCustomCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
-                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
+                }) : UiUtils.getCustomCheckBox(key, 1.5, true, ColorStyles.dFinGray, ColorStyles.dFinWhite,
+                    ColorStyles.dFinWhite,  ColorStyles.dFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
                           if(!checkedValue) {
@@ -352,11 +352,11 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         }),
       ])),
       UiUtils.getMarginBox(0, 3.w),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("우선  ", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("우선  ", 22.sp, FontWeight.w800, ColorStyles.dFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 0.5.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("사건정보가 필요합니다.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("사건정보가 필요합니다.", 22.sp, FontWeight.w800, ColorStyles.dFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 0.5.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("해당 법원을 선택해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("해당 법원을 선택해주세요.", 22.sp, FontWeight.w800, ColorStyles.dFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
       NotificationListener<ScrollNotification>(
           onNotification: (scrollNotification) {
@@ -389,7 +389,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
           },
           child: UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: courtList))),
       UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.dFinBasicButtonTextStyle, ColorStyles.dFinButtonBlue, () async {
         if(selectedCourtInfo.isNotEmpty){
           nextInputView();
         }else{
@@ -409,22 +409,22 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         }),
       ])),
       UiUtils.getMarginBox(0, 3.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("사건번호 ", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("사건번호 ", 22.sp, FontWeight.w800, ColorStyles.dFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 1.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("예) 2023개회1234567", 14.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("예) 2023개회1234567", 14.sp, FontWeight.w500, ColorStyles.dFinRealGray, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
 
       UiUtils.getExpandedScrollView(Axis.vertical,
           SizedBox(width: 85.w, child: Row(children: [
-            UiUtils.getTextField(context, 32.w, TextStyles.upFinTextFormFieldTextStyle, _accidentInfoFocus1, _accidentInfoTextController1, TextInputType.number,
+            UiUtils.getTextField(context, 32.w, TextStyles.dFinTextFormFieldTextStyle, _accidentInfoFocus1, _accidentInfoTextController1, TextInputType.number,
                 UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
-            UiUtils.getTextWithFixedScale("개회", 16.sp, FontWeight.w400, ColorStyles.upFinButtonBlue, TextAlign.center, null),
-            UiUtils.getTextField(context, 43.w, TextStyles.upFinTextFormFieldTextStyle, _accidentInfoFocus2, _accidentInfoTextController2, TextInputType.number,
+            UiUtils.getTextWithFixedScale("개회", 16.sp, FontWeight.w400, ColorStyles.dFinButtonBlue, TextAlign.center, null),
+            UiUtils.getTextField(context, 43.w, TextStyles.dFinTextFormFieldTextStyle, _accidentInfoFocus2, _accidentInfoTextController2, TextInputType.number,
                 UiUtils.getInputDecoration("", 0.sp, "", 0.sp), (value) { }),
           ]))
       ),
       UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.dFinBasicButtonTextStyle, ColorStyles.dFinButtonBlue, () async {
         if(_accidentInfoTextController1.text.length!=4){
           CommonUtils.flutterToast("사건번호 앞4자리를 입력하세요.");
         }else{
@@ -455,15 +455,15 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
   /// bank code view
   Widget _getBankCodeView(){
     List<Widget> bankCodeList = [];
-    Color textColor = ColorStyles.upFinBlack;
+    Color textColor = ColorStyles.dFinBlack;
     FontWeight fontWeight = FontWeight.w500;
     for(int i=0 ; i<LogfinController.bankList.length ; i++){
       Key key = Key(LogfinController.bankList[i]);
       if(selectedBankCodeKey == key){
-        textColor = ColorStyles.upFinBlack;
+        textColor = ColorStyles.dFinBlack;
         fontWeight = FontWeight.w600;
       }else{
-        textColor = ColorStyles.upFinBlack;
+        textColor = ColorStyles.dFinBlack;
         fontWeight = FontWeight.w500;
         if(GetController.to.firstVisibleItem2.value >= 3){
           if(GetController.to.firstVisibleItem2.value-2 <= i && i <= GetController.to.firstVisibleItem2.value+1){
@@ -486,8 +486,8 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
       bankCodeList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                selectedBankCodeKey == key? UiUtils.getCustomCheckBox(key, 1.5, selectedBankCodeKey == key, ColorStyles.upFinButtonBlue, ColorStyles.upFinWhite,
-                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
+                selectedBankCodeKey == key? UiUtils.getCustomCheckBox(key, 1.5, selectedBankCodeKey == key, ColorStyles.dFinButtonBlue, ColorStyles.dFinWhite,
+                    ColorStyles.dFinWhite,  ColorStyles.dFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
                           if(checkedValue) {
@@ -496,8 +496,8 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                           }
                         }
                       });
-                    }) : UiUtils.getCustomCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
-                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
+                    }) : UiUtils.getCustomCheckBox(key, 1.5, true, ColorStyles.dFinGray, ColorStyles.dFinWhite,
+                    ColorStyles.dFinWhite,  ColorStyles.dFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
                           if(!checkedValue) {
@@ -528,10 +528,10 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         }),
       ])),
       UiUtils.getMarginBox(0, 3.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("환급계좌 은행 ", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("환급계좌 은행 ", 22.sp, FontWeight.w800, ColorStyles.dFinTextAndBorderBlue, TextAlign.start, null)),
       // SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("선택해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 1.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("개인회생 신청시 제출했던 본인의 계좌", 14.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("개인회생 신청시 제출했던 본인의 계좌", 14.sp, FontWeight.w500, ColorStyles.dFinRealGray, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
       NotificationListener<ScrollNotification>(
           onNotification: (scrollNotification) {
@@ -563,7 +563,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
           },
           child: UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: bankCodeList))),
       UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.dFinBasicButtonTextStyle, ColorStyles.dFinButtonBlue, () async {
         if(selectedBankCodeInfo.isNotEmpty){
           nextInputView();
         }else{
@@ -583,14 +583,14 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         }),
       ])),
       UiUtils.getMarginBox(0, 3.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("환급계좌 번호", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("환급계좌 번호", 22.sp, FontWeight.w800, ColorStyles.dFinTextAndBorderBlue, TextAlign.start, null)),
       // SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("입력해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getTextField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _bankAccountInfoFocus, _bankAccountInfoTextController, TextInputType.number,
+      UiUtils.getTextField(context, 90.w, TextStyles.dFinTextFormFieldTextStyle, _bankAccountInfoFocus, _bankAccountInfoTextController, TextInputType.number,
           UiUtils.getInputDecoration("계좌번호 8자리", 14.sp, "", 0.sp), (value) { }),
       UiUtils.getExpandedScrollView(Axis.vertical, Container()),
       UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.dFinBasicButtonTextStyle, ColorStyles.dFinButtonBlue, () async {
         selectedBankAccountInfo = _bankAccountInfoTextController.text.trim();
         if(selectedBankAccountInfo.isNotEmpty){
           nextInputView();
@@ -605,23 +605,23 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
   /// pre loan count view
   Widget _getPreLoanCountView(){
     List<Widget> loanCountList = [];
-    Color textColor = ColorStyles.upFinBlack;
+    Color textColor = ColorStyles.dFinBlack;
     FontWeight fontWeight = FontWeight.w500;
     for(var each in LogfinController.preLoanCountList){
       Key key = Key(each);
       if(selectedPreLoanCountKey == key) {
-        textColor = ColorStyles.upFinBlack;
+        textColor = ColorStyles.dFinBlack;
         fontWeight = FontWeight.w600;
       }
       else{
         fontWeight = FontWeight.w500;
-        textColor = ColorStyles.upFinBlack;
+        textColor = ColorStyles.dFinBlack;
       }
       loanCountList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                selectedPreLoanCountKey == key? UiUtils.getCustomCheckBox(key, 1.5, selectedPreLoanCountKey == key, ColorStyles.upFinButtonBlue, ColorStyles.upFinWhite,
-                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
+                selectedPreLoanCountKey == key? UiUtils.getCustomCheckBox(key, 1.5, selectedPreLoanCountKey == key, ColorStyles.dFinButtonBlue, ColorStyles.dFinWhite,
+                    ColorStyles.dFinWhite,  ColorStyles.dFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
                           if(checkedValue) {
@@ -630,8 +630,8 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                           }
                         }
                       });
-                    }) : UiUtils.getCustomCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
-                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
+                    }) : UiUtils.getCustomCheckBox(key, 1.5, true, ColorStyles.dFinGray, ColorStyles.dFinWhite,
+                    ColorStyles.dFinWhite,  ColorStyles.dFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
                           if(!checkedValue) {
@@ -662,15 +662,15 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         }),
       ])),
       UiUtils.getMarginBox(0, 3.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("이미 받고 있는", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("이미 받고 있는", 22.sp, FontWeight.w800, ColorStyles.dFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 0.5.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출 횟수를 알려주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출 횟수를 알려주세요.", 22.sp, FontWeight.w800, ColorStyles.dFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 1.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale2("개인회생 신청 이후에 받은 회생대출 횟수", 14.sp, FontWeight.w500, ColorStyles.upFinRealGray, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale2("개인회생 신청 이후에 받은 회생대출 횟수", 14.sp, FontWeight.w500, ColorStyles.dFinRealGray, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: loanCountList)),
       UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.dFinBasicButtonTextStyle, ColorStyles.dFinButtonBlue, () async {
         if(selectedPreLoanCountInfo.isNotEmpty){
           if(selectedPreLoanCountInfo.split("@")[1] == "0"){
             selectedPreLoanPriceInfo = "0";
@@ -697,13 +697,13 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
           }),
         ])),
         UiUtils.getMarginBox(0, 3.h),
-        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("개인회생 신청 이후", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("개인회생 신청 이후", 22.sp, FontWeight.w800, ColorStyles.dFinTextAndBorderBlue, TextAlign.start, null)),
         UiUtils.getMarginBox(0, 0.5.h),
-        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출 잔액", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출 잔액", 22.sp, FontWeight.w800, ColorStyles.dFinTextAndBorderBlue, TextAlign.start, null)),
         UiUtils.getMarginBox(0, 5.h),
         Obx(()=>
             Row(mainAxisAlignment: MainAxisAlignment.start, children: [
-              UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _preLoanPriceFocus, _preLoanPriceTextController, TextInputType.number, false,
+              UiUtils.getTextFormField(context, 90.w, TextStyles.dFinTextFormFieldTextStyle, _preLoanPriceFocus, _preLoanPriceTextController, TextInputType.number, false,
                   UiUtils.getInputDecorationForPrice("", 0.sp, GetController.to.preLoanPrice.value), (text) {
                     if(text.trim() != ""){
                       final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
@@ -716,7 +716,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         ),
         UiUtils.getMarginBox(0, 5.h),
         UiUtils.getExpandedScrollView(Axis.vertical, Container()),
-        UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+        UiUtils.getTextButtonBox(90.w, "다음", TextStyles.dFinBasicButtonTextStyle, ColorStyles.dFinButtonBlue, () async {
           if(_preLoanPriceTextController.text.trim() != ""){
             final number = double.tryParse(_preLoanPriceTextController.text.trim().replaceAll(',', '')); // 콤마 제거 후 숫자 변환
             String price = number.toString();
@@ -744,9 +744,9 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
           }),
         ])),
         UiUtils.getMarginBox(0, 3.h),
-        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("희망대출 금액", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+        SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("희망대출 금액", 22.sp, FontWeight.w800, ColorStyles.dFinTextAndBorderBlue, TextAlign.start, null)),
         UiUtils.getMarginBox(0, 5.h),
-        Obx(()=>UiUtils.getTextFormField(context, 90.w, TextStyles.upFinTextFormFieldTextStyle, _wantLoanPriceFocus, _wantLoanPriceTextController, TextInputType.number, false,
+        Obx(()=>UiUtils.getTextFormField(context, 90.w, TextStyles.dFinTextFormFieldTextStyle, _wantLoanPriceFocus, _wantLoanPriceTextController, TextInputType.number, false,
             UiUtils.getInputDecorationForPrice("", 0.sp, GetController.to.wantLoanPrice.value), (text) {
               if(text.trim() != ""){
                 final number = double.tryParse(text.replaceAll(',', '')); // 콤마 제거 후 숫자 변환
@@ -758,7 +758,7 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         ),
         UiUtils.getMarginBox(0, 5.h),
         UiUtils.getExpandedScrollView(Axis.vertical, Container()),
-        UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+        UiUtils.getTextButtonBox(90.w, "다음", TextStyles.dFinBasicButtonTextStyle, ColorStyles.dFinButtonBlue, () async {
           if(_wantLoanPriceTextController.text.trim() != ""){
             final number = double.tryParse(_wantLoanPriceTextController.text.trim().replaceAll(',', '')); // 콤마 제거 후 숫자 변환
             String price = number.toString();
@@ -779,23 +779,23 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
   /// job view
   Widget _getJobView(){
     List<Widget> jobList = [];
-    Color textColor = ColorStyles.upFinBlack;
+    Color textColor = ColorStyles.dFinBlack;
     FontWeight fontWeight = FontWeight.w500;
     for(var each in LogfinController.jobList){
       Key key = Key(each);
       if(selectedJobKey == key) {
-        textColor = ColorStyles.upFinBlack;
+        textColor = ColorStyles.dFinBlack;
         fontWeight = FontWeight.w600;
       }
       else{
-        textColor = ColorStyles.upFinBlack;
+        textColor = ColorStyles.dFinBlack;
         fontWeight = FontWeight.w500;
       }
       jobList.add(
           SizedBox(width: 90.w,
               child: Row(children: [
-                selectedJobKey == key? UiUtils.getCustomCheckBox(key, 1.5, selectedJobKey == key, ColorStyles.upFinButtonBlue, ColorStyles.upFinWhite,
-                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
+                selectedJobKey == key? UiUtils.getCustomCheckBox(key, 1.5, selectedJobKey == key, ColorStyles.dFinButtonBlue, ColorStyles.dFinWhite,
+                    ColorStyles.dFinWhite,  ColorStyles.dFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
                           if(checkedValue) {
@@ -804,8 +804,8 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
                           }
                         }
                       });
-                    }) : UiUtils.getCustomCheckBox(key, 1.5, true, ColorStyles.upFinGray, ColorStyles.upFinWhite,
-                    ColorStyles.upFinWhite,  ColorStyles.upFinWhite, (checkedValue){
+                    }) : UiUtils.getCustomCheckBox(key, 1.5, true, ColorStyles.dFinGray, ColorStyles.dFinWhite,
+                    ColorStyles.dFinWhite,  ColorStyles.dFinWhite, (checkedValue){
                       setState(() {
                         if(checkedValue != null){
                           if(!checkedValue) {
@@ -836,21 +836,21 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         }),
       ])),
       UiUtils.getMarginBox(0, 3.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("직업 구분을 선택해주세요.", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("직업 구분을 선택해주세요.", 22.sp, FontWeight.w800, ColorStyles.dFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
 
       //test for input name
       MyData.isTestUser? SizedBox(width: 85.w, child:
       Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        UiUtils.getTextWithFixedScale("테스트용) 사건번호 이름 입력", 10.sp, FontWeight.w600, ColorStyles.upFinRed, TextAlign.center, null),
-        UiUtils.getTextField(context, 30.w, TextStyles.upFinTextFormFieldTextStyle, _nameForTestTextFocus, _nameForTestTextController, TextInputType.text,
+        UiUtils.getTextWithFixedScale("테스트용) 사건번호 이름 입력", 10.sp, FontWeight.w600, ColorStyles.dFinRed, TextAlign.center, null),
+        UiUtils.getTextField(context, 30.w, TextStyles.dFinTextFormFieldTextStyle, _nameForTestTextFocus, _nameForTestTextController, TextInputType.text,
             UiUtils.getInputDecoration("이름", 10.sp, "", 0.sp), (value) { }),
         UiUtils.getMarginBox(0, 5.h),
       ])) : UiUtils.getMarginBox(0, 0),
 
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: jobList)),
       UiUtils.getMarginBox(0, 5.h),
-      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.upFinBasicButtonTextStyle, ColorStyles.upFinButtonBlue, () async {
+      UiUtils.getTextButtonBox(90.w, "다음", TextStyles.dFinBasicButtonTextStyle, ColorStyles.dFinButtonBlue, () async {
         if(selectedJobInfo.isNotEmpty){
           nextInputView();
         }else{
@@ -890,9 +890,9 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
     confirmDataList.add("•  ${selectedJobInfo.split("@")[0]}");
 
     List<Widget> confirmWidgetList = [];
-    Color textColor = ColorStyles.upFinBlack;
+    Color textColor = ColorStyles.dFinBlack;
     for(var each in confirmDataList){
-      textColor = ColorStyles.upFinBlack;
+      textColor = ColorStyles.dFinBlack;
       confirmWidgetList.add(
           SizedBox(width: 80.w, child: UiUtils.getTextButtonWithFixedScale(each, 16.sp, FontWeight.w500, textColor, TextAlign.start, null, (){})),
       );
@@ -908,15 +908,15 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
         }),
       ])),
       UiUtils.getMarginBox(0, 3.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("해당 정보로 ", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("해당 정보로 ", 22.sp, FontWeight.w800, ColorStyles.dFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 0.5.h),
-      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출상품을 찾아볼까요?", 22.sp, FontWeight.w800, ColorStyles.upFinTextAndBorderBlue, TextAlign.start, null)),
+      SizedBox(width: 85.w, child: UiUtils.getTextWithFixedScale("대출상품을 찾아볼까요?", 22.sp, FontWeight.w800, ColorStyles.dFinTextAndBorderBlue, TextAlign.start, null)),
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getExpandedScrollView(Axis.vertical, Column(crossAxisAlignment: CrossAxisAlignment.start, children: confirmWidgetList)),
       UiUtils.getMarginBox(0, 5.h),
       Row(children: [
-        UiUtils.getBorderButtonBox(42.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-            UiUtils.getTextWithFixedScale("네 좋아요!", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
+        UiUtils.getBorderButtonBox(42.w, ColorStyles.dFinButtonBlue, ColorStyles.dFinButtonBlue,
+            UiUtils.getTextWithFixedScale("네 좋아요!", 14.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.start, null), () {
               Map<String, dynamic> inputJson = {
                 "court_name": selectedCourtInfo.split("@")[0],
                 "caseNumberYear": selectedAccidentInfo.split("개회")[0],
@@ -994,8 +994,8 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
               });
             }),
         UiUtils.getMarginBox(2.w, 0),
-        UiUtils.getBorderButtonBox(42.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
-            UiUtils.getTextWithFixedScale("아니오", 14.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null), () async {
+        UiUtils.getBorderButtonBox(42.w, ColorStyles.dFinWhiteSky, ColorStyles.dFinWhiteSky,
+            UiUtils.getTextWithFixedScale("아니오", 14.sp, FontWeight.w600, ColorStyles.dFinButtonBlue, TextAlign.start, null), () async {
               Map<String, dynamic> inputJson = {
                 "court_name": selectedCourtInfo.split("@")[0],
                 "caseNumberYear": selectedAccidentInfo.split("개회")[0],
@@ -1077,23 +1077,23 @@ class AppSearchAccidentViewState extends State<AppSearchAccidentView> with Widge
   Widget build(BuildContext context) {
     Widget? view;
     if(currentViewId == courtViewId){
-      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: Obx(()=>_getCourtView()));
+      view = Container(height: 100.h, width: 100.w, color: ColorStyles.dFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: Obx(()=>_getCourtView()));
     }else if(currentViewId == accidentViewId){
-      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getAccidentView());
+      view = Container(height: 100.h, width: 100.w, color: ColorStyles.dFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getAccidentView());
     }else if(currentViewId == bankCodeViewId){
-      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: Obx(()=>_getBankCodeView()));
+      view = Container(height: 100.h, width: 100.w, color: ColorStyles.dFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: Obx(()=>_getBankCodeView()));
     }else if(currentViewId == bankAccountViewId){
-      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getBankAccountView());
+      view = Container(height: 100.h, width: 100.w, color: ColorStyles.dFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getBankAccountView());
     }else if(currentViewId == preLoanCountViewId){
-      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getPreLoanCountView());
+      view = Container(height: 100.h, width: 100.w, color: ColorStyles.dFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getPreLoanCountView());
     }else if(currentViewId == preLoanPriceViewId){
-      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getPreLoanPriceView());
+      view = Container(height: 100.h, width: 100.w, color: ColorStyles.dFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getPreLoanPriceView());
     }else if(currentViewId == wantLoanPriceViewId){
-      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getWantLoanPriceView());
+      view = Container(height: 100.h, width: 100.w, color: ColorStyles.dFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getWantLoanPriceView());
     }else if(currentViewId == jobViewId){
-      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getJobView());
+      view = Container(height: 100.h, width: 100.w, color: ColorStyles.dFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getJobView());
     }else{
-      view = Container(height: 100.h, width: 100.w, color: ColorStyles.upFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getFinishConfirmView());
+      view = Container(height: 100.h, width: 100.w, color: ColorStyles.dFinWhite, padding: EdgeInsets.only(bottom: 5.w, top: 3.w, left: 5.w, right: 5.w), child: _getFinishConfirmView());
     }
 
     return UiUtils.getViewWithAllowBackForAndroid(context, view, _back);

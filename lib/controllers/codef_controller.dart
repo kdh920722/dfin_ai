@@ -905,10 +905,10 @@ class CodeFController{
             : Column(children: [
           UiUtils.getImage(100.w, 30.w,  Image.asset(fit: BoxFit.fitWidth,'assets/images/cert_called.png')),
           UiUtils.getMarginBox(0, 2.h),
-          UiUtils.getStyledTextWithFixedScale(certName, TextStyles.upFinBasicTextStyle2, TextAlign.center, null)]),
+          UiUtils.getStyledTextWithFixedScale(certName, TextStyles.dFinBasicTextStyle2, TextAlign.center, null)]),
         GetController.to.isWait.value? UiUtils.getMarginBox(0, 2.h) : UiUtils.getMarginBox(0, 0.5.h),
         GetController.to.isWait.value? Column(children: [
-          UiUtils.getStyledTextWithFixedScale("서류를 가지고 오는중입니다.", TextStyles.upFinBasicTextStyle2, TextAlign.center, null),
+          UiUtils.getStyledTextWithFixedScale("서류를 가지고 오는중입니다.", TextStyles.dFinBasicTextStyle2, TextAlign.center, null),
           UiUtils.getMarginBox(0, 2.h),
           LinearPercentIndicator(
             animateFromLastPercent: true,
@@ -916,22 +916,22 @@ class CodeFController{
             barRadius: const Radius.circular(10),
             animation: true,
             center: Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.end, children: [
-              UiUtils.getTextWithFixedScale("${GetController.to.loadingPercent.value}", 16.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
+              UiUtils.getTextWithFixedScale("${GetController.to.loadingPercent.value}", 16.sp, FontWeight.w500, ColorStyles.dFinBlack, TextAlign.center, null),
               UiUtils.getMarginBox(0.5.w, 0),
-              UiUtils.getTextWithFixedScale("%", 16.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
+              UiUtils.getTextWithFixedScale("%", 16.sp, FontWeight.w500, ColorStyles.dFinBlack, TextAlign.center, null),
             ]),
             width: 60.w,
             lineHeight: 3.h,
             linearStrokeCap: LinearStrokeCap.round,
-            backgroundColor : ColorStyles.upFinWhite,
-            progressColor: ColorStyles.upFinWhite,
+            backgroundColor : ColorStyles.dFinWhite,
+            progressColor: ColorStyles.dFinWhite,
           )
         ])
             : Container(),
-        GetController.to.isWait.value? Container() : UiUtils.getStyledTextWithFixedScale("인증 후 확인 버튼을 눌러주세요.", TextStyles.upFinBasicTextStyle2, TextAlign.center, null),
+        GetController.to.isWait.value? Container() : UiUtils.getStyledTextWithFixedScale("인증 후 확인 버튼을 눌러주세요.", TextStyles.dFinBasicTextStyle2, TextAlign.center, null),
         GetController.to.isWait.value? Container() : UiUtils.getExpandedScrollView(Axis.vertical, const Column(children: [])),
-        GetController.to.isWait.value? Container() : UiUtils.getBorderButtonBox(85.w, ColorStyles.upFinTextAndBorderBlue, ColorStyles.upFinTextAndBorderBlue,
-            UiUtils.getTextWithFixedScale("확인", 15.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () {
+        GetController.to.isWait.value? Container() : UiUtils.getBorderButtonBox(85.w, ColorStyles.dFinTextAndBorderBlue, ColorStyles.dFinTextAndBorderBlue,
+            UiUtils.getTextWithFixedScale("확인", 15.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.start, null), () {
               GetController.to.updateWait(true);
               CodeFController._getDataFromApi2(apiInfo, resultInputMap, (isSuccess, _, map, listMap, fullMap){
                 if(isSuccess){

@@ -99,38 +99,38 @@ class AppCarDetailViewState extends State<AppCarDetailView> with WidgetsBindingO
 
       if(eachCarNum == selectedCarNum){
         loanWidgetList.add(
-            UiUtils.getLoanListBorderButtonBox(90.w, ColorStyles.upFinWhite , ColorStyles.upFinGray,
+            UiUtils.getLoanListBorderButtonBox(90.w, ColorStyles.dFinWhite , ColorStyles.dFinGray,
                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Container(padding: EdgeInsets.only(left: 6.w, right: 6.w),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       UiUtils.getMarginBox(0, 1.5.h),
-                      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScaleAndOverFlow(each.companyName, 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, 1)),
+                      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScaleAndOverFlow(each.companyName, 16.sp, FontWeight.w600, ColorStyles.dFinBlack, TextAlign.start, 1)),
                       UiUtils.getMarginBox(0, 2.5.h),
-                      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("접수일", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
+                      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("접수일", 11.sp, FontWeight.w600, ColorStyles.dFinDarkGrayWithAlpha, TextAlign.start, null)),
                       UiUtils.getMarginBox(0, 1.2.h),
-                      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(_setUpdateDate(each.createdDate), 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)),
+                      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(_setUpdateDate(each.createdDate), 14.sp, FontWeight.w500, ColorStyles.dFinBlack, TextAlign.start, null)),
                       UiUtils.getMarginBox(0, 2.h),
 
-                      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("상품명", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
+                      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("상품명", 11.sp, FontWeight.w600, ColorStyles.dFinDarkGrayWithAlpha, TextAlign.start, null)),
                       UiUtils.getMarginBox(0, 1.2.h),
-                      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScaleAndOverFlow(each.productName, 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, 1)),
+                      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScaleAndOverFlow(each.productName, 14.sp, FontWeight.w500, ColorStyles.dFinBlack, TextAlign.start, 1)),
                       UiUtils.getMarginBox(0, 2.h),
 
-                      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("한도", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
+                      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("한도", 11.sp, FontWeight.w600, ColorStyles.dFinDarkGrayWithAlpha, TextAlign.start, null)),
                       UiUtils.getMarginBox(0, 1.2.h),
-                      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(CommonUtils.getPriceFormattedString(double.parse(each.submitAmount)), 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, 1)),
+                      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(CommonUtils.getPriceFormattedString(double.parse(each.submitAmount)), 14.sp, FontWeight.w500, ColorStyles.dFinBlack, TextAlign.start, 1)),
                       UiUtils.getMarginBox(0, 2.h),
 
-                      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("금리", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
+                      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("금리", 11.sp, FontWeight.w600, ColorStyles.dFinDarkGrayWithAlpha, TextAlign.start, null)),
                       UiUtils.getMarginBox(0, 1.2.h),
-                      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("${each.submitRate}%", 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, 1)),
+                      SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("${each.submitRate}%", 14.sp, FontWeight.w500, ColorStyles.dFinBlack, TextAlign.start, 1)),
                       UiUtils.getMarginBox(0, 3.h),
                       Container(width: 90.w, decoration: BoxDecoration(
-                        color: each.statueId == "6" || each.statueId == "7"? ColorStyles.upFinWhiteRed : ColorStyles.upFinWhiteSky, // 배경색 설정
+                        color: each.statueId == "6" || each.statueId == "7"? ColorStyles.dFinWhiteRed : ColorStyles.dFinWhiteSky, // 배경색 설정
                         borderRadius: BorderRadius.circular(1), // 모서리를 둥글게 하는 부분
                       ),child: Padding(padding: EdgeInsets.only(left: 2.5.w, right: 2.5.w, bottom: 3.w, top: 3.w),
                           child: UiUtils.getTextWithFixedScale(LoanInfoData.getDetailStatusName(each.statueId), 12.sp, FontWeight.w600,
-                              each.statueId == "6" || each.statueId == "7"? ColorStyles.upFinRed : ColorStyles.upFinButtonBlue, TextAlign.center, 1))),
+                              each.statueId == "6" || each.statueId == "7"? ColorStyles.dFinRed : ColorStyles.dFinButtonBlue, TextAlign.center, 1))),
                       UiUtils.getMarginBox(0, 2.h),
                     ])
                   ),
@@ -152,7 +152,7 @@ class AppCarDetailViewState extends State<AppCarDetailView> with WidgetsBindingO
           SizedBox(width: 90.w, height: 18.h, child: Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment:CrossAxisAlignment.center, children: [
             Container(
                 width: 65.w,
-                color:ColorStyles.upFinWhite,
+                color:ColorStyles.dFinWhite,
                 alignment: Alignment.center,
                 child: ExtendedImage.network(
                   MyData.selectedCarInfoData!.carImage,
@@ -169,7 +169,7 @@ class AppCarDetailViewState extends State<AppCarDetailView> with WidgetsBindingO
                           int val = state.loadingProgress!.cumulativeBytesLoaded;
                           return Center(
                               child: CircularProgressIndicator(
-                                  color: ColorStyles.upFinWhite,
+                                  color: ColorStyles.dFinWhite,
                                   value: val / total
                               )
                           );
@@ -189,7 +189,7 @@ class AppCarDetailViewState extends State<AppCarDetailView> with WidgetsBindingO
                       case LoadState.failed:
                         _aniController.reset();
                         return GestureDetector(
-                          child: UiUtils.getIcon(10.w, 10.w, Icons.refresh_rounded, 10.w, ColorStyles.upFinRed),
+                          child: UiUtils.getIcon(10.w, 10.w, Icons.refresh_rounded, 10.w, ColorStyles.dFinRed),
                           onTap: () {
                             state.reLoadImage();
                           },
@@ -200,21 +200,21 @@ class AppCarDetailViewState extends State<AppCarDetailView> with WidgetsBindingO
             )
           ])),
           UiUtils.getMarginBox(0, 2.h),
-          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(MyData.selectedCarInfoData!.carModel, 16.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.start, null)),
+          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(MyData.selectedCarInfoData!.carModel, 16.sp, FontWeight.w600, ColorStyles.dFinBlack, TextAlign.start, null)),
           UiUtils.getMarginBox(0, 2.h),
-          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(CommonUtils.getPriceFormattedStringForFullPrice(double.parse(MyData.selectedCarInfoData!.carPrice)), 16.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null)),
+          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(CommonUtils.getPriceFormattedStringForFullPrice(double.parse(MyData.selectedCarInfoData!.carPrice)), 16.sp, FontWeight.w600, ColorStyles.dFinButtonBlue, TextAlign.start, null)),
           UiUtils.getMarginBox(0, 4.h),
-          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("소유주", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha , TextAlign.start, null)),
+          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("소유주", 11.sp, FontWeight.w600, ColorStyles.dFinDarkGrayWithAlpha , TextAlign.start, null)),
           UiUtils.getMarginBox(0, 2.h),
-          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(MyData.selectedCarInfoData!.carOwnerName, 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)),
+          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(MyData.selectedCarInfoData!.carOwnerName, 14.sp, FontWeight.w500, ColorStyles.dFinBlack, TextAlign.start, null)),
           UiUtils.getMarginBox(0, 4.h),
-          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("차량번호", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha , TextAlign.start, null)),
+          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("차량번호", 11.sp, FontWeight.w600, ColorStyles.dFinDarkGrayWithAlpha , TextAlign.start, null)),
           UiUtils.getMarginBox(0, 2.h),
-          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(MyData.selectedCarInfoData!.carNum, 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)),
+          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale(MyData.selectedCarInfoData!.carNum, 14.sp, FontWeight.w500, ColorStyles.dFinBlack, TextAlign.start, null)),
           UiUtils.getMarginBox(0, 4.h),
-          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("상세 모델명", 11.sp, FontWeight.w600, ColorStyles.upFinDarkGrayWithAlpha, TextAlign.start, null)),
+          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("상세 모델명", 11.sp, FontWeight.w600, ColorStyles.dFinDarkGrayWithAlpha, TextAlign.start, null)),
           UiUtils.getMarginBox(0, 2.h),
-          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScaleAndOverFlow(MyData.selectedCarInfoData!.carModelDetail, 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)),
+          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScaleAndOverFlow(MyData.selectedCarInfoData!.carModelDetail, 14.sp, FontWeight.w500, ColorStyles.dFinBlack, TextAlign.start, null)),
           UiUtils.getMarginBox(0, 4.h),
 
         ])
@@ -255,11 +255,11 @@ class AppCarDetailViewState extends State<AppCarDetailView> with WidgetsBindingO
   @override
   Widget build(BuildContext context) {
     Widget view = Container(
-      color: ColorStyles.upFinWhite,
+      color: ColorStyles.dFinWhite,
       width: 100.w,
       height: 100.h,
       child: Column(children: [
-        Container(color: ColorStyles.upFinWhite, width: 100.w, padding: EdgeInsets.only(bottom: 5.w, top: 2.w, left: 5.w, right: 5.w),
+        Container(color: ColorStyles.dFinWhite, width: 100.w, padding: EdgeInsets.only(bottom: 5.w, top: 2.w, left: 5.w, right: 5.w),
             child: Stack(children: [
               Positioned(
                 top: 1.h,
@@ -272,30 +272,30 @@ class AppCarDetailViewState extends State<AppCarDetailView> with WidgetsBindingO
                     alignment: Alignment.topCenter,
                     child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
                       UiUtils.getMarginBox(0, 2.5.h),
-                      UiUtils.getTextWithFixedScale("오토론", 22.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.center, 1),
+                      UiUtils.getTextWithFixedScale("오토론", 22.sp, FontWeight.w600, ColorStyles.dFinButtonBlue, TextAlign.center, 1),
                       UiUtils.getMarginBox(0, 1.h),
-                      UiUtils.getTextWithFixedScale("업데이트 : ${_setUpdateDate(MyData.selectedCarInfoData!.date)}", 10.sp, FontWeight.w500, ColorStyles.upFinButtonBlue, TextAlign.center, 1),
+                      UiUtils.getTextWithFixedScale("업데이트 : ${_setUpdateDate(MyData.selectedCarInfoData!.date)}", 10.sp, FontWeight.w500, ColorStyles.dFinButtonBlue, TextAlign.center, 1),
                     ])
                 ),
               ),
             ])
         ),
-        Expanded(child: Container(color: ColorStyles.upFinWhiteGray, child: MediaQuery(
+        Expanded(child: Container(color: ColorStyles.dFinWhiteGray, child: MediaQuery(
             data : MediaQuery.of(context).copyWith(textScaleFactor : 1.1),
             child : SizedBox(width: 100.w, child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
-              Container(color: ColorStyles.upFinWhite, width: 100.w,
+              Container(color: ColorStyles.dFinWhite, width: 100.w,
                   child: Column(children: [
                     UiUtils.getMarginBox(0, 2.h),
                     SizedBox(width: 90.w, height: 5.h,
                         child: TabBar(
-                          unselectedLabelStyle: TextStyles.upFinUnselectedTabTextInButtonStyle,
-                          unselectedLabelColor: ColorStyles.upFinRealGray,
-                          labelStyle: TextStyles.upFinSelectedTabTextInButtonStyle,
-                          labelColor: ColorStyles.upFinButtonBlue,
+                          unselectedLabelStyle: TextStyles.dFinUnselectedTabTextInButtonStyle,
+                          unselectedLabelColor: ColorStyles.dFinRealGray,
+                          labelStyle: TextStyles.dFinSelectedTabTextInButtonStyle,
+                          labelColor: ColorStyles.dFinButtonBlue,
                           indicatorSize: TabBarIndicatorSize.tab,
                           indicator: MyTabIndicator(),
-                          indicatorColor: ColorStyles.upFinButtonBlue,
-                          dividerColor: ColorStyles.upFinWhiteSky,
+                          indicatorColor: ColorStyles.dFinButtonBlue,
+                          dividerColor: ColorStyles.dFinWhiteSky,
                           controller: _tabController,
                           tabs: const <Widget>[
                             Tab(text: "차량정보"),
@@ -308,16 +308,16 @@ class AppCarDetailViewState extends State<AppCarDetailView> with WidgetsBindingO
               Expanded(child: TabBarView(
                 controller: _tabController,
                 children: <Widget>[
-                  Container(color: ColorStyles.upFinWhite, padding: EdgeInsets.zero,
+                  Container(color: ColorStyles.dFinWhite, padding: EdgeInsets.zero,
                       child: Column(children: [UiUtils.getExpandedScrollView(Axis.vertical, _getCarWidgetList())])
                   ),
-                  _getLoanCnt() != 0 ? Container(color: ColorStyles.upFinWhiteGray, padding: EdgeInsets.zero,
+                  _getLoanCnt() != 0 ? Container(color: ColorStyles.dFinWhiteGray, padding: EdgeInsets.zero,
                       child: Column(mainAxisSize: MainAxisSize.min, children: [
                         UiUtils.getExpandedScrollView(Axis.vertical, Column(mainAxisSize: MainAxisSize.min, children: _getLoanWidgetList()))
                       ])
-                  ) : Container(color: ColorStyles.upFinWhiteGray,
+                  ) : Container(color: ColorStyles.dFinWhiteGray,
                       child: Center(
-                          child: UiUtils.getTextWithFixedScale("접수이력이 없습니다.", 12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null)
+                          child: UiUtils.getTextWithFixedScale("접수이력이 없습니다.", 12.sp, FontWeight.w500, ColorStyles.dFinBlack, TextAlign.center, null)
                       )
                   )
                 ],
@@ -346,7 +346,7 @@ class _MyTabIndicatorPainter extends BoxPainter {
   void paint(Canvas canvas, Offset offset, ImageConfiguration configuration) {
     final Rect rect = offset & configuration.size!;
     final Paint paint = Paint();
-    paint.color = ColorStyles.upFinButtonBlue; // 인디케이터 색상
+    paint.color = ColorStyles.dFinButtonBlue; // 인디케이터 색상
     paint.style = PaintingStyle.fill;
     paint.strokeCap = StrokeCap.round; // 둥글게 된 모서리
 

@@ -92,8 +92,8 @@ class Config{
 
   static Future<void> getOpenState(Function(bool isSuccess) callback) async {
     final ref = FirebaseDatabase.instance.ref();
-    final appForDeviceInfoSnapshot = isAndroid? await ref.child('UPFIN/APP_STATE/android_state').get()
-        : await ref.child('UPFIN/APP_STATE/ios_state').get();
+    final appForDeviceInfoSnapshot = isAndroid? await ref.child('DFIN/APP_STATE/android_state').get()
+        : await ref.child('DFIN/APP_STATE/ios_state').get();
 
     if(appForDeviceInfoSnapshot.exists){
       for(var each in appForDeviceInfoSnapshot.children){
@@ -124,11 +124,11 @@ class Config{
 
       bool isValid = true;
       final ref = FirebaseDatabase.instance.ref();
-      final appInfoSnapshot = await ref.child('UPFIN/APP_STATE/app_info').get();
-      final appSateInfoSnapshot = await ref.child('UPFIN/APP_STATE/app_info/state').get();
-      final appVerPassUserInfoSnapshot = await ref.child('UPFIN/APP_STATE/app_info/app_ver_pass_user').get();
-      final appForDeviceInfoSnapshot = isAndroid? await ref.child('UPFIN/APP_STATE/android_state').get()
-          : await ref.child('UPFIN/APP_STATE/ios_state').get();
+      final appInfoSnapshot = await ref.child('DFIN/APP_STATE/app_info').get();
+      final appSateInfoSnapshot = await ref.child('DFIN/APP_STATE/app_info/state').get();
+      final appVerPassUserInfoSnapshot = await ref.child('DFIN/APP_STATE/app_info/app_ver_pass_user').get();
+      final appForDeviceInfoSnapshot = isAndroid? await ref.child('DFIN/APP_STATE/android_state').get()
+          : await ref.child('DFIN/APP_STATE/ios_state').get();
 
       if(appInfoSnapshot.exists){
         for(var each in appInfoSnapshot.children){
@@ -200,8 +200,8 @@ class Config{
   static Future<int> isNeedToUpdateForMain() async {
     int stateCode = 10;
     final ref = FirebaseDatabase.instance.ref();
-    final appForDeviceInfoSnapshot = isAndroid? await ref.child('UPFIN/APP_STATE/android_state').get()
-        : await ref.child('UPFIN/APP_STATE/ios_state').get();
+    final appForDeviceInfoSnapshot = isAndroid? await ref.child('DFIN/APP_STATE/android_state').get()
+        : await ref.child('DFIN/APP_STATE/ios_state').get();
 
     if(appForDeviceInfoSnapshot.exists){
       for(var each in appForDeviceInfoSnapshot.children){

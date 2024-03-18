@@ -56,7 +56,7 @@ class SnsLoginController{
   static Future<void> initApple(Function(bool) callback) async {
     try {
       final ref = FirebaseDatabase.instance.ref();
-      final snapshot = await ref.child('UPFIN/API/apple').get();
+      final snapshot = await ref.child('DFIN/API/apple').get();
       if (snapshot.exists) {
         for(var each in snapshot.children){
           switch(each.key){
@@ -76,7 +76,7 @@ class SnsLoginController{
   }
 
   static Widget getKakaoLoginButton(BuildContext context, double size, Function(bool? isSuccessToLogin) callback){
-    return UiUtils.getImageButton(Image.asset('assets/images/logo_kakao_circle.png', fit: BoxFit.fill), size, ColorStyles.upFinBlack, () async {
+    return UiUtils.getCircleImageButton(Image.asset('assets/images/logo_kakao_circle.png', fit: BoxFit.fill), size, ColorStyles.dFinBlack, () async {
       if(Config.isControllerLoadFinished){
         if(Config.isAndroid) UiUtils.showLoadingPop(context);
         loginPlatform = LoginPlatform.kakao;
@@ -106,7 +106,7 @@ class SnsLoginController{
   }
 
   static Widget getAppleLoginButton(BuildContext context, double size, Function(bool? isSuccessToLogin) callback){
-    return UiUtils.getImageButton(Image.asset('assets/images/logo_apple_circle.png', fit: BoxFit.fill), size, ColorStyles.upFinBlack, () async {
+    return UiUtils.getCircleImageButton(Image.asset('assets/images/logo_apple_circle.png', fit: BoxFit.fill), size, ColorStyles.dFinWhite, () async {
       if(Config.isControllerLoadFinished){
         try{
           UiUtils.showLoadingPop(context);

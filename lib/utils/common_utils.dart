@@ -204,10 +204,10 @@ class CommonUtils {
         UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isAndroid ? Config.isPad()? 45.h : 35.h : Config.isPad()? 50.h : 40.h, 0.5, (context, setState){
           return Column(children: [
             UiUtils.getMarginBox(0, 5.h),
-            Center(child: UiUtils.getTextWithFixedScale("시스템 점검중입니다.", 14.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
+            Center(child: UiUtils.getTextWithFixedScale("시스템 점검중입니다.", 14.sp, FontWeight.w600, ColorStyles.dFinBlack, TextAlign.center, null)),
             UiUtils.getMarginBox(0, 3.h),
             UiUtils.getExpandedScrollView(Axis.vertical,
-                SizedBox(width : 80.w, child: UiUtils.getTextWithFixedScale2(Config.appInfoTextMap["close_text"].replaceAll("@@", "\n"), 12.sp, FontWeight.w500, ColorStyles.upFinDarkGray, TextAlign.start, null))),
+                SizedBox(width : 80.w, child: UiUtils.getTextWithFixedScale2(Config.appInfoTextMap["close_text"].replaceAll("@@", "\n"), 12.sp, FontWeight.w500, ColorStyles.dFinDarkGray, TextAlign.start, null))),
             UiUtils.getMarginBox(0, 1.h)
           ]);
         });
@@ -218,11 +218,11 @@ class CommonUtils {
         UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isAndroid ? Config.isPad()? 45.h : 35.h : Config.isPad()? 50.h : 40.h, 0.5, (context, setState){
           return Center(child: Column(children: [
             UiUtils.getMarginBox(0, 10.h),
-            UiUtils.getTextWithFixedScale("앱 업데이트가 필요합니다.", 14.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.center, null),
+            UiUtils.getTextWithFixedScale("앱 업데이트가 필요합니다.", 14.sp, FontWeight.w500, ColorStyles.dFinBlack, TextAlign.center, null),
             UiUtils.getMarginBox(0, 3.h),
             UiUtils.getExpandedScrollView(Axis.vertical, Container()),
-            UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                UiUtils.getTextWithFixedScale("확인", 14.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null), () {
+            UiUtils.getBorderButtonBox(90.w, ColorStyles.dFinButtonBlue, ColorStyles.dFinButtonBlue,
+                UiUtils.getTextWithFixedScale("확인", 14.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.center, null), () {
                   launchUrl(Uri.parse(Config.appStoreUrl));
                 }),
             Config.isAndroid? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, 5.h)
@@ -335,8 +335,8 @@ class CommonUtils {
 
   static void flutterToast(String msgString){
     Fluttertoast.cancel();
-    Fluttertoast.showToast(msg: msgString, gravity: ToastGravity.SNACKBAR, backgroundColor: ColorStyles.upFinDarkGray, timeInSecForIosWeb : 3,
-        fontSize: 12.sp, textColor: ColorStyles.upFinWhite, toastLength: Config.isAndroid? Toast.LENGTH_SHORT : Toast.LENGTH_LONG);
+    Fluttertoast.showToast(msg: msgString, gravity: ToastGravity.SNACKBAR, backgroundColor: ColorStyles.dFinDarkGray, timeInSecForIosWeb : 3,
+        fontSize: 12.sp, textColor: ColorStyles.dFinWhite, toastLength: Config.isAndroid? Toast.LENGTH_SHORT : Toast.LENGTH_LONG);
   }
 
   static bool isAppLogInit = false;
@@ -455,26 +455,26 @@ class CommonUtils {
           children: [
             UiUtils.getMarginBox(100.w, 1.h),
             Column(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.center, children: [
-              SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("사용자 맞춤 광고표시를 위한 설정 안내",13.sp, FontWeight.w600, ColorStyles.upFinBlack, TextAlign.center, null)),
+              SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale2("사용자 맞춤 광고표시를 위한 설정 안내",13.sp, FontWeight.w600, ColorStyles.dFinBlack, TextAlign.center, null)),
               UiUtils.getMarginBox(0, 1.h),
-              SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale2("사용자 맞춤 광고표시를 위해\n사용자활동 추적 허용이 필요해요.",12.sp, FontWeight.w500, ColorStyles.upFinBlack, TextAlign.start, null)),
-              SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale2("설정에서 '추적 허용'을 활성화 해주세요.",12.sp, FontWeight.w300, ColorStyles.upFinDarkGray, TextAlign.start, null))
+              SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale2("사용자 맞춤 광고표시를 위해\n사용자활동 추적 허용이 필요해요.",12.sp, FontWeight.w500, ColorStyles.dFinBlack, TextAlign.start, null)),
+              SizedBox(width: 70.w, child: UiUtils.getTextWithFixedScale2("설정에서 '추적 허용'을 활성화 해주세요.",12.sp, FontWeight.w300, ColorStyles.dFinDarkGray, TextAlign.start, null))
             ]),
             UiUtils.getExpandedScrollView(Axis.vertical, Container()),
             isSecond ? Row(children: [
-              UiUtils.getBorderButtonBox(44.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                  UiUtils.getTextWithFixedScale("설정", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () async {
+              UiUtils.getBorderButtonBox(44.w, ColorStyles.dFinButtonBlue, ColorStyles.dFinButtonBlue,
+                  UiUtils.getTextWithFixedScale("설정", 12.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.start, null), () async {
                     Navigator.pop(slideContext);
                     openAppSettings();
                   }),
               UiUtils.getMarginBox(2.w, 0),
-              UiUtils.getBorderButtonBox(44.w, ColorStyles.upFinWhiteSky, ColorStyles.upFinWhiteSky,
-                  UiUtils.getTextWithFixedScale("닫기", 12.sp, FontWeight.w600, ColorStyles.upFinButtonBlue, TextAlign.start, null), () async {
+              UiUtils.getBorderButtonBox(44.w, ColorStyles.dFinWhiteSky, ColorStyles.dFinWhiteSky,
+                  UiUtils.getTextWithFixedScale("닫기", 12.sp, FontWeight.w600, ColorStyles.dFinButtonBlue, TextAlign.start, null), () async {
                     Navigator.pop(slideContext);
                   }),
             ]) :
-            UiUtils.getBorderButtonBox(90.w, ColorStyles.upFinButtonBlue, ColorStyles.upFinButtonBlue,
-                UiUtils.getTextWithFixedScale("다음", 12.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.start, null), () async {
+            UiUtils.getBorderButtonBox(90.w, ColorStyles.dFinButtonBlue, ColorStyles.dFinButtonBlue,
+                UiUtils.getTextWithFixedScale("다음", 12.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.start, null), () async {
                   Navigator.pop(slideContext);
                   await AppTrackingTransparency.requestTrackingAuthorization();
                 }),
@@ -549,16 +549,16 @@ class CommonUtils {
       context: context!,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('FinApp 종료', style: TextStyles.upFinTitleTextStyle),
-          content: Text('앱을 종료 하시겠습니까?', style: TextStyles.upFinBasicTextStyle),
+          title: Text('FinApp 종료', style: TextStyles.dFinTitleTextStyle),
+          content: Text('앱을 종료 하시겠습니까?', style: TextStyles.dFinBasicTextStyle),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(false),
-              child: Text('아니오', style: TextStyles.upFinBasicTextStyle),
+              child: Text('아니오', style: TextStyles.dFinBasicTextStyle),
             ),
             TextButton(
               onPressed: () => Navigator.of(context).pop(true),
-              child: Text('예', style: TextStyles.upFinBasicTextStyle),
+              child: Text('예', style: TextStyles.dFinBasicTextStyle),
             ),
           ],
         );
