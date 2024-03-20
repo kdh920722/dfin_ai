@@ -23,6 +23,7 @@ import 'package:dfin/styles/ColorStyles.dart';
 import 'package:dfin/styles/TextStyles.dart';
 import 'package:dfin/views/app_apply_pr_view.dart';
 import 'package:dfin/views/app_main_view.dart';
+import 'package:dfin/views/app_web_view.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../configs/app_config.dart' as appConfig;
 import '../configs/app_config.dart';
@@ -94,7 +95,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
           currentCompanyLogo = each.companyLogo;
           currentStatus = "0";
           currentRoomType = each.uidType;
-          currentRoomTypeName = "몇분내로 답변을 드립니다.";
+          currentRoomTypeName = CommonUtils.isWeekendInSeoul() ? "채팅상담 운영시간이 아닙니다." : "몇분내로 답변을 드립니다.";
           inputTextHide = false;
           GetController.to.updateInputTextHide(inputTextHide);
           _setAutoAnswerWidgetList();
@@ -123,35 +124,35 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
     _keyboardVisibilityController = CommonUtils.getKeyboardViewController(_functionForKeyboardShow, _functionForKeyboardHide);
     _chatScrollController.addListener(() {
       scrollCheckTimer ??= Timer.periodic(const Duration(milliseconds: 500), (Timer timer) {
-          double currPos = _chatScrollController.position.pixels;
-          double maxH = _chatScrollController.position.maxScrollExtent;
-          if((maxH - deviceH/2) >= 0) maxH = maxH - deviceH/2;
-          if(deviceH < currPos){
-            if(currPos < maxH - 200){
-              if(!isScrollMove){
-                isScrollMove = true;
-                GetController.to.updateShowScrollBottom(true);
-              }
-            }else if(currPos > maxH){
-              if(isScrollMove){
-                isScrollMove = false;
-                GetController.to.updateShowScrollBottom(false);
-              }
+        double currPos = _chatScrollController.position.pixels;
+        double maxH = _chatScrollController.position.maxScrollExtent;
+        if((maxH - deviceH/2) >= 0) maxH = maxH - deviceH/2;
+        if(deviceH < currPos){
+          if(currPos < maxH - 200){
+            if(!isScrollMove){
+              isScrollMove = true;
+              GetController.to.updateShowScrollBottom(true);
             }
-          }else{
-            if(_chatScrollController.position.maxScrollExtent < deviceH - 200){
-              if(isScrollMove){
-                isScrollMove = false;
-                GetController.to.updateShowScrollBottom(false);
-              }
-            }else if(_chatScrollController.position.maxScrollExtent > deviceH){
-              if(!isScrollMove){
-                isScrollMove = true;
-                GetController.to.updateShowScrollBottom(true);
-              }
+          }else if(currPos > maxH){
+            if(isScrollMove){
+              isScrollMove = false;
+              GetController.to.updateShowScrollBottom(false);
             }
           }
-        });
+        }else{
+          if(_chatScrollController.position.maxScrollExtent < deviceH - 200){
+            if(isScrollMove){
+              isScrollMove = false;
+              GetController.to.updateShowScrollBottom(false);
+            }
+          }else if(_chatScrollController.position.maxScrollExtent > deviceH){
+            if(!isScrollMove){
+              isScrollMove = true;
+              GetController.to.updateShowScrollBottom(true);
+            }
+          }
+        }
+      });
       if (_chatScrollController.offset == _chatScrollController.position.maxScrollExtent && !_chatScrollController.position.outOfRange) {
 
       }
@@ -191,7 +192,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
   }
 
   void _setAutoAnswerWaitingState(){
-    if(WebSocketController.isWaitingForAnswerState(currentRoomId, "ME") == WebSocketController.isWaitingForAnswerState(currentRoomId, "UPFIN")){
+    if(WebSocketController.isWaitingForAnswerState(currentRoomId, "ME") == WebSocketController.isWaitingForAnswerState(currentRoomId, "dFin")){
       if(WebSocketController.isWaitingForAnswerState(currentRoomId, "ME")){
         GetController.to.updateAutoAnswerWaiting(true);
       }else{
@@ -385,7 +386,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
     String boldTextId = "";
     bool isFileType = true;
 
-    if(sender == "UPFIN") {
+    if(sender == "dFin") {
       htmlTextTag = "<div id='typeOther'>";
       boldTextId = "boldTextOther";
     }else{
@@ -565,11 +566,20 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
                 }else if(url.toLowerCase() == "car"){
                   _getSearchCarView();
                 }else{
-                  //tel:18009221
-                  if(await canLaunchUrl(Uri.parse(url))){
-                    await launchUrl(Uri.parse(url));
+                  CommonUtils.log("w","https~");
+                  if(url.contains("http")){
+                    AppWebViewState.isFileUpload = false;
+                    AppWebViewState.url = url;
+                    List<int> resultCntArr = await CommonUtils.moveToWithResult(context, AppView.appWebView.value, null) as List<int>;
+                    appConfig.Config.contextForEmergencyBack = context;
+                    appConfig.Config.isEmergencyRoot = false;
                   }else{
-                    CommonUtils.flutterToast("연결할 수 없어요.");
+                    //tel:18009221
+                    if(await canLaunchUrl(Uri.parse(url))){
+                      await launchUrl(Uri.parse(url));
+                    }else{
+                      CommonUtils.flutterToast("연결할 수 없어요.");
+                    }
                   }
                 }
               }
@@ -586,8 +596,8 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
     bool isImageView = false;
     Widget? otherInfoWidget;
     if(otherInfo.messageType == "text"){
-      if(otherInfo.message.contains("<button") || otherInfo.message.contains("<br>")){
-        otherInfoWidget = _getHtmlView(otherInfo.message, "UPFIN", otherInfo.messageType);
+      if(otherInfo.message.contains("<b") || otherInfo.message.contains("<a")  || otherInfo.message.contains("<p") || otherInfo.message.contains("<d") || otherInfo.message.contains("<s")){
+        otherInfoWidget = _getHtmlView(otherInfo.message, "dFin", otherInfo.messageType);
       }else{
         otherInfo.message = otherInfo.message.replaceAll(" / ", "\n");
         otherInfoWidget = UiUtils.getSelectableTextWithFixedScale2(otherInfo.message, 13.sp, FontWeight.w500, ColorStyles.dFinBlack, TextAlign.start, null);
@@ -637,7 +647,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
                   padding: isImageView? EdgeInsets.zero : EdgeInsets.only(left:3.w, right:3.w, top: 4.w, bottom: 4.w),
                   decoration: BoxDecoration(
                     borderRadius: isImageView? const BorderRadius.only(topRight: Radius.circular(1), topLeft: Radius.circular(1), bottomRight: Radius.circular(1))
-                      : const BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomRight: Radius.circular(15)),
+                        : const BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomRight: Radius.circular(15)),
                     color: isImageView? ColorStyles.dFinWhite : ColorStyles.dFinWhiteGray,
                   ),
                   child: otherInfoWidget
@@ -870,7 +880,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
       meInfoWidget = UiUtils.getSelectableTextWithFixedScale2(meInfo.message, 13.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.start, null);
     }else{
       String extension = meInfo.message.split('.').last.toLowerCase();
-      if(extension == "upfin_web"){
+      if(extension == "dFin_web"){
         String fullMsg = meInfo.message.split(".").first;
         String sCnt = "0";
         String sMsg = "";
@@ -982,8 +992,8 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
                 constraints: BoxConstraints(maxWidth: 63.w),
                 padding: EdgeInsets.all(3.w),
                 decoration: const BoxDecoration(
-                  borderRadius: BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomLeft: Radius.circular(15)),
-                  color: ColorStyles.dFinTextAndBorderBlue
+                    borderRadius: BorderRadius.only(topRight: Radius.circular(15), topLeft: Radius.circular(15), bottomLeft: Radius.circular(15)),
+                    color: ColorStyles.dFinTextAndBorderBlue
                 ),
                 child: UiUtils.getImage(5.w, 5.w, Image.asset(fit: BoxFit.fill,'assets/images/chat_loading.gif'))
             ),
@@ -997,20 +1007,20 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
 
   List<Widget> _getChatList(){
     List<Widget> chatList = [];
-    int upFinChatCnt = 0;
+    int dFinChatCnt = 0;
 
     for(var each in GetController.to.chatMessageInfoDataList){
       if(each.senderName == "UPFIN"){
-        upFinChatCnt++;
+        dFinChatCnt++;
         chatList.add(_getOtherView(each));
       }else{
         chatList.add(_getMeView(each));
       }
     }
 
-    if(upFinChatCnt == 0) {
+    if(dFinChatCnt == 0) {
       String defaultIntroMessage = Config.defaultMessage;
-      ChatMessageInfoData defaultMessageInfo = ChatMessageInfoData("0", currentRoomId, defaultIntroMessage.replaceAll("@", "\n"), CommonUtils.convertTimeToString(DateTime.parse(MyData.userChatRoomInfo["created_at"]).toLocal()), "text", "UPFIN", "");
+      ChatMessageInfoData defaultMessageInfo = ChatMessageInfoData("0", currentRoomId, defaultIntroMessage.replaceAll("@", "\n"), CommonUtils.convertTimeToString(DateTime.parse(MyData.userChatRoomInfo["created_at"]).toLocal()), "text", "dFin", "");
       chatList.insert(0, _getOtherView(defaultMessageInfo));
     }
 
@@ -1019,7 +1029,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
         chatList.add(_getMeViewForLoading());
       }
 
-      if(WebSocketController.isWaitingForAnswerState(currentRoomId, "UPFIN")){
+      if(WebSocketController.isWaitingForAnswerState(currentRoomId, "dFin")){
         if(isUserChatRoom){
           // chatList.add(_getOtherLoadingTextView());
         }
@@ -1114,7 +1124,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
     return Column(children: [
       isChecked? passed? UiUtils.getIcon(3.w, 3.w, Icons.radio_button_checked_rounded, 3.w, ColorStyles.dFinButtonBlue)
           : UiUtils.getIcon(3.w, 3.w, Icons.circle, 3.w, ColorStyles.dFinButtonBlue)
-            : UiUtils.getIcon(3.w, 3.w, Icons.radio_button_unchecked_rounded, 3.w, ColorStyles.dFinWhiteSky),
+          : UiUtils.getIcon(3.w, 3.w, Icons.radio_button_unchecked_rounded, 3.w, ColorStyles.dFinWhiteSky),
       UiUtils.getMarginBox(0, 1.5.h),
       UiUtils.getTextWithFixedScale(typeString, 9.sp, FontWeight.w600, ColorStyles.dFinRealGray, TextAlign.center, null),
     ]);
@@ -1241,23 +1251,23 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
       }
 
       if(each.contains("자주하는 질문")){
-       // widgetList.add(Container(key: UniqueKey()));
+        // widgetList.add(Container(key: UniqueKey()));
       }
 
       if(each.contains("파일첨부")){
-       // widgetList.add(Container(key: UniqueKey()));
+        // widgetList.add(Container(key: UniqueKey()));
       }
 
       if(each.contains("상환일정")){
-       // widgetList.add(Container(key: UniqueKey()));
+        // widgetList.add(Container(key: UniqueKey()));
       }
 
       if(each.contains("미납")){
-       // widgetList.add(Container(key: UniqueKey()));
+        // widgetList.add(Container(key: UniqueKey()));
       }
 
       if(each.contains("사진")){
-       // widgetList.add(Container(key: UniqueKey()));
+        // widgetList.add(Container(key: UniqueKey()));
       }
 
       if(each.contains("이전")){
@@ -1269,44 +1279,44 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
       widgetList.add(
           GestureDetector(
               child: UiUtils.getRoundedBoxTextWithFixedScale(each, 11.sp, FontWeight.w500, TextAlign.center, borderColor, fillColor, textColor),
-      onTap: () async {
-        currentKey = each;
-        isScrollMove = false;
-        _scrollToBottom(false, 0);
-        if(each.contains("카메라")){
-          _showCamera();
-        }else if(each.split(" ").first == "파일"){
-          _showFileUploadWebView();
-        }else if(each.contains("채팅")){
-          inputTextHide = false;
-          GetController.to.updateInputTextHide(inputTextHide);
-          _setAutoAnswerWidgetList();
-          setState(() {});
-        }else if(each.contains("이전")){
-          CommonUtils.log("","fcm : ${FireBaseController.fcmToken}");
-          pickedFiles.clear();
-          inputHelpHeight = inputHelpMinHeight;
-          GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
-          isShowPickedFile = false;
-          GetController.to.updateShowPickedFile(isShowPickedFile);
-          setState(() {});
-          inputTextHide = true;
-          GetController.to.updateInputTextHide(inputTextHide);
-          String tempKey = _findPrevKey(answerList[0]);
-          currentKey = _findPrevKey(tempKey);
-          _setAutoAnswerWidgetList();
-          setState(() {});
-        }else{
-          if(_getAnswerListMap(each).isNotEmpty){
-            _setAutoAnswerWidgetList();
-            setState(() {});
-          }else{
-            String result = _findValueForKey(LogfinController.autoAnswerMap, currentKey);
-            _sendMessage("", result);
+              onTap: () async {
+                currentKey = each;
+                isScrollMove = false;
+                _scrollToBottom(false, 0);
+                if(each.contains("카메라")){
+                  _showCamera();
+                }else if(each.split(" ").first == "파일"){
+                  _showFileUploadWebView();
+                }else if(each.contains("채팅")){
+                  inputTextHide = false;
+                  GetController.to.updateInputTextHide(inputTextHide);
+                  _setAutoAnswerWidgetList();
+                  setState(() {});
+                }else if(each.contains("이전")){
+                  CommonUtils.log("","fcm : ${FireBaseController.fcmToken}");
+                  pickedFiles.clear();
+                  inputHelpHeight = inputHelpMinHeight;
+                  GetController.to.updateChatAutoAnswerHeight(inputHelpHeight);
+                  isShowPickedFile = false;
+                  GetController.to.updateShowPickedFile(isShowPickedFile);
+                  setState(() {});
+                  inputTextHide = true;
+                  GetController.to.updateInputTextHide(inputTextHide);
+                  String tempKey = _findPrevKey(answerList[0]);
+                  currentKey = _findPrevKey(tempKey);
+                  _setAutoAnswerWidgetList();
+                  setState(() {});
+                }else{
+                  if(_getAnswerListMap(each).isNotEmpty){
+                    _setAutoAnswerWidgetList();
+                    setState(() {});
+                  }else{
+                    String result = _findValueForKey(LogfinController.autoAnswerMap, currentKey);
+                    _sendMessage("", result);
 
-          }
-        }
-      }));
+                  }
+                }
+              }));
     }
 
     GetController.to.updateChatAutoAnswerWidgetList(widgetList);
@@ -1382,6 +1392,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
                   _cameraController!.setFlashMode(FlashMode.off);
                   _isCameraReady = true;
                   if(context.mounted){
+                    AppWebViewState.isFileUpload = true;
                     List<int> resultCntArr = await CommonUtils.moveToWithResult(context, AppView.appWebView.value, null) as List<int>;
                     appConfig.Config.contextForEmergencyBack = context;
                     appConfig.Config.isEmergencyRoot = false;
@@ -1393,6 +1404,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
             });
           }else{
             if(context.mounted){
+              AppWebViewState.isFileUpload = true;
               List<int> resultCntArr = await CommonUtils.moveToWithResult(context, AppView.appWebView.value, null) as List<int>;
               appConfig.Config.contextForEmergencyBack = context;
               appConfig.Config.isEmergencyRoot = false;
@@ -1459,7 +1471,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
         resultMsg += "$sCnt";
         resultMsg += "@$fCnt";
 
-        _sendMessage("$resultMsg.upfin_web", "file");
+        _sendMessage("$resultMsg.dFin_web", "file");
       }
     }
      */
@@ -1524,7 +1536,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
       }else{
         inputJson["type"] = "text";
       }
-      if(!isUserChatRoom) WebSocketController.setWaitingState(currentRoomId, "UPFIN", true);
+      if(!isUserChatRoom) WebSocketController.setWaitingState(currentRoomId, "dFin", true);
     }else{
       // file
       inputJson["type"] = "file";
@@ -1540,7 +1552,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
       }
 
       if(isUserChatRoom){
-        WebSocketController.setWaitingState(currentRoomId, "UPFIN", false);
+        WebSocketController.setWaitingState(currentRoomId, "dFin", false);
       }
 
       _scrollToBottom(true, 300);
@@ -1619,14 +1631,14 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
                       ])
                   )
                 ]),
+              )
           )
-      )
-          /*
+        /*
           Stack(alignment:Alignment.bottomLeft, children: [
             Container(width: 22.5.w, height: 17.h,
                 decoration: const BoxDecoration(
                     borderRadius: BorderRadius.all(Radius.circular(5)),
-                    color: ColorStyles.upFinWhite
+                    color: ColorStyles.dFinWhite
                 )),
             Positioned(
                 left: 1.w,
@@ -1637,19 +1649,19 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
                   padding: EdgeInsets.zero,
                   decoration: const BoxDecoration(
                       borderRadius: BorderRadius.all(Radius.circular(2)),
-                      color: ColorStyles.upFinBlack
+                      color: ColorStyles.dFinBlack
                   ),
                   child: isImage? Padding(padding: EdgeInsets.only(left: 1.w, right: 1.w, top: 2.w, bottom: 2.w), child: Image.file(File(pickedFiles[i].path),fit: BoxFit.fitWidth))
                       : Column(mainAxisAlignment: MainAxisAlignment.start, children: [
                         UiUtils.getMarginBox(0, 1.5.h),
-                        //UiUtils.getTextWithFixedScaleAndOverFlow(extension.toUpperCase(), 10.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null),
+                        //UiUtils.getTextWithFixedScaleAndOverFlow(extension.toUpperCase(), 10.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.center, null),
                         UiUtils.getMarginBox(0, 0.5.h),
-                        UiUtils.getIcon(19.5.w, 5.5.h, Icons.folder_copy_outlined, 5.5.h, ColorStyles.upFinWhite),
+                        UiUtils.getIcon(19.5.w, 5.5.h, Icons.folder_copy_outlined, 5.5.h, ColorStyles.dFinWhite),
                         UiUtils.getMarginBox(0, 1.h),
-                        UiUtils.getTextWithFixedScale(fileName, 9.sp, FontWeight.w500, ColorStyles.upFinWhite, TextAlign.center, null)
+                        UiUtils.getTextWithFixedScale(fileName, 9.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.center, null)
                   ]),
                 )),
-            Positioned(top: -0.3.h, right: 0.w, child: UiUtils.getIconButtonWithHeight(2.6.h, Icons.cancel_rounded, 2.6.h, ColorStyles.upFinGray, () {
+            Positioned(top: -0.3.h, right: 0.w, child: UiUtils.getIconButtonWithHeight(2.6.h, Icons.cancel_rounded, 2.6.h, ColorStyles.dFinGray, () {
               pickedFiles.removeAt(i);
               CommonUtils.log("i","click!!");
               if(pickedFiles.isEmpty){
@@ -1848,76 +1860,76 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
     });
 
     Widget view = Stack(children: [
-        Container(
-        color: ColorStyles.dFinWhite,
-        width: 100.w,
-        height: 100.h,
-        child: Column(children: [
+      Container(
+          color: ColorStyles.dFinWhite,
+          width: 100.w,
+          height: 100.h,
+          child: Column(children: [
 
-          Stack(children: [
-            Container(height: 6.5.h,),
-            Positioned(
-              top: 1.h,
-              left: 5.w,
-              child: UiUtils.getBackButtonForMainView(() {
-                _back();
-              }),
-            ),
-            Positioned(
-              left: 15.w,
-              child: Align(
-                  alignment: Alignment.topLeft,
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    UiUtils.getMarginBox(0, 1.8.h),
-                    Row(children: [
-                      CommonUtils.isUrlPath(currentCompanyLogo) ? UiUtils.getCircleNetWorkImage(9.w, currentCompanyLogo, _logoAniController)
-                          : UiUtils.getCircleImage(currentCompanyLogo, 9.w),
-                      UiUtils.getMarginBox(2.w, 0),
-                      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        SizedBox(width: 60.w, child: UiUtils.getTextWithFixedScaleAndOverFlow(currentCompany, 12.sp, FontWeight.w600, ColorStyles.dFinBlack, TextAlign.start, 1)),
-                        UiUtils.getMarginBox(0, 0.3.h),
-                        UiUtils.getTextWithFixedScale2(currentRoomTypeName, 10.sp, FontWeight.w500, ColorStyles.dFinRealGray, TextAlign.center, 1),
+            Stack(children: [
+              Container(height: 6.5.h,),
+              Positioned(
+                top: 1.h,
+                left: 5.w,
+                child: UiUtils.getBackButtonForMainView(() {
+                  _back();
+                }),
+              ),
+              Positioned(
+                left: 15.w,
+                child: Align(
+                    alignment: Alignment.topLeft,
+                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      UiUtils.getMarginBox(0, 1.8.h),
+                      Row(children: [
+                        CommonUtils.isUrlPath(currentCompanyLogo) ? UiUtils.getCircleNetWorkImage(9.w, currentCompanyLogo, _logoAniController)
+                            : UiUtils.getCircleImage(currentCompanyLogo, 9.w),
+                        UiUtils.getMarginBox(2.w, 0),
+                        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          SizedBox(width: 60.w, child: UiUtils.getTextWithFixedScaleAndOverFlow(currentCompany, 12.sp, FontWeight.w600, ColorStyles.dFinBlack, TextAlign.start, 1)),
+                          UiUtils.getMarginBox(0, 0.3.h),
+                          UiUtils.getTextWithFixedScale2(currentRoomTypeName, 10.sp, FontWeight.w500, ColorStyles.dFinRealGray, TextAlign.center, 1),
+                        ])
                       ])
                     ])
-                  ])
+                ),
               ),
-            ),
 
-            isUserChatRoom ? Container() : Positioned(
-              child: Align(
-                  alignment: Alignment.topRight,
-                  child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                    UiUtils.getMarginBox(0, 1.7.h),
-                    Row(mainAxisAlignment:MainAxisAlignment.end, children: [
-                      Obx((){
-                        statusString = LoanInfoData.getDisplayStatusName(currentStatus);
-                        return GestureDetector(
-                            child: Container(
-                              padding: EdgeInsets.only(top:1.4.w, bottom:1.2.w, right: 0.5.w, left:0.7.w),
-                              decoration: BoxDecoration(
-                                borderRadius: const BorderRadius.all(Radius.circular(18)),
-                                color: ColorStyles.dFinWhite,
-                                  border: Border.all(
-                                    color: ColorStyles.dFinGray,
-                                    width: 0.25.w,
-                                  )
+              isUserChatRoom ? Container() : Positioned(
+                child: Align(
+                    alignment: Alignment.topRight,
+                    child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                      UiUtils.getMarginBox(0, 1.7.h),
+                      Row(mainAxisAlignment:MainAxisAlignment.end, children: [
+                        Obx((){
+                          statusString = LoanInfoData.getDisplayStatusName(currentStatus);
+                          return GestureDetector(
+                              child: Container(
+                                padding: EdgeInsets.only(top:1.4.w, bottom:1.2.w, right: 0.5.w, left:0.7.w),
+                                decoration: BoxDecoration(
+                                    borderRadius: const BorderRadius.all(Radius.circular(18)),
+                                    color: ColorStyles.dFinWhite,
+                                    border: Border.all(
+                                      color: ColorStyles.dFinGray,
+                                      width: 0.25.w,
+                                    )
+                                ),
+                                child: Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment:MainAxisAlignment.center, children: [
+                                  UiUtils.getMarginBox(1.5.w, 0),
+                                  UiUtils.getTextWithFixedScale(statusString, 10.sp, FontWeight.w500, ColorStyles.dFinBlack, TextAlign.start, null),
+                                  Icon(GetController.to.isShowStatus.value? Icons.arrow_drop_up_outlined : Icons.arrow_drop_down_outlined, color: ColorStyles.dFinBlack, size: 5.w)
+                                ]),
                               ),
-                              child: Row(mainAxisSize: MainAxisSize.min, mainAxisAlignment:MainAxisAlignment.center, children: [
-                                UiUtils.getMarginBox(1.5.w, 0),
-                                UiUtils.getTextWithFixedScale(statusString, 10.sp, FontWeight.w500, ColorStyles.dFinBlack, TextAlign.start, null),
-                                Icon(GetController.to.isShowStatus.value? Icons.arrow_drop_up_outlined : Icons.arrow_drop_down_outlined, color: ColorStyles.dFinBlack, size: 5.w)
-                              ]),
-                            ),
-                            onTap: (){
-                              GetController.to.updateShowStatus(!GetController.to.isShowStatus.value);
-                            }
-                        );
+                              onTap: (){
+                                GetController.to.updateShowStatus(!GetController.to.isShowStatus.value);
+                              }
+                          );
 
 
-                        /*
+                          /*
                         return Column(children: [
                           UiUtils.getMarginBox(0, 2.2.w),
-                          GestureDetector(child: Icon(Icons.signpost_outlined, color: GetController.to.isShowStatus.value? ColorStyles.upFinBlack : ColorStyles.upFinDarkGray, size: 6.w),
+                          GestureDetector(child: Icon(Icons.signpost_outlined, color: GetController.to.isShowStatus.value? ColorStyles.dFinBlack : ColorStyles.dFinDarkGray, size: 6.w),
                            onTap: (){
                              GetController.to.updateShowStatus(!GetController.to.isShowStatus.value);
                            })
@@ -1925,163 +1937,163 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
 
 
                          */
-                      }),
-                      UiUtils.getMarginBox(2.w, 0),
+                        }),
+                        UiUtils.getMarginBox(2.w, 0),
+                      ])
+                      //UiUtils.getMarginBox(0, 1.h),
                     ])
-                    //UiUtils.getMarginBox(0, 1.h),
-                  ])
+                ),
               ),
-            ),
-          ]),
-          UiUtils.getMarginBox(0, 1.1.h),
-          Obx((){
-            if(GetController.to.isShowStatus.value){
-              return isUserChatRoom ? UiUtils.getMarginColoredBox(100.w, 0.1.h, ColorStyles.dFinGray) : UiUtils.getMarginBox(0, 0);
-            }else{
-              return UiUtils.getMarginColoredBox(100.w, 0.1.h, ColorStyles.dFinGray);
-            }
-          }),
-          isUserChatRoom ? CommonUtils.isWeekendInSeoul() ?
-          Container(color: ColorStyles.dFinButtonBlue, width: 100.w, child: Padding(padding: EdgeInsets.only(left: 5.w, right: 5.w, bottom: 2.h, top: 2.h), child: _getWeekendInfoWidgetForUserChat())) : Container() : Obx((){
-            if(GetController.to.isShowStatus.value){
-              return Column(children:[
-                UiUtils.getMarginBox(0, 3.h),
-                _getTimelineWidget()
-              ]);
-            }else{
-              return Container();
-            }
-          }),
-          Expanded(child: RefreshIndicator(onRefresh: ()=>_requestPrev(),color: ColorStyles.dFinButtonBlue, backgroundColor: ColorStyles.dFinWhiteSky,
-              child: SingleChildScrollView(controller: _chatScrollController, scrollDirection: Axis.vertical, physics: const BouncingScrollPhysics(),
-                  child: Obx(()=>Column(mainAxisAlignment: MainAxisAlignment.start, children: _getChatList()))))),
-          Obx((){
-            bool isWaiting = GetController.to.isAutoAnswerWaiting.value;
-            bool isScrollWaiting = GetController.to.isShowScrollBottom.value;
+            ]),
+            UiUtils.getMarginBox(0, 1.1.h),
+            Obx((){
+              if(GetController.to.isShowStatus.value){
+                return isUserChatRoom ? UiUtils.getMarginColoredBox(100.w, 0.1.h, ColorStyles.dFinGray) : UiUtils.getMarginBox(0, 0);
+              }else{
+                return UiUtils.getMarginColoredBox(100.w, 0.1.h, ColorStyles.dFinGray);
+              }
+            }),
+            isUserChatRoom ? CommonUtils.isWeekendInSeoul() ?
+            Container(color: ColorStyles.dFinButtonBlue, width: 100.w, child: Padding(padding: EdgeInsets.only(left: 5.w, right: 5.w, bottom: 2.h, top: 2.h), child: _getWeekendInfoWidgetForUserChat())) : Container() : Obx((){
+              if(GetController.to.isShowStatus.value){
+                return Column(children:[
+                  UiUtils.getMarginBox(0, 3.h),
+                  _getTimelineWidget()
+                ]);
+              }else{
+                return Container();
+              }
+            }),
+            Expanded(child: RefreshIndicator(onRefresh: ()=>_requestPrev(),color: ColorStyles.dFinButtonBlue, backgroundColor: ColorStyles.dFinDarkWhiteGray,
+                child: SingleChildScrollView(controller: _chatScrollController, scrollDirection: Axis.vertical, physics: const BouncingScrollPhysics(),
+                    child: Obx(()=>Column(mainAxisAlignment: MainAxisAlignment.start, children: _getChatList()))))),
+            Obx((){
+              bool isWaiting = GetController.to.isAutoAnswerWaiting.value;
+              bool isScrollWaiting = GetController.to.isShowScrollBottom.value;
 
-            if(isScrollWaiting){
-              isWaiting = isScrollWaiting;
-            }
+              if(isScrollWaiting){
+                isWaiting = isScrollWaiting;
+              }
 
-            if(!isWaiting){
-              if(_chatScrollController.hasClients){
-                if(_chatScrollController.position.hasPixels){
-                  if(isBuild) _chatScrollController.jumpTo(_chatScrollController.position.pixels);
+              if(!isWaiting){
+                if(_chatScrollController.hasClients){
+                  if(_chatScrollController.position.hasPixels){
+                    if(isBuild) _chatScrollController.jumpTo(_chatScrollController.position.pixels);
+                  }
                 }
               }
-            }
 
-            if(isUserChatRoom) isWaiting = false;
+              if(isUserChatRoom) isWaiting = false;
 
-            return Container(color:ColorStyles.dFinWhite, child: Column(
-              mainAxisSize: MainAxisSize.min, // 자식 위젯에 맞게 높이를 조절합니다.
-              children: [
-                isWaiting ? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, isUserChatRoom ? 0 : 0.6.h),
-                isWaiting ? Container() : GetController.to.isShowPickedFile.value? Container() : Align(alignment: Alignment.topRight,
-                    child: Padding(padding: EdgeInsets.only(left: 2.w, right: 2.w),
-                        child: Wrap(runSpacing: 0.7.h, spacing: 1.7.w, alignment: WrapAlignment.end, direction: Axis.horizontal,
-                            children: GetController.to.autoAnswerWidgetList))),
-                isWaiting ? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, isUserChatRoom ? 0 : 1.h),
-                GetController.to.isInputTextHide.value? Container() : GetController.to.isShowPickedFile.value? Container() : UiUtils.getMarginColoredBox(100.w, 0.1.h, ColorStyles.dFinGray),
-                Obx((){
-                  return GetController.to.isInputTextHide.value? Container() : GetController.to.isShowPickedFile.value? Container() : AnimatedContainer(
-                      duration: const Duration(milliseconds:200),
-                      width: 100.w,
-                      height: GetController.to.chatInputHeight.value,
-                      constraints: BoxConstraints(
-                        minHeight: inputMinHeight,
-                        maxHeight: inputMaxHeight,
-                      ),
-                      color: ColorStyles.dFinWhiteGray,
-                      child: Padding(padding: EdgeInsets.only(left: 3.w,right: 3.w,bottom: 3.w,top: 2.w), child:
-                      Container(
-                          decoration: BoxDecoration(
-                            color: ColorStyles.dFinWhiteGray, // 배경색 설정
-                            borderRadius: BorderRadius.circular(1.0), // 모서리를 둥글게 하는 부분
-                          ),
-                          child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                            Expanded(flex: 75, child: Column(children: [UiUtils.getExpandedScrollView(Axis.vertical,
-                                Column(children: [
-                                  UiUtils.getChatTextField(context, 82.w, TextStyles.dFinChatTextStyle, _chatTextFocus, _chatTextController, TextInputType.multiline,
-                                      UiUtils.getChatInputDecoration(), (textValue) {
-                                        if(textValue != ""){
-                                          isTextFieldFocus = true;
-                                          final textLinePainter = TextPainter(
-                                            text: TextSpan(text: textValue, style: TextStyles.dFinTextFormFieldTextStyle),
-                                            maxLines: null,
-                                            textDirection: TextDirection.ltr,
-                                          )..layout(minWidth: 0, maxWidth: 72.w);
+              return Container(color:ColorStyles.dFinWhite, child: Column(
+                mainAxisSize: MainAxisSize.min, // 자식 위젯에 맞게 높이를 조절합니다.
+                children: [
+                  isWaiting ? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, isUserChatRoom ? 0 : 0.6.h),
+                  isWaiting ? Container() : GetController.to.isShowPickedFile.value? Container() : Align(alignment: Alignment.topRight,
+                      child: Padding(padding: EdgeInsets.only(left: 2.w, right: 2.w),
+                          child: Wrap(runSpacing: 0.7.h, spacing: 1.7.w, alignment: WrapAlignment.end, direction: Axis.horizontal,
+                              children: GetController.to.autoAnswerWidgetList))),
+                  isWaiting ? UiUtils.getMarginBox(0, 0) : UiUtils.getMarginBox(0, isUserChatRoom ? 0 : 1.h),
+                  GetController.to.isInputTextHide.value? Container() : GetController.to.isShowPickedFile.value? Container() : UiUtils.getMarginColoredBox(100.w, 0.1.h, ColorStyles.dFinGray),
+                  Obx((){
+                    return GetController.to.isInputTextHide.value? Container() : GetController.to.isShowPickedFile.value? Container() : AnimatedContainer(
+                        duration: const Duration(milliseconds:200),
+                        width: 100.w,
+                        height: GetController.to.chatInputHeight.value,
+                        constraints: BoxConstraints(
+                          minHeight: inputMinHeight,
+                          maxHeight: inputMaxHeight,
+                        ),
+                        color: ColorStyles.dFinWhiteGray,
+                        child: Padding(padding: EdgeInsets.only(left: 3.w,right: 3.w,bottom: 3.w,top: 2.w), child:
+                        Container(
+                            decoration: BoxDecoration(
+                              color: ColorStyles.dFinWhiteGray, // 배경색 설정
+                              borderRadius: BorderRadius.circular(1.0), // 모서리를 둥글게 하는 부분
+                            ),
+                            child: Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                              Expanded(flex: 75, child: Column(children: [UiUtils.getExpandedScrollView(Axis.vertical,
+                                  Column(children: [
+                                    UiUtils.getChatTextField(context, 82.w, TextStyles.dFinChatTextStyle, _chatTextFocus, _chatTextController, TextInputType.multiline,
+                                        UiUtils.getChatInputDecoration(), (textValue) {
+                                          if(textValue != ""){
+                                            isTextFieldFocus = true;
+                                            final textLinePainter = TextPainter(
+                                              text: TextSpan(text: textValue, style: TextStyles.dFinTextFormFieldTextStyle),
+                                              maxLines: null,
+                                              textDirection: TextDirection.ltr,
+                                            )..layout(minWidth: 0, maxWidth: 72.w);
 
-                                          final desiredHeight = inputMinHeight*0.64+textLinePainter.height;
-                                          final height = desiredHeight.clamp(inputMinHeight, inputMaxHeight);
-                                          if(height != GetController.to.chatInputHeight.value){
-                                            //inputHeight = height;
-                                            GetController.to.updateChatInputHeight(height);
+                                            final desiredHeight = inputMinHeight*0.64+textLinePainter.height;
+                                            final height = desiredHeight.clamp(inputMinHeight, inputMaxHeight);
+                                            if(height != GetController.to.chatInputHeight.value){
+                                              //inputHeight = height;
+                                              GetController.to.updateChatInputHeight(height);
+                                              _scrollToBottom(true,300);
+                                            }
+                                          }else{
+                                            isTextFieldFocus = false;
+                                            GetController.to.updateChatInputHeight(inputMinHeight);
                                             _scrollToBottom(true,300);
                                           }
-                                        }else{
-                                          isTextFieldFocus = false;
-                                          GetController.to.updateChatInputHeight(inputMinHeight);
-                                          _scrollToBottom(true,300);
-                                        }
-                                      }),
-                                ]))])),
-                            Expanded(flex: 1, child: Container(color: ColorStyles.dFinWhiteGray)),
-                            Expanded(flex: !isTextFieldFocus? 20 : 13, child: !isTextFieldFocus ? SizedBox(height: 15.w, child: Row(crossAxisAlignment:CrossAxisAlignment.center, mainAxisAlignment:MainAxisAlignment.center, children: [
-                              UiUtils.getIconButtonWithHeight(6.w, Icons.photo_camera_outlined, 7.w, ColorStyles.dFinRealGray, () {
-                                if(chatButtonPressedPossible){
-                                  chatButtonPressedPossible = false;
-                                  CommonUtils.hideKeyBoard();
-                                  Future.delayed(const Duration(milliseconds: 200), () async {
-                                    chatButtonPressedPossible = true;
-                                    _showCamera();
-                                  });
-                                }
-                              }),
-                              UiUtils.getMarginBox(4.w, 0),
-                              Transform.rotate(angle: -25*(3.14/180), child: UiUtils.getIconButtonWithHeight(6.w, Icons.attachment, 7.w, ColorStyles.dFinRealGray, () {
-                                if(chatButtonPressedPossible){
-                                  chatButtonPressedPossible = false;
-                                  CommonUtils.hideKeyBoard();
-                                  Future.delayed(const Duration(milliseconds: 200), () async {
-                                    chatButtonPressedPossible = true;
-                                    _showFileUploadWebView();
-                                  });
-                                }
-
-                              }))
-                            ])) : UiUtils.getBorderButtonBoxForRound6(ColorStyles.dFinButtonBlue, ColorStyles.dFinButtonBlue,
-                                Transform.rotate(angle: -25*(3.14/180), child: Icon(Icons.send_rounded, color: ColorStyles.dFinWhite, size: 6.w)), () {
-                                  if(_chatTextController.text.toString().trim() != ""){
-                                    _sendMessage(_chatTextController.text, "");
-                                    _chatTextController.text = "";
-                                    isTextFieldFocus = false;
-                                    //inputHeight = inputMinHeight;
-                                    GetController.to.updateChatInputHeight(inputMinHeight);
-                                    _scrollToBottom(true,300);
-                                  }else{
-                                    CommonUtils.flutterToast("메시지를 입력하세요.");
+                                        }),
+                                  ]))])),
+                              Expanded(flex: 1, child: Container(color: ColorStyles.dFinWhiteGray)),
+                              Expanded(flex: !isTextFieldFocus? 20 : 13, child: !isTextFieldFocus ? SizedBox(height: 15.w, child: Row(crossAxisAlignment:CrossAxisAlignment.center, mainAxisAlignment:MainAxisAlignment.center, children: [
+                                UiUtils.getIconButtonWithHeight(6.w, Icons.photo_camera_outlined, 7.w, ColorStyles.dFinRealGray, () {
+                                  if(chatButtonPressedPossible){
+                                    chatButtonPressedPossible = false;
+                                    CommonUtils.hideKeyBoard();
+                                    Future.delayed(const Duration(milliseconds: 200), () async {
+                                      chatButtonPressedPossible = true;
+                                      _showCamera();
+                                    });
                                   }
-                                })
-                            ),
-                          ])
-                      ))
-                  );
-                }),
-                GetController.to.isShowPickedFile.value? Column(children: [
-                  UiUtils.getSizedScrollView(90.w, inputHelpMinHeight, Axis.horizontal, _getPickedFilesWidget()),
-                  UiUtils.getMarginBox(0, 3.w),
-                  UiUtils.getBorderButtonBox(90.w, ColorStyles.dFinButtonBlue, ColorStyles.dFinButtonBlue,
-                      UiUtils.getTextWithFixedScale("전송", 14.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.center, null), () async{
-                        await _sendFileToAws();
-                      }),
-                  UiUtils.getMarginBox(0, 5.w),
-                ]) : Container(),
-              ],
-            ));
-          }),
-        ])
-    ),
+                                }),
+                                UiUtils.getMarginBox(4.w, 0),
+                                Transform.rotate(angle: -25*(3.14/180), child: UiUtils.getIconButtonWithHeight(6.w, Icons.attachment, 7.w, ColorStyles.dFinRealGray, () {
+                                  if(chatButtonPressedPossible){
+                                    chatButtonPressedPossible = false;
+                                    CommonUtils.hideKeyBoard();
+                                    Future.delayed(const Duration(milliseconds: 200), () async {
+                                      chatButtonPressedPossible = true;
+                                      _showFileUploadWebView();
+                                    });
+                                  }
+
+                                }))
+                              ])) : UiUtils.getBorderButtonBoxForRound6(ColorStyles.dFinButtonBlue, ColorStyles.dFinButtonBlue,
+                                  Transform.rotate(angle: -25*(3.14/180), child: Icon(Icons.send_rounded, color: ColorStyles.dFinWhite, size: 6.w)), () {
+                                    if(_chatTextController.text.toString().trim() != ""){
+                                      _sendMessage(_chatTextController.text, "");
+                                      _chatTextController.text = "";
+                                      isTextFieldFocus = false;
+                                      //inputHeight = inputMinHeight;
+                                      GetController.to.updateChatInputHeight(inputMinHeight);
+                                      _scrollToBottom(true,300);
+                                    }else{
+                                      CommonUtils.flutterToast("메시지를 입력하세요.");
+                                    }
+                                  })
+                              ),
+                            ])
+                        ))
+                    );
+                  }),
+                  GetController.to.isShowPickedFile.value? Column(children: [
+                    UiUtils.getSizedScrollView(90.w, inputHelpMinHeight, Axis.horizontal, _getPickedFilesWidget()),
+                    UiUtils.getMarginBox(0, 3.w),
+                    UiUtils.getBorderButtonBox(90.w, ColorStyles.dFinButtonBlue, ColorStyles.dFinButtonBlue,
+                        UiUtils.getTextWithFixedScale("전송", 14.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.center, null), () async{
+                          await _sendFileToAws();
+                        }),
+                    UiUtils.getMarginBox(0, 5.w),
+                  ]) : Container(),
+                ],
+              ));
+            }),
+          ])
+      ),
       Obx((){
         if(GetController.to.isShowScrollBottom.value){
           return Positioned(

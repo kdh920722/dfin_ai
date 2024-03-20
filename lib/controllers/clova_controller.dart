@@ -4,6 +4,10 @@ import 'dart:convert';
 import 'dart:io';
 import '../configs/app_config.dart';
 import '../utils/common_utils.dart';
+import 'package:image/image.dart' as imglib;
+
+import '../views/app_apply_pr_view.dart';
+import 'logfin_controller.dart';
 
 class CLOVAController{
   static final CLOVAController _instance = CLOVAController._internal();
@@ -104,5 +108,223 @@ class CLOVAController{
     }
   }
 
+  static bool checkValidInfo(Map<String, dynamic> maskingInfoMap){
+    bool isValid = true;
+    String name = maskingInfoMap['name'][0]["formatted"]["value"].toString();
+    String personalNum = maskingInfoMap['personalNum'][0]["formatted"]["value"].toString().replaceAll("-", "");
 
+    if(maskingInfoMap['id_type'] == "dl"){
+      if(name != "" && personalNum != ""){
+        bool isNameValid = true;
+        for (int i = 0; i < name.length; i++) {
+          int codeUnit = name.codeUnitAt(i);
+          if (codeUnit < 44032 || codeUnit > 55203) {
+            isNameValid = false;
+          }
+        }
+        if(!isNameValid){
+          isValid = false;
+          LogfinController.setLogJson(AppApplyPrViewState.isRetry? LogfinController.applyDocCertCodeString : LogfinController.applyCertCodeString, {"input" : ""},
+              {"masking_info_error" : {"name_error" : maskingInfoMap}});
+        }
+
+        bool isPersonalNumValid = true;
+        for (int i = 0; i < personalNum.length; i++) {
+          if (personalNum.codeUnitAt(i) < 48 || personalNum.codeUnitAt(i) > 57) {
+            isPersonalNumValid = false;
+          }
+        }
+        if(!isPersonalNumValid){
+          isValid = false;
+          LogfinController.setLogJson(AppApplyPrViewState.isRetry? LogfinController.applyDocCertCodeString : LogfinController.applyCertCodeString, {"input" : ""},
+              {"masking_info_error" : {"personalNum_error" : maskingInfoMap}});
+        }
+      }else{
+        isValid = false;
+        LogfinController.setLogJson(AppApplyPrViewState.isRetry? LogfinController.applyDocCertCodeString : LogfinController.applyCertCodeString, {"input" : ""},
+            {"masking_info_error" : {"empty_error" : maskingInfoMap}});
+      }
+    }else{
+      String issueDate = maskingInfoMap['issueDate'][0]["formatted"]["year"].toString() + maskingInfoMap['issueDate'][0]["formatted"]["month"].toString() + maskingInfoMap['issueDate'][0]["formatted"]["day"].toString();
+      if(name != "" && personalNum != "" && issueDate != ""){
+        bool isNameValid = true;
+        for (int i = 0; i < name.length; i++) {
+          int codeUnit = name.codeUnitAt(i);
+          if (codeUnit < 44032 || codeUnit > 55203) {
+            isNameValid = false;
+          }
+        }
+        if(!isNameValid){
+          isValid = false;
+          LogfinController.setLogJson(AppApplyPrViewState.isRetry? LogfinController.applyDocCertCodeString : LogfinController.applyCertCodeString, {"input" : ""},
+              {"masking_info_error" : {"name_error" : maskingInfoMap}});
+        }
+
+        bool isPersonalNumValid = true;
+        for (int i = 0; i < personalNum.length; i++) {
+          if (personalNum.codeUnitAt(i) < 48 || personalNum.codeUnitAt(i) > 57) {
+            isPersonalNumValid = false;
+          }
+        }
+        if(!isPersonalNumValid){
+          isValid = false;
+          LogfinController.setLogJson(AppApplyPrViewState.isRetry? LogfinController.applyDocCertCodeString : LogfinController.applyCertCodeString, {"input" : ""},
+              {"masking_info_error" : {"personalNum_error" : maskingInfoMap}});
+        }
+
+        bool isIssueDateValid = true;
+        for (int i = 0; i < issueDate.length; i++) {
+          if (issueDate.codeUnitAt(i) < 48 || issueDate.codeUnitAt(i) > 57) {
+            isIssueDateValid = false;
+          }
+        }
+        if(!isIssueDateValid){
+          isValid = false;
+          LogfinController.setLogJson(AppApplyPrViewState.isRetry? LogfinController.applyDocCertCodeString : LogfinController.applyCertCodeString, {"input" : ""},
+              {"masking_info_error" : {"issueDate_error" : maskingInfoMap}});
+        }
+      }else{
+        isValid = false;
+        LogfinController.setLogJson(AppApplyPrViewState.isRetry? LogfinController.applyDocCertCodeString : LogfinController.applyCertCodeString, {"input" : ""},
+            {"masking_info_error" : {"empty_error" : maskingInfoMap}});
+      }
+    }
+
+    return isValid;
+  }
+
+  static Future<String> makeMaskingImageAndGetPath(String imagePath, Map<String, dynamic> maskingInfoMap) async {
+    try {
+      final imglib.Image image = imglib.decodeImage(File(imagePath).readAsBytesSync())!;
+      List<dynamic> listMap = maskingInfoMap['personalNum'][0]['maskingPolys'][0]['vertices'];
+      List<int> xPoints = [];
+      List<int> yPoints = [];
+      for(Map<String,dynamic> each in listMap){
+        var xPoint = each['x'].toString().split(".")[0];
+        var yPoint = each['y'].toString().split(".")[0];
+        xPoints.add(int.parse(xPoint));
+        yPoints.add(int.parse(yPoint));
+      }
+
+      int minXValue = xPoints.reduce((min, current) => min < current ? min : current);
+      int maxXValue = xPoints.reduce((max, current) => max > current ? max : current);
+      int minYValue = yPoints.reduce((min, current) => min < current ? min : current);
+      int maxYValue = yPoints.reduce((max, current) => max > current ? max : current);
+      int maskingXSize = maxXValue - minXValue;
+      int maskingYSize = maxYValue - minYValue;
+      int startXPoint = minXValue;
+      int startYPoint = minYValue;
+      int endXPoint = maxXValue;
+      int endYPoint = maxYValue;
+
+      List<dynamic> listMapForBounding = maskingInfoMap['personalNum'][0]['boundingPolys'][0]['vertices'];
+      List<int> xPointsForBounding = [];
+      List<int> yPointsForBounding = [];
+      for(Map<String,dynamic> each in listMapForBounding){
+        var xPointForBounding = each['x'].toString().split(".")[0];
+        var yPointForBounding = each['y'].toString().split(".")[0];
+        xPointsForBounding.add(int.parse(xPointForBounding));
+        yPointsForBounding.add(int.parse(yPointForBounding));
+      }
+
+      int minXValueForBounding = xPointsForBounding.reduce((min, current) => min < current ? min : current);
+      int maxXValueForBounding = xPointsForBounding.reduce((max, current) => max > current ? max : current);
+      int minYValueForBounding = yPointsForBounding.reduce((min, current) => min < current ? min : current);
+      int maxYValueForBounding = yPointsForBounding.reduce((max, current) => max > current ? max : current);
+      int maskingXSizeForBounding = maxXValueForBounding - minXValueForBounding;
+      int maskingYSizeForBounding = maxYValueForBounding - minYValueForBounding;
+      int startXPointForBounding = minXValueForBounding;
+      int startYPointForBounding = minYValueForBounding;
+
+      bool isError = false;
+      if(maskingXSizeForBounding > maskingYSizeForBounding){
+        //가로모드
+        if(maskingXSizeForBounding*0.4 >= maskingXSize){
+          isError = true;
+        }
+
+        if(maskingYSize*2.5 >= maskingXSize){
+          isError = true;
+        }
+      }else{
+        //세로모드
+        if(maskingYSizeForBounding*0.4 >= maskingYSize){
+          isError = true;
+        }
+
+        if(maskingXSize*2.5 >= maskingYSize){
+          isError = true;
+        }
+      }
+
+      CommonUtils.log("i", "Bounding image info ===========>\n"
+          "maskingXSizeForBounding:$maskingXSizeForBounding maskingYSizeForBounding:$maskingYSizeForBounding\n"
+          "startXPointForBounding:$startXPointForBounding startYPointForBounding: $startYPointForBounding");
+
+      CommonUtils.log("i", "Masking image info ===========>\n"
+          "maskingXSize:$maskingXSize maskingYSize:$maskingYSize\n"
+          "startXPoint:$startXPoint startYPoint: $startYPoint");
+
+      if(isError){
+        CommonUtils.log('e', "masking size error");
+        String maskingErrorInfoBounding = "Bounding image info ===========>\n"
+            "maskingXSizeForBounding:$maskingXSizeForBounding maskingYSizeForBounding:$maskingYSizeForBounding\n"
+            "startXPointForBounding:$startXPointForBounding startYPointForBounding: $startYPointForBounding";
+        String maskingErrorInfo = "Masking image info ===========>\n"
+            "maskingXSize:$maskingXSize maskingYSize:$maskingYSize\n"
+            "startXPoint:$startXPoint startYPoint: $startYPoint";
+        LogfinController.setLogJson(AppApplyPrViewState.isRetry? LogfinController.applyDocCertCodeString : LogfinController.applyCertCodeString, {"input" : imagePath},
+            {"maskingErrorInfoBounding" : maskingErrorInfoBounding, "maskingErrorInfo" : maskingErrorInfo, "error_output" : maskingInfoMap});
+
+        return "";
+      }else{
+        if(checkValidInfo(maskingInfoMap)){
+          imglib.fillRect(image, x1: startXPoint, x2 : endXPoint, y1: startYPoint, y2 : endYPoint, color: imglib.ColorRgba8(0, 0, 0, 255));
+          final modifiedImagePath = imagePath.replaceAll('.jpg', '_masked.jpg');
+          File(modifiedImagePath).writeAsBytesSync(imglib.encodeJpg(image));
+          return modifiedImagePath;
+        }else{
+          return "";
+        }
+      }
+
+
+    } catch (e) {
+      CommonUtils.log('e', e.toString());
+      LogfinController.setLogJson(AppApplyPrViewState.isRetry? LogfinController.applyDocCertCodeString : LogfinController.applyCertCodeString, {"input" : imagePath}, {"error_output" : e.toString()});
+      return "";
+    }
+  }
+
+  static Future<String> makeCroppedImageAndGetPath(String imagePath, Map<String,dynamic> infoMap) async {
+    try {
+      final imglib.Image image = imglib.decodeImage(File(imagePath).readAsBytesSync())!;
+      List<dynamic> listMap = infoMap['rois_map'][0]['vertices'];
+      List<int> xPoints = [];
+      List<int> yPoints = [];
+      for(Map<String,dynamic> each in listMap){
+        var xPoint = each['x'].toString().split(".")[0];
+        var yPoint = each['y'].toString().split(".")[0];
+        xPoints.add(int.parse(xPoint));
+        yPoints.add(int.parse(yPoint));
+      }
+
+      int minXValue = xPoints.reduce((min, current) => min < current ? min : current);
+      int maxXValue = xPoints.reduce((max, current) => max > current ? max : current);
+      int minYValue = yPoints.reduce((min, current) => min < current ? min : current);
+      int maxYValue = yPoints.reduce((max, current) => max > current ? max : current);
+      int maskingXSize = maxXValue - minXValue;
+      int maskingYSize = maxYValue - minYValue;
+      int startXPoint = minXValue;
+      int startYPoint = minYValue;
+
+      final cropped = imglib.copyCrop(image, x: startXPoint, y: startYPoint, width: maskingXSize, height: maskingYSize);
+      final modifiedImagePath = imagePath.replaceAll('.jpg', '_cropped.jpg');
+      File(modifiedImagePath).writeAsBytesSync(imglib.encodeJpg(cropped));
+      return modifiedImagePath;
+    } catch (e) {
+      CommonUtils.log('e', e.toString());
+      return "";
+    }
+  }
 }

@@ -20,12 +20,17 @@ class AppWebViewState extends State<AppWebView> with WidgetsBindingObserver{
   static String url = "";
   static List<int> resultArr = []; // success, fail
   static String oneTimeKey = "";
+  static bool isFileUpload = true;
   bool isComplete = false;
   @override
   void initState(){
     CommonUtils.log("i", "AppWebViewState 화면 입장");
     super.initState();
-    _getOneTimeKey();
+    if(isFileUpload){
+      _getOneTimeKey();
+    }else{
+      _getNormalWebView();
+    }
     resultArr.clear();
     isComplete = false;
   }
@@ -74,7 +79,7 @@ class AppWebViewState extends State<AppWebView> with WidgetsBindingObserver{
       });
     }
   }
-  
+
   void _getOneTimeKey() {
     Map<String, dynamic> inputJson = {
       "pr_room_id": AppChatViewState.currentRoomId.toString()
@@ -86,6 +91,10 @@ class AppWebViewState extends State<AppWebView> with WidgetsBindingObserver{
         GetController.to.updateOneTimeKeyFlag(true);
       }
     });
+  }
+
+  void _getNormalWebView() {
+    GetController.to.updateOneTimeKeyFlag(true);
   }
 
   @override
@@ -132,18 +141,18 @@ class AppWebViewState extends State<AppWebView> with WidgetsBindingObserver{
                   onLoadStop: (InAppWebViewController controller, uri) {
                     CommonUtils.log("i", "finished url : $uri");
                     GetController.to.updateWebViewFlag(true);
-                    if(uri.toString().contains("complete_file_send")){
+                    if(uri.toString().contains("complete_file_send") && isFileUpload){
                       Future.delayed(const Duration(milliseconds: 400), () async {
                         Navigator.pop(context, resultArr);
                       });
                     }
                   },  onLoadStart: (InAppWebViewController controller, uri){
-                    if(uri.toString().contains("complete_file_send")){
-                      isComplete = true;
-                    }
-                  }, onCreateWindow: (controller, createWindowRequest) async{
-                    return true;
-                  },
+                  if(uri.toString().contains("complete_file_send") && isFileUpload){
+                    isComplete = true;
+                  }
+                }, onCreateWindow: (controller, createWindowRequest) async{
+                  return true;
+                },
                 );
               }else{
                 return const SizedBox(width: 0, height: 0);

@@ -317,6 +317,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver, T
                     MyData.isTestUser ? UiUtils.getRoundBoxButtonTextWithFixedScale6(
                         UiUtils.getTextWithFixedScale("관리자", 9.sp, FontWeight.w500, ColorStyles.dFinWhiteGray, TextAlign.center, null), ColorStyles.dFinBlack, (){
                       // test
+                      _showInfoPop();
                       //SharedPreferenceController.deleteAllData();
 
                       /*
@@ -1439,13 +1440,13 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver, T
       UiUtils.showSlideMenu(context, SlideMenuMoveType.bottomToTop, false, 100.w, Config.isAndroid ? Config.isPad()? 45.h : 35.h : Config.isPad()? 50.h : 40.h, 0.5, (slideContext, slideSetState){
         return Center(child: Column(crossAxisAlignment:CrossAxisAlignment.start, children: [
           UiUtils.getMarginBox(0, 1.h),
-          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("안내사항", 14.sp, FontWeight.w800, ColorStyles.dFinBlack, TextAlign.center, null)),
+          SizedBox(width: 90.w, child: UiUtils.getTextWithFixedScale("안내사항", 14.sp, FontWeight.w800, ColorStyles.dFinWhiteGray, TextAlign.center, null)),
           UiUtils.getMarginBox(0, 2.h),
           UiUtils.getExpandedScrollViewWithScrollbar(Axis.vertical,
               Padding(padding: EdgeInsets.only(left: 2.w, right: 2.w, top: 0, bottom: 0), child:
-              UiUtils.getTextWithFixedScale2(Config.appInfoTextMap["info_text"].replaceAll("@@", "\n"), 12.sp, FontWeight.w500, ColorStyles.dFinDarkGray, TextAlign.start, null)), _infoPopScrollController),
+              UiUtils.getTextWithFixedScale2(Config.appInfoTextMap["info_text"].replaceAll("@@", "\n"), 12.sp, FontWeight.w500, ColorStyles.dFinWhiteGray, TextAlign.start, null)), _infoPopScrollController),
 
-          UiUtils.getBorderButtonBoxWithZeroPadding(90.w, ColorStyles.dFinWhite, ColorStyles.dFinWhite,
+          UiUtils.getBorderButtonBoxWithZeroPadding(90.w, ColorStyles.dFinDarkWhiteGray, ColorStyles.dFinDarkWhiteGray,
               Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment:CrossAxisAlignment.center, children: [
                 UiUtils.getCustomCheckBox(UniqueKey(), 1.2, isRemove1week, ColorStyles.dFinButtonBlue, ColorStyles.dFinWhiteGray,
                     ColorStyles.dFinWhiteGray,  ColorStyles.dFinWhiteGray, (checkedValue){
@@ -1455,7 +1456,7 @@ class AppMainViewState extends State<AppMainView> with WidgetsBindingObserver, T
                         });
                       }
                     }),
-                Expanded(child: UiUtils.getTextButtonWithFixedScale("일주일간 보지 않기", 12.sp, FontWeight.w500, ColorStyles.dFinDarkGray, TextAlign.start, null, (){
+                Expanded(child: UiUtils.getTextButtonWithFixedScale("일주일간 보지 않기", 12.sp, FontWeight.w500, ColorStyles.dFinWhiteGray, TextAlign.start, null, (){
                   slideSetState((){
                     if(isRemove1week){
                       isRemove1week = false;
