@@ -659,6 +659,8 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     return result;
   }
 
+  bool isIdChecked = true;
+
   @override
   void initState(){
     CommonUtils.log("d", "AppApplyPrView 화면 입장");
@@ -687,18 +689,39 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
     Config.isEmergencyRoot = false;
     FireBaseController.setStateForForeground = null;
 
+    for(var each in unSavedDocsList){
+      if(each["id"] == 99){
+        isIdChecked = false;
+      }
+    }
+
     LogfinController.setLogJson(isRetry? LogfinController.applyDocStartCodeString : LogfinController.applyStartCodeString, {}, {});
     if(isRetry){
       certRetryCnt = 0;
+
+      if(currentViewId != addedDocsInfoIntroViewId){
+        if(isIdChecked){
+          _setConfirmedToDocItemByViewId(currentViewId, false);
+          Map<String, dynamic> resultMap = {
+            "resultValue" : {}
+          };
+          _setResultToListById(cameraId, resultMap);
+          pickedFilePath = "";
+          currentViewId = indivNoViewId;
+        }
+      }
+
     }else{
-      if(certRetryCnt >= 3){
-        _setConfirmedToDocItemByViewId(currentViewId, false);
-        Map<String, dynamic> resultMap = {
-          "resultValue" : {}
-        };
-        _setResultToListById(cameraId, resultMap);
-        pickedFilePath = "";
-        currentViewId = indivNoViewId;
+      if(currentViewId != addedDocsInfoIntroViewId){
+        if(certRetryCnt >= 3){
+          _setConfirmedToDocItemByViewId(currentViewId, false);
+          Map<String, dynamic> resultMap = {
+            "resultValue" : {}
+          };
+          _setResultToListById(cameraId, resultMap);
+          pickedFilePath = "";
+          currentViewId = indivNoViewId;
+        }
       }
     }
   }
@@ -767,80 +790,140 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       int prevDocsCount = 0;
       int prevId = _getIdFromListByViewId(currentViewId-1);
 
-      if(reUseTargetViewId != -1){
-        if(currentViewId == reUseTargetViewId){
-          CommonUtils.hideKeyBoard();
+      if(prevId == cameraId && isIdChecked){
+        isInputValid = false;
+        if(isReInput){
           setState(() {
-            _resetSavedData();
-            _initDocsList();
-            currentViewId = addedDocsInfoIntroViewId;
+            currentViewId = _getViewIdFromListById(cameraId);
           });
         }else{
-          for(var each in addedDocsList){
-            if(each["id"] == prevId && each["is_docs"]){
-              CommonUtils.log("i", " is prev");
-              isPrevDocs = true;
-              prevDocsType = each["docs_type"];
-              if(prevDocsType == "gov24") prevDocsCount = gov24Count;
-              if(prevDocsType == "nhis") prevDocsCount = nhisCount;
-              if(prevDocsType == "nts") prevDocsCount = ntsCount;
+          setState(() {
+            _setConfirmedToDocItemByViewId(currentViewId, false);
+            Map<String, dynamic> resultMap = {
+              "resultValue" : {}
+            };
+            _setResultToListById(cameraId, resultMap);
+            pickedFilePath = "";
+            currentViewId = indivNoViewId;
+          });
+        }
+        isInputValid = true;
+      }else{
+        if(_getViewIdFromListById(95) == currentViewId){
+          isInputValid = false;
+          CommonUtils.log("w","3 : ${addedDocsList.first["id"]}");
+          if(addedDocsList.first["id"] == 99){
+            if(isReInput){
+              setState(() {
+                currentViewId = _getViewIdFromListById(cameraId);
+              });
+            }else{
+              if(isIdChecked){
+                setState(() {
+                  _setConfirmedToDocItemByViewId(currentViewId, false);
+                  Map<String, dynamic> resultMap = {
+                    "resultValue" : {}
+                  };
+                  _setResultToListById(cameraId, resultMap);
+                  pickedFilePath = "";
+                  currentViewId = indivNoViewId;
+                });
+              }else{
+                setState(() {
+                  currentViewId = _getViewIdFromListById(cameraId);
+                });
+              }
+            }
+          }else{
+            setState(() {
+              _setConfirmedToDocItemByViewId(currentViewId, false);
+              Map<String, dynamic> resultMap = {
+                "resultValue" : {}
+              };
+              _setResultToListById(cameraId, resultMap);
+              pickedFilePath = "";
+              currentViewId = indivNoViewId;
+            });
+          }
+          isInputValid = true;
+        }else{
+          //
+          if(reUseTargetViewId != -1){
+            if(currentViewId == reUseTargetViewId){
+              CommonUtils.hideKeyBoard();
+              setState(() {
+                _resetSavedData();
+                _initDocsList();
+                currentViewId = addedDocsInfoIntroViewId;
+              });
+            }else{
+              for(var each in addedDocsList){
+                if(each["id"] == prevId && each["is_docs"]){
+                  CommonUtils.log("i", " is prev");
+                  isPrevDocs = true;
+                  prevDocsType = each["docs_type"];
+                  if(prevDocsType == "gov24") prevDocsCount = gov24Count;
+                  if(prevDocsType == "nhis") prevDocsCount = nhisCount;
+                  if(prevDocsType == "nts") prevDocsCount = ntsCount;
 
-              if(prevId == 1 || prevId == 2 || prevId == 15 || prevId == 16 || prevId == 17 || prevId == 3 || prevId == 4 || prevId == 6 || prevId == 10 || prevId == 11 || prevId == 14){
-                if(isPrevDocs){
-                  currentViewId = currentViewId-prevDocsCount+1;
+                  if(prevId == 1 || prevId == 2 || prevId == 15 || prevId == 16 || prevId == 17 || prevId == 3 || prevId == 4 || prevId == 6 || prevId == 10 || prevId == 11 || prevId == 14){
+                    if(isPrevDocs){
+                      currentViewId = currentViewId-prevDocsCount+1;
+                    }
+                  }
+                }
+              }
+
+              isInputValid = false;
+              CommonUtils.hideKeyBoard();
+              if(currentViewId-1 == 0){
+                Navigator.pop(context);
+              }else{
+                await Future.delayed(const Duration(milliseconds: 120), () async {});
+                setState(() {
+                  currentViewId--;
+                  isInputValid = true;
+                });
+              }
+            }
+          }else{
+            for(var each in addedDocsList){
+              if(each["id"] == prevId && each["is_docs"]){
+                isPrevDocs = true;
+                prevDocsType = each["docs_type"];
+                if(prevDocsType == "gov24") prevDocsCount = gov24Count;
+                if(prevDocsType == "nhis") prevDocsCount = nhisCount;
+                if(prevDocsType == "nts") prevDocsCount = ntsCount;
+
+                if(prevId == 1 || prevId == 2 || prevId == 15 || prevId == 16 || prevId == 17  || prevId == 3 || prevId == 4 || prevId == 6 || prevId == 10 || prevId == 11 || prevId == 14){
+                  if(isPrevDocs){
+                    currentViewId = currentViewId-prevDocsCount+1;
+                  }
                 }
               }
             }
-          }
 
-          isInputValid = false;
-          CommonUtils.hideKeyBoard();
-          if(currentViewId-1 == 0){
-            Navigator.pop(context);
-          }else{
-            await Future.delayed(const Duration(milliseconds: 120), () async {});
-            setState(() {
-              currentViewId--;
-              isInputValid = true;
-            });
-          }
-        }
-      }else{
-        for(var each in addedDocsList){
-          if(each["id"] == prevId && each["is_docs"]){
-            isPrevDocs = true;
-            prevDocsType = each["docs_type"];
-            if(prevDocsType == "gov24") prevDocsCount = gov24Count;
-            if(prevDocsType == "nhis") prevDocsCount = nhisCount;
-            if(prevDocsType == "nts") prevDocsCount = ntsCount;
-
-            if(prevId == 1 || prevId == 2 || prevId == 15 || prevId == 16 || prevId == 17  || prevId == 3 || prevId == 4 || prevId == 6 || prevId == 10 || prevId == 11 || prevId == 14){
-              if(isPrevDocs){
-                currentViewId = currentViewId-prevDocsCount+1;
+            isInputValid = false;
+            CommonUtils.hideKeyBoard();
+            if(currentViewId-1 == 0){
+              if(isHist){
+                setState(() {
+                  _resetSavedData();
+                  _initDocsList();
+                  currentViewId = addedDocsInfoIntroViewId;
+                });
+                isInputValid = true;
+              }else{
+                Navigator.pop(context);
               }
+            }else{
+              await Future.delayed(const Duration(milliseconds: 120), () async {});
+              setState(() {
+                currentViewId--;
+                isInputValid = true;
+              });
             }
           }
-        }
-
-        isInputValid = false;
-        CommonUtils.hideKeyBoard();
-        if(currentViewId-1 == 0){
-          if(isHist){
-            setState(() {
-              _resetSavedData();
-              _initDocsList();
-              currentViewId = addedDocsInfoIntroViewId;
-            });
-            isInputValid = true;
-          }else{
-            Navigator.pop(context);
-          }
-        }else{
-          await Future.delayed(const Duration(milliseconds: 120), () async {});
-          setState(() {
-            currentViewId--;
-            isInputValid = true;
-          });
         }
       }
     }
@@ -1370,6 +1453,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       UiUtils.getMarginBox(0, 5.h),
       UiUtils.getBorderButtonBox(90.w, ColorStyles.dFinButtonBlue, ColorStyles.dFinButtonBlue,
           UiUtils.getTextWithFixedScale("네 좋아요!", 14.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.center, null), () async {
+            isReInput = false;
             await _setSavedData();
             bool isAuthCertError = false;
             for(var each in savedDocsList){
@@ -1418,6 +1502,18 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                   }
                   CommonUtils.log("w","view id : $reUseTargetViewId");
                   currentViewId = reUseTargetViewId;
+
+                  if(isIdChecked){
+                    _setConfirmedToDocItemByViewId(currentViewId, false);
+                    Map<String, dynamic> resultMap = {
+                      "resultValue" : {}
+                    };
+                    _setResultToListById(cameraId, resultMap);
+                    pickedFilePath = "";
+                    currentViewId = indivNoViewId;
+                  }else{
+                    currentViewId = _getViewIdFromListById(cameraId);
+                  }
                 });
                 CommonUtils.flutterToast("미제출 정보를\n입력해야합니다.");
 
@@ -1428,6 +1524,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       UiUtils.getBorderButtonBox(90.w, ColorStyles.dFinWhiteSky, ColorStyles.dFinWhiteSky,
           UiUtils.getTextWithFixedScale("다시 입력할게요", 14.sp, FontWeight.w500, ColorStyles.dFinButtonBlue, TextAlign.center, null), () {
             setState(() {
+              isReInput = true;
               certType = 0;
               isCertTypeSelected = false;
               selectedBusinessNumberInfo = "";
@@ -1448,6 +1545,7 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
           })
     ]);
   }
+  bool isReInput = false;
 
   Future<void> _setSavedData() async {
     for(int eachAddedDocIdx = 0 ; eachAddedDocIdx < addedDocsList.length ; eachAddedDocIdx++){
@@ -1757,15 +1855,30 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             if(certRetryCnt >= 3){
               Navigator.pop(context);
             }else{
-              setState(() {
-                inputIndivNo = "";
-                isNextShow = false;
-                inputLiveTextList.clear();
-                _pinCodeEditor.text = "";
-                currentViewId = _getViewIdFromListById(cameraId);
-              });
+              if(isIdChecked){
+                if(reUseTargetViewId != -1){
+                  setState(() {
+                    _resetSavedData();
+                    _initDocsList();
+                    currentViewId = addedDocsInfoIntroViewId;
+                  });
+                }else{
+                  Navigator.pop(context);
+                }
+              }else{
+                if(reUseTargetViewId != -1){
+                  setState(() {
+                    inputIndivNo = "";
+                    isNextShow = false;
+                    inputLiveTextList.clear();
+                    _pinCodeEditor.text = "";
+                    currentViewId = _getViewIdFromListById(cameraId);
+                  });
+                }else{
+                  Navigator.pop(context);
+                }
+              }
             }
-
           }),
         ])),
         UiUtils.getMarginBox(0, 3.w),
@@ -1909,6 +2022,10 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
       UiUtils.getExpandedScrollView(Axis.vertical, Container()),
       !isNextShow ? Container() : UiUtils.getBorderButtonBox(90.w, ColorStyles.dFinButtonBlue, ColorStyles.dFinButtonBlue,
           UiUtils.getTextWithFixedScale("다음", 14.sp, FontWeight.w500, ColorStyles.dFinWhite, TextAlign.start, null), () {
+            CommonUtils.log("w", "@@@reUseTargetViewId ${addedDocsList.first}");
+            CommonUtils.log("w", "@@@reUseTargetViewId $reUseTargetViewId");
+
+
             inputIndivNo = _pinCodeEditor.text.trim();
 
             // camera false reset
@@ -1920,10 +2037,17 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
             pickedFilePath = "";
             MyData.idNumber = "${MyData.birth.substring(2)}-$inputIndivNo";
             CommonUtils.log("w","id : ${MyData.idNumber}");
-            currentViewId = _getViewIdFromListById(cameraId);
 
+            if(addedDocsList.first["id"] == 99){
+              currentViewId = _getViewIdFromListById(cameraId);
+              nextInputView();
+            }else{
+              setState(() {
+                currentViewId = _getViewIdFromListById(95);
+              });
+            }
             LogfinController.setLogJson(LogfinController.applyIdNumberCodeString, {"input" : inputIndivNo}, {});
-            nextInputView();
+
           }),
       UiUtils.getMarginBox(0, 5.w)
     ]);
@@ -2736,6 +2860,16 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
                       CommonUtils.log("e", "tage imageError : $imageError");
                       _showCertImageFailPop();
                     }
+                  }else{
+                    LogfinController.setLogJson(isRetry? LogfinController.applyDocCertCodeString : LogfinController.applyCertCodeString, {"input" : image.path},
+                        {"error_output" : {"image_mapping_fail" : checkId}});
+                    if(context.mounted) UiUtils.closeLoadingPop(context);
+                    _setConfirmedToDocItemByViewId(currentViewId, false);
+                    setState(() {
+                      pickedFilePath = "";
+                    });
+                    CommonUtils.flutterToast("신분증 인식실패\n다시 시도해주세요");
+                    _showCertImageFailPop();
                   }
                 }else{
                   // masking info fail
@@ -4525,17 +4659,68 @@ class AppApplyPrViewState extends State<AppApplyPrView> with WidgetsBindingObser
         if(certRetryCnt >= 3){
           Navigator.pop(context);
         }else{
-          setState(() {
-            inputIndivNo = "";
-            isNextShow = false;
-            inputLiveTextList.clear();
-            _pinCodeEditor.text = "";
-            currentViewId = _getViewIdFromListById(cameraId);
-          });
+          if(isIdChecked){
+            if(reUseTargetViewId != -1){
+              setState(() {
+                _resetSavedData();
+                _initDocsList();
+                currentViewId = addedDocsInfoIntroViewId;
+              });
+            }else{
+              Navigator.pop(context);
+            }
+          }else{
+            if(reUseTargetViewId != -1){
+              setState(() {
+                currentViewId = _getViewIdFromListById(cameraId);
+              });
+            }else{
+              Navigator.pop(context);
+            }
+          }
         }
       }else{
-        if(_getIdFromListByViewId(currentViewId) != lastId){
-          backInputView();
+        if(_getViewIdFromListById(95) == currentViewId){
+          if(addedDocsList.first["id"] == 99){
+            CommonUtils.log("w","1 : ${addedDocsList.first["id"]}");
+            if(isReInput){
+              setState(() {
+                currentViewId = _getViewIdFromListById(cameraId);
+              });
+            }else{
+              if(isIdChecked){
+                setState(() {
+                  _setConfirmedToDocItemByViewId(currentViewId, false);
+                  Map<String, dynamic> resultMap = {
+                    "resultValue" : {}
+                  };
+                  _setResultToListById(cameraId, resultMap);
+                  pickedFilePath = "";
+                  currentViewId = indivNoViewId;
+                });
+              }else{
+                setState(() {
+                  currentViewId = _getViewIdFromListById(cameraId);
+                });
+              }
+            }
+          }else{
+            setState(() {
+              _setConfirmedToDocItemByViewId(currentViewId, false);
+              Map<String, dynamic> resultMap = {
+                "resultValue" : {}
+              };
+              _setResultToListById(cameraId, resultMap);
+              pickedFilePath = "";
+              currentViewId = indivNoViewId;
+            });
+          }
+        }else{
+          if(_getIdFromListByViewId(currentViewId) != confirmedId){
+            if(_getIdFromListByViewId(currentViewId) != lastId){
+              backInputView();
+            }
+          }
         }
       }
     }

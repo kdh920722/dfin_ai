@@ -570,9 +570,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
                   if(url.contains("http")){
                     AppWebViewState.isFileUpload = false;
                     AppWebViewState.url = url;
-                    List<int> resultCntArr = await CommonUtils.moveToWithResult(context, AppView.appWebView.value, null) as List<int>;
-                    appConfig.Config.contextForEmergencyBack = context;
-                    appConfig.Config.isEmergencyRoot = false;
+                    List<int> temp = await CommonUtils.moveToWithResult(context, AppView.appWebView.value, null) as List<int>;
                   }else{
                     //tel:18009221
                     if(await canLaunchUrl(Uri.parse(url))){
@@ -1010,7 +1008,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
     int dFinChatCnt = 0;
 
     for(var each in GetController.to.chatMessageInfoDataList){
-      if(each.senderName == "UPFIN"){
+      if(each.senderName == "dFin"){
         dFinChatCnt++;
         chatList.add(_getOtherView(each));
       }else{
@@ -1393,9 +1391,13 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
                   _isCameraReady = true;
                   if(context.mounted){
                     AppWebViewState.isFileUpload = true;
+                    isScrollMove = false;
+                    isViewHere = false;
                     List<int> resultCntArr = await CommonUtils.moveToWithResult(context, AppView.appWebView.value, null) as List<int>;
                     appConfig.Config.contextForEmergencyBack = context;
                     appConfig.Config.isEmergencyRoot = false;
+                    isScrollMove = true;
+                    isViewHere = true;
                     CommonUtils.log("i","resultCntArr : $resultCntArr");
                     _scrollToBottom(true, 300);
                   }
@@ -1922,6 +1924,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
                               ),
                               onTap: (){
                                 GetController.to.updateShowStatus(!GetController.to.isShowStatus.value);
+                                CommonUtils.log("w","w ${Config.contextForEmergencyBack} ${GetController.to.isShowStatus.value}");
                               }
                           );
 
@@ -1964,7 +1967,7 @@ class AppChatViewState extends State<AppChatView> with WidgetsBindingObserver, T
                 return Container();
               }
             }),
-            Expanded(child: RefreshIndicator(onRefresh: ()=>_requestPrev(),color: ColorStyles.dFinButtonBlue, backgroundColor: ColorStyles.dFinDarkWhiteGray,
+            Expanded(child: RefreshIndicator(onRefresh: ()=>_requestPrev(),color: ColorStyles.dFinButtonBlue, backgroundColor: ColorStyles.dFinWhiteSky,
                 child: SingleChildScrollView(controller: _chatScrollController, scrollDirection: Axis.vertical, physics: const BouncingScrollPhysics(),
                     child: Obx(()=>Column(mainAxisAlignment: MainAxisAlignment.start, children: _getChatList()))))),
             Obx((){

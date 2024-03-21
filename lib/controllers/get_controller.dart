@@ -266,17 +266,8 @@ class GetController extends GetxController {
     isInputTextHide.value = newValue;
   }
   void updateChatAutoAnswerWidgetList(List<Widget> newList) {
-    if(Config.contextForEmergencyBack != null){
-      if(Config.contextForEmergencyBack!.mounted){
-        autoAnswerWidgetList.clear();
-        autoAnswerWidgetList.assignAll(newList);
-      }else{
-        Future.delayed(const Duration(milliseconds: 700), () {
-          autoAnswerWidgetList.clear();
-          autoAnswerWidgetList.assignAll(newList);
-        });
-      }
-    }
+    autoAnswerWidgetList.clear();
+    autoAnswerWidgetList.assignAll(newList);
   }
   void resetChatAutoAnswerWidgetList() {
     List<Widget> emptyList = [];
@@ -284,52 +275,16 @@ class GetController extends GetxController {
     autoAnswerWidgetList.assignAll(emptyList);
   }
   void updateShowPickedFile(bool newValue) {
-    if(Config.contextForEmergencyBack != null){
-      if(Config.contextForEmergencyBack!.mounted){
-        isShowPickedFile.value = newValue;
-      }else{
-        Future.delayed(const Duration(milliseconds: 700), () {
-          isShowPickedFile.value = newValue;
-        });
-      }
-    }
-
+    isShowPickedFile.value = newValue;
   }
   void updateShowStatus(bool newValue) {
-    if(Config.contextForEmergencyBack != null){
-      if(Config.contextForEmergencyBack!.mounted){
-        isShowStatus.value = newValue;
-      }else{
-        Future.delayed(const Duration(milliseconds: 700), () {
-          isShowStatus.value = newValue;
-        });
-      }
-    }
-
+    isShowStatus.value = newValue;
   }
   void updateShowScrollBottom(bool newValue) {
-    if(Config.contextForEmergencyBack != null){
-      if(Config.contextForEmergencyBack!.mounted){
-        isShowScrollBottom.value = newValue;
-      }else{
-        Future.delayed(const Duration(milliseconds: 700), () {
-          isShowScrollBottom.value = newValue;
-        });
-      }
-    }
-
+    isShowScrollBottom.value = newValue;
   }
   void updateAutoAnswerWaiting(bool newValue) {
-    if(Config.contextForEmergencyBack != null){
-      if(Config.contextForEmergencyBack!.mounted){
-        isAutoAnswerWaiting.value = newValue;
-      }else{
-        Future.delayed(const Duration(milliseconds: 700), () {
-          isAutoAnswerWaiting.value = newValue;
-        });
-      }
-    }
-
+    isAutoAnswerWaiting.value = newValue;
   }
   void updateHtmlLoad(bool newValue) {
     if(Config.contextForEmergencyBack != null){
